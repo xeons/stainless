@@ -93,4 +93,10 @@ public objc interface MDLObjectContainerComponent : MDLComponent, NSFastEnumerat
     [Selector("objectAtIndexedSubscript:")] MDLObject ObjectAtIndexedSubscript(NSUInteger index);
 }
 
+public struct MDLAxisAlignedBoundingBox
+{
+    public vector_float3 maxBounds;
+    public vector_float3 minBounds;
+}
+
 #endif

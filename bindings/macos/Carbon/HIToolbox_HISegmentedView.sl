@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -40,5 +42,7 @@ public using HISegmentBehavior = UInt32;
 
 public const int kHISegmentNoAttributes = 0;
 public const int kHISegmentSendCmdToUserFocus = 1;
+
+public const CFStringRef kHISegmentedViewClassID = "com.apple.HISegmentedView";
 
 #endif

@@ -72,4 +72,10 @@ public delegate void* WSProtocolHandlerDeserializationProcPtr(OpaqueWSProtocolHa
 /// Deprecated in macOS 10.8.
 public extern "C" void WSProtocolHandlerSetDeserializationOverride(WSProtocolHandlerRef? protocol, CFStringRef? typeNamespace, CFStringRef? typeName, WSProtocolHandlerDeserializationProcPtr deserializationProc, WSClientContext* context);
 
+public const CFStringRef kWSMethodName = "/WSMethodName";
+
+public const CFStringRef kWSMethodParameters = "/WSMethodParameters";
+
+public const CFStringRef kWSMethodParameterOrder = "/WSMethodParameterOrder";
+
 #endif

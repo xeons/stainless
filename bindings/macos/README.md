@@ -23,7 +23,7 @@ Every directory but `api/` is written by
 [tools/Stainless.Bindgen](../../tools/Stainless.Bindgen) from the SDK and MUST
 NOT be edited; [tools/bindgen.sh](../../tools/bindgen.sh) regenerates them on a
 Mac. Every framework in the SDK with a C or Objective-C header is generated --
-195 of them, 431,000 lines -- except these:
+196 of them, 438,000 lines -- except these:
 
 | Left out | Why |
 |---|---|
@@ -65,8 +65,8 @@ program reaches. Measured on an M4, a whole build of a small program:
 
 | A program importing | Modules it compiles | Lines | Build |
 |---|---|---|---|
-| Foundation, or AppKit | 38 | 196,000 | 1.3 s |
-| every module | 196 | 431,000 | 2.4 s |
+| Foundation, or AppKit | 39 | 199,000 | 1.1 s |
+| every module | 197 | 438,000 | 2.2 s |
 
 Foundation's closure is AppKit's because `NSUserNotification` names AppKit's
 `NSImage`; whole-program binding makes the cycle cost nothing but parsing.
@@ -88,6 +88,12 @@ Foundation's closure is AppKit's because `NSUserNotification` names AppKit's
 | `NS_OPTIONS`, `CF_OPTIONS` | `[Flags] enum : T` |
 | an enum with no name | `public const` under the C names |
 | `#define` of an integer or float | `public const`, the value clang folded |
+| `#define` of a string literal | `public const byte*` |
+| `#define` of `CFSTR("...")` or `@"..."` | `public const CFStringRef` or `public const NSString`, the constant object clang makes |
+| `ext_vector_type`, `vector_size` | `vfloat4` and the rest; `simd_float4` is a `public using` of it, and `simd_float4x4` a struct of them |
+| `va_list` | `VaList` |
+| `long double` | `ndouble` |
+| `__int128` | `int128` |
 | `extern` variable | `public extern "C"`; an array of unknown length as its first element, whose address is the array's |
 | array in a struct | `T[N]`; a multi-dimensional one flattened, which is the same bytes |
 | flexible array member | left out, as C's `sizeof` leaves it out |
@@ -189,8 +195,10 @@ binding. Most are:
 - **A type from a framework not generated** -- CloudKit's, Intents' -- named
   in the reason.
 - **A variadic function pointer**, which a delegate cannot be.
-- **A `va_list`**, which Stainless has no way to make, and **`long double`**.
-- **A string or object `#define`**, which a `const` cannot hold.
+- **A `#define` that renames an extern**, which an extern cannot be given a
+  second name to be, or that computes a string from others.
+- **Apple's packed simd types**, aligned to a lane rather than to the vector,
+  which no Stainless vector is.
 - **Anything that uses something above**, named in the reason.
 
 Left out whole:
@@ -208,7 +216,7 @@ Left out whole:
 [tests/cases/macos-bindings-layout](../../tests/cases/macos-bindings-layout),
 also generated, holds every bound struct's size, alignment and field offsets
 and every bound enumerator's and integer macro's value against what clang
-says -- 61,916 checks -- built for the target the suite runs as. Each
+says -- 62,132 checks -- built for the target the suite runs as. Each
 framework's checks are compiled with that framework's headers alone, a file
 each: every framework's headers compile by themselves, and not all of them
 together. The macOS lane runs it on Apple silicon and the Rosetta lane as
@@ -231,10 +239,15 @@ nothing implements -- each with why; the case does not ask those.
 program over the bindings: Foundation, a block, AppKit's category on
 `NSString`, an `extern` string constant and Core Foundation's ownership.
 
+[samples/macos/window.sl](../../samples/macos/window.sl) is a window: a view
+defined in Stainless that draws itself with `NSBezierPath`, an application
+delegate, and `--screenshot out.png`, which draws the view into a bitmap the
+way AppKit draws it on screen and writes it as a PNG.
+
 ### Regenerating
 
 ```
-tools/bindgen.sh          # on a Mac; about 26 minutes and 8 GB on an M4
+tools/bindgen.sh          # on a Mac; about 26 minutes and 14 GB on an M4
 ```
 
 The generator compiles each framework's headers, its subframeworks' included,

@@ -97,11 +97,21 @@ public extern "C" short dec2s(decimal* d);
 /// Deprecated in macOS 10.8.
 public extern "C" long dec2l(decimal* d);
 
+public extern "C" relop relationl(ndouble x, ndouble y);
+
+public extern "C" void num2decl(decform* f, ndouble x, decimal* d);
+
+public extern "C" ndouble dec2numl(decimal* d);
+
 /// Deprecated in macOS 10.8.
 public extern "C" double x80tod(extended80* x80);
 
 /// Deprecated in macOS 10.8.
 public extern "C" void dtox80(double* x, extended80* x80);
+
+public extern "C" void x80told(extended80* x80, ndouble* x);
+
+public extern "C" void ldtox80(ndouble* x, extended80* x80);
 
 public const int SIGDIGLEN = 36;
 

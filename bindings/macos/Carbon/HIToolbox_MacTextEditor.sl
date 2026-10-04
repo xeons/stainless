@@ -593,4 +593,24 @@ public const int kTXNTextInputCountMask = 1;
 public const int kTXNRunCountMask = 2;
 public const int kTXNAllCountMask = 3;
 
+public const CFStringRef kTXNTextHandlerKey = "TextInput";
+
+public const CFStringRef kTXNWindowEventHandlerKey = "WindowEvent";
+
+public const CFStringRef kTXNWindowResizeEventHandlerKey = "WindowResize";
+
+public const CFStringRef kTXNCommandTargetKey = "CommandTarget";
+
+public const CFStringRef kTXNCommandUpdateKey = "CommandUpdate";
+
+public const CFStringRef kTXNActionNameMapperKey = "ActionNameMapper";
+
+public const CFStringRef kTXNWheelMouseEventHandlerKey = "WheelMouseEvent";
+
+public const CFStringRef kTXNTSMDocumentAccessHandlerKey = "TSMDocumentAccess";
+
+public const CFStringRef kTXNFontPanelEventHandlerKey = "FontPanel";
+
+public const CFStringRef kTXNActionKeyMapperKey = "ActionKeyMapper";
+
 #endif

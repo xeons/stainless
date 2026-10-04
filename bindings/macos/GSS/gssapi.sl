@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.GSS;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "GSS")
@@ -384,5 +387,45 @@ public const ulong GSS_S_GAP_TOKEN = 16;
 public const int GSS_C_PRF_KEY_FULL = 0;
 
 public const int GSS_C_PRF_KEY_PARTIAL = 1;
+
+public const CFStringRef kGSSICPassword = "kGSSICPassword";
+
+public const CFStringRef kGSSICCertificate = "kGSSICCertificate";
+
+public const CFStringRef kGSSICVerifyCredential = "kGSSICVerifyCredential";
+
+public const CFStringRef kGSSCredentialUsage = "kGSSCredentialUsage";
+
+public const CFStringRef kGSS_C_INITIATE = "kGSS_C_INITIATE";
+
+public const CFStringRef kGSS_C_ACCEPT = "kGSS_C_ACCEPT";
+
+public const CFStringRef kGSS_C_BOTH = "kGSS_C_BOTH";
+
+public const CFStringRef kGSSICLKDCHostname = "kGSSICLKDCHostname";
+
+public const CFStringRef kGSSICKerberosCacheName = "kGSSICKerberosCacheName";
+
+public const CFStringRef kGSSICSiteName = "kGSSICSiteName";
+
+public const CFStringRef kGSSICAppIdentifierACL = "kGSSICAppIdentifierACL";
+
+public const CFStringRef kGSSICVerifyCredentialAcceptorName = "kGSSICVerifyCredentialAcceptorName";
+
+public const CFStringRef kGSSICCreateNewCredential = "kGSSICCreateNewCredential";
+
+public const CFStringRef kGSSICAppleSourceApp = "kGSSICAppleSourceApp";
+
+public const CFStringRef kGSSICAppleSourceAppAuditToken = "kGSSICAppleSourceAppAuditToken";
+
+public const CFStringRef kGSSICAppleSourceAppPID = "kGSSICAppleSourceAppPID";
+
+public const CFStringRef kGSSICAppleSourceAppSigningIdentity = "kGSSICAppleSourceAppSigningIdentity";
+
+public const CFStringRef kGSSICAuthenticationContext = "kGSSICAuthenticationContext";
+
+public const CFStringRef kGSSChangePasswordOldPassword = "kGSSChangePasswordOldPassword";
+
+public const CFStringRef kGSSChangePasswordNewPassword = "kGSSChangePasswordNewPassword";
 
 #endif

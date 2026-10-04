@@ -78,6 +78,13 @@ public extern objc class SCNHitTestResult : NSObject
 }
 
 /// SIMD, a category of SCNHitTestResult.
-public extern objc class SCNHitTestResult { }
+public extern objc class SCNHitTestResult
+{
+    [Selector("simdLocalCoordinates")] public simd_float3 SimdLocalCoordinates { get; }
+    [Selector("simdWorldCoordinates")] public simd_float3 SimdWorldCoordinates { get; }
+    [Selector("simdLocalNormal")] public simd_float3 SimdLocalNormal { get; }
+    [Selector("simdWorldNormal")] public simd_float3 SimdWorldNormal { get; }
+    [Selector("simdModelTransform")] public simd_float4x4 SimdModelTransform { get; }
+}
 
 #endif

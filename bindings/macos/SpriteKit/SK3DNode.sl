@@ -45,6 +45,8 @@ public extern objc class SK3DNode : SKNode
     [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder aDecoder);
     [Selector("nodeWithViewportSize:")] public static Self NodeWithViewportSize(CGSize viewportSize);
     [Selector("hitTest:options:")] public NSArray HitTestOptions(CGPoint point, NSDictionary? options);
+    [Selector("projectPoint:")] public vector_float3 ProjectPoint(vector_float3 point);
+    [Selector("unprojectPoint:")] public vector_float3 UnprojectPoint(vector_float3 point);
 }
 
 #endif

@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -32,5 +35,7 @@ public const int kControlLittleArrowsProc = 96;
 public const int kControlKindLittleArrows = 1818325618;
 
 public const int kControlLittleArrowsIncrementValueTag = 1768842098;
+
+public const CFStringRef kHILittleArrowsClassID = "com.apple.HILittleArrows";
 
 #endif

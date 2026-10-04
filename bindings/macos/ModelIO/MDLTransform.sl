@@ -33,20 +33,41 @@ import Standard.ObjC;
 
 public objc interface MDLTransformComponent : MDLComponent
 {
+    [Selector("matrix", "setMatrix:")] matrix_float4x4 Matrix { get; set; }
     [Selector("resetsTransform", "setResetsTransform:")] bool ResetsTransform { get; set; }
     [Selector("minimumTime")] NSTimeInterval MinimumTime { get; }
     [Selector("maximumTime")] NSTimeInterval MaximumTime { get; }
     [Selector("keyTimes")] NSArray KeyTimes { get; }
+    [Optional] [Selector("setLocalTransform:forTime:")] void SetLocalTransformForTime(matrix_float4x4 transform, NSTimeInterval time);
+    [Optional] [Selector("setLocalTransform:")] void SetLocalTransform(matrix_float4x4 transform);
+    [Optional] [Selector("localTransformAtTime:")] matrix_float4x4 LocalTransformAtTime(NSTimeInterval time);
+    [Optional] [Selector("globalTransformWithObject:atTime:")] static abstract matrix_float4x4 GlobalTransformWithObjectAtTime(MDLObject object, NSTimeInterval time);
 }
 
 public extern objc class MDLTransform : NSObject, NSCopying, MDLTransformComponent
 {
+    [Selector("translation", "setTranslation:")] public vector_float3 Translation { get; set; }
+    [Selector("rotation", "setRotation:")] public vector_float3 Rotation { get; set; }
+    [Selector("shear", "setShear:")] public vector_float3 Shear { get; set; }
+    [Selector("scale", "setScale:")] public vector_float3 Scale { get; set; }
     [Selector("init")] public Self Init();
     /// Deprecated in macOS 10.13.
     [Selector("initWithIdentity")] public Self InitWithIdentity();
     [Selector("initWithTransformComponent:")] public Self InitWithTransformComponent(MDLTransformComponent component);
     [Selector("initWithTransformComponent:resetsTransform:")] public Self InitWithTransformComponentResetsTransform(MDLTransformComponent component, bool resetsTransform);
+    [Selector("initWithMatrix:")] public Self InitWithMatrix(matrix_float4x4 matrix);
+    [Selector("initWithMatrix:resetsTransform:")] public Self InitWithMatrixResetsTransform(matrix_float4x4 matrix, bool resetsTransform);
     [Selector("setIdentity")] public void SetIdentity();
+    [Selector("translationAtTime:")] public vector_float3 TranslationAtTime(NSTimeInterval time);
+    [Selector("rotationAtTime:")] public vector_float3 RotationAtTime(NSTimeInterval time);
+    [Selector("shearAtTime:")] public vector_float3 ShearAtTime(NSTimeInterval time);
+    [Selector("scaleAtTime:")] public vector_float3 ScaleAtTime(NSTimeInterval time);
+    [Selector("setMatrix:forTime:")] public void SetMatrixForTime(matrix_float4x4 matrix, NSTimeInterval time);
+    [Selector("setTranslation:forTime:")] public void SetTranslationForTime(vector_float3 translation, NSTimeInterval time);
+    [Selector("setRotation:forTime:")] public void SetRotationForTime(vector_float3 rotation, NSTimeInterval time);
+    [Selector("setShear:forTime:")] public void SetShearForTime(vector_float3 shear, NSTimeInterval time);
+    [Selector("setScale:forTime:")] public void SetScaleForTime(vector_float3 scale, NSTimeInterval time);
+    [Selector("rotationMatrixAtTime:")] public matrix_float4x4 RotationMatrixAtTime(NSTimeInterval time);
 }
 
 #endif

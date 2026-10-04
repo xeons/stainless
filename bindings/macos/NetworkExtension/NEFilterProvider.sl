@@ -91,4 +91,12 @@ public extern objc class NEFilterReport : NSObject, NSSecureCoding, NSCopying
     [Selector("bytesOutboundCount")] public NSUInteger BytesOutboundCount { get; }
 }
 
+public const NSString NEFilterProviderRemediationURLFlowURLHostname = "NE_FLOW_HOSTNAME";
+
+public const NSString NEFilterProviderRemediationURLFlowURL = "NE_FLOW_URL";
+
+public const NSString NEFilterProviderRemediationURLOrganization = "NE_ORGANIZATION";
+
+public const NSString NEFilterProviderRemediationURLUsername = "NE_USERNAME";
+
 #endif

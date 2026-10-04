@@ -62,8 +62,4 @@ const long long sl_layout_1[] = {
     (long long)((kIOSurfaceSuccess)),
     (long long)((IOSURFACE_REF_H)),
     (long long)((IOSURFACE_OBJC_H)),
-    (long long)(sizeof(struct Float80)),
-    (long long)(_Alignof(struct Float80)),
-    (long long)(__builtin_offsetof(struct Float80, exp)),
-    (long long)(__builtin_offsetof(struct Float80, man)),
 };

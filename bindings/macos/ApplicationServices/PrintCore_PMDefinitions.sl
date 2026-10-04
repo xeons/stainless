@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.ApplicationServices;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -221,5 +223,37 @@ public const int kPMDuplexDefault = 1;
 public const int kPMDestinationTypeDefault = 1;
 
 public const int kPMColorSpaceModelCount = 4;
+
+public const CFStringRef kPMPPDDescriptionType = "PMPPDDescriptionType";
+
+public const CFStringRef kPMDocumentFormatDefault = "com.apple.documentformat.default";
+
+public const CFStringRef kPMDocumentFormatPDF = "application/pdf";
+
+public const CFStringRef kPMDocumentFormatPostScript = "application/postscript";
+
+public const CFStringRef kPMGraphicsContextDefault = "com.apple.graphicscontext.default";
+
+public const CFStringRef kPMGraphicsContextCoreGraphics = "com.apple.graphicscontext.coregraphics";
+
+public const CFStringRef kPDFWorkflowItemURLKey = "itemURL";
+
+public const CFStringRef kPDFWorkflowDisplayNameKey = "displayName";
+
+public const CFStringRef kPDFWorkflowItemsKey = "items";
+
+public const CFStringRef kPDFWorkflowModifiedKey = "wasModifiedInline";
+
+public const CFStringRef kPMPrintSelectionTitleKey = "com.apple.printSelection.title";
+
+public const CFStringRef kPMPresetGraphicsTypeKey = "com.apple.print.preset.graphicsType";
+
+public const CFStringRef kPMPresetGraphicsTypePhoto = "Photo";
+
+public const CFStringRef kPMPresetGraphicsTypeAll = "All";
+
+public const CFStringRef kPMPresetGraphicsTypeGeneral = "General";
+
+public const CFStringRef kPMPresetGraphicsTypeNone = "None";
 
 #endif

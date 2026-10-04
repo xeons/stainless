@@ -579,4 +579,6 @@ public struct DataBrowserAccessibilityItemInfo
     public DataBrowserAccessibilityItemInfoU u;
 }
 
+public const CFStringRef kHIDataBrowserClassID = "com.apple.HIDataBrowser";
+
 #endif

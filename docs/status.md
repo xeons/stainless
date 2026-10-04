@@ -1009,12 +1009,14 @@ last person to edit it -- the suite is the authority.
   three. Both bindings are checked against the real headers by a C file
   compiled beside the test, which is how a constant in a binding stops being
   somebody's recollection
-- [bindings/macos](../bindings/macos): the 41 macOS frameworks whose API is C,
-  generated from the SDK by `tools/Stainless.Bindgen` -- 123,000 lines, a
-  module per framework, arm64 and x86-64 told apart where they differ -- with
-  every struct's layout and every constant's value checked against clang,
-  38,421 checks on each architecture; what could not be bound is listed with
-  its reason. And by hand, the terminal and the event loop on Darwin --
+- [bindings/macos](../bindings/macos): every macOS framework with a C or
+  Objective-C header, 196 of them, generated from the SDK by
+  `tools/Stainless.Bindgen` -- 438,000 lines, a module per framework, arm64 and
+  x86-64 told apart where they differ -- with every struct's layout and every
+  constant's value checked against clang, 62,132 checks on each architecture,
+  and every class and message asked of the Objective-C runtime; what could not
+  be bound is listed with its reason. `samples/macos/window.sl` is a window
+  over AppKit. And by hand, the terminal and the event loop on Darwin --
   `termios`, whose flag words are eight bytes there, and kqueue, which is
   epoll, eventfd, timerfd and inotify in one call. `MacOS.Terminal` has the
   functions `Linux.Terminal` has

@@ -52,6 +52,8 @@ public extern objc class MDLLight : MDLObject
 {
     [Selector("lightType", "setLightType:")] public MDLLightType LightType { get; set; }
     [Selector("colorSpace", "setColorSpace:")] public NSString ColorSpace { get; set; }
+    [Selector("irradianceAtPoint:")] public CGColorRef IrradianceAtPoint(vector_float3 point);
+    [Selector("irradianceAtPoint:colorSpace:")] public CGColorRef IrradianceAtPointColorSpace(vector_float3 point, CGColorSpaceRef colorSpace);
 }
 
 public extern objc class MDLPhysicallyPlausibleLight : MDLLight
@@ -68,6 +70,7 @@ public extern objc class MDLPhysicallyPlausibleLight : MDLLight
 public extern objc class MDLAreaLight : MDLPhysicallyPlausibleLight
 {
     [Selector("areaRadius", "setAreaRadius:")] public float AreaRadius { get; set; }
+    [Selector("superEllipticPower", "setSuperEllipticPower:")] public vector_float2 SuperEllipticPower { get; set; }
     [Selector("aspect", "setAspect:")] public float Aspect { get; set; }
 }
 

@@ -25,6 +25,7 @@ module MacOS.CompositorServices;
 
 import MacOS.ARKit;
 import MacOS.Metal;
+import MacOS.System;
 import Standard.ObjC;
 
 #if MACOS
@@ -91,6 +92,12 @@ public extern "C" void cp_drawable_set_device_anchor(cp_drawable_t drawable, ar_
 public extern "C" ar_device_anchor_t? cp_drawable_get_device_anchor(cp_drawable_t drawable);
 
 /// macOS 26.0 and later.
+public extern "C" simd_float2 cp_drawable_get_depth_range(cp_drawable_t drawable);
+
+/// macOS 26.0 and later.
+public extern "C" void cp_drawable_set_depth_range(cp_drawable_t drawable, simd_float2 depth_range);
+
+/// macOS 26.0 and later.
 public extern "C" void cp_drawable_encode_present(cp_drawable_t drawable, MTLCommandBuffer command_buffer);
 
 /// macOS 26.0 and later.
@@ -107,6 +114,9 @@ public extern "C" cp_compositor_frame_index_t cp_drawable_get_presentation_frame
 
 /// macOS 26.0 and later.
 public extern "C" cp_frame_timing_t cp_drawable_get_frame_timing(cp_drawable_t drawable);
+
+/// macOS 26.0 and later.
+public extern "C" simd_float4x4 cp_drawable_compute_projection(cp_drawable_t drawable, cp_axis_direction_convention normalized_device_coordinates_convension, nuint view_index);
 
 /// macOS 26.0 and later.
 public extern "C" cp_drawable_render_context_t cp_drawable_add_render_context(cp_drawable_t drawable, MTLCommandBuffer cmd_buffer);

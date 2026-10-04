@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -31,5 +34,9 @@ public const int kControlKindHIMenuView = 1835363957;
 public const int kControlKindHIStandardMenuView = 1936551541;
 
 public extern "C" HIViewID kHIViewMenuContentID;
+
+public const CFStringRef kHIMenuViewClassID = "com.apple.HIMenuView";
+
+public const CFStringRef kHIStandardMenuViewClassID = "com.apple.HIStandardMenuView";
 
 #endif

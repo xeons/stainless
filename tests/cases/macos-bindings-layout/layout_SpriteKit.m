@@ -147,4 +147,7 @@ const long long sl_layout_159[] = {
     (long long)((SK_VERSION)),
     (long long)((PHYSICSKIT_MINUS_GL_IMPORTS)),
     (long long)((SKVIEW_AVAILABLE)),
+    (long long)(sizeof(simd_float2x2)),
+    (long long)(_Alignof(simd_float2x2)),
+    (long long)(__builtin_offsetof(simd_float2x2, columns)),
 };

@@ -23,6 +23,8 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CompositorServices;
 
+import MacOS.System;
+
 #if MACOS
 
 #pragma comment(framework, "CompositorServices")
@@ -54,6 +56,16 @@ public extern "C" void cp_frame_start_submission(cp_frame_t frame);
 public extern "C" void cp_frame_end_submission(cp_frame_t frame);
 
 /// macOS 26.0 and later.
+public extern "C" simd_float4x4 cp_frame_monocular_frustum_matrix_for_drawable_target(cp_frame_t frame, cp_drawable_target drawable_target, cp_axis_direction_convention normalized_device_coordinates_convension, nuint view_index, simd_float4 increase_tangents, simd_float2 depth_range);
+
+/// macOS 26.0 and later.
+public extern "C" simd_float4x4 cp_frame_binocular_frustum_matrix_for_drawable_target(cp_frame_t frame, cp_drawable_target drawable_target, cp_axis_direction_convention convention, simd_float4 increase_tangents, simd_float2 depth_range);
+
+/// macOS 26.0 and later.
 public extern "C" nuint cp_frame_get_drawable_target_view_count(cp_frame_t frame, cp_drawable_target drawable_target);
+
+public extern "C" simd_float4x4 cp_frame_monocular_frustum_matrix(cp_frame_t frame, cp_axis_direction_convention normalized_device_coordinates_convension, nuint view_index, simd_float4 increase_tangents, simd_float2 depth_range);
+
+public extern "C" simd_float4x4 cp_frame_binocular_frustum_matrix(cp_frame_t frame, cp_axis_direction_convention convention, simd_float4 increase_tangents, simd_float2 depth_range);
 
 #endif

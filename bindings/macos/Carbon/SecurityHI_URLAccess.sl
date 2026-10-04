@@ -139,4 +139,52 @@ public extern "C" OSStatus InvokeURLNotifyUPP(void* userContext, URLEvent event,
 /// Deprecated in macOS 10.4.
 public extern "C" OSStatus InvokeURLSystemEventUPP(void* userContext, EventRecord* event, URLSystemEventUPP userUPP);
 
+public const byte* kURLURL = "URLString";
+
+public const byte* kURLResourceSize = "URLResourceSize";
+
+public const byte* kURLLastModifiedTime = "URLLastModifiedTime";
+
+public const byte* kURLMIMEType = "URLMIMEType";
+
+public const byte* kURLFileType = "URLFileType";
+
+public const byte* kURLFileCreator = "URLFileCreator";
+
+public const byte* kURLCharacterSet = "URLCharacterSet";
+
+public const byte* kURLResourceName = "URLResourceName";
+
+public const byte* kURLHost = "URLHost";
+
+public const byte* kURLAuthType = "URLAuthType";
+
+public const byte* kURLUserName = "URLUserName";
+
+public const byte* kURLPassword = "URLPassword";
+
+public const byte* kURLStatusString = "URLStatusString";
+
+public const byte* kURLIsSecure = "URLIsSecure";
+
+public const byte* kURLCertificate = "URLCertificate";
+
+public const byte* kURLTotalItems = "URLTotalItems";
+
+public const byte* kURLConnectTimeout = "URLConnectTimeout";
+
+public const byte* kURLHTTPRequestMethod = "URLHTTPRequestMethod";
+
+public const byte* kURLHTTPRequestHeader = "URLHTTPRequestHeader";
+
+public const byte* kURLHTTPRequestBody = "URLHTTPRequestBody";
+
+public const byte* kURLHTTPRespHeader = "URLHTTPRespHeader";
+
+public const byte* kURLHTTPUserAgent = "URLHTTPUserAgent";
+
+public const byte* kURLHTTPRedirectedURL = "URLHTTPRedirectedURL";
+
+public const byte* kURLSSLCipherSuite = "URLSSLCipherSuite";
+
 #endif

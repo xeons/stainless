@@ -27,6 +27,7 @@ import MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -179,5 +180,87 @@ public const int kIMJaTypingMethodKana = 1801547361;
 public using TextServicePropertyValue = void*;
 
 public extern "C" TSMDocumentID TSMGetActiveDocument();
+
+public const CFStringRef kTextServiceInputModeRoman = "com.apple.inputmethod.Roman";
+
+public const CFStringRef kTextServiceInputModePassword = "com.apple.inputmethod.Password";
+
+public const CFStringRef kTextServiceInputModeJapaneseHiragana = "com.apple.inputmethod.Japanese.Hiragana";
+
+public const CFStringRef kTextServiceInputModeJapaneseKatakana = "com.apple.inputmethod.Japanese.Katakana";
+
+public const CFStringRef kTextServiceInputModeJapaneseFullWidthRoman = "com.apple.inputmethod.Japanese.FullWidthRoman";
+
+public const CFStringRef kTextServiceInputModeJapaneseHalfWidthKana = "com.apple.inputmethod.Japanese.HalfWidthKana";
+
+public const CFStringRef kTextServiceInputModeJapanesePlaceName = "com.apple.inputmethod.Japanese.PlaceName";
+
+public const CFStringRef kTextServiceInputModeJapaneseFirstName = "com.apple.inputmethod.Japanese.FirstName";
+
+public const CFStringRef kTextServiceInputModeJapaneseLastName = "com.apple.inputmethod.Japanese.LastName";
+
+public const CFStringRef kTextServiceInputModeBopomofo = "com.apple.inputmethod.TradChinese.Bopomofo";
+
+public const CFStringRef kTextServiceInputModeTradChinesePlaceName = "com.apple.inputmethod.TradChinese.PlaceName";
+
+public const CFStringRef kTextServiceInputModeHangul = "com.apple.inputmethod.Korean.Hangul";
+
+public const CFStringRef kTextServiceInputModeJapanese = "com.apple.inputmethod.Japanese";
+
+public const CFStringRef kTextServiceInputModeTradChinese = "com.apple.inputmethod.TradChinese";
+
+public const CFStringRef kTextServiceInputModeSimpChinese = "com.apple.inputmethod.SimpChinese";
+
+public const CFStringRef kTextServiceInputModeKorean = "com.apple.inputmethod.Korean";
+
+public const CFStringRef kComponentBundleInputModeDictKey = "ComponentInputModeDict";
+
+public const CFStringRef kTSInputMethodIconFileKey = "tsInputMethodIconFileKey";
+
+public const CFStringRef kTSInputMethodAlternateIconFileKey = "tsInputMethodAlternateIconFileKey";
+
+public const CFStringRef kTSInputModeListKey = "tsInputModeListKey";
+
+public const CFStringRef kTSInputModeMenuIconFileKey = "tsInputModeMenuIconFileKey";
+
+public const CFStringRef kTSInputModeAlternateMenuIconFileKey = "tsInputModeAlternateMenuIconFileKey";
+
+public const CFStringRef kTSInputModePaletteIconFileKey = "tsInputModePaletteIconFileKey";
+
+public const CFStringRef kTSInputModeDefaultStateKey = "tsInputModeDefaultStateKey";
+
+public const CFStringRef kTSInputModeScriptKey = "tsInputModeScriptKey";
+
+public const CFStringRef kTSInputModePrimaryInScriptKey = "tsInputModePrimaryInScriptKey";
+
+public const CFStringRef kTSInputModeIsVisibleKey = "tsInputModeIsVisibleKey";
+
+public const CFStringRef kTSInputModeKeyEquivalentModifiersKey = "tsInputModeKeyEquivalentModifiersKey";
+
+public const CFStringRef kTSInputModeKeyEquivalentKey = "tsInputModeKeyEquivalentKey";
+
+public const CFStringRef kTSInputModeJISKeyboardShortcutKey = "tsInputModeJISKeyboardShortcutKey";
+
+public const CFStringRef kTSVisibleInputModeOrderedArrayKey = "tsVisibleInputModeOrderedArrayKey";
+
+public const CFStringRef kComponentBundleInvisibleInSystemUIKey = "ComponentInvisibleInSystemUI";
+
+public const CFStringRef kTSInputModePaletteItemTypeKey = "tsInputModePaletteItemTypeKey";
+
+public const CFStringRef kTSInputModePaletteItemIconKey = "tsInputModePaletteItemIconKey";
+
+public const CFStringRef kTSInputModePaletteItemAltIconKey = "tsInputModePaletteItemAltIconKey";
+
+public const CFStringRef kTSInputModePaletteItemStateKey = "tsInputModePaletteItemStateKey";
+
+public const CFStringRef kTSInputModePaletteItemEnabledKey = "tsInputModePaletteItemEnabledKey";
+
+public const CFStringRef kTSInputModePaletteItemIDKey = "tsInputModePaletteItemIDKey";
+
+public const CFStringRef kTSInputModePaletteItemTitleKey = "tsInputModePaletteItemTitleKey";
+
+public const CFStringRef kTSInputModePaletteItemKeyEquivalentKey = "tsInputModePaletteItemKeyEquivalentKey";
+
+public const CFStringRef kTSInputModePaletteItemKeyEquivalentModifiersKey = "tsInputModePaletteItemKeyEquivalentModifiersKey";
 
 #endif

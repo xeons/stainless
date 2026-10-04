@@ -40,14 +40,18 @@ public extern objc class PHASENumericPair : NSObject
 
 public extern objc class PHASEEnvelopeSegment : NSObject
 {
+    [Selector("endPoint", "setEndPoint:")] public simd_double2 EndPoint { get; set; }
     [Selector("curveType", "setCurveType:")] public PHASECurveType CurveType { get; set; }
+    [Selector("initWithEndPoint:curveType:")] public Self InitWithEndPointCurveType(simd_double2 endPoint, PHASECurveType curveType);
 }
 
 public extern objc class PHASEEnvelope : NSObject
 {
+    [Selector("startPoint")] public simd_double2 StartPoint { get; }
     [Selector("segments")] public NSArray Segments { get; }
     [Selector("domain")] public PHASENumericPair Domain { get; }
     [Selector("range")] public PHASENumericPair Range { get; }
+    [Selector("initWithStartPoint:segments:")] public Self? InitWithStartPointSegments(simd_double2 startPoint, NSArray segments);
     [Selector("evaluateForValue:")] public double EvaluateForValue(double x);
 }
 

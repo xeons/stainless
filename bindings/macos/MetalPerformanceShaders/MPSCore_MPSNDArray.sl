@@ -44,6 +44,7 @@ public extern objc class MPSNDArrayDescriptor : NSObject
     [Selector("transposeDimension:withDimension:")] public void TransposeDimensionWithDimension(NSUInteger dimensionIndex, NSUInteger dimensionIndex2);
     /// macOS 15.0 and later.
     [Selector("permuteWithDimensionOrder:")] public void PermuteWithDimensionOrder(NSUInteger* dimensionOrder);
+    [Selector("dimensionOrder")] public vector_uchar16 DimensionOrder();
     /// macOS 15.0 and later.
     [Selector("getShape")] public NSArray GetShape();
     [Selector("descriptorWithDataType:dimensionCount:dimensionSizes:")] public static Self DescriptorWithDataTypeDimensionCountDimensionSizes(MPSDataType dataType, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes);

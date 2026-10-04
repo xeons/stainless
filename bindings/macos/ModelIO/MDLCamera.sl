@@ -39,6 +39,7 @@ public enum MDLCameraProjection : ulong
 
 public extern objc class MDLCamera : MDLObject
 {
+    [Selector("projectionMatrix")] public matrix_float4x4 ProjectionMatrix { get; }
     [Selector("projection", "setProjection:")] public MDLCameraProjection Projection { get; set; }
     [Selector("nearVisibilityDistance", "setNearVisibilityDistance:")] public float NearVisibilityDistance { get; set; }
     [Selector("farVisibilityDistance", "setFarVisibilityDistance:")] public float FarVisibilityDistance { get; set; }
@@ -56,6 +57,16 @@ public extern objc class MDLCamera : MDLObject
     [Selector("shutterOpenInterval", "setShutterOpenInterval:")] public NSTimeInterval ShutterOpenInterval { get; set; }
     [Selector("sensorVerticalAperture", "setSensorVerticalAperture:")] public float SensorVerticalAperture { get; set; }
     [Selector("sensorAspect", "setSensorAspect:")] public float SensorAspect { get; set; }
+    [Selector("sensorEnlargement", "setSensorEnlargement:")] public vector_float2 SensorEnlargement { get; set; }
+    [Selector("sensorShift", "setSensorShift:")] public vector_float2 SensorShift { get; set; }
+    [Selector("flash", "setFlash:")] public vector_float3 Flash { get; set; }
+    [Selector("exposureCompression", "setExposureCompression:")] public vector_float2 ExposureCompression { get; set; }
+    [Selector("exposure", "setExposure:")] public vector_float3 Exposure { get; set; }
+    [Selector("frameBoundingBox:setNearAndFar:")] public void FrameBoundingBoxSetNearAndFar(MDLAxisAlignedBoundingBox boundingBox, bool setNearAndFar);
+    [Selector("lookAt:")] public void LookAt(vector_float3 focusPosition);
+    [Selector("lookAt:from:")] public void LookAtFrom(vector_float3 focusPosition, vector_float3 cameraPosition);
+    [Selector("rayTo:forViewPort:")] public vector_float3 RayToForViewPort(vector_int2 pixel, vector_int2 size);
+    [Selector("bokehKernelWithSize:")] public MDLTexture BokehKernelWithSize(vector_int2 size);
 }
 
 public extern objc class MDLStereoscopicCamera : MDLCamera
@@ -64,6 +75,10 @@ public extern objc class MDLStereoscopicCamera : MDLCamera
     [Selector("leftVergence", "setLeftVergence:")] public float LeftVergence { get; set; }
     [Selector("rightVergence", "setRightVergence:")] public float RightVergence { get; set; }
     [Selector("overlap", "setOverlap:")] public float Overlap { get; set; }
+    [Selector("leftViewMatrix")] public matrix_float4x4 LeftViewMatrix { get; }
+    [Selector("rightViewMatrix")] public matrix_float4x4 RightViewMatrix { get; }
+    [Selector("leftProjectionMatrix")] public matrix_float4x4 LeftProjectionMatrix { get; }
+    [Selector("rightProjectionMatrix")] public matrix_float4x4 RightProjectionMatrix { get; }
 }
 
 #endif

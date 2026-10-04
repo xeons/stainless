@@ -593,4 +593,10 @@ const long long sl_layout_47[] = {
     (long long)((AVF_DEPLOYING_TO_2022_RELEASES_AND_LATER)),
     (long long)((AVF_DEPLOYING_TO_2024_RELEASES_AND_LATER)),
     (long long)((AVF_DEPLOYING_TO_2025_RELEASES_AND_LATER)),
+    (long long)(sizeof(simd_float3x3)),
+    (long long)(_Alignof(simd_float3x3)),
+    (long long)(__builtin_offsetof(simd_float3x3, columns)),
+    (long long)(sizeof(simd_float4x3)),
+    (long long)(_Alignof(simd_float4x3)),
+    (long long)(__builtin_offsetof(simd_float4x3, columns)),
 };

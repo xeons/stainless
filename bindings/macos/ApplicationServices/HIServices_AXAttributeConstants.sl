@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.ApplicationServices;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "ApplicationServices")
@@ -36,5 +39,309 @@ public enum AXMenuItemModifiers : uint
     Control = 4,
     NoCommand = 8,
 }
+
+public const CFStringRef kAXRoleAttribute = "AXRole";
+
+public const CFStringRef kAXSubroleAttribute = "AXSubrole";
+
+public const CFStringRef kAXRoleDescriptionAttribute = "AXRoleDescription";
+
+public const CFStringRef kAXHelpAttribute = "AXHelp";
+
+public const CFStringRef kAXTitleAttribute = "AXTitle";
+
+public const CFStringRef kAXValueAttribute = "AXValue";
+
+public const CFStringRef kAXValueDescriptionAttribute = "AXValueDescription";
+
+public const CFStringRef kAXMinValueAttribute = "AXMinValue";
+
+public const CFStringRef kAXMaxValueAttribute = "AXMaxValue";
+
+public const CFStringRef kAXValueIncrementAttribute = "AXValueIncrement";
+
+public const CFStringRef kAXAllowedValuesAttribute = "AXAllowedValues";
+
+public const CFStringRef kAXPlaceholderValueAttribute = "AXPlaceholderValue";
+
+public const CFStringRef kAXEnabledAttribute = "AXEnabled";
+
+public const CFStringRef kAXFocusedAttribute = "AXFocused";
+
+public const CFStringRef kAXParentAttribute = "AXParent";
+
+public const CFStringRef kAXChildrenAttribute = "AXChildren";
+
+public const CFStringRef kAXSelectedChildrenAttribute = "AXSelectedChildren";
+
+public const CFStringRef kAXVisibleChildrenAttribute = "AXVisibleChildren";
+
+public const CFStringRef kAXWindowAttribute = "AXWindow";
+
+public const CFStringRef kAXTopLevelUIElementAttribute = "AXTopLevelUIElement";
+
+public const CFStringRef kAXPositionAttribute = "AXPosition";
+
+public const CFStringRef kAXSizeAttribute = "AXSize";
+
+public const CFStringRef kAXOrientationAttribute = "AXOrientation";
+
+public const CFStringRef kAXDescriptionAttribute = "AXDescription";
+
+public const CFStringRef kAXDescription = "AXDescription";
+
+public const CFStringRef kAXSelectedTextAttribute = "AXSelectedText";
+
+public const CFStringRef kAXSelectedTextRangeAttribute = "AXSelectedTextRange";
+
+public const CFStringRef kAXSelectedTextRangesAttribute = "AXSelectedTextRanges";
+
+public const CFStringRef kAXVisibleCharacterRangeAttribute = "AXVisibleCharacterRange";
+
+public const CFStringRef kAXNumberOfCharactersAttribute = "AXNumberOfCharacters";
+
+public const CFStringRef kAXSharedTextUIElementsAttribute = "AXSharedTextUIElements";
+
+public const CFStringRef kAXSharedCharacterRangeAttribute = "AXSharedCharacterRange";
+
+public const CFStringRef kAXSharedFocusElementsAttribute = "AXSharedFocusElements";
+
+public const CFStringRef kAXInsertionPointLineNumberAttribute = "AXInsertionPointLineNumber";
+
+public const CFStringRef kAXMainAttribute = "AXMain";
+
+public const CFStringRef kAXMinimizedAttribute = "AXMinimized";
+
+public const CFStringRef kAXCloseButtonAttribute = "AXCloseButton";
+
+public const CFStringRef kAXZoomButtonAttribute = "AXZoomButton";
+
+public const CFStringRef kAXMinimizeButtonAttribute = "AXMinimizeButton";
+
+public const CFStringRef kAXToolbarButtonAttribute = "AXToolbarButton";
+
+public const CFStringRef kAXFullScreenButtonAttribute = "AXFullScreenButton";
+
+public const CFStringRef kAXProxyAttribute = "AXProxy";
+
+public const CFStringRef kAXGrowAreaAttribute = "AXGrowArea";
+
+public const CFStringRef kAXModalAttribute = "AXModal";
+
+public const CFStringRef kAXDefaultButtonAttribute = "AXDefaultButton";
+
+public const CFStringRef kAXCancelButtonAttribute = "AXCancelButton";
+
+public const CFStringRef kAXMenuItemCmdCharAttribute = "AXMenuItemCmdChar";
+
+public const CFStringRef kAXMenuItemCmdVirtualKeyAttribute = "AXMenuItemCmdVirtualKey";
+
+public const CFStringRef kAXMenuItemCmdGlyphAttribute = "AXMenuItemCmdGlyph";
+
+public const CFStringRef kAXMenuItemCmdModifiersAttribute = "AXMenuItemCmdModifiers";
+
+public const CFStringRef kAXMenuItemMarkCharAttribute = "AXMenuItemMarkChar";
+
+public const CFStringRef kAXMenuItemPrimaryUIElementAttribute = "AXMenuItemPrimaryUIElement";
+
+public const CFStringRef kAXMenuBarAttribute = "AXMenuBar";
+
+public const CFStringRef kAXWindowsAttribute = "AXWindows";
+
+public const CFStringRef kAXFrontmostAttribute = "AXFrontmost";
+
+public const CFStringRef kAXHiddenAttribute = "AXHidden";
+
+public const CFStringRef kAXMainWindowAttribute = "AXMainWindow";
+
+public const CFStringRef kAXFocusedWindowAttribute = "AXFocusedWindow";
+
+public const CFStringRef kAXFocusedUIElementAttribute = "AXFocusedUIElement";
+
+public const CFStringRef kAXExtrasMenuBarAttribute = "AXExtrasMenuBar";
+
+public const CFStringRef kAXHeaderAttribute = "AXHeader";
+
+public const CFStringRef kAXEditedAttribute = "AXEdited";
+
+public const CFStringRef kAXValueWrapsAttribute = "AXValueWraps";
+
+public const CFStringRef kAXTabsAttribute = "AXTabs";
+
+public const CFStringRef kAXTitleUIElementAttribute = "AXTitleUIElement";
+
+public const CFStringRef kAXHorizontalScrollBarAttribute = "AXHorizontalScrollBar";
+
+public const CFStringRef kAXVerticalScrollBarAttribute = "AXVerticalScrollBar";
+
+public const CFStringRef kAXOverflowButtonAttribute = "AXOverflowButton";
+
+public const CFStringRef kAXFilenameAttribute = "AXFilename";
+
+public const CFStringRef kAXExpandedAttribute = "AXExpanded";
+
+public const CFStringRef kAXSelectedAttribute = "AXSelected";
+
+public const CFStringRef kAXSplittersAttribute = "AXSplitters";
+
+public const CFStringRef kAXNextContentsAttribute = "AXNextContents";
+
+public const CFStringRef kAXDocumentAttribute = "AXDocument";
+
+public const CFStringRef kAXDecrementButtonAttribute = "AXDecrementButton";
+
+public const CFStringRef kAXIncrementButtonAttribute = "AXIncrementButton";
+
+public const CFStringRef kAXPreviousContentsAttribute = "AXPreviousContents";
+
+public const CFStringRef kAXContentsAttribute = "AXContents";
+
+public const CFStringRef kAXIncrementorAttribute = "AXIncrementor";
+
+public const CFStringRef kAXHourFieldAttribute = "AXHourField";
+
+public const CFStringRef kAXMinuteFieldAttribute = "AXMinuteField";
+
+public const CFStringRef kAXSecondFieldAttribute = "AXSecondField";
+
+public const CFStringRef kAXAMPMFieldAttribute = "AXAMPMField";
+
+public const CFStringRef kAXDayFieldAttribute = "AXDayField";
+
+public const CFStringRef kAXMonthFieldAttribute = "AXMonthField";
+
+public const CFStringRef kAXYearFieldAttribute = "AXYearField";
+
+public const CFStringRef kAXColumnTitleAttribute = "AXColumnTitles";
+
+public const CFStringRef kAXURLAttribute = "AXURL";
+
+public const CFStringRef kAXLabelUIElementsAttribute = "AXLabelUIElements";
+
+public const CFStringRef kAXLabelValueAttribute = "AXLabelValue";
+
+public const CFStringRef kAXShownMenuUIElementAttribute = "AXShownMenuUIElement";
+
+public const CFStringRef kAXServesAsTitleForUIElementsAttribute = "AXServesAsTitleForUIElements";
+
+public const CFStringRef kAXLinkedUIElementsAttribute = "AXLinkedUIElements";
+
+public const CFStringRef kAXRowsAttribute = "AXRows";
+
+public const CFStringRef kAXVisibleRowsAttribute = "AXVisibleRows";
+
+public const CFStringRef kAXSelectedRowsAttribute = "AXSelectedRows";
+
+public const CFStringRef kAXColumnsAttribute = "AXColumns";
+
+public const CFStringRef kAXVisibleColumnsAttribute = "AXVisibleColumns";
+
+public const CFStringRef kAXSelectedColumnsAttribute = "AXSelectedColumns";
+
+public const CFStringRef kAXSortDirectionAttribute = "AXSortDirection";
+
+public const CFStringRef kAXIndexAttribute = "AXIndex";
+
+public const CFStringRef kAXDisclosingAttribute = "AXDisclosing";
+
+public const CFStringRef kAXDisclosedRowsAttribute = "AXDisclosedRows";
+
+public const CFStringRef kAXDisclosedByRowAttribute = "AXDisclosedByRow";
+
+public const CFStringRef kAXDisclosureLevelAttribute = "AXDisclosureLevel";
+
+public const CFStringRef kAXMatteHoleAttribute = "AXMatteHole";
+
+public const CFStringRef kAXMatteContentUIElementAttribute = "AXMatteContentUIElement";
+
+public const CFStringRef kAXMarkerUIElementsAttribute = "AXMarkerUIElements";
+
+public const CFStringRef kAXUnitsAttribute = "AXUnits";
+
+public const CFStringRef kAXUnitDescriptionAttribute = "AXUnitDescription";
+
+public const CFStringRef kAXMarkerTypeAttribute = "AXMarkerType";
+
+public const CFStringRef kAXMarkerTypeDescriptionAttribute = "AXMarkerTypeDescription";
+
+public const CFStringRef kAXIsApplicationRunningAttribute = "AXIsApplicationRunning";
+
+public const CFStringRef kAXSearchButtonAttribute = "AXSearchButton";
+
+public const CFStringRef kAXClearButtonAttribute = "AXClearButton";
+
+public const CFStringRef kAXFocusedApplicationAttribute = "AXFocusedApplication";
+
+public const CFStringRef kAXRowCountAttribute = "AXRowCount";
+
+public const CFStringRef kAXColumnCountAttribute = "AXColumnCount";
+
+public const CFStringRef kAXOrderedByRowAttribute = "AXOrderedByRow";
+
+public const CFStringRef kAXWarningValueAttribute = "AXWarningValue";
+
+public const CFStringRef kAXCriticalValueAttribute = "AXCriticalValue";
+
+public const CFStringRef kAXSelectedCellsAttribute = "AXSelectedCells";
+
+public const CFStringRef kAXVisibleCellsAttribute = "AXVisibleCells";
+
+public const CFStringRef kAXRowHeaderUIElementsAttribute = "AXRowHeaderUIElements";
+
+public const CFStringRef kAXColumnHeaderUIElementsAttribute = "AXColumnHeaderUIElements";
+
+public const CFStringRef kAXRowIndexRangeAttribute = "AXRowIndexRange";
+
+public const CFStringRef kAXColumnIndexRangeAttribute = "AXColumnIndexRange";
+
+public const CFStringRef kAXHorizontalUnitsAttribute = "AXHorizontalUnits";
+
+public const CFStringRef kAXVerticalUnitsAttribute = "AXVerticalUnits";
+
+public const CFStringRef kAXHorizontalUnitDescriptionAttribute = "AXHorizontalUnitDescription";
+
+public const CFStringRef kAXVerticalUnitDescriptionAttribute = "AXVerticalUnitDescription";
+
+public const CFStringRef kAXHandlesAttribute = "AXHandles";
+
+public const CFStringRef kAXTextAttribute = "AXText";
+
+public const CFStringRef kAXVisibleTextAttribute = "AXVisibleText";
+
+public const CFStringRef kAXIsEditableAttribute = "AXIsEditable";
+
+public const CFStringRef kAXColumnTitlesAttribute = "AXColumnTitles";
+
+public const CFStringRef kAXIdentifierAttribute = "AXIdentifier";
+
+public const CFStringRef kAXAlternateUIVisibleAttribute = "AXAlternateUIVisible";
+
+public const CFStringRef kAXLineForIndexParameterizedAttribute = "AXLineForIndex";
+
+public const CFStringRef kAXRangeForLineParameterizedAttribute = "AXRangeForLine";
+
+public const CFStringRef kAXStringForRangeParameterizedAttribute = "AXStringForRange";
+
+public const CFStringRef kAXRangeForPositionParameterizedAttribute = "AXRangeForPosition";
+
+public const CFStringRef kAXRangeForIndexParameterizedAttribute = "AXRangeForIndex";
+
+public const CFStringRef kAXBoundsForRangeParameterizedAttribute = "AXBoundsForRange";
+
+public const CFStringRef kAXRTFForRangeParameterizedAttribute = "AXRTFForRange";
+
+public const CFStringRef kAXAttributedStringForRangeParameterizedAttribute = "AXAttributedStringForRange";
+
+public const CFStringRef kAXStyleRangeForIndexParameterizedAttribute = "AXStyleRangeForIndex";
+
+public const CFStringRef kAXCellForColumnAndRowParameterizedAttribute = "AXCellForColumnAndRow";
+
+public const CFStringRef kAXLayoutPointForScreenPointParameterizedAttribute = "AXLayoutPointForScreenPoint";
+
+public const CFStringRef kAXLayoutSizeForScreenSizeParameterizedAttribute = "AXLayoutSizeForScreenSize";
+
+public const CFStringRef kAXScreenPointForLayoutPointParameterizedAttribute = "AXScreenPointForLayoutPoint";
+
+public const CFStringRef kAXScreenSizeForLayoutSizeParameterizedAttribute = "AXScreenSizeForLayoutSize";
 
 #endif

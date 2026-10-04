@@ -35,6 +35,7 @@ public extern objc class VNGeometryUtils : NSObject
 {
     [Selector("boundingCircleForContour:error:")] public static VNCircle? BoundingCircleForContourError(VNContour contour, out NSError? error);
     [Selector("boundingCircleForPoints:error:")] public static VNCircle? BoundingCircleForPointsError(NSArray points, out NSError? error);
+    [Selector("boundingCircleForSIMDPoints:pointCount:error:")] public static VNCircle? BoundingCircleForSIMDPointsPointCountError(simd_float2* points, NSInteger pointCount, out NSError? error);
     [Selector("calculateArea:forContour:orientedArea:error:")] public static bool CalculateAreaForContourOrientedAreaError(double* area, VNContour contour, bool orientedArea, out NSError? error);
     [Selector("calculatePerimeter:forContour:error:")] public static bool CalculatePerimeterForContourError(double* perimeter, VNContour contour, out NSError? error);
 }

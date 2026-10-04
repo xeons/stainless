@@ -103,6 +103,8 @@ public extern "C" void InvokeDebugComponentCallbackUPP(SInt32 optionSelectorNum,
 /// Deprecated in macOS 10.8.
 public extern "C" void InvokeDebugAssertOutputHandlerUPP(OSType componentSignature, UInt32 options, byte* assertionString, byte* exceptionLabelString, byte* errorString, byte* fileName, long lineNumber, void* value, ConstStr255Param outputMsg, DebugAssertOutputHandlerUPP userUPP);
 
+public const byte* kComponentSignatureString = "Third Party Client";
+
 public const int COMPONENT_SIGNATURE = 1059733290;
 
 public const int DEBUG_LEVEL_PRODUCTION = 0;

@@ -33,9 +33,11 @@ import Standard.ObjC;
 
 public extern objc class MDLAsset : NSObject, NSCopying, NSFastEnumeration
 {
+    [Selector("boundingBox")] public MDLAxisAlignedBoundingBox BoundingBox { get; }
     [Selector("frameInterval", "setFrameInterval:")] public NSTimeInterval FrameInterval { get; set; }
     [Selector("startTime", "setStartTime:")] public NSTimeInterval StartTime { get; set; }
     [Selector("endTime", "setEndTime:")] public NSTimeInterval EndTime { get; set; }
+    [Selector("upAxis", "setUpAxis:")] public vector_float3 UpAxis { get; set; }
     [Selector("URL")] public NSURL? URL { get; }
     [Selector("resolver", "setResolver:")] public MDLAssetResolver? Resolver { get; set; }
     [Selector("bufferAllocator")] public MDLMeshBufferAllocator BufferAllocator { get; }
@@ -56,6 +58,7 @@ public extern objc class MDLAsset : NSObject, NSCopying, NSFastEnumeration
     [Selector("canExportFileExtension:")] public static bool CanExportFileExtension(NSString extension);
     [Selector("childObjectsOfClass:")] public NSArray ChildObjectsOfClass(Class objectClass);
     [Selector("loadTextures")] public void LoadTextures();
+    [Selector("boundingBoxAtTime:")] public MDLAxisAlignedBoundingBox BoundingBoxAtTime(NSTimeInterval time);
     [Selector("addObject:")] public void AddObject(MDLObject object);
     [Selector("removeObject:")] public void RemoveObject(MDLObject object);
     [Selector("objectAtIndexedSubscript:")] public MDLObject? ObjectAtIndexedSubscript(NSUInteger index);
@@ -64,7 +67,9 @@ public extern objc class MDLAsset : NSObject, NSCopying, NSFastEnumeration
 
 public objc interface MDLLightProbeIrradianceDataSource : NSObjectProtocol
 {
+    [Selector("boundingBox", "setBoundingBox:")] MDLAxisAlignedBoundingBox BoundingBox { get; set; }
     [Optional] [Selector("sphericalHarmonicsLevel", "setSphericalHarmonicsLevel:")] NSUInteger SphericalHarmonicsLevel { get; set; }
+    [Optional] [Selector("sphericalHarmonicsCoefficientsAtPosition:")] NSData SphericalHarmonicsCoefficientsAtPosition(vector_float3 position);
 }
 
 /// MDLLightBaking, a category of MDLAsset.

@@ -470,4 +470,6 @@ public struct TECPluginDispatchTable
 
 public delegate TECPluginDispatchTable* TECPluginGetPluginDispatchTablePtr();
 
+public const byte* kTECMacOSXDispatchTableNameString = "ConverterPluginGetPluginDispatchTable";
+
 #endif

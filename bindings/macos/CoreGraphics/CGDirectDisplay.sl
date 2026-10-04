@@ -166,6 +166,36 @@ public extern "C" CGError CGDisplaySwitchToMode(CGDirectDisplayID display, CFDic
 
 public const uint kCGNullDirectDisplay = 0;
 
+public const CFStringRef kCGDisplayWidth = "Width";
+
+public const CFStringRef kCGDisplayHeight = "Height";
+
+public const CFStringRef kCGDisplayMode = "Mode";
+
+public const CFStringRef kCGDisplayBitsPerPixel = "BitsPerPixel";
+
+public const CFStringRef kCGDisplayBitsPerSample = "BitsPerSample";
+
+public const CFStringRef kCGDisplaySamplesPerPixel = "SamplesPerPixel";
+
+public const CFStringRef kCGDisplayRefreshRate = "RefreshRate";
+
+public const CFStringRef kCGDisplayModeUsableForDesktopGUI = "UsableForDesktopGUI";
+
+public const CFStringRef kCGDisplayIOFlags = "IOFlags";
+
+public const CFStringRef kCGDisplayBytesPerRow = "kCGDisplayBytesPerRow";
+
+public const CFStringRef kCGIODisplayModeID = "IODisplayModeID";
+
+public const CFStringRef kCGDisplayModeIsSafeForHardware = "kCGDisplayModeIsSafeForHardware";
+
+public const CFStringRef kCGDisplayModeIsInterlaced = "kCGDisplayModeIsInterlaced";
+
+public const CFStringRef kCGDisplayModeIsStretched = "kCGDisplayModeIsStretched";
+
+public const CFStringRef kCGDisplayModeIsTelevisionOutput = "kCGDisplayModeIsTelevisionOutput";
+
 public const int CGDisplayNoErr = 0;
 
 #endif

@@ -31,4 +31,274 @@ public const int kIOSystemStateSleepDescriptionHibernateStateInactive = 0;
 public const int kIOSystemStateSleepDescriptionHibernateStateHibernating = 1;
 public const int kIOSystemStateSleepDescriptionHibernateStateWakingFromHibernate = 2;
 
+public const byte* kIOKitBuildVersionKey = "IOKitBuildVersion";
+
+public const byte* kIOKitDiagnosticsKey = "IOKitDiagnostics";
+
+public const byte* kIORegistryPlanesKey = "IORegistryPlanes";
+
+public const byte* kIOCatalogueKey = "IOCatalogue";
+
+public const byte* kIOServicePlane = "IOService";
+
+public const byte* kIOPowerPlane = "IOPower";
+
+public const byte* kIODeviceTreePlane = "IODeviceTree";
+
+public const byte* kIOAudioPlane = "IOAudio";
+
+public const byte* kIOFireWirePlane = "IOFireWire";
+
+public const byte* kIOUSBPlane = "IOUSB";
+
+public const byte* kIORegistryEntryIDKey = "IORegistryEntryID";
+
+public const byte* kIORegistryEntryPropertyKeysKey = "IORegistryEntryPropertyKeys";
+
+public const byte* kIORegistryEntryAllowableSetPropertiesKey = "IORegistryEntryAllowableSetProperties";
+
+public const byte* kIORegistryEntryDefaultLockingSetPropertiesKey = "IORegistryEntryDefaultLockingSetProperties";
+
+public const byte* kIOServiceClass = "IOService";
+
+public const byte* kIOResourcesClass = "IOResources";
+
+public const byte* kIOClassKey = "IOClass";
+
+public const byte* kIOProbeScoreKey = "IOProbeScore";
+
+public const byte* kIOKitDebugKey = "IOKitDebug";
+
+public const byte* kIOUserClassKey = "IOUserClass";
+
+public const byte* kIOUserClassesKey = "IOUserClasses";
+
+public const byte* kIOSupportedPropertiesKey = "IOSupportedProperties";
+
+public const byte* kIOUserServicePropertiesKey = "IOUserServiceProperties";
+
+public const byte* kIOProviderClassKey = "IOProviderClass";
+
+public const byte* kIONameMatchKey = "IONameMatch";
+
+public const byte* kIOPropertyMatchKey = "IOPropertyMatch";
+
+public const byte* kIOPropertyExistsMatchKey = "IOPropertyExistsMatch";
+
+public const byte* kIOPathMatchKey = "IOPathMatch";
+
+public const byte* kIOLocationMatchKey = "IOLocationMatch";
+
+public const byte* kIOParentMatchKey = "IOParentMatch";
+
+public const byte* kIOResourceMatchKey = "IOResourceMatch";
+
+public const byte* kIOResourceMatchedKey = "IOResourceMatched";
+
+public const byte* kIOMatchedServiceCountKey = "IOMatchedServiceCountMatch";
+
+public const byte* kIONameMatchedKey = "IONameMatched";
+
+public const byte* kIOMatchCategoryKey = "IOMatchCategory";
+
+public const byte* kIODefaultMatchCategoryKey = "IODefaultMatchCategory";
+
+public const byte* kIOMatchedPersonalityKey = "IOMatchedPersonality";
+
+public const byte* kIORematchPersonalityKey = "IORematchPersonality";
+
+public const byte* kIORematchCountKey = "IORematchCount";
+
+public const byte* kIODEXTMatchCountKey = "IODEXTMatchCount";
+
+public const byte* kIOUserClientEntitlementsKey = "IOUserClientEntitlements";
+
+public const byte* kIOServiceDEXTEntitlementsKey = "IOServiceDEXTEntitlements";
+
+public const byte* kIODriverKitEntitlementKey = "com.apple.developer.driverkit";
+
+public const byte* kIODriverKitUserClientEntitlementsKey = "com.apple.developer.driverkit.userclient-access";
+
+public const byte* kIODriverKitRequiredEntitlementsKey = "com.apple.private.driverkit.driver-access";
+
+public const byte* kIODriverKitTestDriverEntitlementKey = "com.apple.private.driverkit.test-driver";
+
+public const byte* kIODriverKitUserClientEntitlementAllowAnyKey = "com.apple.developer.driverkit.allow-any-userclient-access";
+
+public const byte* kIODriverKitUserClientEntitlementAdministratorKey = "com.apple.developer.driverkit.administrator";
+
+public const byte* kIODriverKitUserClientEntitlementCommunicatesWithDriversKey = "com.apple.developer.driverkit.communicates-with-drivers";
+
+public const byte* kIODriverKitUserClientEntitlementAllowThirdPartyUserClientsKey = "com.apple.developer.driverkit.allow-third-party-userclients";
+
+public const byte* kIODriverKitUSBTransportEntitlementKey = "com.apple.developer.driverkit.transport.usb";
+
+public const byte* kIODriverKitHIDTransportEntitlementKey = "com.apple.developer.driverkit.transport.hid";
+
+public const byte* kIODriverKitHIDFamilyDeviceEntitlementKey = "com.apple.developer.driverkit.family.hid.device";
+
+public const byte* kIODriverKitHIDFamilyEventServiceEntitlementKey = "com.apple.developer.driverkit.family.hid.eventservice";
+
+public const byte* kIODriverKitTransportBuiltinEntitlementKey = "com.apple.developer.driverkit.builtin";
+
+public const byte* kIONVRAMReadAccessKey = "com.apple.private.iokit.nvram-read-access";
+
+public const byte* kIONVRAMWriteAccessKey = "com.apple.private.iokit.nvram-write-access";
+
+public const byte* kIOResourcesSetPropertyKey = "com.apple.private.iokit.ioresources.setproperty";
+
+public const byte* kIONVRAMSystemAllowKey = "com.apple.private.iokit.system-nvram-allow";
+
+public const byte* kIOMatchDeferKey = "IOMatchDefer";
+
+public const byte* kIOAllCPUInitializedKey = "IOAllCPUInitialized";
+
+public const byte* kIOUserClientClassKey = "IOUserClientClass";
+
+public const byte* kIOMapperIDKey = "IOMapperID";
+
+public const byte* kIOUserClientCrossEndianKey = "IOUserClientCrossEndian";
+
+public const byte* kIOUserClientCrossEndianCompatibleKey = "IOUserClientCrossEndianCompatible";
+
+public const byte* kIOUserClientSharedInstanceKey = "IOUserClientSharedInstance";
+
+public const byte* kIOUserClientDefaultLockingKey = "IOUserClientDefaultLocking";
+
+public const byte* kIOUserClientDefaultLockingSetPropertiesKey = "IOUserClientDefaultLockingSetProperties";
+
+public const byte* kIOUserClientDefaultLockingSingleThreadExternalMethodKey = "IOUserClientDefaultLockingSingleThreadExternalMethod";
+
+public const byte* kIOUserClientCreatorKey = "IOUserClientCreator";
+
+public const byte* kIOUserUserClientKey = "IOUserUserClient";
+
+public const byte* kIOUserServerOneProcessKey = "IOUserServerOneProcess";
+
+public const byte* kIOUserServerPreserveUserspaceRebootKey = "IOUserServerPreserveUserspaceReboot";
+
+public const byte* kIOPublishNotification = "IOServicePublish";
+
+public const byte* kIOFirstPublishNotification = "IOServiceFirstPublish";
+
+public const byte* kIOMatchedNotification = "IOServiceMatched";
+
+public const byte* kIOFirstMatchNotification = "IOServiceFirstMatch";
+
+public const byte* kIOTerminatedNotification = "IOServiceTerminate";
+
+public const byte* kIOWillTerminateNotification = "IOServiceWillTerminate";
+
+public const byte* kIOGeneralInterest = "IOGeneralInterest";
+
+public const byte* kIOBusyInterest = "IOBusyInterest";
+
+public const byte* kIOAppPowerStateInterest = "IOAppPowerStateInterest";
+
+public const byte* kIOPriorityPowerStateInterest = "IOPriorityPowerStateInterest";
+
+public const byte* kIOPlatformDeviceMessageKey = "IOPlatformDeviceMessage";
+
+public const byte* kIOCFPlugInTypesKey = "IOCFPlugInTypes";
+
+public const byte* kIOCompatibilityMatchKey = "IOCompatibilityMatch";
+
+public const byte* kIOCompatibilityPropertiesKey = "IOCompatibilityProperties";
+
+public const byte* kIOPathKey = "IOPath";
+
+public const byte* kIOCommandPoolSizeKey = "IOCommandPoolSize";
+
+public const byte* kIOMaximumPriorityCountKey = "IOMaximumPriorityCount";
+
+public const byte* kIOMaximumBlockCountReadKey = "IOMaximumBlockCountRead";
+
+public const byte* kIOMaximumBlockCountWriteKey = "IOMaximumBlockCountWrite";
+
+public const byte* kIOMaximumByteCountReadKey = "IOMaximumByteCountRead";
+
+public const byte* kIOMaximumByteCountWriteKey = "IOMaximumByteCountWrite";
+
+public const byte* kIOMaximumSegmentCountReadKey = "IOMaximumSegmentCountRead";
+
+public const byte* kIOMaximumSegmentCountWriteKey = "IOMaximumSegmentCountWrite";
+
+public const byte* kIOMaximumSegmentByteCountReadKey = "IOMaximumSegmentByteCountRead";
+
+public const byte* kIOMaximumSegmentByteCountWriteKey = "IOMaximumSegmentByteCountWrite";
+
+public const byte* kIOMinimumSegmentAlignmentByteCountKey = "IOMinimumSegmentAlignmentByteCount";
+
+public const byte* kIOMaximumSegmentAddressableBitCountKey = "IOMaximumSegmentAddressableBitCount";
+
+public const byte* kIOMinimumSaturationByteCountKey = "IOMinimumSaturationByteCount";
+
+public const byte* kIOMaximumSwapWriteKey = "IOMaximumSwapWrite";
+
+public const byte* kIOIconKey = "IOIcon";
+
+public const byte* kIOBundleResourceFileKey = "IOBundleResourceFile";
+
+public const byte* kIOBusBadgeKey = "IOBusBadge";
+
+public const byte* kIODeviceIconKey = "IODeviceIcon";
+
+public const byte* kIOPlatformSerialNumberKey = "IOPlatformSerialNumber";
+
+public const byte* kIOPlatformUUIDKey = "IOPlatformUUID";
+
+public const byte* kIONVRAMBootArgsKey = "boot-args";
+
+public const byte* kIONVRAMDeletePropertyKey = "IONVRAM-DELETE-PROPERTY";
+
+public const byte* kIONVRAMSyncNowPropertyKey = "IONVRAM-SYNCNOW-PROPERTY";
+
+public const byte* kIONVRAMActivateCSRConfigPropertyKey = "IONVRAM-ARMCSR-PROPERTY";
+
+public const byte* kIODTNVRAMPanicInfoKey = "aapl,panic-info";
+
+public const byte* kIONVRAMDeletePropertyKeyWRet = "IONVRAM-DELETEWRET-PROPERTY";
+
+public const byte* kIOBootDeviceKey = "IOBootDevice";
+
+public const byte* kIOBootDevicePathKey = "IOBootDevicePath";
+
+public const byte* kIOBootDeviceSizeKey = "IOBootDeviceSize";
+
+public const byte* kOSBuildVersionKey = "OS Build Version";
+
+public const byte* kIOStateNotificationItemCreateKey = "com.apple.iokit.statenotification.create";
+
+public const byte* kIOStateNotificationItemSetKey = "com.apple.iokit.statenotification.set";
+
+public const byte* kIOStateNotificationItemCopyKey = "com.apple.iokit.statenotification.copy";
+
+public const byte* kIOStateNotificationNameKey = "com.apple.iokit.statenotification.name";
+
+public const byte* kIOStateNotificationEntitlementSetKey = "com.apple.iokit.statenotification.entitlement-set";
+
+public const byte* kIOStateNotificationEntitlementGetKey = "com.apple.iokit.statenotification.entitlement-get";
+
+public const byte* kIOSystemStateClamshellKey = "com.apple.iokit.pm.clamshell";
+
+public const byte* kIOSystemStateSleepDescriptionKey = "com.apple.iokit.pm.sleepdescription";
+
+public const byte* kIOSystemStateSleepDescriptionReasonKey = "com.apple.iokit.pm.sleepreason";
+
+public const byte* kIOSystemStateSleepDescriptionHibernateStateKey = "com.apple.iokit.pm.hibernatestate";
+
+public const byte* kIOSystemStateWakeDescriptionKey = "com.apple.iokit.pm.wakedescription";
+
+public const byte* kIOSystemStateWakeDescriptionWakeReasonKey = "com.apple.iokit.pm.wakereason";
+
+public const byte* kIOSystemStateWakeDescriptionContinuousTimeOffsetKey = "com.apple.iokit.pm.wakedescription.continuous-time-offset";
+
+public const byte* kIOSystemStateHaltDescriptionKey = "com.apple.iokit.pm.haltdescription";
+
+public const byte* kIOSystemStateHaltDescriptionHaltStateKey = "com.apple.iokit.pm.haltstate";
+
+public const byte* kIOSystemStatePowerSourceDescriptionKey = "com.apple.iokit.pm.powersourcedescription";
+
+public const byte* kIOSystemStatePowerSourceDescriptionACAttachedKey = "com.apple.iokit.pm.acattached";
+
 #endif

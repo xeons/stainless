@@ -44,6 +44,9 @@ public extern objc class GKRTree : NSObject
     [Selector("queryReserve", "setQueryReserve:")] public NSUInteger QueryReserve { get; set; }
     [Selector("treeWithMaxNumberOfChildren:")] public static Self TreeWithMaxNumberOfChildren(NSUInteger maxNumberOfChildren);
     [Selector("initWithMaxNumberOfChildren:")] public Self InitWithMaxNumberOfChildren(NSUInteger maxNumberOfChildren);
+    [Selector("addElement:boundingRectMin:boundingRectMax:splitStrategy:")] public void AddElementBoundingRectMinBoundingRectMaxSplitStrategy(AnyObject element, vector_float2 boundingRectMin, vector_float2 boundingRectMax, GKRTreeSplitStrategy splitStrategy);
+    [Selector("removeElement:boundingRectMin:boundingRectMax:")] public void RemoveElementBoundingRectMinBoundingRectMax(AnyObject element, vector_float2 boundingRectMin, vector_float2 boundingRectMax);
+    [Selector("elementsInBoundingRectMin:rectMax:")] public NSArray ElementsInBoundingRectMinRectMax(vector_float2 rectMin, vector_float2 rectMax);
 }
 
 #endif

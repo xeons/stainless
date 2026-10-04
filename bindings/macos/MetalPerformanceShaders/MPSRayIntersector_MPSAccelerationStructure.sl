@@ -57,6 +57,7 @@ public enum MPSAccelerationStructureStatus : ulong
 public extern objc class MPSAccelerationStructure : MPSKernel, NSSecureCoding, NSCopying
 {
     [Selector("group")] public MPSAccelerationStructureGroup Group { get; }
+    [Selector("boundingBox")] public MPSAxisAlignedBoundingBox BoundingBox { get; }
     [Selector("status")] public MPSAccelerationStructureStatus Status { get; }
     [Selector("usage", "setUsage:")] public MPSAccelerationStructureUsage Usage { get; set; }
     [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);

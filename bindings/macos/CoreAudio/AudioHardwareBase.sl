@@ -270,4 +270,24 @@ public const uint kAudioStereoPanControlClassID = 1936744814;
 public const uint kAudioStereoPanControlPropertyValue = 1936745334;
 public const uint kAudioStereoPanControlPropertyPanningChannels = 1936745315;
 
+public const byte* kAudioEndPointDeviceUIDKey = "uid";
+
+public const byte* kAudioEndPointDeviceNameKey = "name";
+
+public const byte* kAudioEndPointDeviceEndPointListKey = "endpoints";
+
+public const byte* kAudioEndPointDeviceMainEndPointKey = "main";
+
+public const byte* kAudioEndPointDeviceMasterEndPointKey = "master";
+
+public const byte* kAudioEndPointDeviceIsPrivateKey = "private";
+
+public const byte* kAudioEndPointUIDKey = "uid";
+
+public const byte* kAudioEndPointNameKey = "name";
+
+public const byte* kAudioEndPointInputChannelsKey = "channels-in";
+
+public const byte* kAudioEndPointOutputChannelsKey = "channels-out";
+
 #endif

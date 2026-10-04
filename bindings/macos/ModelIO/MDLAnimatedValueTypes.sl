@@ -68,12 +68,28 @@ public extern objc class MDLAnimatedVector3Array : MDLAnimatedValue
 {
     [Selector("elementCount")] public NSUInteger ElementCount { get; }
     [Selector("initWithElementCount:")] public AnyObject InitWithElementCount(NSUInteger arrayElementCount);
+    [Selector("setFloat3Array:count:atTime:")] public void SetFloat3ArrayCountAtTime(vector_float3* array, NSUInteger count, NSTimeInterval time);
+    [Selector("setDouble3Array:count:atTime:")] public void SetDouble3ArrayCountAtTime(vector_double3* array, NSUInteger count, NSTimeInterval time);
+    [Selector("getFloat3Array:maxCount:atTime:")] public NSUInteger GetFloat3ArrayMaxCountAtTime(vector_float3* array, NSUInteger maxCount, NSTimeInterval time);
+    [Selector("getDouble3Array:maxCount:atTime:")] public NSUInteger GetDouble3ArrayMaxCountAtTime(vector_double3* array, NSUInteger maxCount, NSTimeInterval time);
+    [Selector("resetWithFloat3Array:count:atTimes:count:")] public void ResetWithFloat3ArrayCountAtTimesCount(vector_float3* valuesArray, NSUInteger valuesCount, NSTimeInterval* timesArray, NSUInteger timesCount);
+    [Selector("resetWithDouble3Array:count:atTimes:count:")] public void ResetWithDouble3ArrayCountAtTimesCount(vector_double3* valuesArray, NSUInteger valuesCount, NSTimeInterval* timesArray, NSUInteger timesCount);
+    [Selector("getFloat3Array:maxCount:")] public NSUInteger GetFloat3ArrayMaxCount(vector_float3* valuesArray, NSUInteger maxCount);
+    [Selector("getDouble3Array:maxCount:")] public NSUInteger GetDouble3ArrayMaxCount(vector_double3* valuesArray, NSUInteger maxCount);
 }
 
 public extern objc class MDLAnimatedQuaternionArray : MDLAnimatedValue
 {
     [Selector("elementCount")] public NSUInteger ElementCount { get; }
     [Selector("initWithElementCount:")] public AnyObject InitWithElementCount(NSUInteger arrayElementCount);
+    [Selector("setFloatQuaternionArray:count:atTime:")] public void SetFloatQuaternionArrayCountAtTime(simd_quatf* array, NSUInteger count, NSTimeInterval time);
+    [Selector("setDoubleQuaternionArray:count:atTime:")] public void SetDoubleQuaternionArrayCountAtTime(simd_quatd* array, NSUInteger count, NSTimeInterval time);
+    [Selector("getFloatQuaternionArray:maxCount:atTime:")] public NSUInteger GetFloatQuaternionArrayMaxCountAtTime(simd_quatf* array, NSUInteger maxCount, NSTimeInterval time);
+    [Selector("getDoubleQuaternionArray:maxCount:atTime:")] public NSUInteger GetDoubleQuaternionArrayMaxCountAtTime(simd_quatd* array, NSUInteger maxCount, NSTimeInterval time);
+    [Selector("resetWithFloatQuaternionArray:count:atTimes:count:")] public void ResetWithFloatQuaternionArrayCountAtTimesCount(simd_quatf* valuesArray, NSUInteger valuesCount, NSTimeInterval* timesArray, NSUInteger timesCount);
+    [Selector("resetWithDoubleQuaternionArray:count:atTimes:count:")] public void ResetWithDoubleQuaternionArrayCountAtTimesCount(simd_quatd* valuesArray, NSUInteger valuesCount, NSTimeInterval* timesArray, NSUInteger timesCount);
+    [Selector("getFloatQuaternionArray:maxCount:")] public NSUInteger GetFloatQuaternionArrayMaxCount(simd_quatf* valuesArray, NSUInteger maxCount);
+    [Selector("getDoubleQuaternionArray:maxCount:")] public NSUInteger GetDoubleQuaternionArrayMaxCount(simd_quatd* valuesArray, NSUInteger maxCount);
 }
 
 public extern objc class MDLAnimatedScalar : MDLAnimatedValue
@@ -88,14 +104,64 @@ public extern objc class MDLAnimatedScalar : MDLAnimatedValue
     [Selector("getDoubleArray:maxCount:")] public NSUInteger GetDoubleArrayMaxCount(double* valuesArray, NSUInteger maxCount);
 }
 
-public extern objc class MDLAnimatedVector2 : MDLAnimatedValue { }
+public extern objc class MDLAnimatedVector2 : MDLAnimatedValue
+{
+    [Selector("setFloat2:atTime:")] public void SetFloat2AtTime(vector_float2 value, NSTimeInterval time);
+    [Selector("setDouble2:atTime:")] public void SetDouble2AtTime(vector_double2 value, NSTimeInterval time);
+    [Selector("float2AtTime:")] public vector_float2 Float2AtTime(NSTimeInterval time);
+    [Selector("double2AtTime:")] public vector_double2 Double2AtTime(NSTimeInterval time);
+    [Selector("resetWithFloat2Array:atTimes:count:")] public void ResetWithFloat2ArrayAtTimesCount(vector_float2* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("resetWithDouble2Array:atTimes:count:")] public void ResetWithDouble2ArrayAtTimesCount(vector_double2* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("getFloat2Array:maxCount:")] public NSUInteger GetFloat2ArrayMaxCount(vector_float2* valuesArray, NSUInteger maxCount);
+    [Selector("getDouble2Array:maxCount:")] public NSUInteger GetDouble2ArrayMaxCount(vector_double2* valuesArray, NSUInteger maxCount);
+}
 
-public extern objc class MDLAnimatedVector3 : MDLAnimatedValue { }
+public extern objc class MDLAnimatedVector3 : MDLAnimatedValue
+{
+    [Selector("setFloat3:atTime:")] public void SetFloat3AtTime(vector_float3 value, NSTimeInterval time);
+    [Selector("setDouble3:atTime:")] public void SetDouble3AtTime(vector_double3 value, NSTimeInterval time);
+    [Selector("float3AtTime:")] public vector_float3 Float3AtTime(NSTimeInterval time);
+    [Selector("double3AtTime:")] public vector_double3 Double3AtTime(NSTimeInterval time);
+    [Selector("resetWithFloat3Array:atTimes:count:")] public void ResetWithFloat3ArrayAtTimesCount(vector_float3* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("resetWithDouble3Array:atTimes:count:")] public void ResetWithDouble3ArrayAtTimesCount(vector_double3* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("getFloat3Array:maxCount:")] public NSUInteger GetFloat3ArrayMaxCount(vector_float3* valuesArray, NSUInteger maxCount);
+    [Selector("getDouble3Array:maxCount:")] public NSUInteger GetDouble3ArrayMaxCount(vector_double3* valuesArray, NSUInteger maxCount);
+}
 
-public extern objc class MDLAnimatedVector4 : MDLAnimatedValue { }
+public extern objc class MDLAnimatedVector4 : MDLAnimatedValue
+{
+    [Selector("setFloat4:atTime:")] public void SetFloat4AtTime(vector_float4 value, NSTimeInterval time);
+    [Selector("setDouble4:atTime:")] public void SetDouble4AtTime(vector_double4 value, NSTimeInterval time);
+    [Selector("float4AtTime:")] public vector_float4 Float4AtTime(NSTimeInterval time);
+    [Selector("double4AtTime:")] public vector_double4 Double4AtTime(NSTimeInterval time);
+    [Selector("resetWithFloat4Array:atTimes:count:")] public void ResetWithFloat4ArrayAtTimesCount(vector_float4* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("resetWithDouble4Array:atTimes:count:")] public void ResetWithDouble4ArrayAtTimesCount(vector_double4* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("getFloat4Array:maxCount:")] public NSUInteger GetFloat4ArrayMaxCount(vector_float4* valuesArray, NSUInteger maxCount);
+    [Selector("getDouble4Array:maxCount:")] public NSUInteger GetDouble4ArrayMaxCount(vector_double4* valuesArray, NSUInteger maxCount);
+}
 
-public extern objc class MDLAnimatedQuaternion : MDLAnimatedValue { }
+public extern objc class MDLAnimatedQuaternion : MDLAnimatedValue
+{
+    [Selector("setFloatQuaternion:atTime:")] public void SetFloatQuaternionAtTime(simd_quatf value, NSTimeInterval time);
+    [Selector("setDoubleQuaternion:atTime:")] public void SetDoubleQuaternionAtTime(simd_quatd value, NSTimeInterval time);
+    [Selector("floatQuaternionAtTime:")] public simd_quatf FloatQuaternionAtTime(NSTimeInterval time);
+    [Selector("doubleQuaternionAtTime:")] public simd_quatd DoubleQuaternionAtTime(NSTimeInterval time);
+    [Selector("resetWithFloatQuaternionArray:atTimes:count:")] public void ResetWithFloatQuaternionArrayAtTimesCount(simd_quatf* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("resetWithDoubleQuaternionArray:atTimes:count:")] public void ResetWithDoubleQuaternionArrayAtTimesCount(simd_quatd* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("getFloatQuaternionArray:maxCount:")] public NSUInteger GetFloatQuaternionArrayMaxCount(simd_quatf* valuesArray, NSUInteger maxCount);
+    [Selector("getDoubleQuaternionArray:maxCount:")] public NSUInteger GetDoubleQuaternionArrayMaxCount(simd_quatd* valuesArray, NSUInteger maxCount);
+}
 
-public extern objc class MDLAnimatedMatrix4x4 : MDLAnimatedValue { }
+public extern objc class MDLAnimatedMatrix4x4 : MDLAnimatedValue
+{
+    [Selector("setFloat4x4:atTime:")] public void SetFloat4x4AtTime(matrix_float4x4 value, NSTimeInterval time);
+    [Selector("setDouble4x4:atTime:")] public void SetDouble4x4AtTime(matrix_double4x4 value, NSTimeInterval time);
+    [Selector("float4x4AtTime:")] public matrix_float4x4 Float4x4AtTime(NSTimeInterval time);
+    [Selector("double4x4AtTime:")] public matrix_double4x4 Double4x4AtTime(NSTimeInterval time);
+    [Selector("resetWithFloat4x4Array:atTimes:count:")] public void ResetWithFloat4x4ArrayAtTimesCount(matrix_float4x4* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("resetWithDouble4x4Array:atTimes:count:")] public void ResetWithDouble4x4ArrayAtTimesCount(matrix_double4x4* valuesArray, NSTimeInterval* timesArray, NSUInteger count);
+    [Selector("getFloat4x4Array:maxCount:")] public NSUInteger GetFloat4x4ArrayMaxCount(matrix_float4x4* valuesArray, NSUInteger maxCount);
+    [Selector("getDouble4x4Array:maxCount:")] public NSUInteger GetDouble4x4ArrayMaxCount(matrix_double4x4* valuesArray, NSUInteger maxCount);
+}
 
 #endif

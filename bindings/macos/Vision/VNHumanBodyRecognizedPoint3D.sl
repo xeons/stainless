@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Vision;
 
+import MacOS.System;
 import Standard.ObjC;
 
 #if MACOS
@@ -32,6 +33,7 @@ import Standard.ObjC;
 /// macOS 14.0 and later.
 public extern objc class VNHumanBodyRecognizedPoint3D : VNRecognizedPoint3D
 {
+    [Selector("localPosition")] public simd_float4x4 LocalPosition { get; }
     [Selector("parentJoint")] public VNHumanBodyPose3DObservationJointName ParentJoint { get; }
 }
 

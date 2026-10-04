@@ -103,4 +103,12 @@ public extern "C" OSStatus PasteboardSetPromiseKeeper(PasteboardRef inPasteboard
 
 public extern "C" OSStatus PasteboardResolvePromises(PasteboardRef inPasteboard);
 
+public const CFStringRef kPasteboardTypeFileURLPromise = "com.apple.pasteboard.promised-file-url";
+
+public const CFStringRef kPasteboardTypeFilePromiseContent = "com.apple.pasteboard.promised-file-content-type";
+
+public const CFStringRef kPasteboardClipboard = "com.apple.pasteboard.clipboard";
+
+public const CFStringRef kPasteboardFind = "com.apple.pasteboard.find";
+
 #endif

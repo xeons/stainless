@@ -109,4 +109,12 @@ public objc closure void AudioComponentValidateWithResultsInCompletionHandlerBlo
 
 public extern "C" OSStatus AudioComponentValidateWithResults(AudioComponent inComponent, CFDictionaryRef? inValidationParameters, AudioComponentValidateWithResultsInCompletionHandlerBlock inCompletionHandler);
 
+public const byte* kAudioComponentConfigurationInfo_ValidationResult = "ValidationResult";
+
+public const byte* kAudioComponentValidationParameter_TimeOut = "TimeOut";
+
+public const byte* kAudioComponentValidationParameter_ForceValidation = "ForceValidation";
+
+public const byte* kAudioComponentValidationParameter_LoadOutOfProcess = "LoadOutOfProcess";
+
 #endif

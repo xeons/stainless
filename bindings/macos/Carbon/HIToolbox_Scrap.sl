@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -76,5 +78,9 @@ public extern "C" void DisposeScrapPromiseKeeperUPP(ScrapPromiseKeeperUPP userUP
 
 /// Deprecated in macOS 10.5.
 public extern "C" OSStatus InvokeScrapPromiseKeeperUPP(ScrapRef scrap, ScrapFlavorType flavorType, void* userData, ScrapPromiseKeeperUPP userUPP);
+
+public const CFStringRef kScrapClipboardScrap = "com.apple.scrap.clipboard";
+
+public const CFStringRef kScrapFindScrap = "com.apple.scrap.find";
 
 #endif

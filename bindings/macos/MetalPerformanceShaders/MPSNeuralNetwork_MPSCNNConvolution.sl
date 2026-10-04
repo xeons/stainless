@@ -123,6 +123,7 @@ public objc interface MPSCNNConvolutionDataSource : NSCopying, NSObjectProtocol
     [Selector("load")] bool Load();
     [Selector("purge")] void Purge();
     [Selector("label")] NSString? Label();
+    [Optional] [Selector("rangesForUInt8Kernel")] vector_float2* RangesForUInt8Kernel();
     [Optional] [Selector("lookupTableForUInt8Kernel")] float* LookupTableForUInt8Kernel();
     [Optional] [Selector("weightsQuantizationType")] MPSCNNWeightsQuantizationType WeightsQuantizationType();
     [Optional] [Selector("updateWithCommandBuffer:gradientState:sourceState:")] MPSCNNConvolutionWeightsAndBiasesState? UpdateWithCommandBufferGradientStateSourceState(MTLCommandBuffer commandBuffer, MPSCNNConvolutionGradientState gradientState, MPSCNNConvolutionWeightsAndBiasesState sourceState);

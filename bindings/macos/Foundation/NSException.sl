@@ -76,6 +76,7 @@ public extern objc class NSException : NSObject, NSCopying, NSSecureCoding
 public extern objc class NSException
 {
     [Selector("raise:format:")] public static void RaiseFormat(NSExceptionName name, NSString format, ...);
+    [Selector("raise:format:arguments:")] public static void RaiseFormatArguments(NSExceptionName name, NSString format, VaList argList);
 }
 
 public delegate void NSUncaughtExceptionHandler(void* arg0);

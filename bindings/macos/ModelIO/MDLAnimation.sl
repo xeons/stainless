@@ -55,6 +55,7 @@ public extern objc class MDLAnimationBindComponent : NSObject, NSCopying, MDLCom
     [Selector("skeleton", "setSkeleton:")] public MDLSkeleton? Skeleton { get; set; }
     [Selector("jointAnimation", "setJointAnimation:")] public MDLJointAnimation? JointAnimation { get; set; }
     [Selector("jointPaths", "setJointPaths:")] public NSArray? JointPaths { get; set; }
+    [Selector("geometryBindTransform", "setGeometryBindTransform:")] public matrix_double4x4 GeometryBindTransform { get; set; }
 }
 
 #endif

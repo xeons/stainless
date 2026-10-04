@@ -23,8 +23,10 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -984,5 +986,13 @@ public const int kThemeScrollBar = 0;
 public const int kThemeSlider = 2;
 public const int kThemeProgressBar = 3;
 public const int kThemeIndeterminateBar = 4;
+
+public const CFStringRef kThemeAppearancePlatinum = "com.apple.theme.appearance.platinum";
+
+public const CFStringRef kThemeAppearanceAqua = "com.apple.theme.appearance.aqua";
+
+public const CFStringRef kThemeAppearanceAquaBlue = "com.apple.theme.appearance.aqua.blue";
+
+public const CFStringRef kThemeAppearanceAquaGraphite = "com.apple.theme.appearance.aqua.graphite";
 
 #endif

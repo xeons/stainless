@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -258,5 +259,7 @@ public const int kHIViewOffscreenImageUseWindowBackingResolution = 1;
 public const int kHITransformNone = 0;
 public const int kHITransformDisabled = 1;
 public const int kHITransformSelected = 16384;
+
+public const CFStringRef kHIViewClassID = "com.apple.hiview";
 
 #endif

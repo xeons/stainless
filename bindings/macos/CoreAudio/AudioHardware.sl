@@ -265,4 +265,48 @@ public const uint kAudioTapPropertyUID = 1953851748;
 public const uint kAudioTapPropertyDescription = 1952740195;
 public const uint kAudioTapPropertyFormat = 1952869748;
 
+public const byte* kAudioAggregateDeviceUIDKey = "uid";
+
+public const byte* kAudioAggregateDeviceNameKey = "name";
+
+public const byte* kAudioAggregateDeviceSubDeviceListKey = "subdevices";
+
+public const byte* kAudioAggregateDeviceMainSubDeviceKey = "master";
+
+public const byte* kAudioAggregateDeviceClockDeviceKey = "clock";
+
+public const byte* kAudioAggregateDeviceIsPrivateKey = "private";
+
+public const byte* kAudioAggregateDeviceIsStackedKey = "stacked";
+
+public const byte* kAudioAggregateDeviceTapListKey = "taps";
+
+public const byte* kAudioAggregateDeviceTapAutoStartKey = "tapautostart";
+
+public const byte* kAudioSubDeviceUIDKey = "uid";
+
+public const byte* kAudioSubDeviceNameKey = "name";
+
+public const byte* kAudioSubDeviceInputChannelsKey = "channels-in";
+
+public const byte* kAudioSubDeviceOutputChannelsKey = "channels-out";
+
+public const byte* kAudioSubDeviceExtraInputLatencyKey = "latency-in";
+
+public const byte* kAudioSubDeviceExtraOutputLatencyKey = "latency-out";
+
+public const byte* kAudioSubDeviceDriftCompensationKey = "drift";
+
+public const byte* kAudioSubDeviceDriftCompensationQualityKey = "drift quality";
+
+public const byte* kAudioSubTapUIDKey = "uid";
+
+public const byte* kAudioSubTapExtraInputLatencyKey = "latency-in";
+
+public const byte* kAudioSubTapExtraOutputLatencyKey = "latency-out";
+
+public const byte* kAudioSubTapDriftCompensationKey = "drift";
+
+public const byte* kAudioSubTapDriftCompensationQualityKey = "drift quality";
+
 #endif

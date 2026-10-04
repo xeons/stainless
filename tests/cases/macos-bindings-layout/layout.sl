@@ -1085,10 +1085,6 @@ void Check2()
     Expect((long)kIOSurfaceSuccess, "(kIOSurfaceSuccess)");
     Expect((long)IOSURFACE_REF_H, "(IOSURFACE_REF_H)");
     Expect((long)IOSURFACE_OBJC_H, "(IOSURFACE_OBJC_H)");
-    Expect((long)sizeof(Float80), "sizeof(struct Float80)");
-    Expect((long)alignof(Float80), "_Alignof(struct Float80)");
-    Expect((long)offsetof(Float80, exp), "__builtin_offsetof(struct Float80, exp)");
-    Expect((long)offsetof(Float80, man), "__builtin_offsetof(struct Float80, man)");
     Expect((long)sizeof(ColorSyncMD5), "sizeof(ColorSyncMD5)");
     Expect((long)alignof(ColorSyncMD5), "_Alignof(ColorSyncMD5)");
     Expect((long)offsetof(ColorSyncMD5, digest), "__builtin_offsetof(ColorSyncMD5, digest)");
@@ -1433,14 +1429,14 @@ void Check2()
     Expect((long)CGWindowSharingType.ReadOnly, "kCGWindowSharingReadOnly");
     Expect((long)CGWindowSharingType.ReadWrite, "kCGWindowSharingReadWrite");
     Expect((long)CGWindowBackingType.Retained, "kCGBackingStoreRetained");
-}
-
-void Check3()
-{
     Expect((long)CGWindowBackingType.Nonretained, "kCGBackingStoreNonretained");
     Expect((long)CGWindowBackingType.Buffered, "kCGBackingStoreBuffered");
     Expect((long)CGWindowListOption.OptionAll, "kCGWindowListOptionAll");
     Expect((long)CGWindowListOption.OptionOnScreenOnly, "kCGWindowListOptionOnScreenOnly");
+}
+
+void Check3()
+{
     Expect((long)CGWindowListOption.OptionOnScreenAboveWindow, "kCGWindowListOptionOnScreenAboveWindow");
     Expect((long)CGWindowListOption.OptionOnScreenBelowWindow, "kCGWindowListOptionOnScreenBelowWindow");
     Expect((long)CGWindowListOption.OptionIncludingWindow, "kCGWindowListOptionIncludingWindow");
@@ -1837,14 +1833,14 @@ void Check3()
     Expect((long)kIOWSAA_From_Accelerated, "kIOWSAA_From_Accelerated");
     Expect((long)kIOWSAA_To_Accelerated, "kIOWSAA_To_Accelerated");
     Expect((long)kIOWSAA_Sleep, "kIOWSAA_Sleep");
-}
-
-void Check4()
-{
     Expect((long)kIOWSAA_Hibernate, "kIOWSAA_Hibernate");
     Expect((long)kIOWSAA_DriverOpen, "kIOWSAA_DriverOpen");
     Expect((long)kIOWSAA_StateMask, "kIOWSAA_StateMask");
     Expect((long)kIOWSAA_Transactional, "kIOWSAA_Transactional");
+}
+
+void Check4()
+{
     Expect((long)kIOWSAA_DeferStart, "kIOWSAA_DeferStart");
     Expect((long)kIOWSAA_DeferEnd, "kIOWSAA_DeferEnd");
     Expect((long)kIOWSAA_NonConsoleDevice, "kIOWSAA_NonConsoleDevice");
@@ -2241,14 +2237,14 @@ void Check4()
     Expect((long)kIODPEventAutomatedTestRequest, "kIODPEventAutomatedTestRequest");
     Expect((long)kIODPEventContentProtection, "kIODPEventContentProtection");
     Expect((long)kIODPEventMCCS, "kIODPEventMCCS");
-}
-
-void Check5()
-{
     Expect((long)kIODPEventSinkSpecific, "kIODPEventSinkSpecific");
     Expect((long)kIODisplayColorMode, "kIODisplayColorMode");
     Expect((long)kIODisplayRGBColorComponentBitsUnknown, "kIODisplayRGBColorComponentBitsUnknown");
     Expect((long)kIODisplayRGBColorComponentBits6, "kIODisplayRGBColorComponentBits6");
+}
+
+void Check5()
+{
     Expect((long)kIODisplayRGBColorComponentBits8, "kIODisplayRGBColorComponentBits8");
     Expect((long)kIODisplayRGBColorComponentBits10, "kIODisplayRGBColorComponentBits10");
     Expect((long)kIODisplayRGBColorComponentBits12, "kIODisplayRGBColorComponentBits12");
@@ -2645,14 +2641,14 @@ void Check5()
     Expect((long)CTFontUIFontType.UIFontSmallSystem, "kCTFontUIFontSmallSystem");
     Expect((long)CTFontUIFontType.UIFontSmallEmphasizedSystem, "kCTFontUIFontSmallEmphasizedSystem");
     Expect((long)CTFontUIFontType.UIFontMiniSystem, "kCTFontUIFontMiniSystem");
-}
-
-void Check6()
-{
     Expect((long)CTFontUIFontType.UIFontMiniEmphasizedSystem, "kCTFontUIFontMiniEmphasizedSystem");
     Expect((long)CTFontUIFontType.UIFontViews, "kCTFontUIFontViews");
     Expect((long)CTFontUIFontType.UIFontApplication, "kCTFontUIFontApplication");
     Expect((long)CTFontUIFontType.UIFontLabel, "kCTFontUIFontLabel");
+}
+
+void Check6()
+{
     Expect((long)CTFontUIFontType.UIFontMenuTitle, "kCTFontUIFontMenuTitle");
     Expect((long)CTFontUIFontType.UIFontMenuItem, "kCTFontUIFontMenuItem");
     Expect((long)CTFontUIFontType.UIFontMenuItemMark, "kCTFontUIFontMenuItemMark");
@@ -3049,14 +3045,14 @@ void Check6()
     Expect((long)kInternationalSymbolsSelector, "kInternationalSymbolsSelector");
     Expect((long)kMathSymbolsSelector, "kMathSymbolsSelector");
     Expect((long)kNoAlternatesSelector, "kNoAlternatesSelector");
-}
-
-void Check7()
-{
     Expect((long)kDesignLevel1Selector, "kDesignLevel1Selector");
     Expect((long)kDesignLevel2Selector, "kDesignLevel2Selector");
     Expect((long)kDesignLevel3Selector, "kDesignLevel3Selector");
     Expect((long)kDesignLevel4Selector, "kDesignLevel4Selector");
+}
+
+void Check7()
+{
     Expect((long)kDesignLevel5Selector, "kDesignLevel5Selector");
     Expect((long)kNoStyleOptionsSelector, "kNoStyleOptionsSelector");
     Expect((long)kDisplayTextSelector, "kDisplayTextSelector");
@@ -3453,14 +3449,14 @@ void Check7()
     Expect((long)kMORTraCDx, "kMORTraCDx");
     Expect((long)kMORTraDCx, "kMORTraDCx");
     Expect((long)kMORTraCDxA, "kMORTraCDxA");
-}
-
-void Check8()
-{
     Expect((long)kMORTraDCxA, "kMORTraDCxA");
     Expect((long)kMORTraDxAB, "kMORTraDxAB");
     Expect((long)kMORTraDxBA, "kMORTraDxBA");
     Expect((long)kMORTraCDxAB, "kMORTraCDxAB");
+}
+
+void Check8()
+{
     Expect((long)kMORTraCDxBA, "kMORTraCDxBA");
     Expect((long)kMORTraDCxAB, "kMORTraDCxAB");
     Expect((long)kMORTraDCxBA, "kMORTraDCxBA");
@@ -3857,14 +3853,14 @@ void Check8()
     Expect((long)kBSLNDistanceFormatWithMap, "kBSLNDistanceFormatWithMap");
     Expect((long)kBSLNControlPointFormatNoMap, "kBSLNControlPointFormatNoMap");
     Expect((long)kBSLNControlPointFormatWithMap, "kBSLNControlPointFormatWithMap");
-}
-
-void Check9()
-{
     Expect((long)kBSLNRomanBaseline, "kBSLNRomanBaseline");
     Expect((long)kBSLNIdeographicCenterBaseline, "kBSLNIdeographicCenterBaseline");
     Expect((long)kBSLNIdeographicLowBaseline, "kBSLNIdeographicLowBaseline");
     Expect((long)kBSLNHangingBaseline, "kBSLNHangingBaseline");
+}
+
+void Check9()
+{
     Expect((long)kBSLNMathBaseline, "kBSLNMathBaseline");
     Expect((long)kBSLNIdeographicHighBaseline, "kBSLNIdeographicHighBaseline");
     Expect((long)kBSLNLastBaseline, "kBSLNLastBaseline");
@@ -4261,14 +4257,14 @@ void Check9()
     Expect((long)offsetof(sfntFontRunFeature, setting), "__builtin_offsetof(struct sfntFontRunFeature, setting)");
     Expect((long)sizeof(sfntFeatureHeader), "sizeof(struct sfntFeatureHeader)");
     Expect((long)alignof(sfntFeatureHeader), "_Alignof(struct sfntFeatureHeader)");
-}
-
-void Check10()
-{
     Expect((long)offsetof(sfntFeatureHeader, version), "__builtin_offsetof(struct sfntFeatureHeader, version)");
     Expect((long)offsetof(sfntFeatureHeader, featureNameCount), "__builtin_offsetof(struct sfntFeatureHeader, featureNameCount)");
     Expect((long)offsetof(sfntFeatureHeader, featureSetCount), "__builtin_offsetof(struct sfntFeatureHeader, featureSetCount)");
     Expect((long)offsetof(sfntFeatureHeader, reserved), "__builtin_offsetof(struct sfntFeatureHeader, reserved)");
+}
+
+void Check10()
+{
     Expect((long)offsetof(sfntFeatureHeader, names), "__builtin_offsetof(struct sfntFeatureHeader, names)");
     Expect((long)offsetof(sfntFeatureHeader, settings), "__builtin_offsetof(struct sfntFeatureHeader, settings)");
     Expect((long)offsetof(sfntFeatureHeader, runs), "__builtin_offsetof(struct sfntFeatureHeader, runs)");
@@ -4665,14 +4661,14 @@ void Check10()
     Expect((long)offsetof(_IODataQueueEntry, data), "__builtin_offsetof(struct _IODataQueueEntry, data)");
     Expect((long)sizeof(_IODataQueueMemory), "sizeof(struct _IODataQueueMemory)");
     Expect((long)alignof(_IODataQueueMemory), "_Alignof(struct _IODataQueueMemory)");
-}
-
-void Check11()
-{
     Expect((long)offsetof(_IODataQueueMemory, queueSize), "__builtin_offsetof(struct _IODataQueueMemory, queueSize)");
     Expect((long)offsetof(_IODataQueueMemory, head), "__builtin_offsetof(struct _IODataQueueMemory, head)");
     Expect((long)offsetof(_IODataQueueMemory, tail), "__builtin_offsetof(struct _IODataQueueMemory, tail)");
     Expect((long)offsetof(_IODataQueueMemory, queue), "__builtin_offsetof(struct _IODataQueueMemory, queue)");
+}
+
+void Check11()
+{
     Expect((long)sizeof(_IODataQueueAppendix), "sizeof(struct _IODataQueueAppendix)");
     Expect((long)alignof(_IODataQueueAppendix), "_Alignof(struct _IODataQueueAppendix)");
     Expect((long)offsetof(_IODataQueueAppendix, version), "__builtin_offsetof(struct _IODataQueueAppendix, version)");
@@ -5069,14 +5065,14 @@ void Check11()
     Expect((long)errSecInvalidName, "errSecInvalidName");
     Expect((long)errSecInvalidCertificateRef, "errSecInvalidCertificateRef");
     Expect((long)errSecInvalidCertificateGroup, "errSecInvalidCertificateGroup");
-}
-
-void Check12()
-{
     Expect((long)errSecTagNotFound, "errSecTagNotFound");
     Expect((long)errSecInvalidQuery, "errSecInvalidQuery");
     Expect((long)errSecInvalidValue, "errSecInvalidValue");
     Expect((long)errSecCallbackFailed, "errSecCallbackFailed");
+}
+
+void Check12()
+{
     Expect((long)errSecACLDeleteFailed, "errSecACLDeleteFailed");
     Expect((long)errSecACLReplaceFailed, "errSecACLReplaceFailed");
     Expect((long)errSecACLAddFailed, "errSecACLAddFailed");
@@ -5473,14 +5469,14 @@ void Check12()
     Expect((long)CSSM_WORDID_CANCELED, "CSSM_WORDID_CANCELED");
     Expect((long)CSSM_WORDID_CERT, "CSSM_WORDID_CERT");
     Expect((long)CSSM_WORDID_COMMENT, "CSSM_WORDID_COMMENT");
-}
-
-void Check13()
-{
     Expect((long)CSSM_WORDID_CRL, "CSSM_WORDID_CRL");
     Expect((long)CSSM_WORDID_CUSTOM, "CSSM_WORDID_CUSTOM");
     Expect((long)CSSM_WORDID_D, "CSSM_WORDID_D");
     Expect((long)CSSM_WORDID_DATE, "CSSM_WORDID_DATE");
+}
+
+void Check13()
+{
     Expect((long)CSSM_WORDID_DB_DELETE, "CSSM_WORDID_DB_DELETE");
     Expect((long)CSSM_WORDID_DB_EXEC_STORED_QUERY, "CSSM_WORDID_DB_EXEC_STORED_QUERY");
     Expect((long)CSSM_WORDID_DB_INSERT, "CSSM_WORDID_DB_INSERT");
@@ -5877,14 +5873,14 @@ void Check13()
     Expect((long)CSSM_ALGID_MD4, "CSSM_ALGID_MD4");
     Expect((long)CSSM_ALGID_MD5, "CSSM_ALGID_MD5");
     Expect((long)CSSM_ALGID_SHA1, "CSSM_ALGID_SHA1");
-}
-
-void Check14()
-{
     Expect((long)CSSM_ALGID_NHASH, "CSSM_ALGID_NHASH");
     Expect((long)CSSM_ALGID_HAVAL, "CSSM_ALGID_HAVAL");
     Expect((long)CSSM_ALGID_RIPEMD, "CSSM_ALGID_RIPEMD");
     Expect((long)CSSM_ALGID_IBCHASH, "CSSM_ALGID_IBCHASH");
+}
+
+void Check14()
+{
     Expect((long)CSSM_ALGID_RIPEMAC, "CSSM_ALGID_RIPEMAC");
     Expect((long)CSSM_ALGID_DES, "CSSM_ALGID_DES");
     Expect((long)CSSM_ALGID_DESX, "CSSM_ALGID_DESX");
@@ -6281,14 +6277,14 @@ void Check14()
     Expect((long)CSSM_CRL_ENCODING_UNKNOWN, "CSSM_CRL_ENCODING_UNKNOWN");
     Expect((long)CSSM_CRL_ENCODING_CUSTOM, "CSSM_CRL_ENCODING_CUSTOM");
     Expect((long)CSSM_CRL_ENCODING_BER, "CSSM_CRL_ENCODING_BER");
-}
-
-void Check15()
-{
     Expect((long)CSSM_CRL_ENCODING_DER, "CSSM_CRL_ENCODING_DER");
     Expect((long)CSSM_CRL_ENCODING_BLOOM, "CSSM_CRL_ENCODING_BLOOM");
     Expect((long)CSSM_CRL_ENCODING_SEXPR, "CSSM_CRL_ENCODING_SEXPR");
     Expect((long)CSSM_CRL_ENCODING_MULTIPLE, "CSSM_CRL_ENCODING_MULTIPLE");
+}
+
+void Check15()
+{
     Expect((long)sizeof(cssm_encoded_crl), "sizeof(struct cssm_encoded_crl)");
     Expect((long)alignof(cssm_encoded_crl), "_Alignof(struct cssm_encoded_crl)");
     Expect((long)offsetof(cssm_encoded_crl, CrlType), "__builtin_offsetof(struct cssm_encoded_crl, CrlType)");
@@ -6685,14 +6681,14 @@ void Check15()
     Expect((long)alignof(cssm_db_schema_index_info), "_Alignof(struct cssm_db_schema_index_info)");
     Expect((long)offsetof(cssm_db_schema_index_info, AttributeId), "__builtin_offsetof(struct cssm_db_schema_index_info, AttributeId)");
     Expect((long)offsetof(cssm_db_schema_index_info, IndexId), "__builtin_offsetof(struct cssm_db_schema_index_info, IndexId)");
-}
-
-void Check16()
-{
     Expect((long)offsetof(cssm_db_schema_index_info, IndexType), "__builtin_offsetof(struct cssm_db_schema_index_info, IndexType)");
     Expect((long)offsetof(cssm_db_schema_index_info, IndexedDataLocation), "__builtin_offsetof(struct cssm_db_schema_index_info, IndexedDataLocation)");
     Expect((long)sizeof(cssm_x509_type_value_pair), "sizeof(struct cssm_x509_type_value_pair)");
     Expect((long)alignof(cssm_x509_type_value_pair), "_Alignof(struct cssm_x509_type_value_pair)");
+}
+
+void Check16()
+{
     Expect((long)offsetof(cssm_x509_type_value_pair, type), "__builtin_offsetof(struct cssm_x509_type_value_pair, type)");
     Expect((long)offsetof(cssm_x509_type_value_pair, valueType), "__builtin_offsetof(struct cssm_x509_type_value_pair, valueType)");
     Expect((long)offsetof(cssm_x509_type_value_pair, value), "__builtin_offsetof(struct cssm_x509_type_value_pair, value)");
@@ -7089,14 +7085,14 @@ void Check16()
     Expect((long)CSSMERR_CSP_INVALID_CONTEXT, "CSSMERR_CSP_INVALID_CONTEXT");
     Expect((long)CSSMERR_CSP_INVALID_ALGORITHM, "CSSMERR_CSP_INVALID_ALGORITHM");
     Expect((long)CSSMERR_CSP_INVALID_ATTR_KEY, "CSSMERR_CSP_INVALID_ATTR_KEY");
-}
-
-void Check17()
-{
     Expect((long)CSSMERR_CSP_MISSING_ATTR_KEY, "CSSMERR_CSP_MISSING_ATTR_KEY");
     Expect((long)CSSMERR_CSP_INVALID_ATTR_INIT_VECTOR, "CSSMERR_CSP_INVALID_ATTR_INIT_VECTOR");
     Expect((long)CSSMERR_CSP_MISSING_ATTR_INIT_VECTOR, "CSSMERR_CSP_MISSING_ATTR_INIT_VECTOR");
     Expect((long)CSSMERR_CSP_INVALID_ATTR_SALT, "CSSMERR_CSP_INVALID_ATTR_SALT");
+}
+
+void Check17()
+{
     Expect((long)CSSMERR_CSP_MISSING_ATTR_SALT, "CSSMERR_CSP_MISSING_ATTR_SALT");
     Expect((long)CSSMERR_CSP_INVALID_ATTR_PADDING, "CSSMERR_CSP_INVALID_ATTR_PADDING");
     Expect((long)CSSMERR_CSP_MISSING_ATTR_PADDING, "CSSMERR_CSP_MISSING_ATTR_PADDING");
@@ -7493,14 +7489,14 @@ void Check17()
     Expect((long)alignof(__CE_GeneralSubtrees), "_Alignof(struct __CE_GeneralSubtrees)");
     Expect((long)offsetof(__CE_GeneralSubtrees, numSubtrees), "__builtin_offsetof(struct __CE_GeneralSubtrees, numSubtrees)");
     Expect((long)offsetof(__CE_GeneralSubtrees, subtrees), "__builtin_offsetof(struct __CE_GeneralSubtrees, subtrees)");
-}
-
-void Check18()
-{
     Expect((long)sizeof(__CE_NameConstraints), "sizeof(struct __CE_NameConstraints)");
     Expect((long)alignof(__CE_NameConstraints), "_Alignof(struct __CE_NameConstraints)");
     Expect((long)offsetof(__CE_NameConstraints, permitted), "__builtin_offsetof(struct __CE_NameConstraints, permitted)");
     Expect((long)offsetof(__CE_NameConstraints, excluded), "__builtin_offsetof(struct __CE_NameConstraints, excluded)");
+}
+
+void Check18()
+{
     Expect((long)sizeof(__CE_PolicyMapping), "sizeof(struct __CE_PolicyMapping)");
     Expect((long)alignof(__CE_PolicyMapping), "_Alignof(struct __CE_PolicyMapping)");
     Expect((long)offsetof(__CE_PolicyMapping, issuerDomainPolicy), "__builtin_offsetof(struct __CE_PolicyMapping, issuerDomainPolicy)");
@@ -7897,14 +7893,14 @@ void Check18()
     Expect((long)CSSM_FEE_PRIME_TYPE_GENERAL, "CSSM_FEE_PRIME_TYPE_GENERAL");
     Expect((long)CSSM_FEE_CURVE_TYPE_DEFAULT, "CSSM_FEE_CURVE_TYPE_DEFAULT");
     Expect((long)CSSM_FEE_CURVE_TYPE_MONTGOMERY, "CSSM_FEE_CURVE_TYPE_MONTGOMERY");
-}
-
-void Check19()
-{
     Expect((long)CSSM_FEE_CURVE_TYPE_WEIERSTRASS, "CSSM_FEE_CURVE_TYPE_WEIERSTRASS");
     Expect((long)CSSM_FEE_CURVE_TYPE_ANSI_X9_62, "CSSM_FEE_CURVE_TYPE_ANSI_X9_62");
     Expect((long)CSSM_ASC_OPTIMIZE_DEFAULT, "CSSM_ASC_OPTIMIZE_DEFAULT");
     Expect((long)CSSM_ASC_OPTIMIZE_SIZE, "CSSM_ASC_OPTIMIZE_SIZE");
+}
+
+void Check19()
+{
     Expect((long)CSSM_ASC_OPTIMIZE_SECURITY, "CSSM_ASC_OPTIMIZE_SECURITY");
     Expect((long)CSSM_ASC_OPTIMIZE_TIME, "CSSM_ASC_OPTIMIZE_TIME");
     Expect((long)CSSM_ASC_OPTIMIZE_TIME_SIZE, "CSSM_ASC_OPTIMIZE_TIME_SIZE");
@@ -8301,14 +8297,14 @@ void Check19()
     Expect((long)TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384");
     Expect((long)TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256, "TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256");
     Expect((long)TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384, "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384");
-}
-
-void Check20()
-{
     Expect((long)TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256");
     Expect((long)TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384");
     Expect((long)TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256, "TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256");
     Expect((long)TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384, "TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384");
+}
+
+void Check20()
+{
     Expect((long)TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256");
     Expect((long)TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
     Expect((long)TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256, "TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256");
@@ -8705,14 +8701,14 @@ void Check20()
     Expect((long)SecKeychainPromptSelector.InvalidAct, "kSecKeychainPromptInvalidAct");
     Expect((long)SecItemClass.InternetPasswordItemClass, "kSecInternetPasswordItemClass");
     Expect((long)SecItemClass.GenericPasswordItemClass, "kSecGenericPasswordItemClass");
-}
-
-void Check21()
-{
     Expect((long)SecItemClass.AppleSharePasswordItemClass, "kSecAppleSharePasswordItemClass");
     Expect((long)SecItemClass.CertificateItemClass, "kSecCertificateItemClass");
     Expect((long)SecItemClass.PublicKeyItemClass, "kSecPublicKeyItemClass");
     Expect((long)SecItemClass.PrivateKeyItemClass, "kSecPrivateKeyItemClass");
+}
+
+void Check21()
+{
     Expect((long)SecItemClass.SymmetricKeyItemClass, "kSecSymmetricKeyItemClass");
     Expect((long)SecItemAttr.CreationDateItemAttr, "kSecCreationDateItemAttr");
     Expect((long)SecItemAttr.ModDateItemAttr, "kSecModDateItemAttr");
@@ -9109,14 +9105,14 @@ void Check21()
     Expect((long)BER_TAG_T61_STRING, "(BER_TAG_T61_STRING)");
     Expect((long)BER_TAG_TELETEX_STRING, "(BER_TAG_TELETEX_STRING)");
     Expect((long)BER_TAG_VIDEOTEX_STRING, "(BER_TAG_VIDEOTEX_STRING)");
-}
-
-void Check22()
-{
     Expect((long)BER_TAG_IA5_STRING, "(BER_TAG_IA5_STRING)");
     Expect((long)BER_TAG_UTC_TIME, "(BER_TAG_UTC_TIME)");
     Expect((long)BER_TAG_GENERALIZED_TIME, "(BER_TAG_GENERALIZED_TIME)");
     Expect((long)BER_TAG_GRAPHIC_STRING, "(BER_TAG_GRAPHIC_STRING)");
+}
+
+void Check22()
+{
     Expect((long)BER_TAG_ISO646_STRING, "(BER_TAG_ISO646_STRING)");
     Expect((long)BER_TAG_GENERAL_STRING, "(BER_TAG_GENERAL_STRING)");
     Expect((long)BER_TAG_VISIBLE_STRING, "(BER_TAG_VISIBLE_STRING)");
@@ -9513,14 +9509,14 @@ void Check22()
     Expect((long)INTEL_X509V3_CERT_R08, "(INTEL_X509V3_CERT_R08)");
     Expect((long)INTEL_X509V3_CERT_R08_LENGTH, "(INTEL_X509V3_CERT_R08_LENGTH)");
     Expect((long)INTEL_X509V3_CERT_PRIVATE_EXTENSIONS, "(INTEL_X509V3_CERT_PRIVATE_EXTENSIONS)");
-}
-
-void Check23()
-{
     Expect((long)INTEL_X509V3_CERT_PRIVATE_EXTENSIONS_LENGTH, "(INTEL_X509V3_CERT_PRIVATE_EXTENSIONS_LENGTH)");
     Expect((long)INTEL_X509V3_SIGN_R08, "(INTEL_X509V3_SIGN_R08)");
     Expect((long)INTEL_X509V3_SIGN_R08_LENGTH, "(INTEL_X509V3_SIGN_R08_LENGTH)");
     Expect((long)CE_NCT_SSL_Client, "(CE_NCT_SSL_Client)");
+}
+
+void Check23()
+{
     Expect((long)CE_NCT_SSL_Server, "(CE_NCT_SSL_Server)");
     Expect((long)CE_NCT_SMIME, "(CE_NCT_SMIME)");
     Expect((long)CE_NCT_ObjSign, "(CE_NCT_ObjSign)");
@@ -9917,14 +9913,14 @@ void Check23()
     Expect((long)kAudioChannelLabel_LFE2, "kAudioChannelLabel_LFE2");
     Expect((long)kAudioChannelLabel_LeftTotal, "kAudioChannelLabel_LeftTotal");
     Expect((long)kAudioChannelLabel_RightTotal, "kAudioChannelLabel_RightTotal");
-}
-
-void Check24()
-{
     Expect((long)kAudioChannelLabel_HearingImpaired, "kAudioChannelLabel_HearingImpaired");
     Expect((long)kAudioChannelLabel_Narration, "kAudioChannelLabel_Narration");
     Expect((long)kAudioChannelLabel_Mono, "kAudioChannelLabel_Mono");
     Expect((long)kAudioChannelLabel_DialogCentricMix, "kAudioChannelLabel_DialogCentricMix");
+}
+
+void Check24()
+{
     Expect((long)kAudioChannelLabel_CenterSurroundDirect, "kAudioChannelLabel_CenterSurroundDirect");
     Expect((long)kAudioChannelLabel_Haptic, "kAudioChannelLabel_Haptic");
     Expect((long)kAudioChannelLabel_LeftTopFront, "kAudioChannelLabel_LeftTopFront");
@@ -10321,14 +10317,14 @@ void Check24()
     Expect((long)kAudioObjectPropertyBaseClass, "kAudioObjectPropertyBaseClass");
     Expect((long)kAudioObjectPropertyClass, "kAudioObjectPropertyClass");
     Expect((long)kAudioObjectPropertyOwner, "kAudioObjectPropertyOwner");
-}
-
-void Check25()
-{
     Expect((long)kAudioObjectPropertyName, "kAudioObjectPropertyName");
     Expect((long)kAudioObjectPropertyModelName, "kAudioObjectPropertyModelName");
     Expect((long)kAudioObjectPropertyManufacturer, "kAudioObjectPropertyManufacturer");
     Expect((long)kAudioObjectPropertyElementName, "kAudioObjectPropertyElementName");
+}
+
+void Check25()
+{
     Expect((long)kAudioObjectPropertyElementCategoryName, "kAudioObjectPropertyElementCategoryName");
     Expect((long)kAudioObjectPropertyElementNumberName, "kAudioObjectPropertyElementNumberName");
     Expect((long)kAudioObjectPropertyOwnedObjects, "kAudioObjectPropertyOwnedObjects");
@@ -10725,14 +10721,14 @@ void Check25()
     Expect((long)offsetof(AudioServerPlugInIOCycleInfo, mIOCycleCounter), "__builtin_offsetof(struct AudioServerPlugInIOCycleInfo, mIOCycleCounter)");
     Expect((long)offsetof(AudioServerPlugInIOCycleInfo, mNominalIOBufferFrameSize), "__builtin_offsetof(struct AudioServerPlugInIOCycleInfo, mNominalIOBufferFrameSize)");
     Expect((long)offsetof(AudioServerPlugInIOCycleInfo, mCurrentTime), "__builtin_offsetof(struct AudioServerPlugInIOCycleInfo, mCurrentTime)");
-}
-
-void Check26()
-{
     Expect((long)offsetof(AudioServerPlugInIOCycleInfo, mInputTime), "__builtin_offsetof(struct AudioServerPlugInIOCycleInfo, mInputTime)");
     Expect((long)offsetof(AudioServerPlugInIOCycleInfo, mOutputTime), "__builtin_offsetof(struct AudioServerPlugInIOCycleInfo, mOutputTime)");
     Expect((long)offsetof(AudioServerPlugInIOCycleInfo, mDeviceHostTicksPerFrame), "__builtin_offsetof(struct AudioServerPlugInIOCycleInfo, mDeviceHostTicksPerFrame)");
     Expect((long)kAudioObjectPlugInObject, "kAudioObjectPlugInObject");
+}
+
+void Check26()
+{
     Expect((long)kAudioServerPlugInHostClientID, "kAudioServerPlugInHostClientID");
     Expect((long)kAudioServerPlugInCustomPropertyDataTypeNone, "kAudioServerPlugInCustomPropertyDataTypeNone");
     Expect((long)kAudioServerPlugInCustomPropertyDataTypeCFString, "kAudioServerPlugInCustomPropertyDataTypeCFString");
@@ -11129,14 +11125,14 @@ void Check26()
     Expect((long)offsetof(MIDICIProfileIDStandard, profileVersion), "__builtin_offsetof(MIDICIProfileIDStandard, profileVersion)");
     Expect((long)offsetof(MIDICIProfileIDStandard, profileLevel), "__builtin_offsetof(MIDICIProfileIDStandard, profileLevel)");
     Expect((long)sizeof(MIDICIProfileIDManufacturerSpecific), "sizeof(MIDICIProfileIDManufacturerSpecific)");
-}
-
-void Check27()
-{
     Expect((long)alignof(MIDICIProfileIDManufacturerSpecific), "_Alignof(MIDICIProfileIDManufacturerSpecific)");
     Expect((long)offsetof(MIDICIProfileIDManufacturerSpecific, sysExID1), "__builtin_offsetof(MIDICIProfileIDManufacturerSpecific, sysExID1)");
     Expect((long)offsetof(MIDICIProfileIDManufacturerSpecific, sysExID2), "__builtin_offsetof(MIDICIProfileIDManufacturerSpecific, sysExID2)");
     Expect((long)offsetof(MIDICIProfileIDManufacturerSpecific, sysExID3), "__builtin_offsetof(MIDICIProfileIDManufacturerSpecific, sysExID3)");
+}
+
+void Check27()
+{
     Expect((long)offsetof(MIDICIProfileIDManufacturerSpecific, info1), "__builtin_offsetof(MIDICIProfileIDManufacturerSpecific, info1)");
     Expect((long)offsetof(MIDICIProfileIDManufacturerSpecific, info2), "__builtin_offsetof(MIDICIProfileIDManufacturerSpecific, info2)");
     Expect((long)sizeof(MIDICIProfileID), "sizeof(MIDICIProfileID)");
@@ -11533,14 +11529,14 @@ void Check27()
     Expect((long)kAudioUnitErr_InstrumentTypeNotFound, "kAudioUnitErr_InstrumentTypeNotFound");
     Expect((long)kAudioUnitScope_Global, "kAudioUnitScope_Global");
     Expect((long)kAudioUnitScope_Input, "kAudioUnitScope_Input");
-}
-
-void Check28()
-{
     Expect((long)kAudioUnitScope_Output, "kAudioUnitScope_Output");
     Expect((long)kAudioUnitScope_Group, "kAudioUnitScope_Group");
     Expect((long)kAudioUnitScope_Part, "kAudioUnitScope_Part");
     Expect((long)kAudioUnitScope_Note, "kAudioUnitScope_Note");
+}
+
+void Check28()
+{
     Expect((long)kAudioUnitScope_Layer, "kAudioUnitScope_Layer");
     Expect((long)kAudioUnitScope_LayerItem, "kAudioUnitScope_LayerItem");
     Expect((long)kAudioUnitProperty_ClassInfo, "kAudioUnitProperty_ClassInfo");
@@ -11937,14 +11933,14 @@ void Check28()
     Expect((long)AUSpatialMixerPointSourceInHeadMode.Bypass, "kSpatialMixerPointSourceInHeadMode_Bypass");
     Expect((long)kAUAudioMixProperty_SpatialAudioMixMetadata, "kAUAudioMixProperty_SpatialAudioMixMetadata");
     Expect((long)kAUAudioMixProperty_EnableSpatialization, "kAUAudioMixProperty_EnableSpatialization");
-}
-
-void Check29()
-{
     Expect((long)kAudioUnitProperty_3DMixerDistanceParams, "kAudioUnitProperty_3DMixerDistanceParams");
     Expect((long)kAudioUnitProperty_3DMixerAttenuationCurve, "kAudioUnitProperty_3DMixerAttenuationCurve");
     Expect((long)kAudioUnitProperty_DopplerShift, "kAudioUnitProperty_DopplerShift");
     Expect((long)kAudioUnitProperty_3DMixerRenderingFlags, "kAudioUnitProperty_3DMixerRenderingFlags");
+}
+
+void Check29()
+{
     Expect((long)kAudioUnitProperty_3DMixerDistanceAtten, "kAudioUnitProperty_3DMixerDistanceAtten");
     Expect((long)kAudioUnitProperty_ReverbPreset, "kAudioUnitProperty_ReverbPreset");
     Expect((long)AU3DMixerRenderingFlags.InterAuralDelay, "k3DMixerRenderingFlags_InterAuralDelay");
@@ -12341,14 +12337,14 @@ void Check29()
     Expect((long)kAUNBandEQFilterType_ResonantHighShelf, "kAUNBandEQFilterType_ResonantHighShelf");
     Expect((long)kNumAUNBandEQFilterTypes, "kNumAUNBandEQFilterTypes");
     Expect((long)kRoundTripAACParam_Format, "kRoundTripAACParam_Format");
-}
-
-void Check30()
-{
     Expect((long)kRoundTripAACParam_EncodingStrategy, "kRoundTripAACParam_EncodingStrategy");
     Expect((long)kRoundTripAACParam_RateOrQuality, "kRoundTripAACParam_RateOrQuality");
     Expect((long)kRoundTripAACParam_BitRate, "kRoundTripAACParam_BitRate");
     Expect((long)kRoundTripAACParam_Quality, "kRoundTripAACParam_Quality");
+}
+
+void Check30()
+{
     Expect((long)kRoundTripAACParam_CompressedFormatSampleRate, "kRoundTripAACParam_CompressedFormatSampleRate");
     Expect((long)kAUSoundIsolationParam_WetDryMixPercent, "kAUSoundIsolationParam_WetDryMixPercent");
     Expect((long)kAUSoundIsolationParam_SoundToIsolate, "kAUSoundIsolationParam_SoundToIsolate");
@@ -12745,14 +12741,14 @@ void Check30()
     Expect((long)kAudioFileGlobalInfo_ExtensionsForType, "kAudioFileGlobalInfo_ExtensionsForType");
     Expect((long)kAudioFileGlobalInfo_HFSTypeCodesForType, "kAudioFileGlobalInfo_HFSTypeCodesForType");
     Expect((long)kAudioFileGlobalInfo_UTIsForType, "kAudioFileGlobalInfo_UTIsForType");
-}
-
-void Check31()
-{
     Expect((long)kAudioFileGlobalInfo_MIMETypesForType, "kAudioFileGlobalInfo_MIMETypesForType");
     Expect((long)kAudioFileGlobalInfo_TypesForMIMEType, "kAudioFileGlobalInfo_TypesForMIMEType");
     Expect((long)kAudioFileGlobalInfo_TypesForUTI, "kAudioFileGlobalInfo_TypesForUTI");
     Expect((long)kAudioFileGlobalInfo_TypesForHFSTypeCode, "kAudioFileGlobalInfo_TypesForHFSTypeCode");
+}
+
+void Check31()
+{
     Expect((long)kAudioFileGlobalInfo_TypesForExtension, "kAudioFileGlobalInfo_TypesForExtension");
     Expect((long)sizeof(AudioFileTypeAndFormatID), "sizeof(struct AudioFileTypeAndFormatID)");
     Expect((long)alignof(AudioFileTypeAndFormatID), "_Alignof(struct AudioFileTypeAndFormatID)");
@@ -13149,14 +13145,14 @@ void Check31()
     Expect((long)offsetof(CAFUMIDChunk, mBytes), "__builtin_offsetof(struct CAFUMIDChunk, mBytes)");
     Expect((long)kExtAudioFilePacketTableInfoOverride_UseFileValue, "kExtAudioFilePacketTableInfoOverride_UseFileValue");
     Expect((long)kExtAudioFilePacketTableInfoOverride_UseFileValueIfValid, "kExtAudioFilePacketTableInfoOverride_UseFileValueIfValid");
-}
-
-void Check32()
-{
     Expect((long)kExtAudioFileProperty_FileDataFormat, "kExtAudioFileProperty_FileDataFormat");
     Expect((long)kExtAudioFileProperty_FileChannelLayout, "kExtAudioFileProperty_FileChannelLayout");
     Expect((long)kExtAudioFileProperty_ClientDataFormat, "kExtAudioFileProperty_ClientDataFormat");
     Expect((long)kExtAudioFileProperty_ClientChannelLayout, "kExtAudioFileProperty_ClientChannelLayout");
+}
+
+void Check32()
+{
     Expect((long)kExtAudioFileProperty_CodecManufacturer, "kExtAudioFileProperty_CodecManufacturer");
     Expect((long)kExtAudioFileProperty_AudioConverter, "kExtAudioFileProperty_AudioConverter");
     Expect((long)kExtAudioFileProperty_AudioFile, "kExtAudioFileProperty_AudioFile");
@@ -13553,14 +13549,14 @@ void Check32()
     Expect((long)kControlPanelFolderAliasType, "kControlPanelFolderAliasType");
     Expect((long)kExtensionFolderAliasType, "kExtensionFolderAliasType");
     Expect((long)kExportedFolderAliasType, "kExportedFolderAliasType");
-}
-
-void Check33()
-{
     Expect((long)kDropFolderAliasType, "kDropFolderAliasType");
     Expect((long)kSharedFolderAliasType, "kSharedFolderAliasType");
     Expect((long)kMountedFolderAliasType, "kMountedFolderAliasType");
     Expect((long)kIsOnDesk, "kIsOnDesk");
+}
+
+void Check33()
+{
     Expect((long)kColor, "kColor");
     Expect((long)kIsShared, "kIsShared");
     Expect((long)kHasNoINITs, "kHasNoINITs");
@@ -13957,14 +13953,14 @@ void Check33()
     Expect((long)langHungarian, "langHungarian");
     Expect((long)langEstonian, "langEstonian");
     Expect((long)langLatvian, "langLatvian");
-}
-
-void Check34()
-{
     Expect((long)langSami, "langSami");
     Expect((long)langFaroese, "langFaroese");
     Expect((long)langFarsi, "langFarsi");
     Expect((long)langPersian, "langPersian");
+}
+
+void Check34()
+{
     Expect((long)langRussian, "langRussian");
     Expect((long)langSimpChinese, "langSimpChinese");
     Expect((long)langFlemish, "langFlemish");
@@ -14361,14 +14357,14 @@ void Check34()
     Expect((long)cedilla, "cedilla");
     Expect((long)doubleAcute, "doubleAcute");
     Expect((long)ogonek, "ogonek");
-}
-
-void Check35()
-{
     Expect((long)hachek, "hachek");
     Expect((long)tokenIntl, "tokenIntl");
     Expect((long)tokenEmpty, "tokenEmpty");
     Expect((long)tokenUnknown, "tokenUnknown");
+}
+
+void Check35()
+{
     Expect((long)tokenWhite, "tokenWhite");
     Expect((long)tokenLeftLit, "tokenLeftLit");
     Expect((long)tokenRightLit, "tokenRightLit");
@@ -14765,14 +14761,14 @@ void Check35()
     Expect((long)midiNoClientErr, "midiNoClientErr");
     Expect((long)midiNoPortErr, "midiNoPortErr");
     Expect((long)midiTooManyPortsErr, "midiTooManyPortsErr");
-}
-
-void Check36()
-{
     Expect((long)midiTooManyConsErr, "midiTooManyConsErr");
     Expect((long)midiVConnectErr, "midiVConnectErr");
     Expect((long)midiVConnectMade, "midiVConnectMade");
     Expect((long)midiVConnectRmvd, "midiVConnectRmvd");
+}
+
+void Check36()
+{
     Expect((long)midiNoConErr, "midiNoConErr");
     Expect((long)midiWriteErr, "midiWriteErr");
     Expect((long)midiNameLenErr, "midiNameLenErr");
@@ -15169,14 +15165,14 @@ void Check36()
     Expect((long)qtmlDllEntryNotFoundErr, "qtmlDllEntryNotFoundErr");
     Expect((long)qtmlUninitialized, "qtmlUninitialized");
     Expect((long)unsupportedOSErr, "unsupportedOSErr");
-}
-
-void Check37()
-{
     Expect((long)unsupportedProcessorErr, "unsupportedProcessorErr");
     Expect((long)componentNotThreadSafeErr, "componentNotThreadSafeErr");
     Expect((long)cannotFindAtomErr, "cannotFindAtomErr");
     Expect((long)notLeafAtomErr, "notLeafAtomErr");
+}
+
+void Check37()
+{
     Expect((long)atomsNotOfSameTypeErr, "atomsNotOfSameTypeErr");
     Expect((long)atomIndexInvalidErr, "atomIndexInvalidErr");
     Expect((long)duplicateAtomTypeAndIDErr, "duplicateAtomTypeAndIDErr");
@@ -15573,14 +15569,14 @@ void Check37()
     Expect((long)cmInvalidProfileLocation, "cmInvalidProfileLocation");
     Expect((long)cmCantCopyModifiedV1Profile, "cmCantCopyModifiedV1Profile");
     Expect((long)cmInvalidSearch, "cmInvalidSearch");
-}
-
-void Check38()
-{
     Expect((long)cmSearchError, "cmSearchError");
     Expect((long)cmErrIncompatibleProfile, "cmErrIncompatibleProfile");
     Expect((long)cmInvalidColorSpace, "cmInvalidColorSpace");
     Expect((long)cmInvalidSrcMap, "cmInvalidSrcMap");
+}
+
+void Check38()
+{
     Expect((long)cmInvalidDstMap, "cmInvalidDstMap");
     Expect((long)cmNoGDevicesError, "cmNoGDevicesError");
     Expect((long)cmInvalidProfileComment, "cmInvalidProfileComment");
@@ -15977,14 +15973,14 @@ void Check38()
     Expect((long)unicodeChecksumErr, "unicodeChecksumErr");
     Expect((long)unicodeNoTableErr, "unicodeNoTableErr");
     Expect((long)unicodeVariantErr, "unicodeVariantErr");
-}
-
-void Check39()
-{
     Expect((long)unicodeFallbacksErr, "unicodeFallbacksErr");
     Expect((long)unicodePartConvertErr, "unicodePartConvertErr");
     Expect((long)unicodeBufErr, "unicodeBufErr");
     Expect((long)unicodeCharErr, "unicodeCharErr");
+}
+
+void Check39()
+{
     Expect((long)unicodeElementErr, "unicodeElementErr");
     Expect((long)unicodeNotFoundErr, "unicodeNotFoundErr");
     Expect((long)unicodeTableFormatErr, "unicodeTableFormatErr");
@@ -16381,14 +16377,14 @@ void Check39()
     Expect((long)kNSpAlreadyAdvertisingErr, "kNSpAlreadyAdvertisingErr");
     Expect((long)kNSpNotAdvertisingErr, "kNSpNotAdvertisingErr");
     Expect((long)kNSpInvalidAddressErr, "kNSpInvalidAddressErr");
-}
-
-void Check40()
-{
     Expect((long)kNSpFreeQExhaustedErr, "kNSpFreeQExhaustedErr");
     Expect((long)kNSpRemovePlayerFailedErr, "kNSpRemovePlayerFailedErr");
     Expect((long)kNSpAddressInUseErr, "kNSpAddressInUseErr");
     Expect((long)kNSpFeatureNotImplementedErr, "kNSpFeatureNotImplementedErr");
+}
+
+void Check40()
+{
     Expect((long)kNSpNameRequiredErr, "kNSpNameRequiredErr");
     Expect((long)kNSpInvalidPlayerIDErr, "kNSpInvalidPlayerIDErr");
     Expect((long)kNSpInvalidGroupIDErr, "kNSpInvalidGroupIDErr");
@@ -16785,14 +16781,14 @@ void Check40()
     Expect((long)kTextEncodingMacCentralEurRoman, "kTextEncodingMacCentralEurRoman");
     Expect((long)kTextEncodingMacVietnamese, "kTextEncodingMacVietnamese");
     Expect((long)kTextEncodingMacExtArabic, "kTextEncodingMacExtArabic");
-}
-
-void Check41()
-{
     Expect((long)kTextEncodingMacSymbol, "kTextEncodingMacSymbol");
     Expect((long)kTextEncodingMacDingbats, "kTextEncodingMacDingbats");
     Expect((long)kTextEncodingMacTurkish, "kTextEncodingMacTurkish");
     Expect((long)kTextEncodingMacCroatian, "kTextEncodingMacCroatian");
+}
+
+void Check41()
+{
     Expect((long)kTextEncodingMacIcelandic, "kTextEncodingMacIcelandic");
     Expect((long)kTextEncodingMacRomanian, "kTextEncodingMacRomanian");
     Expect((long)kTextEncodingMacCeltic, "kTextEncodingMacCeltic");
@@ -17189,14 +17185,14 @@ void Check41()
     Expect((long)kUseNativeISA, "kUseNativeISA");
     Expect((long)kPassSelector, "kPassSelector");
     Expect((long)kDontPassSelector, "kDontPassSelector");
-}
-
-void Check42()
-{
     Expect((long)kRoutineIsNotDispatchedDefaultRoutine, "kRoutineIsNotDispatchedDefaultRoutine");
     Expect((long)kRoutineIsDispatchedDefaultRoutine, "kRoutineIsDispatchedDefaultRoutine");
     Expect((long)kProcDescriptorIsProcPtr, "kProcDescriptorIsProcPtr");
     Expect((long)kProcDescriptorIsIndex, "kProcDescriptorIsIndex");
+}
+
+void Check42()
+{
     Expect((long)sizeof(RoutineRecord), "sizeof(struct RoutineRecord)");
     Expect((long)alignof(RoutineRecord), "_Alignof(struct RoutineRecord)");
     Expect((long)offsetof(RoutineRecord, procInfo), "__builtin_offsetof(struct RoutineRecord, procInfo)");
@@ -17593,14 +17589,14 @@ void Check42()
     Expect((long)gestalt68040FPU, "gestalt68040FPU");
     Expect((long)gestaltFSAttr, "gestaltFSAttr");
     Expect((long)gestaltFullExtFSDispatching, "gestaltFullExtFSDispatching");
-}
-
-void Check43()
-{
     Expect((long)gestaltHasFSSpecCalls, "gestaltHasFSSpecCalls");
     Expect((long)gestaltHasFileSystemManager, "gestaltHasFileSystemManager");
     Expect((long)gestaltFSMDoesDynamicLoad, "gestaltFSMDoesDynamicLoad");
     Expect((long)gestaltFSSupports4GBVols, "gestaltFSSupports4GBVols");
+}
+
+void Check43()
+{
     Expect((long)gestaltFSSupports2TBVols, "gestaltFSSupports2TBVols");
     Expect((long)gestaltHasExtendedDiskInit, "gestaltHasExtendedDiskInit");
     Expect((long)gestaltDTMgrSupportsFSM, "gestaltDTMgrSupportsFSM");
@@ -17997,14 +17993,14 @@ void Check43()
     Expect((long)gestaltPPCSupportsIncomingAppleTalk, "gestaltPPCSupportsIncomingAppleTalk");
     Expect((long)gestaltPPCSupportsIncomingTCP_IP, "gestaltPPCSupportsIncomingTCP_IP");
     Expect((long)gestaltPPCSupportsOutgoingAppleTalk, "gestaltPPCSupportsOutgoingAppleTalk");
-}
-
-void Check44()
-{
     Expect((long)gestaltPPCSupportsOutgoingTCP_IP, "gestaltPPCSupportsOutgoingTCP_IP");
     Expect((long)gestaltPowerPCProcessorFeatures, "gestaltPowerPCProcessorFeatures");
     Expect((long)gestaltPowerPCHasGraphicsInstructions, "gestaltPowerPCHasGraphicsInstructions");
     Expect((long)gestaltPowerPCHasSTFIWXInstruction, "gestaltPowerPCHasSTFIWXInstruction");
+}
+
+void Check44()
+{
     Expect((long)gestaltPowerPCHasSquareRootInstructions, "gestaltPowerPCHasSquareRootInstructions");
     Expect((long)gestaltPowerPCHasDCBAInstruction, "gestaltPowerPCHasDCBAInstruction");
     Expect((long)gestaltPowerPCHasVectorInstructions, "gestaltPowerPCHasVectorInstructions");
@@ -18401,14 +18397,14 @@ void Check44()
     Expect((long)kHandleIsResourceBit, "kHandleIsResourceBit");
     Expect((long)kHandlePurgeableBit, "kHandlePurgeableBit");
     Expect((long)kHandleLockedBit, "kHandleLockedBit");
-}
-
-void Check45()
-{
     Expect((long)kHandleIsResourceMask, "kHandleIsResourceMask");
     Expect((long)kHandlePurgeableMask, "kHandlePurgeableMask");
     Expect((long)kHandleLockedMask, "kHandleLockedMask");
     Expect((long)kCSDiskSpaceRecoveryOptionNoUI, "kCSDiskSpaceRecoveryOptionNoUI");
+}
+
+void Check45()
+{
     Expect((long)toggleUndefined, "toggleUndefined");
     Expect((long)toggleOK, "toggleOK");
     Expect((long)toggleBadField, "toggleBadField");
@@ -18805,14 +18801,14 @@ void Check45()
     Expect((long)offsetof(FSRefForkIOParam, qLink), "__builtin_offsetof(struct FSRefForkIOParam, qLink)");
     Expect((long)offsetof(FSRefForkIOParam, qType), "__builtin_offsetof(struct FSRefForkIOParam, qType)");
     Expect((long)offsetof(FSRefForkIOParam, ioTrap), "__builtin_offsetof(struct FSRefForkIOParam, ioTrap)");
-}
-
-void Check46()
-{
     Expect((long)offsetof(FSRefForkIOParam, ioCmdAddr), "__builtin_offsetof(struct FSRefForkIOParam, ioCmdAddr)");
     Expect((long)offsetof(FSRefForkIOParam, ioCompletion), "__builtin_offsetof(struct FSRefForkIOParam, ioCompletion)");
     Expect((long)offsetof(FSRefForkIOParam, ioResult), "__builtin_offsetof(struct FSRefForkIOParam, ioResult)");
     Expect((long)offsetof(FSRefForkIOParam, parentRef), "__builtin_offsetof(struct FSRefForkIOParam, parentRef)");
+}
+
+void Check46()
+{
     Expect((long)offsetof(FSRefForkIOParam, nameLength), "__builtin_offsetof(struct FSRefForkIOParam, nameLength)");
     Expect((long)offsetof(FSRefForkIOParam, name), "__builtin_offsetof(struct FSRefForkIOParam, name)");
     Expect((long)offsetof(FSRefForkIOParam, whichInfo), "__builtin_offsetof(struct FSRefForkIOParam, whichInfo)");
@@ -19209,14 +19205,14 @@ void Check46()
     Expect((long)kForkInfoFlagsModifiedMask, "kForkInfoFlagsModifiedMask");
     Expect((long)kioACUserNoSeeFolderBit, "kioACUserNoSeeFolderBit");
     Expect((long)kioACUserNoSeeFolderMask, "kioACUserNoSeeFolderMask");
-}
-
-void Check47()
-{
     Expect((long)kioACUserNoSeeFilesBit, "kioACUserNoSeeFilesBit");
     Expect((long)kioACUserNoSeeFilesMask, "kioACUserNoSeeFilesMask");
     Expect((long)kioACUserNoMakeChangesBit, "kioACUserNoMakeChangesBit");
     Expect((long)kioACUserNoMakeChangesMask, "kioACUserNoMakeChangesMask");
+}
+
+void Check47()
+{
     Expect((long)kioACUserNotOwnerBit, "kioACUserNotOwnerBit");
     Expect((long)kioACUserNotOwnerMask, "kioACUserNotOwnerMask");
     Expect((long)kioACAccessOwnerBit, "kioACAccessOwnerBit");
@@ -19613,14 +19609,14 @@ void Check47()
     Expect((long)offsetof(MachineInformationPowerPC, Reserved), "__builtin_offsetof(struct MachineInformationPowerPC, Reserved)");
     Expect((long)sizeof(RegisterInformationPowerPC), "sizeof(struct RegisterInformationPowerPC)");
     Expect((long)alignof(RegisterInformationPowerPC), "_Alignof(struct RegisterInformationPowerPC)");
-}
-
-void Check48()
-{
     Expect((long)offsetof(RegisterInformationPowerPC, R0), "__builtin_offsetof(struct RegisterInformationPowerPC, R0)");
     Expect((long)offsetof(RegisterInformationPowerPC, R1), "__builtin_offsetof(struct RegisterInformationPowerPC, R1)");
     Expect((long)offsetof(RegisterInformationPowerPC, R2), "__builtin_offsetof(struct RegisterInformationPowerPC, R2)");
     Expect((long)offsetof(RegisterInformationPowerPC, R3), "__builtin_offsetof(struct RegisterInformationPowerPC, R3)");
+}
+
+void Check48()
+{
     Expect((long)offsetof(RegisterInformationPowerPC, R4), "__builtin_offsetof(struct RegisterInformationPowerPC, R4)");
     Expect((long)offsetof(RegisterInformationPowerPC, R5), "__builtin_offsetof(struct RegisterInformationPowerPC, R5)");
     Expect((long)offsetof(RegisterInformationPowerPC, R6), "__builtin_offsetof(struct RegisterInformationPowerPC, R6)");
@@ -20017,14 +20013,14 @@ void Check48()
     Expect((long)kFavoritesFolderType, "kFavoritesFolderType");
     Expect((long)kInternetSearchSitesFolderType, "kInternetSearchSitesFolderType");
     Expect((long)kInstallerLogsFolderType, "kInstallerLogsFolderType");
-}
-
-void Check49()
-{
     Expect((long)kScriptsFolderType, "kScriptsFolderType");
     Expect((long)kFolderActionsFolderType, "kFolderActionsFolderType");
     Expect((long)kSpeakableItemsFolderType, "kSpeakableItemsFolderType");
     Expect((long)kKeychainFolderType, "kKeychainFolderType");
+}
+
+void Check49()
+{
     Expect((long)kColorSyncFolderType, "kColorSyncFolderType");
     Expect((long)kColorSyncCMMFolderType, "kColorSyncCMMFolderType");
     Expect((long)kColorSyncScriptingFolderType, "kColorSyncScriptingFolderType");
@@ -20421,14 +20417,14 @@ void Check49()
     Expect((long)kPEFRelocSmSetSectD, "kPEFRelocSmSetSectD");
     Expect((long)kPEFRelocSmBySection, "kPEFRelocSmBySection");
     Expect((long)kPEFRelocIncrPosition, "kPEFRelocIncrPosition");
-}
-
-void Check50()
-{
     Expect((long)kPEFRelocSmRepeat, "kPEFRelocSmRepeat");
     Expect((long)kPEFRelocSetPosition, "kPEFRelocSetPosition");
     Expect((long)kPEFRelocLgByImport, "kPEFRelocLgByImport");
     Expect((long)kPEFRelocLgRepeat, "kPEFRelocLgRepeat");
+}
+
+void Check50()
+{
     Expect((long)kPEFRelocLgSetOrBySection, "kPEFRelocLgSetOrBySection");
     Expect((long)kPEFRelocUndefinedOpcode, "kPEFRelocUndefinedOpcode");
     Expect((long)kPEFRelocLgBySectionSubopcode, "kPEFRelocLgBySectionSubopcode");
@@ -20825,14 +20821,14 @@ void Check50()
     Expect((long)keyActualSenderAuditToken, "keyActualSenderAuditToken");
     Expect((long)keyAppleEventAttributesAttr, "keyAppleEventAttributesAttr");
     Expect((long)kAEDebugPOSTHeader, "kAEDebugPOSTHeader");
-}
-
-void Check51()
-{
     Expect((long)kAEDebugReplyHeader, "kAEDebugReplyHeader");
     Expect((long)kAEDebugXMLRequest, "kAEDebugXMLRequest");
     Expect((long)kAEDebugXMLResponse, "kAEDebugXMLResponse");
     Expect((long)kAEDebugXMLDebugAll, "kAEDebugXMLDebugAll");
+}
+
+void Check51()
+{
     Expect((long)kSOAP1999Schema, "kSOAP1999Schema");
     Expect((long)kSOAP2001Schema, "kSOAP2001Schema");
     Expect((long)keyUserNameAttr, "keyUserNameAttr");
@@ -21229,14 +21225,14 @@ void Check51()
     Expect((long)kAEDeactivate, "kAEDeactivate");
     Expect((long)kAECommandClass, "kAECommandClass");
     Expect((long)kAEKeyClass, "kAEKeyClass");
-}
-
-void Check52()
-{
     Expect((long)kAERawKey, "kAERawKey");
     Expect((long)kAEVirtualKey, "kAEVirtualKey");
     Expect((long)kAENavigationKey, "kAENavigationKey");
     Expect((long)kAEAutoDown, "kAEAutoDown");
+}
+
+void Check52()
+{
     Expect((long)kAEApplicationClass, "kAEApplicationClass");
     Expect((long)kAESuspend, "kAESuspend");
     Expect((long)kAEResume, "kAEResume");
@@ -21633,14 +21629,14 @@ void Check52()
     Expect((long)kFASuiteCode, "kFASuiteCode");
     Expect((long)kFAAttachCommand, "kFAAttachCommand");
     Expect((long)kFARemoveCommand, "kFARemoveCommand");
-}
-
-void Check53()
-{
     Expect((long)kFAEditCommand, "kFAEditCommand");
     Expect((long)kFAFileParam, "kFAFileParam");
     Expect((long)kFAIndexParam, "kFAIndexParam");
     Expect((long)kAEInternetSuite, "kAEInternetSuite");
+}
+
+void Check53()
+{
     Expect((long)kAEISWebStarSuite, "kAEISWebStarSuite");
     Expect((long)kAEISGetURL, "kAEISGetURL");
     Expect((long)KAEISHandleCGI, "KAEISHandleCGI");
@@ -22037,14 +22033,14 @@ void Check53()
     Expect((long)kPasswordChangedKCEvent, "kPasswordChangedKCEvent");
     Expect((long)kSystemKCEvent, "kSystemKCEvent");
     Expect((long)kDefaultChangedKCEvent, "kDefaultChangedKCEvent");
-}
-
-void Check54()
-{
     Expect((long)kDataAccessKCEvent, "kDataAccessKCEvent");
     Expect((long)kKeychainListChangedKCEvent, "kKeychainListChangedKCEvent");
     Expect((long)kIdleKCEventMask, "kIdleKCEventMask");
     Expect((long)kLockKCEventMask, "kLockKCEventMask");
+}
+
+void Check54()
+{
     Expect((long)kUnlockKCEventMask, "kUnlockKCEventMask");
     Expect((long)kAddKCEventMask, "kAddKCEventMask");
     Expect((long)kDeleteKCEventMask, "kDeleteKCEventMask");
@@ -22441,14 +22437,14 @@ void Check54()
     Expect((long)kGenericWindowIcon, "kGenericWindowIcon");
     Expect((long)kQuestionMarkIcon, "kQuestionMarkIcon");
     Expect((long)kDeleteAliasIcon, "kDeleteAliasIcon");
-}
-
-void Check55()
-{
     Expect((long)kEjectMediaIcon, "kEjectMediaIcon");
     Expect((long)kBurningIcon, "kBurningIcon");
     Expect((long)kRightContainerArrowIcon, "kRightContainerArrowIcon");
     Expect((long)kIconServicesNormalUsageFlag, "kIconServicesNormalUsageFlag");
+}
+
+void Check55()
+{
     Expect((long)kIconServicesNoBadgeFlag, "kIconServicesNoBadgeFlag");
     Expect((long)kIconServicesUpdateIfNeededFlag, "kIconServicesUpdateIfNeededFlag");
     Expect((long)kIconServicesCatalogInfoMask, "kIconServicesCatalogInfoMask");
@@ -22673,6 +22669,10 @@ void Check55()
     Expect((long)alignof(UnsignedWide), "_Alignof(struct UnsignedWide)");
     Expect((long)offsetof(UnsignedWide, lo), "__builtin_offsetof(struct UnsignedWide, lo)");
     Expect((long)offsetof(UnsignedWide, hi), "__builtin_offsetof(struct UnsignedWide, hi)");
+    Expect((long)sizeof(Float80), "sizeof(struct Float80)");
+    Expect((long)alignof(Float80), "_Alignof(struct Float80)");
+    Expect((long)offsetof(Float80, exp), "__builtin_offsetof(struct Float80, exp)");
+    Expect((long)offsetof(Float80, man), "__builtin_offsetof(struct Float80, man)");
     Expect((long)sizeof(ProcessSerialNumber), "sizeof(struct ProcessSerialNumber)");
     Expect((long)alignof(ProcessSerialNumber), "_Alignof(struct ProcessSerialNumber)");
     Expect((long)offsetof(ProcessSerialNumber, highLongOfPSN), "__builtin_offsetof(struct ProcessSerialNumber, highLongOfPSN)");
@@ -36035,21 +36035,120 @@ void Check88()
     Expect((long)sizeof(cl_char4), "sizeof(cl_char4)");
     Expect((long)alignof(cl_char4), "_Alignof(cl_char4)");
     Expect((long)offsetof(cl_char4, s), "__builtin_offsetof(cl_char4, s)");
+    Expect((long)sizeof(cl_char8), "sizeof(cl_char8)");
+    Expect((long)alignof(cl_char8), "_Alignof(cl_char8)");
+    Expect((long)offsetof(cl_char8, s), "__builtin_offsetof(cl_char8, s)");
+    Expect((long)sizeof(cl_char16), "sizeof(cl_char16)");
+    Expect((long)alignof(cl_char16), "_Alignof(cl_char16)");
+    Expect((long)offsetof(cl_char16, s), "__builtin_offsetof(cl_char16, s)");
     Expect((long)sizeof(cl_uchar2), "sizeof(cl_uchar2)");
     Expect((long)alignof(cl_uchar2), "_Alignof(cl_uchar2)");
     Expect((long)offsetof(cl_uchar2, s), "__builtin_offsetof(cl_uchar2, s)");
     Expect((long)sizeof(cl_uchar4), "sizeof(cl_uchar4)");
     Expect((long)alignof(cl_uchar4), "_Alignof(cl_uchar4)");
     Expect((long)offsetof(cl_uchar4, s), "__builtin_offsetof(cl_uchar4, s)");
+    Expect((long)sizeof(cl_uchar8), "sizeof(cl_uchar8)");
+    Expect((long)alignof(cl_uchar8), "_Alignof(cl_uchar8)");
+    Expect((long)offsetof(cl_uchar8, s), "__builtin_offsetof(cl_uchar8, s)");
+    Expect((long)sizeof(cl_uchar16), "sizeof(cl_uchar16)");
+    Expect((long)alignof(cl_uchar16), "_Alignof(cl_uchar16)");
+    Expect((long)offsetof(cl_uchar16, s), "__builtin_offsetof(cl_uchar16, s)");
     Expect((long)sizeof(cl_short2), "sizeof(cl_short2)");
     Expect((long)alignof(cl_short2), "_Alignof(cl_short2)");
     Expect((long)offsetof(cl_short2, s), "__builtin_offsetof(cl_short2, s)");
+    Expect((long)sizeof(cl_short4), "sizeof(cl_short4)");
+    Expect((long)alignof(cl_short4), "_Alignof(cl_short4)");
+    Expect((long)offsetof(cl_short4, s), "__builtin_offsetof(cl_short4, s)");
+    Expect((long)sizeof(cl_short8), "sizeof(cl_short8)");
+    Expect((long)alignof(cl_short8), "_Alignof(cl_short8)");
+    Expect((long)offsetof(cl_short8, s), "__builtin_offsetof(cl_short8, s)");
+    Expect((long)sizeof(cl_short16), "sizeof(cl_short16)");
+    Expect((long)alignof(cl_short16), "_Alignof(cl_short16)");
+    Expect((long)offsetof(cl_short16, s), "__builtin_offsetof(cl_short16, s)");
     Expect((long)sizeof(cl_ushort2), "sizeof(cl_ushort2)");
     Expect((long)alignof(cl_ushort2), "_Alignof(cl_ushort2)");
     Expect((long)offsetof(cl_ushort2, s), "__builtin_offsetof(cl_ushort2, s)");
+    Expect((long)sizeof(cl_ushort4), "sizeof(cl_ushort4)");
+    Expect((long)alignof(cl_ushort4), "_Alignof(cl_ushort4)");
+    Expect((long)offsetof(cl_ushort4, s), "__builtin_offsetof(cl_ushort4, s)");
+    Expect((long)sizeof(cl_ushort8), "sizeof(cl_ushort8)");
+    Expect((long)alignof(cl_ushort8), "_Alignof(cl_ushort8)");
+    Expect((long)offsetof(cl_ushort8, s), "__builtin_offsetof(cl_ushort8, s)");
+    Expect((long)sizeof(cl_ushort16), "sizeof(cl_ushort16)");
+    Expect((long)alignof(cl_ushort16), "_Alignof(cl_ushort16)");
+    Expect((long)offsetof(cl_ushort16, s), "__builtin_offsetof(cl_ushort16, s)");
+    Expect((long)sizeof(cl_int2), "sizeof(cl_int2)");
+    Expect((long)alignof(cl_int2), "_Alignof(cl_int2)");
+    Expect((long)offsetof(cl_int2, s), "__builtin_offsetof(cl_int2, s)");
+    Expect((long)sizeof(cl_int4), "sizeof(cl_int4)");
+    Expect((long)alignof(cl_int4), "_Alignof(cl_int4)");
+    Expect((long)offsetof(cl_int4, s), "__builtin_offsetof(cl_int4, s)");
+    Expect((long)sizeof(cl_int8), "sizeof(cl_int8)");
+    Expect((long)alignof(cl_int8), "_Alignof(cl_int8)");
+    Expect((long)offsetof(cl_int8, s), "__builtin_offsetof(cl_int8, s)");
+    Expect((long)sizeof(cl_int16), "sizeof(cl_int16)");
+    Expect((long)alignof(cl_int16), "_Alignof(cl_int16)");
+    Expect((long)offsetof(cl_int16, s), "__builtin_offsetof(cl_int16, s)");
+    Expect((long)sizeof(cl_uint2), "sizeof(cl_uint2)");
+    Expect((long)alignof(cl_uint2), "_Alignof(cl_uint2)");
+    Expect((long)offsetof(cl_uint2, s), "__builtin_offsetof(cl_uint2, s)");
+    Expect((long)sizeof(cl_uint4), "sizeof(cl_uint4)");
+    Expect((long)alignof(cl_uint4), "_Alignof(cl_uint4)");
+    Expect((long)offsetof(cl_uint4, s), "__builtin_offsetof(cl_uint4, s)");
+    Expect((long)sizeof(cl_uint8), "sizeof(cl_uint8)");
+    Expect((long)alignof(cl_uint8), "_Alignof(cl_uint8)");
+    Expect((long)offsetof(cl_uint8, s), "__builtin_offsetof(cl_uint8, s)");
+    Expect((long)sizeof(cl_uint16), "sizeof(cl_uint16)");
+    Expect((long)alignof(cl_uint16), "_Alignof(cl_uint16)");
+    Expect((long)offsetof(cl_uint16, s), "__builtin_offsetof(cl_uint16, s)");
+    Expect((long)sizeof(cl_long2), "sizeof(cl_long2)");
+    Expect((long)alignof(cl_long2), "_Alignof(cl_long2)");
+    Expect((long)offsetof(cl_long2, s), "__builtin_offsetof(cl_long2, s)");
+    Expect((long)sizeof(cl_long4), "sizeof(cl_long4)");
+    Expect((long)alignof(cl_long4), "_Alignof(cl_long4)");
+    Expect((long)offsetof(cl_long4, s), "__builtin_offsetof(cl_long4, s)");
+    Expect((long)sizeof(cl_long8), "sizeof(cl_long8)");
+    Expect((long)alignof(cl_long8), "_Alignof(cl_long8)");
+    Expect((long)offsetof(cl_long8, s), "__builtin_offsetof(cl_long8, s)");
+    Expect((long)sizeof(cl_long16), "sizeof(cl_long16)");
+    Expect((long)alignof(cl_long16), "_Alignof(cl_long16)");
+    Expect((long)offsetof(cl_long16, s), "__builtin_offsetof(cl_long16, s)");
+    Expect((long)sizeof(cl_ulong2), "sizeof(cl_ulong2)");
+    Expect((long)alignof(cl_ulong2), "_Alignof(cl_ulong2)");
+    Expect((long)offsetof(cl_ulong2, s), "__builtin_offsetof(cl_ulong2, s)");
+    Expect((long)sizeof(cl_ulong4), "sizeof(cl_ulong4)");
+    Expect((long)alignof(cl_ulong4), "_Alignof(cl_ulong4)");
+    Expect((long)offsetof(cl_ulong4, s), "__builtin_offsetof(cl_ulong4, s)");
+    Expect((long)sizeof(cl_ulong8), "sizeof(cl_ulong8)");
+    Expect((long)alignof(cl_ulong8), "_Alignof(cl_ulong8)");
+    Expect((long)offsetof(cl_ulong8, s), "__builtin_offsetof(cl_ulong8, s)");
+    Expect((long)sizeof(cl_ulong16), "sizeof(cl_ulong16)");
+    Expect((long)alignof(cl_ulong16), "_Alignof(cl_ulong16)");
+    Expect((long)offsetof(cl_ulong16, s), "__builtin_offsetof(cl_ulong16, s)");
     Expect((long)sizeof(cl_float2), "sizeof(cl_float2)");
     Expect((long)alignof(cl_float2), "_Alignof(cl_float2)");
     Expect((long)offsetof(cl_float2, s), "__builtin_offsetof(cl_float2, s)");
+    Expect((long)sizeof(cl_float4), "sizeof(cl_float4)");
+    Expect((long)alignof(cl_float4), "_Alignof(cl_float4)");
+    Expect((long)offsetof(cl_float4, s), "__builtin_offsetof(cl_float4, s)");
+    Expect((long)sizeof(cl_float8), "sizeof(cl_float8)");
+    Expect((long)alignof(cl_float8), "_Alignof(cl_float8)");
+    Expect((long)offsetof(cl_float8, s), "__builtin_offsetof(cl_float8, s)");
+    Expect((long)sizeof(cl_float16), "sizeof(cl_float16)");
+    Expect((long)alignof(cl_float16), "_Alignof(cl_float16)");
+    Expect((long)offsetof(cl_float16, s), "__builtin_offsetof(cl_float16, s)");
+    Expect((long)sizeof(cl_double2), "sizeof(cl_double2)");
+    Expect((long)alignof(cl_double2), "_Alignof(cl_double2)");
+    Expect((long)offsetof(cl_double2, s), "__builtin_offsetof(cl_double2, s)");
+    Expect((long)sizeof(cl_double4), "sizeof(cl_double4)");
+    Expect((long)alignof(cl_double4), "_Alignof(cl_double4)");
+    Expect((long)offsetof(cl_double4, s), "__builtin_offsetof(cl_double4, s)");
+    Expect((long)sizeof(cl_double8), "sizeof(cl_double8)");
+    Expect((long)alignof(cl_double8), "_Alignof(cl_double8)");
+    Expect((long)offsetof(cl_double8, s), "__builtin_offsetof(cl_double8, s)");
+    Expect((long)sizeof(cl_double16), "sizeof(cl_double16)");
+    Expect((long)alignof(cl_double16), "_Alignof(cl_double16)");
+    Expect((long)offsetof(cl_double16, s), "__builtin_offsetof(cl_double16, s)");
     Expect((long)sizeof(_cl_image_format), "sizeof(struct _cl_image_format)");
     Expect((long)alignof(_cl_image_format), "_Alignof(struct _cl_image_format)");
     Expect((long)offsetof(_cl_image_format, image_channel_order), "__builtin_offsetof(struct _cl_image_format, image_channel_order)");
@@ -36078,6 +36177,10 @@ void Check88()
     Expect((long)offsetof(_cl_ndrange, local_work_size), "__builtin_offsetof(struct _cl_ndrange, local_work_size)");
     Expect((long)clk_sampler_type.__CLK_ADDRESS_BASE, "__CLK_ADDRESS_BASE");
     Expect((long)clk_sampler_type.CLK_ADDRESS_NONE, "CLK_ADDRESS_NONE");
+}
+
+void Check89()
+{
     Expect((long)clk_sampler_type.CLK_ADDRESS_CLAMP, "CLK_ADDRESS_CLAMP");
     Expect((long)clk_sampler_type.CLK_ADDRESS_CLAMP_TO_EDGE, "CLK_ADDRESS_CLAMP_TO_EDGE");
     Expect((long)clk_sampler_type.CLK_ADDRESS_REPEAT, "CLK_ADDRESS_REPEAT");
@@ -36177,10 +36280,6 @@ void Check88()
     Expect((long)CL_INVALID_IMAGE_FORMAT_DESCRIPTOR, "(CL_INVALID_IMAGE_FORMAT_DESCRIPTOR)");
     Expect((long)CL_INVALID_IMAGE_SIZE, "(CL_INVALID_IMAGE_SIZE)");
     Expect((long)CL_INVALID_SAMPLER, "(CL_INVALID_SAMPLER)");
-}
-
-void Check89()
-{
     Expect((long)CL_INVALID_BINARY, "(CL_INVALID_BINARY)");
     Expect((long)CL_INVALID_BUILD_OPTIONS, "(CL_INVALID_BUILD_OPTIONS)");
     Expect((long)CL_INVALID_PROGRAM, "(CL_INVALID_PROGRAM)");
@@ -36482,6 +36581,10 @@ void Check89()
     Expect((long)CL_COMMAND_NATIVE_KERNEL, "(CL_COMMAND_NATIVE_KERNEL)");
     Expect((long)CL_COMMAND_READ_BUFFER, "(CL_COMMAND_READ_BUFFER)");
     Expect((long)CL_COMMAND_WRITE_BUFFER, "(CL_COMMAND_WRITE_BUFFER)");
+}
+
+void Check90()
+{
     Expect((long)CL_COMMAND_COPY_BUFFER, "(CL_COMMAND_COPY_BUFFER)");
     Expect((long)CL_COMMAND_READ_IMAGE, "(CL_COMMAND_READ_IMAGE)");
     Expect((long)CL_COMMAND_WRITE_IMAGE, "(CL_COMMAND_WRITE_IMAGE)");
@@ -36581,10 +36684,6 @@ void Check89()
     Expect((long)tDirStatus.DSCustomYieldFailed, "eDSCustomYieldFailed");
     Expect((long)tDirStatus.DSCorruptBuffer, "eDSCorruptBuffer");
     Expect((long)tDirStatus.DSInvalidIndex, "eDSInvalidIndex");
-}
-
-void Check90()
-{
     Expect((long)tDirStatus.DSIndexOutOfRange, "eDSIndexOutOfRange");
     Expect((long)tDirStatus.DSIndexNotFound, "eDSIndexNotFound");
     Expect((long)tDirStatus.DSCorruptRecEntryData, "eDSCorruptRecEntryData");
@@ -36886,6 +36985,10 @@ void Check90()
     Expect((long)kDVDErrorNotSupportedFunction, "kDVDErrorNotSupportedFunction");
     Expect((long)kDVDErrorNoValidMedia, "kDVDErrorNoValidMedia");
     Expect((long)kDVDErrorWrongParam, "kDVDErrorWrongParam");
+}
+
+void Check91()
+{
     Expect((long)kDVDErrorMissingGraphicsDevice, "kDVDErrorMissingGraphicsDevice");
     Expect((long)kDVDErrorGraphicsDevice, "kDVDErrorGraphicsDevice");
     Expect((long)kDVDErrorPlaybackOpen, "kDVDErrorPlaybackOpen");
@@ -36985,10 +37088,6 @@ void Check90()
     Expect((long)kDVDLanguageCodeBengali, "kDVDLanguageCodeBengali");
     Expect((long)kDVDLanguageCodeTibetan, "kDVDLanguageCodeTibetan");
     Expect((long)kDVDLanguageCodeBreton, "kDVDLanguageCodeBreton");
-}
-
-void Check91()
-{
     Expect((long)kDVDLanguageCodeCatalan, "kDVDLanguageCodeCatalan");
     Expect((long)kDVDLanguageCodeCorsican, "kDVDLanguageCodeCorsican");
     Expect((long)kDVDLanguageCodeCzech, "kDVDLanguageCodeCzech");
@@ -37290,6 +37389,10 @@ void Check91()
     Expect((long)alignof(FFENVELOPE), "_Alignof(struct FFENVELOPE)");
     Expect((long)offsetof(FFENVELOPE, dwSize), "__builtin_offsetof(struct FFENVELOPE, dwSize)");
     Expect((long)offsetof(FFENVELOPE, dwAttackLevel), "__builtin_offsetof(struct FFENVELOPE, dwAttackLevel)");
+}
+
+void Check92()
+{
     Expect((long)offsetof(FFENVELOPE, dwAttackTime), "__builtin_offsetof(struct FFENVELOPE, dwAttackTime)");
     Expect((long)offsetof(FFENVELOPE, dwFadeLevel), "__builtin_offsetof(struct FFENVELOPE, dwFadeLevel)");
     Expect((long)offsetof(FFENVELOPE, dwFadeTime), "__builtin_offsetof(struct FFENVELOPE, dwFadeTime)");
@@ -37389,10 +37492,6 @@ void Check91()
     Expect((long)FFJOFS_BUTTON14, "(FFJOFS_BUTTON14)");
     Expect((long)FFJOFS_BUTTON15, "(FFJOFS_BUTTON15)");
     Expect((long)FFJOFS_BUTTON16, "(FFJOFS_BUTTON16)");
-}
-
-void Check92()
-{
     Expect((long)FFJOFS_BUTTON17, "(FFJOFS_BUTTON17)");
     Expect((long)FFJOFS_BUTTON18, "(FFJOFS_BUTTON18)");
     Expect((long)FFJOFS_BUTTON19, "(FFJOFS_BUTTON19)");
@@ -37694,6 +37793,10 @@ void Check92()
     Expect((long)kICAFileImage, "kICAFileImage");
     Expect((long)kICAFileMovie, "kICAFileMovie");
     Expect((long)kICAFileAudio, "kICAFileAudio");
+}
+
+void Check93()
+{
     Expect((long)kICAFileFirmware, "kICAFileFirmware");
     Expect((long)kICAFileOther, "kICAFileOther");
     Expect((long)kICAProperty, "kICAProperty");
@@ -37793,10 +37896,6 @@ void Check92()
     Expect((long)offsetof(ICACopyObjectPropertyDictionaryPB, header), "__builtin_offsetof(struct ICACopyObjectPropertyDictionaryPB, header)");
     Expect((long)offsetof(ICACopyObjectPropertyDictionaryPB, object), "__builtin_offsetof(struct ICACopyObjectPropertyDictionaryPB, object)");
     Expect((long)offsetof(ICACopyObjectPropertyDictionaryPB, theDict), "__builtin_offsetof(struct ICACopyObjectPropertyDictionaryPB, theDict)");
-}
-
-void Check93()
-{
     Expect((long)kICAThumbnailFormatJPEG, "kICAThumbnailFormatJPEG");
     Expect((long)kICAThumbnailFormatTIFF, "kICAThumbnailFormatTIFF");
     Expect((long)kICAThumbnailFormatPNG, "kICAThumbnailFormatPNG");
@@ -38098,6 +38197,10 @@ void Check93()
     Expect((long)offsetof(ICD_Scannerscanner_callback_functions, f_ICD_ScannerOpenMassStorageDevice), "__builtin_offsetof(struct ICD_Scannerscanner_callback_functions, f_ICD_ScannerOpenMassStorageDevice)");
     Expect((long)offsetof(ICD_Scannerscanner_callback_functions, f_ICD_ScannerWriteDataToFileDescriptor), "__builtin_offsetof(struct ICD_Scannerscanner_callback_functions, f_ICD_ScannerWriteDataToFileDescriptor)");
     Expect((long)offsetof(ICD_Scannerscanner_callback_functions, f_ICD_ScannerWriteDataToFileDescriptor64), "__builtin_offsetof(struct ICD_Scannerscanner_callback_functions, f_ICD_ScannerWriteDataToFileDescriptor64)");
+}
+
+void Check94()
+{
     Expect((long)sizeof(ICARawFileHeader), "sizeof(struct ICARawFileHeader)");
     Expect((long)alignof(ICARawFileHeader), "_Alignof(struct ICARawFileHeader)");
     Expect((long)offsetof(ICARawFileHeader, imageDataOffset), "__builtin_offsetof(struct ICARawFileHeader, imageDataOffset)");
@@ -38197,10 +38300,6 @@ void Check93()
     Expect((long)kLSMMapLoadMutable, "kLSMMapLoadMutable");
     Expect((long)kLSMTextPreserveCase, "kLSMTextPreserveCase");
     Expect((long)kLSMTextPreserveAcronyms, "kLSMTextPreserveAcronyms");
-}
-
-void Check94()
-{
     Expect((long)kLSMTextApplySpamHeuristics, "kLSMTextApplySpamHeuristics");
     Expect((long)sizeof(NetFSMountInterface_V1), "sizeof(struct NetFSMountInterface_V1)");
     Expect((long)alignof(NetFSMountInterface_V1), "_Alignof(struct NetFSMountInterface_V1)");
@@ -38502,6 +38601,10 @@ void Check94()
     Expect((long)MAX_DEVICENAME, "(MAX_DEVICENAME)");
     Expect((long)SCARD_ATR_LENGTH, "(SCARD_ATR_LENGTH)");
     Expect((long)PCSCLITE_MAX_CHANNELS, "(PCSCLITE_MAX_CHANNELS)");
+}
+
+void Check95()
+{
     Expect((long)PCSCLITE_MAX_CONTEXTS, "(PCSCLITE_MAX_CONTEXTS)");
     Expect((long)PCSCLITE_MAX_COMSIZE, "(PCSCLITE_MAX_COMSIZE)");
     Expect((long)PCSCLITE_MAX_MESSAGE_SIZE, "(PCSCLITE_MAX_MESSAGE_SIZE)");
@@ -38601,10 +38704,6 @@ void Check94()
     Expect((long)MSC_AUT_PIN_2, "(MSC_AUT_PIN_2)");
     Expect((long)MSC_AUT_PIN_3, "(MSC_AUT_PIN_3)");
     Expect((long)MSC_AUT_PIN_4, "(MSC_AUT_PIN_4)");
-}
-
-void Check95()
-{
     Expect((long)MSC_AUT_KEY_0, "(MSC_AUT_KEY_0)");
     Expect((long)MSC_AUT_KEY_1, "(MSC_AUT_KEY_1)");
     Expect((long)MSC_AUT_KEY_2, "(MSC_AUT_KEY_2)");
@@ -38906,6 +39005,10 @@ void Check95()
     Expect((long)sizeof(TW_RGBRESPONSE), "sizeof(struct TW_RGBRESPONSE)");
     Expect((long)alignof(TW_RGBRESPONSE), "_Alignof(struct TW_RGBRESPONSE)");
     Expect((long)offsetof(TW_RGBRESPONSE, Response), "__builtin_offsetof(struct TW_RGBRESPONSE, Response)");
+}
+
+void Check96()
+{
     Expect((long)sizeof(TW_SETUPFILEXFER), "sizeof(struct TW_SETUPFILEXFER)");
     Expect((long)alignof(TW_SETUPFILEXFER), "_Alignof(struct TW_SETUPFILEXFER)");
     Expect((long)offsetof(TW_SETUPFILEXFER, FileName), "__builtin_offsetof(struct TW_SETUPFILEXFER, FileName)");
@@ -39005,10 +39108,6 @@ void Check95()
     Expect((long)alignof(TW_PASSTHRU), "_Alignof(struct TW_PASSTHRU)");
     Expect((long)offsetof(TW_PASSTHRU, pCommand), "__builtin_offsetof(struct TW_PASSTHRU, pCommand)");
     Expect((long)offsetof(TW_PASSTHRU, CommandBytes), "__builtin_offsetof(struct TW_PASSTHRU, CommandBytes)");
-}
-
-void Check96()
-{
     Expect((long)offsetof(TW_PASSTHRU, Direction), "__builtin_offsetof(struct TW_PASSTHRU, Direction)");
     Expect((long)offsetof(TW_PASSTHRU, pData), "__builtin_offsetof(struct TW_PASSTHRU, pData)");
     Expect((long)offsetof(TW_PASSTHRU, DataBytes), "__builtin_offsetof(struct TW_PASSTHRU, DataBytes)");
@@ -39310,6 +39409,10 @@ void Check96()
     Expect((long)TWIF_FINELINE, "(TWIF_FINELINE)");
     Expect((long)TWNF_NONE, "(TWNF_NONE)");
     Expect((long)TWNF_AUTO, "(TWNF_AUTO)");
+}
+
+void Check97()
+{
     Expect((long)TWNF_LONEPIXEL, "(TWNF_LONEPIXEL)");
     Expect((long)TWNF_MAJORITYRULE, "(TWNF_MAJORITYRULE)");
     Expect((long)TWOV_NONE, "(TWOV_NONE)");
@@ -39409,10 +39512,6 @@ void Check96()
     Expect((long)TWCY_GRENEDINES, "(TWCY_GRENEDINES)");
     Expect((long)TWCY_GUADELOUPE, "(TWCY_GUADELOUPE)");
     Expect((long)TWCY_GUAM, "(TWCY_GUAM)");
-}
-
-void Check97()
-{
     Expect((long)TWCY_GUANTANAMOBAY, "(TWCY_GUANTANAMOBAY)");
     Expect((long)TWCY_GUATEMALA, "(TWCY_GUATEMALA)");
     Expect((long)TWCY_GUINEA, "(TWCY_GUINEA)");
@@ -39714,6 +39813,10 @@ void Check97()
     Expect((long)DAT_PENDINGXFERS, "(DAT_PENDINGXFERS)");
     Expect((long)DAT_SETUPMEMXFER, "(DAT_SETUPMEMXFER)");
     Expect((long)DAT_SETUPFILEXFER, "(DAT_SETUPFILEXFER)");
+}
+
+void Check98()
+{
     Expect((long)DAT_STATUS, "(DAT_STATUS)");
     Expect((long)DAT_USERINTERFACE, "(DAT_USERINTERFACE)");
     Expect((long)DAT_XFERGROUP, "(DAT_XFERGROUP)");
@@ -39813,10 +39916,6 @@ void Check97()
     Expect((long)CAP_AUTOMATICCAPTURE, "(CAP_AUTOMATICCAPTURE)");
     Expect((long)CAP_TIMEBEFOREFIRSTCAPTURE, "(CAP_TIMEBEFOREFIRSTCAPTURE)");
     Expect((long)CAP_TIMEBETWEENCAPTURES, "(CAP_TIMEBETWEENCAPTURES)");
-}
-
-void Check98()
-{
     Expect((long)CAP_CLEARBUFFERS, "(CAP_CLEARBUFFERS)");
     Expect((long)CAP_MAXBATCHBUFFERS, "(CAP_MAXBATCHBUFFERS)");
     Expect((long)CAP_DEVICETIMEDATE, "(CAP_DEVICETIMEDATE)");
@@ -40118,6 +40217,10 @@ void Check98()
     Expect((long)NSWindowsCP1254StringEncoding, "NSWindowsCP1254StringEncoding");
     Expect((long)NSWindowsCP1250StringEncoding, "NSWindowsCP1250StringEncoding");
     Expect((long)NSISO2022JPStringEncoding, "NSISO2022JPStringEncoding");
+}
+
+void Check99()
+{
     Expect((long)NSMacOSRomanStringEncoding, "NSMacOSRomanStringEncoding");
     Expect((long)NSUTF16StringEncoding, "NSUTF16StringEncoding");
     Expect((long)NSUTF16BigEndianStringEncoding, "NSUTF16BigEndianStringEncoding");
@@ -40217,10 +40320,6 @@ void Check98()
     Expect((long)NSDataWritingOptions.AtomicWrite, "NSAtomicWrite");
     Expect((long)NSDataSearchOptions.Backwards, "NSDataSearchBackwards");
     Expect((long)NSDataSearchOptions.Anchored, "NSDataSearchAnchored");
-}
-
-void Check99()
-{
     Expect((long)NSDataBase64EncodingOptions.Encoding64CharacterLineLength, "NSDataBase64Encoding64CharacterLineLength");
     Expect((long)NSDataBase64EncodingOptions.Encoding76CharacterLineLength, "NSDataBase64Encoding76CharacterLineLength");
     Expect((long)NSDataBase64EncodingOptions.EncodingEndLineWithCarriageReturn, "NSDataBase64EncodingEndLineWithCarriageReturn");
@@ -40522,6 +40621,10 @@ void Check99()
     Expect((long)NSAlignmentOptions.HeightOutward, "NSAlignHeightOutward");
     Expect((long)NSAlignmentOptions.MinXNearest, "NSAlignMinXNearest");
     Expect((long)NSAlignmentOptions.MinYNearest, "NSAlignMinYNearest");
+}
+
+void Check100()
+{
     Expect((long)NSAlignmentOptions.MaxXNearest, "NSAlignMaxXNearest");
     Expect((long)NSAlignmentOptions.MaxYNearest, "NSAlignMaxYNearest");
     Expect((long)NSAlignmentOptions.WidthNearest, "NSAlignWidthNearest");
@@ -40621,10 +40724,6 @@ void Check99()
     Expect((long)NSWindows95OperatingSystem, "NSWindows95OperatingSystem");
     Expect((long)NSSolarisOperatingSystem, "NSSolarisOperatingSystem");
     Expect((long)NSHPUXOperatingSystem, "NSHPUXOperatingSystem");
-}
-
-void Check100()
-{
     Expect((long)NSMACHOperatingSystem, "NSMACHOperatingSystem");
     Expect((long)NSSunOSOperatingSystem, "NSSunOSOperatingSystem");
     Expect((long)NSOSF1OperatingSystem, "NSOSF1OperatingSystem");
@@ -40926,6 +41025,10 @@ void Check100()
     Expect((long)NSPropertyListErrorMinimum, "NSPropertyListErrorMinimum");
     Expect((long)NSPropertyListErrorMaximum, "NSPropertyListErrorMaximum");
     Expect((long)NSXPCConnectionInterrupted, "NSXPCConnectionInterrupted");
+}
+
+void Check101()
+{
     Expect((long)NSXPCConnectionInvalid, "NSXPCConnectionInvalid");
     Expect((long)NSXPCConnectionReplyInvalid, "NSXPCConnectionReplyInvalid");
     Expect((long)NSXPCConnectionCodeSigningRequirementFailure, "NSXPCConnectionCodeSigningRequirementFailure");
@@ -41025,10 +41128,6 @@ void Check100()
     Expect((long)NSExpressionType.MinusSetExpressionType, "NSMinusSetExpressionType");
     Expect((long)NSExpressionType.SubqueryExpressionType, "NSSubqueryExpressionType");
     Expect((long)NSExpressionType.AggregateExpressionType, "NSAggregateExpressionType");
-}
-
-void Check101()
-{
     Expect((long)NSExpressionType.AnyKeyExpressionType, "NSAnyKeyExpressionType");
     Expect((long)NSExpressionType.BlockExpressionType, "NSBlockExpressionType");
     Expect((long)NSExpressionType.ConditionalExpressionType, "NSConditionalExpressionType");
@@ -41330,6 +41429,10 @@ void Check101()
     Expect((long)NSAttributeType.Integer64AttributeType, "NSInteger64AttributeType");
     Expect((long)NSAttributeType.DecimalAttributeType, "NSDecimalAttributeType");
     Expect((long)NSAttributeType.DoubleAttributeType, "NSDoubleAttributeType");
+}
+
+void Check102()
+{
     Expect((long)NSAttributeType.FloatAttributeType, "NSFloatAttributeType");
     Expect((long)NSAttributeType.StringAttributeType, "NSStringAttributeType");
     Expect((long)NSAttributeType.BooleanAttributeType, "NSBooleanAttributeType");
@@ -41429,10 +41532,6 @@ void Check101()
     Expect((long)alignof(CATransform3D), "_Alignof(struct CATransform3D)");
     Expect((long)offsetof(CATransform3D, m11), "__builtin_offsetof(struct CATransform3D, m11)");
     Expect((long)offsetof(CATransform3D, m12), "__builtin_offsetof(struct CATransform3D, m12)");
-}
-
-void Check102()
-{
     Expect((long)offsetof(CATransform3D, m13), "__builtin_offsetof(struct CATransform3D, m13)");
     Expect((long)offsetof(CATransform3D, m14), "__builtin_offsetof(struct CATransform3D, m14)");
     Expect((long)offsetof(CATransform3D, m21), "__builtin_offsetof(struct CATransform3D, m21)");
@@ -41734,6 +41833,10 @@ void Check102()
     Expect((long)NSEventButtonMask.LowerSide, "NSEventButtonMaskPenLowerSide");
     Expect((long)NSEventButtonMask.UpperSide, "NSEventButtonMaskPenUpperSide");
     Expect((long)NSEventPhase.None, "NSEventPhaseNone");
+}
+
+void Check103()
+{
     Expect((long)NSEventPhase.Began, "NSEventPhaseBegan");
     Expect((long)NSEventPhase.Stationary, "NSEventPhaseStationary");
     Expect((long)NSEventPhase.Changed, "NSEventPhaseChanged");
@@ -41833,10 +41936,6 @@ void Check102()
     Expect((long)NSRedoFunctionKey, "NSRedoFunctionKey");
     Expect((long)NSFindFunctionKey, "NSFindFunctionKey");
     Expect((long)NSHelpFunctionKey, "NSHelpFunctionKey");
-}
-
-void Check103()
-{
     Expect((long)NSModeSwitchFunctionKey, "NSModeSwitchFunctionKey");
     Expect((long)NSPasteboardAccessBehavior.Default, "NSPasteboardAccessBehaviorDefault");
     Expect((long)NSPasteboardAccessBehavior.Ask, "NSPasteboardAccessBehaviorAsk");
@@ -42138,6 +42237,10 @@ void Check103()
     Expect((long)NSButtonType.Switch, "NSButtonTypeSwitch");
     Expect((long)NSButtonType.Radio, "NSButtonTypeRadio");
     Expect((long)NSButtonType.MomentaryChange, "NSButtonTypeMomentaryChange");
+}
+
+void Check104()
+{
     Expect((long)NSButtonType.OnOff, "NSButtonTypeOnOff");
     Expect((long)NSButtonType.MomentaryPushIn, "NSButtonTypeMomentaryPushIn");
     Expect((long)NSButtonType.Accelerator, "NSButtonTypeAccelerator");
@@ -42237,10 +42340,6 @@ void Check103()
     Expect((long)NSRectAlignment.Trailing, "NSRectAlignmentTrailing");
     Expect((long)NSRectAlignment.TopTrailing, "NSRectAlignmentTopTrailing");
     Expect((long)NSCollectionLayoutSectionOrthogonalScrollingBehavior.None, "NSCollectionLayoutSectionOrthogonalScrollingBehaviorNone");
-}
-
-void Check104()
-{
     Expect((long)NSCollectionLayoutSectionOrthogonalScrollingBehavior.Continuous, "NSCollectionLayoutSectionOrthogonalScrollingBehaviorContinuous");
     Expect((long)NSCollectionLayoutSectionOrthogonalScrollingBehavior.ContinuousGroupLeadingBoundary, "NSCollectionLayoutSectionOrthogonalScrollingBehaviorContinuousGroupLeadingBoundary");
     Expect((long)NSCollectionLayoutSectionOrthogonalScrollingBehavior.Paging, "NSCollectionLayoutSectionOrthogonalScrollingBehaviorPaging");
@@ -42542,6 +42641,10 @@ void Check104()
     Expect((long)NSLayoutAttribute.LastBaseline, "NSLayoutAttributeLastBaseline");
     Expect((long)NSLayoutAttribute.Baseline, "NSLayoutAttributeBaseline");
     Expect((long)NSLayoutAttribute.FirstBaseline, "NSLayoutAttributeFirstBaseline");
+}
+
+void Check105()
+{
     Expect((long)NSLayoutAttribute.NotAnAttribute, "NSLayoutAttributeNotAnAttribute");
     Expect((long)NSLayoutFormatOptions.AlignAllLeft, "NSLayoutFormatAlignAllLeft");
     Expect((long)NSLayoutFormatOptions.AlignAllRight, "NSLayoutFormatAlignAllRight");
@@ -42641,10 +42744,6 @@ void Check104()
     Expect((long)NSPopUpArrowPosition.NoArrow, "NSPopUpNoArrow");
     Expect((long)NSPopUpArrowPosition.ArrowAtCenter, "NSPopUpArrowAtCenter");
     Expect((long)NSPopUpArrowPosition.ArrowAtBottom, "NSPopUpArrowAtBottom");
-}
-
-void Check105()
-{
     Expect((long)NSPrintingPageOrder.DescendingPageOrder, "NSDescendingPageOrder");
     Expect((long)NSPrintingPageOrder.SpecialPageOrder, "NSSpecialPageOrder");
     Expect((long)NSPrintingPageOrder.AscendingPageOrder, "NSAscendingPageOrder");
@@ -42946,6 +43045,10 @@ void Check105()
     Expect((long)NSStringDrawingOptions.OptionsResolvesNaturalAlignmentWithBaseWritingDirection, "NSStringDrawingOptionsResolvesNaturalAlignmentWithBaseWritingDirection");
     Expect((long)NSStringDrawingOptions.DisableScreenFontSubstitution, "NSStringDrawingDisableScreenFontSubstitution");
     Expect((long)NSStringDrawingOptions.OneShot, "NSStringDrawingOneShot");
+}
+
+void Check106()
+{
     Expect((long)NSRulerOrientation.HorizontalRuler, "NSHorizontalRuler");
     Expect((long)NSRulerOrientation.VerticalRuler, "NSVerticalRuler");
     Expect((long)NSNoInterfaceStyle, "NSNoInterfaceStyle");
@@ -43045,10 +43148,6 @@ void Check105()
     Expect((long)NSOpenGLPFAPixelBuffer, "NSOpenGLPFAPixelBuffer");
     Expect((long)NSOpenGLPFARemotePixelBuffer, "NSOpenGLPFARemotePixelBuffer");
     Expect((long)NSOpenGLProfileVersionLegacy, "NSOpenGLProfileVersionLegacy");
-}
-
-void Check106()
-{
     Expect((long)NSOpenGLProfileVersion3_2Core, "NSOpenGLProfileVersion3_2Core");
     Expect((long)NSOpenGLProfileVersion4_1Core, "NSOpenGLProfileVersion4_1Core");
     Expect((long)NSOpenGLContextParameter.SwapInterval, "NSOpenGLContextParameterSwapInterval");
@@ -43350,6 +43449,10 @@ void Check106()
     Expect((long)MTLPixelFormat.RG32Sint, "MTLPixelFormatRG32Sint");
     Expect((long)MTLPixelFormat.RG32Float, "MTLPixelFormatRG32Float");
     Expect((long)MTLPixelFormat.RGBA16Unorm, "MTLPixelFormatRGBA16Unorm");
+}
+
+void Check107()
+{
     Expect((long)MTLPixelFormat.RGBA16Snorm, "MTLPixelFormatRGBA16Snorm");
     Expect((long)MTLPixelFormat.RGBA16Uint, "MTLPixelFormatRGBA16Uint");
     Expect((long)MTLPixelFormat.RGBA16Sint, "MTLPixelFormatRGBA16Sint");
@@ -43449,10 +43552,6 @@ void Check106()
     Expect((long)MTLDataType.Float, "MTLDataTypeFloat");
     Expect((long)MTLDataType.Float2, "MTLDataTypeFloat2");
     Expect((long)MTLDataType.Float3, "MTLDataTypeFloat3");
-}
-
-void Check107()
-{
     Expect((long)MTLDataType.Float4, "MTLDataTypeFloat4");
     Expect((long)MTLDataType.Float2x2, "MTLDataTypeFloat2x2");
     Expect((long)MTLDataType.Float2x3, "MTLDataTypeFloat2x3");
@@ -43754,6 +43853,10 @@ void Check107()
     Expect((long)offsetof(MTLAccelerationStructureSizes, buildScratchBufferSize), "__builtin_offsetof(MTLAccelerationStructureSizes, buildScratchBufferSize)");
     Expect((long)offsetof(MTLAccelerationStructureSizes, refitScratchBufferSize), "__builtin_offsetof(MTLAccelerationStructureSizes, refitScratchBufferSize)");
     Expect((long)MTLCounterSamplingPoint.StageBoundary, "MTLCounterSamplingPointAtStageBoundary");
+}
+
+void Check108()
+{
     Expect((long)MTLCounterSamplingPoint.DrawBoundary, "MTLCounterSamplingPointAtDrawBoundary");
     Expect((long)MTLCounterSamplingPoint.DispatchBoundary, "MTLCounterSamplingPointAtDispatchBoundary");
     Expect((long)MTLCounterSamplingPoint.TileDispatchBoundary, "MTLCounterSamplingPointAtTileDispatchBoundary");
@@ -43853,10 +43956,6 @@ void Check107()
     Expect((long)MTLStencilOperation.Replace, "MTLStencilOperationReplace");
     Expect((long)MTLStencilOperation.IncrementClamp, "MTLStencilOperationIncrementClamp");
     Expect((long)MTLStencilOperation.DecrementClamp, "MTLStencilOperationDecrementClamp");
-}
-
-void Check108()
-{
     Expect((long)MTLStencilOperation.Invert, "MTLStencilOperationInvert");
     Expect((long)MTLStencilOperation.IncrementWrap, "MTLStencilOperationIncrementWrap");
     Expect((long)MTLStencilOperation.DecrementWrap, "MTLStencilOperationDecrementWrap");
@@ -44158,6 +44257,10 @@ void Check108()
     Expect((long)MTLAccelerationStructureInstanceOptions.None, "MTLAccelerationStructureInstanceOptionNone");
     Expect((long)MTLAccelerationStructureInstanceOptions.DisableTriangleCulling, "MTLAccelerationStructureInstanceOptionDisableTriangleCulling");
     Expect((long)MTLAccelerationStructureInstanceOptions.TriangleFrontFacingWindingCounterClockwise, "MTLAccelerationStructureInstanceOptionTriangleFrontFacingWindingCounterClockwise");
+}
+
+void Check109()
+{
     Expect((long)MTLAccelerationStructureInstanceOptions.Opaque, "MTLAccelerationStructureInstanceOptionOpaque");
     Expect((long)MTLAccelerationStructureInstanceOptions.NonOpaque, "MTLAccelerationStructureInstanceOptionNonOpaque");
     Expect((long)MTLMatrixLayout.ColumnMajor, "MTLMatrixLayoutColumnMajor");
@@ -44257,10 +44360,6 @@ void Check108()
     Expect((long)offsetof(MTL4CopySparseTextureMappingOperation, sourceRegion), "__builtin_offsetof(MTL4CopySparseTextureMappingOperation, sourceRegion)");
     Expect((long)offsetof(MTL4CopySparseTextureMappingOperation, sourceLevel), "__builtin_offsetof(MTL4CopySparseTextureMappingOperation, sourceLevel)");
     Expect((long)offsetof(MTL4CopySparseTextureMappingOperation, sourceSlice), "__builtin_offsetof(MTL4CopySparseTextureMappingOperation, sourceSlice)");
-}
-
-void Check109()
-{
     Expect((long)offsetof(MTL4CopySparseTextureMappingOperation, destinationOrigin), "__builtin_offsetof(MTL4CopySparseTextureMappingOperation, destinationOrigin)");
     Expect((long)offsetof(MTL4CopySparseTextureMappingOperation, destinationLevel), "__builtin_offsetof(MTL4CopySparseTextureMappingOperation, destinationLevel)");
     Expect((long)offsetof(MTL4CopySparseTextureMappingOperation, destinationSlice), "__builtin_offsetof(MTL4CopySparseTextureMappingOperation, destinationSlice)");
@@ -44562,6 +44661,10 @@ void Check109()
     Expect((long)AVAudioUnitDistortionPreset.MultiCellphoneConcert, "AVAudioUnitDistortionPresetMultiCellphoneConcert");
     Expect((long)AVAudioUnitDistortionPreset.MultiDecimated1, "AVAudioUnitDistortionPresetMultiDecimated1");
     Expect((long)AVAudioUnitDistortionPreset.MultiDecimated2, "AVAudioUnitDistortionPresetMultiDecimated2");
+}
+
+void Check110()
+{
     Expect((long)AVAudioUnitDistortionPreset.MultiDecimated3, "AVAudioUnitDistortionPresetMultiDecimated3");
     Expect((long)AVAudioUnitDistortionPreset.MultiDecimated4, "AVAudioUnitDistortionPresetMultiDecimated4");
     Expect((long)AVAudioUnitDistortionPreset.MultiDistortedFunk, "AVAudioUnitDistortionPresetMultiDistortedFunk");
@@ -44661,10 +44764,6 @@ void Check109()
     Expect((long)AVAUDIOENGINE_HAVE_MUSICPLAYER, "(AVAUDIOENGINE_HAVE_MUSICPLAYER)");
     Expect((long)AVAUDIOENGINE_HAVE_AUAUDIOUNIT, "(AVAUDIOENGINE_HAVE_AUAUDIOUNIT)");
     Expect((long)AVAUDIOUNIT_HAVE_AUDIOUNIT, "(AVAUDIOUNIT_HAVE_AUDIOUNIT)");
-}
-
-void Check110()
-{
     Expect((long)AVAUDIOUNITCOMPONENT_HAVE_AUDIOCOMPONENT, "(AVAUDIOUNITCOMPONENT_HAVE_AUDIOCOMPONENT)");
     Expect((long)AVKeyValueStatus.Unknown, "AVKeyValueStatusUnknown");
     Expect((long)AVKeyValueStatus.Loading, "AVKeyValueStatusLoading");
@@ -44966,6 +45065,10 @@ void Check110()
     Expect((long)AVCaptureTorchMode.Auto, "AVCaptureTorchModeAuto");
     Expect((long)AVCaptureFocusMode.Locked, "AVCaptureFocusModeLocked");
     Expect((long)AVCaptureFocusMode.AutoFocus, "AVCaptureFocusModeAutoFocus");
+}
+
+void Check111()
+{
     Expect((long)AVCaptureFocusMode.ContinuousAutoFocus, "AVCaptureFocusModeContinuousAutoFocus");
     Expect((long)AVCaptureCinematicVideoFocusMode.None, "AVCaptureCinematicVideoFocusModeNone");
     Expect((long)AVCaptureCinematicVideoFocusMode.Strong, "AVCaptureCinematicVideoFocusModeStrong");
@@ -45055,6 +45158,12 @@ void Check110()
     Expect((long)AVF_DEPLOYING_TO_2022_RELEASES_AND_LATER, "(AVF_DEPLOYING_TO_2022_RELEASES_AND_LATER)");
     Expect((long)AVF_DEPLOYING_TO_2024_RELEASES_AND_LATER, "(AVF_DEPLOYING_TO_2024_RELEASES_AND_LATER)");
     Expect((long)AVF_DEPLOYING_TO_2025_RELEASES_AND_LATER, "(AVF_DEPLOYING_TO_2025_RELEASES_AND_LATER)");
+    Expect((long)sizeof(simd_float3x3), "sizeof(simd_float3x3)");
+    Expect((long)alignof(simd_float3x3), "_Alignof(simd_float3x3)");
+    Expect((long)offsetof(simd_float3x3, columns), "__builtin_offsetof(simd_float3x3, columns)");
+    Expect((long)sizeof(simd_float4x3), "sizeof(simd_float4x3)");
+    Expect((long)alignof(simd_float4x3), "_Alignof(simd_float4x3)");
+    Expect((long)offsetof(simd_float4x3, columns), "__builtin_offsetof(simd_float4x3, columns)");
     Expect((long)WKDownloadRedirectPolicy.Cancel, "WKDownloadRedirectPolicyCancel");
     Expect((long)WKDownloadRedirectPolicy.Allow, "WKDownloadRedirectPolicyAllow");
     Expect((long)WKDownloadPlaceholderPolicy.Disable, "WKDownloadPlaceholderPolicyDisable");
@@ -45065,10 +45174,6 @@ void Check110()
     Expect((long)WKErrorCode.JavaScriptExceptionOccurred, "WKErrorJavaScriptExceptionOccurred");
     Expect((long)WKErrorCode.JavaScriptResultTypeIsUnsupported, "WKErrorJavaScriptResultTypeIsUnsupported");
     Expect((long)WKErrorCode.ContentRuleListStoreCompileFailed, "WKErrorContentRuleListStoreCompileFailed");
-}
-
-void Check111()
-{
     Expect((long)WKErrorCode.ContentRuleListStoreLookUpFailed, "WKErrorContentRuleListStoreLookUpFailed");
     Expect((long)WKErrorCode.ContentRuleListStoreRemoveFailed, "WKErrorContentRuleListStoreRemoveFailed");
     Expect((long)WKErrorCode.ContentRuleListStoreVersionMismatch, "WKErrorContentRuleListStoreVersionMismatch");
@@ -45364,6 +45469,10 @@ void Check111()
     Expect((long)WebMenuItemTagOther, "WebMenuItemTagOther");
     Expect((long)WebMenuItemTagSearchInSpotlight, "WebMenuItemTagSearchInSpotlight");
     Expect((long)WebMenuItemTagSearchWeb, "WebMenuItemTagSearchWeb");
+}
+
+void Check112()
+{
     Expect((long)WebMenuItemTagLookUpInDictionary, "WebMenuItemTagLookUpInDictionary");
     Expect((long)WebMenuItemTagOpenWithDefaultApplication, "WebMenuItemTagOpenWithDefaultApplication");
     Expect((long)WebMenuItemPDFActualSize, "WebMenuItemPDFActualSize");
@@ -45405,6 +45514,9 @@ void Check111()
     Expect((long)ar_device_anchor_tracking_state_t.orientation_tracked, "ar_device_anchor_tracking_state_orientation_tracked");
     Expect((long)ar_device_anchor_tracking_state_t.tracked, "ar_device_anchor_tracking_state_tracked");
     Expect((long)AR_OBJECT_USE_OBJC, "(AR_OBJECT_USE_OBJC)");
+    Expect((long)sizeof(simd_float4x4), "sizeof(simd_float4x4)");
+    Expect((long)alignof(simd_float4x4), "_Alignof(simd_float4x4)");
+    Expect((long)offsetof(simd_float4x4, columns), "__builtin_offsetof(simd_float4x4, columns)");
     Expect((long)AVVideoFrameAnalysisType.None, "AVVideoFrameAnalysisTypeNone");
     Expect((long)AVVideoFrameAnalysisType.Default, "AVVideoFrameAnalysisTypeDefault");
     Expect((long)AVVideoFrameAnalysisType.Text, "AVVideoFrameAnalysisTypeText");
@@ -45469,10 +45581,6 @@ void Check111()
     Expect((long)ACErrorCode.UpdatingNonexistentAccount, "ACErrorUpdatingNonexistentAccount");
     Expect((long)ACErrorCode.InvalidClientBundleID, "ACErrorInvalidClientBundleID");
     Expect((long)ACErrorCode.DeniedByPlugin, "ACErrorDeniedByPlugin");
-}
-
-void Check112()
-{
     Expect((long)ACErrorCode.CoreDataSaveFailed, "ACErrorCoreDataSaveFailed");
     Expect((long)ACErrorCode.FailedSerializingAccountInfo, "ACErrorFailedSerializingAccountInfo");
     Expect((long)ACErrorCode.InvalidCommand, "ACErrorInvalidCommand");
@@ -45765,6 +45873,10 @@ void Check112()
     Expect((long)AVB17221AEMCommandType.GetDynamicInfo, "AVB17221AEMCommandTypeGetDynamicInfo");
     Expect((long)AVB17221AEMCommandType.SetMaxTransitTime, "AVB17221AEMCommandTypeSetMaxTransitTime");
     Expect((long)AVB17221AEMCommandType.GetMaxTransitTime, "AVB17221AEMCommandTypeGetMaxTransitTime");
+}
+
+void Check113()
+{
     Expect((long)AVB17221AEMCommandType.SetSamplingRateRange, "AVB17221AEMCommandTypeSetSamplingRateRange");
     Expect((long)AVB17221AEMCommandType.GetSamplingRateRange, "AVB17221AEMCommandTypeGetSamplingRateRange");
     Expect((long)AVB17221AEMCommandType.SetPTPInstanceInfo, "AVB17221AEMCommandTypeSetPTPInstanceInfo");
@@ -45873,10 +45985,6 @@ void Check112()
     Expect((long)ASAuthorizationError.CredentialImport, "ASAuthorizationErrorCredentialImport");
     Expect((long)ASAuthorizationError.CredentialExport, "ASAuthorizationErrorCredentialExport");
     Expect((long)ASAuthorizationError.PreferSignInWithApple, "ASAuthorizationErrorPreferSignInWithApple");
-}
-
-void Check113()
-{
     Expect((long)ASAuthorizationError.DeviceNotConfiguredForPasskeyCreation, "ASAuthorizationErrorDeviceNotConfiguredForPasskeyCreation");
     Expect((long)ASAuthorizationPublicKeyCredentialAttachment.Platform, "ASAuthorizationPublicKeyCredentialAttachmentPlatform");
     Expect((long)ASAuthorizationPublicKeyCredentialAttachment.CrossPlatform, "ASAuthorizationPublicKeyCredentialAttachmentCrossPlatform");
@@ -46169,6 +46277,10 @@ void Check113()
     Expect((long)CKAccountStatus.NoAccount, "CKAccountStatusNoAccount");
     Expect((long)CKAccountStatus.TemporarilyUnavailable, "CKAccountStatusTemporarilyUnavailable");
     Expect((long)CKApplicationPermissions.CKApplicationPermissionUserDiscoverability, "CKApplicationPermissionUserDiscoverability");
+}
+
+void Check114()
+{
     Expect((long)CKApplicationPermissionStatus.InitialState, "CKApplicationPermissionStatusInitialState");
     Expect((long)CKApplicationPermissionStatus.CouldNotComplete, "CKApplicationPermissionStatusCouldNotComplete");
     Expect((long)CKApplicationPermissionStatus.Denied, "CKApplicationPermissionStatusDenied");
@@ -46277,10 +46389,6 @@ void Check113()
     Expect((long)CKSyncEngineZoneDeletionReason.Deleted, "CKSyncEngineZoneDeletionReasonDeleted");
     Expect((long)CKSyncEngineZoneDeletionReason.Purged, "CKSyncEngineZoneDeletionReasonPurged");
     Expect((long)CKSyncEngineZoneDeletionReason.EncryptedDataReset, "CKSyncEngineZoneDeletionReasonEncryptedDataReset");
-}
-
-void Check114()
-{
     Expect((long)cp_layer_renderer_configuration_error_code.missing_configuration, "cp_layer_renderer_configuration_error_code_missing_configuration");
     Expect((long)cp_layer_renderer_configuration_error_code.unsupported_color_format, "cp_layer_renderer_configuration_error_code_unsupported_color_format");
     Expect((long)cp_layer_renderer_configuration_error_code.unsupported_color_usage, "cp_layer_renderer_configuration_error_code_unsupported_color_usage");
@@ -46573,6 +46681,10 @@ void Check114()
     Expect((long)MLImageSizeConstraintType.Enumerated, "MLImageSizeConstraintTypeEnumerated");
     Expect((long)MLImageSizeConstraintType.Range, "MLImageSizeConstraintTypeRange");
     Expect((long)MLMultiArrayShapeConstraintType.Unspecified, "MLMultiArrayShapeConstraintTypeUnspecified");
+}
+
+void Check115()
+{
     Expect((long)MLMultiArrayShapeConstraintType.Enumerated, "MLMultiArrayShapeConstraintTypeEnumerated");
     Expect((long)MLMultiArrayShapeConstraintType.Range, "MLMultiArrayShapeConstraintTypeRange");
     Expect((long)MLReshapeFrequencyHint.Frequent, "MLReshapeFrequencyHintFrequent");
@@ -46681,10 +46793,6 @@ void Check114()
     Expect((long)kCMIODeckShuttleReverse1x, "kCMIODeckShuttleReverse1x");
     Expect((long)kCMIODeckShuttleReverseSlow3, "kCMIODeckShuttleReverseSlow3");
     Expect((long)kCMIODeckShuttleReverseSlow2, "kCMIODeckShuttleReverseSlow2");
-}
-
-void Check115()
-{
     Expect((long)kCMIODeckShuttleReverseSlow1, "kCMIODeckShuttleReverseSlow1");
     Expect((long)kCMIODeckShuttleReverseSlowest, "kCMIODeckShuttleReverseSlowest");
     Expect((long)kCMIODeckShuttlePlayPreviousFrame, "kCMIODeckShuttlePlayPreviousFrame");
@@ -46977,6 +47085,10 @@ void Check115()
     Expect((long)kCMIOSampleBufferDiscontinuityFlag_NoDataMarker, "kCMIOSampleBufferDiscontinuityFlag_NoDataMarker");
     Expect((long)kCMIOSampleBufferDiscontinuityFlag_DataFormatChanged, "kCMIOSampleBufferDiscontinuityFlag_DataFormatChanged");
     Expect((long)kCMIOSampleBufferDiscontinuityFlag_TimingReferenceJumped, "kCMIOSampleBufferDiscontinuityFlag_TimingReferenceJumped");
+}
+
+void Check116()
+{
     Expect((long)kCMIOSampleBufferDiscontinuityFlag_DurationWasExtended, "kCMIOSampleBufferDiscontinuityFlag_DurationWasExtended");
     Expect((long)kCMIOSampleBufferDiscontinuityFlag_SleepWakeCycle, "kCMIOSampleBufferDiscontinuityFlag_SleepWakeCycle");
     Expect((long)kCMIOSampleBufferDiscontinuityFlag_CodecSettingsChanged, "kCMIOSampleBufferDiscontinuityFlag_CodecSettingsChanged");
@@ -47085,10 +47197,6 @@ void Check115()
     Expect((long)CSIndexErrorCode.InvalidClientStateError, "CSIndexErrorCodeInvalidClientStateError");
     Expect((long)CSIndexErrorCode.RemoteConnectionError, "CSIndexErrorCodeRemoteConnectionError");
     Expect((long)CSIndexErrorCode.QuotaExceeded, "CSIndexErrorCodeQuotaExceeded");
-}
-
-void Check116()
-{
     Expect((long)CSIndexErrorCode.IndexingUnsupported, "CSIndexErrorCodeIndexingUnsupported");
     Expect((long)CSIndexErrorCode.MismatchedClientState, "CSIndexErrorCodeMismatchedClientState");
     Expect((long)CSSearchQueryErrorCode.Unknown, "CSSearchQueryErrorCodeUnknown");
@@ -47381,6 +47489,10 @@ void Check116()
     Expect((long)kDRInternalErr, "kDRInternalErr");
     Expect((long)kDRDeviceAccessErr, "kDRDeviceAccessErr");
     Expect((long)kDRDeviceBusyErr, "kDRDeviceBusyErr");
+}
+
+void Check117()
+{
     Expect((long)kDRDeviceCommunicationErr, "kDRDeviceCommunicationErr");
     Expect((long)kDRDeviceInvalidErr, "kDRDeviceInvalidErr");
     Expect((long)kDRDeviceNotReadyErr, "kDRDeviceNotReadyErr");
@@ -47489,10 +47601,6 @@ void Check116()
     Expect((long)kDRBurnSessionOK, "kDRBurnSessionOK");
     Expect((long)kDRBurnSessionCancel, "kDRBurnSessionCancel");
     Expect((long)kBurnSessionSetupDialogOptionsCurrentVersion, "kBurnSessionSetupDialogOptionsCurrentVersion");
-}
-
-void Check117()
-{
     Expect((long)kBurnSessionSetupDialogDefaultOptions, "kBurnSessionSetupDialogDefaultOptions");
     Expect((long)kBurnSessionSetupDialogForceClosedDiscs, "kBurnSessionSetupDialogForceClosedDiscs");
     Expect((long)kBurnSessionSetupDialogDontHandleReservations, "kBurnSessionSetupDialogDontHandleReservations");
@@ -47785,6 +47893,10 @@ void Check117()
     Expect((long)FSAccessMask.WriteData, "FSAccessWriteData");
     Expect((long)FSAccessMask.AddFile, "FSAccessAddFile");
     Expect((long)FSAccessMask.Execute, "FSAccessExecute");
+}
+
+void Check118()
+{
     Expect((long)FSAccessMask.Search, "FSAccessSearch");
     Expect((long)FSAccessMask.Delete, "FSAccessDelete");
     Expect((long)FSAccessMask.AppendData, "FSAccessAppendData");
@@ -47893,10 +48005,6 @@ void Check117()
     Expect((long)NSFileProviderVolumeUnsupportedReason.ReadOnly, "NSFileProviderVolumeUnsupportedReasonReadOnly");
     Expect((long)NSFileProviderVolumeUnsupportedReason.Network, "NSFileProviderVolumeUnsupportedReasonNetwork");
     Expect((long)NSFileProviderVolumeUnsupportedReason.Quarantined, "NSFileProviderVolumeUnsupportedReasonQuarantined");
-}
-
-void Check118()
-{
     Expect((long)NSFileProviderCreateItemOptions.MayAlreadyExist, "NSFileProviderCreateItemMayAlreadyExist");
     Expect((long)NSFileProviderCreateItemOptions.DeletionConflicted, "NSFileProviderCreateItemDeletionConflicted");
     Expect((long)NSFileProviderDeleteItemOptions.NSFileProviderDeleteItemRecursive, "NSFileProviderDeleteItemRecursive");
@@ -48189,6 +48297,10 @@ void Check118()
     Expect((long)kIOHIDOptionsTypeMaskPrivate, "kIOHIDOptionsTypeMaskPrivate");
     Expect((long)kIOHIDQueueOptionsTypeNone, "kIOHIDQueueOptionsTypeNone");
     Expect((long)kIOHIDQueueOptionsTypeEnqueueAll, "kIOHIDQueueOptionsTypeEnqueueAll");
+}
+
+void Check119()
+{
     Expect((long)kIOHIDStandardTypeANSI, "kIOHIDStandardTypeANSI");
     Expect((long)kIOHIDStandardTypeISO, "kIOHIDStandardTypeISO");
     Expect((long)kIOHIDStandardTypeJIS, "kIOHIDStandardTypeJIS");
@@ -48297,10 +48409,6 @@ void Check118()
     Expect((long)GKGameSessionErrorCode.BadContainer, "GKGameSessionErrorBadContainer");
     Expect((long)GKGameSessionErrorCode.CloudQuotaExceeded, "GKGameSessionErrorCloudQuotaExceeded");
     Expect((long)GKGameSessionErrorCode.NetworkFailure, "GKGameSessionErrorNetworkFailure");
-}
-
-void Check119()
-{
     Expect((long)GKGameSessionErrorCode.CloudDriveDisabled, "GKGameSessionErrorCloudDriveDisabled");
     Expect((long)GKGameSessionErrorCode.InvalidSession, "GKGameSessionErrorInvalidSession");
     Expect((long)GKTurnBasedMatchStatus.Unknown, "GKTurnBasedMatchStatusUnknown");
@@ -48380,6 +48488,17 @@ void Check119()
     Expect((long)GSSyncState.Conflicted, "GSSyncStateConflicted");
     Expect((long)GSSyncState.Error, "GSSyncStateError");
     Expect((long)GSSyncState.Closed, "GSSyncStateClosed");
+    Expect((long)sizeof(GKBox), "sizeof(struct GKBox)");
+    Expect((long)alignof(GKBox), "_Alignof(struct GKBox)");
+    Expect((long)offsetof(GKBox, boxMin), "__builtin_offsetof(struct GKBox, boxMin)");
+    Expect((long)offsetof(GKBox, boxMax), "__builtin_offsetof(struct GKBox, boxMax)");
+    Expect((long)sizeof(GKQuad), "sizeof(struct GKQuad)");
+    Expect((long)alignof(GKQuad), "_Alignof(struct GKQuad)");
+    Expect((long)offsetof(GKQuad, quadMin), "__builtin_offsetof(struct GKQuad, quadMin)");
+    Expect((long)offsetof(GKQuad, quadMax), "__builtin_offsetof(struct GKQuad, quadMax)");
+    Expect((long)sizeof(GKTriangle), "sizeof(struct GKTriangle)");
+    Expect((long)alignof(GKTriangle), "_Alignof(struct GKTriangle)");
+    Expect((long)offsetof(GKTriangle, points), "__builtin_offsetof(struct GKTriangle, points)");
     Expect((long)GKMeshGraphTriangulationMode.Vertices, "GKMeshGraphTriangulationModeVertices");
     Expect((long)GKMeshGraphTriangulationMode.Centers, "GKMeshGraphTriangulationModeCenters");
     Expect((long)GKMeshGraphTriangulationMode.EdgeMidpoints, "GKMeshGraphTriangulationModeEdgeMidpoints");
@@ -48582,6 +48701,10 @@ void Check119()
     Expect((long)HKStateOfMindAssociation.SelfCare, "HKStateOfMindAssociationSelfCare");
     Expect((long)HKStateOfMindAssociation.Spirituality, "HKStateOfMindAssociationSpirituality");
     Expect((long)HKStateOfMindAssociation.Tasks, "HKStateOfMindAssociationTasks");
+}
+
+void Check120()
+{
     Expect((long)HKStateOfMindAssociation.Travel, "HKStateOfMindAssociationTravel");
     Expect((long)HKStateOfMindAssociation.Work, "HKStateOfMindAssociationWork");
     Expect((long)HKStateOfMindAssociation.Weather, "HKStateOfMindAssociationWeather");
@@ -48701,10 +48824,6 @@ void Check119()
     Expect((long)HKGAD7AssessmentRisk.Mild, "HKGAD7AssessmentRiskMild");
     Expect((long)HKGAD7AssessmentRisk.Moderate, "HKGAD7AssessmentRiskModerate");
     Expect((long)HKGAD7AssessmentRisk.Severe, "HKGAD7AssessmentRiskSevere");
-}
-
-void Check120()
-{
     Expect((long)HKGAD7AssessmentAnswer.NotAtAll, "HKGAD7AssessmentAnswerNotAtAll");
     Expect((long)HKGAD7AssessmentAnswer.SeveralDays, "HKGAD7AssessmentAnswerSeveralDays");
     Expect((long)HKGAD7AssessmentAnswer.MoreThanHalfTheDays, "HKGAD7AssessmentAnswerMoreThanHalfTheDays");
@@ -48986,6 +49105,10 @@ void Check120()
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferLudusHelsinki, "kBluetoothCompanyIdentiferLudusHelsinki");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferBlueRadios, "kBluetoothCompanyIdentiferBlueRadios");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferEquinux, "kBluetoothCompanyIdentiferEquinux");
+}
+
+void Check121()
+{
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferGarminInternational, "kBluetoothCompanyIdentiferGarminInternational");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferEcotest, "kBluetoothCompanyIdentiferEcotest");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferGNResound, "kBluetoothCompanyIdentiferGNResound");
@@ -49105,10 +49228,6 @@ void Check120()
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferKOUKAMM, "kBluetoothCompanyIdentiferKOUKAMM");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferDelphi, "kBluetoothCompanyIdentiferDelphi");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferValenceTech, "kBluetoothCompanyIdentiferValenceTech");
-}
-
-void Check121()
-{
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferStanleyBlackAndDecker, "kBluetoothCompanyIdentiferStanleyBlackAndDecker");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferTypeProducts, "kBluetoothCompanyIdentiferTypeProducts");
     Expect((long)BluetoothCompanyIdentifers.kBluetoothCompanyIdentiferTomTomInternational, "kBluetoothCompanyIdentiferTomTomInternational");
@@ -49390,6 +49509,10 @@ void Check121()
     Expect((long)SDPAttributeIdentifierCodes.HIDSDPDisable, "kBluetoothSDPAttributeIdentifierHIDSDPDisable");
     Expect((long)SDPAttributeIdentifierCodes.HIDBatteryPower, "kBluetoothSDPAttributeIdentifierHIDBatteryPower");
     Expect((long)SDPAttributeIdentifierCodes.HIDRemoteWake, "kBluetoothSDPAttributeIdentifierHIDRemoteWake");
+}
+
+void Check122()
+{
     Expect((long)SDPAttributeIdentifierCodes.HIDProfileVersion, "kBluetoothSDPAttributeIdentifierHIDProfileVersion");
     Expect((long)SDPAttributeIdentifierCodes.HIDSupervisionTimeout, "kBluetoothSDPAttributeIdentifierHIDSupervisionTimeout");
     Expect((long)SDPAttributeIdentifierCodes.HIDNormallyConnectable, "kBluetoothSDPAttributeIdentifierHIDNormallyConnectable");
@@ -49509,10 +49632,6 @@ void Check121()
     Expect((long)kBluetoothEncryptionEnableBREDRE0, "kBluetoothEncryptionEnableBREDRE0");
     Expect((long)kBluetoothEncryptionEnableLEAESCCM, "kBluetoothEncryptionEnableLEAESCCM");
     Expect((long)kBluetoothEncryptionEnableBREDRAESCCM, "kBluetoothEncryptionEnableBREDRAESCCM");
-}
-
-void Check122()
-{
     Expect((long)kBluetoothKeyFlagSemiPermanent, "kBluetoothKeyFlagSemiPermanent");
     Expect((long)kBluetoothKeyFlagTemporary, "kBluetoothKeyFlagTemporary");
     Expect((long)kBluetoothKeyTypeCombination, "kBluetoothKeyTypeCombination");
@@ -49794,6 +49913,10 @@ void Check122()
     Expect((long)BluetoothLESecurityManagerIOCapability.ReservedEnd, "kBluetoothLESecurityManagerIOCapabilityReservedEnd");
     Expect((long)BluetoothLESecurityManagerOOBData.AuthenticationDataNotPresent, "kBluetoothLESecurityManagerOOBAuthenticationDataNotPresent");
     Expect((long)BluetoothLESecurityManagerOOBData.AuthenticationDataPresent, "kBluetoothLESecurityManagerOOBAuthenticationDataPresent");
+}
+
+void Check123()
+{
     Expect((long)BluetoothLESecurityManagerOOBData.DataReservedStart, "kBluetoothLESecurityManagerOOBDataReservedStart");
     Expect((long)BluetoothLESecurityManagerOOBData.DataReservedEnd, "kBluetoothLESecurityManagerOOBDataReservedEnd");
     Expect((long)kBluetoothLESecurityManagerNoBonding, "kBluetoothLESecurityManagerNoBonding");
@@ -49913,10 +50036,6 @@ void Check122()
     Expect((long)kBluetoothHCICommandSetConnectionlessSlaveBroadcast, "kBluetoothHCICommandSetConnectionlessSlaveBroadcast");
     Expect((long)kBluetoothHCICommandSetConnectionlessSlaveBroadcastReceive, "kBluetoothHCICommandSetConnectionlessSlaveBroadcastReceive");
     Expect((long)kBluetoothHCICommandGroupLinkPolicy, "kBluetoothHCICommandGroupLinkPolicy");
-}
-
-void Check123()
-{
     Expect((long)kBluetoothHCICommandHoldMode, "kBluetoothHCICommandHoldMode");
     Expect((long)kBluetoothHCICommandSniffMode, "kBluetoothHCICommandSniffMode");
     Expect((long)kBluetoothHCICommandExitSniffMode, "kBluetoothHCICommandExitSniffMode");
@@ -50198,6 +50317,10 @@ void Check123()
     Expect((long)BluetoothFeatureBits.kBluetoothFeatureCVSD, "kBluetoothFeatureCVSD");
     Expect((long)BluetoothFeatureBits.kBluetoothFeaturePagingScheme, "kBluetoothFeaturePagingScheme");
     Expect((long)BluetoothFeatureBits.kBluetoothFeaturePowerControl, "kBluetoothFeaturePowerControl");
+}
+
+void Check124()
+{
     Expect((long)BluetoothFeatureBits.kBluetoothFeatureTransparentSCOData, "kBluetoothFeatureTransparentSCOData");
     Expect((long)BluetoothFeatureBits.kBluetoothFeatureFlowControlLagBit0, "kBluetoothFeatureFlowControlLagBit0");
     Expect((long)BluetoothFeatureBits.kBluetoothFeatureFlowControlLagBit1, "kBluetoothFeatureFlowControlLagBit1");
@@ -50317,10 +50440,6 @@ void Check123()
     Expect((long)offsetof(BluetoothHCIEnhancedSetupSynchronousConnectionParams, transmitCodecFrameSize), "__builtin_offsetof(struct BluetoothHCIEnhancedSetupSynchronousConnectionParams, transmitCodecFrameSize)");
     Expect((long)offsetof(BluetoothHCIEnhancedSetupSynchronousConnectionParams, receiveCodecFrameSize), "__builtin_offsetof(struct BluetoothHCIEnhancedSetupSynchronousConnectionParams, receiveCodecFrameSize)");
     Expect((long)offsetof(BluetoothHCIEnhancedSetupSynchronousConnectionParams, inputBandwidth), "__builtin_offsetof(struct BluetoothHCIEnhancedSetupSynchronousConnectionParams, inputBandwidth)");
-}
-
-void Check124()
-{
     Expect((long)offsetof(BluetoothHCIEnhancedSetupSynchronousConnectionParams, outputBandwidth), "__builtin_offsetof(struct BluetoothHCIEnhancedSetupSynchronousConnectionParams, outputBandwidth)");
     Expect((long)offsetof(BluetoothHCIEnhancedSetupSynchronousConnectionParams, inputCodingFormat), "__builtin_offsetof(struct BluetoothHCIEnhancedSetupSynchronousConnectionParams, inputCodingFormat)");
     Expect((long)offsetof(BluetoothHCIEnhancedSetupSynchronousConnectionParams, outputCodingFormat), "__builtin_offsetof(struct BluetoothHCIEnhancedSetupSynchronousConnectionParams, outputCodingFormat)");
@@ -50602,6 +50721,10 @@ void Check124()
     Expect((long)kBluetoothHCICommandPacketMaxDataSize, "kBluetoothHCICommandPacketMaxDataSize");
     Expect((long)kBluetoothHCIMaxCommandPacketSize, "kBluetoothHCIMaxCommandPacketSize");
     Expect((long)kBluetoothHCIEventPacketHeaderSize, "kBluetoothHCIEventPacketHeaderSize");
+}
+
+void Check125()
+{
     Expect((long)kBluetoothHCIEventPacketMaxDataSize, "kBluetoothHCIEventPacketMaxDataSize");
     Expect((long)kBluetoothHCIMaxEventPacketSize, "kBluetoothHCIMaxEventPacketSize");
     Expect((long)kBluetoothHCIDataPacketHeaderSize, "kBluetoothHCIDataPacketHeaderSize");
@@ -50721,10 +50844,6 @@ void Check124()
     Expect((long)kBluetoothHCIEventPageScanModeChange, "kBluetoothHCIEventPageScanModeChange");
     Expect((long)kBluetoothHCIEventPageScanRepetitionModeChange, "kBluetoothHCIEventPageScanRepetitionModeChange");
     Expect((long)kBluetoothHCIEventFlowSpecificationComplete, "kBluetoothHCIEventFlowSpecificationComplete");
-}
-
-void Check125()
-{
     Expect((long)kBluetoothHCIEventInquiryResultWithRSSI, "kBluetoothHCIEventInquiryResultWithRSSI");
     Expect((long)kBluetoothHCIEventReadRemoteExtendedFeaturesComplete, "kBluetoothHCIEventReadRemoteExtendedFeaturesComplete");
     Expect((long)kBluetoothHCIEventSynchronousConnectionComplete, "kBluetoothHCIEventSynchronousConnectionComplete");
@@ -51006,6 +51125,10 @@ void Check125()
     Expect((long)kBluetoothHCIErrorCommandDisallowed, "kBluetoothHCIErrorCommandDisallowed");
     Expect((long)kBluetoothHCIErrorHostRejectedLimitedResources, "kBluetoothHCIErrorHostRejectedLimitedResources");
     Expect((long)kBluetoothHCIErrorHostRejectedSecurityReasons, "kBluetoothHCIErrorHostRejectedSecurityReasons");
+}
+
+void Check126()
+{
     Expect((long)kBluetoothHCIErrorHostRejectedRemoteDeviceIsPersonal, "kBluetoothHCIErrorHostRejectedRemoteDeviceIsPersonal");
     Expect((long)kBluetoothHCIErrorHostTimeout, "kBluetoothHCIErrorHostTimeout");
     Expect((long)kBluetoothHCIErrorUnsupportedFeatureOrParameterValue, "kBluetoothHCIErrorUnsupportedFeatureOrParameterValue");
@@ -51125,10 +51248,6 @@ void Check125()
     Expect((long)kBluetoothSDPDataElementTypeURL, "kBluetoothSDPDataElementTypeURL");
     Expect((long)kBluetoothSDPDataElementTypeReservedStart, "kBluetoothSDPDataElementTypeReservedStart");
     Expect((long)kBluetoothSDPDataElementTypeReservedEnd, "kBluetoothSDPDataElementTypeReservedEnd");
-}
-
-void Check126()
-{
     Expect((long)BluetoothLEScanType.Passive, "BluetoothLEScanTypePassive");
     Expect((long)BluetoothLEScanType.Active, "BluetoothLEScanTypeActive");
     Expect((long)BluetoothLEAddressType.Public, "BluetoothLEAddressTypePublic");
@@ -51410,6 +51529,10 @@ void Check126()
     Expect((long)offsetof(OBEXSetPathCommandResponseData, constants), "__builtin_offsetof(struct OBEXSetPathCommandResponseData, constants)");
     Expect((long)sizeof(OBEXAbortCommandResponseData), "sizeof(struct OBEXAbortCommandResponseData)");
     Expect((long)alignof(OBEXAbortCommandResponseData), "_Alignof(struct OBEXAbortCommandResponseData)");
+}
+
+void Check127()
+{
     Expect((long)offsetof(OBEXAbortCommandResponseData, serverResponseOpCode), "__builtin_offsetof(struct OBEXAbortCommandResponseData, serverResponseOpCode)");
     Expect((long)offsetof(OBEXAbortCommandResponseData, headerDataPtr), "__builtin_offsetof(struct OBEXAbortCommandResponseData, headerDataPtr)");
     Expect((long)offsetof(OBEXAbortCommandResponseData, headerDataLength), "__builtin_offsetof(struct OBEXAbortCommandResponseData, headerDataLength)");
@@ -51529,10 +51652,6 @@ void Check126()
     Expect((long)kBluetoothHCIEventMaskDefault64Bit, "(kBluetoothHCIEventMaskDefault64Bit)");
     Expect((long)kBluetoothHCIEventMaskAll64Bit, "(kBluetoothHCIEventMaskAll64Bit)");
     Expect((long)kBluetoothHCIEventMaskFlowSpecificationCompleteEvent, "(kBluetoothHCIEventMaskFlowSpecificationCompleteEvent)");
-}
-
-void Check127()
-{
     Expect((long)kBluetoothHCIEventMaskInquiryResultWithRSSIEvent, "(kBluetoothHCIEventMaskInquiryResultWithRSSIEvent)");
     Expect((long)kBluetoothHCIEventMaskReadRemoteExtendedFeaturesCompleteEvent, "(kBluetoothHCIEventMaskReadRemoteExtendedFeaturesCompleteEvent)");
     Expect((long)kBluetoothHCIEventMaskSynchronousConnectionCompleteEvent, "(kBluetoothHCIEventMaskSynchronousConnectionCompleteEvent)");
@@ -51814,6 +51933,10 @@ void Check127()
     Expect((long)IOUSBHostCITransferCompletionMessageData1TransferStructurePhase, "IOUSBHostCITransferCompletionMessageData1TransferStructurePhase");
     Expect((long)kIOUSBAppleVendorID, "kIOUSBAppleVendorID");
     Expect((long)tIOUSBDescriptorType.DescriptorTypeDevice, "kIOUSBDescriptorTypeDevice");
+}
+
+void Check128()
+{
     Expect((long)tIOUSBDescriptorType.DescriptorTypeConfiguration, "kIOUSBDescriptorTypeConfiguration");
     Expect((long)tIOUSBDescriptorType.DescriptorTypeString, "kIOUSBDescriptorTypeString");
     Expect((long)tIOUSBDescriptorType.DescriptorTypeInterface, "kIOUSBDescriptorTypeInterface");
@@ -51933,10 +52056,6 @@ void Check127()
     Expect((long)kIOUSBEndpointDescriptorTransferType, "kIOUSBEndpointDescriptorTransferType");
     Expect((long)kIOUSBEndpointDescriptorTransferTypePhase, "kIOUSBEndpointDescriptorTransferTypePhase");
     Expect((long)kIOUSBEndpointDescriptorTransferTypeControl, "kIOUSBEndpointDescriptorTransferTypeControl");
-}
-
-void Check128()
-{
     Expect((long)kIOUSBEndpointDescriptorTransferTypeIsochronous, "kIOUSBEndpointDescriptorTransferTypeIsochronous");
     Expect((long)kIOUSBEndpointDescriptorTransferTypeBulk, "kIOUSBEndpointDescriptorTransferTypeBulk");
     Expect((long)kIOUSBEndpointDescriptorTransferTypeInterrupt, "kIOUSBEndpointDescriptorTransferTypeInterrupt");
@@ -52218,6 +52337,10 @@ void Check128()
     Expect((long)offsetof(IOUSBHIDReportDesc, hidDescriptorLengthLo), "__builtin_offsetof(struct IOUSBHIDReportDesc, hidDescriptorLengthLo)");
     Expect((long)offsetof(IOUSBHIDReportDesc, hidDescriptorLengthHi), "__builtin_offsetof(struct IOUSBHIDReportDesc, hidDescriptorLengthHi)");
     Expect((long)sizeof(IOUSBDFUDescriptor), "sizeof(struct IOUSBDFUDescriptor)");
+}
+
+void Check129()
+{
     Expect((long)alignof(IOUSBDFUDescriptor), "_Alignof(struct IOUSBDFUDescriptor)");
     Expect((long)offsetof(IOUSBDFUDescriptor, bLength), "__builtin_offsetof(struct IOUSBDFUDescriptor, bLength)");
     Expect((long)offsetof(IOUSBDFUDescriptor, bDescriptorType), "__builtin_offsetof(struct IOUSBDFUDescriptor, bDescriptorType)");
@@ -52337,10 +52460,6 @@ void Check128()
     Expect((long)tIOUSB30LinkStateTimeout.LinkStateHotResetActiveTimeout, "kIOUSB30LinkStateHotResetActiveTimeout");
     Expect((long)tIOUSB30LinkStateTimeout.LinkStateHotResetExitTimeout, "kIOUSB30LinkStateHotResetExitTimeout");
     Expect((long)tIOUSB30LinkStateTimeout.LinkStatePollingDeadline, "kIOUSB30LinkStatePollingDeadline");
-}
-
-void Check129()
-{
     Expect((long)tIOUSB30LinkStateTimeout.LinkStateSSResumeDeadline, "kIOUSB30LinkStateSSResumeDeadline");
     Expect((long)tIOUSB30LinkStateTimeout.LinkStateRecoveryDeadline, "kIOUSB30LinkStateRecoveryDeadline");
     Expect((long)tIOUSB30LinkStateTimeout.LinkStateHotResetDeadline, "kIOUSB30LinkStateHotResetDeadline");
@@ -52622,6 +52741,10 @@ void Check129()
     Expect((long)ICScannerDocumentType.ICScannerDocumentTypeMF, "ICScannerDocumentTypeMF");
     Expect((long)ICScannerDocumentType.ICScannerDocumentTypeLF, "ICScannerDocumentTypeLF");
     Expect((long)ICScannerFunctionalUnitState.Ready, "ICScannerFunctionalUnitStateReady");
+}
+
+void Check130()
+{
     Expect((long)ICScannerFunctionalUnitState.ScanInProgress, "ICScannerFunctionalUnitStateScanInProgress");
     Expect((long)ICScannerFunctionalUnitState.OverviewScanInProgress, "ICScannerFunctionalUnitStateOverviewScanInProgress");
     Expect((long)ICScannerFeatureType.Enumeration, "ICScannerFeatureTypeEnumeration");
@@ -52741,10 +52864,6 @@ void Check129()
     Expect((long)INIntentHandlingStatus.Unspecified, "INIntentHandlingStatusUnspecified");
     Expect((long)INIntentHandlingStatus.Ready, "INIntentHandlingStatusReady");
     Expect((long)INIntentHandlingStatus.InProgress, "INIntentHandlingStatusInProgress");
-}
-
-void Check130()
-{
     Expect((long)INIntentHandlingStatus.Success, "INIntentHandlingStatusSuccess");
     Expect((long)INIntentHandlingStatus.Failure, "INIntentHandlingStatusFailure");
     Expect((long)INIntentHandlingStatus.DeferredToApplication, "INIntentHandlingStatusDeferredToApplication");
@@ -53026,6 +53145,10 @@ void Check130()
     Expect((long)kJRSUI_ScrollBarPart_arrowMin, "kJRSUI_ScrollBarPart_arrowMin");
     Expect((long)kJRSUI_ScrollBarPart_arrowMax, "kJRSUI_ScrollBarPart_arrowMax");
     Expect((long)kJRSUI_ScrollBarPart_arrowMaxInside, "kJRSUI_ScrollBarPart_arrowMaxInside");
+}
+
+void Check131()
+{
     Expect((long)kJRSUI_ScrollBarPart_arrowMinInside, "kJRSUI_ScrollBarPart_arrowMinInside");
     Expect((long)kJRSUI_ScrollBarPart_trackMin, "kJRSUI_ScrollBarPart_trackMin");
     Expect((long)kJRSUI_ScrollBarPart_trackMax, "kJRSUI_ScrollBarPart_trackMax");
@@ -53145,10 +53268,6 @@ void Check130()
     Expect((long)LAAccessControlOperation.UseKeyKeyExchange, "LAAccessControlOperationUseKeyKeyExchange");
     Expect((long)LAError.AuthenticationFailed, "LAErrorAuthenticationFailed");
     Expect((long)LAError.UserCancel, "LAErrorUserCancel");
-}
-
-void Check131()
-{
     Expect((long)LAError.UserFallback, "LAErrorUserFallback");
     Expect((long)LAError.SystemCancel, "LAErrorSystemCancel");
     Expect((long)LAError.PasscodeNotSet, "LAErrorPasscodeNotSet");
@@ -53430,6 +53549,10 @@ void Check131()
     Expect((long)offsetof(MKMapSize, width), "__builtin_offsetof(MKMapSize, width)");
     Expect((long)offsetof(MKMapSize, height), "__builtin_offsetof(MKMapSize, height)");
     Expect((long)sizeof(MKMapRect), "sizeof(MKMapRect)");
+}
+
+void Check132()
+{
     Expect((long)alignof(MKMapRect), "_Alignof(MKMapRect)");
     Expect((long)offsetof(MKMapRect, origin), "__builtin_offsetof(MKMapRect, origin)");
     Expect((long)offsetof(MKMapRect, size), "__builtin_offsetof(MKMapRect, size)");
@@ -53549,10 +53672,6 @@ void Check131()
     Expect((long)MTRDataTypeLandmarkTag.Stove, "MTRDataTypeLandmarkTagStove");
     Expect((long)MTRDataTypeLandmarkTag.Table, "MTRDataTypeLandmarkTagTable");
     Expect((long)MTRDataTypeLandmarkTag.Toilet, "MTRDataTypeLandmarkTagToilet");
-}
-
-void Check132()
-{
     Expect((long)MTRDataTypeLandmarkTag.TrashCan, "MTRDataTypeLandmarkTagTrashCan");
     Expect((long)MTRDataTypeLandmarkTag.LaundryWasher, "MTRDataTypeLandmarkTagLaundryWasher");
     Expect((long)MTRDataTypeLandmarkTag.Window, "MTRDataTypeLandmarkTagWindow");
@@ -53834,6 +53953,10 @@ void Check132()
     Expect((long)MTRPowerSourceBatCommonDesignation.MTRPowerSourceBatCommonDesignationAA, "MTRPowerSourceBatCommonDesignationAA");
     Expect((long)MTRPowerSourceBatCommonDesignation.MTRPowerSourceBatCommonDesignationC, "MTRPowerSourceBatCommonDesignationC");
     Expect((long)MTRPowerSourceBatCommonDesignation.MTRPowerSourceBatCommonDesignationD, "MTRPowerSourceBatCommonDesignationD");
+}
+
+void Check133()
+{
     Expect((long)MTRPowerSourceBatCommonDesignation.MTRPowerSourceBatCommonDesignation4v5, "MTRPowerSourceBatCommonDesignation4v5");
     Expect((long)MTRPowerSourceBatCommonDesignation.MTRPowerSourceBatCommonDesignation6v0, "MTRPowerSourceBatCommonDesignation6v0");
     Expect((long)MTRPowerSourceBatCommonDesignation.MTRPowerSourceBatCommonDesignation9v0, "MTRPowerSourceBatCommonDesignation9v0");
@@ -53953,10 +54076,6 @@ void Check132()
     Expect((long)MTRNetworkCommissioningStatus.UnsupportedSecurity, "MTRNetworkCommissioningStatusUnsupportedSecurity");
     Expect((long)MTRNetworkCommissioningStatus.OtherConnectionFailure, "MTRNetworkCommissioningStatusOtherConnectionFailure");
     Expect((long)MTRNetworkCommissioningStatus.IPV6Failed, "MTRNetworkCommissioningStatusIPV6Failed");
-}
-
-void Check133()
-{
     Expect((long)MTRNetworkCommissioningStatus.IPBindFailed, "MTRNetworkCommissioningStatusIPBindFailed");
     Expect((long)MTRNetworkCommissioningStatus.UnknownError, "MTRNetworkCommissioningStatusUnknownError");
     Expect((long)MTRNetworkCommissioningWiFiBand.Band2G4, "MTRNetworkCommissioningWiFiBand2G4");
@@ -54238,6 +54357,10 @@ void Check133()
     Expect((long)MTROperationalCredentialsNodeOperationalCertStatus.InvalidPublicKey, "MTROperationalCredentialsNodeOperationalCertStatusInvalidPublicKey");
     Expect((long)MTROperationalCredentialsNodeOperationalCertStatus.InvalidNodeOpId, "MTROperationalCredentialsNodeOperationalCertStatusInvalidNodeOpId");
     Expect((long)MTROperationalCredentialsNodeOperationalCertStatus.InvalidNOC, "MTROperationalCredentialsNodeOperationalCertStatusInvalidNOC");
+}
+
+void Check134()
+{
     Expect((long)MTROperationalCredentialsNodeOperationalCertStatus.MissingCsr, "MTROperationalCredentialsNodeOperationalCertStatusMissingCsr");
     Expect((long)MTROperationalCredentialsNodeOperationalCertStatus.TableFull, "MTROperationalCredentialsNodeOperationalCertStatusTableFull");
     Expect((long)MTROperationalCredentialsNodeOperationalCertStatus.InvalidAdminSubject, "MTROperationalCredentialsNodeOperationalCertStatusInvalidAdminSubject");
@@ -54357,10 +54480,6 @@ void Check133()
     Expect((long)MTRRVCRunModeModeTag.Night, "MTRRVCRunModeModeTagNight");
     Expect((long)MTRRVCRunModeModeTag.Day, "MTRRVCRunModeModeTagDay");
     Expect((long)MTRRVCRunModeModeTag.Idle, "MTRRVCRunModeModeTagIdle");
-}
-
-void Check134()
-{
     Expect((long)MTRRVCRunModeModeTag.Cleaning, "MTRRVCRunModeModeTagCleaning");
     Expect((long)MTRRVCRunModeModeTag.Mapping, "MTRRVCRunModeModeTagMapping");
     Expect((long)MTRRVCRunModeStatusCode.Stuck, "MTRRVCRunModeStatusCodeStuck");
@@ -54642,6 +54761,10 @@ void Check134()
     Expect((long)MTRDeviceEnergyManagementFeature.StartTimeAdjustment, "MTRDeviceEnergyManagementFeatureStartTimeAdjustment");
     Expect((long)MTRDeviceEnergyManagementFeature.Pausable, "MTRDeviceEnergyManagementFeaturePausable");
     Expect((long)MTRDeviceEnergyManagementFeature.ForecastAdjustment, "MTRDeviceEnergyManagementFeatureForecastAdjustment");
+}
+
+void Check135()
+{
     Expect((long)MTRDeviceEnergyManagementFeature.ConstraintBasedAdjustment, "MTRDeviceEnergyManagementFeatureConstraintBasedAdjustment");
     Expect((long)MTREnergyEVSEEnergyTransferStoppedReason.EVStopped, "MTREnergyEVSEEnergyTransferStoppedReasonEVStopped");
     Expect((long)MTREnergyEVSEEnergyTransferStoppedReason.EVSEStopped, "MTREnergyEVSEEnergyTransferStoppedReasonEVSEStopped");
@@ -54761,10 +54884,6 @@ void Check134()
     Expect((long)MTRDoorLockDlCredentialType.PIN, "MTRDoorLockDlCredentialTypePIN");
     Expect((long)MTRDoorLockDlCredentialType.RFID, "MTRDoorLockDlCredentialTypeRFID");
     Expect((long)MTRDoorLockDlCredentialType.Fingerprint, "MTRDoorLockDlCredentialTypeFingerprint");
-}
-
-void Check135()
-{
     Expect((long)MTRDoorLockDlCredentialType.FingerVein, "MTRDoorLockDlCredentialTypeFingerVein");
     Expect((long)MTRDoorLockDlCredentialType.Face, "MTRDoorLockDlCredentialTypeFace");
     Expect((long)MTRDoorLockDataOperationType.Add, "MTRDoorLockDataOperationTypeAdd");
@@ -55046,6 +55165,10 @@ void Check135()
     Expect((long)MTRDoorLockFeature.YearDayAccessSchedules, "MTRDoorLockFeatureYearDayAccessSchedules");
     Expect((long)MTRDoorLockFeature.YearDaySchedules, "MTRDoorLockFeatureYearDaySchedules");
     Expect((long)MTRDoorLockFeature.HolidaySchedules, "MTRDoorLockFeatureHolidaySchedules");
+}
+
+void Check136()
+{
     Expect((long)MTRDoorLockFeature.Unbolt, "MTRDoorLockFeatureUnbolt");
     Expect((long)MTRDoorLockFeature.AliroProvisioning, "MTRDoorLockFeatureAliroProvisioning");
     Expect((long)MTRDoorLockFeature.AliroBLEUWB, "MTRDoorLockFeatureAliroBLEUWB");
@@ -55165,10 +55288,6 @@ void Check135()
     Expect((long)MTRPumpConfigurationAndControlPumpFeature.ConstantTemperature, "MTRPumpConfigurationAndControlPumpFeatureConstantTemperature");
     Expect((long)MTRPumpConfigurationAndControlPumpFeature.Automatic, "MTRPumpConfigurationAndControlPumpFeatureAutomatic");
     Expect((long)MTRPumpConfigurationAndControlPumpFeature.LocalOperation, "MTRPumpConfigurationAndControlPumpFeatureLocalOperation");
-}
-
-void Check136()
-{
     Expect((long)MTRPumpConfigurationAndControlPumpFeature.Local, "MTRPumpConfigurationAndControlPumpFeatureLocal");
     Expect((long)MTRPumpConfigurationAndControlPumpStatusBitmap.DeviceFault, "MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault");
     Expect((long)MTRPumpConfigurationAndControlPumpStatusBitmap.SupplyFault, "MTRPumpConfigurationAndControlPumpStatusBitmapSupplyFault");
@@ -55450,6 +55569,10 @@ void Check136()
     Expect((long)MTRPressureMeasurementPressureFeature.Extended, "MTRPressureMeasurementPressureFeatureExtended");
     Expect((long)MTRPressureMeasurementPressureFeature.EXT, "MTRPressureMeasurementPressureFeatureEXT");
     Expect((long)MTROccupancySensingOccupancySensorType.PIR, "MTROccupancySensingOccupancySensorTypePIR");
+}
+
+void Check137()
+{
     Expect((long)MTROccupancySensingOccupancySensorType.Ultrasonic, "MTROccupancySensingOccupancySensorTypeUltrasonic");
     Expect((long)MTROccupancySensingOccupancySensorType.PIRAndUltrasonic, "MTROccupancySensingOccupancySensorTypePIRAndUltrasonic");
     Expect((long)MTROccupancySensingOccupancySensorType.PhysicalContact, "MTROccupancySensingOccupancySensorTypePhysicalContact");
@@ -55569,10 +55692,6 @@ void Check136()
     Expect((long)MTRPM25ConcentrationMeasurementMeasurementUnit.NGM3, "MTRPM25ConcentrationMeasurementMeasurementUnitNGM3");
     Expect((long)MTRPM25ConcentrationMeasurementMeasurementUnit.PM3, "MTRPM25ConcentrationMeasurementMeasurementUnitPM3");
     Expect((long)MTRPM25ConcentrationMeasurementMeasurementUnit.BQM3, "MTRPM25ConcentrationMeasurementMeasurementUnitBQM3");
-}
-
-void Check137()
-{
     Expect((long)MTRPM25ConcentrationMeasurementFeature.NumericMeasurement, "MTRPM25ConcentrationMeasurementFeatureNumericMeasurement");
     Expect((long)MTRPM25ConcentrationMeasurementFeature.LevelIndication, "MTRPM25ConcentrationMeasurementFeatureLevelIndication");
     Expect((long)MTRPM25ConcentrationMeasurementFeature.MediumLevel, "MTRPM25ConcentrationMeasurementFeatureMediumLevel");
@@ -55854,6 +55973,10 @@ void Check137()
     Expect((long)MTRKeypadInputCecKeyCode.LeftUp, "MTRKeypadInputCecKeyCodeLeftUp");
     Expect((long)MTRKeypadInputCecKeyCode.LeftDown, "MTRKeypadInputCecKeyCodeLeftDown");
     Expect((long)MTRKeypadInputCecKeyCode.RootMenu, "MTRKeypadInputCecKeyCodeRootMenu");
+}
+
+void Check138()
+{
     Expect((long)MTRKeypadInputCecKeyCode.SetupMenu, "MTRKeypadInputCecKeyCodeSetupMenu");
     Expect((long)MTRKeypadInputCecKeyCode.ContentsMenu, "MTRKeypadInputCecKeyCodeContentsMenu");
     Expect((long)MTRKeypadInputCecKeyCode.FavoriteMenu, "MTRKeypadInputCecKeyCodeFavoriteMenu");
@@ -55973,10 +56096,6 @@ void Check137()
     Expect((long)MTRContentLauncherSupportedProtocolsBitmap.DASH, "MTRContentLauncherSupportedProtocolsBitmapDASH");
     Expect((long)MTRContentLauncherSupportedProtocolsBitmap.HLS, "MTRContentLauncherSupportedProtocolsBitmapHLS");
     Expect((long)MTRContentLauncherSupportedStreamingProtocol.DASH, "MTRContentLauncherSupportedStreamingProtocolDASH");
-}
-
-void Check138()
-{
     Expect((long)MTRContentLauncherSupportedStreamingProtocol.HLS, "MTRContentLauncherSupportedStreamingProtocolHLS");
     Expect((long)MTRAudioOutputOutputType.HDMI, "MTRAudioOutputOutputTypeHDMI");
     Expect((long)MTRAudioOutputOutputType.Hdmi, "MTRAudioOutputOutputTypeHdmi");
@@ -56258,6 +56377,10 @@ void Check138()
     Expect((long)MTRClusterIDType.IDTypeContentAppObserverID, "MTRClusterIDTypeContentAppObserverID");
     Expect((long)MTRClusterIDType.IDTypeCommissionerControlID, "MTRClusterIDTypeCommissionerControlID");
     Expect((long)MTRClusterIDType.IDTypeUnitTestingID, "MTRClusterIDTypeUnitTestingID");
+}
+
+void Check139()
+{
     Expect((long)MTRClusterIDType.BarrierControlID, "MTRClusterBarrierControlID");
     Expect((long)MTRClusterIDType.IDTypeBarrierControlID, "MTRClusterIDTypeBarrierControlID");
     Expect((long)MTRClusterIDType.BinaryInputBasicID, "MTRClusterBinaryInputBasicID");
@@ -56377,10 +56500,6 @@ void Check138()
     Expect((long)MTRAttributeIDType.ClusterDescriptorAttributePartsListID, "MTRClusterDescriptorAttributePartsListID");
     Expect((long)MTRAttributeIDType.ClusterDescriptorAttributeGeneratedCommandListID, "MTRClusterDescriptorAttributeGeneratedCommandListID");
     Expect((long)MTRAttributeIDType.ClusterDescriptorAttributeAcceptedCommandListID, "MTRClusterDescriptorAttributeAcceptedCommandListID");
-}
-
-void Check139()
-{
     Expect((long)MTRAttributeIDType.ClusterDescriptorAttributeAttributeListID, "MTRClusterDescriptorAttributeAttributeListID");
     Expect((long)MTRAttributeIDType.ClusterDescriptorAttributeFeatureMapID, "MTRClusterDescriptorAttributeFeatureMapID");
     Expect((long)MTRAttributeIDType.ClusterDescriptorAttributeClusterRevisionID, "MTRClusterDescriptorAttributeClusterRevisionID");
@@ -56662,6 +56781,10 @@ void Check139()
     Expect((long)MTRAttributeIDType.ClusterGeneralCommissioningAttributeFeatureMapID, "MTRClusterGeneralCommissioningAttributeFeatureMapID");
     Expect((long)MTRAttributeIDType.ClusterGeneralCommissioningAttributeClusterRevisionID, "MTRClusterGeneralCommissioningAttributeClusterRevisionID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID, "MTRAttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID");
+}
+
+void Check140()
+{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterGeneralCommissioningAttributeBasicCommissioningInfoID, "MTRAttributeIDTypeClusterGeneralCommissioningAttributeBasicCommissioningInfoID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterGeneralCommissioningAttributeRegulatoryConfigID, "MTRAttributeIDTypeClusterGeneralCommissioningAttributeRegulatoryConfigID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterGeneralCommissioningAttributeLocationCapabilityID, "MTRAttributeIDTypeClusterGeneralCommissioningAttributeLocationCapabilityID");
@@ -56781,10 +56904,6 @@ void Check139()
     Expect((long)MTRAttributeIDType.ClusterThreadNetworkDiagnosticsAttributeTxTotalCountID, "MTRClusterThreadNetworkDiagnosticsAttributeTxTotalCountID");
     Expect((long)MTRAttributeIDType.ClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID, "MTRClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID");
     Expect((long)MTRAttributeIDType.ClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID, "MTRClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID");
-}
-
-void Check140()
-{
     Expect((long)MTRAttributeIDType.ClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID, "MTRClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID");
     Expect((long)MTRAttributeIDType.ClusterThreadNetworkDiagnosticsAttributeTxAckedCountID, "MTRClusterThreadNetworkDiagnosticsAttributeTxAckedCountID");
     Expect((long)MTRAttributeIDType.ClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID, "MTRClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID");
@@ -57066,6 +57185,10 @@ void Check140()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterAdministratorCommissioningAttributeWindowStatusID, "MTRAttributeIDTypeClusterAdministratorCommissioningAttributeWindowStatusID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterAdministratorCommissioningAttributeAdminFabricIndexID, "MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminFabricIndexID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterAdministratorCommissioningAttributeAdminVendorIdID, "MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminVendorIdID");
+}
+
+void Check141()
+{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterAdministratorCommissioningAttributeGeneratedCommandListID, "MTRAttributeIDTypeClusterAdministratorCommissioningAttributeGeneratedCommandListID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID, "MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID, "MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID");
@@ -57185,10 +57308,6 @@ void Check140()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterLaundryDryerControlsAttributeGeneratedCommandListID, "MTRAttributeIDTypeClusterLaundryDryerControlsAttributeGeneratedCommandListID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterLaundryDryerControlsAttributeAcceptedCommandListID, "MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAcceptedCommandListID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterLaundryDryerControlsAttributeAttributeListID, "MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAttributeListID");
-}
-
-void Check141()
-{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterLaundryDryerControlsAttributeFeatureMapID, "MTRAttributeIDTypeClusterLaundryDryerControlsAttributeFeatureMapID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterLaundryDryerControlsAttributeClusterRevisionID, "MTRAttributeIDTypeClusterLaundryDryerControlsAttributeClusterRevisionID");
     Expect((long)MTRAttributeIDType.ClusterModeSelectAttributeDescriptionID, "MTRClusterModeSelectAttributeDescriptionID");
@@ -57470,6 +57589,10 @@ void Check141()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterEnergyEVSEAttributeStateID, "MTRAttributeIDTypeClusterEnergyEVSEAttributeStateID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterEnergyEVSEAttributeSupplyStateID, "MTRAttributeIDTypeClusterEnergyEVSEAttributeSupplyStateID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterEnergyEVSEAttributeFaultStateID, "MTRAttributeIDTypeClusterEnergyEVSEAttributeFaultStateID");
+}
+
+void Check142()
+{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterEnergyEVSEAttributeChargingEnabledUntilID, "MTRAttributeIDTypeClusterEnergyEVSEAttributeChargingEnabledUntilID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterEnergyEVSEAttributeCircuitCapacityID, "MTRAttributeIDTypeClusterEnergyEVSEAttributeCircuitCapacityID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterEnergyEVSEAttributeMinimumChargeCurrentID, "MTRAttributeIDTypeClusterEnergyEVSEAttributeMinimumChargeCurrentID");
@@ -57589,10 +57712,6 @@ void Check141()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID, "MTRAttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID, "MTRAttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID, "MTRAttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID");
-}
-
-void Check142()
-{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID, "MTRAttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID, "MTRAttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID, "MTRAttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID");
@@ -57874,6 +57993,10 @@ void Check142()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFanControlAttributePercentCurrentID, "MTRAttributeIDTypeClusterFanControlAttributePercentCurrentID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFanControlAttributeSpeedMaxID, "MTRAttributeIDTypeClusterFanControlAttributeSpeedMaxID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFanControlAttributeSpeedSettingID, "MTRAttributeIDTypeClusterFanControlAttributeSpeedSettingID");
+}
+
+void Check143()
+{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFanControlAttributeSpeedCurrentID, "MTRAttributeIDTypeClusterFanControlAttributeSpeedCurrentID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFanControlAttributeRockSupportID, "MTRAttributeIDTypeClusterFanControlAttributeRockSupportID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFanControlAttributeRockSettingID, "MTRAttributeIDTypeClusterFanControlAttributeRockSettingID");
@@ -57993,10 +58116,6 @@ void Check142()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterColorControlAttributeColorPointRYID, "MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterColorControlAttributeColorPointRIntensityID, "MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterColorControlAttributeColorPointGXID, "MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID");
-}
-
-void Check143()
-{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterColorControlAttributeColorPointGYID, "MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterColorControlAttributeColorPointGIntensityID, "MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterColorControlAttributeColorPointBXID, "MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID");
@@ -58278,6 +58397,10 @@ void Check143()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasuredValueID, "MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasuredValueID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMinMeasuredValueID, "MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMinMeasuredValueID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMaxMeasuredValueID, "MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMaxMeasuredValueID");
+}
+
+void Check144()
+{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueID, "MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueWindowID, "MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueWindowID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueID, "MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueID");
@@ -58397,10 +58520,6 @@ void Check143()
     Expect((long)MTRAttributeIDType.ClusterChannelAttributeChannelListID, "MTRClusterChannelAttributeChannelListID");
     Expect((long)MTRAttributeIDType.ClusterChannelAttributeLineupID, "MTRClusterChannelAttributeLineupID");
     Expect((long)MTRAttributeIDType.ClusterChannelAttributeCurrentChannelID, "MTRClusterChannelAttributeCurrentChannelID");
-}
-
-void Check144()
-{
     Expect((long)MTRAttributeIDType.ClusterChannelAttributeGeneratedCommandListID, "MTRClusterChannelAttributeGeneratedCommandListID");
     Expect((long)MTRAttributeIDType.ClusterChannelAttributeAcceptedCommandListID, "MTRClusterChannelAttributeAcceptedCommandListID");
     Expect((long)MTRAttributeIDType.ClusterChannelAttributeAttributeListID, "MTRClusterChannelAttributeAttributeListID");
@@ -58682,6 +58801,10 @@ void Check144()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterUnitTestingAttributeInt40sID, "MTRAttributeIDTypeClusterUnitTestingAttributeInt40sID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterUnitTestingAttributeInt48sID, "MTRAttributeIDTypeClusterUnitTestingAttributeInt48sID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterUnitTestingAttributeInt56sID, "MTRAttributeIDTypeClusterUnitTestingAttributeInt56sID");
+}
+
+void Check145()
+{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterUnitTestingAttributeInt64sID, "MTRAttributeIDTypeClusterUnitTestingAttributeInt64sID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterUnitTestingAttributeEnum8ID, "MTRAttributeIDTypeClusterUnitTestingAttributeEnum8ID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterUnitTestingAttributeEnum16ID, "MTRAttributeIDTypeClusterUnitTestingAttributeEnum16ID");
@@ -58801,10 +58924,6 @@ void Check144()
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterBinaryInputBasicAttributePresentValueID, "MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID, "MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID, "MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID");
-}
-
-void Check145()
-{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID, "MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID, "MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID, "MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID");
@@ -59086,6 +59205,10 @@ void Check145()
     Expect((long)MTRAttributeIDType.ClusterOnOffSwitchConfigurationAttributeClusterRevisionID, "MTRClusterOnOffSwitchConfigurationAttributeClusterRevisionID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID, "MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID, "MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID");
+}
+
+void Check146()
+{
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID, "MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID, "MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID");
     Expect((long)MTRAttributeIDType.AttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID, "MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID");
@@ -59205,10 +59328,6 @@ void Check145()
     Expect((long)MTRCommandIDType.ClusterNetworkCommissioningCommandConnectNetworkID, "MTRClusterNetworkCommissioningCommandConnectNetworkID");
     Expect((long)MTRCommandIDType.ClusterNetworkCommissioningCommandConnectNetworkResponseID, "MTRClusterNetworkCommissioningCommandConnectNetworkResponseID");
     Expect((long)MTRCommandIDType.ClusterNetworkCommissioningCommandReorderNetworkID, "MTRClusterNetworkCommissioningCommandReorderNetworkID");
-}
-
-void Check146()
-{
     Expect((long)MTRCommandIDType.CommandIDTypeClusterNetworkCommissioningCommandScanNetworksID, "MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID");
     Expect((long)MTRCommandIDType.CommandIDTypeClusterNetworkCommissioningCommandScanNetworksResponseID, "MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksResponseID");
     Expect((long)MTRCommandIDType.CommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID, "MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID");
@@ -59490,6 +59609,10 @@ void Check146()
     Expect((long)MTRCommandIDType.CommandIDTypeClusterThreadNetworkDirectoryCommandOperationalDatasetResponseID, "MTRCommandIDTypeClusterThreadNetworkDirectoryCommandOperationalDatasetResponseID");
     Expect((long)MTRCommandIDType.ClusterChannelCommandChangeChannelID, "MTRClusterChannelCommandChangeChannelID");
     Expect((long)MTRCommandIDType.ClusterChannelCommandChangeChannelResponseID, "MTRClusterChannelCommandChangeChannelResponseID");
+}
+
+void Check147()
+{
     Expect((long)MTRCommandIDType.ClusterChannelCommandChangeChannelByNumberID, "MTRClusterChannelCommandChangeChannelByNumberID");
     Expect((long)MTRCommandIDType.ClusterChannelCommandSkipChannelID, "MTRClusterChannelCommandSkipChannelID");
     Expect((long)MTRCommandIDType.CommandIDTypeClusterChannelCommandChangeChannelID, "MTRCommandIDTypeClusterChannelCommandChangeChannelID");
@@ -59609,10 +59732,6 @@ void Check146()
     Expect((long)MTRCommandIDType.ClusterTestClusterCommandTimedInvokeRequestID, "MTRClusterTestClusterCommandTimedInvokeRequestID");
     Expect((long)MTRCommandIDType.ClusterTestClusterCommandTestSimpleOptionalArgumentRequestID, "MTRClusterTestClusterCommandTestSimpleOptionalArgumentRequestID");
     Expect((long)MTRCommandIDType.ClusterTestClusterCommandTestEmitTestEventRequestID, "MTRClusterTestClusterCommandTestEmitTestEventRequestID");
-}
-
-void Check147()
-{
     Expect((long)MTRCommandIDType.ClusterTestClusterCommandTestEmitTestFabricScopedEventRequestID, "MTRClusterTestClusterCommandTestEmitTestFabricScopedEventRequestID");
     Expect((long)MTRCommandIDType.CommandIDTypeClusterUnitTestingCommandTestID, "MTRCommandIDTypeClusterUnitTestingCommandTestID");
     Expect((long)MTRCommandIDType.CommandIDTypeClusterUnitTestingCommandTestSpecificResponseID, "MTRCommandIDTypeClusterUnitTestingCommandTestSpecificResponseID");
@@ -59894,6 +60013,10 @@ void Check147()
     Expect((long)MTRDeviceTypeIDType.HumiditySensorID, "MTRDeviceTypeIDTypeHumiditySensorID");
     Expect((long)MTRDeviceTypeIDType.HeatPumpID, "MTRDeviceTypeIDTypeHeatPumpID");
     Expect((long)MTRDeviceTypeIDType.EVSEID, "MTRDeviceTypeIDTypeEVSEID");
+}
+
+void Check148()
+{
     Expect((long)MTRDeviceTypeIDType.DeviceEnergyManagementID, "MTRDeviceTypeIDTypeDeviceEnergyManagementID");
     Expect((long)MTRDeviceTypeIDType.WaterHeaterID, "MTRDeviceTypeIDTypeWaterHeaterID");
     Expect((long)MTRDeviceTypeIDType.ElectricalSensorID, "MTRDeviceTypeIDTypeElectricalSensorID");
@@ -60013,10 +60136,6 @@ void Check147()
     Expect((long)MACaptionAppearanceTextEdgeStyle.Undefined, "kMACaptionAppearanceTextEdgeStyleUndefined");
     Expect((long)MACaptionAppearanceTextEdgeStyle.None, "kMACaptionAppearanceTextEdgeStyleNone");
     Expect((long)MACaptionAppearanceTextEdgeStyle.Raised, "kMACaptionAppearanceTextEdgeStyleRaised");
-}
-
-void Check148()
-{
     Expect((long)MACaptionAppearanceTextEdgeStyle.Depressed, "kMACaptionAppearanceTextEdgeStyleDepressed");
     Expect((long)MACaptionAppearanceTextEdgeStyle.Uniform, "kMACaptionAppearanceTextEdgeStyleUniform");
     Expect((long)MACaptionAppearanceTextEdgeStyle.DropShadow, "kMACaptionAppearanceTextEdgeStyleDropShadow");
@@ -60248,6 +60367,29 @@ void Check148()
     Expect((long)offsetof(MPSIntegerDivisionParams, recip), "__builtin_offsetof(MPSIntegerDivisionParams, recip)");
     Expect((long)offsetof(MPSIntegerDivisionParams, addend), "__builtin_offsetof(MPSIntegerDivisionParams, addend)");
     Expect((long)offsetof(MPSIntegerDivisionParams, shift), "__builtin_offsetof(MPSIntegerDivisionParams, shift)");
+    Expect((long)sizeof(MPSCustomKernelSourceInfo), "sizeof(MPSCustomKernelSourceInfo)");
+    Expect((long)alignof(MPSCustomKernelSourceInfo), "_Alignof(MPSCustomKernelSourceInfo)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, kernelOrigin), "__builtin_offsetof(MPSCustomKernelSourceInfo, kernelOrigin)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, kernelPhase), "__builtin_offsetof(MPSCustomKernelSourceInfo, kernelPhase)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, kernelSize), "__builtin_offsetof(MPSCustomKernelSourceInfo, kernelSize)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, offset), "__builtin_offsetof(MPSCustomKernelSourceInfo, offset)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, stride), "__builtin_offsetof(MPSCustomKernelSourceInfo, stride)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, dilationRate), "__builtin_offsetof(MPSCustomKernelSourceInfo, dilationRate)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, featureChannelOffset), "__builtin_offsetof(MPSCustomKernelSourceInfo, featureChannelOffset)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, featureChannels), "__builtin_offsetof(MPSCustomKernelSourceInfo, featureChannels)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, imageArrayOffset), "__builtin_offsetof(MPSCustomKernelSourceInfo, imageArrayOffset)");
+    Expect((long)offsetof(MPSCustomKernelSourceInfo, imageArraySize), "__builtin_offsetof(MPSCustomKernelSourceInfo, imageArraySize)");
+    Expect((long)sizeof(MPSCustomKernelInfo), "sizeof(MPSCustomKernelInfo)");
+    Expect((long)alignof(MPSCustomKernelInfo), "_Alignof(MPSCustomKernelInfo)");
+    Expect((long)offsetof(MPSCustomKernelInfo, clipOrigin), "__builtin_offsetof(MPSCustomKernelInfo, clipOrigin)");
+    Expect((long)offsetof(MPSCustomKernelInfo, clipSize), "__builtin_offsetof(MPSCustomKernelInfo, clipSize)");
+    Expect((long)offsetof(MPSCustomKernelInfo, destinationFeatureChannels), "__builtin_offsetof(MPSCustomKernelInfo, destinationFeatureChannels)");
+    Expect((long)offsetof(MPSCustomKernelInfo, destImageArraySize), "__builtin_offsetof(MPSCustomKernelInfo, destImageArraySize)");
+    Expect((long)offsetof(MPSCustomKernelInfo, sourceImageCount), "__builtin_offsetof(MPSCustomKernelInfo, sourceImageCount)");
+    Expect((long)offsetof(MPSCustomKernelInfo, threadgroupSize), "__builtin_offsetof(MPSCustomKernelInfo, threadgroupSize)");
+    Expect((long)offsetof(MPSCustomKernelInfo, subbatchIndex), "__builtin_offsetof(MPSCustomKernelInfo, subbatchIndex)");
+    Expect((long)offsetof(MPSCustomKernelInfo, subbatchStride), "__builtin_offsetof(MPSCustomKernelInfo, subbatchStride)");
+    Expect((long)offsetof(MPSCustomKernelInfo, idiv), "__builtin_offsetof(MPSCustomKernelInfo, idiv)");
     Expect((long)MPSImageType.Type2d, "MPSImageType2d");
     Expect((long)MPSImageType.Type2d_array, "MPSImageType2d_array");
     Expect((long)MPSImageType.TypeArray2d, "MPSImageTypeArray2d");
@@ -60275,6 +60417,10 @@ void Check148()
     Expect((long)offsetof(MPSCustomKernelArgumentCount, broadcastTextureCount), "__builtin_offsetof(struct MPSCustomKernelArgumentCount, broadcastTextureCount)");
     Expect((long)MPSAlphaType.NonPremultiplied, "MPSAlphaTypeNonPremultiplied");
     Expect((long)MPSAlphaType.AlphaIsOne, "MPSAlphaTypeAlphaIsOne");
+}
+
+void Check149()
+{
     Expect((long)MPSAlphaType.Premultiplied, "MPSAlphaTypePremultiplied");
     Expect((long)MPSMatrixDecompositionStatus.Success, "MPSMatrixDecompositionStatusSuccess");
     Expect((long)MPSMatrixDecompositionStatus.Failure, "MPSMatrixDecompositionStatusFailure");
@@ -60293,6 +60439,16 @@ void Check148()
     Expect((long)alignof(MPSImageKeypointRangeInfo), "_Alignof(MPSImageKeypointRangeInfo)");
     Expect((long)offsetof(MPSImageKeypointRangeInfo, maximumKeypoints), "__builtin_offsetof(MPSImageKeypointRangeInfo, maximumKeypoints)");
     Expect((long)offsetof(MPSImageKeypointRangeInfo, minimumThresholdValue), "__builtin_offsetof(MPSImageKeypointRangeInfo, minimumThresholdValue)");
+    Expect((long)sizeof(MPSImageKeypointData), "sizeof(MPSImageKeypointData)");
+    Expect((long)alignof(MPSImageKeypointData), "_Alignof(MPSImageKeypointData)");
+    Expect((long)offsetof(MPSImageKeypointData, keypointCoordinate), "__builtin_offsetof(MPSImageKeypointData, keypointCoordinate)");
+    Expect((long)offsetof(MPSImageKeypointData, keypointColorValue), "__builtin_offsetof(MPSImageKeypointData, keypointColorValue)");
+    Expect((long)sizeof(MPSImageHistogramInfo), "sizeof(MPSImageHistogramInfo)");
+    Expect((long)alignof(MPSImageHistogramInfo), "_Alignof(MPSImageHistogramInfo)");
+    Expect((long)offsetof(MPSImageHistogramInfo, numberOfHistogramEntries), "__builtin_offsetof(MPSImageHistogramInfo, numberOfHistogramEntries)");
+    Expect((long)offsetof(MPSImageHistogramInfo, histogramForAlpha), "__builtin_offsetof(MPSImageHistogramInfo, histogramForAlpha)");
+    Expect((long)offsetof(MPSImageHistogramInfo, minPixelValue), "__builtin_offsetof(MPSImageHistogramInfo, minPixelValue)");
+    Expect((long)offsetof(MPSImageHistogramInfo, maxPixelValue), "__builtin_offsetof(MPSImageHistogramInfo, maxPixelValue)");
     Expect((long)MPSCNNConvolutionFlags.MPSCNNConvolutionFlagsNone, "MPSCNNConvolutionFlagsNone");
     Expect((long)MPSCNNBinaryConvolutionFlags.None, "MPSCNNBinaryConvolutionFlagsNone");
     Expect((long)MPSCNNBinaryConvolutionFlags.UseBetaScaling, "MPSCNNBinaryConvolutionFlagsUseBetaScaling");
@@ -60417,16 +60573,20 @@ void Check148()
     Expect((long)offsetof(MPSNDArrayOffsets, dimensions), "__builtin_offsetof(MPSNDArrayOffsets, dimensions)");
     Expect((long)sizeof(MPSNDArraySizes), "sizeof(MPSNDArraySizes)");
     Expect((long)alignof(MPSNDArraySizes), "_Alignof(MPSNDArraySizes)");
-}
-
-void Check149()
-{
     Expect((long)offsetof(MPSNDArraySizes, dimensions), "__builtin_offsetof(MPSNDArraySizes, dimensions)");
     Expect((long)MPSNDArrayQuantizationScheme.None, "MPSNDArrayQuantizationTypeNone");
     Expect((long)MPSNDArrayQuantizationScheme.Affine, "MPSNDArrayQuantizationTypeAffine");
     Expect((long)MPSNDArrayQuantizationScheme.LUT, "MPSNDArrayQuantizationTypeLUT");
     Expect((long)sizeof(_MPSPackedFloat3), "sizeof(struct _MPSPackedFloat3)");
     Expect((long)alignof(_MPSPackedFloat3), "_Alignof(struct _MPSPackedFloat3)");
+    Expect((long)sizeof(_MPSAxisAlignedBoundingBox), "sizeof(struct _MPSAxisAlignedBoundingBox)");
+    Expect((long)alignof(_MPSAxisAlignedBoundingBox), "_Alignof(struct _MPSAxisAlignedBoundingBox)");
+    Expect((long)offsetof(_MPSAxisAlignedBoundingBox, min), "__builtin_offsetof(struct _MPSAxisAlignedBoundingBox, min)");
+    Expect((long)offsetof(_MPSAxisAlignedBoundingBox, max), "__builtin_offsetof(struct _MPSAxisAlignedBoundingBox, max)");
+    Expect((long)sizeof(MPSRayOriginDirection), "sizeof(MPSRayOriginDirection)");
+    Expect((long)alignof(MPSRayOriginDirection), "_Alignof(MPSRayOriginDirection)");
+    Expect((long)offsetof(MPSRayOriginDirection, origin), "__builtin_offsetof(MPSRayOriginDirection, origin)");
+    Expect((long)offsetof(MPSRayOriginDirection, direction), "__builtin_offsetof(MPSRayOriginDirection, direction)");
     Expect((long)sizeof(MPSRayPackedOriginDirection), "sizeof(MPSRayPackedOriginDirection)");
     Expect((long)alignof(MPSRayPackedOriginDirection), "_Alignof(MPSRayPackedOriginDirection)");
     Expect((long)offsetof(MPSRayPackedOriginDirection, origin), "__builtin_offsetof(MPSRayPackedOriginDirection, origin)");
@@ -60455,6 +60615,17 @@ void Check149()
     Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndex, distance), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndex, distance)");
     Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndex, primitiveIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndex, primitiveIndex)");
     Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndex, bufferIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndex, bufferIndex)");
+    Expect((long)sizeof(MPSIntersectionDistancePrimitiveIndexCoordinates), "sizeof(MPSIntersectionDistancePrimitiveIndexCoordinates)");
+    Expect((long)alignof(MPSIntersectionDistancePrimitiveIndexCoordinates), "_Alignof(MPSIntersectionDistancePrimitiveIndexCoordinates)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexCoordinates, distance), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexCoordinates, distance)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexCoordinates, primitiveIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexCoordinates, primitiveIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexCoordinates, coordinates), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexCoordinates, coordinates)");
+    Expect((long)sizeof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates), "sizeof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates)");
+    Expect((long)alignof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates), "_Alignof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, distance), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, distance)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, primitiveIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, primitiveIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, bufferIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, bufferIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, coordinates), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates, coordinates)");
     Expect((long)sizeof(MPSIntersectionDistancePrimitiveIndexInstanceIndex), "sizeof(MPSIntersectionDistancePrimitiveIndexInstanceIndex)");
     Expect((long)alignof(MPSIntersectionDistancePrimitiveIndexInstanceIndex), "_Alignof(MPSIntersectionDistancePrimitiveIndexInstanceIndex)");
     Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndex, distance), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndex, distance)");
@@ -60466,6 +60637,19 @@ void Check149()
     Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndex, primitiveIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndex, primitiveIndex)");
     Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndex, bufferIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndex, bufferIndex)");
     Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndex, instanceIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndex, instanceIndex)");
+    Expect((long)sizeof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates), "sizeof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates)");
+    Expect((long)alignof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates), "_Alignof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, distance), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, distance)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, primitiveIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, primitiveIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, instanceIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, instanceIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, coordinates), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates, coordinates)");
+    Expect((long)sizeof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates), "sizeof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates)");
+    Expect((long)alignof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates), "_Alignof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, distance), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, distance)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, primitiveIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, primitiveIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, bufferIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, bufferIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, instanceIndex), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, instanceIndex)");
+    Expect((long)offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, coordinates), "__builtin_offsetof(MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates, coordinates)");
     Expect((long)MPSAccelerationStructureUsage.None, "MPSAccelerationStructureUsageNone");
     Expect((long)MPSAccelerationStructureUsage.Refit, "MPSAccelerationStructureUsageRefit");
     Expect((long)MPSAccelerationStructureUsage.FrequentRebuild, "MPSAccelerationStructureUsageFrequentRebuild");
@@ -60637,6 +60821,10 @@ void Check149()
     Expect((long)MDLGeometryType.Points, "MDLGeometryTypePoints");
     Expect((long)MDLGeometryType.Lines, "MDLGeometryTypeLines");
     Expect((long)MDLGeometryType.Triangles, "MDLGeometryTypeTriangles");
+}
+
+void Check150()
+{
     Expect((long)MDLGeometryType.TriangleStrips, "MDLGeometryTypeTriangleStrips");
     Expect((long)MDLGeometryType.Quads, "MDLGeometryTypeQuads");
     Expect((long)MDLGeometryType.VariableTopology, "MDLGeometryTypeVariableTopology");
@@ -60645,6 +60833,10 @@ void Check149()
     Expect((long)MDLDataPrecision.Undefined, "MDLDataPrecisionUndefined");
     Expect((long)MDLDataPrecision.Float, "MDLDataPrecisionFloat");
     Expect((long)MDLDataPrecision.Double, "MDLDataPrecisionDouble");
+    Expect((long)sizeof(MDLAxisAlignedBoundingBox), "sizeof(MDLAxisAlignedBoundingBox)");
+    Expect((long)alignof(MDLAxisAlignedBoundingBox), "_Alignof(MDLAxisAlignedBoundingBox)");
+    Expect((long)offsetof(MDLAxisAlignedBoundingBox, maxBounds), "__builtin_offsetof(MDLAxisAlignedBoundingBox, maxBounds)");
+    Expect((long)offsetof(MDLAxisAlignedBoundingBox, minBounds), "__builtin_offsetof(MDLAxisAlignedBoundingBox, minBounds)");
     Expect((long)MDLMeshBufferType.Vertex, "MDLMeshBufferTypeVertex");
     Expect((long)MDLMeshBufferType.Index, "MDLMeshBufferTypeIndex");
     Expect((long)MDLMeshBufferType.Custom, "MDLMeshBufferTypeCustom");
@@ -60792,6 +60984,19 @@ void Check149()
     Expect((long)MDLTransformOpRotationOrder.YZX, "MDLTransformOpRotationOrderYZX");
     Expect((long)MDLTransformOpRotationOrder.ZXY, "MDLTransformOpRotationOrderZXY");
     Expect((long)MDLTransformOpRotationOrder.ZYX, "MDLTransformOpRotationOrderZYX");
+    Expect((long)sizeof(MDLVoxelIndexExtent), "sizeof(MDLVoxelIndexExtent)");
+    Expect((long)alignof(MDLVoxelIndexExtent), "_Alignof(MDLVoxelIndexExtent)");
+    Expect((long)offsetof(MDLVoxelIndexExtent, minimumExtent), "__builtin_offsetof(MDLVoxelIndexExtent, minimumExtent)");
+    Expect((long)offsetof(MDLVoxelIndexExtent, maximumExtent), "__builtin_offsetof(MDLVoxelIndexExtent, maximumExtent)");
+    Expect((long)sizeof(simd_double4x4), "sizeof(simd_double4x4)");
+    Expect((long)alignof(simd_double4x4), "_Alignof(simd_double4x4)");
+    Expect((long)offsetof(simd_double4x4, columns), "__builtin_offsetof(simd_double4x4, columns)");
+    Expect((long)sizeof(simd_quatf), "sizeof(simd_quatf)");
+    Expect((long)alignof(simd_quatf), "_Alignof(simd_quatf)");
+    Expect((long)offsetof(simd_quatf, vector), "__builtin_offsetof(simd_quatf, vector)");
+    Expect((long)sizeof(simd_quatd), "sizeof(simd_quatd)");
+    Expect((long)alignof(simd_quatd), "_Alignof(simd_quatd)");
+    Expect((long)offsetof(simd_quatd, vector), "__builtin_offsetof(simd_quatd, vector)");
     Expect((long)MCErrorCode.Unknown, "MCErrorUnknown");
     Expect((long)MCErrorCode.NotConnected, "MCErrorNotConnected");
     Expect((long)MCErrorCode.InvalidParameter, "MCErrorInvalidParameter");
@@ -60821,10 +61026,6 @@ void Check149()
     Expect((long)NLModelType.Classifier, "NLModelTypeClassifier");
     Expect((long)NLModelType.Sequence, "NLModelTypeSequence");
     Expect((long)NLTaggerOptions.OmitWords, "NLTaggerOmitWords");
-}
-
-void Check150()
-{
     Expect((long)NLTaggerOptions.OmitPunctuation, "NLTaggerOmitPunctuation");
     Expect((long)NLTaggerOptions.OmitWhitespace, "NLTaggerOmitWhitespace");
     Expect((long)NLTaggerOptions.OmitOther, "NLTaggerOmitOther");
@@ -61024,6 +61225,10 @@ void Check150()
     Expect((long)NEAppProxyFlowError.ReadAlreadyPending, "NEAppProxyFlowErrorReadAlreadyPending");
     Expect((long)NEProviderStopReason.None, "NEProviderStopReasonNone");
     Expect((long)NEProviderStopReason.UserInitiated, "NEProviderStopReasonUserInitiated");
+}
+
+void Check151()
+{
     Expect((long)NEProviderStopReason.ProviderFailed, "NEProviderStopReasonProviderFailed");
     Expect((long)NEProviderStopReason.NoNetworkAvailable, "NEProviderStopReasonNoNetworkAvailable");
     Expect((long)NEProviderStopReason.UnrecoverableNetworkChange, "NEProviderStopReasonUnrecoverableNetworkChange");
@@ -61225,10 +61430,6 @@ void Check150()
     Expect((long)OSLogEntryStoreCategory.Metadata, "OSLogEntryStoreCategoryMetadata");
     Expect((long)OSLogEntryStoreCategory.ShortTerm, "OSLogEntryStoreCategoryShortTerm");
     Expect((long)OSLogEntryStoreCategory.LongTermAuto, "OSLogEntryStoreCategoryLongTermAuto");
-}
-
-void Check151()
-{
     Expect((long)OSLogEntryStoreCategory.LongTerm1, "OSLogEntryStoreCategoryLongTerm1");
     Expect((long)OSLogEntryStoreCategory.LongTerm3, "OSLogEntryStoreCategoryLongTerm3");
     Expect((long)OSLogEntryStoreCategory.LongTerm7, "OSLogEntryStoreCategoryLongTerm7");
@@ -61428,6 +61629,10 @@ void Check151()
     Expect((long)PHASEUpdateMode.Automatic, "PHASEUpdateModeAutomatic");
     Expect((long)PHASEUpdateMode.Manual, "PHASEUpdateModeManual");
     Expect((long)PHASERenderingState.Stopped, "PHASERenderingStateStopped");
+}
+
+void Check152()
+{
     Expect((long)PHASERenderingState.Started, "PHASERenderingStateStarted");
     Expect((long)PHASERenderingState.Paused, "PHASERenderingStatePaused");
     Expect((long)PHASESpatializationMode.Automatic, "PHASESpatializationModeAutomatic");
@@ -61629,10 +61834,6 @@ void Check151()
     Expect((long)PKPassLibraryAuthorizationStatus.Authorized, "PKPassLibraryAuthorizationStatusAuthorized");
     Expect((long)PKPassLibraryAuthorizationStatus.Restricted, "PKPassLibraryAuthorizationStatusRestricted");
     Expect((long)PKPaymentSummaryItemType.Final, "PKPaymentSummaryItemTypeFinal");
-}
-
-void Check152()
-{
     Expect((long)PKPaymentSummaryItemType.Pending, "PKPaymentSummaryItemTypePending");
     Expect((long)PKMerchantCapability.Capability3DS, "PKMerchantCapability3DS");
     Expect((long)PKMerchantCapability.CapabilityEMV, "PKMerchantCapabilityEMV");
@@ -61832,6 +62033,10 @@ void Check152()
     Expect((long)PHLivePhotoViewPlaybackStyle.Undefined, "PHLivePhotoViewPlaybackStyleUndefined");
     Expect((long)PHLivePhotoViewPlaybackStyle.Full, "PHLivePhotoViewPlaybackStyleFull");
     Expect((long)PHLivePhotoViewPlaybackStyle.Hint, "PHLivePhotoViewPlaybackStyleHint");
+}
+
+void Check153()
+{
     Expect((long)PHLivePhotoViewContentMode.Fit, "PHLivePhotoViewContentModeAspectFit");
     Expect((long)PHLivePhotoViewContentMode.Fill, "PHLivePhotoViewContentModeAspectFill");
     Expect((long)PHPickerConfigurationAssetRepresentationMode.Automatic, "PHPickerConfigurationAssetRepresentationModeAutomatic");
@@ -62033,10 +62238,6 @@ void Check152()
     Expect((long)SCNDebugOptions.RenderAsWireframe, "SCNDebugOptionRenderAsWireframe");
     Expect((long)SCNDebugOptions.ShowSkeletons, "SCNDebugOptionShowSkeletons");
     Expect((long)SCNDebugOptions.ShowCreases, "SCNDebugOptionShowCreases");
-}
-
-void Check153()
-{
     Expect((long)SCNDebugOptions.ShowConstraints, "SCNDebugOptionShowConstraints");
     Expect((long)SCNDebugOptions.ShowCameras, "SCNDebugOptionShowCameras");
     Expect((long)SCNBufferFrequency.Frame, "SCNBufferFrequencyPerFrame");
@@ -62236,6 +62437,10 @@ void Check153()
     Expect((long)SFAuthorizationViewState.ViewUnlockedState, "SFAuthorizationViewUnlockedState");
     Expect((long)SCSensitivityAnalysisPolicy.Disabled, "SCSensitivityAnalysisPolicyDisabled");
     Expect((long)SCSensitivityAnalysisPolicy.SimpleInterventions, "SCSensitivityAnalysisPolicySimpleInterventions");
+}
+
+void Check154()
+{
     Expect((long)SCSensitivityAnalysisPolicy.DescriptiveInterventions, "SCSensitivityAnalysisPolicyDescriptiveInterventions");
     Expect((long)kSMErrorInternalFailure, "kSMErrorInternalFailure");
     Expect((long)kSMErrorInvalidSignature, "kSMErrorInvalidSignature");
@@ -62414,6 +62619,9 @@ void Check153()
     Expect((long)SK_VERSION, "(SK_VERSION)");
     Expect((long)PHYSICSKIT_MINUS_GL_IMPORTS, "(PHYSICSKIT_MINUS_GL_IMPORTS)");
     Expect((long)SKVIEW_AVAILABLE, "(SKVIEW_AVAILABLE)");
+    Expect((long)sizeof(simd_float2x2), "sizeof(simd_float2x2)");
+    Expect((long)alignof(simd_float2x2), "_Alignof(simd_float2x2)");
+    Expect((long)offsetof(simd_float2x2, columns), "__builtin_offsetof(simd_float2x2, columns)");
     Expect((long)SKCloudServiceAuthorizationStatus.NotDetermined, "SKCloudServiceAuthorizationStatusNotDetermined");
     Expect((long)SKCloudServiceAuthorizationStatus.Denied, "SKCloudServiceAuthorizationStatusDenied");
     Expect((long)SKCloudServiceAuthorizationStatus.Restricted, "SKCloudServiceAuthorizationStatusRestricted");
@@ -62437,10 +62645,6 @@ void Check153()
     Expect((long)SKErrorCode.CloudServicePermissionDenied, "SKErrorCloudServicePermissionDenied");
     Expect((long)SKErrorCode.CloudServiceNetworkConnectionFailed, "SKErrorCloudServiceNetworkConnectionFailed");
     Expect((long)SKErrorCode.CloudServiceRevoked, "SKErrorCloudServiceRevoked");
-}
-
-void Check154()
-{
     Expect((long)SKErrorCode.PrivacyAcknowledgementRequired, "SKErrorPrivacyAcknowledgementRequired");
     Expect((long)SKErrorCode.UnauthorizedRequestData, "SKErrorUnauthorizedRequestData");
     Expect((long)SKErrorCode.InvalidOfferIdentifier, "SKErrorInvalidOfferIdentifier");
@@ -62637,6 +62841,10 @@ void Check154()
     Expect((long)VNImageCropAndScaleOption.CenterCrop, "VNImageCropAndScaleOptionCenterCrop");
     Expect((long)VNImageCropAndScaleOption.ScaleFit, "VNImageCropAndScaleOptionScaleFit");
     Expect((long)VNImageCropAndScaleOption.ScaleFill, "VNImageCropAndScaleOptionScaleFill");
+}
+
+void Check155()
+{
     Expect((long)VNImageCropAndScaleOption.ScaleFitRotate90CCW, "VNImageCropAndScaleOptionScaleFitRotate90CCW");
     Expect((long)VNImageCropAndScaleOption.ScaleFillRotate90CCW, "VNImageCropAndScaleOptionScaleFillRotate90CCW");
     Expect((long)VNElementType.Unknown, "VNElementTypeUnknown");
@@ -62928,6 +63136,7 @@ int Main()
     Check152();
     Check153();
     Check154();
+    Check155();
     if (Checked != SLLayoutCount())
         Console.WriteLine($"checked {Checked} and clang has {SLLayoutCount()}");
     Console.WriteLine($"{Checked} checks, {Wrong} wrong");

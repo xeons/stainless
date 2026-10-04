@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -1159,5 +1160,19 @@ public const int kMouseTrackingMousePressed = 1;
 public const int kMouseTrackingMouseReleased = 2;
 
 public const int kEventControlGetSubviewForMouseEvent = 16;
+
+public const CFStringRef kHIServicesMenuProviderName = "kHIServicesMenuProviderName";
+
+public const CFStringRef kHIServicesMenuItemName = "kHIServicesMenuItemName";
+
+public const CFStringRef kHIServicesMenuCharCode = "kHIServicesMenuCharCode";
+
+public const CFStringRef kHIServicesMenuKeyModifiers = "kHIServicesMenuKeyModifiers";
+
+public const CFStringRef kHISymbolicHotKeyCode = "kHISymbolicHotKeyCode";
+
+public const CFStringRef kHISymbolicHotKeyModifiers = "kHISymbolicHotKeyModifiers";
+
+public const CFStringRef kHISymbolicHotKeyEnabled = "kHISymbolicHotKeyEnabled";
 
 #endif

@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -30,5 +33,7 @@ module MacOS.Carbon;
 public const int kControlSeparatorLineProc = 144;
 
 public const int kControlKindSeparator = 1936027745;
+
+public const CFStringRef kHIVisualSeparatorClassID = "com.apple.HIVisualSeparator";
 
 #endif

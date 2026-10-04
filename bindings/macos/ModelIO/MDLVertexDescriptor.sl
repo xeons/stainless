@@ -142,6 +142,7 @@ public extern objc class MDLVertexAttribute : NSObject, NSCopying
     [Selector("offset", "setOffset:")] public NSUInteger Offset { get; set; }
     [Selector("bufferIndex", "setBufferIndex:")] public NSUInteger BufferIndex { get; set; }
     [Selector("time", "setTime:")] public NSTimeInterval Time { get; set; }
+    [Selector("initializationValue", "setInitializationValue:")] public vector_float4 InitializationValue { get; set; }
     [Selector("initWithName:format:offset:bufferIndex:")] public Self InitWithNameFormatOffsetBufferIndex(NSString name, MDLVertexFormat format, NSUInteger offset, NSUInteger bufferIndex);
 }
 

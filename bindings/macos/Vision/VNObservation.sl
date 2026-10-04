@@ -110,6 +110,7 @@ public extern objc class VNTrajectoryObservation : VNObservation
 {
     [Selector("detectedPoints")] public NSArray DetectedPoints { get; }
     [Selector("projectedPoints")] public NSArray ProjectedPoints { get; }
+    [Selector("equationCoefficients")] public simd_float3 EquationCoefficients { get; }
     [Selector("movingAverageRadius")] public CGFloat MovingAverageRadius { get; }
 }
 
@@ -163,7 +164,10 @@ public extern objc class VNImageTranslationAlignmentObservation : VNImageAlignme
     [Selector("alignmentTransform")] public CGAffineTransform AlignmentTransform { get; }
 }
 
-public extern objc class VNImageHomographicAlignmentObservation : VNImageAlignmentObservation { }
+public extern objc class VNImageHomographicAlignmentObservation : VNImageAlignmentObservation
+{
+    [Selector("warpTransform")] public matrix_float3x3 WarpTransform { get; }
+}
 
 public extern objc class VNSaliencyImageObservation : VNPixelBufferObservation
 {
@@ -243,6 +247,7 @@ public enum VNHumanBodyPose3DObservationHeightEstimation : long
 public extern objc class VNHumanBodyPose3DObservation : VNRecognizedPoints3DObservation
 {
     [Selector("heightEstimation")] public VNHumanBodyPose3DObservationHeightEstimation HeightEstimation { get; }
+    [Selector("cameraOriginMatrix")] public simd_float4x4 CameraOriginMatrix { get; }
     [Selector("availableJointsGroupNames")] public NSArray AvailableJointsGroupNames { get; }
     [Selector("availableJointNames")] public NSArray AvailableJointNames { get; }
     [Selector("bodyHeight")] public float BodyHeight { get; }
@@ -250,6 +255,7 @@ public extern objc class VNHumanBodyPose3DObservation : VNRecognizedPoints3DObse
     [Selector("recognizedPointForJointName:error:")] public VNHumanBodyRecognizedPoint3D? RecognizedPointForJointNameError(VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
     [Selector("pointInImageForJointName:error:")] public VNPoint? PointInImageForJointNameError(VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
     [Selector("parentJointNameForJointName:")] public VNHumanBodyPose3DObservationJointName? ParentJointNameForJointName(VNHumanBodyPose3DObservationJointName jointName);
+    [Selector("getCameraRelativePosition:forJointName:error:")] public bool GetCameraRelativePositionForJointNameError(simd_float4x4* modelPositionOut, VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
 }
 
 /// macOS 15.0 and later.

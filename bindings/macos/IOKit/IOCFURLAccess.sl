@@ -50,4 +50,16 @@ public enum IOURLError : int
     TimeoutError = -18,
 }
 
+public const CFStringRef kIOURLFileExists = "kIOURLFileExists";
+
+public const CFStringRef kIOURLFileDirectoryContents = "kIOURLFileDirectoryContents";
+
+public const CFStringRef kIOURLFileLength = "kIOURLFileLength";
+
+public const CFStringRef kIOURLFileLastModificationTime = "kIOURLFileLastModificationTime";
+
+public const CFStringRef kIOURLFilePOSIXMode = "kIOURLFilePOSIXMode";
+
+public const CFStringRef kIOURLFileOwnerID = "kIOURLFileOwnerID";
+
 #endif

@@ -29,6 +29,10 @@ module MacOS.Security;
 
 public const int _MDS_SCHEMA_H_ = 1;
 
+public const byte* MDS_OBJECT_DIRECTORY_NAME = "MDS Object Directory";
+
+public const byte* MDS_CDSA_DIRECTORY_NAME = "MDS CDSA Directory";
+
 public const int CSSM_DB_RELATIONID_MDS_START = 1073741824;
 
 public const int CSSM_DB_RELATIONID_MDS_END = 1073758208;

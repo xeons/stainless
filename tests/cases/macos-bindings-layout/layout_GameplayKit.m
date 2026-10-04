@@ -42,6 +42,17 @@
 #import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GameplayKit.framework/Headers/SpriteKit+Additions.h"
 
 const long long sl_layout_98[] = {
+    (long long)(sizeof(struct GKBox)),
+    (long long)(_Alignof(struct GKBox)),
+    (long long)(__builtin_offsetof(struct GKBox, boxMin)),
+    (long long)(__builtin_offsetof(struct GKBox, boxMax)),
+    (long long)(sizeof(struct GKQuad)),
+    (long long)(_Alignof(struct GKQuad)),
+    (long long)(__builtin_offsetof(struct GKQuad, quadMin)),
+    (long long)(__builtin_offsetof(struct GKQuad, quadMax)),
+    (long long)(sizeof(struct GKTriangle)),
+    (long long)(_Alignof(struct GKTriangle)),
+    (long long)(__builtin_offsetof(struct GKTriangle, points)),
     (long long)(GKMeshGraphTriangulationModeVertices),
     (long long)(GKMeshGraphTriangulationModeCenters),
     (long long)(GKMeshGraphTriangulationModeEdgeMidpoints),

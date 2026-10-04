@@ -200,4 +200,8 @@ public const uint kAudioControlPropertyVariant = 1668702578;
 
 public const uint kAudioClockSourceControlPropertyItemKind = 1668049771;
 
+public const byte* kAudioHardwareRunLoopMode = "com.apple.audio.CoreAudio";
+
+public const byte* kAudioAggregateDeviceMasterSubDeviceKey = "master";
+
 #endif

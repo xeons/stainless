@@ -140,7 +140,36 @@ public objc interface SCNNodeRendererDelegate : NSObjectProtocol
 }
 
 /// SIMD, a category of SCNNode.
-public extern objc class SCNNode { }
+public extern objc class SCNNode
+{
+    [Selector("simdTransform", "setSimdTransform:")] public simd_float4x4 SimdTransform { get; set; }
+    [Selector("simdPosition", "setSimdPosition:")] public simd_float3 SimdPosition { get; set; }
+    [Selector("simdRotation", "setSimdRotation:")] public simd_float4 SimdRotation { get; set; }
+    [Selector("simdOrientation", "setSimdOrientation:")] public simd_quatf SimdOrientation { get; set; }
+    [Selector("simdEulerAngles", "setSimdEulerAngles:")] public simd_float3 SimdEulerAngles { get; set; }
+    [Selector("simdScale", "setSimdScale:")] public simd_float3 SimdScale { get; set; }
+    [Selector("simdPivot", "setSimdPivot:")] public simd_float4x4 SimdPivot { get; set; }
+    [Selector("simdWorldPosition", "setSimdWorldPosition:")] public simd_float3 SimdWorldPosition { get; set; }
+    [Selector("simdWorldOrientation", "setSimdWorldOrientation:")] public simd_quatf SimdWorldOrientation { get; set; }
+    [Selector("simdWorldTransform", "setSimdWorldTransform:")] public simd_float4x4 SimdWorldTransform { get; set; }
+    [Selector("simdLocalUp")] public static simd_float3 SimdLocalUp { get; }
+    [Selector("simdLocalRight")] public static simd_float3 SimdLocalRight { get; }
+    [Selector("simdLocalFront")] public static simd_float3 SimdLocalFront { get; }
+    [Selector("simdWorldUp")] public simd_float3 SimdWorldUp { get; }
+    [Selector("simdWorldRight")] public simd_float3 SimdWorldRight { get; }
+    [Selector("simdWorldFront")] public simd_float3 SimdWorldFront { get; }
+    [Selector("simdConvertPosition:toNode:")] public simd_float3 SimdConvertPositionToNode(simd_float3 position, SCNNode? node);
+    [Selector("simdConvertPosition:fromNode:")] public simd_float3 SimdConvertPositionFromNode(simd_float3 position, SCNNode? node);
+    [Selector("simdConvertVector:toNode:")] public simd_float3 SimdConvertVectorToNode(simd_float3 vector, SCNNode? node);
+    [Selector("simdConvertVector:fromNode:")] public simd_float3 SimdConvertVectorFromNode(simd_float3 vector, SCNNode? node);
+    [Selector("simdConvertTransform:toNode:")] public simd_float4x4 SimdConvertTransformToNode(simd_float4x4 transform, SCNNode? node);
+    [Selector("simdConvertTransform:fromNode:")] public simd_float4x4 SimdConvertTransformFromNode(simd_float4x4 transform, SCNNode? node);
+    [Selector("simdLookAt:")] public void SimdLookAt(simd_float3 worldTarget);
+    [Selector("simdLookAt:up:localFront:")] public void SimdLookAtUpLocalFront(simd_float3 worldTarget, simd_float3 worldUp, simd_float3 localFront);
+    [Selector("simdLocalTranslateBy:")] public void SimdLocalTranslateBy(simd_float3 translation);
+    [Selector("simdLocalRotateBy:")] public void SimdLocalRotateBy(simd_quatf rotation);
+    [Selector("simdRotateBy:aroundTarget:")] public void SimdRotateByAroundTarget(simd_quatf worldRotation, simd_float3 worldTarget);
+}
 
 /// Focus, a category of SCNNode.
 public extern objc class SCNNode

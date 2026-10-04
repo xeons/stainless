@@ -281,4 +281,28 @@ public const uint kHintBasic = 0;
 public const uint kHintAdvanced = 1;
 public const uint kHintHidden = 2;
 
+public const byte* kAudioSettings_TopLevelKey = "name";
+
+public const byte* kAudioSettings_Version = "version";
+
+public const byte* kAudioSettings_Parameters = "parameters";
+
+public const byte* kAudioSettings_SettingKey = "key";
+
+public const byte* kAudioSettings_SettingName = "name";
+
+public const byte* kAudioSettings_ValueType = "value type";
+
+public const byte* kAudioSettings_AvailableValues = "available values";
+
+public const byte* kAudioSettings_LimitedValues = "limited values";
+
+public const byte* kAudioSettings_CurrentValue = "current value";
+
+public const byte* kAudioSettings_Summary = "summary";
+
+public const byte* kAudioSettings_Hint = "hint";
+
+public const byte* kAudioSettings_Unit = "unit";
+
 #endif

@@ -167,10 +167,13 @@ public enum NSAttributedStringFormattingOptions : ulong
 public extern objc class NSAttributedString
 {
     [Selector("initWithFormat:options:locale:")] public Self InitWithFormatOptionsLocale(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, ...);
+    [Selector("initWithFormat:options:locale:arguments:")] public Self InitWithFormatOptionsLocaleArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, VaList arguments);
     [Selector("localizedAttributedStringWithFormat:")] public static Self LocalizedAttributedStringWithFormat(NSAttributedString format, ...);
     [Selector("localizedAttributedStringWithFormat:options:")] public static Self LocalizedAttributedStringWithFormatOptions(NSAttributedString format, NSAttributedStringFormattingOptions options, ...);
     /// macOS 14.0 and later.
     [Selector("initWithFormat:options:locale:context:")] public Self InitWithFormatOptionsLocaleContext(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, ...);
+    /// macOS 14.0 and later.
+    [Selector("initWithFormat:options:locale:context:arguments:")] public Self InitWithFormatOptionsLocaleContextArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, VaList arguments);
     /// macOS 14.0 and later.
     [Selector("localizedAttributedStringWithFormat:context:")] public static Self LocalizedAttributedStringWithFormatContext(NSAttributedString format, NSDictionary context, ...);
     /// macOS 14.0 and later.

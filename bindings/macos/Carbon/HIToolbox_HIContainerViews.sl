@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -142,5 +144,15 @@ public extern "C" ControlPartCode InvokeControlUserPaneKeyDownUPP(ControlRef con
 public extern "C" void InvokeControlUserPaneActivateUPP(ControlRef control, Boolean activating, ControlUserPaneActivateUPP userUPP);
 
 public extern "C" ControlPartCode InvokeControlUserPaneFocusUPP(ControlRef control, ControlFocusPart action, ControlUserPaneFocusUPP userUPP);
+
+public const CFStringRef kHIGroupBoxClassID = "com.apple.HIGroupBox";
+
+public const CFStringRef kHICheckBoxGroupClassID = "com.apple.HICheckBoxGroup";
+
+public const CFStringRef kHIPlacardViewClassID = "com.apple.HIPlacardView";
+
+public const CFStringRef kHIWindowHeaderViewClassID = "com.apple.HIWindowHeaderView";
+
+public const CFStringRef kHIUserPaneClassID = "com.apple.HIUserPane";
 
 #endif

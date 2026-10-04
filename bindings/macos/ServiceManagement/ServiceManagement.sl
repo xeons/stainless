@@ -51,4 +51,8 @@ public extern "C" Boolean SMJobRemove(CFStringRef? domain, CFStringRef? jobLabel
 /// Deprecated in macOS 13.0.
 public extern "C" Boolean SMJobBless(CFStringRef? domain, CFStringRef? executableLabel, AuthorizationRef auth, __CFError** outError);
 
+public const byte* kSMRightBlessPrivilegedHelper = "com.apple.ServiceManagement.blesshelper";
+
+public const byte* kSMRightModifySystemDaemons = "com.apple.ServiceManagement.daemons.modify";
+
 #endif

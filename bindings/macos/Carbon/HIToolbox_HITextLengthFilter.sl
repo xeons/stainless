@@ -23,10 +23,15 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
 
 public const int kEventParamTextLength = 1414284622;
+
+public const CFStringRef kHITextLengthFilterClassID = "com.apple.appobjects.HITextLengthFilter";
 
 #endif

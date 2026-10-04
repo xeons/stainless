@@ -50,7 +50,10 @@ public extern objc class PHASESpatialMixerDefinition : PHASEMixerDefinition
 
 public extern objc class PHASEAmbientMixerDefinition : PHASEMixerDefinition
 {
+    [Selector("orientation")] public simd_quatf Orientation { get; }
     [Selector("inputChannelLayout")] public AVAudioChannelLayout InputChannelLayout { get; }
+    [Selector("initWithChannelLayout:orientation:identifier:")] public Self InitWithChannelLayoutOrientationIdentifier(AVAudioChannelLayout layout, simd_quatf orientation, NSString identifier);
+    [Selector("initWithChannelLayout:orientation:")] public Self InitWithChannelLayoutOrientation(AVAudioChannelLayout layout, simd_quatf orientation);
 }
 
 public extern objc class PHASEChannelMixerDefinition : PHASEMixerDefinition

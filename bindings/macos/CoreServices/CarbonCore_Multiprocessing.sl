@@ -437,6 +437,12 @@ public extern "C" void _MPLibraryVersion(byte** versionCString, UInt32* major, U
 /// Deprecated in macOS 10.7.
 public extern "C" Boolean _MPLibraryIsCompatible(byte* versionCString, UInt32 major, UInt32 minor, UInt32 release, UInt32 revision);
 
+public const byte* MPCopyrightNotice = "Copyright \uFFFD 1995-2022 Apple Computer, Inc.\u000A";
+
+public const byte* MPLibraryName = "MPLibrary";
+
+public const byte* MP_API_Version = "2.3";
+
 public const int kMPUnresolvedCFragSymbolAddress = 0;
 
 #endif

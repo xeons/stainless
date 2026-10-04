@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -49,5 +52,7 @@ public const int kHIComboBoxListTag = 1667394675;
 public const int kHIComboBoxListPixelWidthTag = 1667394679;
 public const int kHIComboBoxListPixelHeightTag = 1667394664;
 public const int kHIComboBoxNumVisibleItemsTag = 1667395177;
+
+public const CFStringRef kHIComboBoxClassID = "com.apple.HIComboBox";
 
 #endif

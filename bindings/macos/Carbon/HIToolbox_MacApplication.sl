@@ -110,4 +110,16 @@ public const int kHIToolboxVersionNumber10_5_6 = 353;
 
 public const int kHIToolboxVersionNumber10_5_7 = 353;
 
+public const CFStringRef kHIApplicationClassID = "com.apple.HIApplication";
+
+public const CFStringRef kHIAboutBoxNameKey = "HIAboutBoxName";
+
+public const CFStringRef kHIAboutBoxVersionKey = "HIAboutBoxVersion";
+
+public const CFStringRef kHIAboutBoxCopyrightKey = "HIAboutBoxCopyright";
+
+public const CFStringRef kHIAboutBoxDescriptionKey = "HIAboutBoxDescription";
+
+public const CFStringRef kHIAboutBoxStringFileKey = "HIAboutBoxStringFile";
+
 #endif

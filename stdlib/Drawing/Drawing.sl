@@ -180,8 +180,10 @@ extern "C"
     void* CFStringCreateWithCString(void* allocator, byte* text, uint encoding);
     void* CFNumberCreate(void* allocator, long type, void* value);
     void* CFDictionaryCreate(void* allocator, void** keys, void** values, long count,
-                             void* keyCallBacks, void* valueCallBacks);
+                             KeyCallBacks* keyCallBacks, void* valueCallBacks);
     void CFRelease(void* value);
+    byte CFEqual(void* first, void* second);
+    nuint CFHash(void* value);
 
     void* CGImageSourceCreateWithData(void* data, void* options);
     void* CGImageSourceCreateImageAtIndex(void* source, nuint index, void* options);
@@ -219,9 +221,27 @@ extern "C"
     void CGContextRelease(void* context);
 }
 
-extern "C" byte kCFTypeDictionaryKeyCallBacks;
-extern "C" byte kCFTypeDictionaryValueCallBacks;
-extern "C" void* kCGImageDestinationLossyCompressionQuality;
+delegate byte KeysEqualFn(void* first, void* second);
+delegate nuint KeyHashFn(void* key);
+
+/// <summary>
+/// CFDictionaryKeyCallBacks comparing keys by content and retaining nothing.
+/// What the dictionary holds is kept alive by whoever made it, so no
+/// variable of Core Foundation's -- kCFTypeDictionaryKeyCallBacks -- is
+/// declared here to clash with a program's own declaration of it.
+/// </summary>
+struct KeyCallBacks
+{
+    public nint Version;
+    public void* Retain;
+    public void* Release;
+    public void* CopyDescription;
+    public KeysEqualFn Equal;
+    public KeyHashFn Hash;
+}
+
+/// What `kCGImageDestinationLossyCompressionQuality` holds: a key is matched by its text.
+const byte* LossyCompressionQuality = "kCGImageDestinationLossyCompressionQuality";
 
 /// `kCGColorSpaceModelMonochrome`, `...RGB` and `...Indexed`.
 const int ModelMonochrome = 0;

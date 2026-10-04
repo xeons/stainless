@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -42,5 +44,7 @@ public const int kControlSliderPointsUpOrLeft = 1;
 public const int kControlSliderDoesNotPoint = 2;
 
 public const int kControlKindSlider = 1936483442;
+
+public const CFStringRef kHISliderClassID = "com.apple.HISlider";
 
 #endif

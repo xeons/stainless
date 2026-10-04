@@ -92,6 +92,12 @@ public extern "C" cp_layer_renderer_layout cp_layer_renderer_configuration_get_l
 public extern "C" void cp_layer_renderer_configuration_set_layout(cp_layer_renderer_configuration_t configuration, cp_layer_renderer_layout layout);
 
 /// macOS 26.0 and later.
+public extern "C" simd_float2 cp_layer_renderer_configuration_get_default_depth_range(cp_layer_renderer_configuration_t configuration);
+
+/// macOS 26.0 and later.
+public extern "C" void cp_layer_renderer_configuration_set_default_depth_range(cp_layer_renderer_configuration_t configuration, simd_float2 depth_range);
+
+/// macOS 26.0 and later.
 public extern "C" void cp_layer_renderer_configuration_set_drawable_render_context_stencil_format(cp_layer_renderer_configuration_t configuration, MTLPixelFormat stencil_format);
 
 /// macOS 26.0 and later.

@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -41,5 +44,9 @@ public const int kControlChasingArrowsProc = 112;
 public const int kControlKindChasingArrows = 1667330674;
 
 public const int kControlChasingArrowsAnimatingTag = 1634625901;
+
+public const CFStringRef kHIProgressBarClassID = "com.apple.HIProgressBar";
+
+public const CFStringRef kHIChasingArrowsClassID = "com.apple.HIChasingArrows";
 
 #endif

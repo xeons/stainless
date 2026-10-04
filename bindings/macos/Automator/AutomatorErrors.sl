@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Automator;
 
+import MacOS.Foundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Automator")
@@ -64,5 +67,9 @@ public enum AMErrorCode : long
     ConversionNoDataError = -301,
     ConversionFailedError = -302,
 }
+
+public const NSString AMAutomatorErrorDomain = "com.apple.Automator";
+
+public const NSString AMActionErrorKey = "AMActionErrorKey";
 
 #endif

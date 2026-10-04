@@ -774,6 +774,14 @@ declarations bind anywhere, so a binding compiles on every host.
 (SL0900); `extern` goes before `objc class` and nowhere else (SL0901). Neither
 may be generic.
 
+**Apple's frameworks are declared already.** [bindings/macos](../../bindings/macos/README.md)
+is every framework in the SDK with a C or Objective-C header, generated from
+the headers in these declarations and checked against clang and against the
+runtime; a program names the directories and imports what it uses, and
+[samples/macos/window.sl](../../samples/macos/window.sl) is a window over
+AppKit. What follows is how those declarations work, and how to write one the
+bindings do not have.
+
 ### Every member names its message
 
 A member of an objc type is reached by sending a message, and

@@ -78,6 +78,10 @@ public struct hv_vcpu_exit_t
 #endif
 
 #if ARM64
+public using hv_simd_fp_uchar16_t = vbyte16;
+#endif
+
+#if ARM64
 public enum hv_reg_t : uint
 {
     X0 = 0,
@@ -227,6 +231,11 @@ public enum hv_sme_p_reg_t : uint
     HV_SME_P_REG_14 = 14,
     HV_SME_P_REG_15 = 15,
 }
+#endif
+
+#if ARM64
+/// macOS 15.2 and later.
+public using hv_sme_zt0_uchar64_t = vbyte64;
 #endif
 
 #if ARM64

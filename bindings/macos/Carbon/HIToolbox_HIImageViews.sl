@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -62,5 +64,11 @@ public const int kControlKindImageWell = 2003135596;
 public const int kControlImageWellContentTag = 1668247156;
 public const int kControlImageWellTransformTag = 1953653102;
 public const int kControlImageWellIsDragDestinationTag = 1685217639;
+
+public const CFStringRef kHIImageViewClassID = "com.apple.HIImageView";
+
+public const CFStringRef kHIIconViewClassID = "com.apple.HIIconView";
+
+public const CFStringRef kHIImageWellClassID = "com.apple.HIImageWell";
 
 #endif

@@ -33,4 +33,6 @@ import Standard.ObjC;
 
 public extern objc class IOBluetoothObject : NSObject, NSCopying { }
 
+public const NSString kBluetoothTargetDoesNotRespondToCallbackExceptionName = "BluetoothTargetDoesNotRespondToCallbackException";
+
 #endif

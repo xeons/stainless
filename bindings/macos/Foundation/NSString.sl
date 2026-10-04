@@ -187,9 +187,13 @@ public extern objc class NSString
     [Selector("initWithUTF8String:")] public Self? InitWithUTF8String(byte* nullTerminatedCString);
     [Selector("initWithString:")] public Self InitWithString(NSString aString);
     [Selector("initWithFormat:")] public Self InitWithFormat(NSString format, ...);
+    [Selector("initWithFormat:arguments:")] public Self InitWithFormatArguments(NSString format, VaList argList);
     [Selector("initWithFormat:locale:")] public Self InitWithFormatLocale(NSString format, AnyObject? locale, ...);
+    [Selector("initWithFormat:locale:arguments:")] public Self InitWithFormatLocaleArguments(NSString format, AnyObject? locale, VaList argList);
     [Selector("initWithValidatedFormat:validFormatSpecifiers:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
     [Selector("initWithValidatedFormat:validFormatSpecifiers:locale:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersLocaleError(NSString format, NSString validFormatSpecifiers, AnyObject? locale, out NSError? error, ...);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:arguments:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersArgumentsError(NSString format, NSString validFormatSpecifiers, VaList argList, out NSError? error);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersLocaleArgumentsError(NSString format, NSString validFormatSpecifiers, AnyObject? locale, VaList argList, out NSError? error);
     [Selector("initWithData:encoding:")] public Self? InitWithDataEncoding(NSData data, NSStringEncoding encoding);
     [Selector("initWithBytes:length:encoding:")] public Self? InitWithBytesLengthEncoding(void* bytes, NSUInteger len, NSStringEncoding encoding);
     [Selector("initWithBytesNoCopy:length:encoding:freeWhenDone:")] public Self? InitWithBytesNoCopyLengthEncodingFreeWhenDone(void* bytes, NSUInteger len, NSStringEncoding encoding, bool freeBuffer);

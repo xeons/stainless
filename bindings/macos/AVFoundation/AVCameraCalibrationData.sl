@@ -34,7 +34,9 @@ import Standard.ObjC;
 
 public extern objc class AVCameraCalibrationData : NSObject
 {
+    [Selector("intrinsicMatrix")] public matrix_float3x3 IntrinsicMatrix { get; }
     [Selector("intrinsicMatrixReferenceDimensions")] public CGSize IntrinsicMatrixReferenceDimensions { get; }
+    [Selector("extrinsicMatrix")] public matrix_float4x3 ExtrinsicMatrix { get; }
     [Selector("pixelSize")] public float PixelSize { get; }
     [Selector("lensDistortionLookupTable")] public NSData? LensDistortionLookupTable { get; }
     [Selector("inverseLensDistortionLookupTable")] public NSData? InverseLensDistortionLookupTable { get; }

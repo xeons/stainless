@@ -25,6 +25,7 @@ module MacOS.ApplicationServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -1340,5 +1341,25 @@ public delegate OSErr CMIterateDeviceInfoProcPtr(CMDeviceInfo* arg0, void* arg1)
 public delegate OSErr CMIterateDeviceProfileProcPtr(CMDeviceInfo* arg0, NCMDeviceProfileInfo* arg1, void* arg2);
 
 public const int CMBITMAPCALLBACKPROCPTR_DEFINED = 1;
+
+public const CFStringRef kCMPrefsChangedNotification = "AppleColorSyncPreferencesChangedNotification";
+
+public const CFStringRef kCMDeviceRegisteredNotification = "CMDeviceRegisteredNotification";
+
+public const CFStringRef kCMDeviceUnregisteredNotification = "CMDeviceUnregisteredNotification";
+
+public const CFStringRef kCMDeviceOnlineNotification = "CMDeviceOnlineNotification";
+
+public const CFStringRef kCMDeviceOfflineNotification = "CMDeviceOfflineNotification";
+
+public const CFStringRef kCMDeviceStateNotification = "CMDeviceStateNotification";
+
+public const CFStringRef kCMDefaultDeviceNotification = "CMDefaultDeviceNotification";
+
+public const CFStringRef kCMDeviceProfilesNotification = "CMDeviceProfilesNotification";
+
+public const CFStringRef kCMDefaultDeviceProfileNotification = "CMDefaultDeviceProfileNotification";
+
+public const CFStringRef kCMDisplayDeviceProfilesNotification = "CMDisplayDeviceProfilesNotification";
 
 #endif

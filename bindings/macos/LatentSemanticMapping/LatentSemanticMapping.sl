@@ -134,4 +134,24 @@ public const int kLSMTextApplySpamHeuristics = 4;
 
 public extern "C" OSStatus LSMTextAddToken(LSMTextRef textref, CFDataRef token);
 
+public const CFStringRef kLSMAlgorithmKey = "LSMAlgorithm";
+
+public const CFStringRef kLSMAlgorithmDense = "LSMAlgorithmDense";
+
+public const CFStringRef kLSMAlgorithmSparse = "LSMAlgorithmSparse";
+
+public const CFStringRef kLSMPrecisionKey = "LSMPrecision";
+
+public const CFStringRef kLSMPrecisionFloat = "LSMPrecisionFloat";
+
+public const CFStringRef kLSMPrecisionDouble = "LSMPrecisionDouble";
+
+public const CFStringRef kLSMDimensionKey = "LSMDimension";
+
+public const CFStringRef kLSMIterationsKey = "LSMIterations";
+
+public const CFStringRef kLSMSweepAgeKey = "LSMSweepAge";
+
+public const CFStringRef kLSMSweepCutoffKey = "LSMSweepCutoff";
+
 #endif

@@ -73,4 +73,16 @@ public extern "C" OSStatus SecTrustSettingsCreateExternalRepresentation(SecTrust
 
 public extern "C" OSStatus SecTrustSettingsImportExternalRepresentation(SecTrustSettingsDomain domain, CFDataRef trustSettings);
 
+public const CFStringRef kSecTrustSettingsPolicy = "kSecTrustSettingsPolicy";
+
+public const CFStringRef kSecTrustSettingsApplication = "kSecTrustSettingsApplication";
+
+public const CFStringRef kSecTrustSettingsPolicyString = "kSecTrustSettingsPolicyString";
+
+public const CFStringRef kSecTrustSettingsKeyUsage = "kSecTrustSettingsKeyUsage";
+
+public const CFStringRef kSecTrustSettingsAllowedError = "kSecTrustSettingsAllowedError";
+
+public const CFStringRef kSecTrustSettingsResult = "kSecTrustSettingsResult";
+
 #endif

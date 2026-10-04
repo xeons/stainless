@@ -337,4 +337,48 @@ public extern "C" OSStatus AudioFileInitialize(FSRef* inFileRef, AudioFileTypeID
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus AudioFileOpen(FSRef* inFileRef, AudioFilePermissions inPermissions, AudioFileTypeID inFileTypeHint, AudioFileID* outAudioFile);
 
+public const byte* kAFInfoDictionary_Album = "album";
+
+public const byte* kAFInfoDictionary_ApproximateDurationInSeconds = "approximate duration in seconds";
+
+public const byte* kAFInfoDictionary_Artist = "artist";
+
+public const byte* kAFInfoDictionary_ChannelLayout = "channel layout";
+
+public const byte* kAFInfoDictionary_Comments = "comments";
+
+public const byte* kAFInfoDictionary_Composer = "composer";
+
+public const byte* kAFInfoDictionary_Copyright = "copyright";
+
+public const byte* kAFInfoDictionary_EncodingApplication = "encoding application";
+
+public const byte* kAFInfoDictionary_Genre = "genre";
+
+public const byte* kAFInfoDictionary_ISRC = "ISRC";
+
+public const byte* kAFInfoDictionary_KeySignature = "key signature";
+
+public const byte* kAFInfoDictionary_Lyricist = "lyricist";
+
+public const byte* kAFInfoDictionary_NominalBitRate = "nominal bit rate";
+
+public const byte* kAFInfoDictionary_RecordedDate = "recorded date";
+
+public const byte* kAFInfoDictionary_SourceBitDepth = "source bit depth";
+
+public const byte* kAFInfoDictionary_SourceEncoder = "source encoder";
+
+public const byte* kAFInfoDictionary_SubTitle = "subtitle";
+
+public const byte* kAFInfoDictionary_Tempo = "tempo";
+
+public const byte* kAFInfoDictionary_TimeSignature = "time signature";
+
+public const byte* kAFInfoDictionary_Title = "title";
+
+public const byte* kAFInfoDictionary_TrackNumber = "track number";
+
+public const byte* kAFInfoDictionary_Year = "year";
+
 #endif

@@ -23,6 +23,8 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.MetalPerformanceShaders;
 
+import MacOS.System;
+
 #if MACOS
 
 #pragma comment(framework, "MetalPerformanceShaders")
@@ -42,6 +44,20 @@ public struct _MPSPackedFloat3
 }
 
 public using MPSPackedFloat3 = _MPSPackedFloat3;
+
+public struct _MPSAxisAlignedBoundingBox
+{
+    public vector_float3 min;
+    public vector_float3 max;
+}
+
+public using MPSAxisAlignedBoundingBox = _MPSAxisAlignedBoundingBox;
+
+public struct MPSRayOriginDirection
+{
+    public vector_float3 origin;
+    public vector_float3 direction;
+}
 
 public struct MPSRayPackedOriginDirection
 {
@@ -83,6 +99,21 @@ public struct MPSIntersectionDistancePrimitiveIndexBufferIndex
     public uint bufferIndex;
 }
 
+public struct MPSIntersectionDistancePrimitiveIndexCoordinates
+{
+    public float distance;
+    public uint primitiveIndex;
+    public vector_float2 coordinates;
+}
+
+public struct MPSIntersectionDistancePrimitiveIndexBufferIndexCoordinates
+{
+    public float distance;
+    public uint primitiveIndex;
+    public uint bufferIndex;
+    public vector_float2 coordinates;
+}
+
 public struct MPSIntersectionDistancePrimitiveIndexInstanceIndex
 {
     public float distance;
@@ -96,6 +127,23 @@ public struct MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndex
     public uint primitiveIndex;
     public uint bufferIndex;
     public uint instanceIndex;
+}
+
+public struct MPSIntersectionDistancePrimitiveIndexInstanceIndexCoordinates
+{
+    public float distance;
+    public uint primitiveIndex;
+    public uint instanceIndex;
+    public vector_float2 coordinates;
+}
+
+public struct MPSIntersectionDistancePrimitiveIndexBufferIndexInstanceIndexCoordinates
+{
+    public float distance;
+    public uint primitiveIndex;
+    public uint bufferIndex;
+    public uint instanceIndex;
+    public vector_float2 coordinates;
 }
 
 #endif

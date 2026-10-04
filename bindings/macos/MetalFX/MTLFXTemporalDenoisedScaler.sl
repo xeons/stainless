@@ -118,6 +118,8 @@ public objc interface MTLFXTemporalDenoisedScalerBase : MTLFXFrameInterpolatable
     [Selector("outputHeight")] NSUInteger OutputHeight { get; }
     [Selector("inputContentMinScale")] float InputContentMinScale { get; }
     [Selector("inputContentMaxScale")] float InputContentMaxScale { get; }
+    [Selector("worldToViewMatrix", "setWorldToViewMatrix:")] simd_float4x4 WorldToViewMatrix { get; set; }
+    [Selector("viewToClipMatrix", "setViewToClipMatrix:")] simd_float4x4 ViewToClipMatrix { get; set; }
     [Selector("fence", "setFence:")] MTLFence? Fence { get; set; }
 }
 

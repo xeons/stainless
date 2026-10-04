@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.MetalPerformanceShaders;
 
+import MacOS.System;
 import Standard.ObjC;
 
 #if MACOS
@@ -73,6 +74,33 @@ public struct MPSIntegerDivisionParams
     public ushort recip;
     public ushort addend;
     public ushort shift;
+}
+
+public struct MPSCustomKernelSourceInfo
+{
+    public vector_short2 kernelOrigin;
+    public vector_ushort2 kernelPhase;
+    public vector_ushort2 kernelSize;
+    public vector_short2 offset;
+    public vector_ushort2 stride;
+    public vector_ushort2 dilationRate;
+    public ushort featureChannelOffset;
+    public ushort featureChannels;
+    public ushort imageArrayOffset;
+    public ushort imageArraySize;
+}
+
+public struct MPSCustomKernelInfo
+{
+    public vector_ushort4 clipOrigin;
+    public vector_ushort4 clipSize;
+    public ushort destinationFeatureChannels;
+    public ushort destImageArraySize;
+    public ushort sourceImageCount;
+    public ushort threadgroupSize;
+    public ushort subbatchIndex;
+    public ushort subbatchStride;
+    public MPSIntegerDivisionParams idiv;
 }
 
 public enum MPSImageType : uint

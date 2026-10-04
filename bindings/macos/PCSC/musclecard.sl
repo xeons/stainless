@@ -430,6 +430,10 @@ public const int MSC_LIST_SLOTS = 2;
 
 public const int MSC_LIST_ALL = 3;
 
+public const byte* MSC_TOKEN_EMPTY_STR = "Token Removed";
+
+public const byte* MSC_TOKEN_UNKNOWN_STR = "Token Unknown";
+
 public const int MSC_TOKEN_TYPE_REMOVED = 1;
 
 public const int MSC_TOKEN_TYPE_UNKNOWN = 2;

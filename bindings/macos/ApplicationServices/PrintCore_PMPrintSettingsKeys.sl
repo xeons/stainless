@@ -37,6 +37,114 @@ public enum PMPageToPaperMappingType : int
     ScaleToFit = 2,
 }
 
+public const byte* kPMCopiesStr = "com.apple.print.PrintSettings.PMCopies";
+
+public const byte* kPMCopyCollateStr = "com.apple.print.PrintSettings.PMCopyCollate";
+
+public const byte* kPMOutputOrderStr = "OutputOrder";
+
+public const byte* kPMPageSetStr = "page-set";
+
+public const byte* kPMMirrorStr = "mirror";
+
+public const byte* kPMPrintSelectionOnlyStr = "com.apple.print.PrintSettings.PMPrintSelectionOnly";
+
+public const byte* kPMBorderStr = "com.apple.print.PrintSettings.PMBorder";
+
+public const byte* kPMBorderTypeStr = "com.apple.print.PrintSettings.PMBorderType";
+
+public const byte* kPMLayoutNUpStr = "com.apple.print.PrintSettings.PMLayoutNUp";
+
+public const byte* kPMLayoutRowsStr = "com.apple.print.PrintSettings.PMLayoutRows";
+
+public const byte* kPMLayoutColumnsStr = "com.apple.print.PrintSettings.PMLayoutColumns";
+
+public const byte* kPMLayoutDirectionStr = "com.apple.print.PrintSettings.PMLayoutDirection";
+
+public const byte* kPMLayoutTileOrientationStr = "com.apple.print.PrintSettings.PMLayoutTileOrientation";
+
+public const byte* kPMJobStateStr = "com.apple.print.PrintSettings.PMJobState";
+
+public const byte* kPMJobHoldUntilTimeStr = "com.apple.print.PrintSettings.PMJobHoldUntilTime";
+
+public const byte* kPMJobPriorityStr = "com.apple.print.PrintSettings.PMJobPriority";
+
+public const byte* kPMDuplexingStr = "com.apple.print.PrintSettings.PMDuplexing";
+
+public const byte* kPMColorSyncProfileIDStr = "com.apple.print.PrintSettings.PMColorSyncProfileID";
+
+public const byte* kPMPrimaryPaperFeedStr = "com.apple.print.PrintSettings.PMPrimaryPaperFeed";
+
+public const byte* kPMSecondaryPaperFeedStr = "com.apple.print.PrintSettings.PMSecondaryPaperFeed";
+
+public const byte* kPMPSErrorHandlerStr = "com.apple.print.PrintSettings.PMPSErrorHandler";
+
+public const byte* kPMPSTraySwitchStr = "com.apple.print.PrintSettings.PMPSTraySwitch";
+
+public const byte* kPMTotalBeginPagesStr = "com.apple.print.PrintSettings.PMTotalBeginPages";
+
+public const byte* kPMTotalSidesImagedStr = "com.apple.print.PrintSettings.PMTotalSidesImaged";
+
+public const byte* kPMFitToPageStr = "fit-to-page";
+
+public const byte* kPMUseOptionalPINStr = "com.apple.print.PrintSettings.PMUseOptionalPIN";
+
+public const byte* kPMUseOptionalAccountIDStr = "com.apple.print.PrintSettings.PMUseOptionalAccountID";
+
+public const byte* kPMFaxNumberStr = "phone";
+
+public const byte* kPMFaxToStr = "faxTo";
+
+public const byte* kPMFaxPrefixStr = "faxPrefix";
+
+public const byte* kPMFaxSubjectStr = "faxSubject";
+
+public const byte* kPMFaxCoverSheetStr = "faxCoverSheet";
+
+public const byte* kPMFaxCoverSheetMessageStr = "faxCoverSheetMessage";
+
+public const byte* kPMFaxToneDialingStr = "faxToneDialing";
+
+public const byte* kPMFaxUseSoundStr = "faxUseSound";
+
+public const byte* kPMFaxWaitForDialToneStr = "faxWaitForDialTone";
+
+public const byte* kPMFaxToLabelStr = "faxToLabel";
+
+public const byte* kPMFaxFromLabelStr = "faxFromLabel";
+
+public const byte* kPMFaxDateLabelStr = "faxDateLabel";
+
+public const byte* kPMFaxSubjectLabelStr = "faxSubjectLabel";
+
+public const byte* kPMFaxSheetsLabelStr = "faxSheetsLabel";
+
+public const byte* kPMCoverPageStr = "com.apple.print.PrintSettings.PMCoverPage";
+
 public const int kPMCoverPageDefault = 1;
+
+public const byte* kPMCoverPageSourceStr = "com.apple.print.PrintSettings.PMCoverPageSource";
+
+public const byte* kPMDestinationPrinterIDStr = "DestinationPrinterID";
+
+public const byte* kPMInlineWorkflowStr = "inlineWorkflow";
+
+public const byte* kPMPageToPaperMappingTypeStr = "com.apple.print.PageToPaperMappingType";
+
+public const byte* kPMPageToPaperMediaNameStr = "com.apple.print.PageToPaperMappingMediaName";
+
+public const byte* kPMPageToPaperMappingAllowScalingUpStr = "com.apple.print.PageToPaperMappingAllowScalingUp";
+
+public const byte* kPMCustomProfilePathStr = "PMCustomProfilePath";
+
+public const byte* kPMVendorColorMatchingStr = "AP_VendorColorMatching";
+
+public const byte* kPMApplicationColorMatchingStr = "AP_ApplicationColorMatching";
+
+public const byte* kPMColorMatchingModeStr = "AP_ColorMatchingMode";
+
+public const byte* kPMDestinationTypeStr = "com.apple.print.PrintSettings.PMDestinationType";
+
+public const byte* kPMOutputFilenameStr = "com.apple.print.PrintSettings.PMOutputFilename";
 
 #endif

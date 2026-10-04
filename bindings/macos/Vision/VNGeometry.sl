@@ -48,7 +48,11 @@ public extern objc class VNPoint : NSObject, NSCopying, NSSecureCoding
 }
 
 /// macOS 14.0 and later.
-public extern objc class VNPoint3D : NSObject, NSCopying, NSSecureCoding { }
+public extern objc class VNPoint3D : NSObject, NSCopying, NSSecureCoding
+{
+    [Selector("position")] public simd_float4x4 Position { get; }
+    [Selector("initWithPosition:")] public Self? InitWithPosition(simd_float4x4 position);
+}
 
 public extern objc class VNVector : NSObject, NSCopying, NSSecureCoding
 {
@@ -87,6 +91,7 @@ public extern objc class VNContour : NSObject, NSCopying, VNRequestRevisionProvi
     [Selector("childContourCount")] public NSInteger ChildContourCount { get; }
     [Selector("childContours")] public NSArray ChildContours { get; }
     [Selector("pointCount")] public NSInteger PointCount { get; }
+    [Selector("normalizedPoints")] public simd_float2* NormalizedPoints { get; }
     [Selector("normalizedPath")] public CGPathRef? NormalizedPath { get; }
     [Selector("aspectRatio")] public float AspectRatio { get; }
     [Selector("childContourAtIndex:error:")] public VNContour? ChildContourAtIndexError(NSUInteger childContourIndex, out NSError? error);

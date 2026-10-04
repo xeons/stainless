@@ -47,4 +47,7 @@ const long long sl_layout_49[] = {
     (long long)(ar_device_anchor_tracking_state_orientation_tracked),
     (long long)(ar_device_anchor_tracking_state_tracked),
     (long long)((AR_OBJECT_USE_OBJC)),
+    (long long)(sizeof(simd_float4x4)),
+    (long long)(_Alignof(simd_float4x4)),
+    (long long)(__builtin_offsetof(simd_float4x4, columns)),
 };

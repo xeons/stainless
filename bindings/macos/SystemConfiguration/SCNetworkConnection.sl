@@ -106,4 +106,20 @@ public extern "C" Boolean SCNetworkConnectionUnscheduleFromRunLoop(SCNetworkConn
 
 public extern "C" Boolean SCNetworkConnectionSetDispatchQueue(SCNetworkConnectionRef connection, dispatch_queue_t? queue);
 
+public const CFStringRef kSCNetworkConnectionBytesIn = "BytesIn";
+
+public const CFStringRef kSCNetworkConnectionBytesOut = "BytesOut";
+
+public const CFStringRef kSCNetworkConnectionPacketsIn = "PacketsIn";
+
+public const CFStringRef kSCNetworkConnectionPacketsOut = "PacketsOut";
+
+public const CFStringRef kSCNetworkConnectionErrorsIn = "ErrorsIn";
+
+public const CFStringRef kSCNetworkConnectionErrorsOut = "ErrorsOut";
+
+public const CFStringRef kSCNetworkConnectionSelectionOptionOnDemandHostName = "OnDemandHostName";
+
+public const CFStringRef kSCNetworkConnectionSelectionOptionOnDemandRetry = "OnDemandRetry";
+
 #endif

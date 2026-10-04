@@ -52,6 +52,7 @@ public extern objc class SKPhysicsWorld : NSObject, NSSecureCoding
     [Selector("addJoint:")] public void AddJoint(SKPhysicsJoint joint);
     [Selector("removeJoint:")] public void RemoveJoint(SKPhysicsJoint joint);
     [Selector("removeAllJoints")] public void RemoveAllJoints();
+    [Selector("sampleFieldsAt:")] public vector_float3 SampleFieldsAt(vector_float3 position);
     [Selector("bodyAtPoint:")] public SKPhysicsBody? BodyAtPoint(CGPoint point);
     [Selector("bodyInRect:")] public SKPhysicsBody? BodyInRect(CGRect rect);
     [Selector("bodyAlongRayStart:end:")] public SKPhysicsBody? BodyAlongRayStartEnd(CGPoint start, CGPoint end);

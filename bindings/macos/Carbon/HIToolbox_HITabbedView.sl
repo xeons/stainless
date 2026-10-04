@@ -25,6 +25,7 @@ module MacOS.Carbon;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -90,5 +91,7 @@ public struct ControlTabInfoRecV1
 }
 
 public const int kControlTabListResType = 1952539171;
+
+public const CFStringRef kHITabbedViewClassID = "com.apple.HITabbedView";
 
 #endif

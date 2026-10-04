@@ -36,8 +36,16 @@ public extern objc class GKPath : NSObject
     [Selector("radius", "setRadius:")] public float Radius { get; set; }
     [Selector("numPoints")] public NSUInteger NumPoints { get; }
     [Selector("isCyclical", "setCyclical:")] public bool Cyclical { get; set; }
+    [Selector("pathWithPoints:count:radius:cyclical:")] public static Self PathWithPointsCountRadiusCyclical(vector_float2* points, nuint count, float radius, bool cyclical);
+    [Selector("initWithPoints:count:radius:cyclical:")] public Self InitWithPointsCountRadiusCyclical(vector_float2* points, nuint count, float radius, bool cyclical);
+    [Selector("pathWithFloat3Points:count:radius:cyclical:")] public static Self PathWithFloat3PointsCountRadiusCyclical(vector_float3* points, nuint count, float radius, bool cyclical);
+    [Selector("initWithFloat3Points:count:radius:cyclical:")] public Self InitWithFloat3PointsCountRadiusCyclical(vector_float3* points, nuint count, float radius, bool cyclical);
     [Selector("pathWithGraphNodes:radius:")] public static Self PathWithGraphNodesRadius(NSArray graphNodes, float radius);
     [Selector("initWithGraphNodes:radius:")] public Self InitWithGraphNodesRadius(NSArray graphNodes, float radius);
+    /// Deprecated in macOS 10.12.
+    [Selector("pointAtIndex:")] public vector_float2 PointAtIndex(NSUInteger index);
+    [Selector("float2AtIndex:")] public vector_float2 Float2AtIndex(NSUInteger index);
+    [Selector("float3AtIndex:")] public vector_float3 Float3AtIndex(NSUInteger index);
 }
 
 #endif

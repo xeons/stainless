@@ -61,9 +61,15 @@ public struct AEBuildError
 
 public extern "C" OSStatus AEBuildDesc(AEDesc* dst, AEBuildError* error, byte* src, ...);
 
+public extern "C" OSStatus vAEBuildDesc(AEDesc* dst, AEBuildError* error, byte* src, VaList args);
+
 public extern "C" OSStatus AEBuildParameters(AppleEvent* event, AEBuildError* error, byte* format, ...);
 
+public extern "C" OSStatus vAEBuildParameters(AppleEvent* event, AEBuildError* error, byte* format, VaList args);
+
 public extern "C" OSStatus AEBuildAppleEvent(AEEventClass theClass, AEEventID theID, DescType addressType, void* addressData, Size addressLength, SInt16 returnID, SInt32 transactionID, AppleEvent* result, AEBuildError* error, byte* paramsFmt, ...);
+
+public extern "C" OSStatus vAEBuildAppleEvent(AEEventClass theClass, AEEventID theID, DescType addressType, void* addressData, Size addressLength, SInt16 returnID, SInt32 transactionID, AppleEvent* resultEvt, AEBuildError* error, byte* paramsFmt, VaList args);
 
 public extern "C" OSStatus AEPrintDescToHandle(AEDesc* desc, Handle* result);
 

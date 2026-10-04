@@ -835,4 +835,54 @@ public struct AUSamplerBankPresetData
 public const uint kAUSamplerProperty_LoadPresetFromBank = 4100;
 public const uint kAUSamplerProperty_BankAndPreset = 4100;
 
+public const byte* kAUPresetVersionKey = "version";
+
+public const byte* kAUPresetTypeKey = "type";
+
+public const byte* kAUPresetSubtypeKey = "subtype";
+
+public const byte* kAUPresetManufacturerKey = "manufacturer";
+
+public const byte* kAUPresetDataKey = "data";
+
+public const byte* kAUPresetNameKey = "name";
+
+public const byte* kAUPresetNumberKey = "preset-number";
+
+public const byte* kAUPresetRenderQualityKey = "render-quality";
+
+public const byte* kAUPresetCPULoadKey = "cpu-load";
+
+public const byte* kAUPresetElementNameKey = "element-name";
+
+public const byte* kAUPresetExternalFileRefs = "file-references";
+
+public const byte* kAUPresetVSTDataKey = "vstdata";
+
+public const byte* kAUPresetVSTPresetKey = "vstpreset";
+
+public const byte* kAUPresetMASDataKey = "masdata";
+
+public const byte* kAUPresetPartKey = "part";
+
+public const byte* kAudioUnitConfigurationInfo_HasCustomView = "HasCustomView";
+
+public const byte* kAudioUnitConfigurationInfo_ChannelConfigurations = "ChannelConfigurations";
+
+public const byte* kAudioUnitConfigurationInfo_InitialInputs = "InitialInputs";
+
+public const byte* kAudioUnitConfigurationInfo_InitialOutputs = "InitialOutputs";
+
+public const byte* kAudioUnitConfigurationInfo_IconURL = "IconURL";
+
+public const byte* kAudioUnitConfigurationInfo_BusCountWritable = "BusCountWritable";
+
+public const byte* kAudioUnitConfigurationInfo_SupportedChannelLayoutTags = "SupportedChannelLayoutTags";
+
+public const byte* kAudioUnitConfigurationInfo_MIDIProtocol = "MIDIProtocol";
+
+public const byte* kAudioUnitConfigurationInfo_MigrateFromPlugin = "MigrateFromPlugin";
+
+public const byte* kAudioUnitConfigurationInfo_AvailableArchitectures = "AvailableArchitectures";
+
 #endif

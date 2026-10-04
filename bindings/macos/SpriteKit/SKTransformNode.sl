@@ -24,6 +24,7 @@
 module MacOS.SpriteKit;
 
 import MacOS.CoreFoundation;
+import MacOS.System;
 import Standard.ObjC;
 
 #if MACOS
@@ -34,6 +35,12 @@ public extern objc class SKTransformNode : SKNode
 {
     [Selector("xRotation", "setXRotation:")] public CGFloat XRotation { get; set; }
     [Selector("yRotation", "setYRotation:")] public CGFloat YRotation { get; set; }
+    [Selector("setEulerAngles:")] public void SetEulerAngles(vector_float3 euler);
+    [Selector("eulerAngles")] public vector_float3 EulerAngles();
+    [Selector("setRotationMatrix:")] public void SetRotationMatrix(matrix_float3x3 rotationMatrix);
+    [Selector("rotationMatrix")] public matrix_float3x3 RotationMatrix();
+    [Selector("setQuaternion:")] public void SetQuaternion(simd_quatf quaternion);
+    [Selector("quaternion")] public simd_quatf Quaternion();
 }
 
 #endif

@@ -45,6 +45,7 @@ public extern objc class MDLObject : NSObject, MDLNamed
     [Selector("objectAtPath:")] public MDLObject ObjectAtPath(NSString path);
     [Selector("enumerateChildObjectsOfClass:root:usingBlock:stopPointer:")] public void EnumerateChildObjectsOfClassRootUsingBlockStopPointer(Class objectClass, MDLObject root, MDLObjectEnumerateChildObjectsOfClassRootUsingBlockStopPointerBlock block, bool* stopPointer);
     [Selector("addChild:")] public void AddChild(MDLObject child);
+    [Selector("boundingBoxAtTime:")] public MDLAxisAlignedBoundingBox BoundingBoxAtTime(NSTimeInterval time);
 }
 
 public extern objc class MDLObjectContainer : NSObject, MDLObjectContainerComponent { }

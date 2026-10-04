@@ -50,6 +50,8 @@ public enum CGColorConversionInfoTransformType : uint
 
 [ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromList(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, ...);
 
+[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromListWithArguments(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, VaList arg4);
+
 /// macOS 15.0 and later.
 [ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateForToneMapping(CGColorSpaceRef from, float source_headroom, CGColorSpaceRef to, float target_headroom, CGToneMapping method, CFDictionaryRef? options, __CFError** error);
 

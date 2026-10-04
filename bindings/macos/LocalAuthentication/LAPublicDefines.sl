@@ -103,6 +103,8 @@ public const int kLAErrorInvalidDimensions = -14;
 
 public const int kLAErrorCompanionNotAvailable = -11;
 
+public const byte* kLAErrorDomain = "com.apple.LocalAuthentication";
+
 public const int kLACompanionTypeNone = 0;
 
 public const int kLACompanionTypeWatch = 1;

@@ -47,6 +47,78 @@ public extern "C" CFStringRef? NetFSMountURLProbe(CFStringRef? hostname);
 
 [ReturnsRetained] public extern "C" CFURLRef? NetFSCopyURLForRemountingVolume(CFURLRef? localPathURL);
 
+public const CFStringRef kNetFSAuthenticationInfoKey = "AuthenticationInfo";
+
+public const CFStringRef kNetFSServerDisplayNameKey = "ServerDisplayName";
+
+public const CFStringRef kNetFSSupportsChangePasswordKey = "SupportsChangePassword";
+
+public const CFStringRef kNetFSSupportsGuestKey = "SupportsGuest";
+
+public const CFStringRef kNetFSSupportsKerberosKey = "SupportsKerberos";
+
+public const CFStringRef kNetFSGuestOnlyKey = "GuestOnly";
+
+public const CFStringRef kNetFSNoMountAuthenticationKey = "NoMountAuthentication";
+
+public const CFStringRef kNetFSConnectedWithAuthenticationInfoKey = "ConnectedWithAuthenticationInfo";
+
+public const CFStringRef kNetFSConnectedAsUserKey = "MountedByUser";
+
+public const CFStringRef kNetFSConnectedAsGuestKey = "MountedByGuest";
+
+public const CFStringRef kNetFSConnectedMultiUserKey = "ConnectedMultiUser";
+
+public const CFStringRef kNetFSMechTypesSupportedKey = "MechTypesSupported";
+
+public const CFStringRef kNAUIOptionKey = "UIOption";
+
+public const CFStringRef kNAUIOptionNoUI = "NoUI";
+
+public const CFStringRef kNAUIOptionAllowUI = "AllowUI";
+
+public const CFStringRef kNAUIOptionForceUI = "ForceUI";
+
+public const CFStringRef kNetFSSchemeKey = "Scheme";
+
+public const CFStringRef kNetFSHostKey = "Host";
+
+public const CFStringRef kNetFSAlternatePortKey = "AlternatePort";
+
+public const CFStringRef kNetFSAuthorityParamsKey = "AuthorityParams";
+
+public const CFStringRef kNetFSUserNameKey = "UserName";
+
+public const CFStringRef kNetFSPasswordKey = "Password";
+
+public const CFStringRef kNetFSPathKey = "Path";
+
+public const CFStringRef kNetFSURLOptionsKey = "URLOptions";
+
+public const CFStringRef kNetFSNoUserPreferencesKey = "NoUserPreferences";
+
+public const CFStringRef kNetFSForceNewSessionKey = "ForceNewSession";
+
+public const CFStringRef kNetFSUseAuthenticationInfoKey = "UseAuthenticationInfo";
+
+public const CFStringRef kNetFSUseGuestKey = "Guest";
+
+public const CFStringRef kNetFSChangePasswordKey = "ChangePassword";
+
+public const CFStringRef kNetFSAllowLoopbackKey = "AllowLoopback";
+
+public const CFStringRef kNetFSUseKerberosKey = "Kerberos";
+
+public const CFStringRef kNetFSMountedWithAuthenticationInfoKey = "MountedWithAuthenticationInfo";
+
+public const CFStringRef kNetFSMountedByUserKey = "MountedByUser";
+
+public const CFStringRef kNetFSMountedByGuestKey = "MountedByGuest";
+
+public const CFStringRef kNetFSMountedMultiUserKey = "MountedMultiUser";
+
+public const CFStringRef kNetFSMountedByKerberosKey = "MountedByKerberos";
+
 public const int ENETFSPWDNEEDSCHANGE = -5045;
 
 public const int ENETFSPWDPOLICY = -5046;
@@ -58,5 +130,33 @@ public const int ENETFSNOSHARESAVAIL = -5998;
 public const int ENETFSNOAUTHMECHSUPP = -5997;
 
 public const int ENETFSNOPROTOVERSSUPP = -5996;
+
+public const CFStringRef kNetFSGetAccessRightsKey = "GetAccessRights";
+
+public const CFStringRef kNetFSAlreadyMountedKey = "AlreadyMounted";
+
+public const CFStringRef kNetFSMountPathKey = "MountPath";
+
+public const CFStringRef kNetFSHasPasswordKey = "HasPassword";
+
+public const CFStringRef kNetFSIsHiddenKey = "IsHidden";
+
+public const CFStringRef kNetFSPrinterShareKey = "PrinterShare";
+
+public const CFStringRef kNetFSAccessRightsKey = "AccessRights";
+
+public const CFStringRef kNetFSDisplayNameKey = "DisplayName";
+
+public const CFStringRef kNetFSSoftMountKey = "SoftMount";
+
+public const CFStringRef kNetFSMountFlagsKey = "MountFlags";
+
+public const CFStringRef kNetFSAllowSubMountsKey = "AllowSubMounts";
+
+public const CFStringRef kNetFSMountAtMountDirKey = "MountAtMountDir";
+
+public const CFStringRef kNetFSOpenURLMountKey = "OpenURLMount";
+
+public const CFStringRef kNetFSMountedURLKey = "MountedURL";
 
 #endif

@@ -105,9 +105,14 @@ public extern objc class SCNLight : NSObject, SCNAnimatable, NSCopying, NSSecure
     [Selector("sphericalHarmonicsCoefficients")] public NSData SphericalHarmonicsCoefficients { get; }
     [Selector("probeType", "setProbeType:")] public SCNLightProbeType ProbeType { get; set; }
     [Selector("probeUpdateType", "setProbeUpdateType:")] public SCNLightProbeUpdateType ProbeUpdateType { get; set; }
+    [Selector("probeExtents", "setProbeExtents:")] public simd_float3 ProbeExtents { get; set; }
+    [Selector("probeOffset", "setProbeOffset:")] public simd_float3 ProbeOffset { get; set; }
     [Selector("parallaxCorrectionEnabled", "setParallaxCorrectionEnabled:")] public bool ParallaxCorrectionEnabled { get; set; }
+    [Selector("parallaxExtentsFactor", "setParallaxExtentsFactor:")] public simd_float3 ParallaxExtentsFactor { get; set; }
+    [Selector("parallaxCenterOffset", "setParallaxCenterOffset:")] public simd_float3 ParallaxCenterOffset { get; set; }
     [Selector("probeEnvironment")] public SCNMaterialProperty? ProbeEnvironment { get; }
     [Selector("areaType", "setAreaType:")] public SCNLightAreaType AreaType { get; set; }
+    [Selector("areaExtents", "setAreaExtents:")] public simd_float3 AreaExtents { get; set; }
     [Selector("areaPolygonVertices", "setAreaPolygonVertices:")] public NSArray? AreaPolygonVertices { get; set; }
     [Selector("drawsArea", "setDrawsArea:")] public bool DrawsArea { get; set; }
     [Selector("doubleSided", "setDoubleSided:")] public bool DoubleSided { get; set; }

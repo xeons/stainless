@@ -347,7 +347,7 @@ static const long long *const sl_parts[] = {
 
 static const long long sl_counts[] = {
     800,
-    56,
+    52,
     29,
     1433,
     1711,
@@ -361,7 +361,7 @@ static const long long sl_counts[] = {
     494,
     389,
     2291,
-    9095,
+    9099,
     141,
     2530,
     5894,
@@ -374,7 +374,7 @@ static const long long sl_counts[] = {
     3383,
     334,
     169,
-    525,
+    624,
     308,
     320,
     237,
@@ -393,9 +393,9 @@ static const long long sl_counts[] = {
     1741,
     1124,
     293,
-    389,
+    395,
     327,
-    19,
+    22,
     25,
     3,
     16,
@@ -444,7 +444,7 @@ static const long long sl_counts[] = {
     216,
     166,
     7,
-    8,
+    19,
     459,
     2682,
     9,
@@ -468,9 +468,9 @@ static const long long sl_counts[] = {
     6,
     47,
     3,
-    432,
+    497,
     95,
-    165,
+    182,
     15,
     22,
     23,
@@ -505,7 +505,7 @@ static const long long sl_counts[] = {
     4,
     7,
     19,
-    101,
+    104,
     49,
     28,
     17,
@@ -518,7 +518,7 @@ static const long long sl_counts[] = {
     68,
 };
 
-long long SLLayoutCount(void) { return 61928; }
+long long SLLayoutCount(void) { return 62132; }
 
 long long SLLayoutValue(long long index)
 {

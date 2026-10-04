@@ -74,7 +74,11 @@ public extern "C" CFTypeID CFStringGetTypeID();
 
 [ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithFormat(CFAllocatorRef? alloc, CFDictionaryRef? formatOptions, CFStringRef? format, ...);
 
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithFormatAndArguments(CFAllocatorRef? alloc, CFDictionaryRef? formatOptions, CFStringRef? format, VaList arguments);
+
 [ReturnsRetained] public extern "C" CFStringRef? CFStringCreateStringWithValidatedFormat(CFAllocatorRef? alloc, CFDictionaryRef? formatOptions, CFStringRef? validFormatSpecifiers, CFStringRef? format, __CFError** errorPtr, ...);
+
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateStringWithValidatedFormatAndArguments(CFAllocatorRef? alloc, CFDictionaryRef? formatOptions, CFStringRef? validFormatSpecifiers, CFStringRef? format, VaList arguments, __CFError** errorPtr);
 
 [ReturnsRetained] public extern "C" CFMutableStringRef? CFStringCreateMutable(CFAllocatorRef? alloc, CFIndex maxLength);
 
@@ -179,6 +183,8 @@ public extern "C" void CFStringAppendPascalString(CFMutableStringRef? theString,
 public extern "C" void CFStringAppendCString(CFMutableStringRef? theString, byte* cStr, CFStringEncoding encoding);
 
 public extern "C" void CFStringAppendFormat(CFMutableStringRef? theString, CFDictionaryRef? formatOptions, CFStringRef? format, ...);
+
+public extern "C" void CFStringAppendFormatAndArguments(CFMutableStringRef? theString, CFDictionaryRef? formatOptions, CFStringRef? format, VaList arguments);
 
 public extern "C" void CFStringInsert(CFMutableStringRef? str, CFIndex idx, CFStringRef? insertedStr);
 

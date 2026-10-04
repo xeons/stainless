@@ -46,6 +46,8 @@ public extern "C" cl_int clCreateProgramAndKernelsWithSourceAPPLE(cl_context arg
 
 public extern "C" cl_int clSetKernelArgsListAPPLE(cl_kernel arg0, cl_uint arg1, ...);
 
+public extern "C" cl_int clSetKernelArgsVaListAPPLE(cl_kernel arg0, cl_uint arg1, VaList arg2);
+
 public extern "C" cl_int clSetKernelArgByNameAPPLE(cl_kernel arg0, byte* arg1, nuint arg2, void* arg3);
 
 public struct _cl_dag;

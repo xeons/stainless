@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.ApplicationServices;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "ApplicationServices")
@@ -33,5 +36,87 @@ public enum AXPriority : long
     Medium = 50,
     High = 90,
 }
+
+public const CFStringRef kAXMainWindowChangedNotification = "AXMainWindowChanged";
+
+public const CFStringRef kAXFocusedWindowChangedNotification = "AXFocusedWindowChanged";
+
+public const CFStringRef kAXFocusedUIElementChangedNotification = "AXFocusedUIElementChanged";
+
+public const CFStringRef kAXApplicationActivatedNotification = "AXApplicationActivated";
+
+public const CFStringRef kAXApplicationDeactivatedNotification = "AXApplicationDeactivated";
+
+public const CFStringRef kAXApplicationHiddenNotification = "AXApplicationHidden";
+
+public const CFStringRef kAXApplicationShownNotification = "AXApplicationShown";
+
+public const CFStringRef kAXWindowCreatedNotification = "AXWindowCreated";
+
+public const CFStringRef kAXWindowMovedNotification = "AXWindowMoved";
+
+public const CFStringRef kAXWindowResizedNotification = "AXWindowResized";
+
+public const CFStringRef kAXWindowMiniaturizedNotification = "AXWindowMiniaturized";
+
+public const CFStringRef kAXWindowDeminiaturizedNotification = "AXWindowDeminiaturized";
+
+public const CFStringRef kAXDrawerCreatedNotification = "AXDrawerCreated";
+
+public const CFStringRef kAXSheetCreatedNotification = "AXSheetCreated";
+
+public const CFStringRef kAXHelpTagCreatedNotification = "AXHelpTagCreated";
+
+public const CFStringRef kAXValueChangedNotification = "AXValueChanged";
+
+public const CFStringRef kAXUIElementDestroyedNotification = "AXUIElementDestroyed";
+
+public const CFStringRef kAXElementBusyChangedNotification = "AXElementBusyChanged";
+
+public const CFStringRef kAXMenuOpenedNotification = "AXMenuOpened";
+
+public const CFStringRef kAXMenuClosedNotification = "AXMenuClosed";
+
+public const CFStringRef kAXMenuItemSelectedNotification = "AXMenuItemSelected";
+
+public const CFStringRef kAXRowCountChangedNotification = "AXRowCountChanged";
+
+public const CFStringRef kAXRowExpandedNotification = "AXRowExpanded";
+
+public const CFStringRef kAXRowCollapsedNotification = "AXRowCollapsed";
+
+public const CFStringRef kAXSelectedCellsChangedNotification = "AXSelectedCellsChanged";
+
+public const CFStringRef kAXUnitsChangedNotification = "AXUnitsChanged";
+
+public const CFStringRef kAXSelectedChildrenMovedNotification = "AXSelectedChildrenMoved";
+
+public const CFStringRef kAXSelectedChildrenChangedNotification = "AXSelectedChildrenChanged";
+
+public const CFStringRef kAXResizedNotification = "AXResized";
+
+public const CFStringRef kAXMovedNotification = "AXMoved";
+
+public const CFStringRef kAXCreatedNotification = "AXCreated";
+
+public const CFStringRef kAXSelectedRowsChangedNotification = "AXSelectedRowsChanged";
+
+public const CFStringRef kAXSelectedColumnsChangedNotification = "AXSelectedColumnsChanged";
+
+public const CFStringRef kAXSelectedTextChangedNotification = "AXSelectedTextChanged";
+
+public const CFStringRef kAXTitleChangedNotification = "AXTitleChanged";
+
+public const CFStringRef kAXLayoutChangedNotification = "AXLayoutChanged";
+
+public const CFStringRef kAXAnnouncementRequestedNotification = "AXAnnouncementRequested";
+
+public const CFStringRef kAXUIElementsKey = "AXUIElementsKey";
+
+public const CFStringRef kAXPriorityKey = "AXPriorityKey";
+
+public const CFStringRef kAXAnnouncementKey = "AXAnnouncementKey";
+
+public const CFStringRef kAXUIElementTitleKey = "AXUIElementTitleKey";
 
 #endif

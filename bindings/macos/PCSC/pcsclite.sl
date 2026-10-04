@@ -289,11 +289,17 @@ public const int BLOCK_STATUS_RESUME = 255;
 
 public const int BLOCK_STATUS_BLOCKING = 250;
 
+public const byte* PCSCLITE_CONFIG_DIR = "/etc";
+
+public const byte* PCSCLITE_IPC_DIR = "/var/run";
+
 public const int PCSCLITE_SVC_IDENTITY = 16973824;
 
 public const uint INFINITE = 4294967295u;
 
 public const int PCSCLITE_INFINITE_TIMEOUT = 4320000;
+
+public const byte* PCSCLITE_VERSION_NUMBER = "1.4.0";
 
 public const int PCSCLITE_CLIENT_ATTEMPTS = 120;
 

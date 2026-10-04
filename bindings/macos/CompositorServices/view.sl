@@ -24,6 +24,7 @@
 module MacOS.CompositorServices;
 
 import MacOS.Metal;
+import MacOS.System;
 
 #if MACOS
 
@@ -50,5 +51,8 @@ public using cp_view_t = cp_view*;
 
 /// macOS 26.0 and later.
 public extern "C" cp_view_texture_map_t cp_view_get_view_texture_map(cp_view_t view);
+
+/// macOS 26.0 and later.
+public extern "C" simd_float4x4 cp_view_get_transform(cp_view_t view);
 
 #endif

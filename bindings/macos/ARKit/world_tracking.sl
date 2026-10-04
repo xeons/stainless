@@ -81,6 +81,9 @@ public extern "C" ar_device_anchor_t ar_device_anchor_create();
 public extern "C" void ar_device_anchor_get_identifier(ar_device_anchor_t anchor, byte* out_identifier);
 
 /// macOS 26.0 and later.
+public extern "C" simd_float4x4 ar_device_anchor_get_origin_from_anchor_transform(ar_device_anchor_t anchor);
+
+/// macOS 26.0 and later.
 public extern "C" CFTimeInterval ar_device_anchor_get_timestamp(ar_device_anchor_t anchor);
 
 /// macOS 26.0 and later.

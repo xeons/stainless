@@ -837,16 +837,22 @@ threadsafe sealed class Backend
 
             if (destination != null)
             {
+                // The dictionary retains neither, so both outlive it and the
+                // encode that reads it, and are released after.
                 void* properties = null;
+                void* key = null;
+                void* number = null;
                 if (format == ImageFormat.Jpeg)
                 {
                     double fraction = (double)(quality < 0 ? 75 : quality) / 100.0;
-                    void* number = CFNumberCreate(null, NumberDouble, (void*)&fraction);
-                    void* key = kCGImageDestinationLossyCompressionQuality;
-                    properties = CFDictionaryCreate(null, &key, &number, 1,
-                                                    (void*)&kCFTypeDictionaryKeyCallBacks,
-                                                    (void*)&kCFTypeDictionaryValueCallBacks);
-                    CFRelease(number);
+                    number = CFNumberCreate(null, NumberDouble, (void*)&fraction);
+                    key = CFStringCreateWithCString(null, LossyCompressionQuality, EncodingUtf8);
+
+                    KeyCallBacks byContent;
+                    byContent.Equal = CFEqual;
+                    byContent.Hash = CFHash;
+                    if (number != null && key != null)
+                        properties = CFDictionaryCreate(null, &key, &number, 1, &byContent, null);
                 }
 
                 CGImageDestinationAddImage(destination, picture, properties);
@@ -858,9 +864,13 @@ threadsafe sealed class Backend
                         memcpy((void*)&result[0u], (void*)CFDataGetBytePtr(output), (nuint)length);
                 }
 
+                CFRelease(destination);
                 if (properties != null)
                     CFRelease(properties);
-                CFRelease(destination);
+                if (number != null)
+                    CFRelease(number);
+                if (key != null)
+                    CFRelease(key);
             }
 
             if (output != null)

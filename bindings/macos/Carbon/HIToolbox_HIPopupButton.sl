@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -86,5 +88,9 @@ public const int popupTitleNoStyle = 32768;
 public const int popupTitleLeftJust = 0;
 public const int popupTitleCenterJust = 1;
 public const int popupTitleRightJust = 255;
+
+public const CFStringRef kHIPopupButtonClassID = "com.apple.HIPopupButton";
+
+public const CFStringRef kHIPopupArrowClassID = "com.apple.hipopuparrow";
 
 #endif

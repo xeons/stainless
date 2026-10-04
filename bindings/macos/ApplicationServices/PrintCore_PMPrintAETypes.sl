@@ -33,61 +33,91 @@ public const int kPMShowPrintDialogAEType = 1885629543;
 
 public const int kPMPrinterAEType = 1953656946;
 
+public const byte* kPMCopiesAEProp = "copies";
+
 public const int kPMCopiesAEKey = 1819763568;
 
 public const uint kPMCopieAEType = 1819242087;
+
+public const byte* kPMCollateAEProp = "collating";
 
 public const int kPMCollateAEKey = 1819763564;
 
 public const uint kPMCollateAEType = 1651470188;
 
+public const byte* kPMFirstPageAEProp = "starting page";
+
 public const int kPMFirstPageAEKey = 1819764336;
 
 public const uint kPMFirstPageAEType = 1819242087;
+
+public const byte* kPMLastPageAEProp = "ending page";
 
 public const int kPMLastPageAEKey = 1819765872;
 
 public const uint kPMLastPageAEType = 1819242087;
 
+public const byte* kPMLayoutAcrossAEProp = "pages across";
+
 public const int kPMLayoutAcrossAEKey = 1819765857;
 
 public const uint kPMLayoutAcrossAEType = 1819242087;
+
+public const byte* kPMLayoutDownAEProp = "pages down";
 
 public const int kPMLayoutDownAEKey = 1819765860;
 
 public const uint kPMLayoutDownAEType = 1819242087;
 
+public const byte* kPMErrorHandlingAEProp = "error handling";
+
 public const int kPMErrorHandlingAEKey = 1819764072;
 
 public const uint kPMErrorHandlingAEType = 1701737837;
+
+public const byte* kPMPrintTimeAEProp = "requested print time";
 
 public const int kPMPrintTimeAEKey = 1819767156;
 
 public const uint kPMPrintTimeAEType = 1818522656;
 
+public const byte* kPMFeatureAEProp = "printer features";
+
 public const int kPMFeatureAEKey = 1819766886;
 
 public const uint kPMFeatureAEType = 1818850164;
+
+public const byte* kPMFaxNumberAEProp = "fax number";
 
 public const int kPMFaxNumberAEKey = 1717663854;
 
 public const uint kPMFaxNumberAEType = 1413830740;
 
+public const byte* kPMTargetPrinterAEProp = "target printer";
+
 public const int kPMTargetPrinterAEKey = 1953656946;
 
 public const uint kPMTargetPrinterAEType = 1413830740;
+
+public const byte* kPMPDFWorkFlowAEProp = "PDF work flow";
 
 public const int kPMPDFWorkFlowAEKey = 2003987302;
 
 public const uint kPMPDFWorkFlowAEType = 1970562616;
 
+public const byte* kPMPresetAEProp = "preset";
+
 public const int kPMPresetAEKey = 1886548852;
 
 public const uint kPMPresetAEType = 1970562616;
 
+public const byte* kPMSaveAsPDFAEProp = "save as PDF";
+
 public const int kPMSaveAsPDFAEKey = 1936745574;
 
 public const uint kPMSaveAsPDFAEType = 1718973036;
+
+public const byte* kPMSaveAsPSAEProp = "save as PS";
 
 public const int kPMSaveAsPSAEKey = 1936749344;
 

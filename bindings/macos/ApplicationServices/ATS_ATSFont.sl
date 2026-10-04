@@ -25,6 +25,7 @@ module MacOS.ApplicationServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -147,5 +148,25 @@ public const int kATSFontAutoActivationEnabled = 2;
 public const int kATSFontAutoActivationAsk = 4;
 
 public using ATSFontAutoActivationSetting = UInt32;
+
+public const CFStringRef kATSQueryClientPID = "ATS client pid";
+
+public const CFStringRef kATSQueryQDFamilyName = "font family name";
+
+public const CFStringRef kATSQueryFontName = "font name";
+
+public const CFStringRef kATSQueryFontPostScriptName = "font PS name";
+
+public const CFStringRef kATSQueryFontNameTableEntries = "font name table entries";
+
+public const CFStringRef kATSFontNameTableCode = "font name code";
+
+public const CFStringRef kATSFontNameTablePlatform = "font platform code";
+
+public const CFStringRef kATSFontNameTableScript = "font script code";
+
+public const CFStringRef kATSFontNameTableLanguage = "font language code";
+
+public const CFStringRef kATSFontNameTableBytes = "font name table bytes";
 
 #endif

@@ -32,4 +32,18 @@ import Standard.ObjC;
 
 [ReturnsRetained] public extern "C" CFDictionaryRef? CGSessionCopyCurrentDictionary();
 
+public const CFStringRef kCGSessionUserIDKey = "kCGSSessionUserIDKey";
+
+public const CFStringRef kCGSessionUserNameKey = "kCGSSessionUserNameKey";
+
+public const CFStringRef kCGSessionConsoleSetKey = "kCGSSessionConsoleSetKey";
+
+public const CFStringRef kCGSessionOnConsoleKey = "kCGSSessionOnConsoleKey";
+
+public const CFStringRef kCGSessionLoginDoneKey = "kCGSessionLoginDoneKey";
+
+public const byte* kCGNotifyGUIConsoleSessionChanged = "com.apple.coregraphics.GUIConsoleSessionChanged";
+
+public const byte* kCGNotifyGUISessionUserChanged = "com.apple.coregraphics.GUISessionUserChanged";
+
 #endif

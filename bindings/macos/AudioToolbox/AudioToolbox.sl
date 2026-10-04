@@ -41,4 +41,12 @@ public extern "C" OSStatus CopyInstrumentInfoFromSoundBank(CFURLRef inURL, __CFA
 
 public const int AUDIO_TOOLBOX_VERSION = 1060;
 
+public const byte* kInstrumentInfoKey_Name = "name";
+
+public const byte* kInstrumentInfoKey_MSB = "MSB";
+
+public const byte* kInstrumentInfoKey_LSB = "LSB";
+
+public const byte* kInstrumentInfoKey_Program = "program";
+
 #endif

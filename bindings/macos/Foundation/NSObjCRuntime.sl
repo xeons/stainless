@@ -48,6 +48,8 @@ public extern "C" byte* NSGetSizeAndAlignment(byte* typePtr, NSUInteger* sizep, 
 
 public extern "C" void NSLog(AnyObject? arg0, ...);
 
+public extern "C" void NSLogv(AnyObject? arg0, VaList arg1);
+
 public enum NSComparisonResult : long
 {
     Ascending = -1,

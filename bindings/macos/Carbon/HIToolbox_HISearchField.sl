@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -41,5 +44,7 @@ public const int kEventClassSearchField = 1936877156;
 public const int kEventSearchFieldCancelClicked = 1;
 
 public const int kEventSearchFieldSearchClicked = 2;
+
+public const CFStringRef kHISearchFieldClassID = "com.apple.HISearchField";
 
 #endif

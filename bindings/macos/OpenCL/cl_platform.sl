@@ -132,6 +132,36 @@ public union cl_char8
         public cl_char4 hi;
     }
 }
+#else
+[Align(8)]
+public union cl_char8
+{
+    public cl_char[8] s;
+    public struct
+    {
+        public cl_char x;
+        public cl_char y;
+        public cl_char z;
+        public cl_char w;
+    }
+    public struct
+    {
+        public cl_char s0;
+        public cl_char s1;
+        public cl_char s2;
+        public cl_char s3;
+        public cl_char s4;
+        public cl_char s5;
+        public cl_char s6;
+        public cl_char s7;
+    }
+    public struct
+    {
+        public cl_char4 lo;
+        public cl_char4 hi;
+    }
+    public vsbyte8 v8;
+}
 #endif
 
 #if ARM64
@@ -182,6 +212,57 @@ public union cl_char16
         public cl_char8 lo;
         public cl_char8 hi;
     }
+}
+#else
+[Align(16)]
+public union cl_char16
+{
+    public cl_char[16] s;
+    public struct
+    {
+        public cl_char x;
+        public cl_char y;
+        public cl_char z;
+        public cl_char w;
+        public cl_char __spacer4;
+        public cl_char __spacer5;
+        public cl_char __spacer6;
+        public cl_char __spacer7;
+        public cl_char __spacer8;
+        public cl_char __spacer9;
+        public cl_char sa;
+        public cl_char sb;
+        public cl_char sc;
+        public cl_char sd;
+        public cl_char se;
+        public cl_char sf;
+    }
+    public struct
+    {
+        public cl_char s0;
+        public cl_char s1;
+        public cl_char s2;
+        public cl_char s3;
+        public cl_char s4;
+        public cl_char s5;
+        public cl_char s6;
+        public cl_char s7;
+        public cl_char s8;
+        public cl_char s9;
+        public cl_char sA;
+        public cl_char sB;
+        public cl_char sC;
+        public cl_char sD;
+        public cl_char sE;
+        public cl_char sF;
+    }
+    public struct
+    {
+        public cl_char8 lo;
+        public cl_char8 hi;
+    }
+    public vsbyte8[2] v8;
+    public vsbyte16 v16;
 }
 #endif
 
@@ -262,6 +343,36 @@ public union cl_uchar8
         public cl_uchar4 hi;
     }
 }
+#else
+[Align(8)]
+public union cl_uchar8
+{
+    public cl_uchar[8] s;
+    public struct
+    {
+        public cl_uchar x;
+        public cl_uchar y;
+        public cl_uchar z;
+        public cl_uchar w;
+    }
+    public struct
+    {
+        public cl_uchar s0;
+        public cl_uchar s1;
+        public cl_uchar s2;
+        public cl_uchar s3;
+        public cl_uchar s4;
+        public cl_uchar s5;
+        public cl_uchar s6;
+        public cl_uchar s7;
+    }
+    public struct
+    {
+        public cl_uchar4 lo;
+        public cl_uchar4 hi;
+    }
+    public vbyte8 v8;
+}
 #endif
 
 #if ARM64
@@ -313,6 +424,57 @@ public union cl_uchar16
         public cl_uchar8 hi;
     }
 }
+#else
+[Align(16)]
+public union cl_uchar16
+{
+    public cl_uchar[16] s;
+    public struct
+    {
+        public cl_uchar x;
+        public cl_uchar y;
+        public cl_uchar z;
+        public cl_uchar w;
+        public cl_uchar __spacer4;
+        public cl_uchar __spacer5;
+        public cl_uchar __spacer6;
+        public cl_uchar __spacer7;
+        public cl_uchar __spacer8;
+        public cl_uchar __spacer9;
+        public cl_uchar sa;
+        public cl_uchar sb;
+        public cl_uchar sc;
+        public cl_uchar sd;
+        public cl_uchar se;
+        public cl_uchar sf;
+    }
+    public struct
+    {
+        public cl_uchar s0;
+        public cl_uchar s1;
+        public cl_uchar s2;
+        public cl_uchar s3;
+        public cl_uchar s4;
+        public cl_uchar s5;
+        public cl_uchar s6;
+        public cl_uchar s7;
+        public cl_uchar s8;
+        public cl_uchar s9;
+        public cl_uchar sA;
+        public cl_uchar sB;
+        public cl_uchar sC;
+        public cl_uchar sD;
+        public cl_uchar sE;
+        public cl_uchar sF;
+    }
+    public struct
+    {
+        public cl_uchar8 lo;
+        public cl_uchar8 hi;
+    }
+    public vbyte8[2] v8;
+    public vbyte16 v16;
+}
 #endif
 
 [Align(4)]
@@ -361,11 +523,35 @@ public union cl_short4
         public cl_short2 hi;
     }
 }
+#else
+[Align(8)]
+public union cl_short4
+{
+    public cl_short[4] s;
+    public struct
+    {
+        public cl_short x;
+        public cl_short y;
+        public cl_short z;
+        public cl_short w;
+    }
+    public struct
+    {
+        public cl_short s0;
+        public cl_short s1;
+        public cl_short s2;
+        public cl_short s3;
+    }
+    public struct
+    {
+        public cl_short2 lo;
+        public cl_short2 hi;
+    }
+    public vshort4 v4;
+}
 #endif
 
-#if ARM64
 public using cl_short3 = cl_short4;
-#endif
 
 #if ARM64
 [Align(16)]
@@ -395,6 +581,139 @@ public union cl_short8
         public cl_short4 lo;
         public cl_short4 hi;
     }
+}
+#else
+[Align(16)]
+public union cl_short8
+{
+    public cl_short[8] s;
+    public struct
+    {
+        public cl_short x;
+        public cl_short y;
+        public cl_short z;
+        public cl_short w;
+    }
+    public struct
+    {
+        public cl_short s0;
+        public cl_short s1;
+        public cl_short s2;
+        public cl_short s3;
+        public cl_short s4;
+        public cl_short s5;
+        public cl_short s6;
+        public cl_short s7;
+    }
+    public struct
+    {
+        public cl_short4 lo;
+        public cl_short4 hi;
+    }
+    public vshort4[2] v4;
+    public vshort8 v8;
+}
+#endif
+
+#if ARM64
+[Align(32)]
+public union cl_short16
+{
+    public cl_short[16] s;
+    public struct
+    {
+        public cl_short x;
+        public cl_short y;
+        public cl_short z;
+        public cl_short w;
+        public cl_short __spacer4;
+        public cl_short __spacer5;
+        public cl_short __spacer6;
+        public cl_short __spacer7;
+        public cl_short __spacer8;
+        public cl_short __spacer9;
+        public cl_short sa;
+        public cl_short sb;
+        public cl_short sc;
+        public cl_short sd;
+        public cl_short se;
+        public cl_short sf;
+    }
+    public struct
+    {
+        public cl_short s0;
+        public cl_short s1;
+        public cl_short s2;
+        public cl_short s3;
+        public cl_short s4;
+        public cl_short s5;
+        public cl_short s6;
+        public cl_short s7;
+        public cl_short s8;
+        public cl_short s9;
+        public cl_short sA;
+        public cl_short sB;
+        public cl_short sC;
+        public cl_short sD;
+        public cl_short sE;
+        public cl_short sF;
+    }
+    public struct
+    {
+        public cl_short8 lo;
+        public cl_short8 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_short16
+{
+    public cl_short[16] s;
+    public struct
+    {
+        public cl_short x;
+        public cl_short y;
+        public cl_short z;
+        public cl_short w;
+        public cl_short __spacer4;
+        public cl_short __spacer5;
+        public cl_short __spacer6;
+        public cl_short __spacer7;
+        public cl_short __spacer8;
+        public cl_short __spacer9;
+        public cl_short sa;
+        public cl_short sb;
+        public cl_short sc;
+        public cl_short sd;
+        public cl_short se;
+        public cl_short sf;
+    }
+    public struct
+    {
+        public cl_short s0;
+        public cl_short s1;
+        public cl_short s2;
+        public cl_short s3;
+        public cl_short s4;
+        public cl_short s5;
+        public cl_short s6;
+        public cl_short s7;
+        public cl_short s8;
+        public cl_short s9;
+        public cl_short sA;
+        public cl_short sB;
+        public cl_short sC;
+        public cl_short sD;
+        public cl_short sE;
+        public cl_short sF;
+    }
+    public struct
+    {
+        public cl_short8 lo;
+        public cl_short8 hi;
+    }
+    public vshort4[4] v4;
+    public vshort8[2] v8;
 }
 #endif
 
@@ -444,11 +763,35 @@ public union cl_ushort4
         public cl_ushort2 hi;
     }
 }
+#else
+[Align(8)]
+public union cl_ushort4
+{
+    public cl_ushort[4] s;
+    public struct
+    {
+        public cl_ushort x;
+        public cl_ushort y;
+        public cl_ushort z;
+        public cl_ushort w;
+    }
+    public struct
+    {
+        public cl_ushort s0;
+        public cl_ushort s1;
+        public cl_ushort s2;
+        public cl_ushort s3;
+    }
+    public struct
+    {
+        public cl_ushort2 lo;
+        public cl_ushort2 hi;
+    }
+    public vushort4 v4;
+}
 #endif
 
-#if ARM64
 public using cl_ushort3 = cl_ushort4;
-#endif
 
 #if ARM64
 [Align(16)]
@@ -479,6 +822,139 @@ public union cl_ushort8
         public cl_ushort4 hi;
     }
 }
+#else
+[Align(16)]
+public union cl_ushort8
+{
+    public cl_ushort[8] s;
+    public struct
+    {
+        public cl_ushort x;
+        public cl_ushort y;
+        public cl_ushort z;
+        public cl_ushort w;
+    }
+    public struct
+    {
+        public cl_ushort s0;
+        public cl_ushort s1;
+        public cl_ushort s2;
+        public cl_ushort s3;
+        public cl_ushort s4;
+        public cl_ushort s5;
+        public cl_ushort s6;
+        public cl_ushort s7;
+    }
+    public struct
+    {
+        public cl_ushort4 lo;
+        public cl_ushort4 hi;
+    }
+    public vushort4[2] v4;
+    public vushort8 v8;
+}
+#endif
+
+#if ARM64
+[Align(32)]
+public union cl_ushort16
+{
+    public cl_ushort[16] s;
+    public struct
+    {
+        public cl_ushort x;
+        public cl_ushort y;
+        public cl_ushort z;
+        public cl_ushort w;
+        public cl_ushort __spacer4;
+        public cl_ushort __spacer5;
+        public cl_ushort __spacer6;
+        public cl_ushort __spacer7;
+        public cl_ushort __spacer8;
+        public cl_ushort __spacer9;
+        public cl_ushort sa;
+        public cl_ushort sb;
+        public cl_ushort sc;
+        public cl_ushort sd;
+        public cl_ushort se;
+        public cl_ushort sf;
+    }
+    public struct
+    {
+        public cl_ushort s0;
+        public cl_ushort s1;
+        public cl_ushort s2;
+        public cl_ushort s3;
+        public cl_ushort s4;
+        public cl_ushort s5;
+        public cl_ushort s6;
+        public cl_ushort s7;
+        public cl_ushort s8;
+        public cl_ushort s9;
+        public cl_ushort sA;
+        public cl_ushort sB;
+        public cl_ushort sC;
+        public cl_ushort sD;
+        public cl_ushort sE;
+        public cl_ushort sF;
+    }
+    public struct
+    {
+        public cl_ushort8 lo;
+        public cl_ushort8 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_ushort16
+{
+    public cl_ushort[16] s;
+    public struct
+    {
+        public cl_ushort x;
+        public cl_ushort y;
+        public cl_ushort z;
+        public cl_ushort w;
+        public cl_ushort __spacer4;
+        public cl_ushort __spacer5;
+        public cl_ushort __spacer6;
+        public cl_ushort __spacer7;
+        public cl_ushort __spacer8;
+        public cl_ushort __spacer9;
+        public cl_ushort sa;
+        public cl_ushort sb;
+        public cl_ushort sc;
+        public cl_ushort sd;
+        public cl_ushort se;
+        public cl_ushort sf;
+    }
+    public struct
+    {
+        public cl_ushort s0;
+        public cl_ushort s1;
+        public cl_ushort s2;
+        public cl_ushort s3;
+        public cl_ushort s4;
+        public cl_ushort s5;
+        public cl_ushort s6;
+        public cl_ushort s7;
+        public cl_ushort s8;
+        public cl_ushort s9;
+        public cl_ushort sA;
+        public cl_ushort sB;
+        public cl_ushort sC;
+        public cl_ushort sD;
+        public cl_ushort sE;
+        public cl_ushort sF;
+    }
+    public struct
+    {
+        public cl_ushort8 lo;
+        public cl_ushort8 hi;
+    }
+    public vushort4[4] v4;
+    public vushort8[2] v8;
+}
 #endif
 
 #if ARM64
@@ -501,6 +977,28 @@ public union cl_int2
         public cl_int lo;
         public cl_int hi;
     }
+}
+#else
+[Align(8)]
+public union cl_int2
+{
+    public cl_int[2] s;
+    public struct
+    {
+        public cl_int x;
+        public cl_int y;
+    }
+    public struct
+    {
+        public cl_int s0;
+        public cl_int s1;
+    }
+    public struct
+    {
+        public cl_int lo;
+        public cl_int hi;
+    }
+    public vint2 v2;
 }
 #endif
 
@@ -529,10 +1027,199 @@ public union cl_int4
         public cl_int2 hi;
     }
 }
+#else
+[Align(16)]
+public union cl_int4
+{
+    public cl_int[4] s;
+    public struct
+    {
+        public cl_int x;
+        public cl_int y;
+        public cl_int z;
+        public cl_int w;
+    }
+    public struct
+    {
+        public cl_int s0;
+        public cl_int s1;
+        public cl_int s2;
+        public cl_int s3;
+    }
+    public struct
+    {
+        public cl_int2 lo;
+        public cl_int2 hi;
+    }
+    public vint2[2] v2;
+    public vint4 v4;
+}
+#endif
+
+public using cl_int3 = cl_int4;
+
+#if ARM64
+[Align(32)]
+public union cl_int8
+{
+    public cl_int[8] s;
+    public struct
+    {
+        public cl_int x;
+        public cl_int y;
+        public cl_int z;
+        public cl_int w;
+    }
+    public struct
+    {
+        public cl_int s0;
+        public cl_int s1;
+        public cl_int s2;
+        public cl_int s3;
+        public cl_int s4;
+        public cl_int s5;
+        public cl_int s6;
+        public cl_int s7;
+    }
+    public struct
+    {
+        public cl_int4 lo;
+        public cl_int4 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_int8
+{
+    public cl_int[8] s;
+    public struct
+    {
+        public cl_int x;
+        public cl_int y;
+        public cl_int z;
+        public cl_int w;
+    }
+    public struct
+    {
+        public cl_int s0;
+        public cl_int s1;
+        public cl_int s2;
+        public cl_int s3;
+        public cl_int s4;
+        public cl_int s5;
+        public cl_int s6;
+        public cl_int s7;
+    }
+    public struct
+    {
+        public cl_int4 lo;
+        public cl_int4 hi;
+    }
+    public vint2[4] v2;
+    public vint4[2] v4;
+}
 #endif
 
 #if ARM64
-public using cl_int3 = cl_int4;
+[Align(64)]
+public union cl_int16
+{
+    public cl_int[16] s;
+    public struct
+    {
+        public cl_int x;
+        public cl_int y;
+        public cl_int z;
+        public cl_int w;
+        public cl_int __spacer4;
+        public cl_int __spacer5;
+        public cl_int __spacer6;
+        public cl_int __spacer7;
+        public cl_int __spacer8;
+        public cl_int __spacer9;
+        public cl_int sa;
+        public cl_int sb;
+        public cl_int sc;
+        public cl_int sd;
+        public cl_int se;
+        public cl_int sf;
+    }
+    public struct
+    {
+        public cl_int s0;
+        public cl_int s1;
+        public cl_int s2;
+        public cl_int s3;
+        public cl_int s4;
+        public cl_int s5;
+        public cl_int s6;
+        public cl_int s7;
+        public cl_int s8;
+        public cl_int s9;
+        public cl_int sA;
+        public cl_int sB;
+        public cl_int sC;
+        public cl_int sD;
+        public cl_int sE;
+        public cl_int sF;
+    }
+    public struct
+    {
+        public cl_int8 lo;
+        public cl_int8 hi;
+    }
+}
+#else
+[Align(64)]
+public union cl_int16
+{
+    public cl_int[16] s;
+    public struct
+    {
+        public cl_int x;
+        public cl_int y;
+        public cl_int z;
+        public cl_int w;
+        public cl_int __spacer4;
+        public cl_int __spacer5;
+        public cl_int __spacer6;
+        public cl_int __spacer7;
+        public cl_int __spacer8;
+        public cl_int __spacer9;
+        public cl_int sa;
+        public cl_int sb;
+        public cl_int sc;
+        public cl_int sd;
+        public cl_int se;
+        public cl_int sf;
+    }
+    public struct
+    {
+        public cl_int s0;
+        public cl_int s1;
+        public cl_int s2;
+        public cl_int s3;
+        public cl_int s4;
+        public cl_int s5;
+        public cl_int s6;
+        public cl_int s7;
+        public cl_int s8;
+        public cl_int s9;
+        public cl_int sA;
+        public cl_int sB;
+        public cl_int sC;
+        public cl_int sD;
+        public cl_int sE;
+        public cl_int sF;
+    }
+    public struct
+    {
+        public cl_int8 lo;
+        public cl_int8 hi;
+    }
+    public vint2[8] v2;
+    public vint4[4] v4;
+}
 #endif
 
 #if ARM64
@@ -555,6 +1242,28 @@ public union cl_uint2
         public cl_uint lo;
         public cl_uint hi;
     }
+}
+#else
+[Align(8)]
+public union cl_uint2
+{
+    public cl_uint[2] s;
+    public struct
+    {
+        public cl_uint x;
+        public cl_uint y;
+    }
+    public struct
+    {
+        public cl_uint s0;
+        public cl_uint s1;
+    }
+    public struct
+    {
+        public cl_uint lo;
+        public cl_uint hi;
+    }
+    public vuint2 v2;
 }
 #endif
 
@@ -583,10 +1292,199 @@ public union cl_uint4
         public cl_uint2 hi;
     }
 }
+#else
+[Align(16)]
+public union cl_uint4
+{
+    public cl_uint[4] s;
+    public struct
+    {
+        public cl_uint x;
+        public cl_uint y;
+        public cl_uint z;
+        public cl_uint w;
+    }
+    public struct
+    {
+        public cl_uint s0;
+        public cl_uint s1;
+        public cl_uint s2;
+        public cl_uint s3;
+    }
+    public struct
+    {
+        public cl_uint2 lo;
+        public cl_uint2 hi;
+    }
+    public vuint2[2] v2;
+    public vuint4 v4;
+}
+#endif
+
+public using cl_uint3 = cl_uint4;
+
+#if ARM64
+[Align(32)]
+public union cl_uint8
+{
+    public cl_uint[8] s;
+    public struct
+    {
+        public cl_uint x;
+        public cl_uint y;
+        public cl_uint z;
+        public cl_uint w;
+    }
+    public struct
+    {
+        public cl_uint s0;
+        public cl_uint s1;
+        public cl_uint s2;
+        public cl_uint s3;
+        public cl_uint s4;
+        public cl_uint s5;
+        public cl_uint s6;
+        public cl_uint s7;
+    }
+    public struct
+    {
+        public cl_uint4 lo;
+        public cl_uint4 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_uint8
+{
+    public cl_uint[8] s;
+    public struct
+    {
+        public cl_uint x;
+        public cl_uint y;
+        public cl_uint z;
+        public cl_uint w;
+    }
+    public struct
+    {
+        public cl_uint s0;
+        public cl_uint s1;
+        public cl_uint s2;
+        public cl_uint s3;
+        public cl_uint s4;
+        public cl_uint s5;
+        public cl_uint s6;
+        public cl_uint s7;
+    }
+    public struct
+    {
+        public cl_uint4 lo;
+        public cl_uint4 hi;
+    }
+    public vuint2[4] v2;
+    public vuint4[2] v4;
+}
 #endif
 
 #if ARM64
-public using cl_uint3 = cl_uint4;
+[Align(64)]
+public union cl_uint16
+{
+    public cl_uint[16] s;
+    public struct
+    {
+        public cl_uint x;
+        public cl_uint y;
+        public cl_uint z;
+        public cl_uint w;
+        public cl_uint __spacer4;
+        public cl_uint __spacer5;
+        public cl_uint __spacer6;
+        public cl_uint __spacer7;
+        public cl_uint __spacer8;
+        public cl_uint __spacer9;
+        public cl_uint sa;
+        public cl_uint sb;
+        public cl_uint sc;
+        public cl_uint sd;
+        public cl_uint se;
+        public cl_uint sf;
+    }
+    public struct
+    {
+        public cl_uint s0;
+        public cl_uint s1;
+        public cl_uint s2;
+        public cl_uint s3;
+        public cl_uint s4;
+        public cl_uint s5;
+        public cl_uint s6;
+        public cl_uint s7;
+        public cl_uint s8;
+        public cl_uint s9;
+        public cl_uint sA;
+        public cl_uint sB;
+        public cl_uint sC;
+        public cl_uint sD;
+        public cl_uint sE;
+        public cl_uint sF;
+    }
+    public struct
+    {
+        public cl_uint8 lo;
+        public cl_uint8 hi;
+    }
+}
+#else
+[Align(64)]
+public union cl_uint16
+{
+    public cl_uint[16] s;
+    public struct
+    {
+        public cl_uint x;
+        public cl_uint y;
+        public cl_uint z;
+        public cl_uint w;
+        public cl_uint __spacer4;
+        public cl_uint __spacer5;
+        public cl_uint __spacer6;
+        public cl_uint __spacer7;
+        public cl_uint __spacer8;
+        public cl_uint __spacer9;
+        public cl_uint sa;
+        public cl_uint sb;
+        public cl_uint sc;
+        public cl_uint sd;
+        public cl_uint se;
+        public cl_uint sf;
+    }
+    public struct
+    {
+        public cl_uint s0;
+        public cl_uint s1;
+        public cl_uint s2;
+        public cl_uint s3;
+        public cl_uint s4;
+        public cl_uint s5;
+        public cl_uint s6;
+        public cl_uint s7;
+        public cl_uint s8;
+        public cl_uint s9;
+        public cl_uint sA;
+        public cl_uint sB;
+        public cl_uint sC;
+        public cl_uint sD;
+        public cl_uint sE;
+        public cl_uint sF;
+    }
+    public struct
+    {
+        public cl_uint8 lo;
+        public cl_uint8 hi;
+    }
+    public vuint2[8] v2;
+    public vuint4[4] v4;
+}
 #endif
 
 #if ARM64
@@ -610,6 +1508,245 @@ public union cl_long2
         public cl_long hi;
     }
 }
+#else
+[Align(16)]
+public union cl_long2
+{
+    public cl_long[2] s;
+    public struct
+    {
+        public cl_long x;
+        public cl_long y;
+    }
+    public struct
+    {
+        public cl_long s0;
+        public cl_long s1;
+    }
+    public struct
+    {
+        public cl_long lo;
+        public cl_long hi;
+    }
+    public vlong2 v2;
+}
+#endif
+
+#if ARM64
+[Align(32)]
+public union cl_long4
+{
+    public cl_long[4] s;
+    public struct
+    {
+        public cl_long x;
+        public cl_long y;
+        public cl_long z;
+        public cl_long w;
+    }
+    public struct
+    {
+        public cl_long s0;
+        public cl_long s1;
+        public cl_long s2;
+        public cl_long s3;
+    }
+    public struct
+    {
+        public cl_long2 lo;
+        public cl_long2 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_long4
+{
+    public cl_long[4] s;
+    public struct
+    {
+        public cl_long x;
+        public cl_long y;
+        public cl_long z;
+        public cl_long w;
+    }
+    public struct
+    {
+        public cl_long s0;
+        public cl_long s1;
+        public cl_long s2;
+        public cl_long s3;
+    }
+    public struct
+    {
+        public cl_long2 lo;
+        public cl_long2 hi;
+    }
+    public vlong2[2] v2;
+}
+#endif
+
+public using cl_long3 = cl_long4;
+
+#if ARM64
+[Align(64)]
+public union cl_long8
+{
+    public cl_long[8] s;
+    public struct
+    {
+        public cl_long x;
+        public cl_long y;
+        public cl_long z;
+        public cl_long w;
+    }
+    public struct
+    {
+        public cl_long s0;
+        public cl_long s1;
+        public cl_long s2;
+        public cl_long s3;
+        public cl_long s4;
+        public cl_long s5;
+        public cl_long s6;
+        public cl_long s7;
+    }
+    public struct
+    {
+        public cl_long4 lo;
+        public cl_long4 hi;
+    }
+}
+#else
+[Align(64)]
+public union cl_long8
+{
+    public cl_long[8] s;
+    public struct
+    {
+        public cl_long x;
+        public cl_long y;
+        public cl_long z;
+        public cl_long w;
+    }
+    public struct
+    {
+        public cl_long s0;
+        public cl_long s1;
+        public cl_long s2;
+        public cl_long s3;
+        public cl_long s4;
+        public cl_long s5;
+        public cl_long s6;
+        public cl_long s7;
+    }
+    public struct
+    {
+        public cl_long4 lo;
+        public cl_long4 hi;
+    }
+    public vlong2[4] v2;
+}
+#endif
+
+#if ARM64
+[Align(128)]
+public union cl_long16
+{
+    public cl_long[16] s;
+    public struct
+    {
+        public cl_long x;
+        public cl_long y;
+        public cl_long z;
+        public cl_long w;
+        public cl_long __spacer4;
+        public cl_long __spacer5;
+        public cl_long __spacer6;
+        public cl_long __spacer7;
+        public cl_long __spacer8;
+        public cl_long __spacer9;
+        public cl_long sa;
+        public cl_long sb;
+        public cl_long sc;
+        public cl_long sd;
+        public cl_long se;
+        public cl_long sf;
+    }
+    public struct
+    {
+        public cl_long s0;
+        public cl_long s1;
+        public cl_long s2;
+        public cl_long s3;
+        public cl_long s4;
+        public cl_long s5;
+        public cl_long s6;
+        public cl_long s7;
+        public cl_long s8;
+        public cl_long s9;
+        public cl_long sA;
+        public cl_long sB;
+        public cl_long sC;
+        public cl_long sD;
+        public cl_long sE;
+        public cl_long sF;
+    }
+    public struct
+    {
+        public cl_long8 lo;
+        public cl_long8 hi;
+    }
+}
+#else
+[Align(128)]
+public union cl_long16
+{
+    public cl_long[16] s;
+    public struct
+    {
+        public cl_long x;
+        public cl_long y;
+        public cl_long z;
+        public cl_long w;
+        public cl_long __spacer4;
+        public cl_long __spacer5;
+        public cl_long __spacer6;
+        public cl_long __spacer7;
+        public cl_long __spacer8;
+        public cl_long __spacer9;
+        public cl_long sa;
+        public cl_long sb;
+        public cl_long sc;
+        public cl_long sd;
+        public cl_long se;
+        public cl_long sf;
+    }
+    public struct
+    {
+        public cl_long s0;
+        public cl_long s1;
+        public cl_long s2;
+        public cl_long s3;
+        public cl_long s4;
+        public cl_long s5;
+        public cl_long s6;
+        public cl_long s7;
+        public cl_long s8;
+        public cl_long s9;
+        public cl_long sA;
+        public cl_long sB;
+        public cl_long sC;
+        public cl_long sD;
+        public cl_long sE;
+        public cl_long sF;
+    }
+    public struct
+    {
+        public cl_long8 lo;
+        public cl_long8 hi;
+    }
+    public vlong2[8] v2;
+}
 #endif
 
 #if ARM64
@@ -632,6 +1769,245 @@ public union cl_ulong2
         public cl_ulong lo;
         public cl_ulong hi;
     }
+}
+#else
+[Align(16)]
+public union cl_ulong2
+{
+    public cl_ulong[2] s;
+    public struct
+    {
+        public cl_ulong x;
+        public cl_ulong y;
+    }
+    public struct
+    {
+        public cl_ulong s0;
+        public cl_ulong s1;
+    }
+    public struct
+    {
+        public cl_ulong lo;
+        public cl_ulong hi;
+    }
+    public vulong2 v2;
+}
+#endif
+
+#if ARM64
+[Align(32)]
+public union cl_ulong4
+{
+    public cl_ulong[4] s;
+    public struct
+    {
+        public cl_ulong x;
+        public cl_ulong y;
+        public cl_ulong z;
+        public cl_ulong w;
+    }
+    public struct
+    {
+        public cl_ulong s0;
+        public cl_ulong s1;
+        public cl_ulong s2;
+        public cl_ulong s3;
+    }
+    public struct
+    {
+        public cl_ulong2 lo;
+        public cl_ulong2 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_ulong4
+{
+    public cl_ulong[4] s;
+    public struct
+    {
+        public cl_ulong x;
+        public cl_ulong y;
+        public cl_ulong z;
+        public cl_ulong w;
+    }
+    public struct
+    {
+        public cl_ulong s0;
+        public cl_ulong s1;
+        public cl_ulong s2;
+        public cl_ulong s3;
+    }
+    public struct
+    {
+        public cl_ulong2 lo;
+        public cl_ulong2 hi;
+    }
+    public vulong2[2] v2;
+}
+#endif
+
+public using cl_ulong3 = cl_ulong4;
+
+#if ARM64
+[Align(64)]
+public union cl_ulong8
+{
+    public cl_ulong[8] s;
+    public struct
+    {
+        public cl_ulong x;
+        public cl_ulong y;
+        public cl_ulong z;
+        public cl_ulong w;
+    }
+    public struct
+    {
+        public cl_ulong s0;
+        public cl_ulong s1;
+        public cl_ulong s2;
+        public cl_ulong s3;
+        public cl_ulong s4;
+        public cl_ulong s5;
+        public cl_ulong s6;
+        public cl_ulong s7;
+    }
+    public struct
+    {
+        public cl_ulong4 lo;
+        public cl_ulong4 hi;
+    }
+}
+#else
+[Align(64)]
+public union cl_ulong8
+{
+    public cl_ulong[8] s;
+    public struct
+    {
+        public cl_ulong x;
+        public cl_ulong y;
+        public cl_ulong z;
+        public cl_ulong w;
+    }
+    public struct
+    {
+        public cl_ulong s0;
+        public cl_ulong s1;
+        public cl_ulong s2;
+        public cl_ulong s3;
+        public cl_ulong s4;
+        public cl_ulong s5;
+        public cl_ulong s6;
+        public cl_ulong s7;
+    }
+    public struct
+    {
+        public cl_ulong4 lo;
+        public cl_ulong4 hi;
+    }
+    public vulong2[4] v2;
+}
+#endif
+
+#if ARM64
+[Align(128)]
+public union cl_ulong16
+{
+    public cl_ulong[16] s;
+    public struct
+    {
+        public cl_ulong x;
+        public cl_ulong y;
+        public cl_ulong z;
+        public cl_ulong w;
+        public cl_ulong __spacer4;
+        public cl_ulong __spacer5;
+        public cl_ulong __spacer6;
+        public cl_ulong __spacer7;
+        public cl_ulong __spacer8;
+        public cl_ulong __spacer9;
+        public cl_ulong sa;
+        public cl_ulong sb;
+        public cl_ulong sc;
+        public cl_ulong sd;
+        public cl_ulong se;
+        public cl_ulong sf;
+    }
+    public struct
+    {
+        public cl_ulong s0;
+        public cl_ulong s1;
+        public cl_ulong s2;
+        public cl_ulong s3;
+        public cl_ulong s4;
+        public cl_ulong s5;
+        public cl_ulong s6;
+        public cl_ulong s7;
+        public cl_ulong s8;
+        public cl_ulong s9;
+        public cl_ulong sA;
+        public cl_ulong sB;
+        public cl_ulong sC;
+        public cl_ulong sD;
+        public cl_ulong sE;
+        public cl_ulong sF;
+    }
+    public struct
+    {
+        public cl_ulong8 lo;
+        public cl_ulong8 hi;
+    }
+}
+#else
+[Align(128)]
+public union cl_ulong16
+{
+    public cl_ulong[16] s;
+    public struct
+    {
+        public cl_ulong x;
+        public cl_ulong y;
+        public cl_ulong z;
+        public cl_ulong w;
+        public cl_ulong __spacer4;
+        public cl_ulong __spacer5;
+        public cl_ulong __spacer6;
+        public cl_ulong __spacer7;
+        public cl_ulong __spacer8;
+        public cl_ulong __spacer9;
+        public cl_ulong sa;
+        public cl_ulong sb;
+        public cl_ulong sc;
+        public cl_ulong sd;
+        public cl_ulong se;
+        public cl_ulong sf;
+    }
+    public struct
+    {
+        public cl_ulong s0;
+        public cl_ulong s1;
+        public cl_ulong s2;
+        public cl_ulong s3;
+        public cl_ulong s4;
+        public cl_ulong s5;
+        public cl_ulong s6;
+        public cl_ulong s7;
+        public cl_ulong s8;
+        public cl_ulong s9;
+        public cl_ulong sA;
+        public cl_ulong sB;
+        public cl_ulong sC;
+        public cl_ulong sD;
+        public cl_ulong sE;
+        public cl_ulong sF;
+    }
+    public struct
+    {
+        public cl_ulong8 lo;
+        public cl_ulong8 hi;
+    }
+    public vulong2[8] v2;
 }
 #endif
 
@@ -681,10 +2057,196 @@ public union cl_float4
         public cl_float2 hi;
     }
 }
+#else
+[Align(16)]
+public union cl_float4
+{
+    public cl_float[4] s;
+    public struct
+    {
+        public cl_float x;
+        public cl_float y;
+        public cl_float z;
+        public cl_float w;
+    }
+    public struct
+    {
+        public cl_float s0;
+        public cl_float s1;
+        public cl_float s2;
+        public cl_float s3;
+    }
+    public struct
+    {
+        public cl_float2 lo;
+        public cl_float2 hi;
+    }
+    public vfloat4 v4;
+}
+#endif
+
+public using cl_float3 = cl_float4;
+
+#if ARM64
+[Align(32)]
+public union cl_float8
+{
+    public cl_float[8] s;
+    public struct
+    {
+        public cl_float x;
+        public cl_float y;
+        public cl_float z;
+        public cl_float w;
+    }
+    public struct
+    {
+        public cl_float s0;
+        public cl_float s1;
+        public cl_float s2;
+        public cl_float s3;
+        public cl_float s4;
+        public cl_float s5;
+        public cl_float s6;
+        public cl_float s7;
+    }
+    public struct
+    {
+        public cl_float4 lo;
+        public cl_float4 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_float8
+{
+    public cl_float[8] s;
+    public struct
+    {
+        public cl_float x;
+        public cl_float y;
+        public cl_float z;
+        public cl_float w;
+    }
+    public struct
+    {
+        public cl_float s0;
+        public cl_float s1;
+        public cl_float s2;
+        public cl_float s3;
+        public cl_float s4;
+        public cl_float s5;
+        public cl_float s6;
+        public cl_float s7;
+    }
+    public struct
+    {
+        public cl_float4 lo;
+        public cl_float4 hi;
+    }
+    public vfloat4[2] v4;
+}
 #endif
 
 #if ARM64
-public using cl_float3 = cl_float4;
+[Align(64)]
+public union cl_float16
+{
+    public cl_float[16] s;
+    public struct
+    {
+        public cl_float x;
+        public cl_float y;
+        public cl_float z;
+        public cl_float w;
+        public cl_float __spacer4;
+        public cl_float __spacer5;
+        public cl_float __spacer6;
+        public cl_float __spacer7;
+        public cl_float __spacer8;
+        public cl_float __spacer9;
+        public cl_float sa;
+        public cl_float sb;
+        public cl_float sc;
+        public cl_float sd;
+        public cl_float se;
+        public cl_float sf;
+    }
+    public struct
+    {
+        public cl_float s0;
+        public cl_float s1;
+        public cl_float s2;
+        public cl_float s3;
+        public cl_float s4;
+        public cl_float s5;
+        public cl_float s6;
+        public cl_float s7;
+        public cl_float s8;
+        public cl_float s9;
+        public cl_float sA;
+        public cl_float sB;
+        public cl_float sC;
+        public cl_float sD;
+        public cl_float sE;
+        public cl_float sF;
+    }
+    public struct
+    {
+        public cl_float8 lo;
+        public cl_float8 hi;
+    }
+}
+#else
+[Align(64)]
+public union cl_float16
+{
+    public cl_float[16] s;
+    public struct
+    {
+        public cl_float x;
+        public cl_float y;
+        public cl_float z;
+        public cl_float w;
+        public cl_float __spacer4;
+        public cl_float __spacer5;
+        public cl_float __spacer6;
+        public cl_float __spacer7;
+        public cl_float __spacer8;
+        public cl_float __spacer9;
+        public cl_float sa;
+        public cl_float sb;
+        public cl_float sc;
+        public cl_float sd;
+        public cl_float se;
+        public cl_float sf;
+    }
+    public struct
+    {
+        public cl_float s0;
+        public cl_float s1;
+        public cl_float s2;
+        public cl_float s3;
+        public cl_float s4;
+        public cl_float s5;
+        public cl_float s6;
+        public cl_float s7;
+        public cl_float s8;
+        public cl_float s9;
+        public cl_float sA;
+        public cl_float sB;
+        public cl_float sC;
+        public cl_float sD;
+        public cl_float sE;
+        public cl_float sF;
+    }
+    public struct
+    {
+        public cl_float8 lo;
+        public cl_float8 hi;
+    }
+    public vfloat4[4] v4;
+}
 #endif
 
 #if ARM64
@@ -707,6 +2269,245 @@ public union cl_double2
         public cl_double lo;
         public cl_double hi;
     }
+}
+#else
+[Align(16)]
+public union cl_double2
+{
+    public cl_double[2] s;
+    public struct
+    {
+        public cl_double x;
+        public cl_double y;
+    }
+    public struct
+    {
+        public cl_double s0;
+        public cl_double s1;
+    }
+    public struct
+    {
+        public cl_double lo;
+        public cl_double hi;
+    }
+    public vdouble2 v2;
+}
+#endif
+
+#if ARM64
+[Align(32)]
+public union cl_double4
+{
+    public cl_double[4] s;
+    public struct
+    {
+        public cl_double x;
+        public cl_double y;
+        public cl_double z;
+        public cl_double w;
+    }
+    public struct
+    {
+        public cl_double s0;
+        public cl_double s1;
+        public cl_double s2;
+        public cl_double s3;
+    }
+    public struct
+    {
+        public cl_double2 lo;
+        public cl_double2 hi;
+    }
+}
+#else
+[Align(32)]
+public union cl_double4
+{
+    public cl_double[4] s;
+    public struct
+    {
+        public cl_double x;
+        public cl_double y;
+        public cl_double z;
+        public cl_double w;
+    }
+    public struct
+    {
+        public cl_double s0;
+        public cl_double s1;
+        public cl_double s2;
+        public cl_double s3;
+    }
+    public struct
+    {
+        public cl_double2 lo;
+        public cl_double2 hi;
+    }
+    public vdouble2[2] v2;
+}
+#endif
+
+public using cl_double3 = cl_double4;
+
+#if ARM64
+[Align(64)]
+public union cl_double8
+{
+    public cl_double[8] s;
+    public struct
+    {
+        public cl_double x;
+        public cl_double y;
+        public cl_double z;
+        public cl_double w;
+    }
+    public struct
+    {
+        public cl_double s0;
+        public cl_double s1;
+        public cl_double s2;
+        public cl_double s3;
+        public cl_double s4;
+        public cl_double s5;
+        public cl_double s6;
+        public cl_double s7;
+    }
+    public struct
+    {
+        public cl_double4 lo;
+        public cl_double4 hi;
+    }
+}
+#else
+[Align(64)]
+public union cl_double8
+{
+    public cl_double[8] s;
+    public struct
+    {
+        public cl_double x;
+        public cl_double y;
+        public cl_double z;
+        public cl_double w;
+    }
+    public struct
+    {
+        public cl_double s0;
+        public cl_double s1;
+        public cl_double s2;
+        public cl_double s3;
+        public cl_double s4;
+        public cl_double s5;
+        public cl_double s6;
+        public cl_double s7;
+    }
+    public struct
+    {
+        public cl_double4 lo;
+        public cl_double4 hi;
+    }
+    public vdouble2[4] v2;
+}
+#endif
+
+#if ARM64
+[Align(128)]
+public union cl_double16
+{
+    public cl_double[16] s;
+    public struct
+    {
+        public cl_double x;
+        public cl_double y;
+        public cl_double z;
+        public cl_double w;
+        public cl_double __spacer4;
+        public cl_double __spacer5;
+        public cl_double __spacer6;
+        public cl_double __spacer7;
+        public cl_double __spacer8;
+        public cl_double __spacer9;
+        public cl_double sa;
+        public cl_double sb;
+        public cl_double sc;
+        public cl_double sd;
+        public cl_double se;
+        public cl_double sf;
+    }
+    public struct
+    {
+        public cl_double s0;
+        public cl_double s1;
+        public cl_double s2;
+        public cl_double s3;
+        public cl_double s4;
+        public cl_double s5;
+        public cl_double s6;
+        public cl_double s7;
+        public cl_double s8;
+        public cl_double s9;
+        public cl_double sA;
+        public cl_double sB;
+        public cl_double sC;
+        public cl_double sD;
+        public cl_double sE;
+        public cl_double sF;
+    }
+    public struct
+    {
+        public cl_double8 lo;
+        public cl_double8 hi;
+    }
+}
+#else
+[Align(128)]
+public union cl_double16
+{
+    public cl_double[16] s;
+    public struct
+    {
+        public cl_double x;
+        public cl_double y;
+        public cl_double z;
+        public cl_double w;
+        public cl_double __spacer4;
+        public cl_double __spacer5;
+        public cl_double __spacer6;
+        public cl_double __spacer7;
+        public cl_double __spacer8;
+        public cl_double __spacer9;
+        public cl_double sa;
+        public cl_double sb;
+        public cl_double sc;
+        public cl_double sd;
+        public cl_double se;
+        public cl_double sf;
+    }
+    public struct
+    {
+        public cl_double s0;
+        public cl_double s1;
+        public cl_double s2;
+        public cl_double s3;
+        public cl_double s4;
+        public cl_double s5;
+        public cl_double s6;
+        public cl_double s7;
+        public cl_double s8;
+        public cl_double s9;
+        public cl_double sA;
+        public cl_double sB;
+        public cl_double sC;
+        public cl_double sD;
+        public cl_double sE;
+        public cl_double sF;
+    }
+    public struct
+    {
+        public cl_double8 lo;
+        public cl_double8 hi;
+    }
+    public vdouble2[8] v2;
 }
 #endif
 

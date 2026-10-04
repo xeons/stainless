@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -60,5 +62,7 @@ public const int kControlClockLongDateTag = 1684108389;
 public const int kControlClockAbsoluteTimeTag = 1633842036;
 public const int kControlClockFontStyleTag = 1718578804;
 public const int kControlClockAnimatingTag = 1634625901;
+
+public const CFStringRef kHIClockViewClassID = "com.apple.HIClock";
 
 #endif

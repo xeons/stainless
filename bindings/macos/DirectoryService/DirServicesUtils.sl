@@ -82,6 +82,9 @@ public extern "C" tDataListPtr dsBuildListFromStrings(tDirReference inDirReferen
 public extern "C" tDirStatus dsBuildListFromStringsAlloc(tDirReference inDirReferences, tDataListPtr inDataList, byte* in1stCString, ...);
 
 /// Deprecated in macOS 10.6.
+public extern "C" tDirStatus dsBuildListFromStringsAllocV(tDirReference inDirRef, tDataList* inDataList, byte* in1stCString, VaList args);
+
+/// Deprecated in macOS 10.6.
 public extern "C" tDirStatus dsAppendStringToListAlloc(tDirReference inDirReferences, tDataListPtr inDataList, byte* inCString);
 
 /// Deprecated in macOS 10.6.

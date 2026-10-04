@@ -44,6 +44,8 @@ public enum MDLTransformOpRotationOrder : ulong
 public objc interface MDLTransformOp
 {
     [Selector("name")] NSString Name { get; }
+    [Selector("float4x4AtTime:")] matrix_float4x4 Float4x4AtTime(NSTimeInterval time);
+    [Selector("double4x4AtTime:")] matrix_double4x4 Double4x4AtTime(NSTimeInterval time);
     [Selector("IsInverseOp")] bool IsInverseOp();
 }
 
@@ -109,6 +111,8 @@ public extern objc class MDLTransformStack : NSObject, NSCopying, MDLTransformCo
     [Selector("addMatrixOp:inverse:")] public MDLTransformMatrixOp AddMatrixOpInverse(NSString animatedValueName, bool inverse);
     [Selector("addOrientOp:inverse:")] public MDLTransformOrientOp AddOrientOpInverse(NSString animatedValueName, bool inverse);
     [Selector("animatedValueWithName:")] public MDLAnimatedValue AnimatedValueWithName(NSString name);
+    [Selector("float4x4AtTime:")] public matrix_float4x4 Float4x4AtTime(NSTimeInterval time);
+    [Selector("double4x4AtTime:")] public matrix_double4x4 Double4x4AtTime(NSTimeInterval time);
     [Selector("count")] public NSUInteger Count();
 }
 

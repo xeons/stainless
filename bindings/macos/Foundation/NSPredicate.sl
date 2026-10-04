@@ -37,6 +37,7 @@ public extern objc class NSPredicate : NSObject, NSSecureCoding, NSCopying
     [Selector("predicateFormat")] public NSString PredicateFormat { get; }
     [Selector("predicateWithFormat:argumentArray:")] public static NSPredicate PredicateWithFormatArgumentArray(NSString predicateFormat, NSArray? arguments);
     [Selector("predicateWithFormat:")] public static NSPredicate PredicateWithFormat(NSString predicateFormat, ...);
+    [Selector("predicateWithFormat:arguments:")] public static NSPredicate PredicateWithFormatArguments(NSString predicateFormat, VaList argList);
     [Selector("predicateFromMetadataQueryString:")] public static NSPredicate? PredicateFromMetadataQueryString(NSString queryString);
     [Selector("predicateWithValue:")] public static NSPredicate PredicateWithValue(bool value);
     [Selector("predicateWithBlock:")] public static NSPredicate PredicateWithBlock(NSPredicatePredicateWithBlockBlock block);

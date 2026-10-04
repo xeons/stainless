@@ -32,9 +32,15 @@ import Standard.ObjC;
 
 public extern objc class GKGridGraph : GKGraph
 {
+    [Selector("gridOrigin")] public vector_int2 GridOrigin { get; }
     [Selector("gridWidth")] public NSUInteger GridWidth { get; }
     [Selector("gridHeight")] public NSUInteger GridHeight { get; }
     [Selector("diagonalsAllowed")] public bool DiagonalsAllowed { get; }
+    [Selector("graphFromGridStartingAt:width:height:diagonalsAllowed:")] public static Self GraphFromGridStartingAtWidthHeightDiagonalsAllowed(vector_int2 position, int width, int height, bool diagonalsAllowed);
+    [Selector("initFromGridStartingAt:width:height:diagonalsAllowed:")] public Self InitFromGridStartingAtWidthHeightDiagonalsAllowed(vector_int2 position, int width, int height, bool diagonalsAllowed);
+    [Selector("graphFromGridStartingAt:width:height:diagonalsAllowed:nodeClass:")] public static Self GraphFromGridStartingAtWidthHeightDiagonalsAllowedNodeClass(vector_int2 position, int width, int height, bool diagonalsAllowed, Class nodeClass);
+    [Selector("initFromGridStartingAt:width:height:diagonalsAllowed:nodeClass:")] public Self InitFromGridStartingAtWidthHeightDiagonalsAllowedNodeClass(vector_int2 position, int width, int height, bool diagonalsAllowed, Class nodeClass);
+    [Selector("nodeAtGridPosition:")] public AnyObject? NodeAtGridPosition(vector_int2 position);
     [Selector("connectNodeToAdjacentNodes:")] public void ConnectNodeToAdjacentNodes(GKGridGraphNode node);
     [Selector("classForGenericArgumentAtIndex:")] public Class ClassForGenericArgumentAtIndex(NSUInteger index);
 }

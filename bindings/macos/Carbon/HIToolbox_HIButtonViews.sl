@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -168,5 +170,17 @@ public const int kControlRoundButtonContentTag = 1668247156;
 public const int kControlRoundButtonSizeTag = 1936292453;
 
 public const int kControlKindRoundButton = 1919837282;
+
+public const CFStringRef kHIPushButtonClassID = "com.apple.HIPushButton";
+
+public const CFStringRef kHICheckBoxClassID = "com.apple.HICheckBox";
+
+public const CFStringRef kHIRadioButtonClassID = "com.apple.HIRadioButton";
+
+public const CFStringRef kHIRadioGroupClassID = "com.apple.HIRadioGroup";
+
+public const CFStringRef kHIBevelButtonClassID = "com.apple.HIBevelButton";
+
+public const CFStringRef kHIRoundButtonClassID = "com.apple.HIRoundButton";
 
 #endif

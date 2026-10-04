@@ -39,4 +39,12 @@ public extern objc class JRSAppKitAWT : NSObject
     [Selector("markAppIsDaemon")] public static bool MarkAppIsDaemon();
 }
 
+public const NSString JRSAppNameKey = "JRSAppNameKey";
+
+public const NSString JRSAppIsCommandLineKey = "JRSAppIsCommandLineKey";
+
+public const NSString JRSAppIsUIElementKey = "JRSAppIsUIElementKey";
+
+public const NSString JRSAppIsBackgroundOnlyKey = "JRSAppIsBackgroundOnlyKey";
+
 #endif

@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -137,5 +139,23 @@ public const int kHIToolbarItemDisabled = 64;
 public const int kHIToolbarItemSelected = 128;
 public const int kHIToolbarItemValidAttrs = 255;
 public const int kHIToolbarItemMutableAttrs = 230;
+
+public const CFStringRef kHIToolbarIdentifierKey = "identifier";
+
+public const CFStringRef kHIToolbarDataKey = "data";
+
+public const CFStringRef kHIToolbarSeparatorIdentifier = "com.apple.hitoolbox.toolbar.separator";
+
+public const CFStringRef kHIToolbarSpaceIdentifier = "com.apple.hitoolbox.toolbar.space";
+
+public const CFStringRef kHIToolbarFlexibleSpaceIdentifier = "com.apple.hitoolbox.toolbar.flexiblespace";
+
+public const CFStringRef kHIToolbarCustomizeIdentifier = "com.apple.hitoolbox.toolbar.customize";
+
+public const CFStringRef kHIToolbarPrintItemIdentifier = "com.apple.hitoolbox.toolbar.print";
+
+public const CFStringRef kHIToolbarFontsItemIdentifier = "com.apple.hitoolbox.toolbar.fonts";
+
+public const CFStringRef kHIToolbarItemClassID = "com.apple.hitoolbaritem";
 
 #endif

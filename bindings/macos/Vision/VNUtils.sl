@@ -50,6 +50,10 @@ public extern "C" CGRect VNNormalizedRectForImageRect(CGRect imageRect, nuint im
 
 public extern "C" CGRect VNNormalizedRectForImageRectUsingRegionOfInterest(CGRect imageRect, nuint imageWidth, nuint imageHeight, CGRect roi);
 
+public extern "C" CGPoint VNNormalizedFaceBoundingBoxPointForLandmarkPoint(vector_float2 faceLandmarkPoint, CGRect faceBoundingBox, nuint imageWidth, nuint imageHeight);
+
+public extern "C" CGPoint VNImagePointForFaceLandmarkPoint(vector_float2 faceLandmarkPoint, CGRect faceBoundingBox, nuint imageWidth, nuint imageHeight);
+
 public extern "C" NSUInteger VNElementTypeSize(VNElementType elementType);
 
 #endif

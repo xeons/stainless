@@ -51,6 +51,14 @@ public extern "C" hv_return_t hv_vcpu_set_reg(hv_vcpu_t vcpu, hv_reg_t reg, ulon
 #endif
 
 #if ARM64
+public extern "C" hv_return_t hv_vcpu_get_simd_fp_reg(hv_vcpu_t vcpu, hv_simd_fp_reg_t reg, hv_simd_fp_uchar16_t* value);
+#endif
+
+#if ARM64
+public extern "C" hv_return_t hv_vcpu_set_simd_fp_reg(hv_vcpu_t vcpu, hv_simd_fp_reg_t reg, hv_simd_fp_uchar16_t value);
+#endif
+
+#if ARM64
 /// macOS 15.2 and later.
 public extern "C" hv_return_t hv_vcpu_get_sme_state(hv_vcpu_t vcpu, hv_vcpu_sme_state_t* sme_state);
 #endif
@@ -88,6 +96,16 @@ public extern "C" hv_return_t hv_vcpu_get_sme_za_reg(hv_vcpu_t vcpu, byte* value
 #if ARM64
 /// macOS 15.2 and later.
 public extern "C" hv_return_t hv_vcpu_set_sme_za_reg(hv_vcpu_t vcpu, byte* value, nuint length);
+#endif
+
+#if ARM64
+/// macOS 15.2 and later.
+public extern "C" hv_return_t hv_vcpu_get_sme_zt0_reg(hv_vcpu_t vcpu, hv_sme_zt0_uchar64_t* value);
+#endif
+
+#if ARM64
+/// macOS 15.2 and later.
+public extern "C" hv_return_t hv_vcpu_set_sme_zt0_reg(hv_vcpu_t vcpu, hv_sme_zt0_uchar64_t* value);
 #endif
 
 #if ARM64

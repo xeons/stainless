@@ -64,6 +64,10 @@ public class SampleTests
         /// counterpart.</summary>
         public bool LinuxOnly { get; init; }
 
+        /// <summary>macOS-only: written against the generated <c>bindings/macos</c>,
+        /// which are <c>#if MACOS</c>.</summary>
+        public bool MacOnly { get; init; }
+
         /// <summary>
         /// Written against the Forms library, so it needs those sources too --
         /// and the platform bindings the backend for <i>this</i> machine is
@@ -164,6 +168,8 @@ public class SampleTests
 
         new("gtk/hello", ["samples/gtk/hello.sl"]) { UnixOnly = true },
         new("gtk/control", ["samples/gtk/control.sl"]) { UnixOnly = true },
+
+        new("macos/window", ["samples/macos/window.sl"]) { MacOnly = true },
     ];
 
     /// <summary>The Win32 samples are written against the bindings.</summary>
@@ -208,6 +214,8 @@ public class SampleTests
             paths.AddRange(GtkBindings());
         if (sample.LinuxOnly)
             paths.AddRange(BindingsUnder("linux"));
+        if (sample.MacOnly)
+            paths.AddRange(BindingsUnder("macos"));
 
         // A Forms program needs the backend for the machine it is being bound
         // on, because that is the half of `forms/src` the preprocessor will
@@ -264,7 +272,8 @@ public class SampleTests
     private static bool BindsOn(Sample sample, TargetOS host) =>
         !(sample.WindowsOnly && host != TargetOS.Windows)
         && !(sample.UnixOnly && host == TargetOS.Windows)
-        && !(sample.LinuxOnly && host != TargetOS.Linux);
+        && !(sample.LinuxOnly && host != TargetOS.Linux)
+        && !(sample.MacOnly && host != TargetOS.MacOS);
 
     [Fact]
     public void AMacBindsTheUnixSamplesAndNotTheLinuxOnes()
@@ -280,6 +289,11 @@ public class SampleTests
         Assert.True(BindsOn(linux, TargetOS.Linux));
         Assert.False(BindsOn(linux, TargetOS.Windows));
         Assert.False(BindsOn(win32, TargetOS.MacOS));
+
+        var mac = new Sample("mac", []) { MacOnly = true };
+        Assert.True(BindsOn(mac, TargetOS.MacOS));
+        Assert.False(BindsOn(mac, TargetOS.Linux));
+        Assert.False(BindsOn(mac, TargetOS.Windows));
     }
 
     /// <summary>

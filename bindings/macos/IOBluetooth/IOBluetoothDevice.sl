@@ -127,4 +127,18 @@ public extern objc class IOBluetoothDevice : IOBluetoothObject, NSCoding, NSSecu
     [ReturnsRetained] [Selector("awakeAfterUsingCoder:")] public AnyObject? AwakeAfterUsingCoder(NSCoder? coder);
 }
 
+public const NSString kIOBluetoothDeviceNotificationNameConnected = "IOBluetoothDeviceConnected";
+
+public const NSString kIOBluetoothDeviceNotificationNameDisconnected = "IOBluetoothDeviceDisconnected";
+
+public const NSString kIOBluetoothDeviceNameChangedNotification = "IOBluetoothDeviceNameChanged";
+
+public const NSString kIOBluetoothDeviceInquiryInfoChangedNotification = "IOBluetoothDeviceInquiryInfoChanged";
+
+public const NSString kIOBluetoothDeviceServicesChangedNotification = "IOBluetoothDeviceServicesChanged";
+
+public const NSString kIOBluetoothL2CAPChannelMaxAllowedIncomingMTU = "MaxAllowedIncomingMTU";
+
+public const NSString kIOBluetoothL2CAPChannelDesiredOutgoingMTU = "DesiredOutgoingMTU";
+
 #endif

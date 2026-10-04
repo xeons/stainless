@@ -250,6 +250,10 @@ public using CGEventSourceKeyboardType = uint;
 
 public const ulong kCGEventMaskForAllEvents = 18446744073709551615u;
 
+public const byte* kCGNotifyEventTapAdded = "com.apple.coregraphics.eventTapAdded";
+
+public const byte* kCGNotifyEventTapRemoved = "com.apple.coregraphics.eventTapRemoved";
+
 public const uint kCGAnyInputEventType = 4294967295u;
 
 #endif

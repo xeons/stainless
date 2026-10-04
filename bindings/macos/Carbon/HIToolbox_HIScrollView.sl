@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -68,5 +70,9 @@ public const int kHIScrollViewPageUp = 16;
 public const int kHIScrollViewPageDown = 32;
 public const int kHIScrollViewPageLeft = 64;
 public const int kHIScrollViewPageRight = 128;
+
+public const CFStringRef kHIScrollBarClassID = "com.apple.HIScrollBar";
+
+public const CFStringRef kHIScrollViewClassID = "com.apple.HIScrollView";
 
 #endif

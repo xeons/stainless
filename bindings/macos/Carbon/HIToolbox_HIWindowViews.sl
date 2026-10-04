@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -48,5 +51,7 @@ public const int kHIWindowDragPart = 3;
 public const int kHIWindowTitleProxyIconPart = 2;
 
 public const int kControlKindHIGrowBoxView = 1735552887;
+
+public const CFStringRef kHIGrowBoxViewClassID = "com.apple.higrowboxview";
 
 #endif

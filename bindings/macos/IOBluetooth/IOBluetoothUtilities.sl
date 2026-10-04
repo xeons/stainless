@@ -44,7 +44,11 @@ public extern "C" NSString? IOBluetoothGetUniqueFileNameAndPath(NSString? inName
 
 public extern "C" long IOBluetoothPackData(void* ioBuffer, byte* inFormat, ...);
 
+public extern "C" long IOBluetoothPackDataList(void* ioBuffer, byte* inFormat, VaList inArgs);
+
 public extern "C" long IOBluetoothUnpackData(ByteCount inBufferSize, void* inBuffer, byte* inFormat, ...);
+
+public extern "C" long IOBluetoothUnpackDataList(ByteCount inBufferSize, void* inBuffer, byte* inFormat, VaList inArgs);
 
 public extern "C" long IOBluetoothNumberOfAvailableHIDDevices();
 

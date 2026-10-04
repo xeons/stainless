@@ -27,6 +27,8 @@ module MacOS.SpriteKit;
 
 #pragma comment(framework, "SpriteKit")
 
+public using vector_float3 = vfloat3;
+
 public const int PHYSICSKIT_MINUS_GL_IMPORTS = 1;
 
 public const int SKVIEW_AVAILABLE = 1;

@@ -579,4 +579,14 @@ public extern "C" OBEXError OBEXAddAuthorizationResponseHeader(void* inHeaderDat
 
 public extern "C" OBEXError OBEXAddUserDefinedHeader(void* inHeaderData, uint inHeaderDataLength, CFMutableDictionaryRef? dictRef);
 
+public const byte* kCharsetStringISO88591 = "CHARSET=ISO-8859-1";
+
+public const byte* kCharsetStringUTF8 = "UTF-8";
+
+public const byte* kEncodingStringQuotedPrintable = "QUOTED-PRINTABLE";
+
+public const byte* kEncodingStringBase64 = "BASE-64";
+
+public const byte* kEncodingString8Bit = "8BIT";
+
 #endif

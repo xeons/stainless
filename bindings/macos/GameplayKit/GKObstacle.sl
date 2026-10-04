@@ -36,6 +36,7 @@ public extern objc class GKObstacle : NSObject { }
 public extern objc class GKCircleObstacle : GKObstacle
 {
     [Selector("radius", "setRadius:")] public float Radius { get; set; }
+    [Selector("position", "setPosition:")] public vector_float2 Position { get; set; }
     [Selector("obstacleWithRadius:")] public static Self ObstacleWithRadius(float radius);
     [Selector("initWithRadius:")] public Self InitWithRadius(float radius);
 }
@@ -43,11 +44,15 @@ public extern objc class GKCircleObstacle : GKObstacle
 public extern objc class GKPolygonObstacle : GKObstacle, NSSecureCoding
 {
     [Selector("vertexCount")] public NSUInteger VertexCount { get; }
+    [Selector("obstacleWithPoints:count:")] public static Self ObstacleWithPointsCount(vector_float2* points, nuint numPoints);
+    [Selector("initWithPoints:count:")] public Self InitWithPointsCount(vector_float2* points, nuint numPoints);
+    [Selector("vertexAtIndex:")] public vector_float2 VertexAtIndex(NSUInteger index);
 }
 
 public extern objc class GKSphereObstacle : GKObstacle
 {
     [Selector("radius", "setRadius:")] public float Radius { get; set; }
+    [Selector("position", "setPosition:")] public vector_float3 Position { get; set; }
     [Selector("obstacleWithRadius:")] public static Self ObstacleWithRadius(float radius);
     [Selector("initWithRadius:")] public Self InitWithRadius(float radius);
 }

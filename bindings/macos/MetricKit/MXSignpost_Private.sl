@@ -29,4 +29,6 @@ module MacOS.MetricKit;
 
 public extern "C" void* _MXSignpostMetricsSnapshot();
 
+public const byte* _METRICS_SIGNPOST_TYPE_TOKEN = "signpost:metrics";
+
 #endif

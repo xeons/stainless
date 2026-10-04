@@ -38,6 +38,12 @@ public struct MPSImageKeypointRangeInfo
     public float minimumThresholdValue;
 }
 
+public struct MPSImageKeypointData
+{
+    public vector_ushort2 keypointCoordinate;
+    public float keypointColorValue;
+}
+
 public extern objc class MPSImageFindKeypoints : MPSKernel
 {
     [Selector("keypointRangeInfo")] public MPSImageKeypointRangeInfo KeypointRangeInfo { get; }

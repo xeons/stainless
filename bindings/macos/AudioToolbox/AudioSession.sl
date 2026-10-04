@@ -116,4 +116,8 @@ public const int kAudioSessionCategory_LiveAudio = 1818850917;
 
 public const int kAudioSessionProperty_AudioRoute = 1919907188;
 
+public const byte* kAudioSession_AudioRouteChangeKey_Reason = "OutputDeviceDidChange_Reason";
+
+public const byte* kAudioSession_AudioRouteChangeKey_OldRoute = "OutputDeviceDidChange_OldRoute";
+
 #endif

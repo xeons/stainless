@@ -123,9 +123,17 @@ public extern objc class MDLMaterialProperty : NSObject, MDLNamed, NSCopying
     [Selector("textureSamplerValue", "setTextureSamplerValue:")] public MDLTextureSampler? TextureSamplerValue { get; set; }
     [Selector("color", "setColor:")] public CGColorRef? Color { get; set; }
     [Selector("floatValue", "setFloatValue:")] public float FloatValue { get; set; }
+    [Selector("float2Value", "setFloat2Value:")] public vector_float2 Float2Value { get; set; }
+    [Selector("float3Value", "setFloat3Value:")] public vector_float3 Float3Value { get; set; }
+    [Selector("float4Value", "setFloat4Value:")] public vector_float4 Float4Value { get; set; }
+    [Selector("matrix4x4", "setMatrix4x4:")] public matrix_float4x4 Matrix4x4 { get; set; }
     [Selector("luminance", "setLuminance:")] public float Luminance { get; set; }
     [Selector("initWithName:semantic:")] public Self InitWithNameSemantic(NSString name, MDLMaterialSemantic semantic);
     [Selector("initWithName:semantic:float:")] public Self InitWithNameSemanticFloat(NSString name, MDLMaterialSemantic semantic, float value);
+    [Selector("initWithName:semantic:float2:")] public Self InitWithNameSemanticFloat2(NSString name, MDLMaterialSemantic semantic, vector_float2 value);
+    [Selector("initWithName:semantic:float3:")] public Self InitWithNameSemanticFloat3(NSString name, MDLMaterialSemantic semantic, vector_float3 value);
+    [Selector("initWithName:semantic:float4:")] public Self InitWithNameSemanticFloat4(NSString name, MDLMaterialSemantic semantic, vector_float4 value);
+    [Selector("initWithName:semantic:matrix4x4:")] public Self InitWithNameSemanticMatrix4x4(NSString name, MDLMaterialSemantic semantic, matrix_float4x4 value);
     [Selector("initWithName:semantic:URL:")] public Self InitWithNameSemanticURL(NSString name, MDLMaterialSemantic semantic, NSURL? URL);
     [Selector("initWithName:semantic:string:")] public Self InitWithNameSemanticString(NSString name, MDLMaterialSemantic semantic, NSString? string);
     [Selector("initWithName:semantic:textureSampler:")] public Self InitWithNameSemanticTextureSampler(NSString name, MDLMaterialSemantic semantic, MDLTextureSampler? textureSampler);

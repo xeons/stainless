@@ -41,6 +41,7 @@ public extern objc class GKNoise : NSObject
     [Selector("initWithNoiseSource:gradientColors:")] public Self InitWithNoiseSourceGradientColors(GKNoiseSource noiseSource, NSDictionary gradientColors);
     [Selector("noiseWithComponentNoises:selectionNoise:")] public static Self NoiseWithComponentNoisesSelectionNoise(NSArray noises, GKNoise selectionNoise);
     [Selector("noiseWithComponentNoises:selectionNoise:componentBoundaries:boundaryBlendDistances:")] public static Self NoiseWithComponentNoisesSelectionNoiseComponentBoundariesBoundaryBlendDistances(NSArray noises, GKNoise selectionNoise, NSArray componentBoundaries, NSArray blendDistances);
+    [Selector("valueAtPosition:")] public float ValueAtPosition(vector_float2 position);
     [Selector("applyAbsoluteValue")] public void ApplyAbsoluteValue();
     [Selector("clampWithLowerBound:upperBound:")] public void ClampWithLowerBoundUpperBound(double lowerBound, double upperBound);
     [Selector("raiseToPower:")] public void RaiseToPower(double power);
@@ -48,6 +49,9 @@ public extern objc class GKNoise : NSObject
     [Selector("applyTurbulenceWithFrequency:power:roughness:seed:")] public void ApplyTurbulenceWithFrequencyPowerRoughnessSeed(double frequency, double power, int roughness, int seed);
     [Selector("remapValuesToCurveWithControlPoints:")] public void RemapValuesToCurveWithControlPoints(NSDictionary controlPoints);
     [Selector("remapValuesToTerracesWithPeaks:terracesInverted:")] public void RemapValuesToTerracesWithPeaksTerracesInverted(NSArray peakInputValues, bool inverted);
+    [Selector("moveBy:")] public void MoveBy(vector_double3 delta);
+    [Selector("scaleBy:")] public void ScaleBy(vector_double3 factor);
+    [Selector("rotateBy:")] public void RotateBy(vector_double3 radians);
     [Selector("addWithNoise:")] public void AddWithNoise(GKNoise noise);
     [Selector("multiplyWithNoise:")] public void MultiplyWithNoise(GKNoise noise);
     [Selector("minimumWithNoise:")] public void MinimumWithNoise(GKNoise noise);

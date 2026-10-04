@@ -117,4 +117,8 @@ public extern "C" void InvokeControlEditTextValidationUPP(ControlRef control, Co
 
 public extern "C" Boolean InvokeEditUnicodePostUpdateUPP(UniCharArrayHandle uniText, UniCharCount uniTextLength, UniCharArrayOffset iStartOffset, UniCharArrayOffset iEndOffset, void* refcon, EditUnicodePostUpdateUPP userUPP);
 
+public const CFStringRef kHIStaticTextViewClassID = "com.apple.HIStaticTextView";
+
+public const CFStringRef kHITextFieldClassID = "com.apple.HITextField";
+
 #endif

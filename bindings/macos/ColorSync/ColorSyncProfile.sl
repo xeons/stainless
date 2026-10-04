@@ -255,6 +255,8 @@ public const long icVersion4Number = 67108864;
 
 public const long icVersion4Point4Number = 71303168;
 
+public const byte* COLORSYNC_PROFILE_INSTALL_ENTITLEMENT = "com.apple.developer.ColorSync.profile.install";
+
 public const int COLORSYNC_MD5_LENGTH = 16;
 
 #endif

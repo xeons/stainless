@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Carbon")
@@ -100,5 +103,7 @@ public const int kControlScrollTextBoxDelayBetweenAutoScrollTag = 1935893612;
 public const int kControlScrollTextBoxAutoScrollAmountTag = 1935764852;
 public const int kControlScrollTextBoxContentsTag = 1953654131;
 public const int kControlScrollTextBoxAnimatingTag = 1634625901;
+
+public const CFStringRef kHIPictureViewClassID = "com.apple.HIPictureView";
 
 #endif

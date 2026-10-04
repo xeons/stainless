@@ -37,6 +37,9 @@ public objc interface OS_ar_anchor : NSObjectProtocol { }
 public using ar_anchor_t = NSObject;
 
 /// macOS 26.0 and later.
+public extern "C" simd_float4x4 ar_anchor_get_origin_from_anchor_transform(ar_anchor_t anchor);
+
+/// macOS 26.0 and later.
 public extern "C" void ar_anchor_get_identifier(ar_anchor_t anchor, byte* out_identifier);
 
 /// macOS 26.0 and later.

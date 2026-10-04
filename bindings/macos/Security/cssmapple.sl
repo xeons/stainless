@@ -607,6 +607,22 @@ public const int CSSM_TP_APPLE_EVIDENCE_VERSION = 0;
 
 public const uint CSSM_EVIDENCE_FORM_APPLE_CUSTOM = 2147483648u;
 
+public const byte* CSSM_APPLE_CRL_END_OF_TIME = "99991231235959";
+
+public const byte* kKeychainSuffix = ".keychain";
+
+public const byte* kKeychainDbSuffix = ".keychain-db";
+
+public const byte* kSystemKeychainName = "System.keychain";
+
+public const byte* kSystemKeychainDir = "/Library/Keychains/";
+
+public const byte* kSystemUnlockFile = "/var/db/SystemKey";
+
+public const byte* CSSM_APPLE_ACL_TAG_PARTITION_ID = "___PARTITION___";
+
+public const byte* CSSM_APPLE_ACL_TAG_INTEGRITY = "___INTEGRITY___";
+
 public const int errSecErrnoBase = 100000;
 
 public const int errSecErrnoLimit = 100255;

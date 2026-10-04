@@ -140,4 +140,10 @@ public extern "C" void FSEventStreamShow(ConstFSEventStreamRef streamRef);
 
 public extern "C" Boolean FSEventStreamSetExclusionPaths(FSEventStreamRef streamRef, CFArrayRef pathsToExclude);
 
+public const CFStringRef kFSEventStreamEventExtendedDataPathKey = "path";
+
+public const CFStringRef kFSEventStreamEventExtendedFileIDKey = "fileID";
+
+public const CFStringRef kFSEventStreamEventExtendedDocIDKey = "docID";
+
 #endif

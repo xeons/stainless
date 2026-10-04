@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -48,5 +50,9 @@ public const int kControlDisclosureTrianglePointLeft = 2;
 public const int kControlKindDisclosureTriangle = 1684632436;
 
 public const int kControlTriangleLastValueTag = 1818325876;
+
+public const CFStringRef kHIDisclosureButtonClassID = "com.apple.HIDisclosureButton";
+
+public const CFStringRef kHIDisclosureTriangleClassID = "com.apple.HIDisclosureTriangle";
 
 #endif

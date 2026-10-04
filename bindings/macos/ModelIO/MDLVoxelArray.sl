@@ -31,18 +31,32 @@ import Standard.ObjC;
 
 #pragma comment(framework, "ModelIO")
 
+public using MDLVoxelIndex = vector_int4;
+
+public struct MDLVoxelIndexExtent
+{
+    public MDLVoxelIndex minimumExtent;
+    public MDLVoxelIndex maximumExtent;
+}
+
 public extern objc class MDLVoxelArray : MDLObject
 {
     [Selector("count")] public NSUInteger Count { get; }
+    [Selector("voxelIndexExtent")] public MDLVoxelIndexExtent VoxelIndexExtent { get; }
+    [Selector("boundingBox")] public MDLAxisAlignedBoundingBox BoundingBox { get; }
     [Selector("isValidSignedShellField")] public bool IsValidSignedShellField { get; }
     [Selector("shellFieldInteriorThickness", "setShellFieldInteriorThickness:")] public float ShellFieldInteriorThickness { get; set; }
     [Selector("shellFieldExteriorThickness", "setShellFieldExteriorThickness:")] public float ShellFieldExteriorThickness { get; set; }
     [Selector("initWithAsset:divisions:patchRadius:")] public Self InitWithAssetDivisionsPatchRadius(MDLAsset asset, int divisions, float patchRadius);
+    [Selector("initWithData:boundingBox:voxelExtent:")] public Self InitWithDataBoundingBoxVoxelExtent(NSData voxelData, MDLAxisAlignedBoundingBox boundingBox, float voxelExtent);
     /// Deprecated in macOS 10.12.
     [Selector("initWithAsset:divisions:interiorShells:exteriorShells:patchRadius:")] public Self InitWithAssetDivisionsInteriorShellsExteriorShellsPatchRadius(MDLAsset asset, int divisions, int interiorShells, int exteriorShells, float patchRadius);
     /// Deprecated in macOS 10.12.
     [Selector("initWithAsset:divisions:interiorNBWidth:exteriorNBWidth:patchRadius:")] public Self InitWithAssetDivisionsInteriorNBWidthExteriorNBWidthPatchRadius(MDLAsset asset, int divisions, float interiorNBWidth, float exteriorNBWidth, float patchRadius);
+    [Selector("voxelExistsAtIndex:allowAnyX:allowAnyY:allowAnyZ:allowAnyShell:")] public bool VoxelExistsAtIndexAllowAnyXAllowAnyYAllowAnyZAllowAnyShell(MDLVoxelIndex index, bool allowAnyX, bool allowAnyY, bool allowAnyZ, bool allowAnyShell);
+    [Selector("voxelsWithinExtent:")] public NSData? VoxelsWithinExtent(MDLVoxelIndexExtent extent);
     [Selector("voxelIndices")] public NSData? VoxelIndices();
+    [Selector("setVoxelAtIndex:")] public void SetVoxelAtIndex(MDLVoxelIndex index);
     [Selector("setVoxelsForMesh:divisions:patchRadius:")] public void SetVoxelsForMeshDivisionsPatchRadius(MDLMesh mesh, int divisions, float patchRadius);
     /// Deprecated in macOS 10.12.
     [Selector("setVoxelsForMesh:divisions:interiorShells:exteriorShells:patchRadius:")] public void SetVoxelsForMeshDivisionsInteriorShellsExteriorShellsPatchRadius(MDLMesh mesh, int divisions, int interiorShells, int exteriorShells, float patchRadius);
@@ -51,6 +65,9 @@ public extern objc class MDLVoxelArray : MDLObject
     [Selector("unionWithVoxels:")] public void UnionWithVoxels(MDLVoxelArray voxels);
     [Selector("intersectWithVoxels:")] public void IntersectWithVoxels(MDLVoxelArray voxels);
     [Selector("differenceWithVoxels:")] public void DifferenceWithVoxels(MDLVoxelArray voxels);
+    [Selector("indexOfSpatialLocation:")] public MDLVoxelIndex IndexOfSpatialLocation(vector_float3 location);
+    [Selector("spatialLocationOfIndex:")] public vector_float3 SpatialLocationOfIndex(MDLVoxelIndex index);
+    [Selector("voxelBoundingBoxAtIndex:")] public MDLAxisAlignedBoundingBox VoxelBoundingBoxAtIndex(MDLVoxelIndex index);
     [Selector("convertToSignedShellField")] public void ConvertToSignedShellField();
     [Selector("coarseMesh")] public MDLMesh? CoarseMesh();
     [Selector("coarseMeshUsingAllocator:")] public MDLMesh? CoarseMeshUsingAllocator(MDLMeshBufferAllocator? allocator);

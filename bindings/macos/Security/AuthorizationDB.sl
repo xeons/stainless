@@ -37,4 +37,18 @@ public extern "C" OSStatus AuthorizationRightSet(AuthorizationRef authRef, byte*
 
 public extern "C" OSStatus AuthorizationRightRemove(AuthorizationRef authRef, byte* rightName);
 
+public const byte* kAuthorizationRightRule = "rule";
+
+public const byte* kAuthorizationRuleIsAdmin = "is-admin";
+
+public const byte* kAuthorizationRuleAuthenticateAsSessionUser = "authenticate-session-owner";
+
+public const byte* kAuthorizationRuleAuthenticateAsAdmin = "authenticate-admin";
+
+public const byte* kAuthorizationRuleClassAllow = "allow";
+
+public const byte* kAuthorizationRuleClassDeny = "deny";
+
+public const byte* kAuthorizationComment = "comment";
+
 #endif
