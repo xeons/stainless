@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CalendarStore/CalendarStore.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalAlarm.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalAttendee.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalCalendar.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalCalendarItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalCalendarStore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalRecurrenceRule.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalTask.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalendarStore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CalendarStore.framework/Headers/CalendarStoreErrors.h"
+#import <CalendarStore/CalAlarm.h>
+#import <CalendarStore/CalAttendee.h>
+#import <CalendarStore/CalCalendar.h>
+#import <CalendarStore/CalCalendarItem.h>
+#import <CalendarStore/CalCalendarStore.h>
+#import <CalendarStore/CalEvent.h>
+#import <CalendarStore/CalRecurrenceRule.h>
+#import <CalendarStore/CalTask.h>
+#import <CalendarStore/CalendarStore.h>
+#import <CalendarStore/CalendarStoreErrors.h>
 
 const long long sl_layout_64[] = {
     (long long)(CalSpanThisEvent),

@@ -2,11 +2,11 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <Social/Social.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Social.framework/Headers/SLComposeServiceViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Social.framework/Headers/SLRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Social.framework/Headers/SLServiceTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Social.framework/Headers/Social.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Social.framework/Headers/SocialDefines.h"
+#import <Social/SLComposeServiceViewController.h>
+#import <Social/SLRequest.h>
+#import <Social/SLServiceTypes.h>
+#import <Social/Social.h>
+#import <Social/SocialDefines.h>
 
 const long long sl_layout_156[] = {
     (long long)(SLRequestMethodGET),

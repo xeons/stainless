@@ -2,14 +2,14 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <IOBluetooth/IOBluetooth.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/Bluetooth.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/BluetoothAssignedNumbers.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/IOBluetooth.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/IOBluetoothTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/IOBluetoothUserLib.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/IOBluetoothUtilities.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/OBEX.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetooth.framework/Headers/OBEXBluetooth.h"
+#import <IOBluetooth/Bluetooth.h>
+#import <IOBluetooth/BluetoothAssignedNumbers.h>
+#import <IOBluetooth/IOBluetooth.h>
+#import <IOBluetooth/IOBluetoothTypes.h>
+#import <IOBluetooth/IOBluetoothUserLib.h>
+#import <IOBluetooth/IOBluetoothUtilities.h>
+#import <IOBluetooth/OBEX.h>
+#import <IOBluetooth/OBEXBluetooth.h>
 
 const long long sl_layout_100[] = {
     (long long)(kBluetoothCompanyIdentiferEricssonTechnologyLicensing),

@@ -142,9 +142,10 @@ exactly one expectation: `expected.txt` (it must compile, run, and print this)
 or `errors.txt` (it must fail, and every `SL####` the file names must be
 reported). Optional beside them: `args.txt`, `stdin.txt`, `warnings.txt`,
 `defines.txt`, `abi.txt`, `target.txt`, `platform.txt`, `sources.txt`,
-`libraries.txt`, and `expected.linux.txt` or `expected.macos.txt` for a case
+`libraries.txt`, `sdk.txt`, and `expected.linux.txt` or `expected.macos.txt` for a case
 whose subject genuinely differs by platform. A `platform.txt` names one
-platform per line. The comment at the top of
+platform per line. An `sdk.txt` names the macOS SDK a generated bindings case
+checks against; on a Mac with another SDK the case is skipped, saying so. The comment at the top of
 `tests/Stainless.Tests/Program.cs` is the full list, including the cases that
 stop at an object file and so have `ir.txt` in place of `expected.txt`.
 

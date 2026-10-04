@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <OSAKit/OSAKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSAKit.framework/Headers/OSAKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSAKit.framework/Headers/OSALanguage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSAKit.framework/Headers/OSALanguageInstance.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSAKit.framework/Headers/OSAScript.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSAKit.framework/Headers/OSAScriptController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSAKit.framework/Headers/OSAScriptView.h"
+#import <OSAKit/OSAKit.h>
+#import <OSAKit/OSALanguage.h>
+#import <OSAKit/OSALanguageInstance.h>
+#import <OSAKit/OSAScript.h>
+#import <OSAKit/OSAScriptController.h>
+#import <OSAKit/OSAScriptView.h>
 
 const long long sl_layout_131[] = {
     (long long)(OSASupportsCompiling),

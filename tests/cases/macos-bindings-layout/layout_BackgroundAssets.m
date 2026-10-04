@@ -2,22 +2,22 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <BackgroundAssets/BackgroundAssets.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAAppExtensionInfo.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAAssetPack.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAAssetPackManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAAssetPackManifest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAAssetPackStatus.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BABase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BADownload.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BADownloadManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BADownloaderExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAManagedAssetPackDownloadDelegate.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAManagedDownloaderExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAManagedError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BATypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BAURLDownload.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BackgroundAssets.framework/Headers/BackgroundAssets.h"
+#import <BackgroundAssets/BAAppExtensionInfo.h>
+#import <BackgroundAssets/BAAssetPack.h>
+#import <BackgroundAssets/BAAssetPackManager.h>
+#import <BackgroundAssets/BAAssetPackManifest.h>
+#import <BackgroundAssets/BAAssetPackStatus.h>
+#import <BackgroundAssets/BABase.h>
+#import <BackgroundAssets/BADownload.h>
+#import <BackgroundAssets/BADownloadManager.h>
+#import <BackgroundAssets/BADownloaderExtension.h>
+#import <BackgroundAssets/BAError.h>
+#import <BackgroundAssets/BAManagedAssetPackDownloadDelegate.h>
+#import <BackgroundAssets/BAManagedDownloaderExtension.h>
+#import <BackgroundAssets/BAManagedError.h>
+#import <BackgroundAssets/BATypes.h>
+#import <BackgroundAssets/BAURLDownload.h>
+#import <BackgroundAssets/BackgroundAssets.h>
 
 const long long sl_layout_61[] = {
     (long long)(BAContentRequestInstall),

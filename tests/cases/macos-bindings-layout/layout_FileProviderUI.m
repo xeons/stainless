@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <FileProviderUI/FileProviderUI.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProviderUI.framework/Headers/FPUIActionExtensionContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProviderUI.framework/Headers/FPUIActionExtensionViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProviderUI.framework/Headers/FPUIBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProviderUI.framework/Headers/FileProviderUI.h"
+#import <FileProviderUI/FPUIActionExtensionContext.h>
+#import <FileProviderUI/FPUIActionExtensionViewController.h>
+#import <FileProviderUI/FPUIBase.h>
+#import <FileProviderUI/FileProviderUI.h>
 
 const long long sl_layout_92[] = {
     (long long)(FPUIExtensionErrorCodeUserCancelled),

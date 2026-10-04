@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SoundAnalysis/SoundAnalysis.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNAnalyzer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNClassificationResult.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNClassifySoundRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNResult.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNTimeDurationConstraint.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SNTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SoundAnalysis.framework/Headers/SoundAnalysis.h"
+#import <SoundAnalysis/SNAnalyzer.h>
+#import <SoundAnalysis/SNClassificationResult.h>
+#import <SoundAnalysis/SNClassifySoundRequest.h>
+#import <SoundAnalysis/SNDefines.h>
+#import <SoundAnalysis/SNError.h>
+#import <SoundAnalysis/SNRequest.h>
+#import <SoundAnalysis/SNResult.h>
+#import <SoundAnalysis/SNTimeDurationConstraint.h>
+#import <SoundAnalysis/SNTypes.h>
+#import <SoundAnalysis/SoundAnalysis.h>
 
 const long long sl_layout_157[] = {
     (long long)(SNErrorCodeUnknownError),

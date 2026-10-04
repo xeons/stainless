@@ -2,15 +2,15 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <DiscRecordingUI/DiscRecordingUI.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DRBurnProgressPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DRBurnSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DRBurnSetupPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DREraseProgressPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DREraseSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DREraseSetupPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DRSetupPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DiscRecordingUI.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecordingUI.framework/Headers/DiscRecordingUIResources.h"
+#import <DiscRecordingUI/DRBurnProgressPanel.h>
+#import <DiscRecordingUI/DRBurnSession.h>
+#import <DiscRecordingUI/DRBurnSetupPanel.h>
+#import <DiscRecordingUI/DREraseProgressPanel.h>
+#import <DiscRecordingUI/DREraseSession.h>
+#import <DiscRecordingUI/DREraseSetupPanel.h>
+#import <DiscRecordingUI/DRSetupPanel.h>
+#import <DiscRecordingUI/DiscRecordingUI.h>
+#import <DiscRecordingUI/DiscRecordingUIResources.h>
 
 const long long sl_layout_85[] = {
     (long long)(kDRBurnSessionOK),

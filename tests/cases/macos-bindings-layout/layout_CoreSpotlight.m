@@ -2,25 +2,25 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreSpotlight/CoreSpotlight.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSImportExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSIndexExtensionRequestHandler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSPerson.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchQuery.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableIndex.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_Categories.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_Documents.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_Events.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_General.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_Images.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_Media.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_Messaging.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSearchableItemAttributeSet_Places.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSSuggestion.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CSUserQuery.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreSpotlight.framework/Headers/CoreSpotlight.h"
+#import <CoreSpotlight/CSBase.h>
+#import <CoreSpotlight/CSImportExtension.h>
+#import <CoreSpotlight/CSIndexExtensionRequestHandler.h>
+#import <CoreSpotlight/CSPerson.h>
+#import <CoreSpotlight/CSSearchQuery.h>
+#import <CoreSpotlight/CSSearchableIndex.h>
+#import <CoreSpotlight/CSSearchableItem.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_Categories.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_Documents.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_Events.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_General.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_Images.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_Media.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_Messaging.h>
+#import <CoreSpotlight/CSSearchableItemAttributeSet_Places.h>
+#import <CoreSpotlight/CSSuggestion.h>
+#import <CoreSpotlight/CSUserQuery.h>
+#import <CoreSpotlight/CoreSpotlight.h>
 
 const long long sl_layout_78[] = {
     (long long)(CSSearchableItemUpdateListenerOptionDefault),

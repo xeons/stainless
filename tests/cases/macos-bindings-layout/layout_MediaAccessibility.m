@@ -2,14 +2,14 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <MediaAccessibility/MediaAccessibility.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MAAudibleMedia.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MACaptionAppearance.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MADefinitions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MAFlashingLightsProcessing.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MAImageCaptioning.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MAMusicHaptics.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MAVideoAccommodations.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaAccessibility.framework/Headers/MediaAccessibility.h"
+#import <MediaAccessibility/MAAudibleMedia.h>
+#import <MediaAccessibility/MACaptionAppearance.h>
+#import <MediaAccessibility/MADefinitions.h>
+#import <MediaAccessibility/MAFlashingLightsProcessing.h>
+#import <MediaAccessibility/MAImageCaptioning.h>
+#import <MediaAccessibility/MAMusicHaptics.h>
+#import <MediaAccessibility/MAVideoAccommodations.h>
+#import <MediaAccessibility/MediaAccessibility.h>
 
 const long long sl_layout_117[] = {
     (long long)(kMACaptionAppearanceDomainDefault),

@@ -2,14 +2,14 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MCAdvertiserAssistant.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MCBrowserViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MCError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MCNearbyServiceAdvertiser.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MCNearbyServiceBrowser.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MCPeerID.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MCSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MultipeerConnectivity.framework/Headers/MultipeerConnectivity.h"
+#import <MultipeerConnectivity/MCAdvertiserAssistant.h>
+#import <MultipeerConnectivity/MCBrowserViewController.h>
+#import <MultipeerConnectivity/MCError.h>
+#import <MultipeerConnectivity/MCNearbyServiceAdvertiser.h>
+#import <MultipeerConnectivity/MCNearbyServiceBrowser.h>
+#import <MultipeerConnectivity/MCPeerID.h>
+#import <MultipeerConnectivity/MCSession.h>
+#import <MultipeerConnectivity/MultipeerConnectivity.h>
 
 const long long sl_layout_125[] = {
     (long long)(MCErrorUnknown),

@@ -2,9 +2,9 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <BusinessChat/BusinessChat.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BusinessChat.framework/Headers/BCChatAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BusinessChat.framework/Headers/BCChatButton.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/BusinessChat.framework/Headers/BusinessChat.h"
+#import <BusinessChat/BCChatAction.h>
+#import <BusinessChat/BCChatButton.h>
+#import <BusinessChat/BusinessChat.h>
 
 const long long sl_layout_63[] = {
     (long long)(BCChatButtonStyleLight),

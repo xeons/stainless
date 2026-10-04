@@ -2,22 +2,22 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <OpenGL/OpenGL.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/CGLContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/CGLCurrent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/CGLDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/CGLIOSurface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/CGLRenderers.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/CGLTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/OpenGL.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/OpenGLAvailability.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/glext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gliContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gliDispatch.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gltypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/glu.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gluContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gluMacro.h"
+#import <OpenGL/CGLContext.h>
+#import <OpenGL/CGLCurrent.h>
+#import <OpenGL/CGLDevice.h>
+#import <OpenGL/CGLIOSurface.h>
+#import <OpenGL/CGLRenderers.h>
+#import <OpenGL/CGLTypes.h>
+#import <OpenGL/OpenGL.h>
+#import <OpenGL/OpenGLAvailability.h>
+#import <OpenGL/gl.h>
+#import <OpenGL/glext.h>
+#import <OpenGL/gliContext.h>
+#import <OpenGL/gliDispatch.h>
+#import <OpenGL/gltypes.h>
+#import <OpenGL/glu.h>
+#import <OpenGL/gluContext.h>
+#import <OpenGL/gluMacro.h>
 
 const long long sl_layout_25[] = {
     (long long)(kCGLPFAAllRenderers),

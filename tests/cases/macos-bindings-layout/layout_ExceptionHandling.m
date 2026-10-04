@@ -2,9 +2,9 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ExceptionHandling/ExceptionHandling.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExceptionHandling.framework/Headers/ExceptionHandling.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExceptionHandling.framework/Headers/ExceptionHandlingDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExceptionHandling.framework/Headers/NSExceptionHandler.h"
+#import <ExceptionHandling/ExceptionHandling.h>
+#import <ExceptionHandling/ExceptionHandlingDefines.h>
+#import <ExceptionHandling/NSExceptionHandler.h>
 
 const long long sl_layout_87[] = {
     (long long)(NSLogUncaughtExceptionMask),

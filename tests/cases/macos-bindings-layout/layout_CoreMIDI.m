@@ -2,24 +2,24 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreMIDI/CoreMIDI.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/CoreMIDI.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIBluetoothConnection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDICIDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDICIDeviceManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDICapabilityInquiry.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIDriver.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIMessages.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDINetworkSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIServices.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDISetup.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIThruConnection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIUMPCI.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIUMPCIProfile.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIUMPEndpoint.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIUMPEndpointManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIUMPFunctionBlock.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIUMPMutableEndpoint.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMIDI.framework/Headers/MIDIUMPMutableFunctionBlock.h"
+#import <CoreMIDI/CoreMIDI.h>
+#import <CoreMIDI/MIDIBluetoothConnection.h>
+#import <CoreMIDI/MIDICIDevice.h>
+#import <CoreMIDI/MIDICIDeviceManager.h>
+#import <CoreMIDI/MIDICapabilityInquiry.h>
+#import <CoreMIDI/MIDIDriver.h>
+#import <CoreMIDI/MIDIMessages.h>
+#import <CoreMIDI/MIDINetworkSession.h>
+#import <CoreMIDI/MIDIServices.h>
+#import <CoreMIDI/MIDISetup.h>
+#import <CoreMIDI/MIDIThruConnection.h>
+#import <CoreMIDI/MIDIUMPCI.h>
+#import <CoreMIDI/MIDIUMPCIProfile.h>
+#import <CoreMIDI/MIDIUMPEndpoint.h>
+#import <CoreMIDI/MIDIUMPEndpointManager.h>
+#import <CoreMIDI/MIDIUMPFunctionBlock.h>
+#import <CoreMIDI/MIDIUMPMutableEndpoint.h>
+#import <CoreMIDI/MIDIUMPMutableFunctionBlock.h>
 
 const long long sl_layout_13[] = {
     (long long)(kMIDIInvalidClient),

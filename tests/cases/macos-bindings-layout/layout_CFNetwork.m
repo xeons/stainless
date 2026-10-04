@@ -2,18 +2,18 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CFNetwork/CFNetwork.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFFTPStream.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFHTTPAuthentication.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFHTTPMessage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFHTTPStream.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFHost.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFNetDiagnostics.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFNetServices.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFNetwork.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFNetworkDefs.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFNetworkErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFProxySupport.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CFNetwork.framework/Headers/CFSocketStream.h"
+#import <CFNetwork/CFFTPStream.h>
+#import <CFNetwork/CFHTTPAuthentication.h>
+#import <CFNetwork/CFHTTPMessage.h>
+#import <CFNetwork/CFHTTPStream.h>
+#import <CFNetwork/CFHost.h>
+#import <CFNetwork/CFNetDiagnostics.h>
+#import <CFNetwork/CFNetServices.h>
+#import <CFNetwork/CFNetwork.h>
+#import <CFNetwork/CFNetworkDefs.h>
+#import <CFNetwork/CFNetworkErrors.h>
+#import <CFNetwork/CFProxySupport.h>
+#import <CFNetwork/CFSocketStream.h>
 
 const long long sl_layout_16[] = {
     (long long)(kCFHostErrorHostNotFound),

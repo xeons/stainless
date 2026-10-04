@@ -510,6 +510,16 @@ public class BindgenTests
     public void AStringMacroThatIsNotALiteralIsNoString(string body) =>
         Assert.Null(CStringLiterals.Decode(body));
 
+    /// <summary>A layout case's imports are relative to the SDK, so it compiles wherever that is installed.</summary>
+    [Theory]
+    [InlineData("#import \"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/session.h\"",
+                "#import <ARKit/session.h>")]
+    [InlineData("#import \"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/Headers/Events.h\"",
+                "#import <Carbon/../Frameworks/HIToolbox.framework/Headers/Events.h>")]
+    [InlineData("#import <Foundation/Foundation.h>", "#import <Foundation/Foundation.h>")]
+    public void ALayoutCaseImportsRelativeToTheSdk(string written, string portable) =>
+        Assert.Equal(portable, LayoutCase.Portable(written));
+
     [Fact]
     public void TextIsWrittenAsAnAsciiStainlessLiteral() =>
         Assert.Equal(@"""a\""b\\c\u000A\u00E9\U0001F600""", CStringLiterals.Spell("a\"b\\c\n\u00e9\U0001F600"));

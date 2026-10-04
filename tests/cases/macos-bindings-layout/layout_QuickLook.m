@@ -2,11 +2,11 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <QuickLook/QuickLook.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLook.framework/Headers/QLBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLook.framework/Headers/QLGenerator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLook.framework/Headers/QLThumbnail.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLook.framework/Headers/QLThumbnailImage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLook.framework/Headers/QuickLook.h"
+#import <QuickLook/QLBase.h>
+#import <QuickLook/QLGenerator.h>
+#import <QuickLook/QLThumbnail.h>
+#import <QuickLook/QLThumbnailImage.h>
+#import <QuickLook/QuickLook.h>
 
 const long long sl_layout_143[] = {
     (long long)(kQLPreviewPDFStandardStyle),

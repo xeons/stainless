@@ -2,7 +2,7 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <TWAIN/TWAIN.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/TWAIN.framework/Headers/TWAIN.h"
+#import <TWAIN/TWAIN.h>
 
 const long long sl_layout_38[] = {
     (long long)(sizeof(struct TW_FIX32)),

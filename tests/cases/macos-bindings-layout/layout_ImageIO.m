@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ImageIO/ImageIO.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageIO.framework/Headers/CGImageAnimation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageIO.framework/Headers/CGImageDestination.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageIO.framework/Headers/CGImageMetadata.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageIO.framework/Headers/CGImageProperties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageIO.framework/Headers/CGImageSource.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageIO.framework/Headers/ImageIO.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageIO.framework/Headers/ImageIOBase.h"
+#import <ImageIO/CGImageAnimation.h>
+#import <ImageIO/CGImageDestination.h>
+#import <ImageIO/CGImageMetadata.h>
+#import <ImageIO/CGImageProperties.h>
+#import <ImageIO/CGImageSource.h>
+#import <ImageIO/ImageIO.h>
+#import <ImageIO/ImageIOBase.h>
 
 const long long sl_layout_10[] = {
     (long long)(kCGImageMetadataTypeInvalid),

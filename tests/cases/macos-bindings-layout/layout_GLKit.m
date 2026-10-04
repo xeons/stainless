@@ -2,31 +2,31 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <GLKit/GLKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKBaseEffect.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKEffectProperty.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKEffectPropertyFog.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKEffectPropertyLight.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKEffectPropertyMaterial.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKEffectPropertyTexture.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKEffectPropertyTransform.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKEffects.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKMath.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKMathTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKMathUtils.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKMatrix3.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKMatrix4.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKMatrixStack.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKModel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKNamedEffect.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKQuaternion.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKReflectionMapEffect.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKSkyboxEffect.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKTextureLoader.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKVector2.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKVector3.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKVector4.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLKit.framework/Headers/GLKitBase.h"
+#import <GLKit/GLKBaseEffect.h>
+#import <GLKit/GLKEffectProperty.h>
+#import <GLKit/GLKEffectPropertyFog.h>
+#import <GLKit/GLKEffectPropertyLight.h>
+#import <GLKit/GLKEffectPropertyMaterial.h>
+#import <GLKit/GLKEffectPropertyTexture.h>
+#import <GLKit/GLKEffectPropertyTransform.h>
+#import <GLKit/GLKEffects.h>
+#import <GLKit/GLKMath.h>
+#import <GLKit/GLKMathTypes.h>
+#import <GLKit/GLKMathUtils.h>
+#import <GLKit/GLKMatrix3.h>
+#import <GLKit/GLKMatrix4.h>
+#import <GLKit/GLKMatrixStack.h>
+#import <GLKit/GLKModel.h>
+#import <GLKit/GLKNamedEffect.h>
+#import <GLKit/GLKQuaternion.h>
+#import <GLKit/GLKReflectionMapEffect.h>
+#import <GLKit/GLKSkyboxEffect.h>
+#import <GLKit/GLKTextureLoader.h>
+#import <GLKit/GLKVector2.h>
+#import <GLKit/GLKVector3.h>
+#import <GLKit/GLKVector4.h>
+#import <GLKit/GLKit.h>
+#import <GLKit/GLKitBase.h>
 
 const long long sl_layout_94[] = {
     (long long)(sizeof(struct _GLKVertexAttributeParameters)),

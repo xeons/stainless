@@ -2,7 +2,7 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <vmnet/vmnet.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/vmnet.framework/Headers/vmnet.h"
+#import <vmnet/vmnet.h>
 
 const long long sl_layout_39[] = {
     (long long)(VMNET_HOST_MODE),

@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <MetalFX/MetalFX.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTL4FXFrameInterpolator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTL4FXSpatialScaler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTL4FXTemporalDenoisedScaler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTL4FXTemporalScaler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTLFXDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTLFXFrameInterpolator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTLFXSpatialScaler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTLFXTemporalDenoisedScaler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MTLFXTemporalScaler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalFX.framework/Headers/MetalFX.h"
+#import <MetalFX/MTL4FXFrameInterpolator.h>
+#import <MetalFX/MTL4FXSpatialScaler.h>
+#import <MetalFX/MTL4FXTemporalDenoisedScaler.h>
+#import <MetalFX/MTL4FXTemporalScaler.h>
+#import <MetalFX/MTLFXDefines.h>
+#import <MetalFX/MTLFXFrameInterpolator.h>
+#import <MetalFX/MTLFXSpatialScaler.h>
+#import <MetalFX/MTLFXTemporalDenoisedScaler.h>
+#import <MetalFX/MTLFXTemporalScaler.h>
+#import <MetalFX/MetalFX.h>
 
 const long long sl_layout_121[] = {
     (long long)(MTLFXSpatialScalerColorProcessingModePerceptual),

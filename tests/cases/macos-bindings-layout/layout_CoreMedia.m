@@ -2,26 +2,26 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreMedia/CoreMedia.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMAttachment.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMAudioClock.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMAudioDeviceClock.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMBlockBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMBufferQueue.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMFormatDescription.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMFormatDescriptionBridge.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMMemoryPool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMMetadata.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMSampleBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMSimpleQueue.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMSync.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMTag.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMTagCollection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMTaggedBufferGroup.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMTextMarkup.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMTime.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CMTimeRange.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMedia.framework/Headers/CoreMedia.h"
+#import <CoreMedia/CMAttachment.h>
+#import <CoreMedia/CMAudioClock.h>
+#import <CoreMedia/CMAudioDeviceClock.h>
+#import <CoreMedia/CMBase.h>
+#import <CoreMedia/CMBlockBuffer.h>
+#import <CoreMedia/CMBufferQueue.h>
+#import <CoreMedia/CMFormatDescription.h>
+#import <CoreMedia/CMFormatDescriptionBridge.h>
+#import <CoreMedia/CMMemoryPool.h>
+#import <CoreMedia/CMMetadata.h>
+#import <CoreMedia/CMSampleBuffer.h>
+#import <CoreMedia/CMSimpleQueue.h>
+#import <CoreMedia/CMSync.h>
+#import <CoreMedia/CMTag.h>
+#import <CoreMedia/CMTagCollection.h>
+#import <CoreMedia/CMTaggedBufferGroup.h>
+#import <CoreMedia/CMTextMarkup.h>
+#import <CoreMedia/CMTime.h>
+#import <CoreMedia/CMTimeRange.h>
+#import <CoreMedia/CoreMedia.h>
 
 const long long sl_layout_21[] = {
     (long long)(kCMPersistentTrackID_Invalid),

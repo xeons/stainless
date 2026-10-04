@@ -42,6 +42,21 @@ runs:
           sudo softwareupdate --install-rosetta --agree-to-license
         fi
 
+    # The generated bindings cases check what one SDK's headers say, and
+    # sdk.txt names it. The Xcode that ships it is selected, and SDKROOT is
+    # what Homebrew's clang compiles against; without that Xcode the cases
+    # are skipped, saying why.
+    - name: Select the SDK the bindings were generated from
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        version=$(tr -d '[:space:]' < tests/cases/macos-bindings-layout/sdk.txt)
+        if [ -d "/Applications/Xcode_$version.app" ]; then
+          sudo xcode-select -s "/Applications/Xcode_$version.app"
+        fi
+        echo "SDKROOT=$(xcrun --show-sdk-path)" >> "$GITHUB_ENV"
+        xcrun --show-sdk-version
+
     # The Windows image ships LLVM in C:\Program Files\LLVM, which the compiler
     # searches after PATH.
     - name: Report clang

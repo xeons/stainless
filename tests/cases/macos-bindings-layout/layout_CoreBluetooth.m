@@ -2,25 +2,25 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreBluetooth/CoreBluetooth.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBATTRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBAdvertisementData.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBAttribute.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBCentral.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBCentralManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBCentralManagerConstants.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBCharacteristic.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBDescriptor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBL2CAPChannel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBPeer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBPeripheral.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBPeripheralManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBPeripheralManagerConstants.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBService.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CBUUID.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreBluetooth.framework/Headers/CoreBluetooth.h"
+#import <CoreBluetooth/CBATTRequest.h>
+#import <CoreBluetooth/CBAdvertisementData.h>
+#import <CoreBluetooth/CBAttribute.h>
+#import <CoreBluetooth/CBCentral.h>
+#import <CoreBluetooth/CBCentralManager.h>
+#import <CoreBluetooth/CBCentralManagerConstants.h>
+#import <CoreBluetooth/CBCharacteristic.h>
+#import <CoreBluetooth/CBDefines.h>
+#import <CoreBluetooth/CBDescriptor.h>
+#import <CoreBluetooth/CBError.h>
+#import <CoreBluetooth/CBL2CAPChannel.h>
+#import <CoreBluetooth/CBManager.h>
+#import <CoreBluetooth/CBPeer.h>
+#import <CoreBluetooth/CBPeripheral.h>
+#import <CoreBluetooth/CBPeripheralManager.h>
+#import <CoreBluetooth/CBPeripheralManagerConstants.h>
+#import <CoreBluetooth/CBService.h>
+#import <CoreBluetooth/CBUUID.h>
+#import <CoreBluetooth/CoreBluetooth.h>
 
 const long long sl_layout_72[] = {
     (long long)(CBManagerStateUnknown),

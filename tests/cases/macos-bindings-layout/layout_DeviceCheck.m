@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <DeviceCheck/DeviceCheck.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceCheck.framework/Headers/DCAppAttestService.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceCheck.framework/Headers/DCDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceCheck.framework/Headers/DCError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceCheck.framework/Headers/DeviceCheck.h"
+#import <DeviceCheck/DCAppAttestService.h>
+#import <DeviceCheck/DCDevice.h>
+#import <DeviceCheck/DCError.h>
+#import <DeviceCheck/DeviceCheck.h>
 
 const long long sl_layout_82[] = {
     (long long)(DCErrorUnknownSystemFailure),

@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <DiskArbitration/DiskArbitration.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiskArbitration.framework/Headers/DADisk.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiskArbitration.framework/Headers/DADissenter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiskArbitration.framework/Headers/DASession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiskArbitration.framework/Headers/DiskArbitration.h"
+#import <DiskArbitration/DADisk.h>
+#import <DiskArbitration/DADissenter.h>
+#import <DiskArbitration/DASession.h>
+#import <DiskArbitration/DiskArbitration.h>
 
 const long long sl_layout_8[] = {
     (long long)(kDAReturnSuccess),

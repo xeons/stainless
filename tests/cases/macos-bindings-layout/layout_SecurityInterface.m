@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SecurityInterface/SecurityInterface.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFAuthorizationPluginView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFAuthorizationView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFCertificatePanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFCertificateTrustPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFCertificateView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFChooseIdentityPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFChooseIdentityTableCellView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFKeychainSavePanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SFKeychainSettingsPanel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SecurityInterface.framework/Headers/SecurityInterface.h"
+#import <SecurityInterface/SFAuthorizationPluginView.h>
+#import <SecurityInterface/SFAuthorizationView.h>
+#import <SecurityInterface/SFCertificatePanel.h>
+#import <SecurityInterface/SFCertificateTrustPanel.h>
+#import <SecurityInterface/SFCertificateView.h>
+#import <SecurityInterface/SFChooseIdentityPanel.h>
+#import <SecurityInterface/SFChooseIdentityTableCellView.h>
+#import <SecurityInterface/SFKeychainSavePanel.h>
+#import <SecurityInterface/SFKeychainSettingsPanel.h>
+#import <SecurityInterface/SecurityInterface.h>
 
 const long long sl_layout_151[] = {
     (long long)(SFButtonTypeCancel),

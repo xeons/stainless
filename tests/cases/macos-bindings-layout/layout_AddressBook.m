@@ -2,26 +2,26 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AddressBook/AddressBook.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABActions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABActionsC.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABAddressBook.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABAddressBookC.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABGlobals.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABGlobalsC.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABGroup.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABImageLoading.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABMultiValue.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABPeoplePickerC.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABPeoplePickerView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABPerson.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABPersonPicker.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABPersonPickerDelegate.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABPersonView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABRecord.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABSearchElement.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/ABTypedefs.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/AddressBook.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AddressBook.framework/Headers/AddressBookUI.h"
+#import <AddressBook/ABActions.h>
+#import <AddressBook/ABActionsC.h>
+#import <AddressBook/ABAddressBook.h>
+#import <AddressBook/ABAddressBookC.h>
+#import <AddressBook/ABGlobals.h>
+#import <AddressBook/ABGlobalsC.h>
+#import <AddressBook/ABGroup.h>
+#import <AddressBook/ABImageLoading.h>
+#import <AddressBook/ABMultiValue.h>
+#import <AddressBook/ABPeoplePickerC.h>
+#import <AddressBook/ABPeoplePickerView.h>
+#import <AddressBook/ABPerson.h>
+#import <AddressBook/ABPersonPicker.h>
+#import <AddressBook/ABPersonPickerDelegate.h>
+#import <AddressBook/ABPersonView.h>
+#import <AddressBook/ABRecord.h>
+#import <AddressBook/ABSearchElement.h>
+#import <AddressBook/ABTypedefs.h>
+#import <AddressBook/AddressBook.h>
+#import <AddressBook/AddressBookUI.h>
 
 const long long sl_layout_55[] = {
     (long long)(kABErrorInProperty),

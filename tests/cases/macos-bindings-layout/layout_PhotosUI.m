@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <PhotosUI/PhotosUI.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHContentEditingController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHLivePhotoView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHPicker.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHProjectExtensionContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHProjectExtensionController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHProjectInfo.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHProjectTypeDescription.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PHProjectTypeDescriptionDataSource.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PhotosUI.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PhotosUI.framework/Headers/PhotosUITypes.h"
+#import <PhotosUI/PHContentEditingController.h>
+#import <PhotosUI/PHLivePhotoView.h>
+#import <PhotosUI/PHPicker.h>
+#import <PhotosUI/PHProjectExtensionContext.h>
+#import <PhotosUI/PHProjectExtensionController.h>
+#import <PhotosUI/PHProjectInfo.h>
+#import <PhotosUI/PHProjectTypeDescription.h>
+#import <PhotosUI/PHProjectTypeDescriptionDataSource.h>
+#import <PhotosUI/PhotosUI.h>
+#import <PhotosUI/PhotosUITypes.h>
 
 const long long sl_layout_140[] = {
     (long long)(PHLivePhotoViewPlaybackStyleUndefined),

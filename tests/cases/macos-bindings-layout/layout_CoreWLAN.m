@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreWLAN/CoreWLAN.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CWChannel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CWConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CWInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CWNetwork.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CWNetworkProfile.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CWWiFiClient.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CoreWLAN.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CoreWLANConstants.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CoreWLANTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreWLAN.framework/Headers/CoreWLANUtil.h"
+#import <CoreWLAN/CWChannel.h>
+#import <CoreWLAN/CWConfiguration.h>
+#import <CoreWLAN/CWInterface.h>
+#import <CoreWLAN/CWNetwork.h>
+#import <CoreWLAN/CWNetworkProfile.h>
+#import <CoreWLAN/CWWiFiClient.h>
+#import <CoreWLAN/CoreWLAN.h>
+#import <CoreWLAN/CoreWLANConstants.h>
+#import <CoreWLAN/CoreWLANTypes.h>
+#import <CoreWLAN/CoreWLANUtil.h>
 
 const long long sl_layout_80[] = {
     (long long)(kCWNoErr),

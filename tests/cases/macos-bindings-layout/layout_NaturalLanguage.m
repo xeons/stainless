@@ -2,17 +2,17 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <NaturalLanguage/NaturalLanguage.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLContextualEmbedding.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLEmbedding.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLGazetteer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLLanguage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLLanguageRecognizer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLModel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLScript.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLTagScheme.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLTagger.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NLTokenizer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NaturalLanguage.framework/Headers/NaturalLanguage.h"
+#import <NaturalLanguage/NLContextualEmbedding.h>
+#import <NaturalLanguage/NLEmbedding.h>
+#import <NaturalLanguage/NLGazetteer.h>
+#import <NaturalLanguage/NLLanguage.h>
+#import <NaturalLanguage/NLLanguageRecognizer.h>
+#import <NaturalLanguage/NLModel.h>
+#import <NaturalLanguage/NLScript.h>
+#import <NaturalLanguage/NLTagScheme.h>
+#import <NaturalLanguage/NLTagger.h>
+#import <NaturalLanguage/NLTokenizer.h>
+#import <NaturalLanguage/NaturalLanguage.h>
 
 const long long sl_layout_126[] = {
     (long long)(NLDistanceTypeCosine),

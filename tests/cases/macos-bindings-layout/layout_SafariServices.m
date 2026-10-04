@@ -2,25 +2,25 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SafariServices/SafariServices.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFContentBlockerManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFContentBlockerState.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFFoundation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariApplication.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariExtensionHandler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariExtensionHandling.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariExtensionManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariExtensionState.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariExtensionViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariPage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariPageProperties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariTab.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariToolbarItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSafariWindow.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFSwiftOverlaySupport.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SFUniversalLink.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafariServices.framework/Headers/SafariServices.h"
+#import <SafariServices/SFContentBlockerManager.h>
+#import <SafariServices/SFContentBlockerState.h>
+#import <SafariServices/SFError.h>
+#import <SafariServices/SFFoundation.h>
+#import <SafariServices/SFSafariApplication.h>
+#import <SafariServices/SFSafariExtension.h>
+#import <SafariServices/SFSafariExtensionHandler.h>
+#import <SafariServices/SFSafariExtensionHandling.h>
+#import <SafariServices/SFSafariExtensionManager.h>
+#import <SafariServices/SFSafariExtensionState.h>
+#import <SafariServices/SFSafariExtensionViewController.h>
+#import <SafariServices/SFSafariPage.h>
+#import <SafariServices/SFSafariPageProperties.h>
+#import <SafariServices/SFSafariTab.h>
+#import <SafariServices/SFSafariToolbarItem.h>
+#import <SafariServices/SFSafariWindow.h>
+#import <SafariServices/SFSwiftOverlaySupport.h>
+#import <SafariServices/SFUniversalLink.h>
+#import <SafariServices/SafariServices.h>
 
 const long long sl_layout_147[] = {
     (long long)(SFErrorNoExtensionFound),

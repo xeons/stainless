@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <OSLog/OSLog.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/Entry.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/EntryActivity.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/EntryBoundary.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/EntryLog.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/EntrySignpost.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/Enumerator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/MessageComponent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/OSLog.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/Position.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OSLog.framework/Headers/Store.h"
+#import <OSLog/Entry.h>
+#import <OSLog/EntryActivity.h>
+#import <OSLog/EntryBoundary.h>
+#import <OSLog/EntryLog.h>
+#import <OSLog/EntrySignpost.h>
+#import <OSLog/Enumerator.h>
+#import <OSLog/MessageComponent.h>
+#import <OSLog/OSLog.h>
+#import <OSLog/Position.h>
+#import <OSLog/Store.h>
 
 const long long sl_layout_132[] = {
     (long long)(OSLogEntryStoreCategoryUndefined),

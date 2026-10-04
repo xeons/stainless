@@ -41,7 +41,8 @@ internal static class CaseSelection
     /// Apple silicon host can run Intel binaries.
     /// </summary>
     public static string? FindSkipReason(
-        string directory, TargetPlatform host, TargetPlatform? defaultTarget = null, bool rosetta = false)
+        string directory, TargetPlatform host, TargetPlatform? defaultTarget = null, bool rosetta = false,
+        Func<string?>? macSdkVersion = null)
     {
         string platformPath = Path.Combine(directory, "platform.txt");
         if (File.Exists(platformPath))
@@ -57,6 +58,17 @@ internal static class CaseSelection
                     throw new InvalidOperationException($"unknown platform '{named}'");
             if (!wanted.Contains(FormatPlatformName(host.Os)))
                 return $"{string.Join(" and ", wanted)} only";
+        }
+
+        // A case generated from one macOS SDK checks what that SDK says, and
+        // another SDK says other things without anything being wrong.
+        string sdkPath = Path.Combine(directory, "sdk.txt");
+        if (File.Exists(sdkPath) && host.Os == TargetOS.MacOS)
+        {
+            string wanted = File.ReadAllText(sdkPath).Trim();
+            string? found = macSdkVersion?.Invoke();
+            if (found != wanted)
+                return $"generated from the macOS {wanted} SDK, and this machine's is {found ?? "unknown"}";
         }
 
         string targetPath = Path.Combine(directory, "target.txt");
@@ -137,6 +149,35 @@ internal static class CaseSelection
     /// Whether this Mac has Rosetta. The runtime it installs is what an Intel
     /// binary is translated by, and it is absent until someone installs it.
     /// </summary>
+    /// <summary>
+    /// The version of the macOS SDK clang builds against here -- SDKROOT's when
+    /// that is set, as it is for Homebrew's clang, else xcrun's -- or null.
+    /// </summary>
+    public static string? MacSdkVersion()
+    {
+        try
+        {
+            string? sdk = Environment.GetEnvironmentVariable("SDKROOT");
+            if (string.IsNullOrEmpty(sdk))
+            {
+                using var xcrun = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                    "xcrun", "--show-sdk-path") { RedirectStandardOutput = true, UseShellExecute = false });
+                if (xcrun is null) return null;
+                sdk = xcrun.StandardOutput.ReadToEnd().Trim();
+                xcrun.WaitForExit();
+            }
+
+            using var settings = System.Text.Json.JsonDocument.Parse(
+                File.ReadAllText(Path.Combine(sdk, "SDKSettings.json")));
+            return settings.RootElement.GetProperty("Version").GetString();
+        }
+        catch (Exception e) when (e is IOException or System.ComponentModel.Win32Exception
+                                    or System.Text.Json.JsonException or KeyNotFoundException)
+        {
+            return null;
+        }
+    }
+
     public static bool HasRosetta =>
         OperatingSystem.IsMacOS() && File.Exists("/Library/Apple/usr/libexec/oah/libRosettaRuntime");
 

@@ -2,8 +2,8 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <UserNotificationsUI/UserNotificationsUI.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotificationsUI.framework/Headers/UNNotificationContentExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotificationsUI.framework/Headers/UserNotificationsUI.h"
+#import <UserNotificationsUI/UNNotificationContentExtension.h>
+#import <UserNotificationsUI/UserNotificationsUI.h>
 
 const long long sl_layout_164[] = {
     (long long)(UNNotificationContentExtensionMediaPlayPauseButtonTypeNone),

@@ -2,20 +2,20 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SyncServices/SyncServices.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncChange.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncClient.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncCommon.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncConflictPropertyType.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncCoreData.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncFilter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncRecordReference.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncRecordSnapshot.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncSessionDriver.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/ISyncUIHelper.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/SyncServices.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SyncServices.framework/Headers/SyncServicesErrors.h"
+#import <SyncServices/ISyncChange.h>
+#import <SyncServices/ISyncClient.h>
+#import <SyncServices/ISyncCommon.h>
+#import <SyncServices/ISyncConflictPropertyType.h>
+#import <SyncServices/ISyncCoreData.h>
+#import <SyncServices/ISyncFilter.h>
+#import <SyncServices/ISyncManager.h>
+#import <SyncServices/ISyncRecordReference.h>
+#import <SyncServices/ISyncRecordSnapshot.h>
+#import <SyncServices/ISyncSession.h>
+#import <SyncServices/ISyncSessionDriver.h>
+#import <SyncServices/ISyncUIHelper.h>
+#import <SyncServices/SyncServices.h>
+#import <SyncServices/SyncServicesErrors.h>
 
 const long long sl_layout_161[] = {
     (long long)(ISyncChangeTypeNone),

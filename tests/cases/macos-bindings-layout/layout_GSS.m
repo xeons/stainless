@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <GSS/GSS.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GSS.framework/Headers/GSS.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GSS.framework/Headers/gssapi.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GSS.framework/Headers/gssapi_apple.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GSS.framework/Headers/gssapi_krb5.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GSS.framework/Headers/gssapi_oid.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GSS.framework/Headers/gssapi_protos.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GSS.framework/Headers/gssapi_spnego.h"
+#import <GSS/GSS.h>
+#import <GSS/gssapi.h>
+#import <GSS/gssapi_apple.h>
+#import <GSS/gssapi_krb5.h>
+#import <GSS/gssapi_oid.h>
+#import <GSS/gssapi_protos.h>
+#import <GSS/gssapi_spnego.h>
 
 const long long sl_layout_32[] = {
     (long long)(sizeof(struct gss_OID_desc_struct)),

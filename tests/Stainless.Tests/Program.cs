@@ -113,6 +113,10 @@ namespace Stainless.Tests;
 /// line -- windows, linux or macos -- and is reported as skipped elsewhere.
 /// Only a case that cannot mean anything on another platform should have one.
 ///
+/// A case containing sdk.txt was generated from the macOS SDK of that version,
+/// and runs only on a Mac whose SDK -- SDKROOT's, else xcrun's -- is the same:
+/// the generated bindings cases check what one SDK's headers say.
+///
 /// A case containing expected.windows.txt, expected.linux.txt or
 /// expected.macos.txt is measured against that instead of expected.txt where it
 /// applies. That is for a case whose subject really does differ -- `Path.Join`
@@ -229,7 +233,8 @@ internal static class Program
             string name = Path.GetFileName(directory);
 
             if (CaseSelection.FindSkipReason(
-                    directory, Binding.TargetPlatform.Host, s_defaultTarget, CaseSelection.HasRosetta) is { } reason)
+                    directory, Binding.TargetPlatform.Host, s_defaultTarget, CaseSelection.HasRosetta,
+                    () => s_macSdkVersion.Value) is { } reason)
             {
                 skipped++;
                 Console.WriteLine($"  \u001b[33mskip\u001b[0m  {name}  ({reason})");
@@ -303,6 +308,9 @@ internal static class Program
 
     /// <summary>What a case without a target.txt is built for: null is the host.</summary>
     private static Binding.TargetPlatform? s_defaultTarget;
+
+    /// <summary>Asked once, and only if a case records an SDK.</summary>
+    private static readonly Lazy<string?> s_macSdkVersion = new(CaseSelection.MacSdkVersion);
 
     /// <summary>
     /// The calls to sl_retain and sl_release every report counted, summed, which

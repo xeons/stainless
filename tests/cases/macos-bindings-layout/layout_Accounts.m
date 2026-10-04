@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <Accounts/Accounts.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accounts.framework/Headers/ACAccount.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accounts.framework/Headers/ACAccountCredential.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accounts.framework/Headers/ACAccountStore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accounts.framework/Headers/ACAccountType.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accounts.framework/Headers/ACError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accounts.framework/Headers/Accounts.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accounts.framework/Headers/AccountsDefines.h"
+#import <Accounts/ACAccount.h>
+#import <Accounts/ACAccountCredential.h>
+#import <Accounts/ACAccountStore.h>
+#import <Accounts/ACAccountType.h>
+#import <Accounts/ACError.h>
+#import <Accounts/Accounts.h>
+#import <Accounts/AccountsDefines.h>
 
 const long long sl_layout_53[] = {
     (long long)(ACAccountCredentialRenewResultRenewed),

@@ -2,21 +2,21 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SharedWithYou/SharedWithYou.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/NSItemProvider+SWCollaborationMetadata.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/NSPasteboardItem+SWCollaborationMetadata.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWAttributionView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWCollaborationHighlight.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWCollaborationView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWHighlight.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWHighlightCenter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWHighlightChangeEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWHighlightEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWHighlightMembershipEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWHighlightMentionEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWHighlightPersistenceEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SWRemoveParticipantAlert.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SharedWithYou.framework/Headers/SharedWithYou.h"
+#import <SharedWithYou/NSItemProvider+SWCollaborationMetadata.h>
+#import <SharedWithYou/NSPasteboardItem+SWCollaborationMetadata.h>
+#import <SharedWithYou/SWAttributionView.h>
+#import <SharedWithYou/SWCollaborationHighlight.h>
+#import <SharedWithYou/SWCollaborationView.h>
+#import <SharedWithYou/SWErrors.h>
+#import <SharedWithYou/SWHighlight.h>
+#import <SharedWithYou/SWHighlightCenter.h>
+#import <SharedWithYou/SWHighlightChangeEvent.h>
+#import <SharedWithYou/SWHighlightEvent.h>
+#import <SharedWithYou/SWHighlightMembershipEvent.h>
+#import <SharedWithYou/SWHighlightMentionEvent.h>
+#import <SharedWithYou/SWHighlightPersistenceEvent.h>
+#import <SharedWithYou/SWRemoveParticipantAlert.h>
+#import <SharedWithYou/SharedWithYou.h>
 
 const long long sl_layout_154[] = {
     (long long)(SWHighlightCenterErrorCodeNoError),

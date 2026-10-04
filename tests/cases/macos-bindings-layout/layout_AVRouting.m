@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AVRouting/AVRouting.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVRouting.framework/Headers/AVCustomDeviceRoute.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVRouting.framework/Headers/AVCustomRoutingActionItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVRouting.framework/Headers/AVCustomRoutingController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVRouting.framework/Headers/AVCustomRoutingEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVRouting.framework/Headers/AVRouting.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVRouting.framework/Headers/AVRoutingDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVRouting.framework/Headers/AVRoutingPlaybackArbiter.h"
+#import <AVRouting/AVCustomDeviceRoute.h>
+#import <AVRouting/AVCustomRoutingActionItem.h>
+#import <AVRouting/AVCustomRoutingController.h>
+#import <AVRouting/AVCustomRoutingEvent.h>
+#import <AVRouting/AVRouting.h>
+#import <AVRouting/AVRoutingDefines.h>
+#import <AVRouting/AVRoutingPlaybackArbiter.h>
 
 const long long sl_layout_51[] = {
     (long long)(AVCustomRoutingEventReasonActivate),

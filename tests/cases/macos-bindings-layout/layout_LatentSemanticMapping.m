@@ -2,7 +2,7 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <LatentSemanticMapping/LatentSemanticMapping.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LatentSemanticMapping.framework/Headers/LatentSemanticMapping.h"
+#import <LatentSemanticMapping/LatentSemanticMapping.h>
 
 const long long sl_layout_35[] = {
     (long long)(kLSMMapOutOfState),

@@ -2,9 +2,9 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <NetFS/NetFS.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NetFS.framework/Headers/NetFS.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NetFS.framework/Headers/NetFSPlugin.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NetFS.framework/Headers/NetFSUtil.h"
+#import <NetFS/NetFS.h>
+#import <NetFS/NetFSPlugin.h>
+#import <NetFS/NetFSUtil.h>
 
 const long long sl_layout_36[] = {
     (long long)(sizeof(struct NetFSMountInterface_V1)),

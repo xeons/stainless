@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <LinkPresentation/LinkPresentation.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LinkPresentation.framework/Headers/LPError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LinkPresentation.framework/Headers/LPFoundation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LinkPresentation.framework/Headers/LPLinkMetadata.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LinkPresentation.framework/Headers/LPLinkView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LinkPresentation.framework/Headers/LPMetadataProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LinkPresentation.framework/Headers/LinkPresentation.h"
+#import <LinkPresentation/LPError.h>
+#import <LinkPresentation/LPFoundation.h>
+#import <LinkPresentation/LPLinkMetadata.h>
+#import <LinkPresentation/LPLinkView.h>
+#import <LinkPresentation/LPMetadataProvider.h>
+#import <LinkPresentation/LinkPresentation.h>
 
 const long long sl_layout_111[] = {
     (long long)(LPErrorUnknown),

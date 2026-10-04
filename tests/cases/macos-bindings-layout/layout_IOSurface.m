@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <IOSurface/IOSurface.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOSurface.framework/Headers/IOSurface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOSurface.framework/Headers/IOSurfaceAPI.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOSurface.framework/Headers/IOSurfaceBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOSurface.framework/Headers/IOSurfaceObjC.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOSurface.framework/Headers/IOSurfaceRef.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOSurface.framework/Headers/IOSurfaceTypes.h"
+#import <IOSurface/IOSurface.h>
+#import <IOSurface/IOSurfaceAPI.h>
+#import <IOSurface/IOSurfaceBase.h>
+#import <IOSurface/IOSurfaceObjC.h>
+#import <IOSurface/IOSurfaceRef.h>
+#import <IOSurface/IOSurfaceTypes.h>
 
 const long long sl_layout_1[] = {
     (long long)(kIOSurfaceLockReadOnly),

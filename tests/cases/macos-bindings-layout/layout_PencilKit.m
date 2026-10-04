@@ -2,22 +2,22 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <PencilKit/PencilKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKContentVersion.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKDrawing.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKEraserTool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKFloatRange.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKInk.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKInkType.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKInkingTool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKLassoTool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKStroke.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKStrokePath.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKStrokePoint.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKTool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKToolPickerEraserItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKToolPickerInkingItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PKToolPickerItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PencilKit.framework/Headers/PencilKit.h"
+#import <PencilKit/PKContentVersion.h>
+#import <PencilKit/PKDrawing.h>
+#import <PencilKit/PKEraserTool.h>
+#import <PencilKit/PKFloatRange.h>
+#import <PencilKit/PKInk.h>
+#import <PencilKit/PKInkType.h>
+#import <PencilKit/PKInkingTool.h>
+#import <PencilKit/PKLassoTool.h>
+#import <PencilKit/PKStroke.h>
+#import <PencilKit/PKStrokePath.h>
+#import <PencilKit/PKStrokePoint.h>
+#import <PencilKit/PKTool.h>
+#import <PencilKit/PKToolPickerEraserItem.h>
+#import <PencilKit/PKToolPickerInkingItem.h>
+#import <PencilKit/PKToolPickerItem.h>
+#import <PencilKit/PencilKit.h>
 
 const long long sl_layout_138[] = {
     (long long)(PKEraserTypeVector),

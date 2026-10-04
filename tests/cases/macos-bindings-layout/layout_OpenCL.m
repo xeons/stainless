@@ -2,14 +2,14 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <OpenCL/OpenCL.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/cl.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/cl_ext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/cl_gl.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/cl_gl_ext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/cl_platform.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/gcl.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/gcl_priv.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenCL.framework/Headers/opencl.h"
+#import <OpenCL/cl.h>
+#import <OpenCL/cl_ext.h>
+#import <OpenCL/cl_gl.h>
+#import <OpenCL/cl_gl_ext.h>
+#import <OpenCL/cl_platform.h>
+#import <OpenCL/gcl.h>
+#import <OpenCL/gcl_priv.h>
+#import <OpenCL/opencl.h>
 
 const long long sl_layout_28[] = {
     (long long)(sizeof(cl_char2)),

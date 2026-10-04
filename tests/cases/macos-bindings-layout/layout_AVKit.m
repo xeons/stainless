@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AVKit/AVKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVCaptureView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVKitCore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVKitDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVKitTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVPictureInPictureController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVPictureInPictureController_AVSampleBufferDisplayLayerSupport.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVPlaybackSpeed.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVPlayerView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AVKit.framework/Headers/AVRoutePickerView.h"
+#import <AVKit/AVCaptureView.h>
+#import <AVKit/AVKit.h>
+#import <AVKit/AVKitCore.h>
+#import <AVKit/AVKitDefines.h>
+#import <AVKit/AVKitTypes.h>
+#import <AVKit/AVPictureInPictureController.h>
+#import <AVKit/AVPictureInPictureController_AVSampleBufferDisplayLayerSupport.h>
+#import <AVKit/AVPlaybackSpeed.h>
+#import <AVKit/AVPlayerView.h>
+#import <AVKit/AVRoutePickerView.h>
 
 const long long sl_layout_50[] = {
     (long long)(AVVideoFrameAnalysisTypeNone),

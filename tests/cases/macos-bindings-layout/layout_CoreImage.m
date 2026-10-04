@@ -2,31 +2,31 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreImage/CoreImage.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIBarcodeDescriptor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIColor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIDetector.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIFeature.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIFilter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIFilterBuiltins.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIFilterConstructor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIFilterGenerator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIFilterShape.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIImage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIImageAccumulator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIImageProcessor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIImageProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIKernel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIKernelMetalLib.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIPlugIn.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIPlugInInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIRAWFilter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIRAWFilter_Deprecated.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIRenderDestination.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CISampler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIVector.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CoreImage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CoreImageDefines.h"
+#import <CoreImage/CIBarcodeDescriptor.h>
+#import <CoreImage/CIColor.h>
+#import <CoreImage/CIContext.h>
+#import <CoreImage/CIDetector.h>
+#import <CoreImage/CIFeature.h>
+#import <CoreImage/CIFilter.h>
+#import <CoreImage/CIFilterBuiltins.h>
+#import <CoreImage/CIFilterConstructor.h>
+#import <CoreImage/CIFilterGenerator.h>
+#import <CoreImage/CIFilterShape.h>
+#import <CoreImage/CIImage.h>
+#import <CoreImage/CIImageAccumulator.h>
+#import <CoreImage/CIImageProcessor.h>
+#import <CoreImage/CIImageProvider.h>
+#import <CoreImage/CIKernel.h>
+#import <CoreImage/CIKernelMetalLib.h>
+#import <CoreImage/CIPlugIn.h>
+#import <CoreImage/CIPlugInInterface.h>
+#import <CoreImage/CIRAWFilter.h>
+#import <CoreImage/CIRAWFilter_Deprecated.h>
+#import <CoreImage/CIRenderDestination.h>
+#import <CoreImage/CISampler.h>
+#import <CoreImage/CIVector.h>
+#import <CoreImage/CoreImage.h>
+#import <CoreImage/CoreImageDefines.h>
 
 const long long sl_layout_42[] = {
     (long long)(CIRenderDestinationAlphaNone),

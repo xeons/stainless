@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ScreenCaptureKit/ScreenCaptureKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ScreenCaptureKit.framework/Headers/SCContentSharingPicker.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ScreenCaptureKit.framework/Headers/SCError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ScreenCaptureKit.framework/Headers/SCRecordingOutput.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ScreenCaptureKit.framework/Headers/SCScreenshotManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ScreenCaptureKit.framework/Headers/SCShareableContent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ScreenCaptureKit.framework/Headers/SCStream.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ScreenCaptureKit.framework/Headers/ScreenCaptureKit.h"
+#import <ScreenCaptureKit/SCContentSharingPicker.h>
+#import <ScreenCaptureKit/SCError.h>
+#import <ScreenCaptureKit/SCRecordingOutput.h>
+#import <ScreenCaptureKit/SCScreenshotManager.h>
+#import <ScreenCaptureKit/SCShareableContent.h>
+#import <ScreenCaptureKit/SCStream.h>
+#import <ScreenCaptureKit/ScreenCaptureKit.h>
 
 const long long sl_layout_150[] = {
     (long long)(SCShareableContentStyleNone),

@@ -2,15 +2,15 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <QuickLookThumbnailing/QuickLookThumbnailing.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailGenerationRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailGenerator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailReply.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailRepresentation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QLThumbnailingBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/QuickLookThumbnailing.framework/Headers/QuickLookThumbnailing.h"
+#import <QuickLookThumbnailing/QLThumbnailErrors.h>
+#import <QuickLookThumbnailing/QLThumbnailGenerationRequest.h>
+#import <QuickLookThumbnailing/QLThumbnailGenerator.h>
+#import <QuickLookThumbnailing/QLThumbnailProvider.h>
+#import <QuickLookThumbnailing/QLThumbnailReply.h>
+#import <QuickLookThumbnailing/QLThumbnailRepresentation.h>
+#import <QuickLookThumbnailing/QLThumbnailRequest.h>
+#import <QuickLookThumbnailing/QLThumbnailingBase.h>
+#import <QuickLookThumbnailing/QuickLookThumbnailing.h>
 
 const long long sl_layout_144[] = {
     (long long)(QLThumbnailRepresentationTypeIcon),

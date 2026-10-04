@@ -2,27 +2,27 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <LocalAuthentication/LocalAuthentication.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LABase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LABiometryType.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LACompanionType.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LADomainState.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAEnvironment.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAEnvironmentMechanism.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAEnvironmentMechanismBiometry.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAEnvironmentMechanismCompanion.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAEnvironmentMechanismUserPassword.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAEnvironmentState.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAPersistedRight.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAPrivateKey.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAPublicDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LAPublicKey.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LARequirement.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LARight.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LARightStore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LASecret.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/LocalAuthentication.framework/Headers/LocalAuthentication.h"
+#import <LocalAuthentication/LABase.h>
+#import <LocalAuthentication/LABiometryType.h>
+#import <LocalAuthentication/LACompanionType.h>
+#import <LocalAuthentication/LAContext.h>
+#import <LocalAuthentication/LADomainState.h>
+#import <LocalAuthentication/LAEnvironment.h>
+#import <LocalAuthentication/LAEnvironmentMechanism.h>
+#import <LocalAuthentication/LAEnvironmentMechanismBiometry.h>
+#import <LocalAuthentication/LAEnvironmentMechanismCompanion.h>
+#import <LocalAuthentication/LAEnvironmentMechanismUserPassword.h>
+#import <LocalAuthentication/LAEnvironmentState.h>
+#import <LocalAuthentication/LAError.h>
+#import <LocalAuthentication/LAPersistedRight.h>
+#import <LocalAuthentication/LAPrivateKey.h>
+#import <LocalAuthentication/LAPublicDefines.h>
+#import <LocalAuthentication/LAPublicKey.h>
+#import <LocalAuthentication/LARequirement.h>
+#import <LocalAuthentication/LARight.h>
+#import <LocalAuthentication/LARightStore.h>
+#import <LocalAuthentication/LASecret.h>
+#import <LocalAuthentication/LocalAuthentication.h>
 
 const long long sl_layout_112[] = {
     (long long)(LABiometryTypeNone),

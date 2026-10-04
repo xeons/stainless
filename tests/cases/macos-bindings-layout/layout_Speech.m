@@ -2,18 +2,18 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <Speech/Speech.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFSpeechLanguageModel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFSpeechRecognitionMetadata.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFSpeechRecognitionRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFSpeechRecognitionResult.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFSpeechRecognitionTask.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFSpeechRecognitionTaskHint.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFSpeechRecognizer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFTranscription.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFTranscriptionSegment.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/SFVoiceAnalytics.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Speech.framework/Headers/Speech.h"
+#import <Speech/SFErrors.h>
+#import <Speech/SFSpeechLanguageModel.h>
+#import <Speech/SFSpeechRecognitionMetadata.h>
+#import <Speech/SFSpeechRecognitionRequest.h>
+#import <Speech/SFSpeechRecognitionResult.h>
+#import <Speech/SFSpeechRecognitionTask.h>
+#import <Speech/SFSpeechRecognitionTaskHint.h>
+#import <Speech/SFSpeechRecognizer.h>
+#import <Speech/SFTranscription.h>
+#import <Speech/SFTranscriptionSegment.h>
+#import <Speech/SFVoiceAnalytics.h>
+#import <Speech/Speech.h>
 
 const long long sl_layout_158[] = {
     (long long)(SFSpeechErrorCodeInternalServiceError),

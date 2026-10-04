@@ -2,8 +2,8 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AdServices/AdServices.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AdServices.framework/Headers/AAAttribution.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AdServices.framework/Headers/AdServices.h"
+#import <AdServices/AAAttribution.h>
+#import <AdServices/AdServices.h>
 
 const long long sl_layout_54[] = {
     (long long)(AAAttributionErrorCodeNetworkError),

@@ -2,20 +2,20 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ShazamKit/ShazamKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHCatalog.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHCustomCatalog.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHMatch.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHMatchedMediaItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHMediaItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHMediaLibrary.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHRange.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHSignature.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/SHSignatureGenerator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/ShazamKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ShazamKit.framework/Headers/UTType+SHShazamAdditions.h"
+#import <ShazamKit/SHCatalog.h>
+#import <ShazamKit/SHCustomCatalog.h>
+#import <ShazamKit/SHDefines.h>
+#import <ShazamKit/SHError.h>
+#import <ShazamKit/SHMatch.h>
+#import <ShazamKit/SHMatchedMediaItem.h>
+#import <ShazamKit/SHMediaItem.h>
+#import <ShazamKit/SHMediaLibrary.h>
+#import <ShazamKit/SHRange.h>
+#import <ShazamKit/SHSession.h>
+#import <ShazamKit/SHSignature.h>
+#import <ShazamKit/SHSignatureGenerator.h>
+#import <ShazamKit/ShazamKit.h>
+#import <ShazamKit/UTType+SHShazamAdditions.h>
 
 const long long sl_layout_155[] = {
     (long long)(SHErrorCodeInvalidAudioFormat),

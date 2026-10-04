@@ -2,22 +2,22 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <GLUT/GLUT.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/copy.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/extrude.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/glsmap.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/glsmapint.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/glut.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/glutbitmap.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/glutf90.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/glutstroke.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/gutil.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/intersect.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/port.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/rot.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/segment.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/tube.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/tube_gc.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GLUT.framework/Headers/vvector.h"
+#import <GLUT/copy.h>
+#import <GLUT/extrude.h>
+#import <GLUT/glsmap.h>
+#import <GLUT/glsmapint.h>
+#import <GLUT/glut.h>
+#import <GLUT/glutbitmap.h>
+#import <GLUT/glutf90.h>
+#import <GLUT/glutstroke.h>
+#import <GLUT/gutil.h>
+#import <GLUT/intersect.h>
+#import <GLUT/port.h>
+#import <GLUT/rot.h>
+#import <GLUT/segment.h>
+#import <GLUT/tube.h>
+#import <GLUT/tube_gc.h>
+#import <GLUT/vvector.h>
 
 const long long sl_layout_26[] = {
     (long long)(SMAP_CLEAR_SMAP_TEXTURE),

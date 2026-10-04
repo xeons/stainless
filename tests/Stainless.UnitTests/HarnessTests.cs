@@ -69,6 +69,23 @@ public class HarnessTests
         Assert.Null(CaseSelection.FindSkipReason(Case("arm64-abi-windows"), TargetPlatform.X64Linux));
     }
 
+    /// <summary>
+    /// The generated bindings cases run on a Mac whose SDK is the one they were
+    /// generated from, and are skipped, saying so, on any other Mac.
+    /// </summary>
+    [Fact]
+    public void AGeneratedBindingsCaseRunsOnlyAgainstItsSdk()
+    {
+        string layout = Case("macos-bindings-layout");
+        string recorded = File.ReadAllText(Path.Combine(layout, "sdk.txt")).Trim();
+
+        Assert.Null(CaseSelection.FindSkipReason(layout, TargetPlatform.Arm64MacOS, macSdkVersion: () => recorded));
+        Assert.Equal($"generated from the macOS {recorded} SDK, and this machine's is 15.5",
+                     CaseSelection.FindSkipReason(layout, TargetPlatform.Arm64MacOS, macSdkVersion: () => "15.5"));
+        Assert.Equal($"generated from the macOS {recorded} SDK, and this machine's is unknown",
+                     CaseSelection.FindSkipReason(layout, TargetPlatform.Arm64MacOS));
+    }
+
     [Fact]
     public void AnErrorsCaseForAnotherArchitectureRunsOnAMac() =>
         Assert.Null(CaseSelection.FindSkipReason(Case("err-asm-kind"), TargetPlatform.Arm64MacOS));

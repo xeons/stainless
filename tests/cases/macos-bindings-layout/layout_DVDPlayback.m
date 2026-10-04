@@ -2,7 +2,7 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <DVDPlayback/DVDPlayback.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DVDPlayback.framework/Headers/DVDPlayback.h"
+#import <DVDPlayback/DVDPlayback.h>
 
 const long long sl_layout_30[] = {
     (long long)(kDVDErrorUnknown),

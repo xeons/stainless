@@ -2,15 +2,15 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreAudioKit/CoreAudioKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/AUCustomViewPersistentData.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/AUGenericView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/AUGenericViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/AUPannerView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/AUViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/CABTLEMIDIWindowController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/CAInterDeviceAudioViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/CANetworkBrowserWindowController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioKit.framework/Headers/CoreAudioKit.h"
+#import <CoreAudioKit/AUCustomViewPersistentData.h>
+#import <CoreAudioKit/AUGenericView.h>
+#import <CoreAudioKit/AUGenericViewController.h>
+#import <CoreAudioKit/AUPannerView.h>
+#import <CoreAudioKit/AUViewController.h>
+#import <CoreAudioKit/CABTLEMIDIWindowController.h>
+#import <CoreAudioKit/CAInterDeviceAudioViewController.h>
+#import <CoreAudioKit/CANetworkBrowserWindowController.h>
+#import <CoreAudioKit/CoreAudioKit.h>
 
 const long long sl_layout_71[] = {
     (long long)(AUViewTitleDisplayFlag),

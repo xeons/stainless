@@ -2,25 +2,25 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreVideo/CoreVideo.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVDisplayLink.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVHostTime.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVImageBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVMetalBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVMetalBufferCache.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVMetalTexture.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVMetalTextureCache.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVOpenGLBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVOpenGLBufferPool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVOpenGLTexture.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVOpenGLTextureCache.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVPixelBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVPixelBufferIOSurface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVPixelBufferPool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVPixelFormatDescription.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CVReturn.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreVideo.framework/Headers/CoreVideo.h"
+#import <CoreVideo/CVBase.h>
+#import <CoreVideo/CVBuffer.h>
+#import <CoreVideo/CVDisplayLink.h>
+#import <CoreVideo/CVHostTime.h>
+#import <CoreVideo/CVImageBuffer.h>
+#import <CoreVideo/CVMetalBuffer.h>
+#import <CoreVideo/CVMetalBufferCache.h>
+#import <CoreVideo/CVMetalTexture.h>
+#import <CoreVideo/CVMetalTextureCache.h>
+#import <CoreVideo/CVOpenGLBuffer.h>
+#import <CoreVideo/CVOpenGLBufferPool.h>
+#import <CoreVideo/CVOpenGLTexture.h>
+#import <CoreVideo/CVOpenGLTextureCache.h>
+#import <CoreVideo/CVPixelBuffer.h>
+#import <CoreVideo/CVPixelBufferIOSurface.h>
+#import <CoreVideo/CVPixelBufferPool.h>
+#import <CoreVideo/CVPixelFormatDescription.h>
+#import <CoreVideo/CVReturn.h>
+#import <CoreVideo/CoreVideo.h>
 
 const long long sl_layout_5[] = {
     (long long)(sizeof(struct CVSMPTETime)),

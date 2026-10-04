@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <InputMethodKit/InputMethodKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework/Headers/IMKCandidates.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework/Headers/IMKInputController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework/Headers/IMKServer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework/Headers/InputMethodKit.h"
+#import <InputMethodKit/IMKCandidates.h>
+#import <InputMethodKit/IMKInputController.h>
+#import <InputMethodKit/IMKServer.h>
+#import <InputMethodKit/InputMethodKit.h>
 
 const long long sl_layout_104[] = {
     (long long)(kIMKSingleColumnScrollingCandidatePanel),

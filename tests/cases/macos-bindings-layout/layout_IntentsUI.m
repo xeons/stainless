@@ -2,11 +2,11 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <IntentsUI/IntentsUI.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IntentsUI.framework/Headers/INImage+IntentsUI.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IntentsUI.framework/Headers/INUIAddVoiceShortcutButton.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IntentsUI.framework/Headers/INUIAddVoiceShortcutViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IntentsUI.framework/Headers/INUIEditVoiceShortcutViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IntentsUI.framework/Headers/IntentsUI.h"
+#import <IntentsUI/INImage+IntentsUI.h>
+#import <IntentsUI/INUIAddVoiceShortcutButton.h>
+#import <IntentsUI/INUIAddVoiceShortcutViewController.h>
+#import <IntentsUI/INUIEditVoiceShortcutViewController.h>
+#import <IntentsUI/IntentsUI.h>
 
 const long long sl_layout_108[] = {
     (long long)(INUIAddVoiceShortcutButtonStyleWhite),

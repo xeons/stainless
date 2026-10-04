@@ -2,11 +2,11 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <OpenAL/OpenAL.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenAL.framework/Headers/MacOSX_OALExtensions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenAL.framework/Headers/OpenAL.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenAL.framework/Headers/al.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenAL.framework/Headers/alc.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenAL.framework/Headers/alut.h"
+#import <OpenAL/MacOSX_OALExtensions.h>
+#import <OpenAL/OpenAL.h>
+#import <OpenAL/al.h>
+#import <OpenAL/alc.h>
+#import <OpenAL/alut.h>
 
 const long long sl_layout_27[] = {
     (long long)((AL_INVALID)),

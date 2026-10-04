@@ -2,28 +2,28 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <Hypervisor/Hypervisor.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/Hypervisor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_arch_vmx.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_arch_x86.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_base.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_error.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_gic.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_gic_config.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_gic_parameters.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_gic_state.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_gic_types.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_intr.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_sme_config.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_types.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vcpu.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vcpu_config.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vcpu_types.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vm.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vm_allocate.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vm_config.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vm_types.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Hypervisor.framework/Headers/hv_vmx.h"
+#import <Hypervisor/Hypervisor.h>
+#import <Hypervisor/hv.h>
+#import <Hypervisor/hv_arch_vmx.h>
+#import <Hypervisor/hv_arch_x86.h>
+#import <Hypervisor/hv_base.h>
+#import <Hypervisor/hv_error.h>
+#import <Hypervisor/hv_gic.h>
+#import <Hypervisor/hv_gic_config.h>
+#import <Hypervisor/hv_gic_parameters.h>
+#import <Hypervisor/hv_gic_state.h>
+#import <Hypervisor/hv_gic_types.h>
+#import <Hypervisor/hv_intr.h>
+#import <Hypervisor/hv_sme_config.h>
+#import <Hypervisor/hv_types.h>
+#import <Hypervisor/hv_vcpu.h>
+#import <Hypervisor/hv_vcpu_config.h>
+#import <Hypervisor/hv_vcpu_types.h>
+#import <Hypervisor/hv_vm.h>
+#import <Hypervisor/hv_vm_allocate.h>
+#import <Hypervisor/hv_vm_config.h>
+#import <Hypervisor/hv_vm_types.h>
+#import <Hypervisor/hv_vmx.h>
 
 const long long sl_layout_33[] = {
     (long long)(HV_ALLOCATE_DEFAULT),

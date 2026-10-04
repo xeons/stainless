@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ExternalAccessory/ExternalAccessory.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExternalAccessory.framework/Headers/EAAccessory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExternalAccessory.framework/Headers/EAAccessoryManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExternalAccessory.framework/Headers/EASession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExternalAccessory.framework/Headers/EAWiFiUnconfiguredAccessory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExternalAccessory.framework/Headers/EAWiFiUnconfiguredAccessoryBrowser.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExternalAccessory.framework/Headers/ExternalAccessory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExternalAccessory.framework/Headers/ExternalAccessoryDefines.h"
+#import <ExternalAccessory/EAAccessory.h>
+#import <ExternalAccessory/EAAccessoryManager.h>
+#import <ExternalAccessory/EASession.h>
+#import <ExternalAccessory/EAWiFiUnconfiguredAccessory.h>
+#import <ExternalAccessory/EAWiFiUnconfiguredAccessoryBrowser.h>
+#import <ExternalAccessory/ExternalAccessory.h>
+#import <ExternalAccessory/ExternalAccessoryDefines.h>
 
 const long long sl_layout_89[] = {
     (long long)(EABluetoothAccessoryPickerAlreadyConnected),

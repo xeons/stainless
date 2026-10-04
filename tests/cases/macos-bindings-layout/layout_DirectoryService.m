@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <DirectoryService/DirectoryService.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DirectoryService.framework/Headers/DirServices.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DirectoryService.framework/Headers/DirServicesConst.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DirectoryService.framework/Headers/DirServicesCustom.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DirectoryService.framework/Headers/DirServicesTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DirectoryService.framework/Headers/DirServicesUtils.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DirectoryService.framework/Headers/DirectoryService.h"
+#import <DirectoryService/DirServices.h>
+#import <DirectoryService/DirServicesConst.h>
+#import <DirectoryService/DirServicesCustom.h>
+#import <DirectoryService/DirServicesTypes.h>
+#import <DirectoryService/DirServicesUtils.h>
+#import <DirectoryService/DirectoryService.h>
 
 const long long sl_layout_29[] = {
     (long long)(eDSNoErr),

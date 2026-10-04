@@ -2,27 +2,27 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreText/CoreText.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFont.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFontCollection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFontDescriptor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFontManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFontManagerErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFontTraits.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFrame.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTFramesetter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTGlyphInfo.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTLine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTParagraphStyle.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTRubyAnnotation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTRun.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTRunDelegate.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTStringAttributes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTTextTab.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CTTypesetter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/CoreText.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/SFNTLayoutTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreText.framework/Headers/SFNTTypes.h"
+#import <CoreText/CTDefines.h>
+#import <CoreText/CTFont.h>
+#import <CoreText/CTFontCollection.h>
+#import <CoreText/CTFontDescriptor.h>
+#import <CoreText/CTFontManager.h>
+#import <CoreText/CTFontManagerErrors.h>
+#import <CoreText/CTFontTraits.h>
+#import <CoreText/CTFrame.h>
+#import <CoreText/CTFramesetter.h>
+#import <CoreText/CTGlyphInfo.h>
+#import <CoreText/CTLine.h>
+#import <CoreText/CTParagraphStyle.h>
+#import <CoreText/CTRubyAnnotation.h>
+#import <CoreText/CTRun.h>
+#import <CoreText/CTRunDelegate.h>
+#import <CoreText/CTStringAttributes.h>
+#import <CoreText/CTTextTab.h>
+#import <CoreText/CTTypesetter.h>
+#import <CoreText/CoreText.h>
+#import <CoreText/SFNTLayoutTypes.h>
+#import <CoreText/SFNTTypes.h>
 
 const long long sl_layout_4[] = {
     (long long)(kCTFontClassMaskShift),

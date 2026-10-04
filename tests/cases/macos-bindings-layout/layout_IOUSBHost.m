@@ -2,22 +2,22 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <IOUSBHost/IOUSBHost.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/AppleUSBDescriptorParsing.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHost.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostCIControllerStateMachine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostCIDeviceStateMachine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostCIEndpointStateMachine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostCIPortStateMachine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostControllerInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostControllerInterfaceDefinitions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostControllerInterfaceHelpers.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostDefinitions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostIOSource.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostPipe.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOUSBHost.framework/Headers/IOUSBHostStream.h"
+#import <IOUSBHost/AppleUSBDescriptorParsing.h>
+#import <IOUSBHost/IOUSBHost.h>
+#import <IOUSBHost/IOUSBHostCIControllerStateMachine.h>
+#import <IOUSBHost/IOUSBHostCIDeviceStateMachine.h>
+#import <IOUSBHost/IOUSBHostCIEndpointStateMachine.h>
+#import <IOUSBHost/IOUSBHostCIPortStateMachine.h>
+#import <IOUSBHost/IOUSBHostControllerInterface.h>
+#import <IOUSBHost/IOUSBHostControllerInterfaceDefinitions.h>
+#import <IOUSBHost/IOUSBHostControllerInterfaceHelpers.h>
+#import <IOUSBHost/IOUSBHostDefinitions.h>
+#import <IOUSBHost/IOUSBHostDevice.h>
+#import <IOUSBHost/IOUSBHostIOSource.h>
+#import <IOUSBHost/IOUSBHostInterface.h>
+#import <IOUSBHost/IOUSBHostObject.h>
+#import <IOUSBHost/IOUSBHostPipe.h>
+#import <IOUSBHost/IOUSBHostStream.h>
 
 const long long sl_layout_102[] = {
     (long long)(sizeof(struct IOUSBHostIsochronousFrame)),

@@ -2,8 +2,8 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <PreferencePanes/PreferencePanes.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PreferencePanes.framework/Headers/NSPreferencePane.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PreferencePanes.framework/Headers/PreferencePanes.h"
+#import <PreferencePanes/NSPreferencePane.h>
+#import <PreferencePanes/PreferencePanes.h>
 
 const long long sl_layout_141[] = {
     (long long)(NSUnselectCancel),

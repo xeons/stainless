@@ -2,23 +2,23 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <UserNotifications/UserNotifications.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/NSString+UserNotifications.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotification.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationActionIcon.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationAttachment.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationAttributedMessageContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationCategory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationContent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationResponse.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationServiceExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationSettings.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationSound.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNNotificationTrigger.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UNUserNotificationCenter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/UserNotifications.framework/Headers/UserNotifications.h"
+#import <UserNotifications/NSString+UserNotifications.h>
+#import <UserNotifications/UNError.h>
+#import <UserNotifications/UNNotification.h>
+#import <UserNotifications/UNNotificationAction.h>
+#import <UserNotifications/UNNotificationActionIcon.h>
+#import <UserNotifications/UNNotificationAttachment.h>
+#import <UserNotifications/UNNotificationAttributedMessageContext.h>
+#import <UserNotifications/UNNotificationCategory.h>
+#import <UserNotifications/UNNotificationContent.h>
+#import <UserNotifications/UNNotificationRequest.h>
+#import <UserNotifications/UNNotificationResponse.h>
+#import <UserNotifications/UNNotificationServiceExtension.h>
+#import <UserNotifications/UNNotificationSettings.h>
+#import <UserNotifications/UNNotificationSound.h>
+#import <UserNotifications/UNNotificationTrigger.h>
+#import <UserNotifications/UNUserNotificationCenter.h>
+#import <UserNotifications/UserNotifications.h>
 
 const long long sl_layout_163[] = {
     (long long)(UNErrorCodeNotificationsNotAllowed),

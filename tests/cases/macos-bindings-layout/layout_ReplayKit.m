@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ReplayKit/ReplayKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ReplayKit.framework/Headers/RPBroadcast.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ReplayKit.framework/Headers/RPBroadcastConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ReplayKit.framework/Headers/RPBroadcastExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ReplayKit.framework/Headers/RPError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ReplayKit.framework/Headers/RPPreviewViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ReplayKit.framework/Headers/RPScreenRecorder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ReplayKit.framework/Headers/ReplayKit.h"
+#import <ReplayKit/RPBroadcast.h>
+#import <ReplayKit/RPBroadcastConfiguration.h>
+#import <ReplayKit/RPBroadcastExtension.h>
+#import <ReplayKit/RPError.h>
+#import <ReplayKit/RPPreviewViewController.h>
+#import <ReplayKit/RPScreenRecorder.h>
+#import <ReplayKit/ReplayKit.h>
 
 const long long sl_layout_146[] = {
     (long long)(RPSampleBufferTypeVideo),

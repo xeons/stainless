@@ -2,8 +2,8 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <GameSave/GameSave.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GameSave.framework/Headers/GSSyncedDirectory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/GameSave.framework/Headers/GameSave.h"
+#import <GameSave/GSSyncedDirectory.h>
+#import <GameSave/GameSave.h>
 
 const long long sl_layout_97[] = {
     (long long)(GSSyncStateReady),

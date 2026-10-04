@@ -2,21 +2,21 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <JavaScriptCore/JavaScriptCore.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSContextRef.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSExport.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSManagedValue.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSObjectRef.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSStringRef.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSStringRefCF.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSTypedArray.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSValue.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSValueRef.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JSVirtualMachine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JavaScript.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/JavaScriptCore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaScriptCore.framework/Headers/WebKitAvailability.h"
+#import <JavaScriptCore/JSBase.h>
+#import <JavaScriptCore/JSContext.h>
+#import <JavaScriptCore/JSContextRef.h>
+#import <JavaScriptCore/JSExport.h>
+#import <JavaScriptCore/JSManagedValue.h>
+#import <JavaScriptCore/JSObjectRef.h>
+#import <JavaScriptCore/JSStringRef.h>
+#import <JavaScriptCore/JSStringRefCF.h>
+#import <JavaScriptCore/JSTypedArray.h>
+#import <JavaScriptCore/JSValue.h>
+#import <JavaScriptCore/JSValueRef.h>
+#import <JavaScriptCore/JSVirtualMachine.h>
+#import <JavaScriptCore/JavaScript.h>
+#import <JavaScriptCore/JavaScriptCore.h>
+#import <JavaScriptCore/WebKitAvailability.h>
 
 const long long sl_layout_110[] = {
     (long long)(kJSTypeUndefined),

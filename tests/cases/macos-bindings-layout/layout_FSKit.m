@@ -2,26 +2,26 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <FSKit/FSKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSClient.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSContainer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSEntityIdentifier.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSFileName.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSFileSystem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSFileSystemBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSKitDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSKitError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSKitFunctions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSKitTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSModuleIdentity.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSMutableFileDataBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSResource.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSTask.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSTaskOptions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSUnaryFileSystem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSVolume.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FSKit.framework/Headers/FSVolumeExtent.h"
+#import <FSKit/FSClient.h>
+#import <FSKit/FSContainer.h>
+#import <FSKit/FSEntityIdentifier.h>
+#import <FSKit/FSFileName.h>
+#import <FSKit/FSFileSystem.h>
+#import <FSKit/FSFileSystemBase.h>
+#import <FSKit/FSItem.h>
+#import <FSKit/FSKit.h>
+#import <FSKit/FSKitDefines.h>
+#import <FSKit/FSKitError.h>
+#import <FSKit/FSKitFunctions.h>
+#import <FSKit/FSKitTypes.h>
+#import <FSKit/FSModuleIdentity.h>
+#import <FSKit/FSMutableFileDataBuffer.h>
+#import <FSKit/FSResource.h>
+#import <FSKit/FSTask.h>
+#import <FSKit/FSTaskOptions.h>
+#import <FSKit/FSUnaryFileSystem.h>
+#import <FSKit/FSVolume.h>
+#import <FSKit/FSVolumeExtent.h>
 
 const long long sl_layout_90[] = {
     (long long)(FSContainerStateNotReady),

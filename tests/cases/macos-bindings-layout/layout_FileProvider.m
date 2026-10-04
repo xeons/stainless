@@ -2,24 +2,24 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <FileProvider/FileProvider.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/FileProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderActions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderDomain.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderEnumerating.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderItemDecoration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderKnownFolders.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderModifyItemOptions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderReplicatedExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderSearch.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderService.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderTesting.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/FileProvider.framework/Headers/NSFileProviderThumbnailing.h"
+#import <FileProvider/FileProvider.h>
+#import <FileProvider/NSFileProviderActions.h>
+#import <FileProvider/NSFileProviderDefines.h>
+#import <FileProvider/NSFileProviderDomain.h>
+#import <FileProvider/NSFileProviderEnumerating.h>
+#import <FileProvider/NSFileProviderError.h>
+#import <FileProvider/NSFileProviderExtension.h>
+#import <FileProvider/NSFileProviderItem.h>
+#import <FileProvider/NSFileProviderItemDecoration.h>
+#import <FileProvider/NSFileProviderKnownFolders.h>
+#import <FileProvider/NSFileProviderManager.h>
+#import <FileProvider/NSFileProviderModifyItemOptions.h>
+#import <FileProvider/NSFileProviderReplicatedExtension.h>
+#import <FileProvider/NSFileProviderRequest.h>
+#import <FileProvider/NSFileProviderSearch.h>
+#import <FileProvider/NSFileProviderService.h>
+#import <FileProvider/NSFileProviderTesting.h>
+#import <FileProvider/NSFileProviderThumbnailing.h>
 
 const long long sl_layout_91[] = {
     (long long)(NSFileProviderItemCapabilitiesAllowsReading),

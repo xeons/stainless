@@ -2,15 +2,15 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <NearbyInteraction/NearbyInteraction.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NIAlgorithmConvergenceStatusReason.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NIConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NIDLTDOAMeasurement.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NIDeviceCapability.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NIError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NIExport.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NINearbyObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NISession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NearbyInteraction.framework/Headers/NearbyInteraction.h"
+#import <NearbyInteraction/NIAlgorithmConvergenceStatusReason.h>
+#import <NearbyInteraction/NIConfiguration.h>
+#import <NearbyInteraction/NIDLTDOAMeasurement.h>
+#import <NearbyInteraction/NIDeviceCapability.h>
+#import <NearbyInteraction/NIError.h>
+#import <NearbyInteraction/NIExport.h>
+#import <NearbyInteraction/NINearbyObject.h>
+#import <NearbyInteraction/NISession.h>
+#import <NearbyInteraction/NearbyInteraction.h>
 
 const long long sl_layout_127[] = {
     (long long)(NIErrorCodeUnsupportedPlatform),

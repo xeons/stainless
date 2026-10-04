@@ -2,14 +2,14 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AutomaticAssessmentConfiguration/AutomaticAssessmentConfiguration.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AEAssessmentApplication.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AEAssessmentConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AEAssessmentParticipantConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AEAssessmentSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AEAssessmentSessionDelegate.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AEErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AEVisibility.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AutomaticAssessmentConfiguration.framework/Headers/AutomaticAssessmentConfiguration.h"
+#import <AutomaticAssessmentConfiguration/AEAssessmentApplication.h>
+#import <AutomaticAssessmentConfiguration/AEAssessmentConfiguration.h>
+#import <AutomaticAssessmentConfiguration/AEAssessmentParticipantConfiguration.h>
+#import <AutomaticAssessmentConfiguration/AEAssessmentSession.h>
+#import <AutomaticAssessmentConfiguration/AEAssessmentSessionDelegate.h>
+#import <AutomaticAssessmentConfiguration/AEErrors.h>
+#import <AutomaticAssessmentConfiguration/AEVisibility.h>
+#import <AutomaticAssessmentConfiguration/AutomaticAssessmentConfiguration.h>
 
 const long long sl_layout_59[] = {
     (long long)(AEAutocorrectModeNone),

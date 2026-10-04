@@ -2,22 +2,22 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CompositorServices/CompositorServices.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/CompositorServices.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/cp_base.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/cp_conditionals.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/cp_error.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/cp_types.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/drawable.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/drawable_render_context.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/frame.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/frame_timing.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/layer_renderer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/layer_renderer_capabilities.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/layer_renderer_configuration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/layer_renderer_layout.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/layer_renderer_properties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/tracking_area.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CompositorServices.framework/Headers/view.h"
+#import <CompositorServices/CompositorServices.h>
+#import <CompositorServices/cp_base.h>
+#import <CompositorServices/cp_conditionals.h>
+#import <CompositorServices/cp_error.h>
+#import <CompositorServices/cp_types.h>
+#import <CompositorServices/drawable.h>
+#import <CompositorServices/drawable_render_context.h>
+#import <CompositorServices/frame.h>
+#import <CompositorServices/frame_timing.h>
+#import <CompositorServices/layer_renderer.h>
+#import <CompositorServices/layer_renderer_capabilities.h>
+#import <CompositorServices/layer_renderer_configuration.h>
+#import <CompositorServices/layer_renderer_layout.h>
+#import <CompositorServices/layer_renderer_properties.h>
+#import <CompositorServices/tracking_area.h>
+#import <CompositorServices/view.h>
 
 const long long sl_layout_69[] = {
     (long long)(cp_layer_renderer_configuration_error_code_missing_configuration),

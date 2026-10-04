@@ -2,19 +2,19 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CryptoTokenKit/CryptoTokenKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/CryptoTokenKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKSmartCard.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKSmartCardATR.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKSmartCardSlotNFCSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKSmartCardToken.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKSmartCardTokenRegistrationManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKTLVRecord.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKToken.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKTokenConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKTokenKeychainItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CryptoTokenKit.framework/Headers/TKTokenWatcher.h"
+#import <CryptoTokenKit/CryptoTokenKit.h>
+#import <CryptoTokenKit/TKBase.h>
+#import <CryptoTokenKit/TKError.h>
+#import <CryptoTokenKit/TKSmartCard.h>
+#import <CryptoTokenKit/TKSmartCardATR.h>
+#import <CryptoTokenKit/TKSmartCardSlotNFCSession.h>
+#import <CryptoTokenKit/TKSmartCardToken.h>
+#import <CryptoTokenKit/TKSmartCardTokenRegistrationManager.h>
+#import <CryptoTokenKit/TKTLVRecord.h>
+#import <CryptoTokenKit/TKToken.h>
+#import <CryptoTokenKit/TKTokenConfiguration.h>
+#import <CryptoTokenKit/TKTokenKeychainItem.h>
+#import <CryptoTokenKit/TKTokenWatcher.h>
 
 const long long sl_layout_81[] = {
     (long long)(TKErrorCodeNotImplemented),

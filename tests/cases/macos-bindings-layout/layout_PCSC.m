@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <PCSC/PCSC.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PCSC.framework/Headers/PCSC.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PCSC.framework/Headers/mscdefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PCSC.framework/Headers/musclecard.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PCSC.framework/Headers/pcsclite.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PCSC.framework/Headers/winscard.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PCSC.framework/Headers/wintypes.h"
+#import <PCSC/PCSC.h>
+#import <PCSC/mscdefines.h>
+#import <PCSC/musclecard.h>
+#import <PCSC/pcsclite.h>
+#import <PCSC/winscard.h>
+#import <PCSC/wintypes.h>
 
 const long long sl_layout_37[] = {
     (long long)(sizeof(SCARD_READERSTATE_A)),

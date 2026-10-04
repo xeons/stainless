@@ -2,19 +2,19 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ClassKit/ClassKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSActivity.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSActivityItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSBinaryItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSContextProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSDataStore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSProgressReportingCapability.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSQuantityItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/CLSScoreItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/ClassKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ClassKit.framework/Headers/NSUserActivity+CLSDeepLinks.h"
+#import <ClassKit/CLSActivity.h>
+#import <ClassKit/CLSActivityItem.h>
+#import <ClassKit/CLSBinaryItem.h>
+#import <ClassKit/CLSContext.h>
+#import <ClassKit/CLSContextProvider.h>
+#import <ClassKit/CLSDataStore.h>
+#import <ClassKit/CLSDefines.h>
+#import <ClassKit/CLSObject.h>
+#import <ClassKit/CLSProgressReportingCapability.h>
+#import <ClassKit/CLSQuantityItem.h>
+#import <ClassKit/CLSScoreItem.h>
+#import <ClassKit/ClassKit.h>
+#import <ClassKit/NSUserActivity+CLSDeepLinks.h>
 
 const long long sl_layout_67[] = {
     (long long)(CLSErrorCodeNone),

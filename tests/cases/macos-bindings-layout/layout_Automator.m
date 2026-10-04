@@ -2,17 +2,17 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <Automator/Automator.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMAppleScriptAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMAttributesForAnalyzer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMBundleAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMShellScriptAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMWorkflow.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMWorkflowController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMWorkflowView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AMWorkspace.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/Automator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Automator.framework/Headers/AutomatorErrors.h"
+#import <Automator/AMAction.h>
+#import <Automator/AMAppleScriptAction.h>
+#import <Automator/AMAttributesForAnalyzer.h>
+#import <Automator/AMBundleAction.h>
+#import <Automator/AMShellScriptAction.h>
+#import <Automator/AMWorkflow.h>
+#import <Automator/AMWorkflowController.h>
+#import <Automator/AMWorkflowView.h>
+#import <Automator/AMWorkspace.h>
+#import <Automator/Automator.h>
+#import <Automator/AutomatorErrors.h>
 
 const long long sl_layout_60[] = {
     (long long)(AMLogLevelDebug),

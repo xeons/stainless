@@ -2,26 +2,26 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <JavaRuntimeSupport/JavaRuntimeSupport.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSAccessibility.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSAppKitAWT.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSCursor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSDrag.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSFont.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSInputMethodController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSLocalization.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSMenu.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSProperties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSRemoteLayer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSSecurity.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSSymbolicator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSUIControl.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSUIHitTesting.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSUIProperties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSUIScrollBars.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JRSWindow.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaRuntimeSupport.framework/Headers/JavaRuntimeSupport.h"
+#import <JavaRuntimeSupport/JRSAccessibility.h>
+#import <JavaRuntimeSupport/JRSAppKitAWT.h>
+#import <JavaRuntimeSupport/JRSCursor.h>
+#import <JavaRuntimeSupport/JRSDefines.h>
+#import <JavaRuntimeSupport/JRSDrag.h>
+#import <JavaRuntimeSupport/JRSEvent.h>
+#import <JavaRuntimeSupport/JRSFont.h>
+#import <JavaRuntimeSupport/JRSInputMethodController.h>
+#import <JavaRuntimeSupport/JRSLocalization.h>
+#import <JavaRuntimeSupport/JRSMenu.h>
+#import <JavaRuntimeSupport/JRSProperties.h>
+#import <JavaRuntimeSupport/JRSRemoteLayer.h>
+#import <JavaRuntimeSupport/JRSSecurity.h>
+#import <JavaRuntimeSupport/JRSSymbolicator.h>
+#import <JavaRuntimeSupport/JRSUIControl.h>
+#import <JavaRuntimeSupport/JRSUIHitTesting.h>
+#import <JavaRuntimeSupport/JRSUIProperties.h>
+#import <JavaRuntimeSupport/JRSUIScrollBars.h>
+#import <JavaRuntimeSupport/JRSWindow.h>
+#import <JavaRuntimeSupport/JavaRuntimeSupport.h>
 
 const long long sl_layout_109[] = {
     (long long)(kJRSUI_Key_widget),

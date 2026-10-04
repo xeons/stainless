@@ -2,31 +2,31 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CallKit/CallKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXAnswerCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCall.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallDirectory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallDirectoryExtensionContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallDirectoryManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallDirectoryProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallObserver.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXCallUpdate.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXEndCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXHandle.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXPlayDTMFCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXProviderConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXSetGroupCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXSetHeldCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXSetMutedCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXSetTranslatingCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXStartCallAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CXTransaction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CallKit.framework/Headers/CallKit.h"
+#import <CallKit/CXAction.h>
+#import <CallKit/CXAnswerCallAction.h>
+#import <CallKit/CXBase.h>
+#import <CallKit/CXCall.h>
+#import <CallKit/CXCallAction.h>
+#import <CallKit/CXCallController.h>
+#import <CallKit/CXCallDirectory.h>
+#import <CallKit/CXCallDirectoryExtensionContext.h>
+#import <CallKit/CXCallDirectoryManager.h>
+#import <CallKit/CXCallDirectoryProvider.h>
+#import <CallKit/CXCallObserver.h>
+#import <CallKit/CXCallUpdate.h>
+#import <CallKit/CXEndCallAction.h>
+#import <CallKit/CXError.h>
+#import <CallKit/CXHandle.h>
+#import <CallKit/CXPlayDTMFCallAction.h>
+#import <CallKit/CXProvider.h>
+#import <CallKit/CXProviderConfiguration.h>
+#import <CallKit/CXSetGroupCallAction.h>
+#import <CallKit/CXSetHeldCallAction.h>
+#import <CallKit/CXSetMutedCallAction.h>
+#import <CallKit/CXSetTranslatingCallAction.h>
+#import <CallKit/CXStartCallAction.h>
+#import <CallKit/CXTransaction.h>
+#import <CallKit/CallKit.h>
 
 const long long sl_layout_65[] = {
     (long long)(CXTranslationEngineDefault),

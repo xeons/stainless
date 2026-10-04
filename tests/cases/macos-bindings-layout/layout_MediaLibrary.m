@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <MediaLibrary/MediaLibrary.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaLibrary.framework/Headers/MLMediaGroup.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaLibrary.framework/Headers/MLMediaLibrary.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaLibrary.framework/Headers/MLMediaObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaLibrary.framework/Headers/MLMediaSource.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaLibrary.framework/Headers/MLMediaTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaLibrary.framework/Headers/MediaLibrary.h"
+#import <MediaLibrary/MLMediaGroup.h>
+#import <MediaLibrary/MLMediaLibrary.h>
+#import <MediaLibrary/MLMediaObject.h>
+#import <MediaLibrary/MLMediaSource.h>
+#import <MediaLibrary/MLMediaTypes.h>
+#import <MediaLibrary/MediaLibrary.h>
 
 const long long sl_layout_119[] = {
     (long long)(MLMediaSourceTypeAudio),

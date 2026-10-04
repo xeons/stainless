@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreAudio/CoreAudio.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/AudioDriverPlugIn.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/AudioHardware.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/AudioHardwareBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/AudioHardwareDeprecated.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/AudioHardwareTapping.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/AudioServerPlugIn.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/CATapDescription.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/CoreAudio.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/CoreAudioTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudio.framework/Headers/HostTime.h"
+#import <CoreAudio/AudioDriverPlugIn.h>
+#import <CoreAudio/AudioHardware.h>
+#import <CoreAudio/AudioHardwareBase.h>
+#import <CoreAudio/AudioHardwareDeprecated.h>
+#import <CoreAudio/AudioHardwareTapping.h>
+#import <CoreAudio/AudioServerPlugIn.h>
+#import <CoreAudio/CATapDescription.h>
+#import <CoreAudio/CoreAudio.h>
+#import <CoreAudio/CoreAudioTypes.h>
+#import <CoreAudio/HostTime.h>
 
 const long long sl_layout_12[] = {
     (long long)(sizeof(struct AudioObjectPropertyAddress)),

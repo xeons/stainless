@@ -250,6 +250,13 @@ way AppKit draws it on screen and writes it as a PNG.
 tools/bindgen.sh          # on a Mac; about 26 minutes and 14 GB on an M4
 ```
 
+The two generated cases check what that SDK's headers and runtime say, so
+each records the SDK in `sdk.txt` and is skipped, saying why, on a Mac whose
+SDK -- `SDKROOT`'s, else `xcrun`'s -- is another. CI selects the Xcode that
+ships it. Their imports are relative to the SDK, a subframework's header
+reached through its parent's (`<Carbon/../Frameworks/HIToolbox.framework/Headers/Events.h>`),
+so they compile wherever the SDK is installed.
+
 The generator compiles each framework's headers, its subframeworks' included,
 as Objective-C for `arm64-apple-macosx13.0` and `x86_64-apple-macosx13.0`
 with `-ast-dump=json`, and keeps the declarations whose header is in the

@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ICADevices/ICADevices.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ICADevices.framework/Headers/ICAApplication.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ICADevices.framework/Headers/ICACamera.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ICADevices.framework/Headers/ICADevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ICADevices.framework/Headers/ICADevices.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ICADevices.framework/Headers/ICD_CameraCalls.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ICADevices.framework/Headers/ICD_ScannerCalls.h"
+#import <ICADevices/ICAApplication.h>
+#import <ICADevices/ICACamera.h>
+#import <ICADevices/ICADevice.h>
+#import <ICADevices/ICADevices.h>
+#import <ICADevices/ICD_CameraCalls.h>
+#import <ICADevices/ICD_ScannerCalls.h>
 
 const long long sl_layout_34[] = {
     (long long)(kICAPBVersion),

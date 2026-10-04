@@ -2,11 +2,11 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <NotificationCenter/NotificationCenter.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NotificationCenter.framework/Headers/NCWidgetController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NotificationCenter.framework/Headers/NCWidgetListViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NotificationCenter.framework/Headers/NCWidgetProviding.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NotificationCenter.framework/Headers/NCWidgetSearchViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/NotificationCenter.framework/Headers/NotificationCenter.h"
+#import <NotificationCenter/NCWidgetController.h>
+#import <NotificationCenter/NCWidgetListViewController.h>
+#import <NotificationCenter/NCWidgetProviding.h>
+#import <NotificationCenter/NCWidgetSearchViewController.h>
+#import <NotificationCenter/NotificationCenter.h>
 
 const long long sl_layout_130[] = {
     (long long)(NCUpdateResultNewData),

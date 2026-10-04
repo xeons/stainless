@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ColorSync/ColorSync.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ColorSync.framework/Headers/ColorSync.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ColorSync.framework/Headers/ColorSyncBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ColorSync.framework/Headers/ColorSyncCMM.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ColorSync.framework/Headers/ColorSyncDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ColorSync.framework/Headers/ColorSyncProfile.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ColorSync.framework/Headers/ColorSyncTransform.h"
+#import <ColorSync/ColorSync.h>
+#import <ColorSync/ColorSyncBase.h>
+#import <ColorSync/ColorSyncCMM.h>
+#import <ColorSync/ColorSyncDevice.h>
+#import <ColorSync/ColorSyncProfile.h>
+#import <ColorSync/ColorSyncTransform.h>
 
 const long long sl_layout_2[] = {
     (long long)(sizeof(ColorSyncMD5)),

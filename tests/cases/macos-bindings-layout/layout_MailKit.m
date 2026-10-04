@@ -2,29 +2,29 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <MailKit/MailKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEAddressAnnotation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEComposeContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEComposeSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEContentBlocker.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEDecodedMessage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEDecodedMessageBanner.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEEmailAddress.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEEncodedOutgoingMessage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEExtensionManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEExtensionViewController.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageAction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageActionDecision.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageActionHandler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageDecoder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageEncoder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageEncodingResult.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageSecurityHandler.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageSecurityInformation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEMessageSigner.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MEOutgoingMessageEncodingStatus.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MailKit.framework/Headers/MailKit.h"
+#import <MailKit/MEAddressAnnotation.h>
+#import <MailKit/MEComposeContext.h>
+#import <MailKit/MEComposeSession.h>
+#import <MailKit/MEContentBlocker.h>
+#import <MailKit/MEDecodedMessage.h>
+#import <MailKit/MEDecodedMessageBanner.h>
+#import <MailKit/MEEmailAddress.h>
+#import <MailKit/MEEncodedOutgoingMessage.h>
+#import <MailKit/MEExtension.h>
+#import <MailKit/MEExtensionManager.h>
+#import <MailKit/MEExtensionViewController.h>
+#import <MailKit/MEMessage.h>
+#import <MailKit/MEMessageAction.h>
+#import <MailKit/MEMessageActionDecision.h>
+#import <MailKit/MEMessageActionHandler.h>
+#import <MailKit/MEMessageDecoder.h>
+#import <MailKit/MEMessageEncoder.h>
+#import <MailKit/MEMessageEncodingResult.h>
+#import <MailKit/MEMessageSecurityHandler.h>
+#import <MailKit/MEMessageSecurityInformation.h>
+#import <MailKit/MEMessageSigner.h>
+#import <MailKit/MEOutgoingMessageEncodingStatus.h>
+#import <MailKit/MailKit.h>
 
 const long long sl_layout_114[] = {
     (long long)(MEMessageStateReceived),

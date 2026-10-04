@@ -2,24 +2,24 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <OpenDirectory/OpenDirectory.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/NSOpenDirectory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODAttributeMap.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODMappings.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODModuleEntry.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODNode.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODQuery.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODRecord.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODRecordMap.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/ODSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Headers/OpenDirectory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Frameworks/CFOpenDirectory.framework/Headers/CFODContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Frameworks/CFOpenDirectory.framework/Headers/CFODNode.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Frameworks/CFOpenDirectory.framework/Headers/CFODQuery.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Frameworks/CFOpenDirectory.framework/Headers/CFODRecord.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Frameworks/CFOpenDirectory.framework/Headers/CFODSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Frameworks/CFOpenDirectory.framework/Headers/CFOpenDirectory.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenDirectory.framework/Frameworks/CFOpenDirectory.framework/Headers/CFOpenDirectoryConstants.h"
+#import <OpenDirectory/NSOpenDirectory.h>
+#import <OpenDirectory/ODAttributeMap.h>
+#import <OpenDirectory/ODConfiguration.h>
+#import <OpenDirectory/ODMappings.h>
+#import <OpenDirectory/ODModuleEntry.h>
+#import <OpenDirectory/ODNode.h>
+#import <OpenDirectory/ODQuery.h>
+#import <OpenDirectory/ODRecord.h>
+#import <OpenDirectory/ODRecordMap.h>
+#import <OpenDirectory/ODSession.h>
+#import <OpenDirectory/OpenDirectory.h>
+#import <OpenDirectory/../Frameworks/CFOpenDirectory.framework/Headers/CFODContext.h>
+#import <OpenDirectory/../Frameworks/CFOpenDirectory.framework/Headers/CFODNode.h>
+#import <OpenDirectory/../Frameworks/CFOpenDirectory.framework/Headers/CFODQuery.h>
+#import <OpenDirectory/../Frameworks/CFOpenDirectory.framework/Headers/CFODRecord.h>
+#import <OpenDirectory/../Frameworks/CFOpenDirectory.framework/Headers/CFODSession.h>
+#import <OpenDirectory/../Frameworks/CFOpenDirectory.framework/Headers/CFOpenDirectory.h>
+#import <OpenDirectory/../Frameworks/CFOpenDirectory.framework/Headers/CFOpenDirectoryConstants.h>
 
 const long long sl_layout_133[] = {
     (long long)(kODNodeTypeAuthentication),

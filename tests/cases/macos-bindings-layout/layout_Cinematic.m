@@ -2,17 +2,17 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <Cinematic/Cinematic.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNAssetInfo.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNCinematicBase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNCinematicError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNDecision.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNDetection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNDetectionTrack.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNObjectTracker.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNRenderingSession.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNScript.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/CNSpatialAudio.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Cinematic.framework/Headers/Cinematic.h"
+#import <Cinematic/CNAssetInfo.h>
+#import <Cinematic/CNCinematicBase.h>
+#import <Cinematic/CNCinematicError.h>
+#import <Cinematic/CNDecision.h>
+#import <Cinematic/CNDetection.h>
+#import <Cinematic/CNDetectionTrack.h>
+#import <Cinematic/CNObjectTracker.h>
+#import <Cinematic/CNRenderingSession.h>
+#import <Cinematic/CNScript.h>
+#import <Cinematic/CNSpatialAudio.h>
+#import <Cinematic/Cinematic.h>
 
 const long long sl_layout_66[] = {
     (long long)(CNCinematicErrorCodeUnknown),

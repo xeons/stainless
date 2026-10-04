@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <MediaExtension/MediaExtension.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaExtension.framework/Headers/MEError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaExtension.framework/Headers/MEExtensionPlugin.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaExtension.framework/Headers/MEFormatReader.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaExtension.framework/Headers/MERAWProcessor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaExtension.framework/Headers/MEVideoDecoder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaExtension.framework/Headers/MediaExtension.h"
+#import <MediaExtension/MEError.h>
+#import <MediaExtension/MEExtensionPlugin.h>
+#import <MediaExtension/MEFormatReader.h>
+#import <MediaExtension/MERAWProcessor.h>
+#import <MediaExtension/MEVideoDecoder.h>
+#import <MediaExtension/MediaExtension.h>
 
 const long long sl_layout_118[] = {
     (long long)(MEErrorUnsupportedFeature),

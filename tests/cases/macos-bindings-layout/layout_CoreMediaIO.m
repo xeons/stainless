@@ -2,20 +2,20 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreMediaIO/CoreMediaIO.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOExtensionDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOExtensionProperties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOExtensionProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOExtensionStream.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOHardware.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOHardwareControl.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOHardwareDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOHardwareObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOHardwarePlugIn.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOHardwareStream.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOHardwareSystem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CMIOSampleBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreMediaIO.framework/Headers/CoreMediaIO.h"
+#import <CoreMediaIO/CMIOExtension.h>
+#import <CoreMediaIO/CMIOExtensionDevice.h>
+#import <CoreMediaIO/CMIOExtensionProperties.h>
+#import <CoreMediaIO/CMIOExtensionProvider.h>
+#import <CoreMediaIO/CMIOExtensionStream.h>
+#import <CoreMediaIO/CMIOHardware.h>
+#import <CoreMediaIO/CMIOHardwareControl.h>
+#import <CoreMediaIO/CMIOHardwareDevice.h>
+#import <CoreMediaIO/CMIOHardwareObject.h>
+#import <CoreMediaIO/CMIOHardwarePlugIn.h>
+#import <CoreMediaIO/CMIOHardwareStream.h>
+#import <CoreMediaIO/CMIOHardwareSystem.h>
+#import <CoreMediaIO/CMIOSampleBuffer.h>
+#import <CoreMediaIO/CoreMediaIO.h>
 
 const long long sl_layout_76[] = {
     (long long)(CMIOExtensionStreamDirectionSource),

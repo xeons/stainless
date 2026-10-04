@@ -158,11 +158,20 @@ internal static class Program
 
         WriteModules(output, perTarget, linkable);
         WriteSkipped(output, skips.Values, frameworks);
+        // Both cases ask what this SDK says, so each records which SDK that
+        // was, and is skipped on a machine whose SDK is another.
+        string sdkVersion = SdkVersion(sdk);
         if (probeCase is not null)
+        {
             LayoutCase.Write(probeCase, output, frameworks, perTarget["arm64"], perTarget["x64"], Includes);
+            File.WriteAllText(Path.Combine(probeCase, "sdk.txt"), sdkVersion + "\n");
+        }
         if (runtimeCase is not null)
+        {
             RuntimeCase.Write(runtimeCase, output, perTarget["arm64"], perTarget["x64"], ReadUnanswered(output),
                 linkable.Order(StringComparer.Ordinal));
+            File.WriteAllText(Path.Combine(runtimeCase, "sdk.txt"), sdkVersion + "\n");
+        }
         return 0;
     }
 
@@ -253,6 +262,14 @@ internal static class Program
 
     /// <summary>What each framework's translation unit included, for the layout probe to include alike.</summary>
     private static readonly Dictionary<string, string> Includes = new(StringComparer.Ordinal);
+
+    /// <summary>The version an SDK's SDKSettings.json gives, such as <c>26.2</c>.</summary>
+    internal static string SdkVersion(string sdk)
+    {
+        using var settings = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(sdk, "SDKSettings.json")));
+        return settings.RootElement.GetProperty("Version").GetString()
+            ?? throw new InvalidOperationException($"'{sdk}' says no version");
+    }
 
     private static Translation Compile(string clang, string sdk, string framework, string triple)
     {

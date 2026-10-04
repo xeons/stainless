@@ -2,21 +2,21 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SystemConfiguration/SystemConfiguration.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/CaptiveNetwork.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/DHCPClientPreferences.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCDynamicStore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCDynamicStoreCopyDHCPInfo.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCDynamicStoreCopySpecific.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCDynamicStoreKey.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCNetwork.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCNetworkConfiguration.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCNetworkConnection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCNetworkReachability.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCPreferences.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCPreferencesPath.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCPreferencesSetSpecific.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SCSchemaDefinitions.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemConfiguration.framework/Headers/SystemConfiguration.h"
+#import <SystemConfiguration/CaptiveNetwork.h>
+#import <SystemConfiguration/DHCPClientPreferences.h>
+#import <SystemConfiguration/SCDynamicStore.h>
+#import <SystemConfiguration/SCDynamicStoreCopyDHCPInfo.h>
+#import <SystemConfiguration/SCDynamicStoreCopySpecific.h>
+#import <SystemConfiguration/SCDynamicStoreKey.h>
+#import <SystemConfiguration/SCNetwork.h>
+#import <SystemConfiguration/SCNetworkConfiguration.h>
+#import <SystemConfiguration/SCNetworkConnection.h>
+#import <SystemConfiguration/SCNetworkReachability.h>
+#import <SystemConfiguration/SCPreferences.h>
+#import <SystemConfiguration/SCPreferencesPath.h>
+#import <SystemConfiguration/SCPreferencesSetSpecific.h>
+#import <SystemConfiguration/SCSchemaDefinitions.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 
 const long long sl_layout_9[] = {
     (long long)(kSCStatusOK),

@@ -2,25 +2,25 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <EventKit/EventKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKAlarm.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKCalendar.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKCalendarItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKEventStore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKParticipant.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKRecurrenceDayOfWeek.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKRecurrenceEnd.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKRecurrenceRule.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKReminder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKSource.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKStructuredLocation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKVirtualConferenceDescriptor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EKVirtualConferenceProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EventKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/EventKit.framework/Headers/EventKitDefines.h"
+#import <EventKit/EKAlarm.h>
+#import <EventKit/EKCalendar.h>
+#import <EventKit/EKCalendarItem.h>
+#import <EventKit/EKError.h>
+#import <EventKit/EKEvent.h>
+#import <EventKit/EKEventStore.h>
+#import <EventKit/EKObject.h>
+#import <EventKit/EKParticipant.h>
+#import <EventKit/EKRecurrenceDayOfWeek.h>
+#import <EventKit/EKRecurrenceEnd.h>
+#import <EventKit/EKRecurrenceRule.h>
+#import <EventKit/EKReminder.h>
+#import <EventKit/EKSource.h>
+#import <EventKit/EKStructuredLocation.h>
+#import <EventKit/EKTypes.h>
+#import <EventKit/EKVirtualConferenceDescriptor.h>
+#import <EventKit/EKVirtualConferenceProvider.h>
+#import <EventKit/EventKit.h>
+#import <EventKit/EventKitDefines.h>
 
 const long long sl_layout_86[] = {
     (long long)(EKAuthorizationStatusNotDetermined),

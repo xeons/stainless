@@ -2,30 +2,30 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ARKit/ARKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/ARKit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/ARKitCore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/anchor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/authorization.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/barcode_detection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/camera_frame_provider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/data.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/data_provider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/environment_light_estimation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/error.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/hand_skeleton.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/hand_tracking.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/identifiers.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/image_tracking.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/object.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/object_tracking.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/plane_detection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/room_tracking.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/scene_reconstruction.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/session.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/skeleton_joint.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/stereo_properties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/strings_collection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ARKit.framework/Headers/world_tracking.h"
+#import <ARKit/ARKit.h>
+#import <ARKit/ARKitCore.h>
+#import <ARKit/anchor.h>
+#import <ARKit/authorization.h>
+#import <ARKit/barcode_detection.h>
+#import <ARKit/camera_frame_provider.h>
+#import <ARKit/data.h>
+#import <ARKit/data_provider.h>
+#import <ARKit/environment_light_estimation.h>
+#import <ARKit/error.h>
+#import <ARKit/hand_skeleton.h>
+#import <ARKit/hand_tracking.h>
+#import <ARKit/identifiers.h>
+#import <ARKit/image_tracking.h>
+#import <ARKit/object.h>
+#import <ARKit/object_tracking.h>
+#import <ARKit/plane_detection.h>
+#import <ARKit/room_tracking.h>
+#import <ARKit/scene_reconstruction.h>
+#import <ARKit/session.h>
+#import <ARKit/skeleton_joint.h>
+#import <ARKit/stereo_properties.h>
+#import <ARKit/strings_collection.h>
+#import <ARKit/world_tracking.h>
 
 const long long sl_layout_49[] = {
     (long long)(ar_authorization_status_not_determined),

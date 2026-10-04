@@ -2,21 +2,21 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AudioVideoBridging/AudioVideoBridging.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB17221ACMPInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB17221ACMPMessage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB17221AECPInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB17221AECPMessage.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB17221Entity.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB17221EntityDiscovery.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB17221EntityDiscoveryDelegate.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVB1722ControlInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVBCentralManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVBConstants.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVBEthernetInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVBIPAddress.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVBInterface.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AVBMACAddress.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioVideoBridging.framework/Headers/AudioVideoBridging.h"
+#import <AudioVideoBridging/AVB17221ACMPInterface.h>
+#import <AudioVideoBridging/AVB17221ACMPMessage.h>
+#import <AudioVideoBridging/AVB17221AECPInterface.h>
+#import <AudioVideoBridging/AVB17221AECPMessage.h>
+#import <AudioVideoBridging/AVB17221Entity.h>
+#import <AudioVideoBridging/AVB17221EntityDiscovery.h>
+#import <AudioVideoBridging/AVB17221EntityDiscoveryDelegate.h>
+#import <AudioVideoBridging/AVB1722ControlInterface.h>
+#import <AudioVideoBridging/AVBCentralManager.h>
+#import <AudioVideoBridging/AVBConstants.h>
+#import <AudioVideoBridging/AVBEthernetInterface.h>
+#import <AudioVideoBridging/AVBIPAddress.h>
+#import <AudioVideoBridging/AVBInterface.h>
+#import <AudioVideoBridging/AVBMACAddress.h>
+#import <AudioVideoBridging/AudioVideoBridging.h>
 
 const long long sl_layout_57[] = {
     (long long)(AVB17221ADPEntityCapabilitiesDFUMode),

@@ -2,35 +2,35 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <DiscRecording/DiscRecording.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRBurn.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRBurn_ContentSupport.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCDText.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRContentFile.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRContentFolder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRContentObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRContentProperties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRContentTrack.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreBurn.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreCDText.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreErase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreNotifications.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreStatus.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRCoreTrack.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRErase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRFSObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRFile.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRFolder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRMSF.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRMSFFormatter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRNotificationCenter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRStatus.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRTrack.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DRTrack_ContentSupport.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DiscRecording.framework/Headers/DiscRecording.h"
+#import <DiscRecording/DRBurn.h>
+#import <DiscRecording/DRBurn_ContentSupport.h>
+#import <DiscRecording/DRCDText.h>
+#import <DiscRecording/DRContentFile.h>
+#import <DiscRecording/DRContentFolder.h>
+#import <DiscRecording/DRContentObject.h>
+#import <DiscRecording/DRContentProperties.h>
+#import <DiscRecording/DRContentTrack.h>
+#import <DiscRecording/DRCoreBurn.h>
+#import <DiscRecording/DRCoreCDText.h>
+#import <DiscRecording/DRCoreDevice.h>
+#import <DiscRecording/DRCoreErase.h>
+#import <DiscRecording/DRCoreErrors.h>
+#import <DiscRecording/DRCoreNotifications.h>
+#import <DiscRecording/DRCoreObject.h>
+#import <DiscRecording/DRCoreStatus.h>
+#import <DiscRecording/DRCoreTrack.h>
+#import <DiscRecording/DRDevice.h>
+#import <DiscRecording/DRErase.h>
+#import <DiscRecording/DRFSObject.h>
+#import <DiscRecording/DRFile.h>
+#import <DiscRecording/DRFolder.h>
+#import <DiscRecording/DRMSF.h>
+#import <DiscRecording/DRMSFFormatter.h>
+#import <DiscRecording/DRNotificationCenter.h>
+#import <DiscRecording/DRStatus.h>
+#import <DiscRecording/DRTrack.h>
+#import <DiscRecording/DRTrack_ContentSupport.h>
+#import <DiscRecording/DiscRecording.h>
 
 const long long sl_layout_84[] = {
     (long long)(sizeof(struct DRRefConCallbacks)),

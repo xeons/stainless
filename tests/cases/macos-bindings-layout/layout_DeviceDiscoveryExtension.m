@@ -2,12 +2,12 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <DeviceDiscoveryExtension/DeviceDiscoveryExtension.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceDiscoveryExtension.framework/Headers/DDCommon.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceDiscoveryExtension.framework/Headers/DDDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceDiscoveryExtension.framework/Headers/DDErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceDiscoveryExtension.framework/Headers/DDEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceDiscoveryExtension.framework/Headers/DDExtension.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/DeviceDiscoveryExtension.framework/Headers/DeviceDiscoveryExtension.h"
+#import <DeviceDiscoveryExtension/DDCommon.h>
+#import <DeviceDiscoveryExtension/DDDevice.h>
+#import <DeviceDiscoveryExtension/DDErrors.h>
+#import <DeviceDiscoveryExtension/DDEvent.h>
+#import <DeviceDiscoveryExtension/DDExtension.h>
+#import <DeviceDiscoveryExtension/DeviceDiscoveryExtension.h>
 
 const long long sl_layout_83[] = {
     (long long)(DDDeviceProtocolInvalid),

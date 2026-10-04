@@ -2,9 +2,9 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ForceFeedback/ForceFeedback.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ForceFeedback.framework/Headers/ForceFeedback.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ForceFeedback.framework/Headers/ForceFeedbackConstants.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ForceFeedback.framework/Headers/IOForceFeedbackLib.h"
+#import <ForceFeedback/ForceFeedback.h>
+#import <ForceFeedback/ForceFeedbackConstants.h>
+#import <ForceFeedback/IOForceFeedbackLib.h>
 
 const long long sl_layout_31[] = {
     (long long)(FFEFF_CARTESIAN),

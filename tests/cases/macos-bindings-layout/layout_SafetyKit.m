@@ -2,13 +2,13 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SafetyKit/SafetyKit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafetyKit.framework/Headers/SAAuthorizationStatus.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafetyKit.framework/Headers/SABase.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafetyKit.framework/Headers/SACrashDetectionEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafetyKit.framework/Headers/SACrashDetectionManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafetyKit.framework/Headers/SAEmergencyResponseManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafetyKit.framework/Headers/SAError.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SafetyKit.framework/Headers/SafetyKit.h"
+#import <SafetyKit/SAAuthorizationStatus.h>
+#import <SafetyKit/SABase.h>
+#import <SafetyKit/SACrashDetectionEvent.h>
+#import <SafetyKit/SACrashDetectionManager.h>
+#import <SafetyKit/SAEmergencyResponseManager.h>
+#import <SafetyKit/SAError.h>
+#import <SafetyKit/SafetyKit.h>
 
 const long long sl_layout_148[] = {
     (long long)(SAAuthorizationStatusNotDetermined),

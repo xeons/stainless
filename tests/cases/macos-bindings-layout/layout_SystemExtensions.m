@@ -2,7 +2,7 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SystemExtensions/SystemExtensions.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SystemExtensions.framework/Headers/SystemExtensions.h"
+#import <SystemExtensions/SystemExtensions.h>
 
 const long long sl_layout_162[] = {
     (long long)(OSSystemExtensionErrorUnknown),

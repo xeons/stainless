@@ -2,8 +2,8 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <IOBluetoothUI/IOBluetoothUI.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetoothUI.framework/Headers/IOBluetoothUI.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/IOBluetoothUI.framework/Headers/IOBluetoothUIUserLib.h"
+#import <IOBluetoothUI/IOBluetoothUI.h>
+#import <IOBluetoothUI/IOBluetoothUIUserLib.h>
 
 const long long sl_layout_101[] = {
     (long long)(kIOBluetoothServiceBrowserControllerOptionsNone),

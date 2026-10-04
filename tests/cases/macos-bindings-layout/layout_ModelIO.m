@@ -2,27 +2,27 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ModelIO/ModelIO.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLAnimatedValueTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLAnimation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLAsset.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLAssetResolver.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLCamera.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLLight.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLMaterial.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLMesh.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLMeshBuffer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLSubmesh.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLTexture.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLTransform.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLTransformStack.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLUtility.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLValueTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLVertexDescriptor.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/MDLVoxelArray.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/ModelIO.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ModelIO.framework/Headers/ModelIOExports.h"
+#import <ModelIO/MDLAnimatedValueTypes.h>
+#import <ModelIO/MDLAnimation.h>
+#import <ModelIO/MDLAsset.h>
+#import <ModelIO/MDLAssetResolver.h>
+#import <ModelIO/MDLCamera.h>
+#import <ModelIO/MDLLight.h>
+#import <ModelIO/MDLMaterial.h>
+#import <ModelIO/MDLMesh.h>
+#import <ModelIO/MDLMeshBuffer.h>
+#import <ModelIO/MDLObject.h>
+#import <ModelIO/MDLSubmesh.h>
+#import <ModelIO/MDLTexture.h>
+#import <ModelIO/MDLTransform.h>
+#import <ModelIO/MDLTransformStack.h>
+#import <ModelIO/MDLTypes.h>
+#import <ModelIO/MDLUtility.h>
+#import <ModelIO/MDLValueTypes.h>
+#import <ModelIO/MDLVertexDescriptor.h>
+#import <ModelIO/MDLVoxelArray.h>
+#import <ModelIO/ModelIO.h>
+#import <ModelIO/ModelIOExports.h>
 
 const long long sl_layout_124[] = {
     (long long)(MDLIndexBitDepthInvalid),

@@ -2,16 +2,16 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <iTunesLibrary/iTunesLibrary.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibAlbum.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibArtist.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibArtwork.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibMediaEntity.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibMediaItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibMediaItemVideoInfo.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibPlaylist.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/ITLibrary.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/iTunesLibrary.framework/Headers/iTunesLibrary.h"
+#import <iTunesLibrary/ITLibAlbum.h>
+#import <iTunesLibrary/ITLibArtist.h>
+#import <iTunesLibrary/ITLibArtwork.h>
+#import <iTunesLibrary/ITLibDefines.h>
+#import <iTunesLibrary/ITLibMediaEntity.h>
+#import <iTunesLibrary/ITLibMediaItem.h>
+#import <iTunesLibrary/ITLibMediaItemVideoInfo.h>
+#import <iTunesLibrary/ITLibPlaylist.h>
+#import <iTunesLibrary/ITLibrary.h>
+#import <iTunesLibrary/iTunesLibrary.h>
 
 const long long sl_layout_169[] = {
     (long long)(ITLibArtworkFormatNone),

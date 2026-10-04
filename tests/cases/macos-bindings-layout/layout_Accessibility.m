@@ -2,19 +2,19 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <Accessibility/Accessibility.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXAudiograph.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXBrailleMap.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXBrailleTranslator.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXColorUtilities.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXCustomContent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXFeatureOverrideSessionManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXFoundation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXHearingUtilities.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXMathExpression.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXSettings.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/AXTechnology.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accessibility.framework/Headers/Accessibility.h"
+#import <Accessibility/AXAudiograph.h>
+#import <Accessibility/AXBrailleMap.h>
+#import <Accessibility/AXBrailleTranslator.h>
+#import <Accessibility/AXColorUtilities.h>
+#import <Accessibility/AXCustomContent.h>
+#import <Accessibility/AXFeatureOverrideSessionManager.h>
+#import <Accessibility/AXFoundation.h>
+#import <Accessibility/AXHearingUtilities.h>
+#import <Accessibility/AXMathExpression.h>
+#import <Accessibility/AXRequest.h>
+#import <Accessibility/AXSettings.h>
+#import <Accessibility/AXTechnology.h>
+#import <Accessibility/Accessibility.h>
 
 const long long sl_layout_52[] = {
     (long long)(AXScaleTypeLinear),

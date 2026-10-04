@@ -2,11 +2,11 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ParavirtualizedGraphics/ParavirtualizedGraphics.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ParavirtualizedGraphics.framework/Headers/PGDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ParavirtualizedGraphics.framework/Headers/PGDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ParavirtualizedGraphics.framework/Headers/PGDeviceSpec.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ParavirtualizedGraphics.framework/Headers/PGDisplay.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ParavirtualizedGraphics.framework/Headers/ParavirtualizedGraphics.h"
+#import <ParavirtualizedGraphics/PGDefines.h>
+#import <ParavirtualizedGraphics/PGDevice.h>
+#import <ParavirtualizedGraphics/PGDeviceSpec.h>
+#import <ParavirtualizedGraphics/PGDisplay.h>
+#import <ParavirtualizedGraphics/ParavirtualizedGraphics.h>
 
 const long long sl_layout_136[] = {
     (long long)(sizeof(struct PGPhysicalMemoryRange_s)),

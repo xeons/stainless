@@ -2,9 +2,9 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ExecutionPolicy/ExecutionPolicy.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExecutionPolicy.framework/Headers/EPDeveloperTool.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExecutionPolicy.framework/Headers/EPErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ExecutionPolicy.framework/Headers/ExecutionPolicy.h"
+#import <ExecutionPolicy/EPDeveloperTool.h>
+#import <ExecutionPolicy/EPErrors.h>
+#import <ExecutionPolicy/ExecutionPolicy.h>
 
 const long long sl_layout_88[] = {
     (long long)(EPDeveloperToolStatusNotDetermined),

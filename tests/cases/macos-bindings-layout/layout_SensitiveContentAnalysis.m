@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <SensitiveContentAnalysis/SensitiveContentAnalysis.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SensitiveContentAnalysis.framework/Headers/SCSensitivityAnalysis.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SensitiveContentAnalysis.framework/Headers/SCSensitivityAnalyzer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SensitiveContentAnalysis.framework/Headers/SCVideoStreamAnalyzer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/SensitiveContentAnalysis.framework/Headers/SensitiveContentAnalysis.h"
+#import <SensitiveContentAnalysis/SCSensitivityAnalysis.h>
+#import <SensitiveContentAnalysis/SCSensitivityAnalyzer.h>
+#import <SensitiveContentAnalysis/SCVideoStreamAnalyzer.h>
+#import <SensitiveContentAnalysis/SensitiveContentAnalysis.h>
 
 const long long sl_layout_152[] = {
     (long long)(SCSensitivityAnalysisPolicyDisabled),

@@ -2,19 +2,19 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AudioUnit/AudioUnit.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AUAudioUnit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AUAudioUnitImplementation.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AUCocoaUIView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AUComponent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AUParameters.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AudioCodec.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AudioComponent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AudioOutputUnit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AudioUnit.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AudioUnitCarbonView.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AudioUnitParameters.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/AudioUnitProperties.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers/MusicDevice.h"
+#import <AudioUnit/AUAudioUnit.h>
+#import <AudioUnit/AUAudioUnitImplementation.h>
+#import <AudioUnit/AUCocoaUIView.h>
+#import <AudioUnit/AUComponent.h>
+#import <AudioUnit/AUParameters.h>
+#import <AudioUnit/AudioCodec.h>
+#import <AudioUnit/AudioComponent.h>
+#import <AudioUnit/AudioOutputUnit.h>
+#import <AudioUnit/AudioUnit.h>
+#import <AudioUnit/AudioUnitCarbonView.h>
+#import <AudioUnit/AudioUnitParameters.h>
+#import <AudioUnit/AudioUnitProperties.h>
+#import <AudioUnit/MusicDevice.h>
 
 const long long sl_layout_20[] = {
     (long long)((AUDIO_UNIT_VERSION)),

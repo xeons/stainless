@@ -2,23 +2,23 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <VideoSubscriberAccount/VideoSubscriberAccount.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAccountApplicationProvider.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAccountManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAccountManagerResult.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAccountMetadata.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAccountMetadataRequest.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAccountProviderResponse.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAppleSubscription.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAutoSignInAuthorization.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAutoSignInToken.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSAutoSignInTokenUpdateContext.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSSubscription.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSSubscriptionRegistrationCenter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSUserAccount.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VSUserAccountManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VideoSubscriberAccount.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VideoSubscriberAccountDefines.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/VideoSubscriberAccount.framework/Headers/VideoSubscriberAccountErrors.h"
+#import <VideoSubscriberAccount/VSAccountApplicationProvider.h>
+#import <VideoSubscriberAccount/VSAccountManager.h>
+#import <VideoSubscriberAccount/VSAccountManagerResult.h>
+#import <VideoSubscriberAccount/VSAccountMetadata.h>
+#import <VideoSubscriberAccount/VSAccountMetadataRequest.h>
+#import <VideoSubscriberAccount/VSAccountProviderResponse.h>
+#import <VideoSubscriberAccount/VSAppleSubscription.h>
+#import <VideoSubscriberAccount/VSAutoSignInAuthorization.h>
+#import <VideoSubscriberAccount/VSAutoSignInToken.h>
+#import <VideoSubscriberAccount/VSAutoSignInTokenUpdateContext.h>
+#import <VideoSubscriberAccount/VSSubscription.h>
+#import <VideoSubscriberAccount/VSSubscriptionRegistrationCenter.h>
+#import <VideoSubscriberAccount/VSUserAccount.h>
+#import <VideoSubscriberAccount/VSUserAccountManager.h>
+#import <VideoSubscriberAccount/VideoSubscriberAccount.h>
+#import <VideoSubscriberAccount/VideoSubscriberAccountDefines.h>
+#import <VideoSubscriberAccount/VideoSubscriberAccountErrors.h>
 
 const long long sl_layout_165[] = {
     (long long)(VSAccountAccessStatusNotDetermined),

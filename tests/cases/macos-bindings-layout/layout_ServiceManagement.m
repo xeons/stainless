@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ServiceManagement/ServiceManagement.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ServiceManagement.framework/Headers/SMAppService.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ServiceManagement.framework/Headers/SMErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ServiceManagement.framework/Headers/SMLoginItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ServiceManagement.framework/Headers/ServiceManagement.h"
+#import <ServiceManagement/SMAppService.h>
+#import <ServiceManagement/SMErrors.h>
+#import <ServiceManagement/SMLoginItem.h>
+#import <ServiceManagement/ServiceManagement.h>
 
 const long long sl_layout_153[] = {
     (long long)(kSMErrorInternalFailure),

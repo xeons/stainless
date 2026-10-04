@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <InstallerPlugins/InstallerPlugins.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InstallerPlugins.framework/Headers/InstallerPane.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InstallerPlugins.framework/Headers/InstallerPlugins.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InstallerPlugins.framework/Headers/InstallerSection.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/InstallerPlugins.framework/Headers/InstallerState.h"
+#import <InstallerPlugins/InstallerPane.h>
+#import <InstallerPlugins/InstallerPlugins.h>
+#import <InstallerPlugins/InstallerSection.h>
+#import <InstallerPlugins/InstallerState.h>
 
 const long long sl_layout_105[] = {
     (long long)(InstallerDirectionForward),

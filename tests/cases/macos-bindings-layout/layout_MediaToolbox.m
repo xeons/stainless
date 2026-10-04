@@ -2,10 +2,10 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <MediaToolbox/MediaToolbox.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaToolbox.framework/Headers/MTAudioProcessingTap.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaToolbox.framework/Headers/MTFormatNames.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaToolbox.framework/Headers/MTProfessionalVideoWorkflow.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MediaToolbox.framework/Headers/MediaToolbox.h"
+#import <MediaToolbox/MTAudioProcessingTap.h>
+#import <MediaToolbox/MTFormatNames.h>
+#import <MediaToolbox/MTProfessionalVideoWorkflow.h>
+#import <MediaToolbox/MediaToolbox.h>
 
 const long long sl_layout_23[] = {
     (long long)(kMTAudioProcessingTapCreationFlag_PreEffects),

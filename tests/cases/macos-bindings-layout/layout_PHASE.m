@@ -2,29 +2,29 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <PHASE/PHASE.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASE.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEAssetRegistry.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEDefinition.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEDirectivityModel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEDistanceModel.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEDucker.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEEngine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEEnvelope.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEGroup.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEGroupPreset.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEListener.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEMaterial.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEMedium.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEMetaParameter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEMixer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEObject.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEOccluder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASEShape.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASESoundEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASESoundEventNodes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASESource.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASESpatialPipeline.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/PHASE.framework/Headers/PHASETypes.h"
+#import <PHASE/PHASE.h>
+#import <PHASE/PHASEAssetRegistry.h>
+#import <PHASE/PHASEDefinition.h>
+#import <PHASE/PHASEDirectivityModel.h>
+#import <PHASE/PHASEDistanceModel.h>
+#import <PHASE/PHASEDucker.h>
+#import <PHASE/PHASEEngine.h>
+#import <PHASE/PHASEEnvelope.h>
+#import <PHASE/PHASEGroup.h>
+#import <PHASE/PHASEGroupPreset.h>
+#import <PHASE/PHASEListener.h>
+#import <PHASE/PHASEMaterial.h>
+#import <PHASE/PHASEMedium.h>
+#import <PHASE/PHASEMetaParameter.h>
+#import <PHASE/PHASEMixer.h>
+#import <PHASE/PHASEObject.h>
+#import <PHASE/PHASEOccluder.h>
+#import <PHASE/PHASEShape.h>
+#import <PHASE/PHASESoundEvent.h>
+#import <PHASE/PHASESoundEventNodes.h>
+#import <PHASE/PHASESource.h>
+#import <PHASE/PHASESpatialPipeline.h>
+#import <PHASE/PHASETypes.h>
 
 const long long sl_layout_135[] = {
     (long long)(PHASEUpdateModeAutomatic),

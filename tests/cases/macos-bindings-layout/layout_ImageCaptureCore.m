@@ -2,18 +2,18 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <ImageCaptureCore/ImageCaptureCore.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICCameraDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICCameraFile.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICCameraFolder.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICCameraItem.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICDeviceBrowser.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICScannerBandData.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICScannerDevice.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ICScannerFunctionalUnits.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ImageCaptureConstants.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ImageCaptureCore.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ImageCaptureCore.framework/Headers/ImageCapturePlatform.h"
+#import <ImageCaptureCore/ICCameraDevice.h>
+#import <ImageCaptureCore/ICCameraFile.h>
+#import <ImageCaptureCore/ICCameraFolder.h>
+#import <ImageCaptureCore/ICCameraItem.h>
+#import <ImageCaptureCore/ICDevice.h>
+#import <ImageCaptureCore/ICDeviceBrowser.h>
+#import <ImageCaptureCore/ICScannerBandData.h>
+#import <ImageCaptureCore/ICScannerDevice.h>
+#import <ImageCaptureCore/ICScannerFunctionalUnits.h>
+#import <ImageCaptureCore/ImageCaptureConstants.h>
+#import <ImageCaptureCore/ImageCaptureCore.h>
+#import <ImageCaptureCore/ImageCapturePlatform.h>
 
 const long long sl_layout_103[] = {
     (long long)(ICDeviceTypeCamera),

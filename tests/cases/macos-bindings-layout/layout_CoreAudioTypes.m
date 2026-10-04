@@ -2,9 +2,9 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioTypes.framework/Headers/AudioSessionTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioTypes.framework/Headers/CoreAudioBaseTypes.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreAudioTypes.framework/Headers/CoreAudioTypes.h"
+#import <CoreAudioTypes/AudioSessionTypes.h>
+#import <CoreAudioTypes/CoreAudioBaseTypes.h>
+#import <CoreAudioTypes/CoreAudioTypes.h>
 
 const long long sl_layout_11[] = {
     (long long)(kAudio_NoError),

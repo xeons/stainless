@@ -2,14 +2,14 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <CoreHaptics/CoreHaptics.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CHHapticDeviceCapability.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CHHapticEngine.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CHHapticErrors.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CHHapticEvent.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CHHapticParameter.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CHHapticPattern.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CHHapticPatternPlayer.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreHaptics.framework/Headers/CoreHaptics.h"
+#import <CoreHaptics/CHHapticDeviceCapability.h>
+#import <CoreHaptics/CHHapticEngine.h>
+#import <CoreHaptics/CHHapticErrors.h>
+#import <CoreHaptics/CHHapticEvent.h>
+#import <CoreHaptics/CHHapticParameter.h>
+#import <CoreHaptics/CHHapticPattern.h>
+#import <CoreHaptics/CHHapticPatternPlayer.h>
+#import <CoreHaptics/CoreHaptics.h>
 
 const long long sl_layout_73[] = {
     (long long)(CHHapticErrorCodeEngineNotRunning),

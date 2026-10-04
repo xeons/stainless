@@ -2,8 +2,8 @@
 // headers bound is. Do not edit; regenerate with tools/bindgen.sh.
 
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AppTrackingTransparency.framework/Headers/ATTrackingManager.h"
-#import "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AppTrackingTransparency.framework/Headers/AppTrackingTransparency.h"
+#import <AppTrackingTransparency/ATTrackingManager.h>
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
 
 const long long sl_layout_56[] = {
     (long long)(ATTrackingManagerAuthorizationStatusNotDetermined),
