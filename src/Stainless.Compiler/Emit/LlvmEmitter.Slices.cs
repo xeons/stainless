@@ -323,9 +323,8 @@ public sealed partial class LlvmEmitter
 
         if (returnInfo.Style == PassStyle.Indirect)
         {
-            var structType = (StructTypeSymbol)type.ReturnType;
-            sretSlot = Alloca(StructName(structType), "call.sret");
-            arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
+            sretSlot = Alloca(LlvmTypeOf(type.ReturnType), "call.sret");
+            arguments.Add($"ptr sret({LlvmTypeOf(type.ReturnType)}) {sretSlot}");
         }
 
         arguments.Add($"ptr {receiver}");
@@ -337,7 +336,7 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
-            return Fresh(new Val(sretSlot!, "ptr", type.ReturnType));
+            return ResultInSlot(sretSlot!, type.ReturnType);
         }
 
         if (returnInfo.Style == PassStyle.Ignore)
@@ -386,14 +385,25 @@ public sealed partial class LlvmEmitter
     {
         if (returnInfo.Style == PassStyle.Coerce)
         {
-            var structType = (StructTypeSymbol)returnType;
-            string slot = Alloca(StructName(structType), "call.result");
+            string slot = Alloca(LlvmTypeOf(returnType), "call.result");
             StoreCoerced(slot, result, returnInfo);
-            return Fresh(new Val(slot, "ptr", returnType));
+            return ResultInSlot(slot, returnType);
         }
 
         // A returned reference arrives at +1.
         return Fresh(new Val(result, returnInfo.LlvmType, returnType));
+    }
+
+    /// <summary>
+    /// A result the call wrote into a slot: a struct is held by its address, and
+    /// anything else -- a vector -- is read out of it.
+    /// </summary>
+    private Val ResultInSlot(string slot, TypeSymbol type)
+    {
+        if (type is StructTypeSymbol) return Fresh(new Val(slot, "ptr", type));
+
+        string llvmType = LlvmTypeOf(type);
+        return new Val(Emit(llvmType, $"load {llvmType}, ptr {slot}{AlignedFor(type)}"), llvmType, type);
     }
 
     private Val EmitIndirectCall(BoundIndirectCall call)
@@ -410,9 +420,8 @@ public sealed partial class LlvmEmitter
 
         if (returnInfo.Style == PassStyle.Indirect)
         {
-            var structType = (StructTypeSymbol)delegateType.ReturnType;
-            sretSlot = Alloca(StructName(structType), "call.sret");
-            arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
+            sretSlot = Alloca(LlvmTypeOf(delegateType.ReturnType), "call.sret");
+            arguments.Add($"ptr sret({LlvmTypeOf(delegateType.ReturnType)}) {sretSlot}");
         }
 
         AppendArguments(call.Arguments, arguments, call.EvaluationOrder);
@@ -431,7 +440,7 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
-            return Fresh(new Val(sretSlot!, "ptr", delegateType.ReturnType));
+            return ResultInSlot(sretSlot!, delegateType.ReturnType);
         }
 
         if (returnInfo.Style == PassStyle.Ignore)
@@ -465,9 +474,8 @@ public sealed partial class LlvmEmitter
 
         if (returnInfo.Style == PassStyle.Indirect)
         {
-            var structType = (StructTypeSymbol)function.ReturnType;
-            sretSlot = Alloca(StructName(structType), "call.sret");
-            arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
+            sretSlot = Alloca(LlvmTypeOf(function.ReturnType), "call.sret");
+            arguments.Add($"ptr sret({LlvmTypeOf(function.ReturnType)}) {sretSlot}");
         }
 
         // Held locally, not in a field: an argument may itself be an interface
@@ -511,7 +519,7 @@ public sealed partial class LlvmEmitter
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
-            return Fresh(new Val(sretSlot!, "ptr", function.ReturnType));
+            return ResultInSlot(sretSlot!, function.ReturnType);
         }
 
         if (returnInfo.Style == PassStyle.Ignore)
@@ -906,9 +914,21 @@ public sealed partial class LlvmEmitter
     /// <summary>Lowers one already-emitted value to its ABI form.</summary>
     private void AppendArgument(Val value, TypeSymbol type, List<string> arguments, bool variadic)
     {
-        if (type is StructTypeSymbol structType)
+        var classified = ClassifyValue(type, variadic);
+
+        // A vector that does not cross as itself crosses as its bytes, as a
+        // struct does: put in memory first, which is where a struct already is.
+        if (type is VectorTypeSymbol && classified.Style is PassStyle.Indirect or PassStyle.Coerce)
         {
-            var info = ClassifyValue(structType, variadic);
+            string spilled = Alloca(value.LlvmType, "arg.lanes");
+            Line($"store {value.LlvmType} {value.Ref}, ptr {spilled}{AlignedFor(type)}");
+            value = new Val(spilled, "ptr", type);
+        }
+
+        if (type is StructTypeSymbol || value.LlvmType == "ptr" && type is VectorTypeSymbol)
+        {
+            var info = classified;
+            string valueType = LlvmTypeOf(type);
             if (info.Style == PassStyle.Ignore)
                 return;
 
@@ -917,11 +937,11 @@ public sealed partial class LlvmEmitter
                 // Win64 passes a pointer to a copy the caller owns, and so does
                 // AAPCS64 -- the difference is only whether LLVM is told to
                 // make the copy itself.
-                string copy = Alloca(StructName(structType), "arg.copy");
-                MemCopy(copy, value.Ref, structType.Size);
+                string copy = Alloca(valueType, "arg.copy");
+                MemCopy(copy, value.Ref, type.Size);
                 arguments.Add(info.IndirectAsPointer
                     ? $"ptr {copy}"
-                    : $"ptr byval({StructName(structType)}) {copy}");
+                    : $"ptr byval({valueType}){IndirectAlign(info)} {copy}");
             }
             else
             {
@@ -932,7 +952,7 @@ public sealed partial class LlvmEmitter
                 if (NeedsPadding(info))
                 {
                     source = PaddedCopy(info);
-                    MemCopy(source, value.Ref, structType.Size);
+                    MemCopy(source, value.Ref, type.Size);
                 }
 
                 for (int piece = 0; piece < info.Pieces.Count; piece++)
@@ -946,6 +966,6 @@ public sealed partial class LlvmEmitter
             return;
         }
 
-        arguments.Add($"{value.LlvmType}{Widening(ClassifyValue(type, variadic))} {value.Ref}");
+        arguments.Add($"{value.LlvmType}{Widening(classified)} {value.Ref}");
     }
 }

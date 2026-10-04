@@ -394,7 +394,7 @@ public sealed partial class LlvmEmitter
             return;
         }
 
-        Line($"store {LlvmTypeOf(targetType)} {value.Ref}, ptr {slot}");
+        Line($"store {LlvmTypeOf(targetType)} {value.Ref}, ptr {slot}{AlignedFor(targetType)}");
     }
 
     /// <summary>

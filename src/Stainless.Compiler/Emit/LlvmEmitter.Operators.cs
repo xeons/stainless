@@ -246,13 +246,13 @@ public sealed partial class LlvmEmitter
                 return Same();
 
             case ConversionKind.IntegerWiden:
-                if (conversion.IsChecked)
+                if (conversion.IsChecked && conversion.Type is not VectorTypeSymbol)
                     GuardIntegerConversion(operand.Ref, conversion.Operand.Type, conversion.Type);
                 if (from == to) return new Val(operand.Ref, to, conversion.Type);
                 return Converted(IsSigned(conversion.Operand.Type) ? "sext" : "zext");
 
             case ConversionKind.IntegerNarrow:
-                if (conversion.IsChecked)
+                if (conversion.IsChecked && conversion.Type is not VectorTypeSymbol)
                     GuardIntegerConversion(operand.Ref, conversion.Operand.Type, conversion.Type);
                 if (from == to) return new Val(operand.Ref, to, conversion.Type);
                 return Converted("trunc");
@@ -262,7 +262,8 @@ public sealed partial class LlvmEmitter
 
             case ConversionKind.FloatToInt:
                 return new Val(
-                    FloatToInteger(operand.Ref, from, to, IsSigned(conversion.Type), conversion.IsChecked),
+                    FloatToInteger(operand.Ref, from, to, IsSigned(conversion.Type),
+                        conversion.IsChecked && conversion.Type is not VectorTypeSymbol),
                     to, conversion.Type);
 
             case ConversionKind.FloatResize:
@@ -321,7 +322,7 @@ public sealed partial class LlvmEmitter
             return Emit(to, $"{(signed ? "fptosi" : "fptoui")} {from} {value} to {to}");
         }
 
-        string intrinsic = $"llvm.{(signed ? "fptosi" : "fptoui")}.sat.{to}.{LlvmFloatSuffix(from)}";
+        string intrinsic = $"llvm.{(signed ? "fptosi" : "fptoui")}.sat.{OverloadSuffix(to)}.{OverloadSuffix(from)}";
         _overflowIntrinsics.Add(
             $"declare {to} @{intrinsic}({from}) nounwind willreturn memory(none) speculatable");
         return Emit(to, $"call {to} @{intrinsic}({from} {value})");
@@ -335,8 +336,21 @@ public sealed partial class LlvmEmitter
         _ => "f64",
     };
 
+    /// <summary>
+    /// How an overloaded intrinsic's name spells a type: <c>i32</c>,
+    /// <c>f32</c>, and <c>v4f32</c> for four of them.
+    /// </summary>
+    private static string OverloadSuffix(string type) =>
+        type.StartsWith('<')
+            ? $"v{type[1..type.IndexOf(' ')]}{OverloadSuffix(LaneTypeOf(type))}"
+            : type.StartsWith('i') ? type : LlvmFloatSuffix(type);
+
+    /// <summary>A vector's lane type, <c>float</c> of <c>&lt;4 x float&gt;</c>; a scalar is its own.</summary>
+    private static string LaneTypeOf(string type) =>
+        type.StartsWith('<') ? type[(type.IndexOf(" x ", StringComparison.Ordinal) + 3)..^1] : type;
+
     /// <summary>The bits an LLVM float type carries, to tell a widening from a narrowing.</summary>
-    private static int FloatWidth(string type) => type switch
+    private static int FloatWidth(string type) => LaneTypeOf(type) switch
     {
         "float" => 32,
         "double" => 64,
@@ -397,6 +411,8 @@ public sealed partial class LlvmEmitter
 
     private Val EmitUnary(BoundUnary unary)
     {
+        if (unary.Type is VectorTypeSymbol vector) return EmitVectorUnary(unary, vector);
+
         var operand = EmitExpression(unary.Operand);
         string llvmType = operand.LlvmType;
 
@@ -441,6 +457,8 @@ public sealed partial class LlvmEmitter
                     $"getelementptr inbounds {element}, ptr {basePointer.Ref}, {Word} {index}"),
                 "ptr", binary.Type);
         }
+
+        if (binary.Left.Type is VectorTypeSymbol vector) return EmitVectorBinary(binary, vector);
 
         var left = EmitExpression(binary.Left);
         var right = EmitExpression(binary.Right);

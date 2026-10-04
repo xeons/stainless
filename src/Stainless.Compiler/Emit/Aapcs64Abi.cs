@@ -99,6 +99,26 @@ public static class Aapcs64Abi
         TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf,
         bool darwin = false, bool windowsVariadic = false)
     {
+        // Four bytes or less in a general register; three lanes of eight or
+        // sixteen bytes as that many 32-bit lanes; wider than sixteen behind a
+        // pointer; and the rest in a SIMD register as itself.
+        if (type is VectorTypeSymbol vector)
+            return vector switch
+            {
+                { Size: <= 4 } => new ArgInfo(PassStyle.Coerce, "i32", type)
+                {
+                    Pieces = ["i32"],
+                    PaddedSize = vector.Size < 4 ? 4 : 0,
+                },
+                { Size: > MaxRegisterSize } =>
+                    new ArgInfo(PassStyle.Indirect, "ptr", type) { IndirectAsPointer = true },
+                { Lanes: 3 } => new ArgInfo(PassStyle.Coerce, $"<{vector.Size / 4} x i32>", type)
+                {
+                    Pieces = [$"<{vector.Size / 4} x i32>"],
+                },
+                _ => ArgInfo.Scalar(type, llvmTypeOf, widened: false),
+            };
+
         if (type is not StructTypeSymbol structType)
             return ArgInfo.Scalar(type, llvmTypeOf, widened: darwin);
 
@@ -109,7 +129,7 @@ public static class Aapcs64Abi
         // come into it: four doubles is thirty-two bytes and travels in v0-v3.
         if (!windowsVariadic && Homogeneous(structType) is { } homogeneous)
         {
-            string spelling = $"[{homogeneous.Count} x {llvmTypeOf(homogeneous.Element)}]";
+            string spelling = $"[{homogeneous.Count} x {Member(homogeneous.Element, llvmTypeOf)}]";
             return new ArgInfo(PassStyle.Coerce, spelling, type) { Pieces = [spelling] };
         }
 
@@ -131,6 +151,12 @@ public static class Aapcs64Abi
         TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf, bool darwin = false)
     {
         if (type.IsVoid()) return new ArgInfo(PassStyle.Direct, "void", type);
+
+        // A vector comes back as itself, unless it is wider than sixteen bytes.
+        if (type is VectorTypeSymbol vector)
+            return vector.Size > MaxRegisterSize
+                ? new ArgInfo(PassStyle.Indirect, "ptr", type)
+                : ArgInfo.Scalar(type, llvmTypeOf, widened: false);
 
         if (type is not StructTypeSymbol structType)
             return ArgInfo.Scalar(type, llvmTypeOf, widened: darwin);
@@ -198,10 +224,24 @@ public static class Aapcs64Abi
     /// one float in it is neither -- so it is not this, whatever its members
     /// look like one at a time.
     /// </summary>
-    private static (PrimitiveTypeSymbol Element, int Count)? Homogeneous(
+    /// <summary>
+    /// How one member of a homogeneous aggregate is spelled: a float as
+    /// itself, a vector of three lanes as the four it takes the room of.
+    /// </summary>
+    private static string Member(TypeSymbol element, Func<TypeSymbol, string> llvmTypeOf) =>
+        element is VectorTypeSymbol vector
+            ? $"<{vector.Size / vector.Element.Size} x {llvmTypeOf(vector.Element)}>"
+            : llvmTypeOf(element);
+
+    /// <summary>
+    /// The member type -- one floating-point type, or vectors of eight or of
+    /// sixteen bytes, whose lanes do not matter -- and how many, or null when
+    /// the value is not a homogeneous aggregate.
+    /// </summary>
+    private static (TypeSymbol Element, int Count)? Homogeneous(
         StructTypeSymbol structType)
     {
-        PrimitiveTypeSymbol? element = null;
+        TypeSymbol? element = null;
         int members = 0;
 
         if (!Gather(structType, ref element, ref members)) return null;
@@ -216,7 +256,7 @@ public static class Aapcs64Abi
     /// whatever is nested. False the moment anything that is not the one
     /// floating-point type turns up.
     /// </summary>
-    private static bool Gather(TypeSymbol type, ref PrimitiveTypeSymbol? element, ref int members)
+    private static bool Gather(TypeSymbol type, ref TypeSymbol? element, ref int members)
     {
         switch (type)
         {
@@ -255,8 +295,15 @@ public static class Aapcs64Abi
             }
 
             case PrimitiveTypeSymbol { Kind: PrimitiveKind.Float or PrimitiveKind.Double or PrimitiveKind.NDouble } real:
-                if (element is not null && element.Kind != real.Kind) return false;
+                if (element is not null && element != real) return false;
                 element = real;
+                members++;
+                return true;
+
+            case VectorTypeSymbol { Size: 8 or 16 } vector:
+                if (element is not null && (element is not VectorTypeSymbol || element.Size != vector.Size))
+                    return false;
+                element ??= vector;
                 members++;
                 return true;
 

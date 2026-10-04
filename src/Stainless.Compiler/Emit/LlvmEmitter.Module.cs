@@ -284,6 +284,10 @@ public sealed partial class LlvmEmitter
 
         EnumTypeSymbol enumType => MeasuredAs(enumType.UnderlyingType),
 
+        // LLVM aligns a vector to its whole size, where C stops at sixteen on
+        // ARM and on Apple's targets. A struct holding one is then packed.
+        VectorTypeSymbol vector => (vector.Size, vector.Size),
+
         PrimitiveTypeSymbol primitive => primitive.Kind switch
         {
             PrimitiveKind.Void => (0, 1),
@@ -525,7 +529,7 @@ public sealed partial class LlvmEmitter
             PassStyle.Indirect => [
                 info.IndirectAsPointer
                     ? "ptr"
-                    : $"ptr byval({StructName((StructTypeSymbol)info.Type)})"],
+                    : $"ptr byval({LlvmTypeOf(info.Type)}){IndirectAlign(info)}"],
             PassStyle.Coerce => info.Pieces,
             PassStyle.Ignore => [],
             _ => [info.LlvmType + Widening(info)],
@@ -548,12 +552,16 @@ public sealed partial class LlvmEmitter
     /// The attribute that says a value was widened, with its leading space, or
     /// nothing. It follows the type in a parameter and precedes it in a result.
     /// </summary>
-    private static string Widening(ArgInfo info) => info.Extension switch
+    private static string Widening(ArgInfo info) => (info.Extension switch
     {
         ArgExtension.Sign => " signext",
         ArgExtension.Zero => " zeroext",
         _ => "",
-    };
+    }) + (info.InRegister ? " inreg" : "");
+
+    /// <summary>The <c>align</c> a <c>byval</c> states, where it is not LLVM's own.</summary>
+    private static string IndirectAlign(ArgInfo info) =>
+        info.IndirectAlignment > 0 ? $" align {info.IndirectAlignment}" : "";
 
     /// <summary>
     /// A result as a definition, a declaration or a call spells it:
@@ -686,7 +694,7 @@ public sealed partial class LlvmEmitter
             var parts = new List<string>();
 
             if (returnInfo.Style == PassStyle.Indirect)
-                parts.Add($"ptr sret({StructName((StructTypeSymbol)function.ReturnType)})");
+                parts.Add($"ptr sret({LlvmTypeOf(function.ReturnType)})");
 
             int declaredFirst = parts.Count;
             foreach (var parameter in function.Parameters)

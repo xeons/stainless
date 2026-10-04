@@ -347,6 +347,21 @@ public sealed class DebugInfo
                 return id;
             }
 
+            // DWARF's array, marked as a vector, which is how clang describes
+            // one and what lets a debugger print it as a register.
+            case VectorTypeSymbol vector:
+            {
+                int id = Reserve();
+                _types[type] = id;
+                int range = Add($"!DISubrange(count: {vector.Lanes})");
+                Fill(id,
+                    $"!DICompositeType(tag: DW_TAG_array_type, " +
+                    $"baseType: !{Type(vector.Element)}, size: {(long)vector.Size * 8}, " +
+                    $"align: {vector.Alignment * 8}, flags: DIFlagVector, " +
+                    $"elements: !{Add($"!{{!{range}}}")})");
+                return id;
+            }
+
             case StructTypeSymbol structType:
                 return Composite(structType, structType.Size, headerBytes: 0,
                                  asBody: false);

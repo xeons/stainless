@@ -770,6 +770,29 @@ public abstract class BoundTreeRewriter
                     : new BoundTupleCreate(tuple.Span, tuple.Tuple, elements);
             }
 
+            case BoundVectorNew made:
+            {
+                var parts = RewriteAll(made.Parts);
+                return Same(made.Parts, parts) ? made : new BoundVectorNew(made.Span, made.Vector, parts);
+            }
+
+            case BoundVectorShuffle shuffle:
+            {
+                var vector = Rewrite(shuffle.Vector);
+                return Same(shuffle.Vector, vector)
+                    ? shuffle
+                    : new BoundVectorShuffle(shuffle.Span, (VectorTypeSymbol)shuffle.Type, vector, shuffle.Lanes);
+            }
+
+            case BoundSwizzleAssignment written:
+            {
+                var target = (BoundVectorShuffle)Rewrite(written.Target);
+                var value = Rewrite(written.Value);
+                return Same(written.Target, target) && Same(written.Value, value)
+                    ? written
+                    : new BoundSwizzleAssignment(written.Span, target, value);
+            }
+
             case BoundTupleDraft tuple:
             {
                 var elements = RewriteAll(tuple.Elements);

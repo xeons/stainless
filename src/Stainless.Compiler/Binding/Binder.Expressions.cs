@@ -157,6 +157,8 @@ public sealed partial class Binder
     {
         if (value.Type.IsError()) return value;
         if (_builtins.IsString(value.Type)) return value;
+        if (value.Type is VectorTypeSymbol vector)
+            return VectorText(value, vector, span, lane => AsText(lane, span));
         if (AsFormattable(value, "", span) is { } written) return written;
 
         if (value.Type is EnumTypeSymbol enumType)
@@ -205,6 +207,8 @@ public sealed partial class Binder
         BoundExpression value, string format, SourceSpan formatSpan, SourceSpan span)
     {
         if (value.Type.IsError()) return value;
+        if (value.Type is VectorTypeSymbol vector)
+            return VectorText(value, vector, span, lane => AsFormattedText(lane, format, formatSpan, span));
         if (AsFormattable(value, format, span) is { } written) return written;
 
         bool isInteger = value.Type is PrimitiveTypeSymbol
@@ -1259,6 +1263,9 @@ public sealed partial class Binder
         if (FindUnaryOperator(syntax.Span, syntax.Operator, operand) is { } overloaded)
             return overloaded;
 
+        if (operand.Type is VectorTypeSymbol vector)
+            return BindVectorUnary(syntax, operand, vector);
+
         if (syntax.Operator == TokenKind.Plus)
             return operand;
 
@@ -1520,6 +1527,9 @@ public sealed partial class Binder
                            (left.Type is NullType || right.Type is NullType);
         if (!againstNull && FindBinaryOperator(span, token, left, right) is { } overloaded)
             return overloaded;
+
+        if (left.Type is VectorTypeSymbol || right.Type is VectorTypeSymbol)
+            return BindVectorBinary(span, left, op, right, token);
 
         // Pointer arithmetic: p + i, p - i.
         if (left.Type is PointerTypeSymbol && op is BoundBinaryOp.Add or BoundBinaryOp.Subtract &&
@@ -2469,7 +2479,7 @@ public sealed partial class Binder
             {
                 BoundFieldAccess { Receiver: { } receiver, Field.ContainingType: StructTypeSymbol }
                     => receiver,
-                BoundIndex { Target.Type: FixedArrayTypeSymbol } element => element.Target,
+                BoundIndex element when element.Target.Type.HoldsElementsInline() => element.Target,
                 _ => null,
             };
 
@@ -2657,6 +2667,8 @@ public sealed partial class Binder
 
         if (target.Type.IsError() || value.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
+
+        if (target is BoundVectorShuffle swizzle) return BindSwizzleAssignment(syntax, swizzle, value);
 
         if (!Writable(target, syntax.Target.Span, "=")) return new BoundErrorExpression(syntax.Span);
 
@@ -3134,7 +3146,7 @@ public sealed partial class Binder
             return BindPositionIndex(target, position, syntax.Span);
 
         if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol or SliceTypeSymbol
-                                or FixedArrayTypeSymbol))
+                                or FixedArrayTypeSymbol or VectorTypeSymbol))
         {
             diagnostics.Error("SL0241", syntax.Span,
                 target.Type is NamedTypeSymbol subject && subject.Properties.Any(p => p.IsIndexer)
@@ -3188,6 +3200,22 @@ public sealed partial class Binder
             }
 
             return new BoundIndex(syntax.Span, inline.Element, target, PromoteToInt(index));
+        }
+
+        // A lane count is in the type as a length is, and checked the same way.
+        if (target.Type is VectorTypeSymbol lanes)
+        {
+            if (FoldSwitchLabel(index) is { } constant &&
+                constant <= long.MaxValue && (long)constant >= lanes.Lanes)
+            {
+                diagnostics.Error("SL0490", syntax.Indices[0].Span,
+                    $"index {constant} is past the end of '{lanes.Name}', which has " +
+                    $"{Counted(lanes.Lanes, "lane")}",
+                    lanes);
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return new BoundIndex(syntax.Span, lanes.Element, target, PromoteToInt(index));
         }
 
         if (target.Type is ArrayTypeSymbol array)

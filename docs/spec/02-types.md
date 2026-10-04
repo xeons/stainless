@@ -3377,6 +3377,93 @@ public void Clear() where T : zeroable      // Span<String> has no Clear
 **Not in scope:** an `enum` with no member at zero, and a `variant` whose
 cases leave tag zero unused. Their zero names nothing, but it is not a null.
 
+## 2.17 `vfloat4` -- SIMD vectors
+
+```csharp
+vfloat4 position = new vfloat4(1, 2, 3, 1);
+vfloat4 moved = position + velocity * seconds;     // lane by lane
+vfloat3 back = position.zyx;                       // a swizzle
+position.xy = new vfloat2(0, 0);                   // written through one
+```
+
+**A vector is a fixed number of lanes of one type, operated on together.** It
+is LLVM's vector type and C's `ext_vector_type`, so it is a value that lives
+in a register, and an operation on it is one instruction where the target has
+one -- SSE on x86, NEON on ARM -- and the lanes one at a time where it does not.
+It is in the language rather than the library so that every target gets that
+code from the same source.
+
+**The name is the lane type and the count, after a `v`**: `vfloat4` is four
+floats, `vint8` eight ints, `vbyte16` sixteen bytes. The `v` says it is a
+vector rather than a number, and keeps `vint8` from reading as an eight-bit
+integer. The names are not reserved: a type a program declares under one of
+them is the one it means.
+
+| Lanes of | Counts |
+|---|---|
+| `sbyte` `byte` | 2, 3, 4, 8, 16, 32, 64 |
+| `short` `ushort` | 2, 3, 4, 8, 16, 32 |
+| `int` `uint` `float` | 2, 3, 4, 8, 16 |
+| `long` `ulong` `double` | 2, 3, 4, 8 |
+
+which is Apple's simd set: nothing wider than 64 bytes.
+
+**Laid out as C lays it out**: the lanes rounded up to a power of two, so a
+`vfloat3` takes the sixteen bytes of a `vfloat4`, and aligned to that size --
+up to sixteen on ARM and on every Apple target, and without a limit on x86
+Windows and Linux, where a `vdouble4` is aligned to 32. A struct holding a
+vector is the C struct holding it, and a class or array of them is allocated
+to that alignment.
+
+**Made with `new`**, from a value per lane, one value for every lane, or
+smaller vectors and lanes joined in order:
+
+```csharp
+new vfloat4(1, 2, 3, 4)
+new vfloat4(0.5f)               // every lane
+new vfloat4(v.xyz, 1)           // three lanes, then one
+new vfloat4()                   // zero
+```
+
+A lane is converted as an argument would be, and the count has to come out
+right (SL0929).
+
+**A lane is storage.** `v.x`, `v.y`, `v.z` and `v.w` name the first four,
+`v[i]` names any one -- checked against the count, at compile time for a
+constant (SL0490) -- and either may be assigned, incremented or passed by
+`ref`. Up to four letters read several lanes as a vector, in the order
+written, and a vector with an even count has halves: `lo`, `hi`, `even` and
+`odd`. A swizzle may be assigned when it names each lane once (SL0931):
+`v.zw = p` writes two lanes and leaves the rest.
+
+**Operators work lane by lane**: `+ - * / %` on every vector, `& | ^ ~ << >>
+>>>` on integer lanes. A lane value on one side fills every lane, so `v * 2`
+scales. Arithmetic wraps as SIMD does, whatever `checked` says; an integer
+division by zero in any lane stops the program, as it does for a number.
+Two different vectors do not mix (SL0932): one is cast to the other first.
+
+**`==` is a `bool`**, true when every lane is equal, and `!=` is its opposite.
+A vector is not ordered as a whole, so `<` is refused (SL0932); comparing lane
+by lane gives a mask, which is a function and not an operator.
+
+**A cast converts each lane**, as each lane alone would convert -- saturating
+from float to integer, wrapping from wider integer to narrower -- between
+vectors of the same count. Nothing converts implicitly.
+
+**In an interpolation** a vector is written as .NET writes one: `<1, 2, 3, 4>`,
+each lane as that number alone would be, and a format applying to every lane.
+
+**Across `extern "C"` a vector is passed as clang passes the same
+`ext_vector_type`** on that target, and the conventions disagree a great deal:
+System V passes eight bytes as a `double` and anything wider than sixteen in
+memory; AAPCS64 passes three lanes as four 32-bit ones and anything wider than
+sixteen behind a pointer; 32-bit Windows passes three in SSE registers and the
+rest behind pointers, which no Stainless signature spells, so a fourth by value
+is refused there (SL0933). A struct holding vectors is classified as C
+classifies it, as a homogeneous aggregate on ARM included. A C header names
+each vector with a `typedef` of `ext_vector_type`, which MSVC cannot read, so
+such a header refuses MSVC.
+
 ---
 
 <sub>[&larr; Modules](01-modules.md) &nbsp;&middot;&nbsp; [Text &rarr;](03-text.md)</sub>

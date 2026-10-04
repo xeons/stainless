@@ -753,4 +753,67 @@ public class AbiTests
 
         Assert.Contains("define i16 @widen(i16 %arg.a)", ir);
     }
+
+    private static readonly string[] s_vectorShapes =
+        ["vbyte2", "vbyte3", "vshort3", "vbyte8", "vint2", "vfloat2", "vfloat3", "vint4", "vdouble3", "vbyte64"];
+
+    /// <summary>
+    /// How clang 21 declared <c>T pass(T a)</c> over ext_vector_type for a
+    /// target, one shape per rule a convention has for vectors.
+    /// </summary>
+    private static string ClangVectorSignature(string target, string vector)
+    {
+        string plain = LlvmEmitter.LlvmTypeOf(VectorTypeSymbol.Named(vector)!);
+        string name = "@pass_" + vector;
+        bool wide = target == "x64-linux";
+
+        return target switch
+        {
+            "x64-windows" => $"define {plain} {name}({plain} %arg.a)",
+            "x86-windows" => $"define {plain} {name}({plain} inreg %arg.a)",
+            "x86-linux" => $"define {plain} {name}({(vector is "vbyte8" or "vint2" ? "i64" : plain)} %arg.a)",
+            "x64-linux" or "x64-macos" => vector switch
+            {
+                "vbyte2" => $"define i16 {name}(i16 %arg.a)",
+                "vbyte3" => $"define i32 {name}(i32 %arg.a)",
+                "vshort3" or "vbyte8" or "vint2" or "vfloat2" => $"define double {name}(double %arg.a)",
+                "vdouble3" => $"define {plain} {name}(ptr byval({plain}) align {(wide ? 32 : 16)} %arg.a)",
+                "vbyte64" => $"define {plain} {name}(ptr byval({plain}) align {(wide ? 64 : 16)} %arg.a)",
+                _ => $"define {plain} {name}({plain} %arg.a)",
+            },
+            _ => vector switch
+            {
+                "vbyte2" or "vbyte3" => $"define {plain} {name}(i32 %arg.a)",
+                "vshort3" => $"define {plain} {name}(<2 x i32> %arg.a)",
+                "vfloat3" => $"define {plain} {name}(<4 x i32> %arg.a)",
+                "vdouble3" or "vbyte64" => $"define void {name}(ptr sret({plain}) %sret.result, ptr %arg.a)",
+                _ => $"define {plain} {name}({plain} %arg.a)",
+            },
+        };
+    }
+
+    [Theory]
+    [InlineData("x64-windows")]
+    [InlineData("x86-windows")]
+    [InlineData("arm64-windows")]
+    [InlineData("x64-linux")]
+    [InlineData("x86-linux")]
+    [InlineData("arm64-linux")]
+    [InlineData("x64-macos")]
+    [InlineData("arm64-macos")]
+    public void AVectorCrossesAsClangPassesIt(string target)
+    {
+        string source = string.Concat(
+            s_vectorShapes.Select(v => $"export \"C\" {v} pass_{v}({v} a) => a;\n"));
+
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = TargetPlatform.Parse(target)!;
+        string ir;
+        try { ir = Front.ModuleIr(source, TargetPlatform.Current.Abi); }
+        finally { TargetPlatform.Current = before; }
+
+        // Windows marks an export, which clang's own definition does not say.
+        ir = ir.Replace("define dllexport ", "define ");
+        Assert.All(s_vectorShapes, v => Assert.Contains(ClangVectorSignature(target, v), ir));
+    }
 }

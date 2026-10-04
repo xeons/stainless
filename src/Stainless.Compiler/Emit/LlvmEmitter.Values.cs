@@ -69,6 +69,8 @@ public sealed partial class LlvmEmitter
         // is what makes a struct holding one the width the C struct is.
         FixedArrayTypeSymbol inline => $"[{inline.Length} x {LlvmTypeOf(inline.Element)}]",
 
+        VectorTypeSymbol vector => $"<{vector.Lanes} x {LlvmTypeOf(vector.Element)}>",
+
         // A delegate is a bare function pointer, which is what makes it the
         // same value a C function pointer is.
         DelegateTypeSymbol => "ptr",
@@ -102,6 +104,7 @@ public sealed partial class LlvmEmitter
     {
         // An enum orders and shifts as the integer it is represented by.
         EnumTypeSymbol enumType => enumType.UnderlyingType.IsSigned,
+        VectorTypeSymbol vector => vector.Element.IsSigned,
         _ => type is PrimitiveTypeSymbol { IsSigned: true },
     };
 
@@ -195,8 +198,37 @@ public sealed partial class LlvmEmitter
 
         _ when llvmType.StartsWith('%') =>
             _structAlignment.TryGetValue(llvmType, out int declared) ? declared : 1,
+        _ when llvmType.StartsWith('<') => VectorNamed(llvmType).Alignment,
         _ => 8,
     };
+
+    /// <summary>The vector an IR spelling such as <c>&lt;4 x float&gt;</c> is.</summary>
+    private static VectorTypeSymbol VectorNamed(string llvmType)
+    {
+        int x = llvmType.IndexOf(" x ", StringComparison.Ordinal);
+        int lanes = int.Parse(llvmType.AsSpan(1, x - 1), CultureInfo.InvariantCulture);
+        string element = llvmType[(x + 3)..^1];
+        var primitive = element switch
+        {
+            "i8" => PrimitiveTypeSymbol.Byte,
+            "i16" => PrimitiveTypeSymbol.UShort,
+            "i32" => PrimitiveTypeSymbol.UInt,
+            "i64" => PrimitiveTypeSymbol.ULong,
+            "float" => PrimitiveTypeSymbol.Float,
+            "double" => PrimitiveTypeSymbol.Double,
+            _ => throw new Source.InternalCompilerError($"'{llvmType}' is no vector a program can name"),
+        };
+        return VectorTypeSymbol.Of(primitive, lanes)
+            ?? throw new Source.InternalCompilerError($"'{llvmType}' is no vector a program can name");
+    }
+
+    /// <summary>
+    /// The <c>align</c> a load or store of this type states, where LLVM's own
+    /// would claim more than C gives it: a vector wider than sixteen bytes on
+    /// ARM and on Apple's targets, which C aligns to sixteen and LLVM to its size.
+    /// </summary>
+    private static string AlignedFor(TypeSymbol type) =>
+        type is VectorTypeSymbol vector ? $", align {vector.Alignment}" : "";
 
     /// <summary>
     /// Ties a stack slot to the name and type the source gave it, so a debugger

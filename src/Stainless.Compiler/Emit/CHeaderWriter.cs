@@ -92,6 +92,21 @@ public static class CHeaderWriter
             sb.AppendLine();
         }
 
+        // A vector is clang's extension, which gcc has too and MSVC has not;
+        // a header naming one refuses there rather than declaring it wrongly.
+        var vectors = Mentioned(exports, named).OfType<VectorTypeSymbol>()
+            .Distinct().OrderBy(v => v.Name, StringComparer.Ordinal).ToList();
+        if (vectors.Count > 0)
+        {
+            sb.AppendLine("#if defined(_MSC_VER) && !defined(__clang__)");
+            sb.AppendLine("#error \"this header has a SIMD vector, which MSVC has no way to declare\"");
+            sb.AppendLine("#endif");
+            foreach (var vector in vectors)
+                sb.AppendLine($"typedef {TypeName(vector.Element)} {vector.Name} " +
+                              $"__attribute__((ext_vector_type({vector.Lanes})));");
+            sb.AppendLine();
+        }
+
         // A packed field has gcc's and clang's spelling and no MSVC one; a
         // header that would lay the struct out wrongly there refuses instead.
         if (named.Any(t => t is StructTypeSymbol && t.Fields.Any(f => f.IsPacked)))
@@ -262,22 +277,15 @@ public static class CHeaderWriter
     }
 
     /// <summary>
-    /// Gathers the named types an export mentions, depth first, so anything a
-    /// declaration depends on is written before the declaration itself.
-    /// </summary>
-    /// <summary>
-    /// Whether char16 or char32 appears anywhere the header will spell out.
+    /// Every type the header spells out, through pointers and inline arrays.
     ///
     /// <see cref="Collect"/> has already walked every exported signature into
     /// <paramref name="named"/>, so between the two lists every type the header
     /// writes is reachable from here without walking the program again.
     /// </summary>
-    private static bool MentionsWideChar(
+    private static IEnumerable<TypeSymbol> Mentioned(
         IReadOnlyList<FunctionSymbol> exports, IReadOnlyList<NamedTypeSymbol> named)
     {
-        static bool Wide(TypeSymbol type) => Bare(type) is
-            PrimitiveTypeSymbol { Kind: PrimitiveKind.Char16 or PrimitiveKind.Char32 };
-
         static TypeSymbol Bare(TypeSymbol type) => type switch
         {
             PointerTypeSymbol pointer => Bare(pointer.Element),
@@ -287,21 +295,34 @@ public static class CHeaderWriter
 
         foreach (var function in exports)
         {
-            if (Wide(function.ReturnType)) return true;
-            if (function.Parameters.Any(p => Wide(p.Type))) return true;
+            yield return Bare(function.ReturnType);
+            foreach (var parameter in function.Parameters)
+                yield return Bare(parameter.Type);
         }
 
         foreach (var type in named)
         {
-            if (type.Fields.Any(f => Wide(f.Type))) return true;
-            if (type is DelegateTypeSymbol signature &&
-                (Wide(signature.ReturnType) || signature.Signature.Any(p => Wide(p.Type))))
-                return true;
+            foreach (var field in type.Fields)
+                yield return Bare(field.Type);
+            if (type is DelegateTypeSymbol signature)
+            {
+                yield return Bare(signature.ReturnType);
+                foreach (var parameter in signature.Signature)
+                    yield return Bare(parameter.Type);
+            }
         }
-
-        return false;
     }
 
+    /// <summary>Whether char16 or char32 appears anywhere the header will spell out.</summary>
+    private static bool MentionsWideChar(
+        IReadOnlyList<FunctionSymbol> exports, IReadOnlyList<NamedTypeSymbol> named) =>
+        Mentioned(exports, named).Any(type =>
+            type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Char16 or PrimitiveKind.Char32 });
+
+    /// <summary>
+    /// Gathers the named types an export mentions, depth first, so anything a
+    /// declaration depends on is written before the declaration itself.
+    /// </summary>
     private static void Collect(
         TypeSymbol type, List<NamedTypeSymbol> ordered, HashSet<NamedTypeSymbol> seen)
     {
@@ -446,6 +467,9 @@ public static class CHeaderWriter
         // pointer; both are typedef'd above, so the name is enough here.
         EnumTypeSymbol enumType => CName(enumType),
         DelegateTypeSymbol delegateType => CName(delegateType),
+
+        // Typedef'd above as clang's ext_vector_type.
+        VectorTypeSymbol vector => vector.Name,
 
         // A managed reference has no C spelling. It crosses as an opaque handle,
         // which the caller must not free or dereference.

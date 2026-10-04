@@ -50,7 +50,7 @@ internal sealed class Places(Func<string, TypeSymbol, LocalSymbol> newLocal)
                         : HoldContainer(receiver, held, everything),
                     field.Field);
 
-            case BoundIndex { Target.Type: FixedArrayTypeSymbol } element:
+            case BoundIndex element when element.Target.Type.HoldsElementsInline():
                 return new BoundIndex(element.Span, element.Type,
                     HoldPlace(element.Target, held, everything),
                     HoldValue(element.Index, held, everything))

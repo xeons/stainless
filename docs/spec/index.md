@@ -110,6 +110,7 @@ Primitives, `struct`, `class`, `record`, pointers, `variant`, `union`, `Result`,
   - [2.16.2 Fields](02-types.md#2162-fields)
   - [2.16.3 Arrays](02-types.md#2163-arrays)
   - [2.16.4 Generics](02-types.md#2164-generics)
+- [2.17 `vfloat4` -- SIMD vectors](02-types.md#217-vfloat4----simd-vectors)
 
 ### [3. Text](03-text.md)
 

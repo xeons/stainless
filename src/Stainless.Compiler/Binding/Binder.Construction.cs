@@ -231,7 +231,7 @@ public sealed partial class Binder
         {
             ClassTypeSymbol made => !made.IsAbstract && !made.IsStaticClass,
             UnionTypeSymbol or VariantTypeSymbol => false,
-            StructTypeSymbol => true,
+            StructTypeSymbol or VectorTypeSymbol => true,
             _ => false,
         };
 
@@ -251,6 +251,9 @@ public sealed partial class Binder
         // a different expression with the same spelling.
         if (type is StructTypeSymbol and not (UnionTypeSymbol or VariantTypeSymbol))
             return BindStructConstruction(syntax, (StructTypeSymbol)type, arguments);
+
+        if (type is VectorTypeSymbol vector)
+            return BindVectorNew(syntax, vector, arguments);
 
         if (type is not ClassTypeSymbol classType)
         {

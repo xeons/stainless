@@ -263,6 +263,14 @@ public static class Mangler
                 AppendType(sb, fixedArray.Element);
                 break;
 
+            // Lanes first, as an inline array's length is.
+            case VectorTypeSymbol vector:
+                sb.Append('V');
+                sb.Append(vector.Lanes);
+                sb.Append('_');
+                AppendType(sb, vector.Element);
+                break;
+
             case StructTypeSymbol structType:
                 sb.Append('S');
                 AppendIdentifier(sb, Sanitize(structType.QualifiedName));

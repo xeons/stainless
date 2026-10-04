@@ -696,10 +696,11 @@ public sealed partial class LlvmEmitter
 
     /// <summary>
     /// What a TypeInfo says its instances' storage is aligned to: the
-    /// alignment, when it is more than malloc's sixteen, and 0 otherwise, which
-    /// the runtime reads as malloc's own.
+    /// alignment, when it is more than malloc's, and 0 otherwise, which the
+    /// runtime reads as malloc's own.
     /// </summary>
-    private static int StorageAlignment(int alignment) => alignment > 16 ? alignment : 0;
+    private static int StorageAlignment(int alignment) =>
+        alignment > TargetPlatform.Current.MallocAlignment ? alignment : 0;
 
     private readonly StringBuilder _metadata = new();
     private int _nextMetadata;

@@ -291,6 +291,91 @@ public sealed class FixedArrayTypeSymbol : TypeSymbol
 }
 
 /// <summary>
+/// <c>vfloat4</c>: a SIMD vector, its lanes operated on together. LLVM's
+/// vector type and C's <c>ext_vector_type</c>, so it is a value held in a
+/// register, and SSE, NEON or scalar code as the target has.
+///
+/// A vector is as wide as its lanes rounded up to a power of two, so three
+/// lanes take the room of four, and aligned to that width up to
+/// <see cref="TargetPlatform.VectorAlignmentLimit"/>. Made only by
+/// <see cref="Of"/>, so one element and lane count is one object.
+/// </summary>
+public sealed class VectorTypeSymbol : TypeSymbol
+{
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<(PrimitiveKind, int), VectorTypeSymbol>
+        s_made = new();
+
+    private VectorTypeSymbol(PrimitiveTypeSymbol element, int lanes)
+    {
+        Element = element;
+        Lanes = lanes;
+        Name = "v" + element.Name + lanes;
+    }
+
+    /// <summary>The vector of these lanes, or null when there is no such vector.</summary>
+    public static VectorTypeSymbol? Of(PrimitiveTypeSymbol element, int lanes) =>
+        IsElement(element) && LaneCounts(element).Contains(lanes)
+            ? s_made.GetOrAdd((element.Kind, lanes), _ => new VectorTypeSymbol(element, lanes))
+            : null;
+
+    /// <summary>The vector a name such as <c>vfloat4</c> spells, or null.</summary>
+    public static VectorTypeSymbol? Named(string name)
+    {
+        if (name.Length < 3 || name[0] != 'v') return null;
+
+        int digits = name.Length;
+        while (digits > 1 && char.IsAsciiDigit(name[digits - 1]))
+            digits--;
+        if (digits == name.Length || name[digits] == '0') return null;
+
+        string element = name[1..digits];
+        var primitive = PrimitiveTypeSymbol.All.FirstOrDefault(p => p.Name == element);
+        return primitive is not null && int.TryParse(name.AsSpan(digits), out int lanes)
+            ? Of(primitive, lanes)
+            : null;
+    }
+
+    /// <summary>Whether a primitive is a vector's element: a fixed-width integer or a float.</summary>
+    public static bool IsElement(PrimitiveTypeSymbol element) => element.Kind is
+        PrimitiveKind.SByte or PrimitiveKind.Byte or PrimitiveKind.Short or PrimitiveKind.UShort or
+        PrimitiveKind.Int or PrimitiveKind.UInt or PrimitiveKind.Long or PrimitiveKind.ULong or
+        PrimitiveKind.Float or PrimitiveKind.Double;
+
+    /// <summary>The lane counts an element comes in: Apple's simd set, 64 bytes at most.</summary>
+    public static int[] LaneCounts(PrimitiveTypeSymbol element) => element.Size switch
+    {
+        1 => [2, 3, 4, 8, 16, 32, 64],
+        2 => [2, 3, 4, 8, 16, 32],
+        4 => [2, 3, 4, 8, 16],
+        _ => [2, 3, 4, 8],
+    };
+
+    public PrimitiveTypeSymbol Element { get; }
+    public int Lanes { get; }
+    public override string Name { get; }
+
+    /// <summary>The lanes rounded up to a power of two: three take the room of four.</summary>
+    public override int Size => Element.Size * (int)System.Numerics.BitOperations.RoundUpToPowerOf2((uint)Lanes);
+
+    public override int Alignment => Math.Min(Size, TargetPlatform.Current.VectorAlignmentLimit);
+
+    /// <summary>
+    /// What a per-lane comparison answers: the signed integers as wide as
+    /// these lanes, each all ones where it holds and zero where it does not.
+    /// </summary>
+    public VectorTypeSymbol MaskType => Of(Element.Size switch
+    {
+        1 => PrimitiveTypeSymbol.SByte,
+        2 => PrimitiveTypeSymbol.Short,
+        4 => PrimitiveTypeSymbol.Int,
+        _ => PrimitiveTypeSymbol.Long,
+    }, Lanes)!;
+
+    /// <summary>The same element in another number of lanes, or null.</summary>
+    public VectorTypeSymbol? WithLanes(int lanes) => Of(Element, lanes);
+}
+
+/// <summary>
 /// <c>C?</c>: an optional reference. Same representation, may be null. Made
 /// only by <see cref="TypeSymbol.MakeOptionalType"/>.
 /// </summary>
@@ -2035,6 +2120,13 @@ public static class TypeExtensions
 
     /// <summary>The class a reference type points at, or null for an interface.</summary>
     public static ClassTypeSymbol? AsClass(this TypeSymbol type) => type.AsReference() as ClassTypeSymbol;
+
+    /// <summary>
+    /// An inline array or a vector: elements laid out inside the value, so an
+    /// element is part of what holds it and is storage only when that is.
+    /// </summary>
+    public static bool HoldsElementsInline(this TypeSymbol type) =>
+        type is FixedArrayTypeSymbol or VectorTypeSymbol;
 
     public static bool IsVoid(this TypeSymbol type) =>
         type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Void };

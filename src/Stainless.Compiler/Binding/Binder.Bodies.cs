@@ -1721,6 +1721,7 @@ public sealed partial class Binder
     private static bool Effective(BoundExpression expression) => expression switch
     {
         BoundAssignment or BoundMemberAssignment or BoundPropertyAssignment or BoundCompoundAssignment
+            or BoundSwizzleAssignment
             or BoundCall or BoundIndirectCall or BoundClosureCall or BoundIncrement or BoundPropertyIncrement
             or BoundNew or BoundStructNew or BoundErrorExpression => true,
 
@@ -2699,7 +2700,7 @@ public sealed partial class Binder
         BoundFieldAccess { Receiver: { } receiver }
             when receiver.Type is StructTypeSymbol => BaseOf(receiver),
 
-        BoundIndex index when index.Target.Type is FixedArrayTypeSymbol => BaseOf(index.Target),
+        BoundIndex index when index.Target.Type.HoldsElementsInline() => BaseOf(index.Target),
 
         BoundConversion conversion => BaseOf(conversion.Operand),
 

@@ -905,6 +905,43 @@ public sealed class BoundTupleCreate(
 }
 
 /// <summary>
+/// <c>new vfloat4(...)</c>: the lanes in order, each part a lane or a vector
+/// of the same element filling as many as it has. One lane alone fills every
+/// lane, and none is zero.
+/// </summary>
+public sealed class BoundVectorNew(
+    SourceSpan span, VectorTypeSymbol type, IReadOnlyList<BoundExpression> parts)
+    : BoundExpression(span, type)
+{
+    public VectorTypeSymbol Vector { get; } = type;
+    public IReadOnlyList<BoundExpression> Parts { get; } = parts;
+}
+
+/// <summary>
+/// <c>v.zyx</c>: lanes of a vector read in the order named, as a vector. One
+/// lane read alone is a <see cref="BoundIndex"/>, which is storage.
+/// </summary>
+public sealed class BoundVectorShuffle(
+    SourceSpan span, VectorTypeSymbol type, BoundExpression vector, IReadOnlyList<int> lanes)
+    : BoundExpression(span, type)
+{
+    public BoundExpression Vector { get; } = vector;
+    public IReadOnlyList<int> Lanes { get; } = lanes;
+}
+
+/// <summary>
+/// <c>v.xy = p</c>: the value's lanes written into the named lanes of a
+/// vector with storage, which is read and written once.
+/// </summary>
+public sealed class BoundSwizzleAssignment(
+    SourceSpan span, BoundVectorShuffle target, BoundExpression value)
+    : BoundExpression(span, target.Type)
+{
+    public BoundVectorShuffle Target { get; } = target;
+    public BoundExpression Value { get; } = value;
+}
+
+/// <summary>
 /// <c>var (a, b) = t;</c> and <c>(int a, b) = t;</c> — a deconstruction that
 /// declares some of what it names.
 ///
@@ -1585,10 +1622,10 @@ public sealed class BoundIndex(
 
     /// <summary>
     /// An element of an array, a slice or a pointer is storage. An element of
-    /// an inline array is part of the value holding it, so it is storage only
-    /// when that value is.
+    /// an inline array or a lane of a vector is part of the value holding it,
+    /// so it is storage only when that value is.
     /// </summary>
-    public override bool IsLValue => Target.Type is not FixedArrayTypeSymbol || Target.IsLValue;
+    public override bool IsLValue => !Target.Type.HoldsElementsInline() || Target.IsLValue;
 }
 
 public sealed class BoundSizeof(SourceSpan span, TypeSymbol type, TypeSymbol measuredType)

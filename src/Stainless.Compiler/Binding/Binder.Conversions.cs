@@ -806,6 +806,13 @@ public sealed partial class Binder
     {
         if (from.Equals(to)) return ConversionKind.Identity;
 
+        // Lane by lane, as each lane would convert, and only when asked: a
+        // vector of one element is never quietly another.
+        if (from is VectorTypeSymbol fromLanes && to is VectorTypeSymbol toLanes)
+            return explicitCast && fromLanes.Lanes == toLanes.Lanes
+                ? ClassifyConversion(fromLanes.Element, toLanes.Element, explicitCast: true)
+                : null;
+
         // null literal -> any nullable representation. A delegate is a raw
         // function pointer, so a null one is exactly C's null callback.
         if (from is NullType)

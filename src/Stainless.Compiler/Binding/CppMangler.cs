@@ -173,6 +173,9 @@ public static class CppMangler
     {
         PointerTypeSymbol pointer => "P" + ItaniumPointee(pointer.Element, seen),
         NamedTypeSymbol named => ItaniumNamed(named),
+
+        // clang's vector extension: `Dv4_f` is four floats.
+        VectorTypeSymbol vector => $"Dv{vector.Lanes}_{ItaniumBuiltin(vector.Element.Kind)}",
         _ => "v",
     };
 
@@ -276,19 +279,20 @@ public static class CppMangler
         TypeSymbol returnType,
         IReadOnlyList<TypeSymbol> parameters)
     {
+        var names = new MicrosoftNames();
         var sb = new StringBuilder("?");
-        sb.Append(name).Append('@');
+        names.Append(sb, name);
 
         // Innermost first: `geometry::area` is `?area@geometry@@`.
-        for (int i = qualifiers.Count - 1; i >= 0; i--) sb.Append(qualifiers[i]).Append('@');
+        for (int i = qualifiers.Count - 1; i >= 0; i--) names.Append(sb, qualifiers[i]);
 
         sb.Append('@');
 
         // `Y` is a free function; `A` is __cdecl, which is what x64 has.
         sb.Append("YA");
 
-        var seen = new List<string>();
-        AppendMicrosoftType(sb, returnType, seen);
+        var seen = new List<TypeSymbol>();
+        AppendMicrosoftType(sb, returnType, seen, names);
 
         if (parameters.Count == 0)
         {
@@ -298,13 +302,38 @@ public static class CppMangler
             return sb.ToString();
         }
 
-        foreach (var parameter in parameters) AppendMicrosoftType(sb, parameter, seen);
+        foreach (var parameter in parameters) AppendMicrosoftType(sb, parameter, seen, names);
 
         sb.Append("@Z");
         return sb.ToString();
     }
 
-    private static void AppendMicrosoftType(StringBuilder sb, TypeSymbol type, List<string> seen)
+    /// <summary>
+    /// The names a Microsoft signature has written. Each is written once, and
+    /// after that named by its position: `?area@geometry@@` makes `geometry`
+    /// the second, so a struct in that namespace is `Upoint@1@@`. MSVC
+    /// remembers ten.
+    /// </summary>
+    private sealed class MicrosoftNames
+    {
+        private readonly List<string> _names = [];
+
+        public void Append(StringBuilder sb, string name)
+        {
+            int at = _names.IndexOf(name);
+            if (at >= 0)
+            {
+                sb.Append((char)('0' + at));
+                return;
+            }
+
+            if (_names.Count < 10) _names.Add(name);
+            sb.Append(name).Append('@');
+        }
+    }
+
+    private static void AppendMicrosoftType(
+        StringBuilder sb, TypeSymbol type, List<TypeSymbol> seen, MicrosoftNames names)
     {
         if (type is PrimitiveTypeSymbol primitive)
         {
@@ -313,46 +342,69 @@ public static class CppMangler
             return;
         }
 
-        string encoded = MicrosoftEncoding(type);
-
-        int existing = seen.IndexOf(encoded);
-        if (existing >= 0 && existing < 10)
+        int existing = seen.IndexOf(type);
+        if (existing is >= 0 and < 10)
         {
             sb.Append((char)('0' + existing));
             return;
         }
 
-        if (seen.Count < 10) seen.Add(encoded);
-        sb.Append(encoded);
+        if (seen.Count < 10) seen.Add(type);
+        AppendMicrosoftEncoding(sb, type, names);
     }
 
-    private static string MicrosoftEncoding(TypeSymbol type) => type switch
+    private static void AppendMicrosoftEncoding(StringBuilder sb, TypeSymbol type, MicrosoftNames names)
     {
-        // On x64 every pointer is 64-bit, which is the `E`; `A` is the
-        // unqualified form, as opposed to const or volatile.
-        PointerTypeSymbol pointer => "PEA" + MicrosoftPointee(pointer.Element),
-        NamedTypeSymbol named => MicrosoftNamed(named),
-        _ => "X",
-    };
+        switch (type)
+        {
+            // On x64 every pointer is 64-bit, which is the `E`; `A` is the
+            // unqualified form, as opposed to const or volatile.
+            case PointerTypeSymbol { Element: PrimitiveTypeSymbol primitive }:
+                sb.Append("PEA").Append(MicrosoftBuiltin(primitive.Kind));
+                break;
+            case PointerTypeSymbol pointer:
+                sb.Append("PEA");
+                AppendMicrosoftEncoding(sb, pointer.Element, names);
+                break;
 
-    private static string MicrosoftPointee(TypeSymbol element) =>
-        element is PrimitiveTypeSymbol primitive
-            ? MicrosoftBuiltin(primitive.Kind)
-            : MicrosoftEncoding(element);
+            // `Vwidget@geometry@@`: `V` for a class, `U` for a struct, then the
+            // name and its qualifiers innermost first.
+            case NamedTypeSymbol named:
+            {
+                var parts = CppNameParts(named);
+                sb.Append(named is StructTypeSymbol ? 'U' : 'V');
+                for (int i = parts.Count - 1; i >= 0; i--) names.Append(sb, parts[i]);
+                sb.Append('@');
+                break;
+            }
+
+            // clang's vector extension, spelled as the template
+            // `__clang::__vector<float, 4>`: `T?$__vector@M$03@__clang@@`.
+            case VectorTypeSymbol vector:
+                sb.Append('T');
+                names.Append(sb, $"?$__vector@{MicrosoftBuiltin(vector.Element.Kind)}$0{MicrosoftNumber(vector.Lanes)}");
+                names.Append(sb, "__clang");
+                sb.Append('@');
+                break;
+
+            default:
+                sb.Append('X');
+                break;
+        }
+    }
 
     /// <summary>
-    /// <c>Vwidget@geometry@@</c> — `V` for a class, `U` for a struct, then the
-    /// name and its qualifiers innermost first.
+    /// A template's number: one to ten as one digit less, anything else in
+    /// hexadecimal spelled with A to P and ended by <c>@</c>.
     /// </summary>
-    private static string MicrosoftNamed(NamedTypeSymbol type)
+    private static string MicrosoftNumber(int value)
     {
-        var parts = CppNameParts(type);
-        var sb = new StringBuilder(type is StructTypeSymbol ? "U" : "V");
+        if (value is >= 1 and <= 10) return ((char)('0' + value - 1)).ToString();
 
-        for (int i = parts.Count - 1; i >= 0; i--) sb.Append(parts[i]).Append('@');
-
-        sb.Append('@');
-        return sb.ToString();
+        var digits = new StringBuilder();
+        for (int rest = value; rest > 0; rest /= 16)
+            digits.Insert(0, (char)('A' + rest % 16));
+        return digits.Append('@').ToString();
     }
 
     private static string MicrosoftBuiltin(PrimitiveKind kind) => kind switch

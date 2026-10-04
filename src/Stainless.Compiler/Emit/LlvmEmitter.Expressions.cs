@@ -101,6 +101,9 @@ public sealed partial class LlvmEmitter
             }
 
             case BoundTupleCreate tuple: return EmitTupleCreate(tuple);
+            case BoundVectorNew made: return EmitVectorNew(made);
+            case BoundVectorShuffle shuffle: return EmitVectorShuffle(shuffle);
+            case BoundSwizzleAssignment written: return EmitSwizzleAssignment(written);
             case BoundConversion conversion: return EmitConversion(conversion);
 
             // Everything but the last is evaluated for what it does; the last
@@ -525,6 +528,8 @@ public sealed partial class LlvmEmitter
                 if (index.Target.Type is SliceTypeSymbol) return EmitSliceElementAddress(index);
                 if (index.Target.Type is FixedArrayTypeSymbol inline)
                     return EmitInlineElementAddress(index, inline);
+                if (index.Target.Type is VectorTypeSymbol vector)
+                    return EmitVectorLaneAddress(index, vector);
 
                 var target = EmitExpression(index.Target);
                 var offset = EmitExpression(index.Index);
@@ -797,9 +802,13 @@ public sealed partial class LlvmEmitter
         if (expression.Type is StructTypeSymbol)
             return new Val(EmitAddress(expression), "ptr", expression.Type);
 
+        if (expression is BoundIndex index && TryEmitLaneOfValue(index) is { } lane)
+            return lane;
+
         string address = EmitAddress(expression);
         string llvmType = LlvmTypeOf(expression.Type);
-        return new Val(Emit(llvmType, $"load {llvmType}, ptr {address}"), llvmType, expression.Type);
+        return new Val(
+            Emit(llvmType, $"load {llvmType}, ptr {address}{AlignedFor(expression.Type)}"), llvmType, expression.Type);
     }
 
     /// <summary>

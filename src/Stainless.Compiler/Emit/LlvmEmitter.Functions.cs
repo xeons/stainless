@@ -52,7 +52,7 @@ public sealed partial class LlvmEmitter
         {
             _sretSlot = "%sret.result";
             declaredParameters.Add(
-                $"ptr sret({StructName((StructTypeSymbol)symbol.ReturnType)}) {_sretSlot}");
+                $"ptr sret({LlvmTypeOf(symbol.ReturnType)}) {_sretSlot}");
         }
 
         foreach (var (parameter, info) in parameterInfos)
@@ -143,7 +143,16 @@ public sealed partial class LlvmEmitter
 
             if (info.Style == PassStyle.Indirect)
             {
-                // byval already points at a private copy owned by this call.
+                // byval already points at a private copy owned by this call --
+                // aligned as the convention says, which may be less than the
+                // value asks for, and then it is copied once more to be read.
+                if (info.IndirectAlignment > 0 && info.IndirectAlignment < parameter.Type.Alignment)
+                {
+                    string aligned = Alloca(LlvmTypeOf(parameter.Type), parameter.Name);
+                    MemCopy(aligned, incoming, parameter.Type.Size);
+                    incoming = aligned;
+                }
+
                 _parameterSlots[parameter] = incoming;
                 _pointerParameters.Add(parameter);
                 AdoptWrittenParameter(parameter, incoming);

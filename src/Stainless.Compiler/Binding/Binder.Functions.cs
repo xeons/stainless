@@ -658,6 +658,14 @@ public sealed partial class Binder
                           "header written for it has no way to name the class. Pass a pointer",
                     IsObjCReference(symbol.ReturnType) ? symbol.ReturnType : null);
 
+            // i386 Windows passes three vectors in SSE registers and the rest
+            // behind pointers, which no signature here can spell.
+            if (TargetPlatform.Current is { Architecture: TargetArch.X86, IsWindows: true } &&
+                symbol.Parameters.Count(p => !p.IsByReference && p.Type is VectorTypeSymbol) > 3)
+                diagnostics.Error("SL0933", symbol.Span,
+                    $"'{symbol.Name}' passes more than three vectors across {how}, and 32-bit Windows " +
+                    "passes only three in registers; pass the rest by 'ref' or in a struct");
+
             if (FindSlot(symbol.ReturnType) is { } returnedSlot)
                 diagnostics.Error("SL0284", symbol.Span,
                     $"'{symbol.ReturnType.Name}' is or holds '{returnedSlot.Name}', whose layout " +

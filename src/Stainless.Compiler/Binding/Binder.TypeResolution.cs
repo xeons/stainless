@@ -426,6 +426,10 @@ public sealed partial class Binder
                     "; qualify it with its module name");
                 return ErrorTypeSymbol.Instance;
             }
+
+            // Built in, and not reserved: a type of the program's own by the
+            // same name was found above and is the one meant.
+            if (VectorTypeSymbol.Named(parts[0]) is { } vector) return vector;
         }
         else
         {

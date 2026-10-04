@@ -314,6 +314,12 @@ public abstract class BoundTreeWalker
                 break;
 
             case BoundTupleCreate tuple: VisitAll(tuple.Elements); break;
+            case BoundVectorNew made: VisitAll(made.Parts); break;
+            case BoundVectorShuffle shuffle: Visit(shuffle.Vector); break;
+            case BoundSwizzleAssignment written:
+                Visit(written.Target);
+                Visit(written.Value);
+                break;
             case BoundTupleDraft tuple: VisitAll(tuple.Elements); break;
             case BoundVariantConstruction built: VisitAll(built.Arguments); break;
             case BoundVariantDraft built: VisitAll(built.Arguments); break;
@@ -1018,7 +1024,7 @@ internal sealed class ClosureFieldUseFinder(ClassTypeSymbol closure) : BoundTree
     {
         BoundFieldAccess { Receiver: { } receiver } when receiver.Type is StructTypeSymbol =>
             RootOf(receiver),
-        BoundIndex index when index.Target.Type is FixedArrayTypeSymbol => RootOf(index.Target),
+        BoundIndex index when index.Target.Type.HoldsElementsInline() => RootOf(index.Target),
         BoundConversion conversion => RootOf(conversion.Operand),
         _ => place,
     };

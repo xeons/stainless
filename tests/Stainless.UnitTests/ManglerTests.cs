@@ -245,11 +245,38 @@ public class ManglerTests
     [InlineData("void nothing();", CppAbi.Microsoft, "nothing", "?nothing@@YAXXZ")]
     [InlineData("int deref(int* a, int* b);", CppAbi.Itanium, "deref", "_Z5derefPiS_")]
     [InlineData("int deref(int* a, int* b);", CppAbi.Microsoft, "deref", "?deref@@YAHPEAH0@Z")]
+
+    // clang 21's names for the same C++ declaration over ext_vector_type.
+    [InlineData("void takes(vfloat4 a, vfloat3 b, vbyte16 c, vdouble2 d, vlong8 e);", CppAbi.Itanium,
+        "takes", "_Z5takesDv4_fDv3_fDv16_hDv2_dDv8_x")]
+    [InlineData("void takes(vfloat4 a, vfloat3 b, vbyte16 c, vdouble2 d, vlong8 e);", CppAbi.Microsoft,
+        "takes", "?takes@@YAXT?$__vector@M$03@__clang@@T?$__vector@M$02@2@T?$__vector@E$0BA@@2@" +
+                 "T?$__vector@N$01@2@T?$__vector@_J$07@2@@Z")]
+    [InlineData("void again(vfloat4 a, vfloat4 b);", CppAbi.Itanium, "again", "_Z5againDv4_fS_")]
+    [InlineData("void again(vfloat4 a, vfloat4 b);", CppAbi.Microsoft, "again",
+        "?again@@YAXT?$__vector@M$03@__clang@@0@Z")]
     public void CppManglingFollowsTheNamedScheme(
-        string declaration, CppAbi abi, string name, string expected)
+        string declaration, CppAbi abi, string name, string expected) =>
+        AssertCppName("public extern \"C++\" " + declaration, abi, name, expected);
+
+    /// <summary>
+    /// A Microsoft name written once is named by its position after that, a
+    /// namespace and a struct alike. clang 21's names for the same C++.
+    /// </summary>
+    [Theory]
+    [InlineData("public extern \"C++\" void Test::area(Point* p, Size s, Point q);", "area",
+        "?area@Test@@YAXPEAUPoint@1@USize@1@U21@@Z")]
+    [InlineData("public extern \"C++\" void outside(Point* p, Size* s);", "outside",
+        "?outside@@YAXPEAUPoint@Test@@PEAUSize@2@@Z")]
+    public void AMicrosoftNameIsWrittenOnce(string declaration, string name, string expected) =>
+        AssertCppName(
+            "public struct Point { public int x; }\npublic struct Size { public int w; }\n" + declaration,
+            CppAbi.Microsoft, name, expected);
+
+    private static void AssertCppName(
+        string source, CppAbi abi, string name, string expected)
     {
-        var program = Front.BindModule(
-            "public extern \"C++\" " + declaration, out var diagnostics, abi);
+        var program = Front.BindModule(source, out var diagnostics, abi);
 
         Assert.Empty(Front.Codes(diagnostics));
 

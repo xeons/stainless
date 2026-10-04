@@ -359,6 +359,9 @@ public sealed partial class Binder
         if (receiver.Type is ArrayTypeSymbol or SliceTypeSymbol && syntax.Member == "Length")
             return new BoundArrayLength(syntax.Span, PrimitiveTypeSymbol.NUInt, receiver);
 
+        if (receiver.Type is VectorTypeSymbol vector && !syntax.ThroughPointer)
+            return BindVectorMember(receiver, vector, syntax);
+
         if (receiver.Type is ArrayTypeSymbol)
         {
             diagnostics.Error("SL0313", syntax.Span,

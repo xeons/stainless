@@ -64,24 +64,56 @@ public static class X86Abi
     /// A struct returned in registers rather than through a hidden pointer.
     /// Windows only, and only at the four sizes a register pair covers.
     /// </summary>
+    /// <summary>
+    /// A struct returned in registers rather than through a hidden pointer.
+    /// Windows only, and only at the four sizes a register pair covers --
+    /// and not at eight bytes when there is a vector in it.
+    /// </summary>
     public static bool ReturnsInRegisters(TypeSymbol type, bool windows) =>
-        windows && type is StructTypeSymbol && type.Size is 1 or 2 or 4 or 8;
+        windows && type is StructTypeSymbol && type.Size is 1 or 2 or 4 or 8 &&
+        !(type.Size == 8 && HoldsVector(type));
+
+    private static bool HoldsVector(TypeSymbol type) => type switch
+    {
+        VectorTypeSymbol => true,
+        StructTypeSymbol structType => structType.Fields.Any(f => HoldsVector(f.Type)),
+        FixedArrayTypeSymbol inline => HoldsVector(inline.Element),
+        _ => false,
+    };
 
     public static ArgInfo ClassifyArgument(
         TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf, bool windows)
     {
+        // Windows passes a vector in an SSE register while one is free, which
+        // is LLVM's rule for `inreg`. Elsewhere eight bytes of integers is an
+        // i64, as clang keeps MMX out of it -- three lanes are not, being
+        // six bytes of the eight -- and the rest is the back end's.
+        if (type is VectorTypeSymbol vector)
+        {
+            if (windows)
+                return ArgInfo.Scalar(type, llvmTypeOf, widened: false) with { InRegister = true };
+            if (vector.Size == 8 && vector.Element.IsInteger && vector.Lanes != 3)
+                return new ArgInfo(PassStyle.Coerce, "i64", type) { Pieces = ["i64"] };
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: false);
+        }
+
         if (type is not StructTypeSymbol)
             return ArgInfo.Scalar(type, llvmTypeOf, widened: true);
 
+        // On the stack at four bytes, whatever the struct asks for: clang's
+        // `byval align 4`, which LLVM would otherwise take from the type.
         return !windows && ArgInfo.IsEmpty(type)
             ? ArgInfo.Ignored(type)
-            : new ArgInfo(PassStyle.Indirect, "ptr", type);
+            : new ArgInfo(PassStyle.Indirect, "ptr", type) { IndirectAlignment = 4 };
     }
 
     public static ArgInfo ClassifyReturn(
         TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf, bool windows)
     {
         if (type.IsVoid()) return new ArgInfo(PassStyle.Direct, "void", type);
+
+        if (type is VectorTypeSymbol)
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: false);
 
         if (type is not StructTypeSymbol)
             return ArgInfo.Scalar(type, llvmTypeOf, widened: true);

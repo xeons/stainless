@@ -1,0 +1,18 @@
+floats: <1.75, -2.5, 3e+09, -0>
+truncated: <1, -2, 2147483647, 0>
+unsigned: <0, 1, 4294967295, 2>
+widened: <-1, 2, -3, 4>
+narrowed: <0, 1, 255, 44>
+to doubles: <0.5, 0.25>
+from ints: <1, -2, 3>
+formatted: <3.14, 2.72>
+particle: 7 <1.5, 19.5, 3, 4> <0.5, -0.5>
+particle layout: 48 bytes, position at 16
+body: <1, 2, 3, 40> <5, 5, 5, 5, 5, 5, 5, 70>
+momentum aligned: true, counters aligned: true
+path: <0, 0, 0, 1> <1, 1, 9, 2> <2, 2, 2, 3>
+path aligned: true
+list: 2 <1, 2, 3> <4, 5, 6>
+statics: <5, 0, 0, 1> <1, 2, 3, 4>
+by reference: <3, 5, 7, 9> <3, 5, 7, 9>
+wide: 3 9 64 true

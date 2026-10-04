@@ -73,10 +73,17 @@ last person to edit it -- the suite is the authority.
   aligned to at most N as C's `#pragma pack(N)` does, and a raised alignment.
   `[Packed]` on one field packs that field alone.
   They are rules about layout rather than library features, so none needs an
-  import; they combine, N is a power of two capped at 16, and both apply to a
-  `struct` and nothing else. The generated C header states them with
-  `#pragma pack` and an `SL_ALIGN` macro, and the sizes, alignments and offsets
-  are checked against the target's own C compiler
+  import; they combine, N is a power of two up to 4096, a page, and both apply
+  to a `struct` and nothing else. A class or array holding something aligned
+  past what `malloc` promises is allocated on that boundary. The generated C
+  header states them with `#pragma pack` and an `SL_ALIGN` macro, and the
+  sizes, alignments and offsets are checked against the target's own C compiler
+- SIMD vectors, `vfloat4` and the rest of Apple's simd set in Stainless's
+  element types: LLVM vectors laid out as C's `ext_vector_type`, made with
+  `new`, read and written by lane, by index and by swizzle, operated on lane by
+  lane, `==` true when every lane is, cast lane by lane, written in an
+  interpolation, and passed across `extern "C"` as clang passes them on each
+  of the eight targets
 - `struct` with fields, methods and constructors; exact C layout; value copy
   semantics. `new Point(3, 4)` allocates nothing: the constructor runs over the
   slot the expression needed, zeroed first, so a constructor adds no header and
@@ -1090,11 +1097,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   because gcc packs the bits and MSVC keeps the unit and nothing here yet says
   which this language means. `[Reflect]` is refused on a type with bit-fields
   (SL0475): the field tables describe a byte offset, and a bit-field has none.
-- **`[Align(N)]` stops at 16.** `malloc` guarantees `max_align_t` and nothing
-  more, so a class holding a more-aligned field would be handed memory that did
-  not honour it. Lifting the cap means allocating by a type's alignment as well
-  as by its size, which the runtime does not do yet. There is also no alignment
-  on a single field, only on a whole type.
+- **There is no alignment on a single field**, only on a whole type.
+- **A vector has no functions yet**: no `Dot`, `Min`, `Sqrt`, per-lane
+  comparison or `Select`. They come next, as static members of the type.
 - **A slice is owning, and there is no borrowed one.** It retains the array it
   came from, which is what makes it impossible to dangle and also what makes it
   cost a reference count per copy and keep a large array alive for a small view

@@ -98,6 +98,19 @@ public sealed record ArgInfo(PassStyle Style, string LlvmType, TypeSymbol Type)
     public bool IndirectAsPointer { get; init; }
 
     /// <summary>
+    /// The <c>align</c> an <see cref="PassStyle.Indirect"/> argument's
+    /// <c>byval</c> states, or zero for LLVM's own: a vector's, where C aligns
+    /// it less than LLVM would.
+    /// </summary>
+    public int IndirectAlignment { get; init; }
+
+    /// <summary>
+    /// A <see cref="PassStyle.Direct"/> vector that i386 Windows passes in an
+    /// SSE register: <c>inreg</c>, which LLVM gives the first three of.
+    /// </summary>
+    public bool InRegister { get; init; }
+
+    /// <summary>
     /// The widening a <see cref="PassStyle.Direct"/> narrow integer carries.
     /// Every declaration, definition and call MUST agree about it: a callee
     /// told that the caller widened reads the whole register.

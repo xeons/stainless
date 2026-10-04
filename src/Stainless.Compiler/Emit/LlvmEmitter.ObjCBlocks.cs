@@ -240,7 +240,7 @@ public sealed partial class LlvmEmitter
         var forwarded = new List<string>();
         if (returnInfo.Style == PassStyle.Indirect)
         {
-            string sret = $"ptr sret({StructName((StructTypeSymbol)block.ReturnType)})";
+            string sret = $"ptr sret({LlvmTypeOf(block.ReturnType)})";
             declared.Add($"{sret} %sret");
             forwarded.Add($"{sret} %sret");
         }

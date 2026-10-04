@@ -881,7 +881,7 @@ public sealed partial class Binder
     /// <summary>Value types: what is copied where it is assigned.</summary>
     private static bool IsValueType(TypeSymbol type) =>
         type is StructTypeSymbol or PrimitiveTypeSymbol or EnumTypeSymbol
-             or VariantTypeSymbol or FixedArrayTypeSymbol;
+             or VariantTypeSymbol or FixedArrayTypeSymbol or VectorTypeSymbol;
 
     /// <summary>
     /// What <c>new()</c> asks for: exactly what would let the body write
@@ -920,6 +920,7 @@ public sealed partial class Binder
             PrimitiveTypeSymbol => "primitive",
             ArrayTypeSymbol => "array",
             FixedArrayTypeSymbol => "inline array",
+            VectorTypeSymbol => "vector",
             PointerTypeSymbol => "pointer",
             DelegateTypeSymbol => "delegate",
             _ => type.Name,

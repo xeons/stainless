@@ -61,7 +61,8 @@ public sealed partial class Binder
 
     private bool Sendable(TypeSymbol type) => type switch
     {
-        PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol => true,
+        PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol
+            or VectorTypeSymbol => true,
 
         // A variant's own fields are a tag and a blob of bytes, both of them
         // plain data, so asking them would say yes to a variant holding a List.
@@ -94,6 +95,7 @@ public sealed partial class Binder
 
     private bool IsPlainData(TypeSymbol type) =>
         type is PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol
+            or VectorTypeSymbol
         || (type is StructTypeSymbol structType && !structType.CarriesReferences())
         || (type is FixedArrayTypeSymbol inline && IsPlainData(inline.Element));
 

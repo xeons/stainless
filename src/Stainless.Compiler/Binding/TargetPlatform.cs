@@ -203,6 +203,18 @@ public sealed record TargetPlatform
         _ => WideScalarAlignment,
     };
 
+    /// <summary>
+    /// What malloc aligns every allocation to: eight on 32-bit Windows, sixteen
+    /// everywhere else. The runtime's SL_MALLOC_ALIGNMENT MUST say the same.
+    /// </summary>
+    public int MallocAlignment => Architecture == TargetArch.X86 && IsWindows ? 8 : 16;
+
+    /// <summary>
+    /// The most a SIMD vector is aligned to: its size on x86 Windows and Linux,
+    /// whatever it is; 16 on ARM and on every Apple target. clang's answer.
+    /// </summary>
+    public int VectorAlignmentLimit => Architecture == TargetArch.Arm64 || IsDarwin ? 16 : 64;
+
     // ------------------------------------------------------------- the set
 
     public static readonly TargetPlatform X64Windows = new()

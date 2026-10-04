@@ -309,8 +309,16 @@ struct SlTypeInfo {
     size_t                  alignment;
 };
 
-/* What malloc aligns every allocation to, on every target the compiler builds. */
+/*
+ * What malloc aligns every allocation to: 8 on 32-bit Windows, 16 on every
+ * other target the compiler builds. The compiler's TargetPlatform.MallocAlignment
+ * MUST say the same.
+ */
+#if defined(_WIN32) && !defined(_WIN64)
+#define SL_MALLOC_ALIGNMENT 8
+#else
 #define SL_MALLOC_ALIGNMENT 16
+#endif
 
 typedef struct SlObject {
     size_t              strong;

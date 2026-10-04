@@ -163,7 +163,7 @@ public sealed partial class LlvmEmitter
 
         if (returnInfo.Style == PassStyle.Indirect)
         {
-            string sret = $"ptr sret({StructName((StructTypeSymbol)method.ReturnType)})";
+            string sret = $"ptr sret({LlvmTypeOf(method.ReturnType)})";
             declared.Add($"{sret} %sret");
             forwarded.Add($"{sret} %sret");
         }
@@ -819,6 +819,10 @@ public sealed partial class LlvmEmitter
 
             case FixedArrayTypeSymbol fixedArray:
                 return $"[{fixedArray.Length}{TypeEncoding(fixedArray.Element, topLevel: false)}]";
+
+            // The runtime has no letter for a vector, and clang writes nothing.
+            case VectorTypeSymbol:
+                return "";
 
             default:
                 return "?";

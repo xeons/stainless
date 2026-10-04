@@ -94,6 +94,18 @@ public static class SysVAbi
 
     public static ArgInfo ClassifyArgument(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf)
     {
+        // Four bytes or less is an integer register and eight an SSE one,
+        // spelled as a double; sixteen is one SSE register as the vector, and
+        // anything wider is memory.
+        if (type is VectorTypeSymbol vector)
+            return vector.Size switch
+            {
+                <= 4 => Coerced($"i{vector.Size * 8}", type),
+                8 => Coerced("double", type),
+                16 => ArgInfo.Scalar(type, llvmTypeOf, widened: false),
+                _ => new ArgInfo(PassStyle.Indirect, "ptr", type) { IndirectAlignment = vector.Alignment },
+            };
+
         if (type is not StructTypeSymbol structType)
             return ArgInfo.Scalar(type, llvmTypeOf, widened: true);
 
@@ -112,6 +124,10 @@ public static class SysVAbi
     {
         if (type.IsVoid()) return new ArgInfo(PassStyle.Direct, "void", type);
 
+        // A wide vector comes back as itself, which LLVM returns as clang does.
+        if (type is VectorTypeSymbol { Size: > 16 })
+            return ArgInfo.Scalar(type, llvmTypeOf, widened: false);
+
         var info = ClassifyArgument(type, llvmTypeOf);
         if (info.Style != PassStyle.Coerce || info.Pieces.Count < 2) return info;
 
@@ -121,6 +137,9 @@ public static class SysVAbi
         return info with { LlvmType = "{ " + string.Join(", ", info.Pieces) + " }" };
     }
 
+    private static ArgInfo Coerced(string register, TypeSymbol type) =>
+        new(PassStyle.Coerce, register, type) { Pieces = [register] };
+
     /// <summary>
     /// The registers a struct travels in, or null when it travels in memory.
     /// </summary>
@@ -128,6 +147,11 @@ public static class SysVAbi
         StructTypeSymbol structType, Func<TypeSymbol, string> llvmTypeOf)
     {
         if (structType.Size == 0 || structType.Size > MaxRegisterSize) return null;
+
+        // A sixteen-byte vector filling the struct is SSE and SSEUP: one
+        // register, the vector, and not two doubles in two.
+        if (structType.Size == MaxRegisterSize && OnlyVector(structType) is { Size: MaxRegisterSize } whole)
+            return [llvmTypeOf(whole)];
 
         int count = (structType.Size + Width - 1) / Width;
         var parts = new EightByte[count];
@@ -238,6 +262,14 @@ public static class SysVAbi
             case PrimitiveTypeSymbol { Kind: PrimitiveKind.NDouble }:
                 return false;
 
+            // As a vector argument alone is: an integer register for four bytes
+            // or less, SSE for eight. Sixteen is handled whole, by Pieces.
+            case VectorTypeSymbol vector:
+                if (vector.Size > Width) return false;
+                Mark(vector.Size <= 4 ? Class.Integer : Class.Sse, at, vector.Size, parts,
+                     isDouble: true, isPointer: false);
+                return true;
+
             // Everything else is a scalar in an integer register: an integer, a
             // bool, a code unit, an enum, a pointer, a function pointer, and
             // every kind of reference.
@@ -247,6 +279,16 @@ public static class SysVAbi
                 return true;
         }
     }
+
+    /// <summary>The one vector a struct holds and nothing else, through nesting, or null.</summary>
+    private static VectorTypeSymbol? OnlyVector(TypeSymbol type) => type switch
+    {
+        VectorTypeSymbol vector => vector,
+        UnionTypeSymbol => null,
+        StructTypeSymbol { Fields: [{ IsBitField: false } only] } => OnlyVector(only.Type),
+        FixedArrayTypeSymbol { Length: 1 } single => OnlyVector(single.Element),
+        _ => null,
+    };
 
     /// <summary>
     /// Merges a class into every eightbyte the field touches, and records how

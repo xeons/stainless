@@ -44,6 +44,7 @@ public static class MetadataTypeNames
     public static string Write(TypeSymbol type) => type switch
     {
         PrimitiveTypeSymbol primitive => primitive.Name,
+        VectorTypeSymbol vector => vector.Name,
         PointerTypeSymbol pointer => Write(pointer.Element) + "*",
         ArrayTypeSymbol array => Write(array.Element) + "[]",
         FixedArrayTypeSymbol inline => $"{Write(inline.Element)}[{inline.Length}]",
@@ -137,7 +138,7 @@ public static class MetadataTypeNames
             return tupleOf?.Invoke(elements) ?? elements[0];
         }
 
-        return Primitive(name) ?? (TypeSymbol?)lookup(name);
+        return Primitive(name) ?? VectorTypeSymbol.Named(name) ?? (TypeSymbol?)lookup(name);
     }
 
     /// <summary>

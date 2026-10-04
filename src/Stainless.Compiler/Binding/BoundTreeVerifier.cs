@@ -311,7 +311,7 @@ public static class BoundTreeVerifier
             BoundPlaceholder standing => standing.IsStorage,
             BoundFieldAccess field => field.Field.ContainingType is not StructTypeSymbol ||
                                       field.Receiver is not null && HasAddress(field.Receiver),
-            BoundIndex element => element.Target.Type is not FixedArrayTypeSymbol || HasAddress(element.Target),
+            BoundIndex element => !element.Target.Type.HoldsElementsInline() || HasAddress(element.Target),
             _ => false,
         };
 

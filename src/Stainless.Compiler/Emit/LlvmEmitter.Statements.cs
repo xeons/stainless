@@ -516,8 +516,17 @@ public sealed partial class LlvmEmitter
             ? EmitOwnable(statement.Value)
             : EmitOwned(statement.Value);
 
-        if (value.Type is StructTypeSymbol structType)
+        // A vector going back as its bytes goes from memory, as a struct does.
+        if (value.Type is VectorTypeSymbol && returnInfo.Style is PassStyle.Indirect or PassStyle.Coerce)
         {
+            string spilled = Alloca(value.LlvmType, "ret.lanes");
+            Line($"store {value.LlvmType} {value.Ref}, ptr {spilled}{AlignedFor(value.Type)}");
+            value = new Val(spilled, "ptr", value.Type);
+        }
+
+        if (value.Type is StructTypeSymbol || value.LlvmType == "ptr" && value.Type is VectorTypeSymbol)
+        {
+            var structType = value.Type;
             if (returnInfo.Style == PassStyle.Ignore)
             {
                 FlushTemporaries();
