@@ -121,7 +121,7 @@ public sealed partial class LlvmEmitter
 
         // name, kind, type, getter, setter, attributeCount, attributes, flags.
         _module.AppendLine(
-            $"%SlPropertyInfo = type {{ ptr, i32, ptr, ptr, ptr, {word}, ptr, i32 }}");
+            $"%SlPropertyInfo = type {{ ptr, i32, ptr, ptr, ptr, {word}, ptr, i32, i32 }}");
 
         _module.AppendLine($"%SlTypeBlock = type {{ {word}, ptr, ptr }}");
         _module.AppendLine($"%SlAttribute = type {{ ptr, {word}, ptr }}");

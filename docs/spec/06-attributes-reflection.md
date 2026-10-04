@@ -176,6 +176,19 @@ with `SetText`, `SetBool`, `SetDouble` and `SetAggregate` beside them, and the
 matching readers. Setting through the wrong one does nothing rather than
 writing the wrong bytes, and so does setting a property with no setter.
 
+**A struct property is copied through memory.** `GetStruct(raw, property,
+into)` and `SetStruct(raw, property, from)` take the value by address, so a
+`Color` or a `Rectangle` is read and set whatever registers its target passes
+it in: the compiler emits a small thunk per accessor that does the passing.
+A struct holding a reference has no accessors through reflection --
+`CanRead` and `CanWrite` are false -- because the bytes copied out would own
+what they hold, and nothing reading bytes can release it.
+
+**An array property says what it holds**, in `Property.ElementKind`, and
+`GetTextArray` reads a `String[]` one as a copy. It is safe where
+`GetAggregate` is not: a getter that makes a new array for each call, as
+`ListBox.Items` does, hands back one nothing else owns.
+
 **An automatic property's storage is a field named after the property**, which
 is why `Field.IsPropertyStorage` exists: without it a walk over the field
 table cannot tell `Name` the storage from `Name` the property, and writing it

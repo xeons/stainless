@@ -528,10 +528,8 @@ public sealed partial class LlvmEmitter
             var property = newest[name];
             string attributes = AttributeTable(property.Attributes);
 
-            // Symbol() supplies the '@' and quotes the name when a mangling
-            // needs it, which a C++-linkage accessor does.
-            string getter = property.Getter is { } read ? Symbol(read) : "null";
-            string setter = property.Setter is { } write ? Symbol(write) : "null";
+            string getter = property.Getter is { } read ? AccessorSymbol(property, read, reads: true) : "null";
+            string setter = property.Setter is { } write ? AccessorSymbol(property, write, reads: false) : "null";
 
             // SL_PROPERTY_PUBLIC, so a tool listing what a caller can set --
             // a form designer's grid -- can leave out what a caller cannot.
@@ -541,9 +539,12 @@ public sealed partial class LlvmEmitter
             if (!ZeroValues.HasZeroValue(property.Type))
                 flags |= 2;
 
+            var array = (property.Type.NonNullForm() ?? property.Type) as ArrayTypeSymbol;
+            int elementKind = array is null ? 0 : (int)KindOf(array.Element);
+
             return $"%SlPropertyInfo {{ ptr {InternBytes(property.Name)}, " +
                    $"i32 {(int)KindOf(property.Type)}, ptr {NestedTypeInfo(property.Type)}, " +
-                   $"ptr {getter}, ptr {setter}, {attributes}, i32 {flags} }}";
+                   $"ptr {getter}, ptr {setter}, {attributes}, i32 {flags}, i32 {elementKind} }}";
         }).ToList();
 
         string table = "@" + NextMetadataName("properties");
@@ -552,6 +553,92 @@ public sealed partial class LlvmEmitter
             $"[{string.Join(", ", rows)}]");
 
         return $"{Word} {order.Count}, ptr {table}";
+    }
+
+    /// <summary>
+    /// What a property row points at for one accessor: the accessor, or for a
+    /// struct a thunk taking the value by address.
+    ///
+    /// C cannot call a function that takes or returns a struct by value
+    /// without knowing the struct's shape, so the runtime calls one signature,
+    /// <c>void(ptr self, ptr value)</c>, for every struct. A struct holding
+    /// references gets no accessor: a copy of one owns what it holds, and
+    /// bytes read through reflection have no way to release it.
+    ///
+    /// <see cref="Symbol(FunctionSymbol)"/> supplies the '@' and quotes the
+    /// name when a mangling needs it, which a C++-linkage accessor does.
+    /// </summary>
+    private string AccessorSymbol(PropertySymbol property, FunctionSymbol accessor, bool reads)
+    {
+        if (property.Type is not StructTypeSymbol structType)
+            return Symbol(accessor);
+        if (structType.CarriesReferences())
+            return "null";
+
+        string name = $"@sl.property.{(reads ? "get" : "set")}.{_propertyThunks.Count}";
+        _propertyThunks.Add((name, accessor, structType, reads));
+        return name;
+    }
+
+    private readonly List<(string Name, FunctionSymbol Accessor, StructTypeSymbol Type, bool Reads)>
+        _propertyThunks = [];
+
+    private int _propertyThunksEmitted;
+
+    /// <summary>
+    /// Emits the thunks <see cref="AccessorSymbol"/> named since the last
+    /// call, and answers whether there were any: each reaches its accessor,
+    /// which has yet to be emitted.
+    /// </summary>
+    private bool EmitPropertyThunks()
+    {
+        bool any = false;
+        for (; _propertyThunksEmitted < _propertyThunks.Count; _propertyThunksEmitted++)
+        {
+            var (name, accessor, type, reads) = _propertyThunks[_propertyThunksEmitted];
+            any = true;
+            ResetFunctionState();
+            _body.Clear();
+            Reach(accessor);
+
+            string llvmType = LlvmTypeOf(type);
+            string call = Convention(accessor);
+            if (reads)
+            {
+                var info = ClassifyResult(type);
+                call = $"call {call}{ResultSpelling(info)} {Symbol(accessor)}";
+                switch (info.Style)
+                {
+                    case PassStyle.Indirect:
+                        Line($"{call}(ptr sret({llvmType}) %value, ptr %self)");
+                        break;
+                    case PassStyle.Ignore:
+                        Line($"{call}(ptr %self)");
+                        break;
+                    case PassStyle.Coerce:
+                        StoreCoerced("%value", Emit(info.LlvmType, $"{call}(ptr %self)"), info);
+                        break;
+                    default:
+                        Line($"store {info.LlvmType} {Emit(info.LlvmType, $"{call}(ptr %self)")}, ptr %value");
+                        break;
+                }
+            }
+            else
+            {
+                List<string> arguments = ["ptr %self"];
+                AppendArgument(new Val("%value", "ptr", type), type, arguments, variadic: false);
+                Line($"call {call}void {Symbol(accessor)}({string.Join(", ", arguments)})");
+            }
+            Terminator("ret void");
+
+            _module.AppendLine($"define internal void {name}(ptr %self, ptr %value)" + FrameAttributes + " {");
+            _module.AppendLine("entry:");
+            _module.Append(_entryAllocas);
+            _module.Append(_body);
+            _module.AppendLine("}");
+            _module.AppendLine();
+        }
+        return any;
     }
 
     /// <summary>

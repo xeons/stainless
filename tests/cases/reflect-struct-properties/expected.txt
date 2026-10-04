@@ -1,0 +1,9 @@
+colour 10 20 30 255, set 1 time
+where 1 -2 3
+range 0.5 2.25
+measure 7 1.5
+big 15
+stored -2 1.5 5
+a struct holding a String: read no, write no
+elements: names String, points struct, colour none
+names 2: one two; fresh made each time; not text 0

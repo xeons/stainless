@@ -33,7 +33,7 @@ documented here.
 
 **Types** &nbsp; [IFormattable](#iformattable-interface) &middot; [String](#string-class) &middot; [StringBuilder](#stringbuilder-class) &middot; [Utf16String](#utf16string-class) &middot; [string](#string-alias)
 
-**Functions** &nbsp; [AlignText](#aligntext-function) &middot; [FormatDouble](#formatdouble-function) &middot; [FormatInteger](#formatinteger-function) &middot; [FormatInteger](#formatinteger-function) &middot; [FromBool](#frombool-function) &middot; [FromBytes](#frombytes-function) &middot; [FromChar](#fromchar-function) &middot; [FromDouble](#fromdouble-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromNullTerminated](#fromnullterminated-function) &middot; [FromNullTerminatedUtf16](#fromnullterminatedutf16-function) &middot; [FromUtf16](#fromutf16-function)
+**Functions** &nbsp; [AlignText](#aligntext-function) &middot; [FormatDouble](#formatdouble-function) &middot; [FormatInteger](#formatinteger-function) &middot; [FormatInteger](#formatinteger-function) &middot; [FromBool](#frombool-function) &middot; [FromBytes](#frombytes-function) &middot; [FromChar](#fromchar-function) &middot; [FromDouble](#fromdouble-function) &middot; [FromDouble](#fromdouble-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromNullTerminated](#fromnullterminated-function) &middot; [FromNullTerminatedUtf16](#fromnullterminatedutf16-function) &middot; [FromUtf16](#fromutf16-function)
 
 **Constants** &nbsp; [NotFound](#notfound-constant)
 
@@ -1049,7 +1049,7 @@ String FromBool(bool value)
 
 `"true"` or `"false"`.
 
-<sub>[stdlib/Text/Text.sl:221](../../stdlib/Text/Text.sl#L221)</sub>
+<sub>[stdlib/Text/Text.sl:259](../../stdlib/Text/Text.sl#L259)</sub>
 
 ### FromBytes *function*
 
@@ -1061,7 +1061,7 @@ A copy of `byteLength` bytes, taken to be UTF-8.
 
 **See also** &nbsp; [String.ToBytes](#tobytes-method)
 
-<sub>[stdlib/Text/Text.sl:232](../../stdlib/Text/Text.sl#L232)</sub>
+<sub>[stdlib/Text/Text.sl:270](../../stdlib/Text/Text.sl#L270)</sub>
 
 ### FromChar *function*
 
@@ -1074,7 +1074,7 @@ One code point as the character it names, not as its number.
 
 **See also** &nbsp; [Text.FromInteger](#frominteger-function)
 
-<sub>[stdlib/Text/Text.sl:227](../../stdlib/Text/Text.sl#L227)</sub>
+<sub>[stdlib/Text/Text.sl:265](../../stdlib/Text/Text.sl#L265)</sub>
 
 ### FromDouble *function*
 
@@ -1084,7 +1084,17 @@ String FromDouble(double value)
 
 The shortest text that reads back as the same number.
 
-<sub>[stdlib/Text/Text.sl:218](../../stdlib/Text/Text.sl#L218)</sub>
+<sub>[stdlib/Text/Text.sl:253](../../stdlib/Text/Text.sl#L253)</sub>
+
+### FromDouble *function*
+
+```
+String FromDouble(ndouble value)
+```
+
+An `ndouble`, as the `double` nearest it: what the runtime formats.
+
+<sub>[stdlib/Text/Text.sl:256](../../stdlib/Text/Text.sl#L256)</sub>
 
 ### FromInteger *function*
 
@@ -1124,6 +1134,26 @@ stack, and `$"{n}"` printed 8612659968337772549 for 5.
 
 <sub>[stdlib/Text/Text.sl:215](../../stdlib/Text/Text.sl#L215)</sub>
 
+### FromInteger *function*
+
+```
+String FromInteger(int128 value)
+```
+
+A signed 128-bit integer in base ten.
+
+<sub>[stdlib/Text/Text.sl:218](../../stdlib/Text/Text.sl#L218)</sub>
+
+### FromInteger *function*
+
+```
+String FromInteger(uint128 value)
+```
+
+An unsigned 128-bit integer in base ten.
+
+<sub>[stdlib/Text/Text.sl:227](../../stdlib/Text/Text.sl#L227)</sub>
+
 ### FromNullTerminated *function*
 
 ```
@@ -1135,7 +1165,7 @@ function that answers with a `char*` hands back.
 
 **See also** &nbsp; [Text.FromBytes](#frombytes-function)
 
-<sub>[stdlib/Text/Text.sl:239](../../stdlib/Text/Text.sl#L239)</sub>
+<sub>[stdlib/Text/Text.sl:277](../../stdlib/Text/Text.sl#L277)</sub>
 
 ### FromNullTerminatedUtf16 *function*
 
@@ -1147,7 +1177,7 @@ UTF-16 up to the first NUL unit, transcoded to UTF-8.
 
 **See also** &nbsp; [Text.FromUtf16](#fromutf16-function)
 
-<sub>[stdlib/Text/Text.sl:253](../../stdlib/Text/Text.sl#L253)</sub>
+<sub>[stdlib/Text/Text.sl:291](../../stdlib/Text/Text.sl#L291)</sub>
 
 ### FromUtf16 *function*
 
@@ -1162,7 +1192,7 @@ API writes into a buffer the caller owns and that pair is what comes back.
 
 **See also** &nbsp; [Text.FromNullTerminatedUtf16](#fromnullterminatedutf16-function)
 
-<sub>[stdlib/Text/Text.sl:247](../../stdlib/Text/Text.sl#L247)</sub>
+<sub>[stdlib/Text/Text.sl:285](../../stdlib/Text/Text.sl#L285)</sub>
 
 ## Constants
 

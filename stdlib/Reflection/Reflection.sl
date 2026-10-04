@@ -43,6 +43,8 @@
 /// its own affair: a pointer can be cast to anything.
 module Standard.Reflection;
 
+import Standard.Collections;
+
 // The runtime accessors. Handles are raw pointers into static tables, which is
 // why they are never freed and never counted.
 extern "C"
@@ -115,6 +117,9 @@ extern "C"
     void   sl_property_set_double(byte* instance, byte* property, double value);
     void   sl_property_set_bool(byte* instance, byte* property, bool value);
     void   sl_property_set_reference(byte* instance, byte* property, byte* value);
+    uint   sl_property_element_kind(byte* property);
+    void   sl_property_get_struct(byte* instance, byte* property, byte* value);
+    void   sl_property_set_struct(byte* instance, byte* property, byte* value);
 
     byte*  sl_type_find(byte* name);
 
@@ -292,6 +297,46 @@ public void SetText(byte* instance, Property property, String value)
 public void SetAggregate(byte* instance, Property property, byte* value)
 {
     sl_property_set_reference(instance, property.Handle, value);
+}
+
+/// Calls the getter of a `String[]` property, and answers a copy of what it
+/// gave. Empty when the property cannot be read or holds anything else, and a
+/// null element reads as `""`.
+///
+/// Safe whether the getter hands back an array it holds or one it made for
+/// the call: the answer is a copy, and the getter's reference is released.
+public String[] GetTextArray(byte* instance, Property property)
+{
+    if (property.Kind != KindArray || property.ElementKind != KindString)
+        return [];
+
+    var raw = sl_property_get_reference(instance, property.Handle);
+    if (raw == null)
+        return [];
+
+    var copy = new List<String>();
+    nuint length = sl_array_length(raw);
+    for (nuint i = 0u; i < length; i++)
+        copy.Add(ReadTextAt(sl_array_data(raw) + i * sizeof(byte*)));
+    sl_release(raw);
+    return copy.ToArray();
+}
+
+/// Calls the getter of a struct property and copies what it answers to
+/// `into`, which MUST hold as many bytes as the struct has. A struct that holds a
+/// reference cannot be read this way: `CanRead` is false for one.
+///
+/// @seealso SetStruct
+public void GetStruct(byte* instance, Property property, byte* into)
+{
+    sl_property_get_struct(instance, property.Handle, into);
+}
+
+/// Calls the setter of a struct property with the struct at `from`. Does
+/// nothing when there is no setter, as for one holding a reference.
+public void SetStruct(byte* instance, Property property, byte* from)
+{
+    sl_property_set_struct(instance, property.Handle, from);
 }
 
 // ------------------------------------------------------------------ reading

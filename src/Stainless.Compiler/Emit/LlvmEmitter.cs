@@ -339,6 +339,11 @@ public sealed partial class LlvmEmitter(
         if (program.EntryPoint is not null && !forSharedLibrary)
             EmitEntryPoint(program.EntryPoint);
 
+        // A property thunk reaches its accessor, and emitting that can describe
+        // a type with struct properties of its own.
+        while (EmitPropertyThunks())
+            EmitReached();
+
         // The last function is emitted here, so after this nothing new can be
         // named; what follows reads what the functions collected.
         EmitReached();

@@ -694,6 +694,27 @@ void sl_property_set_bool(void *instance, const void *property, _Bool value)
     ((void (*)(void *, _Bool))info->setter)(instance, value);
 }
 
+uint32_t sl_property_element_kind(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->elementKind;
+}
+
+void sl_property_get_struct(void *instance, const void *property, void *value)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    if (info->getter == NULL || info->kind != SL_KIND_STRUCT) return;
+
+    ((void (*)(void *, void *))info->getter)(instance, value);
+}
+
+void sl_property_set_struct(void *instance, const void *property, const void *value)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    if (info->setter == NULL || info->kind != SL_KIND_STRUCT) return;
+
+    ((void (*)(void *, const void *))info->setter)(instance, value);
+}
+
 /*
  * A setter borrows its argument, as every function does, and retains what it
  * stores. So nothing is retained here, and the caller still owns `value`.

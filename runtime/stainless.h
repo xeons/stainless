@@ -204,6 +204,7 @@ typedef struct SlPropertyInfo {
     size_t             attributeCount;
     const SlAttribute *attributes;
     uint32_t           flags;       /* SL_PROPERTY_* */
+    uint32_t           elementKind; /* an array's elements; SL_KIND_NONE otherwise */
 } SlPropertyInfo;
 
 /* A property anything can reach, rather than its class and module only. */
@@ -1004,6 +1005,15 @@ SL_API void sl_property_set_bool(void *instance, const void *property, _Bool val
  * same bargain sl_write_reference makes for a field.
  */
 SL_API void sl_property_set_reference(void *instance, const void *property, void *value);
+
+/*
+ * A struct property, copied out of or into the bytes at `value`, which MUST be
+ * the struct's size. Its accessors are thunks the compiler emits taking the
+ * value by address; a struct holding references has none, and answers nothing.
+ */
+SL_API uint32_t sl_property_element_kind(const void *property);
+SL_API void sl_property_get_struct(void *instance, const void *property, void *value);
+SL_API void sl_property_set_struct(void *instance, const void *property, const void *value);
 
 /* --------------------------------------------------- finding a type by name */
 

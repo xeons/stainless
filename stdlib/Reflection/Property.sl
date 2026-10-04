@@ -127,4 +127,7 @@ public struct Property
 
     /// True for a `String` property.
     public bool IsText => Kind == KindString;
+
+    /// What an array property's elements are. `KindNone` for anything else.
+    public int ElementKind => (int)sl_property_element_kind(Handle);
 }
