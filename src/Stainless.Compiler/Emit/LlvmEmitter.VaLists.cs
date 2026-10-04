@@ -31,8 +31,10 @@ public sealed partial class LlvmEmitter
     private Val EmitVaStart(BoundVaStart started)
     {
         string list = Alloca(LlvmTypeOf(started.Type), "va.list");
-        _overflowIntrinsics.Add("declare void @llvm.va_start.p0(ptr) nounwind");
-        Line($"call void @llvm.va_start.p0(ptr {list})");
+        // Unsuffixed: LLVM 18 has no overloaded form, and 19 and later upgrade
+        // this one to `.p0` as they read it.
+        _overflowIntrinsics.Add("declare void @llvm.va_start(ptr) nounwind");
+        Line($"call void @llvm.va_start(ptr {list})");
         return new Val(list, "ptr", started.Type);
     }
 
