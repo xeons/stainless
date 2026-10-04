@@ -465,7 +465,8 @@ of it the compiler enforces today.
 ## 9.3 `const` and `static`
 
 A `const` is a compile-time value inlined at every use, so it holds what fits in
-one: a number, a `bool`, a `char` or an enum member. Its initializer is a
+one: a number, a `bool`, a `char`, an enum member, or a string compiled into
+read-only data (below). Its initializer is a
 literal, or a negated one — `const int GwlpUserData = -21;` — since a C header
 is full of those.
 
@@ -492,14 +493,36 @@ The one place it does not reach is an inline array's length, `T[N]`,
 which is settled during layout — before any type has its members — so a length
 there must still be a literal or a module-level `const`.
 
+**A string literal makes two kinds of constant**, the two a C or Objective-C
+header defines with a macro:
+
+- **A C string**, `byte*`: the bytes are compiled in once, terminated with a
+  zero, and the constant is their address wherever it is named. IOKit's
+  `#define kIOServiceClass "IOService"` is `const byte* IOServiceClass =
+  "IOService";`.
+- **A string object**, `NSString` or a `[CFType("CFStringGetTypeID")]` class
+  such as `CFStringRef`, on Apple's platforms only: the constant object clang
+  makes of `@"..."` and `CFSTR("...")`, laid out as clang lays it out, in
+  `__DATA,__cfstring`. ASCII text is stored as bytes and anything else as
+  UTF-16. The object is immortal, so naming it is its address and nothing is
+  counted.
+
+```csharp
+public const NSString NotificationName = "SLDidFinish";
+public const CFStringRef AccessibleKey = "kSecAttrAccessible";
+```
+
+A mutable string class is refused, since the object is in read-only data.
+
 A `String` is not one of them. It is a counted object, and inlining a pointer to
 its bytes would produce something that looks like a `String`, passes every check
 and is not one, so it is refused with the alternative:
 
 ```
-error[SL0478]: a 'const' holds a number, a bool, a char or an enum, and 'String'
-is none of those. Write 'static readonly String Greeting = ...' instead, which
-has storage rather than being inlined
+error[SL0478]: a 'const' holds a number, a bool, a char, an enum, a C string
+('byte*') or a string object ('NSString', 'CFStringRef'), and 'String' is none
+of those. Write 'static readonly String Greeting = ...' instead, which has
+storage rather than being inlined
 ```
 
 The literal has to suit the declared type, because the alternative is not an

@@ -149,7 +149,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
                 CEnumDecl enumeration => WriteEnum(enumeration, enumeration.Name, context),
                 CTypedefDecl typedef => WriteTypedef(typedef, context),
                 CVariableDecl variable => WriteVariable(variable, context),
-                CMacro macro => WriteMacro(macro),
+                CMacro macro => WriteMacro(macro, context),
                 CObjCContainer container => WriteObjCContainer(container, context),
                 _ => null,
             };
@@ -507,12 +507,13 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
 
     /// <summary>
     /// A <c>#define</c> constant: an integer with the value clang folded it
-    /// to, or a floating-point literal as written. One that is a string or an
-    /// object has no <c>const</c> to be.
+    /// to, a floating-point literal as written, or a string literal -- a C
+    /// string, a <c>CFSTR("...")</c> or an <c>@"..."</c>.
     /// </summary>
-    private string? WriteMacro(CMacro macro)
+    private string? WriteMacro(CMacro macro, Context context)
     {
         if (macro.Type is null) return null;
+        if (WriteStringMacro(macro, context) is { } stringConstant) return stringConstant;
 
         string? type = MacroType(macro.Type);
         string name = Identifier(macro.Name);
@@ -544,6 +545,64 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
 
         throw new Unsupported($"a macro of type '{macro.Type}', which a const cannot hold");
     }
+
+    /// <summary>
+    /// A macro whose body is a string literal, as the constant it makes: a
+    /// <c>byte*</c> for a <c>char</c> array, and the string object for
+    /// <c>CFSTR</c> and <c>@</c>. Null when the macro is not one; a body that
+    /// computes a string, from other macros say, is not a literal and is refused.
+    /// </summary>
+    private string? WriteStringMacro(CMacro macro, Context context)
+    {
+        string? type;
+        string body;
+        switch (Canonical(macro.Type!))
+        {
+            case CArray { Element: CBuiltin { Name: "char" } }:
+                type = "byte*";
+                body = macro.Body;
+                break;
+
+            case CPointer { Pointee: CTag { Kind: CTagKind.Struct, Name: "__CFString" } }:
+                var made = CFStringMacro().Match(macro.Body);
+                if (!made.Success) throw new Unsupported($"a CFStringRef macro that is not CFSTR(\"...\") ({macro.Body})");
+                type = Spell(new CTypedef("CFStringRef"), context, macro.Name, Placement.Value, Nullability.NonNull);
+                body = made.Groups[1].Value;
+                break;
+
+            case CPointer when MacroAlias().IsMatch(macro.Body) && macro.Body.Trim() is not ("NULL" or "nil" or "Nil"):
+                throw new Unsupported($"a macro naming '{macro.Body.Trim()}', and an extern cannot take a second name");
+
+            case CPointer when macro.Body.StartsWith('@'):
+                type = Spell(macro.Type!, context, macro.Name, Placement.Value, Nullability.NonNull);
+                if (type != "NSString") throw new Unsupported($"an object macro of type '{type}', which is no NSString");
+                body = macro.Body[1..];
+                break;
+
+            default:
+                return null;
+        }
+
+        var bytes = CStringLiterals.Decode(body)
+            ?? throw new Unsupported($"a string macro whose body is not a literal ({macro.Body})");
+        string text;
+        try
+        {
+            text = new UTF8Encoding(false, true).GetString(bytes);
+        }
+        catch (DecoderFallbackException)
+        {
+            throw new Unsupported($"a string macro that is not UTF-8 ({macro.Body})");
+        }
+
+        return $"public const {type} {Identifier(macro.Name)} = {CStringLiterals.Spell(text)};\n";
+    }
+
+    [GeneratedRegex(@"^\(?\s*CFSTR\s*\((.*)\)\s*\)?$")]
+    private static partial Regex CFStringMacro();
+
+    [GeneratedRegex(@"^\s*[A-Za-z_][A-Za-z0-9_]*\s*$")]
+    private static partial Regex MacroAlias();
 
     /// <summary>The primitive a macro's type comes to, through typedefs and enums, or null.</summary>
     private string? MacroType(CType type)

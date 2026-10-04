@@ -194,7 +194,7 @@ public sealed partial class Binder
         if (!syntax.ThroughPointer && ResolveModulePrefix(syntax.Target) is { } importedModule)
         {
             if (importedModule.Constants.TryGetValue(syntax.Member, out var constant) && constant.IsPublic)
-                return new BoundConstantAccess(syntax.Span, constant);
+                return ConstantAccess(syntax.Span, constant);
 
             if (importedModule.Statics.TryGetValue(syntax.Member, out var shared) && shared.IsPublic)
                 return new BoundStaticAccess(syntax.Span, shared);
@@ -243,7 +243,7 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            return new BoundConstantAccess(syntax.Span, inlined);
+            return ConstantAccess(syntax.Span, inlined);
         }
 
         // `FileStream.Open` without a call is the method itself, waiting for a

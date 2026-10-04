@@ -1173,6 +1173,12 @@ public sealed partial class Binder
             ? PrimitiveTypeSymbol.Int
             : ResolveType(declaration.Type, scope);
 
+        // Whether an objc class is a string type is for '[CFType]' to say, and
+        // attributes are read after this pass.
+        bool settledLater = type is ClassTypeSymbol { ObjC: ObjCClassKind.Imported };
+        if (settledLater)
+            _objCConstants.Add((declaration, type));
+
         if (ConstantLiteral(declaration.Value) is { } literal)
         {
             bool negated = Negated(declaration.Value);
@@ -1192,11 +1198,8 @@ public sealed partial class Binder
                     TokenKind.CharLiteral => PrimitiveTypeSymbol.Char,
                     _ => PrimitiveTypeSymbol.Int,
                 };
-            else if (!Suits(literal.Kind, type))
-                diagnostics.Error("SL0479", declaration.Value.Span,
-                    $"'{declaration.Name}' is declared '{type.Name}', and " +
-                    $"{literal.Kind.Describe()} is not one",
-                    type);
+            else if (!settledLater && !Suits(literal.Kind, type))
+                ReportUnsuitableLiteral(declaration, literal, type);
         }
         else
         {
@@ -1208,18 +1211,11 @@ public sealed partial class Binder
         // that fits in one. A String is a counted object, and inlining a pointer
         // to its bytes would produce something that looks like a String, passes
         // every check, and is not one -- which is worse than not compiling.
-        if (type is not (PrimitiveTypeSymbol or EnumTypeSymbol) && !type.IsError())
-        {
-            diagnostics.Error("SL0478", declaration.Span,
-                $"a 'const' holds a number, a bool, a char or an enum, and " +
-                $"'{type.Name}' is none of those. Write " +
-                $"'static readonly {type.Name} {declaration.Name} = ...' instead, " +
-                "which has storage rather than being inlined",
-                type);
-
-            // Registered anyway, so that every use of it does not then report
-            // an undefined name on top of the one real error.
-        }
+        // Registered anyway, so that every use of it does not then report an
+        // undefined name on top of the one real error.
+        if (!settledLater && type is not (PrimitiveTypeSymbol or EnumTypeSymbol) &&
+            !IsConstantStringType(type) && !type.IsError())
+            ReportUnsuitableConstantType(declaration, type);
 
         var symbol = new ConstantSymbol(declaration.Name, type, value)
         {
@@ -1229,6 +1225,34 @@ public sealed partial class Binder
         if (containingType is not null) containingType.Constants.Add(symbol);
         else module.Constants[declaration.Name] = symbol;
     }
+
+    /// <summary>The constants of an objc class type, checked once '[CFType]' has been read.</summary>
+    private readonly List<(GlobalConstDeclSyntax Declaration, TypeSymbol Type)> _objCConstants = [];
+
+    private void CheckObjCConstants()
+    {
+        foreach (var (declaration, type) in _objCConstants)
+        {
+            if (!IsConstantStringType(type))
+                ReportUnsuitableConstantType(declaration, type);
+            else if (ConstantLiteral(declaration.Value) is { } literal && !Suits(literal.Kind, type))
+                ReportUnsuitableLiteral(declaration, literal, type);
+        }
+    }
+
+    private void ReportUnsuitableConstantType(GlobalConstDeclSyntax declaration, TypeSymbol type) =>
+        diagnostics.Error("SL0478", declaration.Span,
+            $"a 'const' holds a number, a bool, a char, an enum, a C string ('byte*') or a " +
+            $"string object ('NSString', 'CFStringRef'), and '{type.Name}' is none of those. " +
+            $"Write 'static readonly {type.Name} {declaration.Name} = ...' instead, " +
+            "which has storage rather than being inlined",
+            type);
+
+    private void ReportUnsuitableLiteral(GlobalConstDeclSyntax declaration, LiteralSyntax literal, TypeSymbol type) =>
+        diagnostics.Error("SL0479", declaration.Value.Span,
+            $"'{declaration.Name}' is declared '{type.Name}', and " +
+            $"{literal.Kind.Describe()} is not one",
+            type);
 
     /// <summary>
     /// Whether a literal of this kind can be the value of a constant of this type.
@@ -1252,11 +1276,34 @@ public sealed partial class Binder
             TokenKind.FloatLiteral => underlying is PrimitiveTypeSymbol { IsFloat: true },
             TokenKind.TrueKeyword or TokenKind.FalseKeyword =>
                 underlying is PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool },
+            TokenKind.StringLiteral => IsConstantStringType(underlying),
             _ => false,
         };
     }
 
     /// <summary>The literal a constant initializer is, looking through one minus.</summary>
+    /// <summary>
+    /// What a string literal may be the constant value of: a C string, its
+    /// bytes compiled in and inlined as their address; or a string object --
+    /// <c>NSString</c> or <c>CFStringRef</c>, not a mutable one -- compiled in as
+    /// the constant object clang makes of <c>@"..."</c> and <c>CFSTR("...")</c>.
+    /// </summary>
+    internal static bool IsConstantStringType(TypeSymbol type) => type switch
+    {
+        PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } } => true,
+        ClassTypeSymbol { IsCoreFoundation: true, CFTypeIDFunction: "CFStringGetTypeID" } => true,
+        ClassTypeSymbol { ObjC: ObjCClassKind.Imported, IsCoreFoundation: false } objcClass =>
+            (objcClass.ObjCRuntimeName ?? objcClass.SimpleName) == "NSString",
+        _ => false,
+    };
+
+    /// <summary>A named constant read; one that is a string object is Objective-C's, and Apple's alone.</summary>
+    private BoundConstantAccess ConstantAccess(Source.SourceSpan span, ConstantSymbol constant)
+    {
+        if (IsObjCReference(constant.Type)) RequireDarwin(span);
+        return new BoundConstantAccess(span, constant);
+    }
+
     private static LiteralSyntax? ConstantLiteral(ExpressionSyntax value) => value switch
     {
         LiteralSyntax literal => literal,

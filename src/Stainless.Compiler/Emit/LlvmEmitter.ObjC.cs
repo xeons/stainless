@@ -378,6 +378,63 @@ public sealed partial class LlvmEmitter
         return Emit("i1", $"icmp ne i8 {answer}, 0");
     }
 
+    /// <summary>Each constant string object, by its text, and its index.</summary>
+    private readonly Dictionary<string, int> _constantStrings = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The constant object an <c>NSString</c> or <c>CFStringRef</c> constant is:
+    /// what clang makes of <c>@"..."</c> and <c>CFSTR("...")</c>, an isa of
+    /// <c>__CFConstantStringClassReference</c>, flags, the characters and their
+    /// count. It is immortal, and costs nothing until it is read.
+    /// </summary>
+    private string ConstantStringObject(string text)
+    {
+        _countsObjC = true;
+        if (!_constantStrings.TryGetValue(text, out int index))
+            _constantStrings[text] = index = _constantStrings.Count;
+        return $"@sl.cfstring.{index}";
+    }
+
+    /// <summary>
+    /// The constant string objects, as clang lays them out: ASCII text as
+    /// bytes in <c>__cstring</c> with flags 0x7C8, anything else as UTF-16 in
+    /// <c>__ustring</c> with flags 0x7D0, the count in the units each holds.
+    /// </summary>
+    private void ConstantStringTables()
+    {
+        if (_constantStrings.Count == 0) return;
+
+        _module.AppendLine("%struct.__NSConstantString_tag = type { ptr, i32, ptr, i64 }");
+        Declare("__CFConstantStringClassReference", "@__CFConstantStringClassReference = external global [0 x i32]");
+
+        foreach (var (text, index) in _constantStrings)
+        {
+            bool ascii = text.All(c => c < 0x80);
+            string characters = $"@sl.cfstring.chars.{index}";
+            if (ascii)
+            {
+                var bytes = Encoding.ASCII.GetBytes(text);
+                string cells = string.Concat(bytes.Select(b => $"\\{b:X2}"));
+                _module.AppendLine(
+                    $"{characters} = private unnamed_addr constant [{bytes.Length + 1} x i8] c\"{cells}\\00\", " +
+                    "section \"__TEXT,__cstring,cstring_literals\", align 1");
+            }
+            else
+            {
+                var units = text.Select(c => $"i16 {(int)c}").Append("i16 0");
+                _module.AppendLine(
+                    $"{characters} = private unnamed_addr constant [{text.Length + 1} x i16] " +
+                    $"[{string.Join(", ", units)}], section \"__TEXT,__ustring\", align 2");
+            }
+
+            int length = ascii ? Encoding.ASCII.GetByteCount(text) : text.Length;
+            _module.AppendLine(
+                $"@sl.cfstring.{index} = private global %struct.__NSConstantString_tag " +
+                $"{{ ptr @__CFConstantStringClassReference, i32 {(ascii ? 1992 : 2000)}, ptr {characters}, " +
+                $"i64 {length} }}, section \"__DATA,__cfstring\", align 8");
+        }
+    }
+
     /// <summary>The functions answering a Core Foundation type's CFTypeID that a cast has asked.</summary>
     private readonly SortedSet<string> _cfTypeIDs = new(StringComparer.Ordinal);
 
@@ -462,6 +519,8 @@ public sealed partial class LlvmEmitter
     private void ObjCTables()
     {
         if (!UsesObjC) return;
+
+        ConstantStringTables();
 
         var used = new List<string>();
         _module.AppendLine();

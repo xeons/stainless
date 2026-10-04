@@ -480,6 +480,7 @@ public sealed partial class LlvmEmitter
             double number => FormatFloating(number, constant.Type),
             float number => FormatFloating(number, constant.Type),
             ulong number => FormatInteger(number, constant.Type),
+            string s when IsObjCReference(constant.Type) => ConstantStringObject(s),
             string s => InternBytes(s),
             _ => throw new InternalCompilerError(
                 $"a constant holding {constant.Value?.GetType().Name ?? "null"}", access.Span),

@@ -300,6 +300,7 @@ public sealed partial class Binder(
                                     //         and every 'where' clause could be met
         ResolveAttributes();        // pass 6: attributes fold to constants
         CheckObjCClasses();         //         and every objc class is one the runtime can find
+        CheckObjCConstants();       //         and every objc constant a string object
         SettleLayoutsWaitingForAttributes();
         CheckActivatableClasses();  //         and a CLSID says who can be made
         ComputeLayouts();           // pass 7: every value type has a size

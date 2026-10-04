@@ -1,0 +1,3 @@
+9 bytes, 0 in the empty one
+first I, last e, then 0
+the same address: true

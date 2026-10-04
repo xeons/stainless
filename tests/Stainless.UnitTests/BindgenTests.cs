@@ -480,4 +480,27 @@ public class BindgenTests
         var block = Assert.IsType<CBlock>(CTypeParser.Parse("void (^ _Nonnull)(NSString * _Nonnull, id _Nullable)"));
         Assert.Equal([Nullability.NonNull, Nullability.Nullable], block.Function.ParameterNullability);
     }
+
+    [Theory]
+    [InlineData(@"""IOService""", "IOService")]
+    [InlineData(@"(""IO"" ""Service"")", "IOService")]
+    [InlineData(@"u8""caf"" ""\303\251""", "caf\u00e9")]
+    [InlineData(@"""tab\there\n""", "tab\there\n")]
+    [InlineData(@"""\101\x42\\\""""", "AB\\\"")]
+    [InlineData(@"""""", "")]
+    public void AStringMacroIsItsBytes(string body, string text) =>
+        Assert.Equal(System.Text.Encoding.UTF8.GetBytes(text), CStringLiterals.Decode(body));
+
+    [Theory]
+    [InlineData(@"kPrefix ""Service""")]
+    [InlineData(@"L""wide""")]
+    [InlineData(@"""unterminated")]
+    [InlineData(@"""\x123""")]
+    [InlineData("")]
+    public void AStringMacroThatIsNotALiteralIsNoString(string body) =>
+        Assert.Null(CStringLiterals.Decode(body));
+
+    [Fact]
+    public void TextIsWrittenAsAnAsciiStainlessLiteral() =>
+        Assert.Equal(@"""a\""b\\c\u000A\u00E9\U0001F600""", CStringLiterals.Spell("a\"b\\c\n\u00e9\U0001F600"));
 }

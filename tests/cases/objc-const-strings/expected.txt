@@ -1,0 +1,5 @@
+Greeting: 12 characters, equal to one made now: true
+Coffee: 6 units, the e is U+00E9, the cup U+2615
+Key: 18 characters, a string: true
+toll-free: true
+read ten thousand times: 120000

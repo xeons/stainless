@@ -1072,7 +1072,7 @@ public sealed partial class Binder
             // in front of it -- which is how it reads inside its own methods,
             // and what C# does with the same declaration.
             if (EnclosingType?.FindConstant(name) is { } ownConstant)
-                return new BoundConstantAccess(syntax.Span, ownConstant);
+                return ConstantAccess(syntax.Span, ownConstant);
 
             if (EnclosingType?.FindStatic(name) is { } ownStatic)
                 return new BoundStaticAccess(syntax.Span, ownStatic);
@@ -1124,7 +1124,7 @@ public sealed partial class Binder
                 return primary;
 
             if (_currentModule!.Constants.TryGetValue(name, out var constant))
-                return new BoundConstantAccess(syntax.Span, constant);
+                return ConstantAccess(syntax.Span, constant);
 
             if (_currentModule.Statics.TryGetValue(name, out var moduleStatic))
                 return new BoundStaticAccess(syntax.Span, moduleStatic);
@@ -1132,7 +1132,7 @@ public sealed partial class Binder
             foreach (var import in _context.File!.ImportedModules)
             {
                 if (import.Constants.TryGetValue(name, out var imported) && imported.IsPublic)
-                    return new BoundConstantAccess(syntax.Span, imported);
+                    return ConstantAccess(syntax.Span, imported);
 
                 if (import.Statics.TryGetValue(name, out var importedStatic) && importedStatic.IsPublic)
                     return new BoundStaticAccess(syntax.Span, importedStatic);

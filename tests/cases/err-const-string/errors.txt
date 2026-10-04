@@ -1,0 +1,4 @@
+# a const of a type no string literal makes
+SL0478
+# a literal of the wrong kind for the constant
+SL0479
