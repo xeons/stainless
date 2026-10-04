@@ -21,8 +21,10 @@
 // the control classes `[Reflect]`, so a control's properties are found by
 // name, read through their getters and written through their setters -- the
 // setter being what re-lays the control out. An enum property offers its
-// members, a `[Flags]` one a box per member. What reflection cannot say is
-// which properties a person should see; `IsHiddenProperty` is that list.
+// members, a `[Flags]` one a box per member. A colour and a font are typed or
+// chosen from the platform's dialog, and a list of strings is edited a line
+// to an item. What reflection cannot say is which properties a person should
+// see; `IsHiddenProperty` is that list.
 module Ide.Designing;
 
 import Standard.Collections;
@@ -37,7 +39,7 @@ import Ide.Designer;
 public closure void HandlerChosenHandler(String method, String handlerType);
 public closure void GridMessageHandler(String message);
 
-enum GridRowKind { Name, Text, Boolean, Integer, Floating, Choice, Flags }
+enum GridRowKind { Name, Text, Boolean, Integer, Floating, Choice, Flags, Colour, Typeface, Lines }
 
 class GridRow
 {
@@ -68,6 +70,9 @@ public class PropertyGrid : Panel
     private ComboBox _choice;
     private Panel _flags;
     private List<CheckBox> _flagBoxes;
+    private Button _pick;
+    private TextBox _lines;
+    private Button _apply;
     private TextBox _handler;
 
     private DesignSurface? _surface;
@@ -115,6 +120,18 @@ public class PropertyGrid : Panel
         _choice.Dock = DockStyle.Top;
         _choice.Height = 200;
         _choice.SelectedIndexChanged += this.OnChoiceChanged;
+        _pick = new Button(_editor);
+        _pick.Dock = DockStyle.Top;
+        _pick.Height = 24;
+        _pick.Text = "Choose...";
+        _pick.Click += this.OnPickClicked;
+        _apply = new Button(_editor);
+        _apply.Dock = DockStyle.Bottom;
+        _apply.Height = 24;
+        _apply.Text = "Apply";
+        _apply.Click += this.OnApplyLinesClicked;
+        _lines = new TextBox(_editor, true);
+        _lines.Dock = DockStyle.Fill;
         _flags = new Panel(_editor);
         _flags.Dock = DockStyle.Fill;
 
@@ -182,6 +199,9 @@ public class PropertyGrid : Panel
         _component = component;
         _type = FindDesignedType(component.TypeName);
         _heading.Text = " " + component.Name + "   " + component.TypeName;
+        if (designer.SelectedCount > 1u)
+            _heading.Text = _heading.Text + "   and " + Standard.Text.FromInteger((long)designer.SelectedCount - 1)
+                            + " more selected";
 
         CollectRows(chosen == null);
         foreach (var row in _rows)
@@ -238,6 +258,13 @@ public class PropertyGrid : Panel
             GridRowKind shown;
             if (enumeration.Exists && enumeration.IsEnum)
                 shown = enumeration.HasAttribute("Flags") ? GridRowKind.Flags : GridRowKind.Choice;
+            else if (kind == KindStruct && enumeration.Exists && enumeration.Name == DesignedColorType)
+                shown = GridRowKind.Colour;
+            else if (kind == KindClass && property.Name == "Font" && enumeration.Exists
+                     && enumeration.Name == DesignedFontType)
+                shown = GridRowKind.Typeface;
+            else if (kind == KindArray && property.ElementKind == KindString)
+                shown = GridRowKind.Lines;
             else if (kind == KindString)
                 shown = GridRowKind.Text;
             else if (kind == KindBool)
@@ -292,8 +319,8 @@ public class PropertyGrid : Panel
         if (row.Kind == GridRowKind.Name)
             return component.Name;
 
-        WindowedControl? live = FindLive();
-        if (live == null)
+        byte* raw = FindTarget();
+        if (raw == null)
             return ReadDocumentValue(component, row.Name);
 
         // Where and how big are the file's `Bounds`, as asked for; the live
@@ -312,7 +339,6 @@ public class PropertyGrid : Panel
                 break;
         }
 
-        byte* raw = (byte*)((WindowedControl)live);
         switch (row.Kind)
         {
             case GridRowKind.Text:
@@ -327,9 +353,34 @@ public class PropertyGrid : Panel
                 return FindMemberName(row.Enumeration, GetInteger(raw, row.Reflected));
             case GridRowKind.Flags:
                 return DescribeFlags(row.Enumeration, GetInteger(raw, row.Reflected), false);
+            case GridRowKind.Colour:
+            {
+                // A theme's colour stays its name: the live value is what
+                // this theme makes of it.
+                FormProperty? written = component.FindProperty(row.Name);
+                if (written != null && ((FormProperty)written).Value.Items[0u].StartsWith("SystemColors."))
+                    return ((FormProperty)written).Value.Items[0u];
+                Color colour;
+                GetStruct(raw, row.Reflected, (byte*)&colour);
+                return DescribeColour(colour);
+            }
+            case GridRowKind.Typeface:
+                return FindLive() is WindowedControl control ? DescribeDesignedFont(control.Font) : "";
+            case GridRowKind.Lines:
+                return SpellDesignedTextArray(GetTextArray(raw, row.Reflected));
             default:
                 return "";
         }
+    }
+
+    /// A colour as the grid shows it: `Red`, or its channels.
+    private static String DescribeColour(Color colour)
+    {
+        String spelled = SpellDesignedColour(colour);
+        if (spelled.StartsWith("Colors."))
+            return spelled.Substring(7u);
+        nuint open = (nuint)spelled.IndexOf("(") + 1u;
+        return spelled.Substring(open, spelled.ByteLength() - open - 1u);
     }
 
     /// The form's properties, from the file, since nothing live holds them.
@@ -355,12 +406,24 @@ public class PropertyGrid : Panel
         }
     }
 
+    /// The selected control, or null for the form and for a component with
+    /// no window.
     private WindowedControl? FindLive()
     {
         var surface = _surface;
         if (surface == null)
             return null;
         return ((DesignSurface)surface).SelectedLive;
+    }
+
+    /// What reflection reads and writes for the selection: the control, or
+    /// the component itself; null for the form, which nothing live holds.
+    private byte* FindTarget()
+    {
+        var surface = _surface;
+        if (surface == null)
+            return null;
+        return ((DesignSurface)surface).SelectedTarget;
     }
 
     private static String FindMemberName(Type enumeration, long value)
@@ -425,6 +488,9 @@ public class PropertyGrid : Panel
         _text.Visible = false;
         _choice.Visible = false;
         _flags.Visible = false;
+        _pick.Visible = false;
+        _lines.Visible = false;
+        _apply.Visible = false;
         foreach (var box in _flagBoxes)
             _flags.RemoveControl(box);
         _flagBoxes.Clear();
@@ -467,8 +533,8 @@ public class PropertyGrid : Panel
 
             case GridRowKind.Flags:
             {
-                WindowedControl? live = FindLive();
-                long bits = live == null ? 0 : GetInteger((byte*)((WindowedControl)live), row.Reflected);
+                byte* target = FindTarget();
+                long bits = target == null ? 0 : GetInteger(target, row.Reflected);
                 int y = 0;
                 for (nuint i = 0u; i < row.Enumeration.EnumMemberCount; i++)
                 {
@@ -487,6 +553,23 @@ public class PropertyGrid : Panel
                 break;
             }
 
+            case GridRowKind.Colour:
+            case GridRowKind.Typeface:
+                _text.Text = value;
+                _text.Visible = true;
+                _pick.Visible = true;
+                break;
+
+            case GridRowKind.Lines:
+            {
+                // One item to a line, which is how a person writes a list.
+                byte* target = FindTarget();
+                _lines.Lines = target == null ? [] : GetTextArray(target, row.Reflected);
+                _lines.Visible = true;
+                _apply.Visible = true;
+                break;
+            }
+
             default:
                 _text.Text = value;
                 _text.Visible = true;
@@ -500,6 +583,39 @@ public class PropertyGrid : Panel
         if (args.Key == Key.Enter)
             ApplyText(_text.Text);
     }
+
+    /// The platform's colour or font dialog, opened on the row's value.
+    private void OnPickClicked(Control sender)
+    {
+        var chosen = CurrentRow();
+        WindowedControl? live = FindLive();
+        if (chosen == null || live == null)
+            return;
+        var row = (GridRow)chosen;
+        var control = (WindowedControl)live;
+
+        if (row.Kind == GridRowKind.Colour)
+        {
+            var dialog = new ColorDialog();
+            Color colour;
+            GetStruct((byte*)control, row.Reflected, (byte*)&colour);
+            dialog.Color = colour;
+            var answer = dialog.ShowDialog(this);
+            if (answer.Ok)
+                ApplyText(SpellDesignedColour(answer.Value));
+            return;
+        }
+        if (row.Kind == GridRowKind.Typeface)
+        {
+            var dialog = new FontDialog();
+            dialog.Font = control.Font;
+            var answer = dialog.ShowDialog(this);
+            if (answer.Ok)
+                ApplyText(SpellDesignedFont(answer.Value));
+        }
+    }
+
+    private void OnApplyLinesClicked(Control sender) => ApplyText("\n".Join(_lines.Lines));
 
     private void OnChoiceChanged(Control sender)
     {
@@ -558,8 +674,8 @@ public class PropertyGrid : Panel
                 break;
 
             case GridRowKind.Text:
-                if (FindLive() is WindowedControl live)
-                    SetText((byte*)live, row.Reflected, typed);
+                if (FindTarget() != null)
+                    SetText(FindTarget(), row.Reflected, typed);
                 designer.StoreComponentProperty(component, row.Name, FormValue.FromText(typed));
                 break;
 
@@ -587,8 +703,8 @@ public class PropertyGrid : Panel
                     Message("'" + typed + "' is not a number.");
                     break;
                 }
-                if (FindLive() is WindowedControl live)
-                    SetDouble((byte*)live, row.Reflected, read.Value);
+                if (FindTarget() != null)
+                    SetDouble(FindTarget(), row.Reflected, read.Value);
                 designer.StoreComponentProperty(component, row.Name, FormValue.FromName(typed.Trim()));
                 break;
             }
@@ -601,10 +717,78 @@ public class PropertyGrid : Panel
                 }
                 break;
 
+            case GridRowKind.Colour:
+                ApplyColour(row, typed);
+                break;
+
+            case GridRowKind.Typeface:
+            {
+                var font = ReadDesignedFont(typed);
+                if (!font.Ok)
+                {
+                    Message(font.Error + ".");
+                    break;
+                }
+                if (FindTarget() != null)
+                    SetAggregate(FindTarget(), row.Reflected, (byte*)font.Value);
+                designer.RequireImport(DesignedDrawingModule);
+                designer.StoreComponentProperty(component, row.Name,
+                                                FormValue.FromName(SpellDesignedFont(font.Value)));
+                break;
+            }
+
+            case GridRowKind.Lines:
+            {
+                // A list as the file writes it, or one item to a line.
+                String[] lines;
+                if (typed.Trim().StartsWith("["))
+                {
+                    var read = ReadDesignedTextArray(typed);
+                    if (!read.Ok)
+                    {
+                        Message(read.Error + ".");
+                        break;
+                    }
+                    lines = read.Value;
+                }
+                else
+                {
+                    lines = typed == "" ? [] : typed.Replace("\r", "").Split("\n");
+                }
+                if (FindTarget() != null)
+                    SetAggregate(FindTarget(), row.Reflected, (byte*)lines);
+                designer.StoreComponentProperty(component, row.Name,
+                                                FormValue.FromName(SpellDesignedTextArray(lines)));
+                break;
+            }
+
             default:
                 break;
         }
         ShowSurface(_surface);
+    }
+
+    /// Sets a colour from a name or its channels. A theme's colour is written
+    /// as its name, so the form follows the theme it runs under.
+    private void ApplyColour(GridRow row, String typed)
+    {
+        var designer = (DesignSurface)_surface;
+        var component = (FormComponent)_component;
+        var colour = ReadDesignedColour(typed);
+        if (!colour.Ok)
+        {
+            Message(colour.Error + ".");
+            return;
+        }
+
+        Color value = colour.Value;
+        if (FindTarget() != null)
+            SetStruct(FindTarget(), row.Reflected, (byte*)&value);
+
+        String trimmed = typed.Trim();
+        String spelled = trimmed.StartsWith("SystemColors.") ? trimmed : SpellDesignedColour(value);
+        designer.RequireImport(DesignedDrawingModule);
+        designer.StoreComponentProperty(component, row.Name, FormValue.FromName(spelled));
     }
 
     private void ApplyBoolean(GridRow row, bool truth)
@@ -612,11 +796,9 @@ public class PropertyGrid : Panel
         var designer = (DesignSurface)_surface;
         var component = (FormComponent)_component;
 
-        // A hidden control stays in the designer, which is where a person
-        // would otherwise lose it; only the file says it is hidden.
-        WindowedControl? live = FindLive();
-        if (live != null && row.Name != "Visible")
-            SetBool((byte*)((WindowedControl)live), row.Reflected, truth);
+        byte* target = FindTarget();
+        if (target != null && !IsDesignInert(_type, row.Name))
+            SetBool(target, row.Reflected, truth);
         designer.StoreComponentProperty(component, row.Name, FormValue.FromBoolean(truth));
     }
 
@@ -624,9 +806,9 @@ public class PropertyGrid : Panel
     {
         var designer = (DesignSurface)_surface;
         var component = (FormComponent)_component;
-        WindowedControl? live = FindLive();
+        byte* target = FindTarget();
 
-        if (live == null)
+        if (target == null)
         {
             // The form: its size is its `Bounds`.
             FormProperty? bounds = component.FindProperty("Bounds");
@@ -650,8 +832,6 @@ public class PropertyGrid : Panel
                                             FormValue.FromRectangle(x, y, width, height));
             return;
         }
-
-        var control = (WindowedControl)live;
 
         // Where and how big go through the file's `Bounds`, one field of it.
         Rectangle asked = designer.ReadDesignedBounds(component);
@@ -677,7 +857,7 @@ public class PropertyGrid : Panel
                 break;
         }
 
-        SetInteger((byte*)control, row.Reflected, value);
+        SetInteger(target, row.Reflected, value);
 
         switch (row.Kind)
         {

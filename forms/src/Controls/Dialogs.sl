@@ -38,6 +38,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ================================================================ file dialogs
 
@@ -232,6 +235,9 @@ public class FontDialog
 /// clock.Tick += this.OnSecond;
 /// clock.Start();
 /// ```
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Timer : ITimerNotify
 {
     ITimerPeer _native;

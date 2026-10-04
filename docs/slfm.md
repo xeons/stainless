@@ -60,12 +60,22 @@ A member is one of three things, told apart by what follows its first name:
 | `Name = a, b, c;` | a property set from several values | `target.SetName(a, b, c);` |
 | `Event += Method;` | a handler, which is a method of the form | `target.Event += this.Method;` |
 | `Type Name { ... }` | a control, whose parent is the block it is in | `Name = new Type(parent);` |
+| `Type Name = new Type(...) { ... }` | a component made as it says, with no parent | `Name = new Type(...);` |
 
 A value is a string literal, a number (decimal, with an optional fraction or a
-leading `-`, or hexadecimal after `0x`), or one or more names joined by `|`:
-`true`, `DockStyle.Fill`, `AnchorStyles.Top | AnchorStyles.Left`. Each is
-copied into the generated half as it is written, so a value means what it would
-mean in Stainless and the compiler is what checks it.
+leading `-`, or hexadecimal after `0x`), one or more names joined by `|`, a
+call, or an array: `true`, `DockStyle.Fill`, `AnchorStyles.Top |
+AnchorStyles.Left`, `Color.FromRgb(255, 128, 0)`, `new Font("Segoe UI", 9,
+FontStyle.Bold)`, `["One", "Two"]`. Each is copied into the generated half as
+it is written, so a value means what it would mean in Stainless and the
+compiler is what checks it. The commas inside a call or an array are its own,
+so either is one value.
+
+The designer reads the values it writes: a colour as a member of `Colors` or
+`SystemColors` or its channels, a font as `new Font(...)`, and a list of
+strings as an array. A colour or a font adds `import Forms.Drawing;`, which is
+where both are declared. A theme's colour stays its name, so the form follows
+the theme it runs under rather than the one it was designed under.
 
 **Several values go to a method rather than a property.** `Bounds = 0, 0, 360,
 170` becomes `SetBounds(0, 0, 360, 170)`. That is what keeps the generator free
@@ -77,6 +87,13 @@ reachable the same way.
 change. `Click = OnGreet` reads as a property holding a name, and a bare name is
 also how an enum member would be written if one were ever allowed unqualified.
 `+=` is what the generated line says, and nothing else in the file uses it.
+
+**A component that is not a control says how it is made.** A `Timer` has no
+window and so no parent, and `Timer _clock = new Timer() { ... }` is copied as
+written where a control would get `new Type(parent)`. That keeps the generator
+free of knowing which types take a parent: the file says so. The designer
+shows such a component in a tray under the form, as Visual Studio does, and
+does not start it there.
 
 Comments are `//` to the end of a line. One above a member belongs to that
 member and moves with it; one after a member's `;` stays on its line; one before
@@ -189,11 +206,9 @@ with `partial`, and Stainless allows it for a class.
 
 ## 6. What is not there yet
 
-- **A control whose constructor takes more than its parent.** `TabPage` takes
-  its caption, `ImageList` and `Timer` take no parent at all. Neither shape can
-  be written yet.
-- **Items.** A `ListBox`'s rows, a `MenuItem`'s children and a `ToolBar`'s
-  buttons are made by calling methods, not by setting properties.
-- **A colour, a font or a picture as a value.** The grid sets what reflection
-  can — text, numbers, true or false, enums — and a struct or an object is
-  not one of those yet.
+- **Items that are not strings.** A list's rows are an array, but a
+  `MenuItem`'s children and a `ToolBar`'s buttons are made by calling methods,
+  not by setting properties.
+- **A picture as a value.** A path is a promise about a file beside a binary
+  that may have moved, and embedding one needs a declaration the generated half
+  does not yet write.

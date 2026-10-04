@@ -41,6 +41,9 @@ module Forms.Drawing;
 
 import Standard.Collections;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // =================================================================== colour
 
@@ -52,6 +55,9 @@ import Forms.Platform;
 /// `Color` is always four channels that are already resolved, and the system
 /// colours live in `SystemColors` where they are looked up when asked for.
 /// The BGR packing is a Windows detail, and belongs in the Windows backend.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public struct Color
 {
     public byte R;
@@ -265,6 +271,9 @@ public enum FontStyle
 /// The handle is made once, lazily, by the platform, and released when the last
 /// reference to the font goes. Sharing one `Font` across a hundred controls
 /// therefore costs one platform font, which is what the LCL's sharing was for.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public sealed class Font
 {
     IFontBackend? _backend;

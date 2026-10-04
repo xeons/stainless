@@ -97,6 +97,10 @@ public class FormComponent : FormMember
     public String Name;
     public List<FormMember> Members;
 
+    /// How the component is made, `new Timer()`, or empty for a control,
+    /// which is made with its parent: `new Button(parent)`.
+    public String Initializer;
+
     /// The comments between the last member and the `}`.
     public List<String> ClosingComments;
     public bool HasBlankLineBeforeClosing;
@@ -107,6 +111,7 @@ public class FormComponent : FormMember
         TypeName = typeName;
         Name = name;
         Members = new List<FormMember>();
+        Initializer = "";
         ClosingComments = new List<String>();
         HasBlankLineBeforeClosing = false;
     }
@@ -509,8 +514,9 @@ class FormParser
         }
     }
 
-    /// `Name = value;`, `Event += Method;` or `Type Name { ... }`, decided by
-    /// what follows the first name.
+    /// `Name = value;`, `Event += Method;`, `Type Name { ... }` or
+    /// `Type Name = new Type(...) { ... }`, decided by what follows the first
+    /// name.
     private FormMember? ReadMember()
     {
         String first = ReadDottedName("a name");
@@ -540,6 +546,11 @@ class FormParser
         if (after.Kind == FormTokenKind.Word)
         {
             var child = new FormComponent(first, ReadName("the control's name"));
+            if (_error == null && IsPunctuation(Peek(), "="))
+            {
+                _next++;
+                child.Initializer = ReadValueItem();
+            }
             if (_error == null)
                 ReadBlock(child);
             return child;
@@ -565,10 +576,32 @@ class FormParser
         }
     }
 
-    /// A string, a number, or names joined by `|`.
+    /// A string, a number, names joined by `|`, a call -- `Color.FromRgb(255,
+    /// 128, 0)`, `new Font("Segoe UI", 9)` -- or an array, `["One", "Two"]`.
+    /// Each is kept in its Stainless spelling, the commas inside it included.
     private String ReadValueItem()
     {
         FormToken token = Peek();
+
+        if (IsPunctuation(token, "["))
+        {
+            _next++;
+            return "[" + ReadValueItems("]") + "]";
+        }
+
+        if (AcceptWord("new"))
+        {
+            String made = ReadDottedName("a type after 'new'");
+            if (_error != null)
+                return "";
+            if (!IsPunctuation(Peek(), "("))
+            {
+                Report(Peek(), "expected '(' after 'new " + made + "'");
+                return "";
+            }
+            _next++;
+            return "new " + made + "(" + ReadValueItems(")") + ")";
+        }
 
         if (token.Kind == FormTokenKind.Text || token.Kind == FormTokenKind.Number)
         {
@@ -590,6 +623,12 @@ class FormParser
 
         var names = new StringBuilder();
         names.Append(ReadDottedName("a name"));
+        if (_error == null && IsPunctuation(Peek(), "("))
+        {
+            _next++;
+            names.Append("(" + ReadValueItems(")") + ")");
+            return names.ToText();
+        }
         while (_error == null && IsPunctuation(Peek(), "|"))
         {
             _next++;
@@ -597,6 +636,37 @@ class FormParser
             names.Append(ReadDottedName("a name after '|'"));
         }
         return names.ToText();
+    }
+
+    /// The items of a call or an array up to the closing punctuation, which
+    /// is consumed, joined as the file would write them.
+    private String ReadValueItems(String closing)
+    {
+        var items = new StringBuilder();
+        if (IsPunctuation(Peek(), closing))
+        {
+            _next++;
+            return "";
+        }
+        while (true)
+        {
+            String item = ReadValueItem();
+            if (_error != null)
+                return "";
+            items.Append(item);
+            if (IsPunctuation(Peek(), closing))
+            {
+                _next++;
+                return items.ToText();
+            }
+            if (!IsPunctuation(Peek(), ","))
+            {
+                Report(Peek(), "expected ',' or '" + closing + "'");
+                return "";
+            }
+            _next++;
+            items.Append(", ");
+        }
     }
 
     // ---------------------------------------------------------------- names
@@ -808,6 +878,10 @@ class FormParser
                     case (byte)'.':
                     case (byte)'|':
                     case (byte)'-':
+                    case (byte)'(':
+                    case (byte)')':
+                    case (byte)'[':
+                    case (byte)']':
                         at++;
                         break;
                     default:
@@ -945,7 +1019,8 @@ void WriteFormBlock(StringBuilder text, FormComponent component, String indent)
         }
         else if (member is FormComponent child)
         {
-            text.AppendLine(inner + child.TypeName + " " + child.Name);
+            text.AppendLine(inner + child.TypeName + " " + child.Name
+                            + (child.Initializer == "" ? "" : " = " + child.Initializer));
             WriteFormBlock(text, child, inner);
         }
     }

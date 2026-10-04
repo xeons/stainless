@@ -186,13 +186,16 @@ backends render it. The IDE is what found the faults listed in
   keeps comments and order, so the designer and a text editor can take turns
   on one file.
 - **A Toolbox and a Properties grid.** Pick a control in the Toolbox and
-  click on the form to place one, inside a `Panel` or `GroupBox` if that is
-  what was clicked. The grid shows the selected control's properties — or the
-  form's title and size — and sets them on the live control and in the file
-  as they are changed; an enum is a list of its members and a `[Flags]` enum
-  a box per member. Its Events tab names the handler for each event, and
-  double-clicking one wires it to `OnGreetClick` and writes the empty method
-  into the form's own half, opening it there.
+  click on the form to place one, inside a `Panel`, `GroupBox` or tab page if
+  that is what was clicked. A `TabControl` comes with a page, and a `TabPage`
+  goes on the `TabControl` clicked; a `Timer` goes in a tray under the form.
+  The grid shows the selected control's properties -- or the form's title and
+  size -- and sets them on the live control and in the file as they are
+  changed; an enum is a list of its members and a `[Flags]` enum a box per
+  member, a colour and a font are typed or chosen from the platform's dialog,
+  and a list's items are edited one to a line. Its Events tab names the
+  handler for each event, and double-clicking one wires it to `OnGreetClick`
+  and writes the empty method into the form's own half, opening it there.
 
   **Driven by reflection.** The IDE builds Forms with `FORMS_REFLECT`, which
   marks each control class `[Reflect]`: its properties are found by name and
@@ -203,8 +206,13 @@ backends render it. The IDE is what found the faults listed in
   made by the program as they will be at run time, under a transparent
   overlay that takes the pointer. Click to select, drag to move, drag a handle
   to resize, all snapped to an 8-pixel grid; the arrows nudge a pixel, Shift
-  and the arrows resize, Delete removes, Escape selects the container. F12
-  switches to the file's text and back.
+  and the arrows resize, Delete removes, Escape selects the container. Shift
+  or Ctrl and a click adds to the selection, and a band drawn from an empty
+  part of the form selects the form's controls it touches; several move,
+  nudge and delete together, and the grid shows the first. A control on a
+  page behind another brings its page forward when it is selected, and the
+  page a form opens on is the `TabControl`'s `SelectedIndex`. F12 switches to
+  the file's text and back.
 
   **Lazarus's arrangement.** The controls are in design mode
   (`WindowedControl.IsDesigning`, its `csDesigning`) so they never turn hot or
@@ -259,9 +267,11 @@ Named honestly, since the point of the page is to say where the edges are.
   putting a pane back on an edge it was not built on is the one thing that
   cannot happen live.
 - **The Properties grid edits what reflection can set**: text, true or false,
-  numbers, and enums, with `[Flags]` ones as a box per member. A colour, a
-  font, a picture and a list's items are none of those and are written in
-  the text. There is one selection, not several, and no rubber band.
+  numbers, enums (with `[Flags]` ones as a box per member), colours, fonts and
+  a list's items. A picture is none of those and is written in the text. With
+  several controls selected it shows and sets the first, not what they share.
+  A tab is not chosen by clicking it, since the overlay takes the click; it is
+  chosen by selecting something on its page, or with `SelectedIndex`.
 - **A handler is written into the `.sl` beside the `.slfm`**, into the first
   declaration of the form's class there. A form whose class lives elsewhere
   gets its `+=` and a status line saying where to write the method.

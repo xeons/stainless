@@ -653,6 +653,9 @@ public class TrackBar : WindowedControl
 /// A real container, so controls are put on it exactly as they are put on a
 /// panel -- which is what makes a tabbed form no different from an untabbed one
 /// once the page is chosen.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class TabPage : WindowedControl
 {
     IPanelPeer _native;
@@ -666,6 +669,10 @@ public class TabPage : WindowedControl
         StoredText = text;
         _index = owner.RegisterPage(this, text);
     }
+
+    /// A page with no caption yet, which `Text` gives it. What a form file's
+    /// generated half makes, since it names one parent and sets the rest.
+    public TabPage(TabControl owner) => this(owner, "");
 
     /// Which tab this page is behind.
     public int Index => _index;
@@ -695,17 +702,23 @@ public class TabPage : WindowedControl
 }
 
 /// A stack of pages with tabs across the top.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class TabControl : WindowedControl
 {
     ITabControlPeer _native;
     List<TabPage> _pages;
     ImageList? _images;
+    /// A page asked for before it was added, chosen when it is; -1 for none.
+    int _wanted;
 
     public TabControl(WindowedControl parent)
     {
         base(parent);
         _pages = new List<TabPage>();
         _images = null;
+        _wanted = -1;
         _native = WidgetSet.Current.CreateTabControl(this, ParentPeer);
         AttachContainerPeer(_native);
     }
@@ -720,8 +733,10 @@ public class TabControl : WindowedControl
         // selection at -1 until something is chosen, so a control that simply
         // showed whichever page was selected would show none of them -- every
         // page hidden, and a tab strip over an empty rectangle.
-        if (_native.GetSelectedTab() < 0)
-            _native.SetSelectedTab(0);
+        if (_native.GetSelectedTab() < 0 || at == _wanted)
+            _native.SetSelectedTab(at == _wanted ? at : 0);
+        if (at == _wanted)
+            _wanted = -1;
         ShowOnlyPage(_native.GetSelectedTab());
         return at;
     }
@@ -786,14 +801,22 @@ public class TabControl : WindowedControl
     /// an insertion quietly did nothing.
     public int TabCount => _native.TabCount;
 
-    /// Which page is showing. An index naming no page is ignored.
+    /// Which page is showing. An index past the last page is chosen when that
+    /// page is added, so a form may name its page before making its pages, as
+    /// a form file's generated half does; a negative one is ignored.
     public int SelectedIndex
     {
         get => _native.GetSelectedTab();
         set
         {
-            if (value < 0 || (nuint)value >= _pages.Count)
+            if (value < 0)
                 return;
+            if ((nuint)value >= _pages.Count)
+            {
+                _wanted = value;
+                return;
+            }
+            _wanted = -1;
             int was = _native.GetSelectedTab();
             _native.SetSelectedTab(value);
             int now = _native.GetSelectedTab();

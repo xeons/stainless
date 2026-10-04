@@ -22,7 +22,8 @@
 //
 // It is generated syntactically, with no knowledge of Forms' types. A value
 // is copied as written; several values go to `SetName(...)` rather than to
-// `Name`; a handler is `+=` on `this.Method`. The compiler checks the result.
+// `Name`; a handler is `+=` on `this.Method`; a control is made with its
+// parent unless the file says how it is made. The compiler checks the result.
 module Ide.Designer;
 
 import Standard.Collections;
@@ -147,7 +148,8 @@ void GenerateFormMembers(StringBuilder text, FormComponent component, String tar
         {
             if (text.HasContent)
                 text.AppendLine();
-            text.AppendLine(indent + child.Name + " = new " + child.TypeName + "(" + parent + ");");
+            String made = child.Initializer == "" ? "new " + child.TypeName + "(" + parent + ")" : child.Initializer;
+            text.AppendLine(indent + child.Name + " = " + made + ";");
             GenerateFormMembers(text, child, child.Name + ".");
         }
     }

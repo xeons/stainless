@@ -34,19 +34,40 @@ import Ide.Designer;
 public class DesignedItem
 {
     public FormComponent Component;
+
+    /// The control, or for a component with no window its entry in the tray.
     public WindowedControl Live;
+
+    /// A component with no window, made for the Properties grid to read and
+    /// write. A `Timer` is the one kind today.
+    public Timer? Held;
 
     public DesignedItem(FormComponent component, WindowedControl live)
     {
         Component = component;
         Live = live;
+        Held = null;
+    }
+
+    public bool IsNonVisual => Held != null;
+
+    /// What reflection reads and writes: the control, or the component.
+    public byte* Target
+    {
+        get
+        {
+            var held = Held;
+            return held == null ? (byte*)Live : (byte*)((Timer)held);
+        }
     }
 }
 
 public closure void DesignChangedHandler();
+public closure void DesignMessageHandler(String message);
 
-/// What a drag is doing.
-enum DesignDrag { None, Moving, Sizing }
+/// What a drag is doing: moving the selection, sizing the one control
+/// selected, or drawing a band to select what it touches.
+enum DesignDrag { None, Moving, Sizing, Band }
 
 /// A form, shown for editing.
 ///
@@ -69,15 +90,22 @@ public class DesignSurface : Panel
     const int FrameSide = 8;
     const int FrameTop = 31;
 
+    /// The tray's entries, one to a component with no window.
+    const int TrayEntryWidth = 128;
+    const int TrayHeight = 28;
+
     private FormDocument _document;
     private Panel _frame;
+    /// Below the form, the components with no window: Visual Studio's tray.
+    private Panel _tray;
     private Label _caption;
     private Panel _client;
     private CustomControl _overlay;
     private List<DesignedItem> _items;
 
-    /// The selected component, or null when the form itself is.
-    private DesignedItem? _selected;
+    /// What is selected, in the order it was chosen, and empty when the form
+    /// itself is. The first is the one the Properties grid shows.
+    private List<DesignedItem> _selection;
 
     private DesignDrag _drag;
     /// Whether the pointer has gone far enough for a press to be a drag.
@@ -85,23 +113,28 @@ public class DesignSurface : Panel
     /// Which handle a resize is holding, 0 to 7 clockwise from the top left.
     private int _handle;
     private Point _dragFrom;
-    private Rectangle _boundsAtDrag;
-    /// Where the drag last put the control, as asked rather than as settled.
-    private Rectangle _draggedTo;
+    /// Where each selected control was when the drag began, in the
+    /// selection's order.
+    private List<Rectangle> _boundsAtDrag;
+    /// Where the drag last put each, as asked rather than as settled.
+    private List<Rectangle> _draggedTo;
+    /// The band being drawn, in the overlay's coordinates.
+    private Rectangle _band;
 
     public DesignSurface(WindowedControl parent)
     {
         base(parent);
         BackColor = SystemColors.ControlDark;
         _items = new List<DesignedItem>();
-        _selected = null;
+        _selection = new List<DesignedItem>();
         PendingType = "";
         _drag = DesignDrag.None;
         _dragStarted = false;
         _handle = 0;
         _dragFrom = Point.Empty;
-        _boundsAtDrag = Rectangle.Empty;
-        _draggedTo = Rectangle.Empty;
+        _boundsAtDrag = new List<Rectangle>();
+        _draggedTo = new List<Rectangle>();
+        _band = Rectangle.Empty;
         _document = new FormDocument("", "", "Form");
 
         _frame = new Panel(this);
@@ -117,7 +150,15 @@ public class DesignSurface : Panel
         _client.IsDesigning = true;
         _client.Paint += this.OnLiveControlPaint;
         _overlay = CreateOverlay();
+
+        _tray = new Panel(this);
+        _tray.BackColor = SystemColors.Window;
+        _tray.Visible = false;
     }
+
+    /// Something a person asked for that the surface could not do, for the
+    /// status line.
+    public event DesignMessageHandler Message;
 
     /// Raised after every change to the document.
     public event DesignChangedHandler Changed;
@@ -139,24 +180,76 @@ public class DesignSurface : Panel
 
     public FormDocument Document => _document;
 
-    /// The selected component, or null for the form.
+    /// The first selected component, or null for the form.
     public FormComponent? SelectedComponent
     {
         get
         {
-            var chosen = _selected;
+            var chosen = Primary;
             return chosen == null ? null : ((DesignedItem)chosen).Component;
         }
     }
 
-    /// The live control of the selected component, or null for the form.
+    /// The live control of the first selected component, or null for the form
+    /// and for a component with no window.
     public WindowedControl? SelectedLive
     {
         get
         {
-            var chosen = _selected;
-            return chosen == null ? null : ((DesignedItem)chosen).Live;
+            var chosen = Primary;
+            if (chosen == null || ((DesignedItem)chosen).IsNonVisual)
+                return null;
+            return ((DesignedItem)chosen).Live;
         }
+    }
+
+    /// What the Properties grid reads and writes for the first selected
+    /// component: its control, or the component; null for the form.
+    public byte* SelectedTarget
+    {
+        get
+        {
+            var chosen = Primary;
+            return chosen == null ? null : ((DesignedItem)chosen).Target;
+        }
+    }
+
+    /// How many components are selected; none when the form is.
+    public nuint SelectedCount => _selection.Count;
+
+    /// Whether a component is one of those selected.
+    public bool IsComponentSelected(String name)
+    {
+        foreach (var item in _selection)
+        {
+            if (item.Component.Name == name)
+                return true;
+        }
+        return false;
+    }
+
+    private DesignedItem? Primary => _selection.IsEmpty ? null : _selection[0u];
+
+    private bool IsSelected(DesignedItem item)
+    {
+        foreach (var each in _selection)
+        {
+            if (each == item)
+                return true;
+        }
+        return false;
+    }
+
+    /// Whether something that contains an item is selected too, which moves
+    /// and deletes the item with it.
+    private bool IsInsideSelection(DesignedItem item)
+    {
+        foreach (var each in _selection)
+        {
+            if (each != item && IsInside(item.Live, each.Live))
+                return true;
+        }
+        return false;
     }
 
     /// The live control made for a component, or null.
@@ -180,7 +273,7 @@ public class DesignSurface : Panel
     public List<String> LoadDocument(FormDocument document)
     {
         _document = document;
-        _selected = null;
+        _selection.Clear();
         foreach (var item in _items)
         {
             var parent = item.Live.Parent;
@@ -198,7 +291,121 @@ public class DesignSurface : Panel
         ApplyFormProperties();
         CreateDesignedChildren(document.Form, _client, unknown);
         _overlay = CreateOverlay();
+        LayOutTray();
         return unknown;
+    }
+
+    /// The entries of the components with no window, in the file's order,
+    /// along a strip under the form; hidden when there are none.
+    private void LayOutTray()
+    {
+        int x = 4;
+        foreach (var item in _items)
+        {
+            if (!item.IsNonVisual)
+                continue;
+            item.Live.SetBounds(x, 4, TrayEntryWidth, TrayHeight - 8);
+            x += TrayEntryWidth + 4;
+        }
+        _tray.Visible = x > 4;
+        Rectangle frame = _frame.Bounds;
+        _tray.SetBounds(frame.X, frame.Bottom + GridStep, Math.Max(frame.Width, x), TrayHeight);
+    }
+
+    /// A tray entry: the component's name and type, highlighted when it is
+    /// selected. A click selects it as a click on a control does.
+    private WindowedControl CreateTrayEntry()
+    {
+        var entry = new CustomControl(_tray);
+        entry.Paint += this.OnTrayEntryPaint;
+        entry.MouseDown += this.OnTrayEntryMouseDown;
+        return entry;
+    }
+
+    private DesignedItem? FindTrayItem(Control entry)
+    {
+        foreach (var item in _items)
+        {
+            if (item.Live == entry)
+                return item;
+        }
+        return null;
+    }
+
+    private void OnTrayEntryPaint(Control sender, PaintEventArgs args)
+    {
+        var found = FindTrayItem(sender);
+        if (found == null)
+            return;
+        var item = (DesignedItem)found;
+        bool chosen = IsSelected(item);
+        args.Graphics.FillRectangle(new Brush(chosen ? SystemColors.Highlight : SystemColors.Control),
+                                    Rectangle.FromBounds(0, 0, sender.Bounds.Width, sender.Bounds.Height));
+        args.Graphics.DrawString(item.Component.Name + " : " + item.Component.TypeName, sender.Font,
+                                 chosen ? SystemColors.HighlightText : SystemColors.ControlText, 6, 2);
+    }
+
+    private void OnTrayEntryMouseDown(Control sender, MouseEventArgs args)
+    {
+        var found = FindTrayItem(sender);
+        if (found == null)
+            return;
+        var item = (DesignedItem)found;
+        _overlay.Focus();
+        bool adding = args.Modifiers.HasFlag(ModifierKeys.Shift) || args.Modifiers.HasFlag(ModifierKeys.Control);
+        if (!adding)
+            _selection.Clear();
+        if (IsSelected(item))
+            _selection.RemoveAll((each) => each == item);
+        else
+            _selection.Add(item);
+        RefreshSelection();
+    }
+
+    /// Shows a change of selection: the handles, the tray, the page a
+    /// selected control is on, and the Properties grid.
+    private void RefreshSelection()
+    {
+        ShowSelectedPage();
+        _overlay.Invalidate();
+        foreach (var item in _items)
+        {
+            if (item.IsNonVisual)
+                item.Live.Invalidate();
+        }
+        SelectionChanged();
+    }
+
+    /// Brings forward every page the first selected control is on, so a
+    /// control on a page behind another can be seen once it is chosen.
+    private void ShowSelectedPage()
+    {
+        var chosen = Primary;
+        if (chosen == null || ((DesignedItem)chosen).IsNonVisual)
+            return;
+        Control? walk = ((DesignedItem)chosen).Live;
+        while (walk != null && walk != _client)
+        {
+            if (walk is TabPage page && page.Parent is TabControl tabs && tabs.SelectedIndex != page.Index)
+                tabs.SelectedIndex = page.Index;
+            walk = ((Control)walk).Parent;
+        }
+    }
+
+    /// Whether a control can be seen: it and everything it is inside are
+    /// visible, which a page behind another is not.
+    private bool IsShown(DesignedItem item)
+    {
+        if (item.IsNonVisual)
+            return false;
+        Control? walk = item.Live;
+        while (walk != null && walk != _client)
+        {
+            if (!((Control)walk).Visible)
+                return false;
+            walk = ((Control)walk).Parent;
+        }
+        return true;
     }
 
     private CustomControl CreateOverlay()
@@ -244,6 +451,7 @@ public class DesignSurface : Panel
         _caption.SetBounds(FrameSide, 7, width - FrameSide * 2, FrameTop - 12);
         _client.SetBounds(FrameSide, FrameTop, width - FrameSide * 2,
                           height - FrameTop - FrameSide);
+        LayOutTray();
     }
 
     private void CreateDesignedChildren(FormComponent component, WindowedControl parent,
@@ -251,6 +459,12 @@ public class DesignSurface : Panel
     {
         foreach (var child in component.ListChildren())
         {
+            if (IsNonVisualType(child.TypeName))
+            {
+                CreateNonVisualItem(child);
+                continue;
+            }
+
             WindowedControl? made = CreateDesignedControl(child.TypeName, parent);
             if (made == null)
             {
@@ -270,6 +484,22 @@ public class DesignSurface : Panel
             _items.Add(new DesignedItem(child, live));
             CreateDesignedChildren(child, live, unknown);
         }
+    }
+
+    /// A component with no window: the object itself, which never starts,
+    /// and its entry in the tray.
+    private void CreateNonVisualItem(FormComponent component)
+    {
+        var item = new DesignedItem(component, CreateTrayEntry());
+        item.Held = new Timer();
+
+        var type = FindDesignedType(component.TypeName);
+        for (nuint i = 0u; i < component.Members.Count; i++)
+        {
+            if (component.Members[i] is FormProperty property)
+                ApplyReflectedProperty(item.Target, type, property);
+        }
+        _items.Add(item);
     }
 
     // ------------------------------------------------------------ geometry
@@ -308,7 +538,7 @@ public class DesignSurface : Panel
         for (nuint i = _items.Count; i > 0u; i--)
         {
             var item = _items[i - 1u];
-            if (FindClientBounds(item.Live).Contains(at))
+            if (IsShown(item) && FindClientBounds(item.Live).Contains(at))
                 return item;
         }
         return null;
@@ -349,19 +579,32 @@ public class DesignSurface : Panel
     /// Lazarus's `TDesigner.PaintControl` and the redraw after it.
     private void OnLiveControlPaint(Control sender, PaintEventArgs args) => _overlay.RedrawOver();
 
+    /// One control selected has its eight handles; several have their corners
+    /// marked in grey, as Lazarus marks them, since only one can be sized.
     private void OnOverlayPaint(Control sender, PaintEventArgs args)
     {
-        var chosen = _selected;
-        if (chosen == null)
-            return;
-
-        Rectangle around = FindClientBounds(((DesignedItem)chosen).Live);
         var outline = new Pen(SystemColors.Highlight);
         var fill = new Brush(SystemColors.Highlight);
-        args.Graphics.DrawRectangle(outline, Rectangle.FromBounds(
-            around.X - 1, around.Y - 1, around.Width + 1, around.Height + 1));
-        foreach (var handle in ListHandles(around))
-            args.Graphics.FillRectangle(fill, handle);
+        var several = new Brush(SystemColors.GrayText);
+        foreach (var item in _selection)
+        {
+            if (!IsShown(item))
+                continue;
+            Rectangle around = FindClientBounds(item.Live);
+            args.Graphics.DrawRectangle(outline, Rectangle.FromBounds(
+                around.X - 1, around.Y - 1, around.Width + 1, around.Height + 1));
+            var handles = ListHandles(around);
+            for (nuint i = 0u; i < handles.Length; i++)
+            {
+                if (_selection.Count == 1u)
+                    args.Graphics.FillRectangle(fill, handles[i]);
+                else if (i % 2u == 0u)
+                    args.Graphics.FillRectangle(several, handles[i]);
+            }
+        }
+
+        if (_drag == DesignDrag.Band && !_band.IsEmpty)
+            args.Graphics.DrawRectangle(new Pen(SystemColors.ControlText, 1, PenStyle.Dot), _band);
     }
 
     // ------------------------------------------------------------ the pointer
@@ -372,9 +615,9 @@ public class DesignSurface : Panel
         if (args.Button != MouseButton.Left)
             return;
 
-        // A handle of the selection wins over whatever is under it.
-        var chosen = _selected;
-        if (chosen != null)
+        // A handle of a lone selection wins over whatever is under it.
+        var chosen = Primary;
+        if (chosen != null && _selection.Count == 1u && IsShown((DesignedItem)chosen))
         {
             Rectangle around = FindClientBounds(((DesignedItem)chosen).Live);
             var handles = ListHandles(around);
@@ -395,13 +638,41 @@ public class DesignSurface : Panel
             return;
         }
 
-        var was = _selected;
-        _selected = FindItemAt(args.Location);
-        _overlay.Invalidate();
-        if (_selected != was)
-            SelectionChanged();
-        if (_selected != null)
-            BeginDesignDrag(DesignDrag.Moving, 0, args.Location);
+        // Shift or Ctrl adds to the selection or takes away from it, and
+        // starts nothing: the next plain press is what drags.
+        bool adding = args.Modifiers.HasFlag(ModifierKeys.Shift) || args.Modifiers.HasFlag(ModifierKeys.Control);
+        var hit = FindItemAt(args.Location);
+        if (hit == null)
+        {
+            if (!adding && !_selection.IsEmpty)
+            {
+                _selection.Clear();
+                RefreshSelection();
+            }
+            _overlay.Invalidate();
+            BeginDesignDrag(DesignDrag.Band, 0, args.Location);
+            return;
+        }
+
+        var item = (DesignedItem)hit;
+        if (adding)
+        {
+            if (IsSelected(item))
+                _selection.RemoveAll((each) => each == item);
+            else
+                _selection.Add(item);
+            RefreshSelection();
+            return;
+        }
+
+        // A press on one of several keeps them all, so they move together.
+        if (!IsSelected(item))
+        {
+            _selection.Clear();
+            _selection.Add(item);
+            RefreshSelection();
+        }
+        BeginDesignDrag(DesignDrag.Moving, 0, args.Location);
     }
 
     private void BeginDesignDrag(DesignDrag kind, int handle, Point from)
@@ -410,15 +681,21 @@ public class DesignSurface : Panel
         _dragStarted = false;
         _handle = handle;
         _dragFrom = from;
-        _boundsAtDrag = ReadDesignedBounds(((DesignedItem)_selected).Component);
-        _draggedTo = _boundsAtDrag;
+        _band = Rectangle.Empty;
+        _boundsAtDrag.Clear();
+        _draggedTo.Clear();
+        foreach (var item in _selection)
+        {
+            Rectangle at = ReadDesignedBounds(item.Component);
+            _boundsAtDrag.Add(at);
+            _draggedTo.Add(at);
+        }
         _overlay.CaptureMouse(true);
     }
 
     private void OnOverlayMouseMove(Control sender, MouseEventArgs args)
     {
-        var chosen = _selected;
-        if (_drag == DesignDrag.None || chosen == null)
+        if (_drag == DesignDrag.None)
             return;
 
         int dx = args.X - _dragFrom.X;
@@ -429,17 +706,31 @@ public class DesignSurface : Panel
         if (!_dragStarted && Math.Abs(dx) < DragThreshold && Math.Abs(dy) < DragThreshold)
             return;
         _dragStarted = true;
-        Rectangle was = _boundsAtDrag;
-        var live = ((DesignedItem)chosen).Live;
+
+        if (_drag == DesignDrag.Band)
+        {
+            _band = Rectangle.FromEdges(Math.Min(_dragFrom.X, args.X), Math.Min(_dragFrom.Y, args.Y),
+                                        Math.Max(_dragFrom.X, args.X), Math.Max(_dragFrom.Y, args.Y));
+            _overlay.Invalidate();
+            return;
+        }
 
         if (_drag == DesignDrag.Moving)
         {
-            _draggedTo = Rectangle.FromBounds(SnapToGrid(was.X + dx), SnapToGrid(was.Y + dy),
-                                              was.Width, was.Height);
-            live.Bounds = _draggedTo;
+            for (nuint i = 0u; i < _selection.Count; i++)
+            {
+                if (IsInsideSelection(_selection[i]) || _selection[i].IsNonVisual)
+                    continue;
+                Rectangle at = _boundsAtDrag[i];
+                _draggedTo[i] = Rectangle.FromBounds(SnapToGrid(at.X + dx), SnapToGrid(at.Y + dy),
+                                                     at.Width, at.Height);
+                _selection[i].Live.Bounds = _draggedTo[i];
+            }
         }
         else
         {
+            Rectangle was = _boundsAtDrag[0u];
+            var live = _selection[0u].Live;
             int left = was.Left;
             int top = was.Top;
             int right = was.Right;
@@ -456,8 +747,8 @@ public class DesignSurface : Panel
                 right = left + GridStep;
             if (bottom - top < GridStep)
                 bottom = top + GridStep;
-            _draggedTo = Rectangle.FromBounds(left, top, right - left, bottom - top);
-            live.Bounds = _draggedTo;
+            _draggedTo[0u] = Rectangle.FromBounds(left, top, right - left, bottom - top);
+            live.Bounds = _draggedTo[0u];
         }
         _overlay.Invalidate();
     }
@@ -466,12 +757,57 @@ public class DesignSurface : Panel
     {
         if (_drag == DesignDrag.None)
             return;
+        var drag = _drag;
         _drag = DesignDrag.None;
         _overlay.CaptureMouse(false);
 
-        var chosen = _selected;
-        if (chosen != null && _dragStarted && !_draggedTo.Equals(_boundsAtDrag))
-            StoreDesignedBounds((DesignedItem)chosen, _draggedTo);
+        if (drag == DesignDrag.Band)
+        {
+            if (_dragStarted)
+                SelectWithin(_band);
+            _band = Rectangle.Empty;
+            _overlay.Invalidate();
+            return;
+        }
+
+        if (!_dragStarted)
+            return;
+        bool moved = false;
+        for (nuint i = 0u; i < _selection.Count; i++)
+        {
+            if (!_draggedTo[i].Equals(_boundsAtDrag[i]))
+            {
+                WriteDesignedBounds(_selection[i], _draggedTo[i]);
+                moved = true;
+            }
+        }
+        if (moved)
+            AnnounceChange();
+    }
+
+    /// Selects the form's own controls that a rectangle touches, in the
+    /// overlay's coordinates; nothing touched selects the form. Controls
+    /// inside a container are reached by selecting it, or with Shift.
+    public void SelectWithin(Rectangle band)
+    {
+        _selection.Clear();
+        foreach (var item in _items)
+        {
+            if (item.Live.Parent == _client && !FindClientBounds(item.Live).Intersect(band).IsEmpty)
+                _selection.Add(item);
+        }
+        RefreshSelection();
+    }
+
+    /// Adds a component to the selection, as Shift and a click do.
+    public void AddToSelection(String name)
+    {
+        foreach (var item in _items)
+        {
+            if (item.Component.Name == name && !IsSelected(item))
+                _selection.Add(item);
+        }
+        RefreshSelection();
     }
 
     // ------------------------------------------------------------ the keyboard
@@ -480,7 +816,6 @@ public class DesignSurface : Panel
     /// with Shift, which is Lazarus's pair.
     private void OnOverlayKeyDown(Control sender, KeyEventArgs args)
     {
-        var chosen = _selected;
         bool moves = args.Key == Key.Delete || args.Key == Key.Escape || args.Key == Key.Left
                      || args.Key == Key.Right || args.Key == Key.Up || args.Key == Key.Down;
         if (!moves)
@@ -488,9 +823,8 @@ public class DesignSurface : Panel
             KeyNotHandled(this, args);
             return;
         }
-        if (chosen == null)
+        if (_selection.IsEmpty)
             return;
-        var item = (DesignedItem)chosen;
 
         int dx = 0;
         int dy = 0;
@@ -509,71 +843,94 @@ public class DesignSurface : Panel
             default: return;
         }
 
-        Rectangle was = ReadDesignedBounds(item.Component);
-        Rectangle now = args.Shift
-            ? Rectangle.FromBounds(was.X, was.Y, Math.Max(1, was.Width + dx), Math.Max(1, was.Height + dy))
-            : Rectangle.FromBounds(was.X + dx, was.Y + dy, was.Width, was.Height);
-        item.Live.Bounds = now;
-        StoreDesignedBounds(item, now);
+        NudgeSelection(dx, dy, args.Shift);
+    }
+
+    /// Moves every selected control by a step, or sizes each with `sizing`.
+    /// What the arrows do; public for a test.
+    public void NudgeSelection(int dx, int dy, bool sizing)
+    {
+        foreach (var item in _selection)
+        {
+            if ((!sizing && IsInsideSelection(item)) || item.IsNonVisual)
+                continue;
+            Rectangle was = ReadDesignedBounds(item.Component);
+            Rectangle now = sizing
+                ? Rectangle.FromBounds(was.X, was.Y, Math.Max(1, was.Width + dx), Math.Max(1, was.Height + dy))
+                : Rectangle.FromBounds(was.X + dx, was.Y + dy, was.Width, was.Height);
+            item.Live.Bounds = now;
+            WriteDesignedBounds(item, now);
+        }
+        AnnounceChange();
     }
 
     // ------------------------------------------------------------ changes
 
-    /// Selects a component by name, or the form for a name that is not one.
+    /// Selects a component by name, alone, or the form for a name that is not
+    /// one.
     public void SelectComponent(String name)
     {
-        _selected = null;
+        _selection.Clear();
         foreach (var item in _items)
         {
             if (item.Component.Name == name)
-                _selected = item;
+                _selection.Add(item);
         }
-        _overlay.Invalidate();
-        SelectionChanged();
+        RefreshSelection();
     }
 
-    /// Selects what contains the selection, or the form.
+    /// Selects what contains the first of the selection, or the form.
     public void SelectParentComponent()
     {
-        var chosen = _selected;
+        var chosen = Primary;
         if (chosen == null)
             return;
         var parent = ((DesignedItem)chosen).Live.Parent;
-        _selected = null;
+        _selection.Clear();
         foreach (var item in _items)
         {
             if (item.Live == parent)
-                _selected = item;
+                _selection.Add(item);
         }
-        _overlay.Invalidate();
-        SelectionChanged();
+        RefreshSelection();
     }
 
-    /// Removes the selected component, and everything inside it, from the
+    /// Removes the selected components, and everything inside them, from the
     /// document and from the surface.
     public void DeleteSelectedComponent()
     {
-        var chosen = _selected;
-        if (chosen == null)
+        if (_selection.IsEmpty)
             return;
-        var item = (DesignedItem)chosen;
 
-        _document.Form.RemoveComponent(item.Component.Name);
-        var parent = item.Live.Parent;
-        if (parent != null)
-            ((WindowedControl)parent).RemoveControl(item.Live);
+        var removed = new List<DesignedItem>();
+        foreach (var item in _selection)
+        {
+            if (IsInsideSelection(item))
+                continue;
+            _document.Form.RemoveComponent(item.Component.Name);
+            var parent = item.Live.Parent;
+            if (parent != null)
+                ((WindowedControl)parent).RemoveControl(item.Live);
+            removed.Add(item);
+        }
 
         var kept = new List<DesignedItem>();
         foreach (var each in _items)
         {
-            if (each != item && !IsInside(each.Live, item.Live))
+            bool gone = false;
+            foreach (var item in removed)
+            {
+                if (each == item || IsInside(each.Live, item.Live))
+                    gone = true;
+            }
+            if (!gone)
                 kept.Add(each);
         }
         _items = kept;
-        _selected = null;
+        _selection.Clear();
+        LayOutTray();
         Changed();
-        _overlay.Invalidate();
-        SelectionChanged();
+        RefreshSelection();
     }
 
     private bool IsInside(Control inner, Control outer)
@@ -618,6 +975,18 @@ public class DesignSurface : Panel
         _overlay.Invalidate();
     }
 
+    /// Adds a module to what the generated half imports, for a value that
+    /// names one of its types. The next change writes it.
+    public void RequireImport(String moduleName)
+    {
+        foreach (var each in _document.Imports)
+        {
+            if (each == moduleName)
+                return;
+        }
+        _document.Imports.Add(moduleName);
+    }
+
     /// Wires an event of a component to a method, or unwires it for an empty
     /// name.
     public void StoreComponentHandler(FormComponent component, String eventName, String method)
@@ -652,37 +1021,89 @@ public class DesignSurface : Panel
         return true;
     }
 
-    /// A new control of a Toolbox type, where the pointer is: inside the
+    /// A new component of a Toolbox type, where the pointer is: inside the
     /// container under it, or on the form. Named `_button1` and so on.
+    ///
+    /// A page goes on the `TabControl` under the pointer, and is refused
+    /// anywhere else; a component with no window goes in the tray, wherever
+    /// the click was. A new `TabControl` comes with a page, as Visual
+    /// Studio's does, so there is somewhere to put a control at once.
     public void PlaceComponent(String typeName, Point at)
     {
         FormComponent parent = _document.Form;
-        int x = at.X;
-        int y = at.Y;
-
-        var under = FindItemAt(at);
-        if (under != null && IsDesignableContainer(((DesignedItem)under).Component.TypeName))
-        {
-            var container = (DesignedItem)under;
-            Rectangle outer = FindClientBounds(container.Live);
-            x = at.X - outer.X - container.Live.ClientOrigin.X;
-            y = at.Y - outer.Y - container.Live.ClientOrigin.Y;
-            parent = container.Component;
-        }
-
         String name = CreateComponentName(typeName);
         var made = new FormComponent(typeName, name);
         made.HasBlankLineBefore = true;
         if (TakesDesignedText(typeName))
             made.SetProperty("Text", FormValue.FromText(name.Substring(1u)));
-        Size extent = FindDefaultExtent(typeName);
-        made.SetProperty("Bounds", FormValue.FromRectangle(SnapToGrid(x), SnapToGrid(y),
-                                                            extent.Width, extent.Height));
+
+        if (IsNonVisualType(typeName))
+        {
+            made.Initializer = "new " + typeName + "()";
+        }
+        else if (typeName == "TabPage")
+        {
+            var tabs = FindTabControlAt(at);
+            if (tabs == null)
+            {
+                Message("A TabPage goes on a TabControl; click on one to add a page to it.");
+                return;
+            }
+            parent = ((DesignedItem)tabs).Component;
+        }
+        else
+        {
+            int x = at.X;
+            int y = at.Y;
+            var under = FindItemAt(at);
+            if (under != null && IsDesignableContainer(((DesignedItem)under).Component.TypeName))
+            {
+                var container = (DesignedItem)under;
+                Rectangle outer = FindClientBounds(container.Live);
+                x = at.X - outer.X - container.Live.ClientOrigin.X;
+                y = at.Y - outer.Y - container.Live.ClientOrigin.Y;
+                parent = container.Component;
+            }
+            Size extent = FindDefaultExtent(typeName);
+            made.SetProperty("Bounds", FormValue.FromRectangle(SnapToGrid(x), SnapToGrid(y),
+                                                                extent.Width, extent.Height));
+        }
         parent.Members.Add(made);
+
+        if (typeName == "TabControl")
+        {
+            String page = CreateComponentName("TabPage");
+            var first = new FormComponent("TabPage", page);
+            first.SetProperty("Text", FormValue.FromText(page.Substring(1u)));
+            made.Members.Add(first);
+        }
 
         LoadDocument(_document);
         SelectComponent(name);
         Changed();
+    }
+
+    /// The `TabControl` under a point, or the one a page or a control under
+    /// it is on; null for none.
+    private DesignedItem? FindTabControlAt(Point at)
+    {
+        var under = FindItemAt(at);
+        if (under == null)
+            return null;
+        Control? walk = ((DesignedItem)under).Live;
+        while (walk != null && walk != _client)
+        {
+            if (walk is TabControl)
+            {
+                foreach (var item in _items)
+                {
+                    if (item.Live == walk)
+                        return item;
+                }
+            }
+            walk = ((Control)walk).Parent;
+        }
+        return null;
     }
 
     /// `_button1`, `_button2`: the type's name, lowered, and the first number
@@ -708,6 +1129,7 @@ public class DesignSurface : Panel
             case "RadioButton":
             case "ToggleButton":
             case "GroupBox":
+            case "TabPage":
                 return true;
             default:
                 return false;
@@ -732,6 +1154,7 @@ public class DesignSurface : Panel
             case "ListView": return Size.FromDimensions(160, 120);
             case "Panel":
             case "GroupBox": return Size.FromDimensions(160, 96);
+            case "TabControl": return Size.FromDimensions(200, 128);
             default: return Size.FromDimensions(80, 24);
         }
     }
@@ -769,11 +1192,17 @@ public class DesignSurface : Panel
 
     private void StoreDesignedBounds(DesignedItem item, Rectangle now)
     {
-        item.Component.SetProperty("Bounds",
-            FormValue.FromRectangle(now.X, now.Y, now.Width, now.Height));
+        WriteDesignedBounds(item, now);
+        AnnounceChange();
+    }
 
-        // After the change is written back: that repaints the tab, and the
-        // overlay has to be the last thing drawn.
+    private static void WriteDesignedBounds(DesignedItem item, Rectangle now) =>
+        item.Component.SetProperty("Bounds", FormValue.FromRectangle(now.X, now.Y, now.Width, now.Height));
+
+    /// After the change is written back: that repaints the tab, and the
+    /// overlay has to be the last thing drawn.
+    private void AnnounceChange()
+    {
         Changed();
         _overlay.Invalidate();
     }

@@ -26,17 +26,23 @@ import Standard.Convert;
 import Standard.Reflection;
 import Standard.Text;
 import Forms;
+import Forms.Drawing;
 import Ide.Designer;
 
-/// The control types the designer can make, in the order a Toolbox lists them.
+/// The types the designer can make, in the order a Toolbox lists them.
 public String[] ListDesignableTypes() =>
     ["Button", "Label", "TextBox", "CheckBox", "RadioButton", "ToggleButton",
      "ListBox", "ComboBox", "CheckListBox", "SpinEdit", "ProgressBar", "TrackBar",
-     "TreeView", "ListView", "Panel", "GroupBox"];
+     "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Timer"];
 
-/// Whether controls may be put inside one of these.
+/// Whether controls may be put inside one of these. A `TabControl` holds
+/// pages and nothing else, so it is not one.
 public bool IsDesignableContainer(String typeName) =>
-    typeName == "Panel" || typeName == "GroupBox";
+    typeName == "Panel" || typeName == "GroupBox" || typeName == "TabPage";
+
+/// Whether a type has no window, and so is shown in the tray under the form
+/// and made by the expression its declaration gives, `new Timer()`.
+public bool IsNonVisualType(String typeName) => typeName == "Timer";
 
 /// A control of the named type inside `parent`, or null for a name the
 /// designer does not know.
@@ -60,6 +66,8 @@ public WindowedControl? CreateDesignedControl(String typeName, WindowedControl p
         case "ListView": return new ListView(parent);
         case "Panel": return new Panel(parent);
         case "GroupBox": return new GroupBox(parent);
+        case "TabControl": return new TabControl(parent);
+        case "TabPage": return parent is TabControl tabs ? new TabPage(tabs) : null;
         default: return null;
     }
 }
@@ -72,9 +80,9 @@ public Type FindDesignedType(String typeName) =>
 /// Applies a property from the file to its live control through the
 /// property's own setter, and answers whether it could.
 ///
-/// `Bounds` is several values and goes to `SetBounds`. `Visible` is not
-/// applied: a hidden control stays in the designer, which is where a person
-/// would otherwise lose it, and the file is what says it is hidden.
+/// `Bounds` is several values and goes to `SetBounds`. A property that would
+/// make the designer behave as the program does is not applied; see
+/// `IsDesignInert`.
 public bool ApplyDesignedProperty(WindowedControl control, Type type, FormProperty property)
 {
     var items = property.Value.Items;
@@ -86,14 +94,27 @@ public bool ApplyDesignedProperty(WindowedControl control, Type type, FormProper
                           ReadDesignedInteger(items[2u]), ReadDesignedInteger(items[3u]));
         return true;
     }
-    if (property.Name == "Visible" || items.Count != 1u || !type.Exists)
+    return ApplyReflectedProperty((byte*)control, type, property);
+}
+
+/// What the file says and the designer does not do: a hidden control stays
+/// in the designer, which is where a person would otherwise lose it, and an
+/// enabled timer does not tick there. The file is what says either.
+public bool IsDesignInert(Type type, String propertyName) =>
+    propertyName == "Visible" || (propertyName == "Enabled" && type.Exists && type.Name == "Forms.Timer");
+
+/// The same for any object reflection describes: a control, or a component
+/// with no window.
+public bool ApplyReflectedProperty(byte* raw, Type type, FormProperty property)
+{
+    var items = property.Value.Items;
+    if (items.Count != 1u || !type.Exists || IsDesignInert(type, property.Name))
         return false;
 
     var target = type.FindProperty(property.Name);
     if (!target.Exists || !target.IsPublic || !target.CanWrite)
         return false;
 
-    byte* raw = (byte*)control;
     String item = items[0u];
     Type enumeration = target.PropertyType;
     if (enumeration.Exists && enumeration.IsEnum)
@@ -103,6 +124,29 @@ public bool ApplyDesignedProperty(WindowedControl control, Type type, FormProper
     }
 
     int kind = target.Kind;
+    if (kind == KindStruct && enumeration.Exists && enumeration.Name == DesignedColorType)
+    {
+        var colour = ReadDesignedColour(item);
+        if (!colour.Ok)
+            return false;
+        Color value = colour.Value;
+        SetStruct(raw, target, (byte*)&value);
+        return true;
+    }
+    if (kind == KindClass && enumeration.Exists && enumeration.Name == DesignedFontType)
+    {
+        var font = ReadDesignedFont(item);
+        if (font.Ok)
+            SetAggregate(raw, target, (byte*)font.Value);
+        return font.Ok;
+    }
+    if (kind == KindArray && target.ElementKind == KindString)
+    {
+        var lines = ReadDesignedTextArray(item);
+        if (lines.Ok)
+            SetAggregate(raw, target, (byte*)lines.Value);
+        return lines.Ok;
+    }
     if (kind == KindString)
     {
         SetText(raw, target, UnquoteFormText(item));

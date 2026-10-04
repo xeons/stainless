@@ -77,6 +77,8 @@ String CreateWholeForm() =>
     + "        Text = \"Greet\";\n"
     + "        Bounds = 12, 12, 90, 26;\n"
     + "        Anchors = AnchorStyles.Top | AnchorStyles.Right;\n"
+    + "        BackColor = Color.FromRgb(255, 128, 0);\n"
+    + "        Font = new Font(\"Segoe UI\", 9, FontStyle.Bold | FontStyle.Italic);\n"
     + "        Click += OnGreet; // wired by the designer\n"
     + "    }\n"
     + "\n"
@@ -86,6 +88,8 @@ String CreateWholeForm() =>
     + "        Height = 0x20;\n"
     + "        Tag = -3;\n"
     + "        Ratio = 1.5;\n"
+    + "        Items = [\"One\", \"Two, \\\"three\\\"\", Names.Four];\n"
+    + "        Empty = [];\n"
     + "\n"
     + "        Label _note\n"
     + "        {\n"
@@ -94,6 +98,11 @@ String CreateWholeForm() =>
     + "        }\n"
     + "\n"
     + "        // Nothing else yet.\n"
+    + "    }\n"
+    + "\n"
+    + "    Timer _clock = new Timer(500)\n"
+    + "    {\n"
+    + "        Tick += OnTick;\n"
     + "    }\n"
     + "}\n"
     + "\n"
@@ -133,13 +142,32 @@ void TestRoundTrip(Harness harness)
             ((FormProperty)anchors).Value.Items[0u] == "AnchorStyles.Top | AnchorStyles.Right");
         FormHandler? click = button.FindHandler("Click");
         harness.Check("a handler", click != null && ((FormHandler)click).MethodName == "OnGreet");
+        FormProperty? colour = button.FindProperty("BackColor");
+        harness.Check("a call is one item, commas and all", colour != null &&
+            ((FormProperty)colour).Value.Items.Count == 1u &&
+            ((FormProperty)colour).Value.Items[0u] == "Color.FromRgb(255, 128, 0)");
+        FormProperty? font = button.FindProperty("Font");
+        harness.Check("so is 'new'", font != null &&
+            ((FormProperty)font).Value.Items.Count == 1u &&
+            ((FormProperty)font).Value.Items[0u] == "new Font(\"Segoe UI\", 9, FontStyle.Bold | FontStyle.Italic)");
     }
+
+    FormComponent? box = document.Form.FindComponent("_box");
+    FormProperty? items = box == null ? null : ((FormComponent)box).FindProperty("Items");
+    harness.Check("an array is one item", items != null &&
+        ((FormProperty)items).Value.Items.Count == 1u &&
+        ((FormProperty)items).Value.Items[0u] == "[\"One\", \"Two, \\\"three\\\"\", Names.Four]");
 
     FormProperty? bounds = document.Form.FindProperty("Bounds");
     harness.Check("a list has four items", bounds != null &&
                   ((FormProperty)bounds).Value.IsList &&
                   ((FormProperty)bounds).Value.Items.Count == 4u);
     harness.Check("a nested control is found", document.Form.FindComponent("_note") != null);
+    FormComponent? clock = document.Form.FindComponent("_clock");
+    harness.Check("a control says how it is made", clock != null &&
+                  ((FormComponent)clock).Initializer == "new Timer(500)");
+    harness.Check("and one that does not says nothing",
+                  ((FormComponent)document.Form.FindComponent("_note")).Initializer == "");
 
     harness.CheckSame("it writes back byte for byte", whole, WriteFormDocument(document));
 }
@@ -191,6 +219,11 @@ void CheckRefused(Harness harness, String what, String text, int line, String sa
 
 void TestRefusing(Harness harness)
 {
+    Console.WriteLine("refusing values");
+    harness.Check("an unclosed call", !ParseFormDocument("form F : Form { Color = Color.FromRgb(1, 2; }").Ok);
+    harness.Check("an unclosed array", !ParseFormDocument("form F : Form { Items = [\"a\" ; }").Ok);
+    harness.Check("'new' without arguments", !ParseFormDocument("form F : Form { Font = new Font; }").Ok);
+
     Console.WriteLine("refusing");
 
     CheckRefused(harness, "no module", "form F : Form {}", 1, "starts with 'module");
@@ -299,15 +332,26 @@ void TestGenerating(Harness harness)
         + "    Button _greet\n"
         + "    {\n"
         + "        Text = \"Greet\";\n"
+        + "        BackColor = Color.FromRgb(1, 2, 3);\n"
         + "        Click += OnGreet;\n"
         + "    }\n"
         + "\n"
         + "    Panel _box\n"
         + "    {\n"
+        + "        ListBox _list\n"
+        + "        {\n"
+        + "            Items = [\"One\", \"Two\"];\n"
+        + "        }\n"
+        + "\n"
         + "        Label _note\n"
         + "        {\n"
         + "            Dock = DockStyle.Fill;\n"
         + "        }\n"
+        + "    }\n"
+        + "\n"
+        + "    Timer _clock = new Timer()\n"
+        + "    {\n"
+        + "        Interval = 250;\n"
         + "    }\n"
         + "}\n";
 
@@ -322,7 +366,9 @@ void TestGenerating(Harness harness)
         + "{\n"
         + "    private Button _greet;\n"
         + "    private Panel _box;\n"
+        + "    private ListBox _list;\n"
         + "    private Label _note;\n"
+        + "    private Timer _clock;\n"
         + "\n"
         + "    private void InitializeComponent()\n"
         + "    {\n"
@@ -331,12 +377,19 @@ void TestGenerating(Harness harness)
         + "\n"
         + "        _greet = new Button(this);\n"
         + "        _greet.Text = \"Greet\";\n"
+        + "        _greet.BackColor = Color.FromRgb(1, 2, 3);\n"
         + "        _greet.Click += this.OnGreet;\n"
         + "\n"
         + "        _box = new Panel(this);\n"
         + "\n"
+        + "        _list = new ListBox(_box);\n"
+        + "        _list.Items = [\"One\", \"Two\"];\n"
+        + "\n"
         + "        _note = new Label(_box);\n"
         + "        _note.Dock = DockStyle.Fill;\n"
+        + "\n"
+        + "        _clock = new Timer();\n"
+        + "        _clock.Interval = 250;\n"
         + "    }\n"
         + "}\n";
 

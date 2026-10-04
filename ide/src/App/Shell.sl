@@ -2673,6 +2673,7 @@ public class Shell : Form
                 this.OnDesignChanged(changed);
         };
         surface.SelectionChanged += () => this.ShowActiveDesign();
+        surface.Message += (message) => this.ShowStatus(message);
         surface.KeyNotHandled += this.OnEditorKey;
         tab.Designer = surface;
         ShowDesigner(tab);
@@ -2832,6 +2833,8 @@ public class Shell : Form
         long dot = name.LastIndexOf(".");
         if (dot >= 0)
             name = name.Substring((nuint)dot + 1u);
+        if (name == "TimerHandler")
+            return "Timer sender";
         if (name == "EventHandler" || !name.EndsWith("EventHandler"))
             return "Control sender";
         String stem = name.Substring(0u, name.ByteLength() - "Handler".ByteLength());
@@ -5026,9 +5029,21 @@ public class Shell : Form
             + "    Bounds = 0, 0, 320, 240;" + Newline + Newline
             + "    Button _ok" + Newline + "    {" + Newline
             + "        Text = \"OK\";" + Newline
-            + "        Bounds = 8, 8, 80, 24;" + Newline + "    }" + Newline + "}" + Newline);
+            + "        Bounds = 8, 8, 80, 24;" + Newline + "    }" + Newline + Newline
+            + "    ListBox _list" + Newline + "    {" + Newline
+            + "        Bounds = 8, 120, 120, 96;" + Newline
+            + "        Items = [\"a\", \"b, c\"];" + Newline
+            + "        BackColor = Colors.Teal;" + Newline + "    }" + Newline + "}" + Newline);
         AttachDesigner(pad);
         var surface = (DesignSurface)pad.Designer;
+
+        var list = surface.FindLiveControl("_list");
+        if (list == null || !(list is ListBox) || ((ListBox)list).Count != 2u
+            || ((ListBox)list).GetItemAt(1u) != "b, c" || !((ListBox)list).BackColor.Equals(Colors.Teal))
+        {
+            Console.WriteLine("FAIL: a list's items and a colour in the file did not reach the control");
+            ok = false;
+        }
 
         _toolbox.ChooseType("CheckBox");
         if (surface.PendingType != "CheckBox")
@@ -5082,6 +5097,83 @@ public class Shell : Form
             ok = false;
         }
 
+        surface.SelectComponent("_ok");
+        _grid.SelectProperty("BackColor");
+        _grid.ApplyText("255, 128, 0");
+        text = pad.Editor.Contents.GetText();
+        live = surface.FindLiveControl("_ok");
+        if (!text.Contains("BackColor = Color.FromRgb(255, 128, 0);") || !text.Contains("import Forms.Drawing;")
+            || live == null || !((WindowedControl)live).BackColor.Equals(Color.FromRgb(255, 128, 0)))
+        {
+            Console.WriteLine("FAIL: a colour set in the grid reached neither the file, its import, nor the control");
+            ok = false;
+        }
+        _grid.SelectProperty("BackColor");
+        _grid.ApplyText("Red");
+        bool named = pad.Editor.Contents.GetText().Contains("BackColor = Colors.Red;");
+        _grid.SelectProperty("BackColor");
+        _grid.ApplyText("SystemColors.Window");
+        if (!named || !pad.Editor.Contents.GetText().Contains("BackColor = SystemColors.Window;")
+            || _grid.ReadPropertyValue("BackColor") != "SystemColors.Window")
+        {
+            Console.WriteLine("FAIL: a named colour, or a theme's, was not written by its name");
+            ok = false;
+        }
+
+        _grid.SelectProperty("Font");
+        _grid.ApplyText("Arial, 12, Bold | Italic");
+        live = surface.FindLiveControl("_ok");
+        if (!pad.Editor.Contents.GetText().Contains(
+                "Font = new Font(\"Arial\", 12, FontStyle.Bold | FontStyle.Italic);")
+            || live == null || ((WindowedControl)live).Font.Family != "Arial"
+            || _grid.ReadPropertyValue("Font") != "Arial, 12, Bold | Italic")
+        {
+            Console.WriteLine("FAIL: a font set in the grid did not reach the file or the control");
+            ok = false;
+        }
+
+        surface.SelectComponent("_list");
+        _grid.SelectProperty("Items");
+        _grid.ApplyText("One" + Newline + "Two \"2\"" + Newline + "Three");
+        if (!pad.Editor.Contents.GetText().Contains("Items = [\"One\", \"Two \\\"2\\\"\", \"Three\"];")
+            || ((ListBox)surface.FindLiveControl("_list")).Count != 3u)
+        {
+            Console.WriteLine("FAIL: a list's items set in the grid did not reach the file or the control");
+            ok = false;
+        }
+        surface.SelectComponent("_ok");
+
+        // A TabControl comes with a page, a page goes only on a TabControl,
+        // and a Timer goes in the tray and is made by what the file says.
+        surface.PlaceComponent("TabControl", Point.FromXY(144, 8));
+        surface.PlaceComponent("TabPage", Point.FromXY(4, 4));
+        surface.PlaceComponent("Timer", Point.FromXY(4, 4));
+        text = pad.Editor.Contents.GetText();
+        if (!text.Contains("TabControl _tabControl1") || !text.Contains("TabPage _tabPage1")
+            || text.Contains("TabPage _tabPage2") || !text.Contains("Timer _timer1 = new Timer()")
+            || surface.FindLiveControl("_tabPage1") == null)
+        {
+            Console.WriteLine("FAIL: a TabControl, its page or a Timer was not placed as the file needs");
+            ok = false;
+        }
+        surface.SelectComponent("_timer1");
+        String before = pad.Editor.Contents.GetText();
+        _grid.SelectProperty("Enabled");
+        Application.DoEvents();
+        if (pad.Editor.Contents.GetText() != before)
+        {
+            Console.WriteLine("FAIL: choosing a Timer's Enabled row in the grid changed the file");
+            ok = false;
+        }
+        _grid.SelectProperty("Interval");
+        _grid.ApplyText("250");
+        if (!pad.Editor.Contents.GetText().Contains("Interval = 250;") || _grid.FindEventIndex("Tick") < 0)
+        {
+            Console.WriteLine("FAIL: a Timer's properties and events were not offered through reflection");
+            ok = false;
+        }
+        surface.SelectComponent("_ok");
+
         long click = _grid.FindEventIndex("Click");
         if (click < 0)
         {
@@ -5099,7 +5191,8 @@ public class Shell : Form
         }
 
         if (DescribeHandlerParameters("Forms.MouseEventHandler") != "Control sender, MouseEventArgs args"
-            || DescribeHandlerParameters("Forms.EventHandler") != "Control sender")
+            || DescribeHandlerParameters("Forms.EventHandler") != "Control sender"
+            || DescribeHandlerParameters("Forms.TimerHandler") != "Timer sender")
         {
             Console.WriteLine("FAIL: a handler's parameters did not follow from its delegate");
             ok = false;
@@ -5155,6 +5248,27 @@ public class Shell : Form
         if (!pad.Editor.Contents.Edited)
         {
             Console.WriteLine("FAIL: a designer change did not mark the tab edited");
+            ok = false;
+        }
+
+        // A band takes the form's own controls it touches, and not what is
+        // inside one of them; they then move as one.
+        surface.SelectWithin(Rectangle.FromBounds(0, 0, 300, 200));
+        bool banded = surface.SelectedCount == 2u && surface.IsComponentSelected("_ok")
+                      && surface.IsComponentSelected("_box") && !surface.IsComponentSelected("_note");
+        surface.AddToSelection("_note");
+        surface.NudgeSelection(8, 0, false);
+        String moved = pad.Editor.Contents.GetText();
+        if (!banded || !moved.Contains("Bounds = 24, 24, 96, 32;") || !moved.Contains("Bounds = 16, 48, 200, 80;")
+            || !moved.Contains("Bounds = 8, 8, 100, 20;"))
+        {
+            Console.WriteLine("FAIL: a band did not select the form's controls, or they did not move as one");
+            ok = false;
+        }
+        surface.SelectWithin(Rectangle.FromBounds(290, 190, 4, 4));
+        if (surface.SelectedCount != 0u)
+        {
+            Console.WriteLine("FAIL: a band that touched nothing selected something");
             ok = false;
         }
 

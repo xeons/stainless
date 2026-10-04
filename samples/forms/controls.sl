@@ -271,10 +271,11 @@ public class ChecksForm : Form
                    Tabs.SelectedPage == TabThree && TabThree.Visible);
         ok = Check(ok, "and reports no change of page", TabChanges == 0);
 
-        // An index naming no page leaves the page and the tab as they were.
+        // An index naming no page leaves the page and the tab as they were,
+        // until a page of that index is made.
         Tabs.SelectedIndex = 7;
         Settle();
-        ok = Check(ok, "a tab index past the end is ignored",
+        ok = Check(ok, "a tab index past the end waits for its page",
                    Tabs.SelectedIndex == 1 && TabThree.Visible && !TabTwo.Visible);
 
 #if WINDOWS
