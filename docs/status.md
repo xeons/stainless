@@ -69,8 +69,9 @@ last person to edit it -- the suite is the authority.
   count a link error rather than an unbalanced stack. Decoration is Microsoft's
   and stops where PE does: an i386 ELF `__stdcall` gets the convention and the
   plain name, which is what gcc has always done
-- `[Packed]` and `[Align(N)]`: no padding at all, and a raised alignment. Both
-  are rules about layout rather than library features, so neither needs an
+- `[Packed]`, `[Pack(N)]` and `[Align(N)]`: no padding at all, each field
+  aligned to at most N as C's `#pragma pack(N)` does, and a raised alignment.
+  They are rules about layout rather than library features, so none needs an
   import; they combine, N is a power of two capped at 16, and both apply to a
   `struct` and nothing else. The generated C header states them with
   `#pragma pack` and an `SL_ALIGN` macro, and the sizes, alignments and offsets
@@ -986,10 +987,15 @@ last person to edit it -- the suite is the authority.
   three. Both bindings are checked against the real headers by a C file
   compiled beside the test, which is how a constant in a binding stops being
   somebody's recollection
-- [bindings/macos](../bindings/macos): the terminal and the event loop on
-  Darwin -- `termios`, whose flag words are eight bytes there, and kqueue, which
-  is epoll, eventfd, timerfd and inotify in one call. `MacOS.Terminal` has the
-  functions `Linux.Terminal` has. Checked against the headers the same way
+- [bindings/macos](../bindings/macos): the 41 macOS frameworks whose API is C,
+  generated from the SDK by `tools/Stainless.Bindgen` -- 123,000 lines, a
+  module per framework, arm64 and x86-64 told apart where they differ -- with
+  every struct's layout and every constant's value checked against clang,
+  38,421 checks on each architecture; what could not be bound is listed with
+  its reason. And by hand, the terminal and the event loop on Darwin --
+  `termios`, whose flag words are eight bytes there, and kqueue, which is
+  epoll, eventfd, timerfd and inotify in one call. `MacOS.Terminal` has the
+  functions `Linux.Terminal` has
 - Conditional compilation: `#if`, `#elif`, `#else`, `#endif`, `#define`,
   `#undef`, `#error`, `#warning`, `#region` and `#endregion`, with C#'s
   condition grammar, plus `#pragma comment(lib, "...")` so a file can name the

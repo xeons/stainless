@@ -16,6 +16,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
   </ItemGroup>
 
+  <!-- clang's dump of a header holding one of each shape the bindings generator reads. -->
+  <ItemGroup>
+    <None Include="Bindgen/fixture.*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!-- The end-to-end harness's case selection, so it can be asked as another host. -->
   <ItemGroup>
     <Compile Include="../Stainless.Tests/CaseSelection.cs" Link="Harness/CaseSelection.cs" />
@@ -23,5 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/Stainless.Compiler/Stainless.Compiler.csproj" />
+    <ProjectReference Include="../../tools/Stainless.Bindgen/Stainless.Bindgen.csproj" />
   </ItemGroup>
 </Project>
