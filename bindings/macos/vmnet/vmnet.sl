@@ -24,6 +24,7 @@
 module MacOS.vmnet;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -121,21 +122,47 @@ public extern "C" byte* vmnet_read_max_packets_key;
 /// macOS 15.0 and later.
 public extern "C" byte* vmnet_write_max_packets_key;
 
+public objc closure void vmnet_start_interface_completion_handler_t(vmnet_return_t arg0, xpc_object_t? arg1);
+
+public extern "C" interface_ref vmnet_start_interface(xpc_object_t interface_desc, dispatch_queue_t queue, vmnet_start_interface_completion_handler_t handler);
+
+public objc closure void vmnet_interface_event_callback_t(interface_event_t arg0, xpc_object_t arg1);
+
+public extern "C" vmnet_return_t vmnet_interface_set_event_callback(interface_ref @interface, interface_event_t event_mask, dispatch_queue_t? queue, vmnet_interface_event_callback_t? callback);
+
 public extern "C" vmnet_return_t vmnet_write(interface_ref @interface, vmpktdesc* packets, int* pktcnt);
 
 public extern "C" vmnet_return_t vmnet_read(interface_ref @interface, vmpktdesc* packets, int* pktcnt);
 
 public objc closure void vmnet_interface_completion_handler_t(vmnet_return_t arg0);
 
-/// Deprecated in macOS 12.0.
-public extern "C" vmnet_return_t vmnet_interface_add_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, in_addr internal_address, ushort internal_port, vmnet_interface_completion_handler_t handler);
+public extern "C" vmnet_return_t vmnet_stop_interface(interface_ref @interface, dispatch_queue_t queue, vmnet_interface_completion_handler_t handler);
 
 /// Deprecated in macOS 12.0.
-public extern "C" vmnet_return_t vmnet_interface_remove_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, vmnet_interface_completion_handler_t handler);
+public extern "C" vmnet_return_t vmnet_interface_add_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, in_addr internal_address, ushort internal_port, vmnet_interface_completion_handler_t? handler);
 
-public extern "C" vmnet_return_t vmnet_interface_add_ip_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, byte address_family, void* internal_address, ushort internal_port, vmnet_interface_completion_handler_t handler);
+/// Deprecated in macOS 12.0.
+public extern "C" vmnet_return_t vmnet_interface_remove_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, vmnet_interface_completion_handler_t? handler);
 
-public extern "C" vmnet_return_t vmnet_interface_remove_ip_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, byte address_family, vmnet_interface_completion_handler_t handler);
+public objc closure void vmnet_interface_get_port_forwarding_rules_handler_t(xpc_object_t? arg0);
+
+/// Deprecated in macOS 12.0.
+public extern "C" vmnet_return_t vmnet_port_forwarding_rule_get_details(xpc_object_t rule, byte* protocol, ushort* external_port, in_addr* internal_address, ushort* internal_port);
+
+/// Deprecated in macOS 12.0.
+public extern "C" vmnet_return_t vmnet_interface_get_port_forwarding_rules(interface_ref @interface, vmnet_interface_get_port_forwarding_rules_handler_t handler);
+
+public extern "C" vmnet_return_t vmnet_interface_add_ip_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, byte address_family, void* internal_address, ushort internal_port, vmnet_interface_completion_handler_t? handler);
+
+public extern "C" vmnet_return_t vmnet_interface_remove_ip_port_forwarding_rule(interface_ref @interface, byte protocol, ushort external_port, byte address_family, vmnet_interface_completion_handler_t? handler);
+
+public objc closure void vmnet_interface_get_ip_port_forwarding_rules_handler_t(xpc_object_t? arg0);
+
+public extern "C" vmnet_return_t vmnet_ip_port_forwarding_rule_get_details(xpc_object_t rule, byte* protocol, ushort* external_port, byte address_family, void* internal_address, ushort* internal_port);
+
+public extern "C" vmnet_return_t vmnet_interface_get_ip_port_forwarding_rules(interface_ref @interface, byte address_family, vmnet_interface_get_ip_port_forwarding_rules_handler_t handler);
+
+public extern "C" xpc_object_t? vmnet_copy_shared_interface_list();
 
 public struct vmnet_network;
 
@@ -156,6 +183,15 @@ public extern "C" void vmnet_network_get_ipv4_subnet(vmnet_network_ref network, 
 
 /// macOS 26.0 and later.
 public extern "C" void vmnet_network_get_ipv6_prefix(vmnet_network_ref network, in6_addr* prefix, byte* prefix_len);
+
+/// macOS 26.0 and later.
+public extern "C" xpc_object_t? vmnet_network_copy_serialization(vmnet_network_ref network, vmnet_return_t* status);
+
+/// macOS 26.0 and later.
+public extern "C" vmnet_network_ref vmnet_network_create_with_serialization(xpc_object_t network, vmnet_return_t* status);
+
+/// macOS 26.0 and later.
+public extern "C" interface_ref vmnet_interface_start_with_network(vmnet_network_ref network, xpc_object_t interface_desc, dispatch_queue_t queue, vmnet_start_interface_completion_handler_t start_block);
 
 /// macOS 26.0 and later.
 public extern "C" vmnet_return_t vmnet_network_configuration_set_external_interface(vmnet_network_configuration_ref config, byte* interface_name);

@@ -225,9 +225,9 @@ public struct AlertStdCFStringAlertParamRec
     public UInt32 version;
     public Boolean movable;
     public Boolean helpButton;
-    public CFStringRef defaultText;
-    public CFStringRef cancelText;
-    public CFStringRef otherText;
+    public __CFString* defaultText;
+    public __CFString* cancelText;
+    public __CFString* otherText;
     public SInt16 defaultButton;
     public SInt16 cancelButton;
     public UInt16 position;

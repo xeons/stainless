@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,29 +32,30 @@ import MacOS.System;
 
 public struct __CFUserNotification;
 
-public using CFUserNotificationRef = __CFUserNotification*;
+[CFType("CFUserNotificationGetTypeID")]
+public extern objc class CFUserNotificationRef : CFTypeRef { }
 
-public delegate void CFUserNotificationCallBack(CFUserNotificationRef arg0, CFOptionFlags arg1);
+public delegate void CFUserNotificationCallBack(__CFUserNotification* arg0, CFOptionFlags arg1);
 
 public extern "C" CFTypeID CFUserNotificationGetTypeID();
 
-public extern "C" CFUserNotificationRef CFUserNotificationCreate(CFAllocatorRef allocator, CFTimeInterval timeout, CFOptionFlags flags, SInt32* error, CFDictionaryRef dictionary);
+[ReturnsRetained] public extern "C" CFUserNotificationRef? CFUserNotificationCreate(CFAllocatorRef? allocator, CFTimeInterval timeout, CFOptionFlags flags, SInt32* error, CFDictionaryRef? dictionary);
 
-public extern "C" SInt32 CFUserNotificationReceiveResponse(CFUserNotificationRef userNotification, CFTimeInterval timeout, CFOptionFlags* responseFlags);
+public extern "C" SInt32 CFUserNotificationReceiveResponse(CFUserNotificationRef? userNotification, CFTimeInterval timeout, CFOptionFlags* responseFlags);
 
-public extern "C" CFStringRef CFUserNotificationGetResponseValue(CFUserNotificationRef userNotification, CFStringRef key, CFIndex idx);
+public extern "C" CFStringRef? CFUserNotificationGetResponseValue(CFUserNotificationRef? userNotification, CFStringRef? key, CFIndex idx);
 
-public extern "C" CFDictionaryRef CFUserNotificationGetResponseDictionary(CFUserNotificationRef userNotification);
+public extern "C" CFDictionaryRef? CFUserNotificationGetResponseDictionary(CFUserNotificationRef? userNotification);
 
-public extern "C" SInt32 CFUserNotificationUpdate(CFUserNotificationRef userNotification, CFTimeInterval timeout, CFOptionFlags flags, CFDictionaryRef dictionary);
+public extern "C" SInt32 CFUserNotificationUpdate(CFUserNotificationRef? userNotification, CFTimeInterval timeout, CFOptionFlags flags, CFDictionaryRef? dictionary);
 
-public extern "C" SInt32 CFUserNotificationCancel(CFUserNotificationRef userNotification);
+public extern "C" SInt32 CFUserNotificationCancel(CFUserNotificationRef? userNotification);
 
-public extern "C" CFRunLoopSourceRef CFUserNotificationCreateRunLoopSource(CFAllocatorRef allocator, CFUserNotificationRef userNotification, CFUserNotificationCallBack callout, CFIndex order);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFUserNotificationCreateRunLoopSource(CFAllocatorRef? allocator, CFUserNotificationRef? userNotification, CFUserNotificationCallBack callout, CFIndex order);
 
-public extern "C" SInt32 CFUserNotificationDisplayNotice(CFTimeInterval timeout, CFOptionFlags flags, CFURLRef iconURL, CFURLRef soundURL, CFURLRef localizationURL, CFStringRef alertHeader, CFStringRef alertMessage, CFStringRef defaultButtonTitle);
+public extern "C" SInt32 CFUserNotificationDisplayNotice(CFTimeInterval timeout, CFOptionFlags flags, CFURLRef? iconURL, CFURLRef? soundURL, CFURLRef? localizationURL, CFStringRef? alertHeader, CFStringRef? alertMessage, CFStringRef? defaultButtonTitle);
 
-public extern "C" SInt32 CFUserNotificationDisplayAlert(CFTimeInterval timeout, CFOptionFlags flags, CFURLRef iconURL, CFURLRef soundURL, CFURLRef localizationURL, CFStringRef alertHeader, CFStringRef alertMessage, CFStringRef defaultButtonTitle, CFStringRef alternateButtonTitle, CFStringRef otherButtonTitle, CFOptionFlags* responseFlags);
+public extern "C" SInt32 CFUserNotificationDisplayAlert(CFTimeInterval timeout, CFOptionFlags flags, CFURLRef? iconURL, CFURLRef? soundURL, CFURLRef? localizationURL, CFStringRef? alertHeader, CFStringRef? alertMessage, CFStringRef? defaultButtonTitle, CFStringRef? alternateButtonTitle, CFStringRef? otherButtonTitle, CFOptionFlags* responseFlags);
 
 public const ulong kCFUserNotificationStopAlertLevel = 0;
 public const ulong kCFUserNotificationNoteAlertLevel = 1;
@@ -68,36 +70,36 @@ public const ulong kCFUserNotificationCancelResponse = 3;
 public const ulong kCFUserNotificationNoDefaultButtonFlag = 32;
 public const ulong kCFUserNotificationUseRadioButtonsFlag = 64;
 
-public extern "C" CFStringRef kCFUserNotificationIconURLKey;
+public extern "C" CFStringRef? kCFUserNotificationIconURLKey;
 
-public extern "C" CFStringRef kCFUserNotificationSoundURLKey;
+public extern "C" CFStringRef? kCFUserNotificationSoundURLKey;
 
-public extern "C" CFStringRef kCFUserNotificationLocalizationURLKey;
+public extern "C" CFStringRef? kCFUserNotificationLocalizationURLKey;
 
-public extern "C" CFStringRef kCFUserNotificationAlertHeaderKey;
+public extern "C" CFStringRef? kCFUserNotificationAlertHeaderKey;
 
-public extern "C" CFStringRef kCFUserNotificationAlertMessageKey;
+public extern "C" CFStringRef? kCFUserNotificationAlertMessageKey;
 
-public extern "C" CFStringRef kCFUserNotificationDefaultButtonTitleKey;
+public extern "C" CFStringRef? kCFUserNotificationDefaultButtonTitleKey;
 
-public extern "C" CFStringRef kCFUserNotificationAlternateButtonTitleKey;
+public extern "C" CFStringRef? kCFUserNotificationAlternateButtonTitleKey;
 
-public extern "C" CFStringRef kCFUserNotificationOtherButtonTitleKey;
+public extern "C" CFStringRef? kCFUserNotificationOtherButtonTitleKey;
 
-public extern "C" CFStringRef kCFUserNotificationProgressIndicatorValueKey;
+public extern "C" CFStringRef? kCFUserNotificationProgressIndicatorValueKey;
 
-public extern "C" CFStringRef kCFUserNotificationPopUpTitlesKey;
+public extern "C" CFStringRef? kCFUserNotificationPopUpTitlesKey;
 
-public extern "C" CFStringRef kCFUserNotificationTextFieldTitlesKey;
+public extern "C" CFStringRef? kCFUserNotificationTextFieldTitlesKey;
 
-public extern "C" CFStringRef kCFUserNotificationCheckBoxTitlesKey;
+public extern "C" CFStringRef? kCFUserNotificationCheckBoxTitlesKey;
 
-public extern "C" CFStringRef kCFUserNotificationTextFieldValuesKey;
+public extern "C" CFStringRef? kCFUserNotificationTextFieldValuesKey;
 
-public extern "C" CFStringRef kCFUserNotificationPopUpSelectionKey;
+public extern "C" CFStringRef? kCFUserNotificationPopUpSelectionKey;
 
-public extern "C" CFStringRef kCFUserNotificationAlertTopMostKey;
+public extern "C" CFStringRef? kCFUserNotificationAlertTopMostKey;
 
-public extern "C" CFStringRef kCFUserNotificationKeyboardTypesKey;
+public extern "C" CFStringRef? kCFUserNotificationKeyboardTypesKey;
 
 #endif

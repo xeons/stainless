@@ -24,6 +24,7 @@
 module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,18 +32,19 @@ import MacOS.CoreFoundation;
 
 public struct __CTTextTab;
 
-public using CTTextTabRef = __CTTextTab*;
+[CFType("CTTextTabGetTypeID")]
+public extern objc class CTTextTabRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTTextTabGetTypeID();
 
 public extern "C" CFStringRef kCTTabColumnTerminatorsAttributeName;
 
-public extern "C" CTTextTabRef CTTextTabCreate(CTTextAlignment alignment, double location, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CTTextTabRef CTTextTabCreate(CTTextAlignment alignment, double location, CFDictionaryRef? options);
 
 public extern "C" CTTextAlignment CTTextTabGetAlignment(CTTextTabRef tab);
 
 public extern "C" double CTTextTabGetLocation(CTTextTabRef tab);
 
-public extern "C" CFDictionaryRef CTTextTabGetOptions(CTTextTabRef tab);
+public extern "C" CFDictionaryRef? CTTextTabGetOptions(CTTextTabRef tab);
 
 #endif

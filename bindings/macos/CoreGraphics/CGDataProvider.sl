@@ -25,6 +25,7 @@ module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct CGDataProvider;
 
-public using CGDataProviderRef = CGDataProvider*;
+[CFType("CGDataProviderGetTypeID")]
+public extern objc class CGDataProviderRef : CFTypeRef { }
 
 public delegate nuint CGDataProviderGetBytesCallback(void* arg0, void* arg1, nuint arg2);
 
@@ -68,26 +70,22 @@ public struct CGDataProviderDirectCallbacks
 
 public extern "C" CFTypeID CGDataProviderGetTypeID();
 
-public extern "C" CGDataProviderRef CGDataProviderCreateSequential(void* info, CGDataProviderSequentialCallbacks* callbacks);
+[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateSequential(void* info, CGDataProviderSequentialCallbacks* callbacks);
 
-public extern "C" CGDataProviderRef CGDataProviderCreateDirect(void* info, off_t size, CGDataProviderDirectCallbacks* callbacks);
+[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateDirect(void* info, off_t size, CGDataProviderDirectCallbacks* callbacks);
 
 public delegate void CGDataProviderReleaseDataCallback(void* arg0, void* arg1, nuint arg2);
 
-public extern "C" CGDataProviderRef CGDataProviderCreateWithData(void* info, void* data, nuint size, CGDataProviderReleaseDataCallback releaseData);
+[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithData(void* info, void* data, nuint size, CGDataProviderReleaseDataCallback releaseData);
 
-public extern "C" CGDataProviderRef CGDataProviderCreateWithCFData(CFDataRef data);
+[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithCFData(CFDataRef? data);
 
-public extern "C" CGDataProviderRef CGDataProviderCreateWithURL(CFURLRef url);
+[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithURL(CFURLRef? url);
 
-public extern "C" CGDataProviderRef CGDataProviderCreateWithFilename(byte* filename);
+[ReturnsRetained] public extern "C" CGDataProviderRef? CGDataProviderCreateWithFilename(byte* filename);
 
-public extern "C" CGDataProviderRef CGDataProviderRetain(CGDataProviderRef provider);
+[ReturnsRetained] public extern "C" CFDataRef? CGDataProviderCopyData(CGDataProviderRef? provider);
 
-public extern "C" void CGDataProviderRelease(CGDataProviderRef provider);
-
-public extern "C" CFDataRef CGDataProviderCopyData(CGDataProviderRef provider);
-
-public extern "C" void* CGDataProviderGetInfo(CGDataProviderRef provider);
+public extern "C" void* CGDataProviderGetInfo(CGDataProviderRef? provider);
 
 #endif

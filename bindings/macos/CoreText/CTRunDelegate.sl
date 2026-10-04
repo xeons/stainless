@@ -24,6 +24,8 @@
 module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
+import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +33,8 @@ import MacOS.CoreFoundation;
 
 public struct __CTRunDelegate;
 
-public using CTRunDelegateRef = __CTRunDelegate*;
+[CFType("CTRunDelegateGetTypeID")]
+public extern objc class CTRunDelegateRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTRunDelegateGetTypeID();
 
@@ -55,8 +58,13 @@ public struct CTRunDelegateCallbacks
 public const int kCTRunDelegateVersion1 = 1;
 public const int kCTRunDelegateCurrentVersion = 1;
 
-public extern "C" CTRunDelegateRef CTRunDelegateCreate(CTRunDelegateCallbacks* callbacks, void* refCon);
+[ReturnsRetained] public extern "C" CTRunDelegateRef? CTRunDelegateCreate(CTRunDelegateCallbacks* callbacks, void* refCon);
 
 public extern "C" void* CTRunDelegateGetRefCon(CTRunDelegateRef runDelegate);
+
+public objc interface CTAdaptiveImageProviding
+{
+    [Selector("imageForProposedSize:scaleFactor:imageOffset:imageSize:")] CGImageRef? ImageForProposedSizeScaleFactorImageOffsetImageSize(CGSize proposedSize, CGFloat scaleFactor, CGPoint* outImageOffset, CGSize* outImageSize);
+}
 
 #endif

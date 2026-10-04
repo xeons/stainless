@@ -24,6 +24,7 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,388 +32,389 @@ import MacOS.CoreFoundation;
 
 public struct __MDItem;
 
-public using MDItemRef = __MDItem*;
+[CFType("MDItemGetTypeID")]
+public extern objc class MDItemRef : CFTypeRef { }
 
 public extern "C" CFTypeID MDItemGetTypeID();
 
-public extern "C" MDItemRef MDItemCreate(CFAllocatorRef allocator, CFStringRef path);
+[ReturnsRetained] public extern "C" MDItemRef? MDItemCreate(CFAllocatorRef? allocator, CFStringRef? path);
 
-public extern "C" MDItemRef MDItemCreateWithURL(CFAllocatorRef allocator, CFURLRef url);
+[ReturnsRetained] public extern "C" MDItemRef? MDItemCreateWithURL(CFAllocatorRef? allocator, CFURLRef? url);
 
-public extern "C" CFArrayRef MDItemsCreateWithURLs(CFAllocatorRef allocator, CFArrayRef urls);
+[ReturnsRetained] public extern "C" CFArrayRef? MDItemsCreateWithURLs(CFAllocatorRef? allocator, CFArrayRef? urls);
 
-public extern "C" CFTypeRef MDItemCopyAttribute(MDItemRef item, CFStringRef name);
+[ReturnsRetained] public extern "C" CFTypeRef? MDItemCopyAttribute(MDItemRef? item, CFStringRef? name);
 
-public extern "C" CFDictionaryRef MDItemCopyAttributes(MDItemRef item, CFArrayRef names);
+[ReturnsRetained] public extern "C" CFDictionaryRef? MDItemCopyAttributes(MDItemRef? item, CFArrayRef? names);
 
-public extern "C" CFDictionaryRef MDItemCopyAttributeList(MDItemRef item, ...);
+[ReturnsRetained] public extern "C" CFDictionaryRef? MDItemCopyAttributeList(MDItemRef? item, ...);
 
-public extern "C" CFArrayRef MDItemCopyAttributeNames(MDItemRef item);
+[ReturnsRetained] public extern "C" CFArrayRef? MDItemCopyAttributeNames(MDItemRef? item);
 
-public extern "C" CFArrayRef MDItemsCopyAttributes(CFArrayRef items, CFArrayRef names);
+[ReturnsRetained] public extern "C" CFArrayRef? MDItemsCopyAttributes(CFArrayRef? items, CFArrayRef? names);
 
-public objc closure void MDItemGetCacheFileDescriptorsCompletionHandlerBlock(CFArrayRef arg0);
+public objc closure void MDItemGetCacheFileDescriptorsCompletionHandlerBlock(CFArrayRef? arg0);
 
 /// macOS 15.2 and later.
-public extern "C" void MDItemGetCacheFileDescriptors(CFArrayRef items, MDItemGetCacheFileDescriptorsCompletionHandlerBlock completionHandler);
+public extern "C" void MDItemGetCacheFileDescriptors(CFArrayRef? items, MDItemGetCacheFileDescriptorsCompletionHandlerBlock? completionHandler);
 
-public extern "C" CFStringRef kMDItemAttributeChangeDate;
+public extern "C" CFStringRef? kMDItemAttributeChangeDate;
 
-public extern "C" CFStringRef kMDItemContentType;
+public extern "C" CFStringRef? kMDItemContentType;
 
-public extern "C" CFStringRef kMDItemContentTypeTree;
+public extern "C" CFStringRef? kMDItemContentTypeTree;
 
-public extern "C" CFStringRef kMDItemKeywords;
+public extern "C" CFStringRef? kMDItemKeywords;
 
-public extern "C" CFStringRef kMDItemTitle;
+public extern "C" CFStringRef? kMDItemTitle;
 
-public extern "C" CFStringRef kMDItemAuthors;
+public extern "C" CFStringRef? kMDItemAuthors;
 
-public extern "C" CFStringRef kMDItemEditors;
+public extern "C" CFStringRef? kMDItemEditors;
 
-public extern "C" CFStringRef kMDItemParticipants;
+public extern "C" CFStringRef? kMDItemParticipants;
 
-public extern "C" CFStringRef kMDItemProjects;
+public extern "C" CFStringRef? kMDItemProjects;
 
-public extern "C" CFStringRef kMDItemDownloadedDate;
+public extern "C" CFStringRef? kMDItemDownloadedDate;
 
-public extern "C" CFStringRef kMDItemWhereFroms;
+public extern "C" CFStringRef? kMDItemWhereFroms;
 
-public extern "C" CFStringRef kMDItemComment;
+public extern "C" CFStringRef? kMDItemComment;
 
-public extern "C" CFStringRef kMDItemCopyright;
+public extern "C" CFStringRef? kMDItemCopyright;
 
-public extern "C" CFStringRef kMDItemLastUsedDate;
+public extern "C" CFStringRef? kMDItemLastUsedDate;
 
-public extern "C" CFStringRef kMDItemContentCreationDate;
+public extern "C" CFStringRef? kMDItemContentCreationDate;
 
-public extern "C" CFStringRef kMDItemContentModificationDate;
+public extern "C" CFStringRef? kMDItemContentModificationDate;
 
-public extern "C" CFStringRef kMDItemDateAdded;
+public extern "C" CFStringRef? kMDItemDateAdded;
 
-public extern "C" CFStringRef kMDItemDurationSeconds;
+public extern "C" CFStringRef? kMDItemDurationSeconds;
 
-public extern "C" CFStringRef kMDItemContactKeywords;
+public extern "C" CFStringRef? kMDItemContactKeywords;
 
-public extern "C" CFStringRef kMDItemVersion;
+public extern "C" CFStringRef? kMDItemVersion;
 
-public extern "C" CFStringRef kMDItemPixelHeight;
+public extern "C" CFStringRef? kMDItemPixelHeight;
 
-public extern "C" CFStringRef kMDItemXMPCredit;
+public extern "C" CFStringRef? kMDItemXMPCredit;
 
-public extern "C" CFStringRef kMDItemXMPDigitalSourceType;
+public extern "C" CFStringRef? kMDItemXMPDigitalSourceType;
 
-public extern "C" CFStringRef kMDItemPixelWidth;
+public extern "C" CFStringRef? kMDItemPixelWidth;
 
-public extern "C" CFStringRef kMDItemPixelCount;
+public extern "C" CFStringRef? kMDItemPixelCount;
 
-public extern "C" CFStringRef kMDItemColorSpace;
+public extern "C" CFStringRef? kMDItemColorSpace;
 
-public extern "C" CFStringRef kMDItemBitsPerSample;
+public extern "C" CFStringRef? kMDItemBitsPerSample;
 
-public extern "C" CFStringRef kMDItemFlashOnOff;
+public extern "C" CFStringRef? kMDItemFlashOnOff;
 
-public extern "C" CFStringRef kMDItemFocalLength;
+public extern "C" CFStringRef? kMDItemFocalLength;
 
-public extern "C" CFStringRef kMDItemAcquisitionMake;
+public extern "C" CFStringRef? kMDItemAcquisitionMake;
 
-public extern "C" CFStringRef kMDItemAcquisitionModel;
+public extern "C" CFStringRef? kMDItemAcquisitionModel;
 
-public extern "C" CFStringRef kMDItemISOSpeed;
+public extern "C" CFStringRef? kMDItemISOSpeed;
 
-public extern "C" CFStringRef kMDItemOrientation;
+public extern "C" CFStringRef? kMDItemOrientation;
 
-public extern "C" CFStringRef kMDItemLayerNames;
+public extern "C" CFStringRef? kMDItemLayerNames;
 
-public extern "C" CFStringRef kMDItemWhiteBalance;
+public extern "C" CFStringRef? kMDItemWhiteBalance;
 
-public extern "C" CFStringRef kMDItemAperture;
+public extern "C" CFStringRef? kMDItemAperture;
 
-public extern "C" CFStringRef kMDItemProfileName;
+public extern "C" CFStringRef? kMDItemProfileName;
 
-public extern "C" CFStringRef kMDItemResolutionWidthDPI;
+public extern "C" CFStringRef? kMDItemResolutionWidthDPI;
 
-public extern "C" CFStringRef kMDItemResolutionHeightDPI;
+public extern "C" CFStringRef? kMDItemResolutionHeightDPI;
 
-public extern "C" CFStringRef kMDItemExposureMode;
+public extern "C" CFStringRef? kMDItemExposureMode;
 
-public extern "C" CFStringRef kMDItemExposureTimeSeconds;
+public extern "C" CFStringRef? kMDItemExposureTimeSeconds;
 
-public extern "C" CFStringRef kMDItemEXIFVersion;
+public extern "C" CFStringRef? kMDItemEXIFVersion;
 
-public extern "C" CFStringRef kMDItemCameraOwner;
+public extern "C" CFStringRef? kMDItemCameraOwner;
 
-public extern "C" CFStringRef kMDItemFocalLength35mm;
+public extern "C" CFStringRef? kMDItemFocalLength35mm;
 
-public extern "C" CFStringRef kMDItemLensModel;
+public extern "C" CFStringRef? kMDItemLensModel;
 
-public extern "C" CFStringRef kMDItemEXIFGPSVersion;
+public extern "C" CFStringRef? kMDItemEXIFGPSVersion;
 
-public extern "C" CFStringRef kMDItemAltitude;
+public extern "C" CFStringRef? kMDItemAltitude;
 
-public extern "C" CFStringRef kMDItemLatitude;
+public extern "C" CFStringRef? kMDItemLatitude;
 
-public extern "C" CFStringRef kMDItemLongitude;
+public extern "C" CFStringRef? kMDItemLongitude;
 
-public extern "C" CFStringRef kMDItemSpeed;
+public extern "C" CFStringRef? kMDItemSpeed;
 
-public extern "C" CFStringRef kMDItemTimestamp;
+public extern "C" CFStringRef? kMDItemTimestamp;
 
-public extern "C" CFStringRef kMDItemGPSTrack;
+public extern "C" CFStringRef? kMDItemGPSTrack;
 
-public extern "C" CFStringRef kMDItemImageDirection;
+public extern "C" CFStringRef? kMDItemImageDirection;
 
-public extern "C" CFStringRef kMDItemNamedLocation;
+public extern "C" CFStringRef? kMDItemNamedLocation;
 
-public extern "C" CFStringRef kMDItemGPSStatus;
+public extern "C" CFStringRef? kMDItemGPSStatus;
 
-public extern "C" CFStringRef kMDItemGPSMeasureMode;
+public extern "C" CFStringRef? kMDItemGPSMeasureMode;
 
-public extern "C" CFStringRef kMDItemGPSDOP;
+public extern "C" CFStringRef? kMDItemGPSDOP;
 
-public extern "C" CFStringRef kMDItemGPSMapDatum;
+public extern "C" CFStringRef? kMDItemGPSMapDatum;
 
-public extern "C" CFStringRef kMDItemGPSDestLatitude;
+public extern "C" CFStringRef? kMDItemGPSDestLatitude;
 
-public extern "C" CFStringRef kMDItemGPSDestLongitude;
+public extern "C" CFStringRef? kMDItemGPSDestLongitude;
 
-public extern "C" CFStringRef kMDItemGPSDestBearing;
+public extern "C" CFStringRef? kMDItemGPSDestBearing;
 
-public extern "C" CFStringRef kMDItemGPSDestDistance;
+public extern "C" CFStringRef? kMDItemGPSDestDistance;
 
-public extern "C" CFStringRef kMDItemGPSProcessingMethod;
+public extern "C" CFStringRef? kMDItemGPSProcessingMethod;
 
-public extern "C" CFStringRef kMDItemGPSAreaInformation;
+public extern "C" CFStringRef? kMDItemGPSAreaInformation;
 
-public extern "C" CFStringRef kMDItemGPSDateStamp;
+public extern "C" CFStringRef? kMDItemGPSDateStamp;
 
-public extern "C" CFStringRef kMDItemGPSDifferental;
+public extern "C" CFStringRef? kMDItemGPSDifferental;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kMDItemMediaExtensions;
+public extern "C" CFStringRef? kMDItemMediaExtensions;
 
-public extern "C" CFStringRef kMDItemCodecs;
+public extern "C" CFStringRef? kMDItemCodecs;
 
-public extern "C" CFStringRef kMDItemMediaTypes;
+public extern "C" CFStringRef? kMDItemMediaTypes;
 
-public extern "C" CFStringRef kMDItemStreamable;
+public extern "C" CFStringRef? kMDItemStreamable;
 
-public extern "C" CFStringRef kMDItemTotalBitRate;
+public extern "C" CFStringRef? kMDItemTotalBitRate;
 
-public extern "C" CFStringRef kMDItemVideoBitRate;
+public extern "C" CFStringRef? kMDItemVideoBitRate;
 
-public extern "C" CFStringRef kMDItemAudioBitRate;
+public extern "C" CFStringRef? kMDItemAudioBitRate;
 
-public extern "C" CFStringRef kMDItemDeliveryType;
+public extern "C" CFStringRef? kMDItemDeliveryType;
 
-public extern "C" CFStringRef kMDItemAlbum;
+public extern "C" CFStringRef? kMDItemAlbum;
 
-public extern "C" CFStringRef kMDItemHasAlphaChannel;
+public extern "C" CFStringRef? kMDItemHasAlphaChannel;
 
-public extern "C" CFStringRef kMDItemRedEyeOnOff;
+public extern "C" CFStringRef? kMDItemRedEyeOnOff;
 
-public extern "C" CFStringRef kMDItemMeteringMode;
+public extern "C" CFStringRef? kMDItemMeteringMode;
 
-public extern "C" CFStringRef kMDItemMaxAperture;
+public extern "C" CFStringRef? kMDItemMaxAperture;
 
-public extern "C" CFStringRef kMDItemFNumber;
+public extern "C" CFStringRef? kMDItemFNumber;
 
-public extern "C" CFStringRef kMDItemExposureProgram;
+public extern "C" CFStringRef? kMDItemExposureProgram;
 
-public extern "C" CFStringRef kMDItemExposureTimeString;
+public extern "C" CFStringRef? kMDItemExposureTimeString;
 
-public extern "C" CFStringRef kMDItemHeadline;
+public extern "C" CFStringRef? kMDItemHeadline;
 
-public extern "C" CFStringRef kMDItemInstructions;
+public extern "C" CFStringRef? kMDItemInstructions;
 
-public extern "C" CFStringRef kMDItemCity;
+public extern "C" CFStringRef? kMDItemCity;
 
-public extern "C" CFStringRef kMDItemStateOrProvince;
+public extern "C" CFStringRef? kMDItemStateOrProvince;
 
-public extern "C" CFStringRef kMDItemCountry;
+public extern "C" CFStringRef? kMDItemCountry;
 
-public extern "C" CFStringRef kMDItemFSName;
+public extern "C" CFStringRef? kMDItemFSName;
 
-public extern "C" CFStringRef kMDItemDisplayName;
+public extern "C" CFStringRef? kMDItemDisplayName;
 
-public extern "C" CFStringRef kMDItemPath;
+public extern "C" CFStringRef? kMDItemPath;
 
-public extern "C" CFStringRef kMDItemFSSize;
+public extern "C" CFStringRef? kMDItemFSSize;
 
-public extern "C" CFStringRef kMDItemFSCreationDate;
+public extern "C" CFStringRef? kMDItemFSCreationDate;
 
-public extern "C" CFStringRef kMDItemFSContentChangeDate;
+public extern "C" CFStringRef? kMDItemFSContentChangeDate;
 
-public extern "C" CFStringRef kMDItemFSOwnerUserID;
+public extern "C" CFStringRef? kMDItemFSOwnerUserID;
 
-public extern "C" CFStringRef kMDItemFSOwnerGroupID;
-
-/// Deprecated in macOS 10.4.
-public extern "C" CFStringRef kMDItemFSExists;
+public extern "C" CFStringRef? kMDItemFSOwnerGroupID;
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFStringRef kMDItemFSIsReadable;
+public extern "C" CFStringRef? kMDItemFSExists;
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFStringRef kMDItemFSIsWriteable;
+public extern "C" CFStringRef? kMDItemFSIsReadable;
 
-public extern "C" CFStringRef kMDItemFSHasCustomIcon;
+/// Deprecated in macOS 10.4.
+public extern "C" CFStringRef? kMDItemFSIsWriteable;
 
-public extern "C" CFStringRef kMDItemFSIsExtensionHidden;
+public extern "C" CFStringRef? kMDItemFSHasCustomIcon;
 
-public extern "C" CFStringRef kMDItemFSIsStationery;
+public extern "C" CFStringRef? kMDItemFSIsExtensionHidden;
 
-public extern "C" CFStringRef kMDItemFSInvisible;
+public extern "C" CFStringRef? kMDItemFSIsStationery;
 
-public extern "C" CFStringRef kMDItemFSLabel;
+public extern "C" CFStringRef? kMDItemFSInvisible;
 
-public extern "C" CFStringRef kMDItemFSNodeCount;
+public extern "C" CFStringRef? kMDItemFSLabel;
 
-public extern "C" CFStringRef kMDItemHTMLContent;
+public extern "C" CFStringRef? kMDItemFSNodeCount;
 
-public extern "C" CFStringRef kMDItemTextContent;
+public extern "C" CFStringRef? kMDItemHTMLContent;
 
-public extern "C" CFStringRef kMDItemAudioSampleRate;
+public extern "C" CFStringRef? kMDItemTextContent;
 
-public extern "C" CFStringRef kMDItemAudioChannelCount;
+public extern "C" CFStringRef? kMDItemAudioSampleRate;
 
-public extern "C" CFStringRef kMDItemTempo;
+public extern "C" CFStringRef? kMDItemAudioChannelCount;
 
-public extern "C" CFStringRef kMDItemKeySignature;
+public extern "C" CFStringRef? kMDItemTempo;
 
-public extern "C" CFStringRef kMDItemTimeSignature;
+public extern "C" CFStringRef? kMDItemKeySignature;
 
-public extern "C" CFStringRef kMDItemAudioEncodingApplication;
+public extern "C" CFStringRef? kMDItemTimeSignature;
 
-public extern "C" CFStringRef kMDItemComposer;
+public extern "C" CFStringRef? kMDItemAudioEncodingApplication;
 
-public extern "C" CFStringRef kMDItemLyricist;
+public extern "C" CFStringRef? kMDItemComposer;
 
-public extern "C" CFStringRef kMDItemAudioTrackNumber;
+public extern "C" CFStringRef? kMDItemLyricist;
 
-public extern "C" CFStringRef kMDItemRecordingDate;
+public extern "C" CFStringRef? kMDItemAudioTrackNumber;
 
-public extern "C" CFStringRef kMDItemMusicalGenre;
+public extern "C" CFStringRef? kMDItemRecordingDate;
 
-public extern "C" CFStringRef kMDItemIsGeneralMIDISequence;
+public extern "C" CFStringRef? kMDItemMusicalGenre;
 
-public extern "C" CFStringRef kMDItemRecordingYear;
+public extern "C" CFStringRef? kMDItemIsGeneralMIDISequence;
 
-public extern "C" CFStringRef kMDItemOrganizations;
+public extern "C" CFStringRef? kMDItemRecordingYear;
 
-public extern "C" CFStringRef kMDItemLanguages;
+public extern "C" CFStringRef? kMDItemOrganizations;
 
-public extern "C" CFStringRef kMDItemRights;
+public extern "C" CFStringRef? kMDItemLanguages;
 
-public extern "C" CFStringRef kMDItemPublishers;
+public extern "C" CFStringRef? kMDItemRights;
 
-public extern "C" CFStringRef kMDItemContributors;
+public extern "C" CFStringRef? kMDItemPublishers;
 
-public extern "C" CFStringRef kMDItemCoverage;
+public extern "C" CFStringRef? kMDItemContributors;
 
-public extern "C" CFStringRef kMDItemSubject;
+public extern "C" CFStringRef? kMDItemCoverage;
 
-public extern "C" CFStringRef kMDItemTheme;
+public extern "C" CFStringRef? kMDItemSubject;
 
-public extern "C" CFStringRef kMDItemDescription;
+public extern "C" CFStringRef? kMDItemTheme;
 
-public extern "C" CFStringRef kMDItemIdentifier;
+public extern "C" CFStringRef? kMDItemDescription;
 
-public extern "C" CFStringRef kMDItemAudiences;
+public extern "C" CFStringRef? kMDItemIdentifier;
 
-public extern "C" CFStringRef kMDItemNumberOfPages;
+public extern "C" CFStringRef? kMDItemAudiences;
 
-public extern "C" CFStringRef kMDItemPageWidth;
+public extern "C" CFStringRef? kMDItemNumberOfPages;
 
-public extern "C" CFStringRef kMDItemPageHeight;
+public extern "C" CFStringRef? kMDItemPageWidth;
 
-public extern "C" CFStringRef kMDItemSecurityMethod;
+public extern "C" CFStringRef? kMDItemPageHeight;
 
-public extern "C" CFStringRef kMDItemCreator;
+public extern "C" CFStringRef? kMDItemSecurityMethod;
 
-public extern "C" CFStringRef kMDItemEncodingApplications;
+public extern "C" CFStringRef? kMDItemCreator;
 
-public extern "C" CFStringRef kMDItemDueDate;
+public extern "C" CFStringRef? kMDItemEncodingApplications;
 
-public extern "C" CFStringRef kMDItemStarRating;
+public extern "C" CFStringRef? kMDItemDueDate;
 
-public extern "C" CFStringRef kMDItemPhoneNumbers;
+public extern "C" CFStringRef? kMDItemStarRating;
 
-public extern "C" CFStringRef kMDItemEmailAddresses;
+public extern "C" CFStringRef? kMDItemPhoneNumbers;
 
-public extern "C" CFStringRef kMDItemInstantMessageAddresses;
+public extern "C" CFStringRef? kMDItemEmailAddresses;
 
-public extern "C" CFStringRef kMDItemKind;
+public extern "C" CFStringRef? kMDItemInstantMessageAddresses;
 
-public extern "C" CFStringRef kMDItemRecipients;
+public extern "C" CFStringRef? kMDItemKind;
 
-public extern "C" CFStringRef kMDItemFinderComment;
+public extern "C" CFStringRef? kMDItemRecipients;
 
-public extern "C" CFStringRef kMDItemFonts;
+public extern "C" CFStringRef? kMDItemFinderComment;
 
-public extern "C" CFStringRef kMDItemAppleLoopsRootKey;
+public extern "C" CFStringRef? kMDItemFonts;
 
-public extern "C" CFStringRef kMDItemAppleLoopsKeyFilterType;
+public extern "C" CFStringRef? kMDItemAppleLoopsRootKey;
 
-public extern "C" CFStringRef kMDItemAppleLoopsLoopMode;
+public extern "C" CFStringRef? kMDItemAppleLoopsKeyFilterType;
 
-public extern "C" CFStringRef kMDItemAppleLoopDescriptors;
+public extern "C" CFStringRef? kMDItemAppleLoopsLoopMode;
 
-public extern "C" CFStringRef kMDItemMusicalInstrumentCategory;
+public extern "C" CFStringRef? kMDItemAppleLoopDescriptors;
 
-public extern "C" CFStringRef kMDItemMusicalInstrumentName;
+public extern "C" CFStringRef? kMDItemMusicalInstrumentCategory;
 
-public extern "C" CFStringRef kMDItemCFBundleIdentifier;
+public extern "C" CFStringRef? kMDItemMusicalInstrumentName;
+
+public extern "C" CFStringRef? kMDItemCFBundleIdentifier;
 
 /// Deprecated in macOS 10.5.
-public extern "C" CFStringRef kMDItemSupportFileType;
+public extern "C" CFStringRef? kMDItemSupportFileType;
 
-public extern "C" CFStringRef kMDItemInformation;
+public extern "C" CFStringRef? kMDItemInformation;
 
-public extern "C" CFStringRef kMDItemDirector;
+public extern "C" CFStringRef? kMDItemDirector;
 
-public extern "C" CFStringRef kMDItemProducer;
+public extern "C" CFStringRef? kMDItemProducer;
 
-public extern "C" CFStringRef kMDItemGenre;
+public extern "C" CFStringRef? kMDItemGenre;
 
-public extern "C" CFStringRef kMDItemPerformers;
+public extern "C" CFStringRef? kMDItemPerformers;
 
-public extern "C" CFStringRef kMDItemOriginalFormat;
+public extern "C" CFStringRef? kMDItemOriginalFormat;
 
-public extern "C" CFStringRef kMDItemOriginalSource;
+public extern "C" CFStringRef? kMDItemOriginalSource;
 
-public extern "C" CFStringRef kMDItemAuthorEmailAddresses;
+public extern "C" CFStringRef? kMDItemAuthorEmailAddresses;
 
-public extern "C" CFStringRef kMDItemRecipientEmailAddresses;
+public extern "C" CFStringRef? kMDItemRecipientEmailAddresses;
 
-public extern "C" CFStringRef kMDItemAuthorAddresses;
+public extern "C" CFStringRef? kMDItemAuthorAddresses;
 
-public extern "C" CFStringRef kMDItemRecipientAddresses;
+public extern "C" CFStringRef? kMDItemRecipientAddresses;
 
-public extern "C" CFStringRef kMDItemURL;
-
-/// Deprecated in macOS 10.7.
-public extern "C" CFStringRef kMDItemLabelIcon;
+public extern "C" CFStringRef? kMDItemURL;
 
 /// Deprecated in macOS 10.7.
-public extern "C" CFStringRef kMDItemLabelID;
+public extern "C" CFStringRef? kMDItemLabelIcon;
 
 /// Deprecated in macOS 10.7.
-public extern "C" CFStringRef kMDItemLabelKind;
+public extern "C" CFStringRef? kMDItemLabelID;
 
 /// Deprecated in macOS 10.7.
-public extern "C" CFStringRef kMDItemLabelUUID;
+public extern "C" CFStringRef? kMDItemLabelKind;
 
-public extern "C" CFStringRef kMDItemIsLikelyJunk;
+/// Deprecated in macOS 10.7.
+public extern "C" CFStringRef? kMDItemLabelUUID;
 
-public extern "C" CFStringRef kMDItemExecutableArchitectures;
+public extern "C" CFStringRef? kMDItemIsLikelyJunk;
 
-public extern "C" CFStringRef kMDItemExecutablePlatform;
+public extern "C" CFStringRef? kMDItemExecutableArchitectures;
 
-public extern "C" CFStringRef kMDItemApplicationCategories;
+public extern "C" CFStringRef? kMDItemExecutablePlatform;
 
-public extern "C" CFStringRef kMDItemIsApplicationManaged;
+public extern "C" CFStringRef? kMDItemApplicationCategories;
 
-public extern "C" CFDictionaryRef __MDItemCopyAttributesEllipsis1(MDItemRef item, ...);
+public extern "C" CFStringRef? kMDItemIsApplicationManaged;
+
+[ReturnsRetained] public extern "C" CFDictionaryRef? __MDItemCopyAttributesEllipsis1(MDItemRef? item, ...);
 
 #endif

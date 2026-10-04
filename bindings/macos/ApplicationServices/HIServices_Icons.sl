@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -181,13 +182,13 @@ public extern "C" OSErr SetIconFamilyData(IconFamilyHandle iconFamily, OSType ic
 
 public extern "C" OSErr GetIconFamilyData(IconFamilyHandle iconFamily, OSType iconType, Handle h);
 
-public extern "C" OSStatus PlotIconRefInContext(CGContextRef inContext, CGRect* inRect, IconAlignmentType inAlign, IconTransformType inTransform, RGBColor* inLabelColor, PlotIconRefFlags inFlags, IconRef inIconRef);
+public extern "C" OSStatus PlotIconRefInContext(CGContextRef? inContext, CGRect* inRect, IconAlignmentType inAlign, IconTransformType inTransform, RGBColor* inLabelColor, PlotIconRefFlags inFlags, IconRef inIconRef);
 
 public extern "C" Boolean IconRefContainsCGPoint(CGPoint* testPt, CGRect* iconRect, IconAlignmentType align, IconServicesUsageFlags iconServicesUsageFlags, IconRef theIconRef);
 
 public extern "C" Boolean IconRefIntersectsCGRect(CGRect* testRect, CGRect* iconRect, IconAlignmentType align, IconServicesUsageFlags iconServicesUsageFlags, IconRef theIconRef);
 
-public extern "C" HIShapeRef IconRefToHIShape(CGRect* iconRect, IconAlignmentType align, IconServicesUsageFlags iconServicesUsageFlags, IconRef theIconRef);
+public extern "C" HIShapeRef? IconRefToHIShape(CGRect* iconRect, IconAlignmentType align, IconServicesUsageFlags iconServicesUsageFlags, IconRef theIconRef);
 
 public extern "C" Boolean IsIconRefMaskEmpty(IconRef iconRef);
 

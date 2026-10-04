@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -43,23 +44,24 @@ public const int kCMBufferQueueError_InvalidBuffer = -12769;
 
 public struct opaqueCMBufferQueue;
 
-public using CMBufferQueueRef = opaqueCMBufferQueue*;
+[CFType("CMBufferQueueGetTypeID")]
+public extern objc class CMBufferQueueRef : CFTypeRef { }
 
 public using CMBufferRef = CFTypeRef;
 
-public delegate CMTime CMBufferGetTimeCallback(CMBufferRef arg0, void* arg1);
+public delegate CMTime CMBufferGetTimeCallback(void* arg0, void* arg1);
 
 public objc closure CMTime CMBufferGetTimeHandler(CMBufferRef arg0);
 
-public delegate Boolean CMBufferGetBooleanCallback(CMBufferRef arg0, void* arg1);
+public delegate Boolean CMBufferGetBooleanCallback(void* arg0, void* arg1);
 
 public objc closure Boolean CMBufferGetBooleanHandler(CMBufferRef arg0);
 
-public delegate CFComparisonResult CMBufferCompareCallback(CMBufferRef arg0, CMBufferRef arg1, void* arg2);
+public delegate CFComparisonResult CMBufferCompareCallback(void* arg0, void* arg1, void* arg2);
 
 public objc closure CFComparisonResult CMBufferCompareHandler(CMBufferRef arg0, CMBufferRef arg1);
 
-public delegate nuint CMBufferGetSizeCallback(CMBufferRef arg0, void* arg1);
+public delegate nuint CMBufferGetSizeCallback(void* arg0, void* arg1);
 
 public objc closure nuint CMBufferGetSizeHandler(CMBufferRef arg0);
 
@@ -73,43 +75,39 @@ public struct CMBufferCallbacks
     public CMBufferGetTimeCallback getDuration;
     public CMBufferGetBooleanCallback isDataReady;
     public CMBufferCompareCallback compare;
-    public CFStringRef dataBecameReadyNotification;
+    public __CFString* dataBecameReadyNotification;
     public CMBufferGetSizeCallback getSize;
 }
 
 public struct CMBufferHandlers
 {
     public nuint version;
-    public CMBufferGetTimeHandler getDecodeTimeStamp;
-    public CMBufferGetTimeHandler getPresentationTimeStamp;
-    public CMBufferGetTimeHandler getDuration;
-    public CMBufferGetBooleanHandler isDataReady;
-    public CMBufferCompareHandler compare;
-    public CFStringRef dataBecameReadyNotification;
-    public CMBufferGetSizeHandler getSize;
+    public void* getDecodeTimeStamp;
+    public void* getPresentationTimeStamp;
+    public void* getDuration;
+    public void* isDataReady;
+    public void* compare;
+    public __CFString* dataBecameReadyNotification;
+    public void* getSize;
 }
 
 public extern "C" CMBufferCallbacks* CMBufferQueueGetCallbacksForUnsortedSampleBuffers();
 
 public extern "C" CMBufferCallbacks* CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS();
 
-public extern "C" OSStatus CMBufferQueueCreate(CFAllocatorRef allocator, CMItemCount capacity, CMBufferCallbacks* callbacks, CMBufferQueueRef* queueOut);
+public extern "C" OSStatus CMBufferQueueCreate(CFAllocatorRef? allocator, CMItemCount capacity, CMBufferCallbacks* callbacks, opaqueCMBufferQueue** queueOut);
 
-public extern "C" OSStatus CMBufferQueueCreateWithHandlers(CFAllocatorRef allocator, CMItemCount capacity, CMBufferHandlers* handlers, CMBufferQueueRef* queueOut);
+public extern "C" OSStatus CMBufferQueueCreateWithHandlers(CFAllocatorRef? allocator, CMItemCount capacity, CMBufferHandlers* handlers, opaqueCMBufferQueue** queueOut);
 
 public extern "C" CFTypeID CMBufferQueueGetTypeID();
 
 public extern "C" OSStatus CMBufferQueueEnqueue(CMBufferQueueRef queue, CMBufferRef buf);
 
-public extern "C" CMBufferRef CMBufferQueueDequeueAndRetain(CMBufferQueueRef queue);
-
-public extern "C" CMBufferRef CMBufferQueueDequeueIfDataReadyAndRetain(CMBufferQueueRef queue);
-
 /// Deprecated in macOS 15.0.
-public extern "C" CMBufferRef CMBufferQueueGetHead(CMBufferQueueRef queue);
+public extern "C" CMBufferRef? CMBufferQueueGetHead(CMBufferQueueRef queue);
 
 /// macOS 14.0 and later.
-public extern "C" CMBufferRef CMBufferQueueCopyHead(CMBufferQueueRef queue);
+[ReturnsRetained] public extern "C" CMBufferRef? CMBufferQueueCopyHead(CMBufferQueueRef queue);
 
 public extern "C" Boolean CMBufferQueueIsEmpty(CMBufferQueueRef queue);
 
@@ -121,7 +119,7 @@ public extern "C" Boolean CMBufferQueueIsAtEndOfData(CMBufferQueueRef queue);
 
 public extern "C" OSStatus CMBufferQueueReset(CMBufferQueueRef queue);
 
-public delegate void CMBufferQueueResetWithCallbackCallbackFunction(CMBufferRef arg0, void* arg1);
+public delegate void CMBufferQueueResetWithCallbackCallbackFunction(void* arg0, void* arg1);
 
 public extern "C" OSStatus CMBufferQueueResetWithCallback(CMBufferQueueRef queue, CMBufferQueueResetWithCallbackCallbackFunction callback, void* refcon);
 
@@ -170,19 +168,19 @@ public extern "C" OSStatus CMBufferQueueInstallTrigger(CMBufferQueueRef queue, C
 
 public extern "C" OSStatus CMBufferQueueInstallTriggerWithIntegerThreshold(CMBufferQueueRef queue, CMBufferQueueTriggerCallback callback, void* refcon, CMBufferQueueTriggerCondition condition, CMItemCount threshold, CMBufferQueueTriggerToken* triggerTokenOut);
 
-public extern "C" OSStatus CMBufferQueueInstallTriggerHandler(CMBufferQueueRef queue, CMBufferQueueTriggerCondition condition, CMTime time, CMBufferQueueTriggerToken* triggerTokenOut, CMBufferQueueTriggerHandler handler);
+public extern "C" OSStatus CMBufferQueueInstallTriggerHandler(CMBufferQueueRef queue, CMBufferQueueTriggerCondition condition, CMTime time, CMBufferQueueTriggerToken* triggerTokenOut, CMBufferQueueTriggerHandler? handler);
 
-public extern "C" OSStatus CMBufferQueueInstallTriggerHandlerWithIntegerThreshold(CMBufferQueueRef queue, CMBufferQueueTriggerCondition condition, CMItemCount threshold, CMBufferQueueTriggerToken* triggerTokenOut, CMBufferQueueTriggerHandler handler);
+public extern "C" OSStatus CMBufferQueueInstallTriggerHandlerWithIntegerThreshold(CMBufferQueueRef queue, CMBufferQueueTriggerCondition condition, CMItemCount threshold, CMBufferQueueTriggerToken* triggerTokenOut, CMBufferQueueTriggerHandler? handler);
 
 public extern "C" OSStatus CMBufferQueueRemoveTrigger(CMBufferQueueRef queue, CMBufferQueueTriggerToken triggerToken);
 
 public extern "C" Boolean CMBufferQueueTestTrigger(CMBufferQueueRef queue, CMBufferQueueTriggerToken triggerToken);
 
-public delegate OSStatus CMBufferQueueCallForEachBufferCallbackFunction(CMBufferRef arg0, void* arg1);
+public delegate OSStatus CMBufferQueueCallForEachBufferCallbackFunction(void* arg0, void* arg1);
 
 public extern "C" OSStatus CMBufferQueueCallForEachBuffer(CMBufferQueueRef queue, CMBufferQueueCallForEachBufferCallbackFunction callback, void* refcon);
 
-public delegate OSStatus CMBufferValidationCallback(CMBufferQueueRef arg0, CMBufferRef arg1, void* arg2);
+public delegate OSStatus CMBufferValidationCallback(opaqueCMBufferQueue* arg0, void* arg1, void* arg2);
 
 public objc closure OSStatus CMBufferValidationHandler(CMBufferQueueRef arg0, CMBufferRef arg1);
 

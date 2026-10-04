@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,31 +32,32 @@ import MacOS.System;
 
 public struct __CFCalendar;
 
-public using CFCalendarRef = __CFCalendar*;
+[CFType("CFCalendarGetTypeID")]
+public extern objc class CFCalendarRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFCalendarGetTypeID();
 
-public extern "C" CFCalendarRef CFCalendarCopyCurrent();
+[ReturnsRetained] public extern "C" CFCalendarRef? CFCalendarCopyCurrent();
 
-public extern "C" CFCalendarRef CFCalendarCreateWithIdentifier(CFAllocatorRef allocator, CFCalendarIdentifier identifier);
+[ReturnsRetained] public extern "C" CFCalendarRef? CFCalendarCreateWithIdentifier(CFAllocatorRef? allocator, CFCalendarIdentifier? identifier);
 
-public extern "C" CFCalendarIdentifier CFCalendarGetIdentifier(CFCalendarRef calendar);
+public extern "C" CFCalendarIdentifier? CFCalendarGetIdentifier(CFCalendarRef? calendar);
 
-public extern "C" CFLocaleRef CFCalendarCopyLocale(CFCalendarRef calendar);
+[ReturnsRetained] public extern "C" CFLocaleRef? CFCalendarCopyLocale(CFCalendarRef? calendar);
 
-public extern "C" void CFCalendarSetLocale(CFCalendarRef calendar, CFLocaleRef locale);
+public extern "C" void CFCalendarSetLocale(CFCalendarRef? calendar, CFLocaleRef? locale);
 
-public extern "C" CFTimeZoneRef CFCalendarCopyTimeZone(CFCalendarRef calendar);
+[ReturnsRetained] public extern "C" CFTimeZoneRef? CFCalendarCopyTimeZone(CFCalendarRef? calendar);
 
-public extern "C" void CFCalendarSetTimeZone(CFCalendarRef calendar, CFTimeZoneRef tz);
+public extern "C" void CFCalendarSetTimeZone(CFCalendarRef? calendar, CFTimeZoneRef? tz);
 
-public extern "C" CFIndex CFCalendarGetFirstWeekday(CFCalendarRef calendar);
+public extern "C" CFIndex CFCalendarGetFirstWeekday(CFCalendarRef? calendar);
 
-public extern "C" void CFCalendarSetFirstWeekday(CFCalendarRef calendar, CFIndex wkdy);
+public extern "C" void CFCalendarSetFirstWeekday(CFCalendarRef? calendar, CFIndex wkdy);
 
-public extern "C" CFIndex CFCalendarGetMinimumDaysInFirstWeek(CFCalendarRef calendar);
+public extern "C" CFIndex CFCalendarGetMinimumDaysInFirstWeek(CFCalendarRef? calendar);
 
-public extern "C" void CFCalendarSetMinimumDaysInFirstWeek(CFCalendarRef calendar, CFIndex mwd);
+public extern "C" void CFCalendarSetMinimumDaysInFirstWeek(CFCalendarRef? calendar, CFIndex mwd);
 
 [Flags]
 public enum CFCalendarUnit : ulong
@@ -77,24 +79,24 @@ public enum CFCalendarUnit : ulong
     DayOfYear = 65536,
 }
 
-public extern "C" CFRange CFCalendarGetMinimumRangeOfUnit(CFCalendarRef calendar, CFCalendarUnit unit);
+public extern "C" CFRange CFCalendarGetMinimumRangeOfUnit(CFCalendarRef? calendar, CFCalendarUnit unit);
 
-public extern "C" CFRange CFCalendarGetMaximumRangeOfUnit(CFCalendarRef calendar, CFCalendarUnit unit);
+public extern "C" CFRange CFCalendarGetMaximumRangeOfUnit(CFCalendarRef? calendar, CFCalendarUnit unit);
 
-public extern "C" CFRange CFCalendarGetRangeOfUnit(CFCalendarRef calendar, CFCalendarUnit smallerUnit, CFCalendarUnit biggerUnit, CFAbsoluteTime at);
+public extern "C" CFRange CFCalendarGetRangeOfUnit(CFCalendarRef? calendar, CFCalendarUnit smallerUnit, CFCalendarUnit biggerUnit, CFAbsoluteTime at);
 
-public extern "C" CFIndex CFCalendarGetOrdinalityOfUnit(CFCalendarRef calendar, CFCalendarUnit smallerUnit, CFCalendarUnit biggerUnit, CFAbsoluteTime at);
+public extern "C" CFIndex CFCalendarGetOrdinalityOfUnit(CFCalendarRef? calendar, CFCalendarUnit smallerUnit, CFCalendarUnit biggerUnit, CFAbsoluteTime at);
 
-public extern "C" Boolean CFCalendarGetTimeRangeOfUnit(CFCalendarRef calendar, CFCalendarUnit unit, CFAbsoluteTime at, CFAbsoluteTime* startp, CFTimeInterval* tip);
+public extern "C" Boolean CFCalendarGetTimeRangeOfUnit(CFCalendarRef? calendar, CFCalendarUnit unit, CFAbsoluteTime at, CFAbsoluteTime* startp, CFTimeInterval* tip);
 
-public extern "C" Boolean CFCalendarComposeAbsoluteTime(CFCalendarRef calendar, CFAbsoluteTime* at, byte* componentDesc, ...);
+public extern "C" Boolean CFCalendarComposeAbsoluteTime(CFCalendarRef? calendar, CFAbsoluteTime* at, byte* componentDesc, ...);
 
-public extern "C" Boolean CFCalendarDecomposeAbsoluteTime(CFCalendarRef calendar, CFAbsoluteTime at, byte* componentDesc, ...);
+public extern "C" Boolean CFCalendarDecomposeAbsoluteTime(CFCalendarRef? calendar, CFAbsoluteTime at, byte* componentDesc, ...);
 
 public const ulong kCFCalendarComponentsWrap = 1;
 
-public extern "C" Boolean CFCalendarAddComponents(CFCalendarRef calendar, CFAbsoluteTime* at, CFOptionFlags options, byte* componentDesc, ...);
+public extern "C" Boolean CFCalendarAddComponents(CFCalendarRef? calendar, CFAbsoluteTime* at, CFOptionFlags options, byte* componentDesc, ...);
 
-public extern "C" Boolean CFCalendarGetComponentDifference(CFCalendarRef calendar, CFAbsoluteTime startingAT, CFAbsoluteTime resultAT, CFOptionFlags options, byte* componentDesc, ...);
+public extern "C" Boolean CFCalendarGetComponentDifference(CFCalendarRef? calendar, CFAbsoluteTime startingAT, CFAbsoluteTime resultAT, CFOptionFlags options, byte* componentDesc, ...);
 
 #endif

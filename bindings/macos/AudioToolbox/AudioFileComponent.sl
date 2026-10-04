@@ -27,6 +27,7 @@ import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -202,9 +203,9 @@ public extern "C" OSStatus AudioFileComponentInitialize(AudioFileComponent inCom
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus AudioFileComponentOpenFile(AudioFileComponent inComponent, FSRef* inFileRef, SInt8 inPermissions, SInt16 inRefNum);
 
-public delegate OSStatus AudioFileComponentCreateURLProc(void* arg0, CFURLRef arg1, AudioStreamBasicDescription* arg2, UInt32 arg3);
+public delegate OSStatus AudioFileComponentCreateURLProc(void* arg0, __CFURL* arg1, AudioStreamBasicDescription* arg2, UInt32 arg3);
 
-public delegate OSStatus AudioFileComponentOpenURLProc(void* arg0, CFURLRef arg1, SInt8 arg2, int arg3);
+public delegate OSStatus AudioFileComponentOpenURLProc(void* arg0, __CFURL* arg1, SInt8 arg2, int arg3);
 
 public delegate OSStatus AudioFileComponentOpenWithCallbacksProc(void* arg0, void* arg1, AudioFile_ReadProc arg2, AudioFile_WriteProc arg3, AudioFile_GetSizeProc arg4, AudioFile_SetSizeProc arg5);
 
@@ -244,7 +245,7 @@ public delegate OSStatus AudioFileComponentSetUserDataProc(void* arg0, UInt32 ar
 
 public delegate OSStatus AudioFileComponentRemoveUserDataProc(void* arg0, UInt32 arg1, UInt32 arg2);
 
-public delegate OSStatus AudioFileComponentExtensionIsThisFormatProc(void* arg0, CFStringRef arg1, UInt32* arg2);
+public delegate OSStatus AudioFileComponentExtensionIsThisFormatProc(void* arg0, __CFString* arg1, UInt32* arg2);
 
 public delegate OSStatus AudioFileComponentFileDataIsThisFormatProc(void* arg0, UInt32 arg1, void* arg2, UInt32* arg3);
 

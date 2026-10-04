@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -42,21 +43,21 @@ public const int kCSIdentityQueryStringBeginsWith = 2;
 
 public using CSIdentityQueryStringComparisonMethod = CFIndex;
 
-public extern "C" CSIdentityQueryRef CSIdentityQueryCreate(CFAllocatorRef allocator, CSIdentityClass identityClass, CSIdentityAuthorityRef authority);
+[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreate(CFAllocatorRef? allocator, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
 
-public extern "C" CSIdentityQueryRef CSIdentityQueryCreateForName(CFAllocatorRef allocator, CFStringRef name, CSIdentityQueryStringComparisonMethod comparisonMethod, CSIdentityClass identityClass, CSIdentityAuthorityRef authority);
+[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForName(CFAllocatorRef? allocator, CFStringRef? name, CSIdentityQueryStringComparisonMethod comparisonMethod, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
 
-public extern "C" CSIdentityQueryRef CSIdentityQueryCreateForUUID(CFAllocatorRef allocator, CFUUIDRef uuid, CSIdentityAuthorityRef authority);
+[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForUUID(CFAllocatorRef? allocator, CFUUIDRef? uuid, CSIdentityAuthorityRef? authority);
 
-public extern "C" CSIdentityQueryRef CSIdentityQueryCreateForPosixID(CFAllocatorRef allocator, id_t posixID, CSIdentityClass identityClass, CSIdentityAuthorityRef authority);
+[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForPosixID(CFAllocatorRef? allocator, id_t posixID, CSIdentityClass identityClass, CSIdentityAuthorityRef? authority);
 
-public extern "C" CSIdentityQueryRef CSIdentityQueryCreateForPersistentReference(CFAllocatorRef allocator, CFDataRef referenceData);
+[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForPersistentReference(CFAllocatorRef? allocator, CFDataRef? referenceData);
 
-public extern "C" CSIdentityQueryRef CSIdentityQueryCreateForCurrentUser(CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityQueryCreateForCurrentUser(CFAllocatorRef? allocator);
 
-public extern "C" CFArrayRef CSIdentityQueryCopyResults(CSIdentityQueryRef query);
+[ReturnsRetained] public extern "C" CFArrayRef? CSIdentityQueryCopyResults(CSIdentityQueryRef? query);
 
-public extern "C" Boolean CSIdentityQueryExecute(CSIdentityQueryRef query, CSIdentityQueryFlags flags, CFErrorRef* error);
+public extern "C" Boolean CSIdentityQueryExecute(CSIdentityQueryRef? query, CSIdentityQueryFlags flags, __CFError** error);
 
 public const int kCSIdentityQueryEventSearchPhaseFinished = 1;
 public const int kCSIdentityQueryEventResultsAdded = 2;
@@ -66,7 +67,7 @@ public const int kCSIdentityQueryEventErrorOccurred = 5;
 
 public using CSIdentityQueryEvent = CFIndex;
 
-public delegate void CSIdentityQueryReceiveEventCallback(CSIdentityQueryRef arg0, CSIdentityQueryEvent arg1, CFArrayRef arg2, CFErrorRef arg3, void* arg4);
+public delegate void CSIdentityQueryReceiveEventCallback(__CSIdentityQuery* arg0, CSIdentityQueryEvent arg1, __CFArray* arg2, __CFError* arg3, void* arg4);
 
 [Pack(2)]
 public struct CSIdentityQueryClientContext
@@ -79,8 +80,8 @@ public struct CSIdentityQueryClientContext
     public CSIdentityQueryReceiveEventCallback receiveEvent;
 }
 
-public extern "C" Boolean CSIdentityQueryExecuteAsynchronously(CSIdentityQueryRef query, CSIdentityQueryFlags flags, CSIdentityQueryClientContext* clientContext, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+public extern "C" Boolean CSIdentityQueryExecuteAsynchronously(CSIdentityQueryRef? query, CSIdentityQueryFlags flags, CSIdentityQueryClientContext* clientContext, CFRunLoopRef? runLoop, CFStringRef? runLoopMode);
 
-public extern "C" void CSIdentityQueryStop(CSIdentityQueryRef query);
+public extern "C" void CSIdentityQueryStop(CSIdentityQueryRef? query);
 
 #endif

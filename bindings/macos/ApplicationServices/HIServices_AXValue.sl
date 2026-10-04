@@ -25,6 +25,7 @@ module MacOS.ApplicationServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -42,11 +43,12 @@ public enum AXValueType : uint
 
 public struct __AXValue;
 
-public using AXValueRef = __AXValue*;
+[CFType("AXValueGetTypeID")]
+public extern objc class AXValueRef : CFTypeRef { }
 
 public extern "C" CFTypeID AXValueGetTypeID();
 
-public extern "C" AXValueRef AXValueCreate(AXValueType theType, void* valuePtr);
+[ReturnsRetained] public extern "C" AXValueRef? AXValueCreate(AXValueType theType, void* valuePtr);
 
 public extern "C" AXValueType AXValueGetType(AXValueRef value);
 

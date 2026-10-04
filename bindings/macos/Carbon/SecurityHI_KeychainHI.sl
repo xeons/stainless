@@ -25,51 +25,52 @@ module MacOS.Carbon;
 
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Carbon")
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCAddAppleSharePassword(AFPServerSignature* serverSignature, StringPtr serverAddress, StringPtr serverName, StringPtr volumeName, StringPtr accountName, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus KCAddAppleSharePassword(AFPServerSignature* serverSignature, StringPtr serverAddress, StringPtr serverName, StringPtr volumeName, StringPtr accountName, UInt32 passwordLength, void* passwordData, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCAddInternetPassword(StringPtr serverName, StringPtr securityDomain, StringPtr accountName, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus KCAddInternetPassword(StringPtr serverName, StringPtr securityDomain, StringPtr accountName, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCAddInternetPasswordWithPath(StringPtr serverName, StringPtr securityDomain, StringPtr accountName, StringPtr path, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus KCAddInternetPasswordWithPath(StringPtr serverName, StringPtr securityDomain, StringPtr accountName, StringPtr path, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCAddGenericPassword(StringPtr serviceName, StringPtr accountName, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus KCAddGenericPassword(StringPtr serviceName, StringPtr accountName, UInt32 passwordLength, void* passwordData, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCAddItem(KCItemRef item);
+public extern "C" OSStatus KCAddItem(KCItemRef? item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCUnlock(KCRef keychain, StringPtr password);
+public extern "C" OSStatus KCUnlock(KCRef? keychain, StringPtr password);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCCreateKeychain(StringPtr password, KCRef* keychain);
+public extern "C" OSStatus KCCreateKeychain(StringPtr password, void** keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCChangeSettings(KCRef keychain);
+public extern "C" OSStatus KCChangeSettings(KCRef? keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcunlock(KCRef keychain, byte* password);
+public extern "C" OSStatus kcunlock(KCRef? keychain, byte* password);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kccreatekeychain(byte* password, KCRef* keychain);
+public extern "C" OSStatus kccreatekeychain(byte* password, void** keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcaddapplesharepassword(AFPServerSignature* serverSignature, byte* serverAddress, byte* serverName, byte* volumeName, byte* accountName, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus kcaddapplesharepassword(AFPServerSignature* serverSignature, byte* serverAddress, byte* serverName, byte* volumeName, byte* accountName, UInt32 passwordLength, void* passwordData, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcaddinternetpassword(byte* serverName, byte* securityDomain, byte* accountName, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus kcaddinternetpassword(byte* serverName, byte* securityDomain, byte* accountName, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcaddinternetpasswordwithpath(byte* serverName, byte* securityDomain, byte* accountName, byte* path, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus kcaddinternetpasswordwithpath(byte* serverName, byte* securityDomain, byte* accountName, byte* path, UInt16 port, OSType protocol, OSType authType, UInt32 passwordLength, void* passwordData, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcaddgenericpassword(byte* serviceName, byte* accountName, UInt32 passwordLength, void* passwordData, KCItemRef* item);
+public extern "C" OSStatus kcaddgenericpassword(byte* serviceName, byte* accountName, UInt32 passwordLength, void* passwordData, void** item);
 
 #endif

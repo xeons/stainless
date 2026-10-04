@@ -25,20 +25,21 @@ module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreVideo")
 
-public extern "C" CFStringRef kCVBufferPropagatedAttachmentsKey;
+public extern "C" CFStringRef? kCVBufferPropagatedAttachmentsKey;
 
-public extern "C" CFStringRef kCVBufferNonPropagatedAttachmentsKey;
+public extern "C" CFStringRef? kCVBufferNonPropagatedAttachmentsKey;
 
-public extern "C" CFStringRef kCVBufferMovieTimeKey;
+public extern "C" CFStringRef? kCVBufferMovieTimeKey;
 
-public extern "C" CFStringRef kCVBufferTimeValueKey;
+public extern "C" CFStringRef? kCVBufferTimeValueKey;
 
-public extern "C" CFStringRef kCVBufferTimeScaleKey;
+public extern "C" CFStringRef? kCVBufferTimeScaleKey;
 
 public enum CVAttachmentMode : uint
 {
@@ -48,31 +49,28 @@ public enum CVAttachmentMode : uint
 
 public struct __CVBuffer;
 
-public using CVBufferRef = __CVBuffer*;
-
-public extern "C" CVBufferRef CVBufferRetain(CVBufferRef buffer);
-
-public extern "C" void CVBufferRelease(CVBufferRef buffer);
+[CFType]
+public extern objc class CVBufferRef : CFTypeRef { }
 
 public extern "C" void CVBufferSetAttachment(CVBufferRef buffer, CFStringRef key, CFTypeRef value, CVAttachmentMode attachmentMode);
 
 /// Deprecated in macOS 12.0.
-public extern "C" CFTypeRef CVBufferGetAttachment(CVBufferRef buffer, CFStringRef key, CVAttachmentMode* attachmentMode);
+public extern "C" CFTypeRef? CVBufferGetAttachment(CVBufferRef buffer, CFStringRef key, CVAttachmentMode* attachmentMode);
 
 public extern "C" void CVBufferRemoveAttachment(CVBufferRef buffer, CFStringRef key);
 
 public extern "C" void CVBufferRemoveAllAttachments(CVBufferRef buffer);
 
 /// Deprecated in macOS 12.0.
-public extern "C" CFDictionaryRef CVBufferGetAttachments(CVBufferRef buffer, CVAttachmentMode attachmentMode);
+public extern "C" CFDictionaryRef? CVBufferGetAttachments(CVBufferRef buffer, CVAttachmentMode attachmentMode);
 
 public extern "C" void CVBufferSetAttachments(CVBufferRef buffer, CFDictionaryRef theAttachments, CVAttachmentMode attachmentMode);
 
 public extern "C" void CVBufferPropagateAttachments(CVBufferRef sourceBuffer, CVBufferRef destinationBuffer);
 
-public extern "C" CFDictionaryRef CVBufferCopyAttachments(CVBufferRef buffer, CVAttachmentMode attachmentMode);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CVBufferCopyAttachments(CVBufferRef buffer, CVAttachmentMode attachmentMode);
 
-public extern "C" CFTypeRef CVBufferCopyAttachment(CVBufferRef buffer, CFStringRef key, CVAttachmentMode* attachmentMode);
+[ReturnsRetained] public extern "C" CFTypeRef? CVBufferCopyAttachment(CVBufferRef buffer, CFStringRef key, CVAttachmentMode* attachmentMode);
 
 public extern "C" Boolean CVBufferHasAttachment(CVBufferRef buffer, CFStringRef key);
 

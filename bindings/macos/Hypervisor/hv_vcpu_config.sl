@@ -23,9 +23,16 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Hypervisor;
 
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Hypervisor")
+
+#if ARM64
+public extern "C" hv_vcpu_config_t hv_vcpu_config_create();
+#endif
 
 #if ARM64
 public enum hv_feature_reg_t : uint
@@ -45,6 +52,14 @@ public enum hv_feature_reg_t : uint
     ID_AA64SMFR0_EL1 = 12,
     ID_AA64ZFR0_EL1 = 13,
 }
+#endif
+
+#if ARM64
+public extern "C" hv_return_t hv_vcpu_config_get_feature_reg(hv_vcpu_config_t config, hv_feature_reg_t feature_reg, ulong* value);
+#endif
+
+#if ARM64
+public extern "C" hv_return_t hv_vcpu_config_get_ccsidr_el1_sys_reg_values(hv_vcpu_config_t config, hv_cache_type_t cache_type, ulong* values);
 #endif
 
 #endif

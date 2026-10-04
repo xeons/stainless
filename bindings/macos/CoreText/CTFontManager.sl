@@ -26,24 +26,25 @@ module MacOS.CoreText;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreText")
 
-public extern "C" CFArrayRef CTFontManagerCopyAvailablePostScriptNames();
+[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCopyAvailablePostScriptNames();
 
-public extern "C" CFArrayRef CTFontManagerCopyAvailableFontFamilyNames();
+[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCopyAvailableFontFamilyNames();
 
-public extern "C" CFArrayRef CTFontManagerCopyAvailableFontURLs();
+[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCopyAvailableFontURLs();
 
 public extern "C" CFComparisonResult CTFontManagerCompareFontFamilyNames(void* family1, void* family2, void* context);
 
-public extern "C" CFArrayRef CTFontManagerCreateFontDescriptorsFromURL(CFURLRef fileURL);
+[ReturnsRetained] public extern "C" CFArrayRef? CTFontManagerCreateFontDescriptorsFromURL(CFURLRef fileURL);
 
-public extern "C" CTFontDescriptorRef CTFontManagerCreateFontDescriptorFromData(CFDataRef data);
+[ReturnsRetained] public extern "C" CTFontDescriptorRef? CTFontManagerCreateFontDescriptorFromData(CFDataRef data);
 
-public extern "C" CFArrayRef CTFontManagerCreateFontDescriptorsFromData(CFDataRef data);
+[ReturnsRetained] public extern "C" CFArrayRef CTFontManagerCreateFontDescriptorsFromData(CFDataRef data);
 
 public enum CTFontManagerScope : uint
 {
@@ -54,37 +55,37 @@ public enum CTFontManagerScope : uint
     User = 2,
 }
 
-public extern "C" bool CTFontManagerRegisterFontsForURL(CFURLRef fontURL, CTFontManagerScope scope, CFErrorRef* error);
+public extern "C" bool CTFontManagerRegisterFontsForURL(CFURLRef fontURL, CTFontManagerScope scope, __CFError** error);
 
-public extern "C" bool CTFontManagerUnregisterFontsForURL(CFURLRef fontURL, CTFontManagerScope scope, CFErrorRef* error);
-
-/// Deprecated in macOS 15.
-public extern "C" bool CTFontManagerRegisterGraphicsFont(CGFontRef font, CFErrorRef* error);
+public extern "C" bool CTFontManagerUnregisterFontsForURL(CFURLRef fontURL, CTFontManagerScope scope, __CFError** error);
 
 /// Deprecated in macOS 15.
-public extern "C" bool CTFontManagerUnregisterGraphicsFont(CGFontRef font, CFErrorRef* error);
+public extern "C" bool CTFontManagerRegisterGraphicsFont(CGFontRef font, __CFError** error);
+
+/// Deprecated in macOS 15.
+public extern "C" bool CTFontManagerUnregisterGraphicsFont(CGFontRef font, __CFError** error);
 
 /// Deprecated in macOS 10.15.
-public extern "C" bool CTFontManagerRegisterFontsForURLs(CFArrayRef fontURLs, CTFontManagerScope scope, CFArrayRef* errors);
+public extern "C" bool CTFontManagerRegisterFontsForURLs(CFArrayRef fontURLs, CTFontManagerScope scope, __CFArray** errors);
 
 /// Deprecated in macOS 10.15.
-public extern "C" bool CTFontManagerUnregisterFontsForURLs(CFArrayRef fontURLs, CTFontManagerScope scope, CFArrayRef* errors);
+public extern "C" bool CTFontManagerUnregisterFontsForURLs(CFArrayRef fontURLs, CTFontManagerScope scope, __CFArray** errors);
 
 public objc closure bool CTFontManagerRegisterFontURLsRegistrationHandlerBlock(CFArrayRef arg0, bool arg1);
 
-public extern "C" void CTFontManagerRegisterFontURLs(CFArrayRef fontURLs, CTFontManagerScope scope, bool enabled, CTFontManagerRegisterFontURLsRegistrationHandlerBlock registrationHandler);
+public extern "C" void CTFontManagerRegisterFontURLs(CFArrayRef fontURLs, CTFontManagerScope scope, bool enabled, CTFontManagerRegisterFontURLsRegistrationHandlerBlock? registrationHandler);
 
 public objc closure bool CTFontManagerUnregisterFontURLsRegistrationHandlerBlock(CFArrayRef arg0, bool arg1);
 
-public extern "C" void CTFontManagerUnregisterFontURLs(CFArrayRef fontURLs, CTFontManagerScope scope, CTFontManagerUnregisterFontURLsRegistrationHandlerBlock registrationHandler);
+public extern "C" void CTFontManagerUnregisterFontURLs(CFArrayRef fontURLs, CTFontManagerScope scope, CTFontManagerUnregisterFontURLsRegistrationHandlerBlock? registrationHandler);
 
 public objc closure bool CTFontManagerRegisterFontDescriptorsRegistrationHandlerBlock(CFArrayRef arg0, bool arg1);
 
-public extern "C" void CTFontManagerRegisterFontDescriptors(CFArrayRef fontDescriptors, CTFontManagerScope scope, bool enabled, CTFontManagerRegisterFontDescriptorsRegistrationHandlerBlock registrationHandler);
+public extern "C" void CTFontManagerRegisterFontDescriptors(CFArrayRef fontDescriptors, CTFontManagerScope scope, bool enabled, CTFontManagerRegisterFontDescriptorsRegistrationHandlerBlock? registrationHandler);
 
 public objc closure bool CTFontManagerUnregisterFontDescriptorsRegistrationHandlerBlock(CFArrayRef arg0, bool arg1);
 
-public extern "C" void CTFontManagerUnregisterFontDescriptors(CFArrayRef fontDescriptors, CTFontManagerScope scope, CTFontManagerUnregisterFontDescriptorsRegistrationHandlerBlock registrationHandler);
+public extern "C" void CTFontManagerUnregisterFontDescriptors(CFArrayRef fontDescriptors, CTFontManagerScope scope, CTFontManagerUnregisterFontDescriptorsRegistrationHandlerBlock? registrationHandler);
 
 public extern "C" void CTFontManagerEnableFontDescriptors(CFArrayRef descriptors, bool enable);
 
@@ -95,9 +96,9 @@ public extern "C" bool CTFontManagerIsSupportedFont(CFURLRef fontURL);
 public objc closure CFArrayRef CTFontManagerCreateFontRequestRunLoopSourceCreateMatchesCallbackBlock(CFDictionaryRef arg0, pid_t arg1);
 
 /// Deprecated in macOS 11.0.
-public extern "C" CFRunLoopSourceRef CTFontManagerCreateFontRequestRunLoopSource(CFIndex sourceOrder, CTFontManagerCreateFontRequestRunLoopSourceCreateMatchesCallbackBlock createMatchesCallback);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CTFontManagerCreateFontRequestRunLoopSource(CFIndex sourceOrder, CTFontManagerCreateFontRequestRunLoopSourceCreateMatchesCallbackBlock createMatchesCallback);
 
-public extern "C" CFStringRef kCTFontManagerBundleIdentifier;
+public extern "C" CFStringRef? kCTFontManagerBundleIdentifier;
 
 public enum CTFontManagerAutoActivationSetting : uint
 {
@@ -107,9 +108,9 @@ public enum CTFontManagerAutoActivationSetting : uint
     PromptUser = 3,
 }
 
-public extern "C" void CTFontManagerSetAutoActivationSetting(CFStringRef bundleIdentifier, CTFontManagerAutoActivationSetting setting);
+public extern "C" void CTFontManagerSetAutoActivationSetting(CFStringRef? bundleIdentifier, CTFontManagerAutoActivationSetting setting);
 
-public extern "C" CTFontManagerAutoActivationSetting CTFontManagerGetAutoActivationSetting(CFStringRef bundleIdentifier);
+public extern "C" CTFontManagerAutoActivationSetting CTFontManagerGetAutoActivationSetting(CFStringRef? bundleIdentifier);
 
 public extern "C" CFStringRef kCTFontManagerRegisteredFontsChangedNotification;
 

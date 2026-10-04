@@ -25,6 +25,7 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 

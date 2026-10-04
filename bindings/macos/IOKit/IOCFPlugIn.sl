@@ -25,6 +25,7 @@ module MacOS.IOKit;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -36,9 +37,9 @@ public delegate ULONG IOCFPlugInInterfaceStructAddRefFunction(void* arg0);
 
 public delegate ULONG IOCFPlugInInterfaceStructReleaseFunction(void* arg0);
 
-public delegate IOReturn IOCFPlugInInterfaceStructProbeFunction(void* arg0, CFDictionaryRef arg1, io_service_t arg2, SInt32* arg3);
+public delegate IOReturn IOCFPlugInInterfaceStructProbeFunction(void* arg0, __CFDictionary* arg1, io_service_t arg2, SInt32* arg3);
 
-public delegate IOReturn IOCFPlugInInterfaceStructStartFunction(void* arg0, CFDictionaryRef arg1, io_service_t arg2);
+public delegate IOReturn IOCFPlugInInterfaceStructStartFunction(void* arg0, __CFDictionary* arg1, io_service_t arg2);
 
 public delegate IOReturn IOCFPlugInInterfaceStructStopFunction(void* arg0);
 
@@ -57,7 +58,7 @@ public struct IOCFPlugInInterfaceStruct
 
 public using IOCFPlugInInterface = IOCFPlugInInterfaceStruct;
 
-public extern "C" kern_return_t IOCreatePlugInInterfaceForService(io_service_t service, CFUUIDRef pluginType, CFUUIDRef interfaceType, IOCFPlugInInterface*** theInterface, SInt32* theScore);
+public extern "C" kern_return_t IOCreatePlugInInterfaceForService(io_service_t service, CFUUIDRef? pluginType, CFUUIDRef? interfaceType, IOCFPlugInInterface*** theInterface, SInt32* theScore);
 
 public extern "C" kern_return_t IODestroyPlugInInterface(IOCFPlugInInterface** @interface);
 

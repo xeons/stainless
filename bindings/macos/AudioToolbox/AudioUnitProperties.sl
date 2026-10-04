@@ -130,7 +130,7 @@ public struct AURenderCallbackStruct
 public struct AUPreset
 {
     public SInt32 presetNumber;
-    public CFStringRef presetName;
+    public __CFString* presetName;
 }
 
 public const int kRenderQuality_Max = 127;
@@ -172,13 +172,13 @@ public struct AUDependentParameter
 
 public struct AudioUnitCocoaViewInfo
 {
-    public CFURLRef mCocoaAUViewBundleLocation;
-    public CFStringRef[1] mCocoaAUViewClass;
+    public __CFURL* mCocoaAUViewBundleLocation;
+    public __CFString*[1] mCocoaAUViewClass;
 }
 
 public struct AUHostVersionIdentifier
 {
-    public CFStringRef hostName;
+    public __CFString* hostName;
     public UInt32 hostVersion;
 }
 
@@ -201,6 +201,14 @@ public struct AudioUnitParameterHistoryInfo
     public Float32 updatesPerSecond;
     public Float32 historyDurationInSeconds;
 }
+
+public struct AudioUnitRenderContext
+{
+    public void* workgroup;
+    public uint[6] reserved;
+}
+
+public objc closure void AURenderContextObserver(AudioUnitRenderContext* arg0);
 
 public using AUEventSampleTime = long;
 
@@ -268,9 +276,9 @@ public enum AudioUnitParameterOptions : uint
 public struct AudioUnitParameterInfo
 {
     public byte[52] name;
-    public CFStringRef unitName;
+    public __CFString* unitName;
     public UInt32 clumpID;
-    public CFStringRef cfNameString;
+    public __CFString* cfNameString;
     public AudioUnitParameterUnit unit;
     public AudioUnitParameterValue minValue;
     public AudioUnitParameterValue maxValue;
@@ -286,7 +294,7 @@ public struct AudioUnitParameterNameInfo
 {
     public AudioUnitParameterID inID;
     public SInt32 inDesiredLength;
-    public CFStringRef outName;
+    public __CFString* outName;
 }
 
 public using AudioUnitParameterIDName = AudioUnitParameterNameInfo;
@@ -295,13 +303,13 @@ public struct AudioUnitParameterStringFromValue
 {
     public AudioUnitParameterID inParamID;
     public AudioUnitParameterValue* inValue;
-    public CFStringRef outString;
+    public __CFString* outString;
 }
 
 public struct AudioUnitParameterValueFromString
 {
     public AudioUnitParameterID inParamID;
-    public CFStringRef inString;
+    public __CFString* inString;
     public AudioUnitParameterValue outValue;
 }
 
@@ -704,7 +712,7 @@ public const uint kAUSamplerProperty_LoadAudioFiles = 4101;
 
 public struct AUSamplerInstrumentData
 {
-    public CFURLRef fileURL;
+    public __CFURL* fileURL;
     public UInt8 instrumentType;
     public UInt8 bankMSB;
     public UInt8 bankLSB;
@@ -765,7 +773,7 @@ public struct AUNumVersion
 
 public struct AUHostIdentifier
 {
-    public CFStringRef hostName;
+    public __CFString* hostName;
     public AUNumVersion hostVersion;
 }
 
@@ -800,7 +808,7 @@ public struct AudioUnitParameterValueName
 {
     public AudioUnitParameterID inParamID;
     public Float32* inValue;
-    public CFStringRef outName;
+    public __CFString* outName;
 }
 
 public const uint kMusicDeviceProperty_GroupOutputBus = 1002;
@@ -817,7 +825,7 @@ public const int kSpeakerConfiguration_5_1 = 3;
 
 public struct AUSamplerBankPresetData
 {
-    public CFURLRef bankURL;
+    public __CFURL* bankURL;
     public UInt8 bankMSB;
     public UInt8 bankLSB;
     public UInt8 presetID;

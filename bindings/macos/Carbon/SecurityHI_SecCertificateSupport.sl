@@ -27,6 +27,7 @@ import MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.Security;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -35,21 +36,21 @@ import MacOS.System;
 public const int typeSecIdentityRef = 1936286841;
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SecChooseIdentity(CFStringRef displayInfo, CFArrayRef identities, SecIdentityRef* identityRef);
+public extern "C" OSStatus SecChooseIdentity(CFStringRef? displayInfo, CFArrayRef? identities, __SecIdentity** identityRef);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SecChooseIdentityAsSheet(WindowRef parentWindow, EventTargetRef inTarget, CFStringRef displayInfo, CFArrayRef identities);
+public extern "C" OSStatus SecChooseIdentityAsSheet(WindowRef parentWindow, EventTargetRef inTarget, CFStringRef? displayInfo, CFArrayRef? identities);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SecDisplayCertificate(SecCertificateRef certificate, CFArrayRef keychainList);
+public extern "C" OSStatus SecDisplayCertificate(SecCertificateRef? certificate, CFArrayRef? keychainList);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SecDisplayCertificateGroup(CSSM_CERTGROUP* certificates, CFArrayRef keychainList);
+public extern "C" OSStatus SecDisplayCertificateGroup(CSSM_CERTGROUP* certificates, CFArrayRef? keychainList);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SecEditTrust(CFStringRef displayInfo, SecTrustRef trust);
+public extern "C" OSStatus SecEditTrust(CFStringRef? displayInfo, SecTrustRef? trust);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SecEditTrustAsSheet(WindowRef parentWindow, EventTargetRef inTarget, CFStringRef displayInfo, SecTrustRef trust);
+public extern "C" OSStatus SecEditTrustAsSheet(WindowRef parentWindow, EventTargetRef inTarget, CFStringRef? displayInfo, SecTrustRef? trust);
 
 #endif

@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -77,10 +78,10 @@ public struct SecKeyImportExportParameters
 {
     public uint version;
     public SecKeyImportExportFlags flags;
-    public CFTypeRef passphrase;
-    public CFStringRef alertTitle;
-    public CFStringRef alertPrompt;
-    public SecAccessRef accessRef;
+    public void* passphrase;
+    public __CFString* alertTitle;
+    public __CFString* alertPrompt;
+    public __SecAccess* accessRef;
     public CSSM_KEYUSE keyUsage;
     public CSSM_KEYATTR_FLAGS keyAttributes;
 }
@@ -89,23 +90,23 @@ public struct SecItemImportExportKeyParameters
 {
     public uint version;
     public SecKeyImportExportFlags flags;
-    public CFTypeRef passphrase;
-    public CFStringRef alertTitle;
-    public CFStringRef alertPrompt;
-    public SecAccessRef accessRef;
-    public CFArrayRef keyUsage;
-    public CFArrayRef keyAttributes;
+    public void* passphrase;
+    public __CFString* alertTitle;
+    public __CFString* alertPrompt;
+    public __SecAccess* accessRef;
+    public __CFArray* keyUsage;
+    public __CFArray* keyAttributes;
 }
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecKeychainItemExport(CFTypeRef keychainItemOrArray, SecExternalFormat outputFormat, SecItemImportExportFlags flags, SecKeyImportExportParameters* keyParams, CFDataRef* exportedData);
+public extern "C" OSStatus SecKeychainItemExport(CFTypeRef keychainItemOrArray, SecExternalFormat outputFormat, SecItemImportExportFlags flags, SecKeyImportExportParameters* keyParams, __CFData** exportedData);
 
-public extern "C" OSStatus SecItemExport(CFTypeRef secItemOrArray, SecExternalFormat outputFormat, SecItemImportExportFlags flags, SecItemImportExportKeyParameters* keyParams, CFDataRef* exportedData);
+public extern "C" OSStatus SecItemExport(CFTypeRef secItemOrArray, SecExternalFormat outputFormat, SecItemImportExportFlags flags, SecItemImportExportKeyParameters* keyParams, __CFData** exportedData);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecKeychainItemImport(CFDataRef importedData, CFStringRef fileNameOrExtension, SecExternalFormat* inputFormat, SecExternalItemType* itemType, SecItemImportExportFlags flags, SecKeyImportExportParameters* keyParams, SecKeychainRef importKeychain, CFArrayRef* outItems);
+public extern "C" OSStatus SecKeychainItemImport(CFDataRef importedData, CFStringRef? fileNameOrExtension, SecExternalFormat* inputFormat, SecExternalItemType* itemType, SecItemImportExportFlags flags, SecKeyImportExportParameters* keyParams, SecKeychainRef? importKeychain, __CFArray** outItems);
 
-public extern "C" OSStatus SecItemImport(CFDataRef importedData, CFStringRef fileNameOrExtension, SecExternalFormat* inputFormat, SecExternalItemType* itemType, SecItemImportExportFlags flags, SecItemImportExportKeyParameters* keyParams, SecKeychainRef importKeychain, CFArrayRef* outItems);
+public extern "C" OSStatus SecItemImport(CFDataRef importedData, CFStringRef? fileNameOrExtension, SecExternalFormat* inputFormat, SecExternalItemType* itemType, SecItemImportExportFlags flags, SecItemImportExportKeyParameters* keyParams, SecKeychainRef? importKeychain, __CFArray** outItems);
 
 public extern "C" CFStringRef kSecImportExportPassphrase;
 
@@ -126,7 +127,7 @@ public extern "C" CFStringRef kSecImportItemCertChain;
 
 public extern "C" CFStringRef kSecImportItemIdentity;
 
-public extern "C" OSStatus SecPKCS12Import(CFDataRef pkcs12_data, CFDictionaryRef options, CFArrayRef* items);
+public extern "C" OSStatus SecPKCS12Import(CFDataRef pkcs12_data, CFDictionaryRef options, __CFArray** items);
 
 public const int SEC_KEY_IMPORT_EXPORT_PARAMS_VERSION = 0;
 

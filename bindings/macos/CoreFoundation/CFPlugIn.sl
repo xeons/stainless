@@ -24,74 +24,76 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
 
-public extern "C" CFStringRef kCFPlugInDynamicRegistrationKey;
+public extern "C" CFStringRef? kCFPlugInDynamicRegistrationKey;
 
-public extern "C" CFStringRef kCFPlugInDynamicRegisterFunctionKey;
+public extern "C" CFStringRef? kCFPlugInDynamicRegisterFunctionKey;
 
-public extern "C" CFStringRef kCFPlugInUnloadFunctionKey;
+public extern "C" CFStringRef? kCFPlugInUnloadFunctionKey;
 
-public extern "C" CFStringRef kCFPlugInFactoriesKey;
+public extern "C" CFStringRef? kCFPlugInFactoriesKey;
 
-public extern "C" CFStringRef kCFPlugInTypesKey;
+public extern "C" CFStringRef? kCFPlugInTypesKey;
 
-public delegate void CFPlugInDynamicRegisterFunction(CFPlugInRef arg0);
+public delegate void CFPlugInDynamicRegisterFunction(__CFBundle* arg0);
 
-public delegate void CFPlugInUnloadFunction(CFPlugInRef arg0);
+public delegate void CFPlugInUnloadFunction(__CFBundle* arg0);
 
-public delegate void* CFPlugInFactoryFunction(CFAllocatorRef arg0, CFUUIDRef arg1);
+public delegate void* CFPlugInFactoryFunction(__CFAllocator* arg0, __CFUUID* arg1);
 
 public extern "C" CFTypeID CFPlugInGetTypeID();
 
-public extern "C" CFPlugInRef CFPlugInCreate(CFAllocatorRef allocator, CFURLRef plugInURL);
+[ReturnsRetained] public extern "C" CFPlugInRef? CFPlugInCreate(CFAllocatorRef? allocator, CFURLRef? plugInURL);
 
-public extern "C" CFBundleRef CFPlugInGetBundle(CFPlugInRef plugIn);
+public extern "C" CFBundleRef? CFPlugInGetBundle(CFPlugInRef? plugIn);
 
-public extern "C" void CFPlugInSetLoadOnDemand(CFPlugInRef plugIn, Boolean flag);
+public extern "C" void CFPlugInSetLoadOnDemand(CFPlugInRef? plugIn, Boolean flag);
 
-public extern "C" Boolean CFPlugInIsLoadOnDemand(CFPlugInRef plugIn);
+public extern "C" Boolean CFPlugInIsLoadOnDemand(CFPlugInRef? plugIn);
 
-public extern "C" CFArrayRef CFPlugInFindFactoriesForPlugInType(CFUUIDRef typeUUID);
+[ReturnsRetained] public extern "C" CFArrayRef? CFPlugInFindFactoriesForPlugInType(CFUUIDRef? typeUUID);
 
-public extern "C" CFArrayRef CFPlugInFindFactoriesForPlugInTypeInPlugIn(CFUUIDRef typeUUID, CFPlugInRef plugIn);
+[ReturnsRetained] public extern "C" CFArrayRef? CFPlugInFindFactoriesForPlugInTypeInPlugIn(CFUUIDRef? typeUUID, CFPlugInRef? plugIn);
 
-public extern "C" void* CFPlugInInstanceCreate(CFAllocatorRef allocator, CFUUIDRef factoryUUID, CFUUIDRef typeUUID);
+public extern "C" void* CFPlugInInstanceCreate(CFAllocatorRef? allocator, CFUUIDRef? factoryUUID, CFUUIDRef? typeUUID);
 
-public extern "C" Boolean CFPlugInRegisterFactoryFunction(CFUUIDRef factoryUUID, CFPlugInFactoryFunction func);
+public extern "C" Boolean CFPlugInRegisterFactoryFunction(CFUUIDRef? factoryUUID, CFPlugInFactoryFunction func);
 
-public extern "C" Boolean CFPlugInRegisterFactoryFunctionByName(CFUUIDRef factoryUUID, CFPlugInRef plugIn, CFStringRef functionName);
+public extern "C" Boolean CFPlugInRegisterFactoryFunctionByName(CFUUIDRef? factoryUUID, CFPlugInRef? plugIn, CFStringRef? functionName);
 
-public extern "C" Boolean CFPlugInUnregisterFactory(CFUUIDRef factoryUUID);
+public extern "C" Boolean CFPlugInUnregisterFactory(CFUUIDRef? factoryUUID);
 
-public extern "C" Boolean CFPlugInRegisterPlugInType(CFUUIDRef factoryUUID, CFUUIDRef typeUUID);
+public extern "C" Boolean CFPlugInRegisterPlugInType(CFUUIDRef? factoryUUID, CFUUIDRef? typeUUID);
 
-public extern "C" Boolean CFPlugInUnregisterPlugInType(CFUUIDRef factoryUUID, CFUUIDRef typeUUID);
+public extern "C" Boolean CFPlugInUnregisterPlugInType(CFUUIDRef? factoryUUID, CFUUIDRef? typeUUID);
 
-public extern "C" void CFPlugInAddInstanceForFactory(CFUUIDRef factoryID);
+public extern "C" void CFPlugInAddInstanceForFactory(CFUUIDRef? factoryID);
 
-public extern "C" void CFPlugInRemoveInstanceForFactory(CFUUIDRef factoryID);
+public extern "C" void CFPlugInRemoveInstanceForFactory(CFUUIDRef? factoryID);
 
 public struct __CFPlugInInstance;
 
-public using CFPlugInInstanceRef = __CFPlugInInstance*;
+[CFType("CFPlugInInstanceGetTypeID")]
+public extern objc class CFPlugInInstanceRef : CFTypeRef { }
 
-public delegate Boolean CFPlugInInstanceGetInterfaceFunction(CFPlugInInstanceRef arg0, CFStringRef arg1, void** arg2);
+public delegate Boolean CFPlugInInstanceGetInterfaceFunction(__CFPlugInInstance* arg0, __CFString* arg1, void** arg2);
 
 public delegate void CFPlugInInstanceDeallocateInstanceDataFunction(void* arg0);
 
-public extern "C" Boolean CFPlugInInstanceGetInterfaceFunctionTable(CFPlugInInstanceRef instance, CFStringRef interfaceName, void** ftbl);
+public extern "C" Boolean CFPlugInInstanceGetInterfaceFunctionTable(CFPlugInInstanceRef? instance, CFStringRef? interfaceName, void** ftbl);
 
-public extern "C" CFStringRef CFPlugInInstanceGetFactoryName(CFPlugInInstanceRef instance);
+[ReturnsRetained] public extern "C" CFStringRef? CFPlugInInstanceGetFactoryName(CFPlugInInstanceRef? instance);
 
-public extern "C" void* CFPlugInInstanceGetInstanceData(CFPlugInInstanceRef instance);
+public extern "C" void* CFPlugInInstanceGetInstanceData(CFPlugInInstanceRef? instance);
 
 public extern "C" CFTypeID CFPlugInInstanceGetTypeID();
 
-public extern "C" CFPlugInInstanceRef CFPlugInInstanceCreateWithInstanceDataSize(CFAllocatorRef allocator, CFIndex instanceDataSize, CFPlugInInstanceDeallocateInstanceDataFunction deallocateInstanceFunction, CFStringRef factoryName, CFPlugInInstanceGetInterfaceFunction getInterfaceFunction);
+[ReturnsRetained] public extern "C" CFPlugInInstanceRef? CFPlugInInstanceCreateWithInstanceDataSize(CFAllocatorRef? allocator, CFIndex instanceDataSize, CFPlugInInstanceDeallocateInstanceDataFunction deallocateInstanceFunction, CFStringRef? factoryName, CFPlugInInstanceGetInterfaceFunction getInterfaceFunction);
 
 public const int COREFOUNDATION_CFPLUGINCOM_SEPARATE = 1;
 

@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -37,8 +38,8 @@ public extern "C" nuint CGPDFStringGetLength(CGPDFStringRef string);
 
 public extern "C" byte* CGPDFStringGetBytePtr(CGPDFStringRef string);
 
-public extern "C" CFStringRef CGPDFStringCopyTextString(CGPDFStringRef string);
+[ReturnsRetained] public extern "C" CFStringRef? CGPDFStringCopyTextString(CGPDFStringRef string);
 
-public extern "C" CFDateRef CGPDFStringCopyDate(CGPDFStringRef string);
+[ReturnsRetained] public extern "C" CFDateRef? CGPDFStringCopyDate(CGPDFStringRef string);
 
 #endif

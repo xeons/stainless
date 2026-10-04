@@ -96,11 +96,11 @@ public delegate OSStatus AuthorizationCallbacksGetSessionIdFunction(Authorizatio
 
 public delegate OSStatus AuthorizationCallbacksGetImmutableHintValueFunction(AuthorizationEngineRef arg0, AuthorizationString arg1, AuthorizationValue** arg2);
 
-public delegate OSStatus AuthorizationCallbacksGetLAContextFunction(AuthorizationEngineRef arg0, CFTypeRef* arg1);
+public delegate OSStatus AuthorizationCallbacksGetLAContextFunction(AuthorizationEngineRef arg0, void** arg1);
 
-public delegate OSStatus AuthorizationCallbacksGetTokenIdentitiesFunction(AuthorizationEngineRef arg0, CFTypeRef arg1, CFArrayRef* arg2);
+public delegate OSStatus AuthorizationCallbacksGetTokenIdentitiesFunction(AuthorizationEngineRef arg0, void* arg1, __CFArray** arg2);
 
-public delegate OSStatus AuthorizationCallbacksGetTKTokenWatcherFunction(AuthorizationEngineRef arg0, CFTypeRef* arg1);
+public delegate OSStatus AuthorizationCallbacksGetTKTokenWatcherFunction(AuthorizationEngineRef arg0, void** arg1);
 
 public delegate OSStatus AuthorizationCallbacksRemoveHintValueFunction(AuthorizationEngineRef arg0, AuthorizationString arg1);
 

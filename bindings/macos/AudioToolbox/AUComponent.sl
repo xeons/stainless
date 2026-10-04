@@ -23,9 +23,11 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AudioToolbox;
 
+import MacOS.AppKit;
 import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -268,9 +270,11 @@ public extern "C" OSStatus AudioUnitProcessMultiple(AudioUnit inUnit, AudioUnitR
 
 public extern "C" OSStatus AudioUnitReset(AudioUnit inUnit, AudioUnitScope inScope, AudioUnitElement inElement);
 
-public extern "C" OSStatus AudioUnitExtensionSetComponentList(CFStringRef extensionIdentifier, CFArrayRef audioComponentInfo);
+public extern "C" NSImage? AudioComponentCopyIcon(AudioComponent comp);
 
-public extern "C" CFArrayRef AudioUnitExtensionCopyComponentList(CFStringRef extensionIdentifier);
+public extern "C" OSStatus AudioUnitExtensionSetComponentList(CFStringRef extensionIdentifier, CFArrayRef? audioComponentInfo);
+
+[ReturnsRetained] public extern "C" CFArrayRef? AudioUnitExtensionCopyComponentList(CFStringRef extensionIdentifier);
 
 public const int kAudioUnitRange = 0;
 public const int kAudioUnitInitializeSelect = 1;

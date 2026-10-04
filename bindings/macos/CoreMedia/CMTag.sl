@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -213,21 +214,21 @@ public extern "C" CFComparisonResult CMTagCompare(CMTag tag1, CMTag tag2);
 public extern "C" CFHashCode CMTagHash(CMTag tag);
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef CMTagCopyDescription(CFAllocatorRef allocator, CMTag tag);
+[ReturnsRetained] public extern "C" CFStringRef? CMTagCopyDescription(CFAllocatorRef? allocator, CMTag tag);
 
 /// macOS 14.0 and later.
-public extern "C" CFDictionaryRef CMTagCopyAsDictionary(CMTag tag, CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CMTagCopyAsDictionary(CMTag tag, CFAllocatorRef? allocator);
 
 /// macOS 14.0 and later.
 public extern "C" CMTag CMTagMakeFromDictionary(CFDictionaryRef dict);
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kCMTagValueKey;
+public extern "C" CFStringRef? kCMTagValueKey;
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kCMTagCategoryKey;
+public extern "C" CFStringRef? kCMTagCategoryKey;
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kCMTagDataTypeKey;
+public extern "C" CFStringRef? kCMTagDataTypeKey;
 
 #endif

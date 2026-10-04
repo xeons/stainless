@@ -24,6 +24,7 @@
 module MacOS.ImageIO;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,19 +32,22 @@ import MacOS.CoreFoundation;
 
 public struct CGImageMetadata;
 
-public using CGImageMetadataRef = CGImageMetadata*;
+[CFType("CGImageMetadataGetTypeID")]
+public extern objc class CGImageMetadataRef : CFTypeRef { }
 
 public extern "C" CFTypeID CGImageMetadataGetTypeID();
 
-public using CGMutableImageMetadataRef = CGImageMetadata*;
+[CFType]
+public extern objc class CGMutableImageMetadataRef : CGImageMetadataRef { }
 
-public extern "C" CGMutableImageMetadataRef CGImageMetadataCreateMutable();
+[ReturnsRetained] public extern "C" CGMutableImageMetadataRef CGImageMetadataCreateMutable();
 
-public extern "C" CGMutableImageMetadataRef CGImageMetadataCreateMutableCopy(CGImageMetadataRef metadata);
+[ReturnsRetained] public extern "C" CGMutableImageMetadataRef? CGImageMetadataCreateMutableCopy(CGImageMetadataRef metadata);
 
 public struct CGImageMetadataTag;
 
-public using CGImageMetadataTagRef = CGImageMetadataTag*;
+[CFType("CGImageMetadataTagGetTypeID")]
+public extern objc class CGImageMetadataTagRef : CFTypeRef { }
 
 public extern "C" CFTypeID CGImageMetadataTagGetTypeID();
 
@@ -99,47 +103,47 @@ public enum CGImageMetadataType : int
     Structure = 6,
 }
 
-public extern "C" CGImageMetadataTagRef CGImageMetadataTagCreate(CFStringRef xmlns, CFStringRef prefix, CFStringRef name, CGImageMetadataType type, CFTypeRef value);
+[ReturnsRetained] public extern "C" CGImageMetadataTagRef? CGImageMetadataTagCreate(CFStringRef xmlns, CFStringRef? prefix, CFStringRef name, CGImageMetadataType type, CFTypeRef value);
 
-public extern "C" CFStringRef CGImageMetadataTagCopyNamespace(CGImageMetadataTagRef tag);
+[ReturnsRetained] public extern "C" CFStringRef? CGImageMetadataTagCopyNamespace(CGImageMetadataTagRef tag);
 
-public extern "C" CFStringRef CGImageMetadataTagCopyPrefix(CGImageMetadataTagRef tag);
+[ReturnsRetained] public extern "C" CFStringRef? CGImageMetadataTagCopyPrefix(CGImageMetadataTagRef tag);
 
-public extern "C" CFStringRef CGImageMetadataTagCopyName(CGImageMetadataTagRef tag);
+[ReturnsRetained] public extern "C" CFStringRef? CGImageMetadataTagCopyName(CGImageMetadataTagRef tag);
 
-public extern "C" CFTypeRef CGImageMetadataTagCopyValue(CGImageMetadataTagRef tag);
+[ReturnsRetained] public extern "C" CFTypeRef? CGImageMetadataTagCopyValue(CGImageMetadataTagRef tag);
 
 public extern "C" CGImageMetadataType CGImageMetadataTagGetType(CGImageMetadataTagRef tag);
 
-public extern "C" CFArrayRef CGImageMetadataTagCopyQualifiers(CGImageMetadataTagRef tag);
+[ReturnsRetained] public extern "C" CFArrayRef? CGImageMetadataTagCopyQualifiers(CGImageMetadataTagRef tag);
 
-public extern "C" CFArrayRef CGImageMetadataCopyTags(CGImageMetadataRef metadata);
+[ReturnsRetained] public extern "C" CFArrayRef? CGImageMetadataCopyTags(CGImageMetadataRef metadata);
 
-public extern "C" CGImageMetadataTagRef CGImageMetadataCopyTagWithPath(CGImageMetadataRef metadata, CGImageMetadataTagRef parent, CFStringRef path);
+[ReturnsRetained] public extern "C" CGImageMetadataTagRef? CGImageMetadataCopyTagWithPath(CGImageMetadataRef metadata, CGImageMetadataTagRef? parent, CFStringRef path);
 
-public extern "C" CFStringRef CGImageMetadataCopyStringValueWithPath(CGImageMetadataRef metadata, CGImageMetadataTagRef parent, CFStringRef path);
+[ReturnsRetained] public extern "C" CFStringRef? CGImageMetadataCopyStringValueWithPath(CGImageMetadataRef metadata, CGImageMetadataTagRef? parent, CFStringRef path);
 
-public extern "C" bool CGImageMetadataRegisterNamespaceForPrefix(CGMutableImageMetadataRef metadata, CFStringRef xmlns, CFStringRef prefix, CFErrorRef* err);
+public extern "C" bool CGImageMetadataRegisterNamespaceForPrefix(CGMutableImageMetadataRef metadata, CFStringRef xmlns, CFStringRef prefix, __CFError** err);
 
-public extern "C" bool CGImageMetadataSetTagWithPath(CGMutableImageMetadataRef metadata, CGImageMetadataTagRef parent, CFStringRef path, CGImageMetadataTagRef tag);
+public extern "C" bool CGImageMetadataSetTagWithPath(CGMutableImageMetadataRef metadata, CGImageMetadataTagRef? parent, CFStringRef path, CGImageMetadataTagRef tag);
 
-public extern "C" bool CGImageMetadataSetValueWithPath(CGMutableImageMetadataRef metadata, CGImageMetadataTagRef parent, CFStringRef path, CFTypeRef value);
+public extern "C" bool CGImageMetadataSetValueWithPath(CGMutableImageMetadataRef metadata, CGImageMetadataTagRef? parent, CFStringRef path, CFTypeRef value);
 
-public extern "C" bool CGImageMetadataRemoveTagWithPath(CGMutableImageMetadataRef metadata, CGImageMetadataTagRef parent, CFStringRef path);
+public extern "C" bool CGImageMetadataRemoveTagWithPath(CGMutableImageMetadataRef metadata, CGImageMetadataTagRef? parent, CFStringRef path);
 
 public objc closure bool CGImageMetadataTagBlock(CFStringRef arg0, CGImageMetadataTagRef arg1);
 
-public extern "C" void CGImageMetadataEnumerateTagsUsingBlock(CGImageMetadataRef metadata, CFStringRef rootPath, CFDictionaryRef options, CGImageMetadataTagBlock block);
+public extern "C" void CGImageMetadataEnumerateTagsUsingBlock(CGImageMetadataRef metadata, CFStringRef? rootPath, CFDictionaryRef? options, CGImageMetadataTagBlock block);
 
 public extern "C" CFStringRef kCGImageMetadataEnumerateRecursively;
 
-public extern "C" CGImageMetadataTagRef CGImageMetadataCopyTagMatchingImageProperty(CGImageMetadataRef metadata, CFStringRef dictionaryName, CFStringRef propertyName);
+[ReturnsRetained] public extern "C" CGImageMetadataTagRef? CGImageMetadataCopyTagMatchingImageProperty(CGImageMetadataRef metadata, CFStringRef dictionaryName, CFStringRef propertyName);
 
 public extern "C" bool CGImageMetadataSetValueMatchingImageProperty(CGMutableImageMetadataRef metadata, CFStringRef dictionaryName, CFStringRef propertyName, CFTypeRef value);
 
-public extern "C" CFDataRef CGImageMetadataCreateXMPData(CGImageMetadataRef metadata, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CFDataRef? CGImageMetadataCreateXMPData(CGImageMetadataRef metadata, CFDictionaryRef? options);
 
-public extern "C" CGImageMetadataRef CGImageMetadataCreateFromXMPData(CFDataRef data);
+[ReturnsRetained] public extern "C" CGImageMetadataRef? CGImageMetadataCreateFromXMPData(CFDataRef data);
 
 public extern "C" CFStringRef kCFErrorDomainCGImageMetadata;
 

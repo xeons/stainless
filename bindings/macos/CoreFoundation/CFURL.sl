@@ -25,6 +25,7 @@ module MacOS.CoreFoundation;
 
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -39,78 +40,79 @@ public enum CFURLPathStyle : long
 
 public struct __CFURL;
 
-public using CFURLRef = __CFURL*;
+[CFType("CFURLGetTypeID")]
+public extern objc class CFURLRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFURLGetTypeID();
 
-public extern "C" CFURLRef CFURLCreateWithBytes(CFAllocatorRef allocator, UInt8* URLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef baseURL);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithBytes(CFAllocatorRef? allocator, UInt8* URLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef? baseURL);
 
-public extern "C" CFDataRef CFURLCreateData(CFAllocatorRef allocator, CFURLRef url, CFStringEncoding encoding, Boolean escapeWhitespace);
+[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateData(CFAllocatorRef? allocator, CFURLRef? url, CFStringEncoding encoding, Boolean escapeWhitespace);
 
-public extern "C" CFURLRef CFURLCreateWithString(CFAllocatorRef allocator, CFStringRef URLString, CFURLRef baseURL);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithString(CFAllocatorRef? allocator, CFStringRef? URLString, CFURLRef? baseURL);
 
-public extern "C" CFURLRef CFURLCreateAbsoluteURLWithBytes(CFAllocatorRef alloc, UInt8* relativeURLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef baseURL, Boolean useCompatibilityMode);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateAbsoluteURLWithBytes(CFAllocatorRef? alloc, UInt8* relativeURLBytes, CFIndex length, CFStringEncoding encoding, CFURLRef? baseURL, Boolean useCompatibilityMode);
 
-public extern "C" CFURLRef CFURLCreateWithFileSystemPath(CFAllocatorRef allocator, CFStringRef filePath, CFURLPathStyle pathStyle, Boolean isDirectory);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithFileSystemPath(CFAllocatorRef? allocator, CFStringRef? filePath, CFURLPathStyle pathStyle, Boolean isDirectory);
 
-public extern "C" CFURLRef CFURLCreateFromFileSystemRepresentation(CFAllocatorRef allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFromFileSystemRepresentation(CFAllocatorRef? allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory);
 
-public extern "C" CFURLRef CFURLCreateWithFileSystemPathRelativeToBase(CFAllocatorRef allocator, CFStringRef filePath, CFURLPathStyle pathStyle, Boolean isDirectory, CFURLRef baseURL);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateWithFileSystemPathRelativeToBase(CFAllocatorRef? allocator, CFStringRef? filePath, CFURLPathStyle pathStyle, Boolean isDirectory, CFURLRef? baseURL);
 
-public extern "C" CFURLRef CFURLCreateFromFileSystemRepresentationRelativeToBase(CFAllocatorRef allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory, CFURLRef baseURL);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFromFileSystemRepresentationRelativeToBase(CFAllocatorRef? allocator, UInt8* buffer, CFIndex bufLen, Boolean isDirectory, CFURLRef? baseURL);
 
-public extern "C" Boolean CFURLGetFileSystemRepresentation(CFURLRef url, Boolean resolveAgainstBase, UInt8* buffer, CFIndex maxBufLen);
+public extern "C" Boolean CFURLGetFileSystemRepresentation(CFURLRef? url, Boolean resolveAgainstBase, UInt8* buffer, CFIndex maxBufLen);
 
-public extern "C" CFURLRef CFURLCopyAbsoluteURL(CFURLRef relativeURL);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCopyAbsoluteURL(CFURLRef? relativeURL);
 
-public extern "C" CFStringRef CFURLGetString(CFURLRef anURL);
+public extern "C" CFStringRef? CFURLGetString(CFURLRef? anURL);
 
-public extern "C" CFURLRef CFURLGetBaseURL(CFURLRef anURL);
+public extern "C" CFURLRef? CFURLGetBaseURL(CFURLRef? anURL);
 
-public extern "C" Boolean CFURLCanBeDecomposed(CFURLRef anURL);
+public extern "C" Boolean CFURLCanBeDecomposed(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyScheme(CFURLRef anURL);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyScheme(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyNetLocation(CFURLRef anURL);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyNetLocation(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyPath(CFURLRef anURL);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyPath(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyStrictPath(CFURLRef anURL, Boolean* isAbsolute);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyStrictPath(CFURLRef? anURL, Boolean* isAbsolute);
 
-public extern "C" CFStringRef CFURLCopyFileSystemPath(CFURLRef anURL, CFURLPathStyle pathStyle);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyFileSystemPath(CFURLRef? anURL, CFURLPathStyle pathStyle);
 
-public extern "C" Boolean CFURLHasDirectoryPath(CFURLRef anURL);
+public extern "C" Boolean CFURLHasDirectoryPath(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyResourceSpecifier(CFURLRef anURL);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyResourceSpecifier(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyHostName(CFURLRef anURL);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyHostName(CFURLRef? anURL);
 
-public extern "C" SInt32 CFURLGetPortNumber(CFURLRef anURL);
+public extern "C" SInt32 CFURLGetPortNumber(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyUserName(CFURLRef anURL);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyUserName(CFURLRef? anURL);
 
-public extern "C" CFStringRef CFURLCopyPassword(CFURLRef anURL);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyPassword(CFURLRef? anURL);
 
 /// Deprecated in macOS 10.15.
-public extern "C" CFStringRef CFURLCopyParameterString(CFURLRef anURL, CFStringRef charactersToLeaveEscaped);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyParameterString(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
 
-public extern "C" CFStringRef CFURLCopyQueryString(CFURLRef anURL, CFStringRef charactersToLeaveEscaped);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyQueryString(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
 
-public extern "C" CFStringRef CFURLCopyFragment(CFURLRef anURL, CFStringRef charactersToLeaveEscaped);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyFragment(CFURLRef? anURL, CFStringRef? charactersToLeaveEscaped);
 
-public extern "C" CFStringRef CFURLCopyLastPathComponent(CFURLRef url);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyLastPathComponent(CFURLRef? url);
 
-public extern "C" CFStringRef CFURLCopyPathExtension(CFURLRef url);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCopyPathExtension(CFURLRef? url);
 
-public extern "C" CFURLRef CFURLCreateCopyAppendingPathComponent(CFAllocatorRef allocator, CFURLRef url, CFStringRef pathComponent, Boolean isDirectory);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyAppendingPathComponent(CFAllocatorRef? allocator, CFURLRef? url, CFStringRef? pathComponent, Boolean isDirectory);
 
-public extern "C" CFURLRef CFURLCreateCopyDeletingLastPathComponent(CFAllocatorRef allocator, CFURLRef url);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyDeletingLastPathComponent(CFAllocatorRef? allocator, CFURLRef? url);
 
-public extern "C" CFURLRef CFURLCreateCopyAppendingPathExtension(CFAllocatorRef allocator, CFURLRef url, CFStringRef extension);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyAppendingPathExtension(CFAllocatorRef? allocator, CFURLRef? url, CFStringRef? extension);
 
-public extern "C" CFURLRef CFURLCreateCopyDeletingPathExtension(CFAllocatorRef allocator, CFURLRef url);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateCopyDeletingPathExtension(CFAllocatorRef? allocator, CFURLRef? url);
 
-public extern "C" CFIndex CFURLGetBytes(CFURLRef url, UInt8* buffer, CFIndex bufferLength);
+public extern "C" CFIndex CFURLGetBytes(CFURLRef? url, UInt8* buffer, CFIndex bufferLength);
 
 public enum CFURLComponentType : long
 {
@@ -128,311 +130,311 @@ public enum CFURLComponentType : long
     Fragment = 12,
 }
 
-public extern "C" CFRange CFURLGetByteRangeForComponent(CFURLRef url, CFURLComponentType component, CFRange* rangeIncludingSeparators);
+public extern "C" CFRange CFURLGetByteRangeForComponent(CFURLRef? url, CFURLComponentType component, CFRange* rangeIncludingSeparators);
 
-public extern "C" CFStringRef CFURLCreateStringByReplacingPercentEscapes(CFAllocatorRef allocator, CFStringRef originalString, CFStringRef charactersToLeaveEscaped);
-
-/// Deprecated in macOS 10.11.
-public extern "C" CFStringRef CFURLCreateStringByReplacingPercentEscapesUsingEncoding(CFAllocatorRef allocator, CFStringRef origString, CFStringRef charsToLeaveEscaped, CFStringEncoding encoding);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCreateStringByReplacingPercentEscapes(CFAllocatorRef? allocator, CFStringRef? originalString, CFStringRef? charactersToLeaveEscaped);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef CFURLCreateStringByAddingPercentEscapes(CFAllocatorRef allocator, CFStringRef originalString, CFStringRef charactersToLeaveUnescaped, CFStringRef legalURLCharactersToBeEscaped, CFStringEncoding encoding);
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCreateStringByReplacingPercentEscapesUsingEncoding(CFAllocatorRef? allocator, CFStringRef? origString, CFStringRef? charsToLeaveEscaped, CFStringEncoding encoding);
 
-public extern "C" Boolean CFURLIsFileReferenceURL(CFURLRef url);
+/// Deprecated in macOS 10.11.
+[ReturnsRetained] public extern "C" CFStringRef? CFURLCreateStringByAddingPercentEscapes(CFAllocatorRef? allocator, CFStringRef? originalString, CFStringRef? charactersToLeaveUnescaped, CFStringRef? legalURLCharactersToBeEscaped, CFStringEncoding encoding);
 
-public extern "C" CFURLRef CFURLCreateFileReferenceURL(CFAllocatorRef allocator, CFURLRef url, CFErrorRef* error);
+public extern "C" Boolean CFURLIsFileReferenceURL(CFURLRef? url);
 
-public extern "C" CFURLRef CFURLCreateFilePathURL(CFAllocatorRef allocator, CFURLRef url, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFileReferenceURL(CFAllocatorRef? allocator, CFURLRef? url, __CFError** error);
+
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFilePathURL(CFAllocatorRef? allocator, CFURLRef? url, __CFError** error);
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFURLRef CFURLCreateFromFSRef(CFAllocatorRef allocator, FSRef* fsRef);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateFromFSRef(CFAllocatorRef? allocator, FSRef* fsRef);
 
 /// Deprecated in macOS 10.9.
-public extern "C" Boolean CFURLGetFSRef(CFURLRef url, FSRef* fsRef);
+public extern "C" Boolean CFURLGetFSRef(CFURLRef? url, FSRef* fsRef);
 
-public extern "C" Boolean CFURLCopyResourcePropertyForKey(CFURLRef url, CFStringRef key, void* propertyValueTypeRefPtr, CFErrorRef* error);
+public extern "C" Boolean CFURLCopyResourcePropertyForKey(CFURLRef? url, CFStringRef? key, void* propertyValueTypeRefPtr, __CFError** error);
 
-public extern "C" CFDictionaryRef CFURLCopyResourcePropertiesForKeys(CFURLRef url, CFArrayRef keys, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFURLCopyResourcePropertiesForKeys(CFURLRef? url, CFArrayRef? keys, __CFError** error);
 
-public extern "C" Boolean CFURLSetResourcePropertyForKey(CFURLRef url, CFStringRef key, CFTypeRef propertyValue, CFErrorRef* error);
+public extern "C" Boolean CFURLSetResourcePropertyForKey(CFURLRef? url, CFStringRef? key, CFTypeRef? propertyValue, __CFError** error);
 
-public extern "C" Boolean CFURLSetResourcePropertiesForKeys(CFURLRef url, CFDictionaryRef keyedPropertyValues, CFErrorRef* error);
+public extern "C" Boolean CFURLSetResourcePropertiesForKeys(CFURLRef? url, CFDictionaryRef? keyedPropertyValues, __CFError** error);
 
-public extern "C" CFStringRef kCFURLKeysOfUnsetValuesKey;
+public extern "C" CFStringRef? kCFURLKeysOfUnsetValuesKey;
 
-public extern "C" void CFURLClearResourcePropertyCacheForKey(CFURLRef url, CFStringRef key);
+public extern "C" void CFURLClearResourcePropertyCacheForKey(CFURLRef? url, CFStringRef? key);
 
-public extern "C" void CFURLClearResourcePropertyCache(CFURLRef url);
+public extern "C" void CFURLClearResourcePropertyCache(CFURLRef? url);
 
-public extern "C" void CFURLSetTemporaryResourcePropertyForKey(CFURLRef url, CFStringRef key, CFTypeRef propertyValue);
+public extern "C" void CFURLSetTemporaryResourcePropertyForKey(CFURLRef? url, CFStringRef? key, CFTypeRef? propertyValue);
 
-public extern "C" Boolean CFURLResourceIsReachable(CFURLRef url, CFErrorRef* error);
+public extern "C" Boolean CFURLResourceIsReachable(CFURLRef? url, __CFError** error);
 
-public extern "C" CFStringRef kCFURLNameKey;
+public extern "C" CFStringRef? kCFURLNameKey;
 
-public extern "C" CFStringRef kCFURLLocalizedNameKey;
+public extern "C" CFStringRef? kCFURLLocalizedNameKey;
 
-public extern "C" CFStringRef kCFURLIsRegularFileKey;
+public extern "C" CFStringRef? kCFURLIsRegularFileKey;
 
-public extern "C" CFStringRef kCFURLIsDirectoryKey;
+public extern "C" CFStringRef? kCFURLIsDirectoryKey;
 
-public extern "C" CFStringRef kCFURLIsSymbolicLinkKey;
+public extern "C" CFStringRef? kCFURLIsSymbolicLinkKey;
 
-public extern "C" CFStringRef kCFURLIsVolumeKey;
+public extern "C" CFStringRef? kCFURLIsVolumeKey;
 
-public extern "C" CFStringRef kCFURLIsPackageKey;
+public extern "C" CFStringRef? kCFURLIsPackageKey;
 
-public extern "C" CFStringRef kCFURLIsApplicationKey;
+public extern "C" CFStringRef? kCFURLIsApplicationKey;
 
-public extern "C" CFStringRef kCFURLApplicationIsScriptableKey;
+public extern "C" CFStringRef? kCFURLApplicationIsScriptableKey;
 
-public extern "C" CFStringRef kCFURLIsSystemImmutableKey;
+public extern "C" CFStringRef? kCFURLIsSystemImmutableKey;
 
-public extern "C" CFStringRef kCFURLIsUserImmutableKey;
+public extern "C" CFStringRef? kCFURLIsUserImmutableKey;
 
-public extern "C" CFStringRef kCFURLIsHiddenKey;
+public extern "C" CFStringRef? kCFURLIsHiddenKey;
 
-public extern "C" CFStringRef kCFURLHasHiddenExtensionKey;
+public extern "C" CFStringRef? kCFURLHasHiddenExtensionKey;
 
-public extern "C" CFStringRef kCFURLCreationDateKey;
+public extern "C" CFStringRef? kCFURLCreationDateKey;
 
-public extern "C" CFStringRef kCFURLContentAccessDateKey;
+public extern "C" CFStringRef? kCFURLContentAccessDateKey;
 
-public extern "C" CFStringRef kCFURLContentModificationDateKey;
+public extern "C" CFStringRef? kCFURLContentModificationDateKey;
 
-public extern "C" CFStringRef kCFURLAttributeModificationDateKey;
+public extern "C" CFStringRef? kCFURLAttributeModificationDateKey;
 
 /// macOS 13.3 and later.
-public extern "C" CFStringRef kCFURLFileIdentifierKey;
+public extern "C" CFStringRef? kCFURLFileIdentifierKey;
 
-public extern "C" CFStringRef kCFURLFileContentIdentifierKey;
+public extern "C" CFStringRef? kCFURLFileContentIdentifierKey;
 
-public extern "C" CFStringRef kCFURLMayShareFileContentKey;
+public extern "C" CFStringRef? kCFURLMayShareFileContentKey;
 
-public extern "C" CFStringRef kCFURLMayHaveExtendedAttributesKey;
+public extern "C" CFStringRef? kCFURLMayHaveExtendedAttributesKey;
 
-public extern "C" CFStringRef kCFURLIsPurgeableKey;
+public extern "C" CFStringRef? kCFURLIsPurgeableKey;
 
-public extern "C" CFStringRef kCFURLIsSparseKey;
+public extern "C" CFStringRef? kCFURLIsSparseKey;
 
-public extern "C" CFStringRef kCFURLLinkCountKey;
+public extern "C" CFStringRef? kCFURLLinkCountKey;
 
-public extern "C" CFStringRef kCFURLParentDirectoryURLKey;
+public extern "C" CFStringRef? kCFURLParentDirectoryURLKey;
 
-public extern "C" CFStringRef kCFURLVolumeURLKey;
+public extern "C" CFStringRef? kCFURLVolumeURLKey;
 
 /// Deprecated in macOS 100000.
-public extern "C" CFStringRef kCFURLTypeIdentifierKey;
+public extern "C" CFStringRef? kCFURLTypeIdentifierKey;
 
-public extern "C" CFStringRef kCFURLLocalizedTypeDescriptionKey;
+public extern "C" CFStringRef? kCFURLLocalizedTypeDescriptionKey;
 
-public extern "C" CFStringRef kCFURLLabelNumberKey;
-
-/// Deprecated in macOS 10.12.
-public extern "C" CFStringRef kCFURLLabelColorKey;
-
-public extern "C" CFStringRef kCFURLLocalizedLabelKey;
+public extern "C" CFStringRef? kCFURLLabelNumberKey;
 
 /// Deprecated in macOS 10.12.
-public extern "C" CFStringRef kCFURLEffectiveIconKey;
+public extern "C" CFStringRef? kCFURLLabelColorKey;
+
+public extern "C" CFStringRef? kCFURLLocalizedLabelKey;
 
 /// Deprecated in macOS 10.12.
-public extern "C" CFStringRef kCFURLCustomIconKey;
+public extern "C" CFStringRef? kCFURLEffectiveIconKey;
 
-public extern "C" CFStringRef kCFURLFileResourceIdentifierKey;
+/// Deprecated in macOS 10.12.
+public extern "C" CFStringRef? kCFURLCustomIconKey;
 
-public extern "C" CFStringRef kCFURLVolumeIdentifierKey;
+public extern "C" CFStringRef? kCFURLFileResourceIdentifierKey;
 
-public extern "C" CFStringRef kCFURLPreferredIOBlockSizeKey;
+public extern "C" CFStringRef? kCFURLVolumeIdentifierKey;
 
-public extern "C" CFStringRef kCFURLIsReadableKey;
+public extern "C" CFStringRef? kCFURLPreferredIOBlockSizeKey;
 
-public extern "C" CFStringRef kCFURLIsWritableKey;
+public extern "C" CFStringRef? kCFURLIsReadableKey;
 
-public extern "C" CFStringRef kCFURLIsExecutableKey;
+public extern "C" CFStringRef? kCFURLIsWritableKey;
 
-public extern "C" CFStringRef kCFURLFileSecurityKey;
+public extern "C" CFStringRef? kCFURLIsExecutableKey;
 
-public extern "C" CFStringRef kCFURLIsExcludedFromBackupKey;
+public extern "C" CFStringRef? kCFURLFileSecurityKey;
 
-public extern "C" CFStringRef kCFURLTagNamesKey;
+public extern "C" CFStringRef? kCFURLIsExcludedFromBackupKey;
 
-public extern "C" CFStringRef kCFURLPathKey;
+public extern "C" CFStringRef? kCFURLTagNamesKey;
 
-public extern "C" CFStringRef kCFURLCanonicalPathKey;
+public extern "C" CFStringRef? kCFURLPathKey;
 
-public extern "C" CFStringRef kCFURLIsMountTriggerKey;
+public extern "C" CFStringRef? kCFURLCanonicalPathKey;
 
-public extern "C" CFStringRef kCFURLGenerationIdentifierKey;
+public extern "C" CFStringRef? kCFURLIsMountTriggerKey;
 
-public extern "C" CFStringRef kCFURLDocumentIdentifierKey;
+public extern "C" CFStringRef? kCFURLGenerationIdentifierKey;
 
-public extern "C" CFStringRef kCFURLAddedToDirectoryDateKey;
+public extern "C" CFStringRef? kCFURLDocumentIdentifierKey;
 
-public extern "C" CFStringRef kCFURLQuarantinePropertiesKey;
+public extern "C" CFStringRef? kCFURLAddedToDirectoryDateKey;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeKey;
+public extern "C" CFStringRef? kCFURLQuarantinePropertiesKey;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeNamedPipe;
+public extern "C" CFStringRef? kCFURLFileResourceTypeKey;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeCharacterSpecial;
+public extern "C" CFStringRef? kCFURLFileResourceTypeNamedPipe;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeDirectory;
+public extern "C" CFStringRef? kCFURLFileResourceTypeCharacterSpecial;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeBlockSpecial;
+public extern "C" CFStringRef? kCFURLFileResourceTypeDirectory;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeRegular;
+public extern "C" CFStringRef? kCFURLFileResourceTypeBlockSpecial;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeSymbolicLink;
+public extern "C" CFStringRef? kCFURLFileResourceTypeRegular;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeSocket;
+public extern "C" CFStringRef? kCFURLFileResourceTypeSymbolicLink;
 
-public extern "C" CFStringRef kCFURLFileResourceTypeUnknown;
+public extern "C" CFStringRef? kCFURLFileResourceTypeSocket;
 
-public extern "C" CFStringRef kCFURLFileSizeKey;
+public extern "C" CFStringRef? kCFURLFileResourceTypeUnknown;
 
-public extern "C" CFStringRef kCFURLFileAllocatedSizeKey;
+public extern "C" CFStringRef? kCFURLFileSizeKey;
 
-public extern "C" CFStringRef kCFURLTotalFileSizeKey;
+public extern "C" CFStringRef? kCFURLFileAllocatedSizeKey;
 
-public extern "C" CFStringRef kCFURLTotalFileAllocatedSizeKey;
+public extern "C" CFStringRef? kCFURLTotalFileSizeKey;
 
-public extern "C" CFStringRef kCFURLIsAliasFileKey;
+public extern "C" CFStringRef? kCFURLTotalFileAllocatedSizeKey;
+
+public extern "C" CFStringRef? kCFURLIsAliasFileKey;
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kCFURLDirectoryEntryCountKey;
+public extern "C" CFStringRef? kCFURLDirectoryEntryCountKey;
 
-public extern "C" CFStringRef kCFURLVolumeLocalizedFormatDescriptionKey;
+public extern "C" CFStringRef? kCFURLVolumeLocalizedFormatDescriptionKey;
 
-public extern "C" CFStringRef kCFURLVolumeTotalCapacityKey;
+public extern "C" CFStringRef? kCFURLVolumeTotalCapacityKey;
 
-public extern "C" CFStringRef kCFURLVolumeAvailableCapacityKey;
+public extern "C" CFStringRef? kCFURLVolumeAvailableCapacityKey;
 
-public extern "C" CFStringRef kCFURLVolumeAvailableCapacityForImportantUsageKey;
+public extern "C" CFStringRef? kCFURLVolumeAvailableCapacityForImportantUsageKey;
 
-public extern "C" CFStringRef kCFURLVolumeAvailableCapacityForOpportunisticUsageKey;
+public extern "C" CFStringRef? kCFURLVolumeAvailableCapacityForOpportunisticUsageKey;
 
-public extern "C" CFStringRef kCFURLVolumeResourceCountKey;
+public extern "C" CFStringRef? kCFURLVolumeResourceCountKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsPersistentIDsKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsPersistentIDsKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsSymbolicLinksKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsSymbolicLinksKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsHardLinksKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsHardLinksKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsJournalingKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsJournalingKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsJournalingKey;
+public extern "C" CFStringRef? kCFURLVolumeIsJournalingKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsSparseFilesKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsSparseFilesKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsZeroRunsKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsZeroRunsKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsCaseSensitiveNamesKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsCaseSensitiveNamesKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsCasePreservedNamesKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsCasePreservedNamesKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsRootDirectoryDatesKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsRootDirectoryDatesKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsVolumeSizesKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsVolumeSizesKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsRenamingKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsRenamingKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsAdvisoryFileLockingKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsAdvisoryFileLockingKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsExtendedSecurityKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsExtendedSecurityKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsBrowsableKey;
+public extern "C" CFStringRef? kCFURLVolumeIsBrowsableKey;
 
-public extern "C" CFStringRef kCFURLVolumeMaximumFileSizeKey;
+public extern "C" CFStringRef? kCFURLVolumeMaximumFileSizeKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsEjectableKey;
+public extern "C" CFStringRef? kCFURLVolumeIsEjectableKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsRemovableKey;
+public extern "C" CFStringRef? kCFURLVolumeIsRemovableKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsInternalKey;
+public extern "C" CFStringRef? kCFURLVolumeIsInternalKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsAutomountedKey;
+public extern "C" CFStringRef? kCFURLVolumeIsAutomountedKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsLocalKey;
+public extern "C" CFStringRef? kCFURLVolumeIsLocalKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsReadOnlyKey;
+public extern "C" CFStringRef? kCFURLVolumeIsReadOnlyKey;
 
-public extern "C" CFStringRef kCFURLVolumeCreationDateKey;
+public extern "C" CFStringRef? kCFURLVolumeCreationDateKey;
 
-public extern "C" CFStringRef kCFURLVolumeURLForRemountingKey;
+public extern "C" CFStringRef? kCFURLVolumeURLForRemountingKey;
 
-public extern "C" CFStringRef kCFURLVolumeUUIDStringKey;
+public extern "C" CFStringRef? kCFURLVolumeUUIDStringKey;
 
-public extern "C" CFStringRef kCFURLVolumeNameKey;
+public extern "C" CFStringRef? kCFURLVolumeNameKey;
 
-public extern "C" CFStringRef kCFURLVolumeLocalizedNameKey;
+public extern "C" CFStringRef? kCFURLVolumeLocalizedNameKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsEncryptedKey;
+public extern "C" CFStringRef? kCFURLVolumeIsEncryptedKey;
 
-public extern "C" CFStringRef kCFURLVolumeIsRootFileSystemKey;
+public extern "C" CFStringRef? kCFURLVolumeIsRootFileSystemKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsCompressionKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsCompressionKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsFileCloningKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsFileCloningKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsSwapRenamingKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsSwapRenamingKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsExclusiveRenamingKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsExclusiveRenamingKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsImmutableFilesKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsImmutableFilesKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsAccessPermissionsKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsAccessPermissionsKey;
 
-public extern "C" CFStringRef kCFURLVolumeSupportsFileProtectionKey;
-
-/// macOS 13.3 and later.
-public extern "C" CFStringRef kCFURLVolumeTypeNameKey;
+public extern "C" CFStringRef? kCFURLVolumeSupportsFileProtectionKey;
 
 /// macOS 13.3 and later.
-public extern "C" CFStringRef kCFURLVolumeSubtypeKey;
+public extern "C" CFStringRef? kCFURLVolumeTypeNameKey;
 
 /// macOS 13.3 and later.
-public extern "C" CFStringRef kCFURLVolumeMountFromLocationKey;
+public extern "C" CFStringRef? kCFURLVolumeSubtypeKey;
 
-public extern "C" CFStringRef kCFURLIsUbiquitousItemKey;
+/// macOS 13.3 and later.
+public extern "C" CFStringRef? kCFURLVolumeMountFromLocationKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemHasUnresolvedConflictsKey;
+public extern "C" CFStringRef? kCFURLIsUbiquitousItemKey;
+
+public extern "C" CFStringRef? kCFURLUbiquitousItemHasUnresolvedConflictsKey;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLUbiquitousItemIsDownloadedKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemIsDownloadedKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemIsDownloadingKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemIsDownloadingKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemIsUploadedKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemIsUploadedKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemIsUploadingKey;
-
-/// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kCFURLUbiquitousItemPercentDownloadedKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemIsUploadingKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kCFURLUbiquitousItemPercentUploadedKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemPercentDownloadedKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemDownloadingStatusKey;
+/// Deprecated in macOS 10.8.
+public extern "C" CFStringRef? kCFURLUbiquitousItemPercentUploadedKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemDownloadingErrorKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemDownloadingStatusKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemUploadingErrorKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemDownloadingErrorKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemIsExcludedFromSyncKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemUploadingErrorKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemDownloadingStatusNotDownloaded;
+public extern "C" CFStringRef? kCFURLUbiquitousItemIsExcludedFromSyncKey;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemDownloadingStatusDownloaded;
+public extern "C" CFStringRef? kCFURLUbiquitousItemDownloadingStatusNotDownloaded;
 
-public extern "C" CFStringRef kCFURLUbiquitousItemDownloadingStatusCurrent;
+public extern "C" CFStringRef? kCFURLUbiquitousItemDownloadingStatusDownloaded;
+
+public extern "C" CFStringRef? kCFURLUbiquitousItemDownloadingStatusCurrent;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCFURLUbiquitousItemSupportedSyncControlsKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemSupportedSyncControlsKey;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCFURLUbiquitousItemIsSyncPausedKey;
+public extern "C" CFStringRef? kCFURLUbiquitousItemIsSyncPausedKey;
 
 [Flags]
 public enum CFURLBookmarkCreationOptions : ulong
@@ -458,23 +460,23 @@ public enum CFURLBookmarkResolutionOptions : ulong
 
 public using CFURLBookmarkFileCreationOptions = CFOptionFlags;
 
-public extern "C" CFDataRef CFURLCreateBookmarkData(CFAllocatorRef allocator, CFURLRef url, CFURLBookmarkCreationOptions options, CFArrayRef resourcePropertiesToInclude, CFURLRef relativeToURL, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateBookmarkData(CFAllocatorRef? allocator, CFURLRef? url, CFURLBookmarkCreationOptions options, CFArrayRef? resourcePropertiesToInclude, CFURLRef? relativeToURL, __CFError** error);
 
-public extern "C" CFURLRef CFURLCreateByResolvingBookmarkData(CFAllocatorRef allocator, CFDataRef bookmark, CFURLBookmarkResolutionOptions options, CFURLRef relativeToURL, CFArrayRef resourcePropertiesToInclude, Boolean* isStale, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFURLRef? CFURLCreateByResolvingBookmarkData(CFAllocatorRef? allocator, CFDataRef? bookmark, CFURLBookmarkResolutionOptions options, CFURLRef? relativeToURL, CFArrayRef? resourcePropertiesToInclude, Boolean* isStale, __CFError** error);
 
-public extern "C" CFDictionaryRef CFURLCreateResourcePropertiesForKeysFromBookmarkData(CFAllocatorRef allocator, CFArrayRef resourcePropertiesToReturn, CFDataRef bookmark);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFURLCreateResourcePropertiesForKeysFromBookmarkData(CFAllocatorRef? allocator, CFArrayRef? resourcePropertiesToReturn, CFDataRef? bookmark);
 
-public extern "C" CFTypeRef CFURLCreateResourcePropertyForKeyFromBookmarkData(CFAllocatorRef allocator, CFStringRef resourcePropertyKey, CFDataRef bookmark);
+[ReturnsRetained] public extern "C" CFTypeRef? CFURLCreateResourcePropertyForKeyFromBookmarkData(CFAllocatorRef? allocator, CFStringRef? resourcePropertyKey, CFDataRef? bookmark);
 
-public extern "C" CFDataRef CFURLCreateBookmarkDataFromFile(CFAllocatorRef allocator, CFURLRef fileURL, CFErrorRef* errorRef);
+[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateBookmarkDataFromFile(CFAllocatorRef? allocator, CFURLRef? fileURL, __CFError** errorRef);
 
-public extern "C" Boolean CFURLWriteBookmarkDataToFile(CFDataRef bookmarkRef, CFURLRef fileURL, CFURLBookmarkFileCreationOptions options, CFErrorRef* errorRef);
+public extern "C" Boolean CFURLWriteBookmarkDataToFile(CFDataRef? bookmarkRef, CFURLRef? fileURL, CFURLBookmarkFileCreationOptions options, __CFError** errorRef);
 
 /// Deprecated in macOS 11.0.
-public extern "C" CFDataRef CFURLCreateBookmarkDataFromAliasRecord(CFAllocatorRef allocatorRef, CFDataRef aliasRecordDataRef);
+[ReturnsRetained] public extern "C" CFDataRef? CFURLCreateBookmarkDataFromAliasRecord(CFAllocatorRef? allocatorRef, CFDataRef? aliasRecordDataRef);
 
-public extern "C" Boolean CFURLStartAccessingSecurityScopedResource(CFURLRef url);
+public extern "C" Boolean CFURLStartAccessingSecurityScopedResource(CFURLRef? url);
 
-public extern "C" void CFURLStopAccessingSecurityScopedResource(CFURLRef url);
+public extern "C" void CFURLStopAccessingSecurityScopedResource(CFURLRef? url);
 
 #endif

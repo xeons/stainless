@@ -26,6 +26,7 @@ module MacOS.CoreServices;
 import MacOS.CoreFoundation;
 import MacOS.Security;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,63 +34,65 @@ import MacOS.System;
 
 public struct OpaqueLSSharedFileListRef;
 
-public using LSSharedFileListRef = OpaqueLSSharedFileListRef*;
+[CFType("LSSharedFileListGetTypeID")]
+public extern objc class LSSharedFileListRef : CFTypeRef { }
 
 public struct OpaqueLSSharedFileListItemRef;
 
-public using LSSharedFileListItemRef = OpaqueLSSharedFileListItemRef*;
+[CFType("LSSharedFileListItemGetTypeID")]
+public extern objc class LSSharedFileListItemRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListFavoriteVolumes;
+public extern "C" CFStringRef? kLSSharedFileListFavoriteVolumes;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListFavoriteItems;
+public extern "C" CFStringRef? kLSSharedFileListFavoriteItems;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListRecentApplicationItems;
+public extern "C" CFStringRef? kLSSharedFileListRecentApplicationItems;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListRecentDocumentItems;
+public extern "C" CFStringRef? kLSSharedFileListRecentDocumentItems;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListRecentServerItems;
+public extern "C" CFStringRef? kLSSharedFileListRecentServerItems;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListSessionLoginItems;
+public extern "C" CFStringRef? kLSSharedFileListSessionLoginItems;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kLSSharedFileListGlobalLoginItems;
+public extern "C" CFStringRef? kLSSharedFileListGlobalLoginItems;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListRecentItemsMaxAmount;
+public extern "C" CFStringRef? kLSSharedFileListRecentItemsMaxAmount;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListVolumesComputerVisible;
+public extern "C" CFStringRef? kLSSharedFileListVolumesComputerVisible;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kLSSharedFileListVolumesIDiskVisible;
+public extern "C" CFStringRef? kLSSharedFileListVolumesIDiskVisible;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListVolumesNetworkVisible;
+public extern "C" CFStringRef? kLSSharedFileListVolumesNetworkVisible;
 
 /// Deprecated in macOS 10.11.
-public extern "C" LSSharedFileListItemRef kLSSharedFileListItemBeforeFirst;
+public extern "C" LSSharedFileListItemRef? kLSSharedFileListItemBeforeFirst;
 
 /// Deprecated in macOS 10.11.
-public extern "C" LSSharedFileListItemRef kLSSharedFileListItemLast;
+public extern "C" LSSharedFileListItemRef? kLSSharedFileListItemLast;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListItemHidden;
+public extern "C" CFStringRef? kLSSharedFileListItemHidden;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kLSSharedFileListLoginItemHidden;
+public extern "C" CFStringRef? kLSSharedFileListLoginItemHidden;
 
 public using LSSharedFileListResolutionFlags = UInt32;
 
 public const int kLSSharedFileListNoUserInteraction = 1;
 public const int kLSSharedFileListDoNotMountVolumes = 2;
 
-public delegate void LSSharedFileListChangedProcPtr(LSSharedFileListRef arg0, void* arg1);
+public delegate void LSSharedFileListChangedProcPtr(OpaqueLSSharedFileListRef* arg0, void* arg1);
 
 /// Deprecated in macOS 10.11.
 public extern "C" CFTypeID LSSharedFileListGetTypeID();
@@ -98,13 +101,13 @@ public extern "C" CFTypeID LSSharedFileListGetTypeID();
 public extern "C" CFTypeID LSSharedFileListItemGetTypeID();
 
 /// Deprecated in macOS 10.11.
-public extern "C" LSSharedFileListRef LSSharedFileListCreate(CFAllocatorRef inAllocator, CFStringRef inListType, CFTypeRef listOptions);
+[ReturnsRetained] public extern "C" LSSharedFileListRef? LSSharedFileListCreate(CFAllocatorRef? inAllocator, CFStringRef inListType, CFTypeRef? listOptions);
 
 /// Deprecated in macOS 10.11.
 public extern "C" OSStatus LSSharedFileListSetAuthorization(LSSharedFileListRef inList, AuthorizationRef inAuthorization);
 
 /// Deprecated in macOS 10.11.
-public extern "C" void LSSharedFileListAddObserver(LSSharedFileListRef inList, CFRunLoopRef inRunloop, CFStringRef inRunloopMode, LSSharedFileListChangedProcPtr callback, void* context);
+public extern "C" void LSSharedFileListAddObserver(LSSharedFileListRef? inList, CFRunLoopRef inRunloop, CFStringRef inRunloopMode, LSSharedFileListChangedProcPtr callback, void* context);
 
 /// Deprecated in macOS 10.11.
 public extern "C" void LSSharedFileListRemoveObserver(LSSharedFileListRef inList, CFRunLoopRef inRunloop, CFStringRef inRunloopMode, LSSharedFileListChangedProcPtr callback, void* context);
@@ -113,19 +116,19 @@ public extern "C" void LSSharedFileListRemoveObserver(LSSharedFileListRef inList
 public extern "C" UInt32 LSSharedFileListGetSeedValue(LSSharedFileListRef inList);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFTypeRef LSSharedFileListCopyProperty(LSSharedFileListRef inList, CFStringRef inPropertyName);
+[ReturnsRetained] public extern "C" CFTypeRef? LSSharedFileListCopyProperty(LSSharedFileListRef inList, CFStringRef inPropertyName);
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus LSSharedFileListSetProperty(LSSharedFileListRef inList, CFStringRef inPropertyName, CFTypeRef inPropertyData);
+public extern "C" OSStatus LSSharedFileListSetProperty(LSSharedFileListRef inList, CFStringRef inPropertyName, CFTypeRef? inPropertyData);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFArrayRef LSSharedFileListCopySnapshot(LSSharedFileListRef inList, UInt32* outSnapshotSeed);
+[ReturnsRetained] public extern "C" CFArrayRef? LSSharedFileListCopySnapshot(LSSharedFileListRef inList, UInt32* outSnapshotSeed);
 
 /// Deprecated in macOS 10.11.
-public extern "C" LSSharedFileListItemRef LSSharedFileListInsertItemURL(LSSharedFileListRef inList, LSSharedFileListItemRef insertAfterThisItem, CFStringRef inDisplayName, IconRef inIconRef, CFURLRef inURL, CFDictionaryRef inPropertiesToSet, CFArrayRef inPropertiesToClear);
+[ReturnsRetained] public extern "C" LSSharedFileListItemRef? LSSharedFileListInsertItemURL(LSSharedFileListRef inList, LSSharedFileListItemRef insertAfterThisItem, CFStringRef? inDisplayName, IconRef inIconRef, CFURLRef inURL, CFDictionaryRef? inPropertiesToSet, CFArrayRef? inPropertiesToClear);
 
 /// Deprecated in macOS 10.10.
-public extern "C" LSSharedFileListItemRef LSSharedFileListInsertItemFSRef(LSSharedFileListRef inList, LSSharedFileListItemRef insertAfterThisItem, CFStringRef inDisplayName, IconRef inIconRef, FSRef* inFSRef, CFDictionaryRef inPropertiesToSet, CFArrayRef inPropertiesToClear);
+[ReturnsRetained] public extern "C" LSSharedFileListItemRef? LSSharedFileListInsertItemFSRef(LSSharedFileListRef inList, LSSharedFileListItemRef insertAfterThisItem, CFStringRef? inDisplayName, IconRef inIconRef, FSRef* inFSRef, CFDictionaryRef? inPropertiesToSet, CFArrayRef? inPropertiesToClear);
 
 /// Deprecated in macOS 10.11.
 public extern "C" OSStatus LSSharedFileListItemMove(LSSharedFileListRef inList, LSSharedFileListItemRef inItem, LSSharedFileListItemRef inMoveAfterItem);
@@ -143,16 +146,16 @@ public extern "C" UInt32 LSSharedFileListItemGetID(LSSharedFileListItemRef inIte
 public extern "C" IconRef LSSharedFileListItemCopyIconRef(LSSharedFileListItemRef inItem);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef LSSharedFileListItemCopyDisplayName(LSSharedFileListItemRef inItem);
+[ReturnsRetained] public extern "C" CFStringRef LSSharedFileListItemCopyDisplayName(LSSharedFileListItemRef inItem);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSSharedFileListItemResolve(LSSharedFileListItemRef inItem, LSSharedFileListResolutionFlags inFlags, CFURLRef* outURL, FSRef* outRef);
+public extern "C" OSStatus LSSharedFileListItemResolve(LSSharedFileListItemRef inItem, LSSharedFileListResolutionFlags inFlags, __CFURL** outURL, FSRef* outRef);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFURLRef LSSharedFileListItemCopyResolvedURL(LSSharedFileListItemRef inItem, LSSharedFileListResolutionFlags inFlags, CFErrorRef* outError);
+[ReturnsRetained] public extern "C" CFURLRef? LSSharedFileListItemCopyResolvedURL(LSSharedFileListItemRef inItem, LSSharedFileListResolutionFlags inFlags, __CFError** outError);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFTypeRef LSSharedFileListItemCopyProperty(LSSharedFileListItemRef inItem, CFStringRef inPropertyName);
+[ReturnsRetained] public extern "C" CFTypeRef? LSSharedFileListItemCopyProperty(LSSharedFileListItemRef inItem, CFStringRef inPropertyName);
 
 /// Deprecated in macOS 10.11.
 public extern "C" OSStatus LSSharedFileListItemSetProperty(LSSharedFileListItemRef inItem, CFStringRef inPropertyName, CFTypeRef inPropertyData);

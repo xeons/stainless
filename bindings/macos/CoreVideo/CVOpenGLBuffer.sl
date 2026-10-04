@@ -25,25 +25,26 @@ module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
 import MacOS.OpenGL;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreVideo")
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLBufferWidth;
+public extern "C" CFStringRef? kCVOpenGLBufferWidth;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLBufferHeight;
+public extern "C" CFStringRef? kCVOpenGLBufferHeight;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLBufferTarget;
+public extern "C" CFStringRef? kCVOpenGLBufferTarget;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLBufferInternalFormat;
+public extern "C" CFStringRef? kCVOpenGLBufferInternalFormat;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLBufferMaximumMipmapLevel;
+public extern "C" CFStringRef? kCVOpenGLBufferMaximumMipmapLevel;
 
 public using CVOpenGLBufferRef = CVImageBufferRef;
 
@@ -51,16 +52,13 @@ public using CVOpenGLBufferRef = CVImageBufferRef;
 public extern "C" CFTypeID CVOpenGLBufferGetTypeID();
 
 /// Deprecated in macOS 10.14.
-public extern "C" CVOpenGLBufferRef CVOpenGLBufferRetain(CVOpenGLBufferRef buffer);
+public extern "C" CVOpenGLBufferRef? CVOpenGLBufferRetain(CVOpenGLBufferRef? buffer);
 
 /// Deprecated in macOS 10.14.
-public extern "C" void CVOpenGLBufferRelease(CVOpenGLBufferRef buffer);
+public extern "C" CVReturn CVOpenGLBufferCreate(CFAllocatorRef? allocator, nuint width, nuint height, CFDictionaryRef? attributes, void** bufferOut);
 
 /// Deprecated in macOS 10.14.
-public extern "C" CVReturn CVOpenGLBufferCreate(CFAllocatorRef allocator, nuint width, nuint height, CFDictionaryRef attributes, CVOpenGLBufferRef* bufferOut);
-
-/// Deprecated in macOS 10.14.
-public extern "C" CFDictionaryRef CVOpenGLBufferGetAttributes(CVOpenGLBufferRef openGLBuffer);
+public extern "C" CFDictionaryRef? CVOpenGLBufferGetAttributes(CVOpenGLBufferRef openGLBuffer);
 
 /// Deprecated in macOS 10.14.
 public extern "C" CVReturn CVOpenGLBufferAttach(CVOpenGLBufferRef openGLBuffer, CGLContextObj cglContext, GLenum face, GLint level, GLint screen);

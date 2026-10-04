@@ -24,67 +24,68 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Security")
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecPaddingNoneKey;
+public extern "C" CFStringRef? kSecPaddingNoneKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecPaddingPKCS1Key;
+public extern "C" CFStringRef? kSecPaddingPKCS1Key;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecPaddingPKCS5Key;
+public extern "C" CFStringRef? kSecPaddingPKCS5Key;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecPaddingPKCS7Key;
+public extern "C" CFStringRef? kSecPaddingPKCS7Key;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecPaddingOAEPKey;
+public extern "C" CFStringRef? kSecPaddingOAEPKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecModeNoneKey;
+public extern "C" CFStringRef? kSecModeNoneKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecModeECBKey;
+public extern "C" CFStringRef? kSecModeECBKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecModeCBCKey;
+public extern "C" CFStringRef? kSecModeCBCKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecModeCFBKey;
+public extern "C" CFStringRef? kSecModeCFBKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecModeOFBKey;
+public extern "C" CFStringRef? kSecModeOFBKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecEncryptKey;
+public extern "C" CFStringRef? kSecEncryptKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecPaddingKey;
+public extern "C" CFStringRef? kSecPaddingKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecIVKey;
+public extern "C" CFStringRef? kSecIVKey;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecEncryptionMode;
+public extern "C" CFStringRef? kSecEncryptionMode;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecOAEPMessageLengthAttributeName;
+public extern "C" CFStringRef? kSecOAEPMessageLengthAttributeName;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecOAEPEncodingParametersAttributeName;
+public extern "C" CFStringRef? kSecOAEPEncodingParametersAttributeName;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecOAEPMGF1DigestAlgorithmAttributeName;
+public extern "C" CFStringRef? kSecOAEPMGF1DigestAlgorithmAttributeName;
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecEncryptTransformCreate(SecKeyRef keyRef, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef SecEncryptTransformCreate(SecKeyRef keyRef, __CFError** error);
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecDecryptTransformCreate(SecKeyRef keyRef, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef SecDecryptTransformCreate(SecKeyRef keyRef, __CFError** error);
 
 /// Deprecated in macOS 13.0.
 public extern "C" CFTypeID SecDecryptTransformGetTypeID();

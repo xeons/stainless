@@ -24,6 +24,7 @@
 module MacOS.IOKit;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,6 +32,6 @@ import MacOS.CoreFoundation;
 
 public const int kIOCFSerializeToBinary = 1;
 
-public extern "C" CFDataRef IOCFSerialize(CFTypeRef object, CFOptionFlags options);
+[ReturnsRetained] public extern "C" CFDataRef? IOCFSerialize(CFTypeRef? object, CFOptionFlags options);
 
 #endif

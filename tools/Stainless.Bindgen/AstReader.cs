@@ -35,6 +35,12 @@ public sealed class AstReader
     private int _line;
     private readonly Translation _translation = new();
 
+    /// <summary>Where a header named by a relative path is: beside the dump.</summary>
+    private string _directory = "";
+
+    /// <summary>Each header's lines, read once, for what the dump does not say.</summary>
+    private readonly Dictionary<string, string[]?> _sources = new(StringComparer.Ordinal);
+
     /// <summary>Records and enums with no tag, by node id, until a typedef gives one a name.</summary>
     private readonly Dictionary<string, CDecl> _anonymousById = new(StringComparer.Ordinal);
 
@@ -56,7 +62,7 @@ public sealed class AstReader
     /// </summary>
     public static Translation ReadFile(string path)
     {
-        var reader = new AstReader();
+        var reader = new AstReader { _directory = Path.GetDirectoryName(Path.GetFullPath(path)) ?? "" };
         var options = new JsonDocumentOptions { MaxDepth = 100_000 };
         using var file = new StreamReader(path);
         System.Text.StringBuilder? element = null;
@@ -149,6 +155,7 @@ public sealed class AstReader
     {
         string kind = Text(node, "kind") ?? "";
         var (file, where) = Locate(node);
+        int line = _line;
 
         CDecl? declared = kind switch
         {
@@ -157,18 +164,23 @@ public sealed class AstReader
             "EnumDecl" => ReadEnum(node, file, where),
             "TypedefDecl" => ReadTypedef(node, file),
             "VarDecl" => ReadVariable(node, file),
+            "ObjCInterfaceDecl" or "ObjCProtocolDecl" or "ObjCCategoryDecl" => ReadObjCContainer(node, kind, file, line),
             _ => null,
         };
 
-        // A record is read with its children, which moves the tracking
-        // along itself; everything else is tracked here.
-        if (kind != "RecordDecl") TrackRest(node);
+        // A record and an Objective-C container are read with their
+        // children, which moves the tracking along itself; everything else
+        // is tracked here.
+        if (kind is not ("RecordDecl" or "ObjCInterfaceDecl" or "ObjCProtocolDecl" or "ObjCCategoryDecl"))
+            TrackRest(node);
 
         if (declared is null) return;
         declared = declared with { Availability = ReadAvailability(node) };
 
         if (declared is CTypedefDecl typedef && NameAnonymous(node, typedef) is { } named)
         {
+            // `typedef struct { ... } X API_UNAVAILABLE(macos)` says it of the typedef.
+            if (named.Availability == Availability.Always) named = named with { Availability = typedef.Availability };
             Register(named);
             declared = typedef with
             {
@@ -227,6 +239,20 @@ public sealed class AstReader
         _translation.Declarations.Add(declared);
         switch (declared)
         {
+            case CObjCInterface objcClass:
+                if (!_translation.Interfaces.TryGetValue(objcClass.Name, out var knownClass) || !knownClass.IsDefinition)
+                    _translation.Interfaces[objcClass.Name] = objcClass;
+                break;
+
+            case CObjCProtocol protocol:
+                if (!_translation.Protocols.TryGetValue(protocol.Name, out var knownProtocol) || !knownProtocol.IsDefinition)
+                    _translation.Protocols[protocol.Name] = protocol;
+                break;
+
+            case CFunctionDecl { Parameters.Count: 0 } function when function.Name.EndsWith("GetTypeID", StringComparison.Ordinal):
+                _translation.TypeIDFunctions.Add(function.Name);
+                break;
+
             case CTypedefDecl typedef:
                 _translation.Typedefs.TryAdd(typedef.Name, typedef);
                 break;
@@ -236,6 +262,7 @@ public sealed class AstReader
                 break;
 
             case CRecordDecl record:
+                if (record.IsBridged) _translation.BridgedRecords.Add(record.Name);
                 var key = (record.Kind, record.Name);
                 if (!_translation.Records.TryGetValue(key, out var existing) || (!existing.IsComplete && record.IsComplete))
                     _translation.Records[key] = record;
@@ -291,16 +318,65 @@ public sealed class AstReader
         return ParseOrUnsupported(spelling);
     }
 
-    private static CType ParseOrUnsupported(string spelling)
+    private static CType ParseOrUnsupported(string spelling) => ParseAnnotated(spelling).Type;
+
+    private static (CType Type, Nullability Nullability) ParseAnnotated(string spelling)
     {
         try
         {
-            return CTypeParser.Parse(spelling);
+            return CTypeParser.ParseAnnotated(spelling);
         }
         catch (FormatException error)
         {
-            return new CUnsupported($"'{spelling}' could not be read: {error.Message}");
+            return (new CUnsupported($"'{spelling}' could not be read: {error.Message}"), Nullability.Unspecified);
         }
+    }
+
+    /// <summary>A node's type with what its outermost level says about nil, from <paramref name="property"/>.</summary>
+    private static (CType Type, Nullability Nullability) AnnotatedTypeOf(JsonElement node, string property = "type")
+    {
+        if (!node.TryGetProperty(property, out var type) || Text(type, "qualType") is not { } spelling)
+            return (new CUnsupported("no type"), Nullability.Unspecified);
+
+        if (spelling.Contains("typeof", StringComparison.Ordinal) && Text(type, "desugaredQualType") is { } desugared)
+            spelling = desugared;
+
+        return ParseAnnotated(spelling);
+    }
+
+    private static string QualType(JsonElement node) =>
+        node.TryGetProperty("type", out var type) ? Text(type, "qualType") ?? "" : "";
+
+    private static bool HasAttribute(JsonElement node, params string[] kinds) =>
+        Inner(node).Any(c => kinds.Contains(Text(c, "kind")));
+
+    private static CParameter ReadParameter(JsonElement node)
+    {
+        var (type, nullability) = AnnotatedTypeOf(node);
+        return new CParameter(Text(node, "name"), type)
+        {
+            Nullability = nullability,
+            IsAutoreleasing = QualType(node).Contains("__autoreleasing", StringComparison.Ordinal),
+            IsConsumed = HasAttribute(node, "NSConsumedAttr", "CFConsumedAttr"),
+        };
+    }
+
+    /// <summary>
+    /// What an attribute says about ownership of what is returned: written as
+    /// an attribute of the declaration, or of the function's type, where
+    /// clang keeps <c>ns_returns_retained</c> on a function.
+    /// </summary>
+    private static bool? ReadReturnsRetained(JsonElement node, string typeSpelling)
+    {
+        if (HasAttribute(node, "NSReturnsRetainedAttr", "CFReturnsRetainedAttr") ||
+            typeSpelling.Contains("ns_returns_retained", StringComparison.Ordinal) ||
+            typeSpelling.Contains("cf_returns_retained", StringComparison.Ordinal))
+            return true;
+        if (HasAttribute(node, "NSReturnsNotRetainedAttr", "CFReturnsNotRetainedAttr") ||
+            typeSpelling.Contains("ns_returns_not_retained", StringComparison.Ordinal) ||
+            typeSpelling.Contains("cf_returns_not_retained", StringComparison.Ordinal))
+            return false;
+        return null;
     }
 
     private static CFunctionDecl? ReadFunction(JsonElement node, string file)
@@ -310,7 +386,7 @@ public sealed class AstReader
         var type = TypeOf(node);
         var parameters = Inner(node)
             .Where(c => Text(c, "kind") == "ParmVarDecl")
-            .Select(c => new CParameter(Text(c, "name"), TypeOf(c)))
+            .Select(ReadParameter)
             .ToList();
 
         var result = type is CFunction function ? function.Result : type;
@@ -320,7 +396,155 @@ public sealed class AstReader
             IsInline = Text(node, "storageClass") == "static" || Flag(node, "inline"),
             AsmLabel = Inner(node).Where(c => Text(c, "kind") == "AsmLabelAttr")
                 .Select(c => Text(c, "label") ?? "?").FirstOrDefault(),
+            ResultNullability = type is CFunction annotated ? annotated.ResultNullability : Nullability.Unspecified,
+            ReturnsRetained = ReadReturnsRetained(node, QualType(node)),
         };
+    }
+
+    // ------------------------------------------------------------ Objective-C
+
+    /// <summary>
+    /// A class, a protocol or a category, with its members. A method that
+    /// clang made for a property is the property's, and is not read twice.
+    /// </summary>
+    private CObjCContainer ReadObjCContainer(JsonElement node, string kind, string file, int line)
+    {
+        string name = Text(node, "name") ?? "";
+        CObjCContainer container = kind switch
+        {
+            "ObjCInterfaceDecl" => new CObjCInterface(name, file)
+            {
+                Super = node.TryGetProperty("super", out var super) ? Text(super, "name") : null,
+                IsDefinition = !IsForwardDeclaration(file, line, "@class"),
+            },
+            "ObjCProtocolDecl" => new CObjCProtocol(name, file)
+            {
+                IsDefinition = !IsForwardDeclaration(file, line, "@protocol"),
+            },
+            _ => new CObjCCategory(name, file,
+                node.TryGetProperty("interface", out var extended) ? Text(extended, "name") ?? "" : ""),
+        };
+
+        if (node.TryGetProperty("protocols", out var protocols))
+            foreach (var protocol in protocols.EnumerateArray())
+                if (Text(protocol, "name") is { } adopted)
+                    container.Protocols.Add(adopted);
+
+        // The range is written before the children.
+        if (node.TryGetProperty("range", out var range)) Track(range);
+
+        foreach (var child in Inner(node))
+        {
+            Locate(child);
+            int memberLine = _line;
+
+            switch (Text(child, "kind"))
+            {
+                case "ObjCTypeParamDecl" when Text(child, "name") is { } parameter:
+                    container.TypeParameters.Add(parameter);
+                    break;
+
+                case "ObjCMethodDecl" when !Flag(child, "isImplicit"):
+                    container.Methods.Add(ReadObjCMethod(child, memberLine) with
+                    {
+                        IsOptional = container is CObjCProtocol && IsUnderOptional(file, line, memberLine),
+                    });
+                    break;
+
+                case "ObjCPropertyDecl":
+                    container.Properties.Add(ReadObjCProperty(child));
+                    break;
+            }
+
+            TrackRest(child);
+        }
+
+        return container;
+    }
+
+    private static CObjCMethod ReadObjCMethod(JsonElement node, int line)
+    {
+        var (result, nullability) = AnnotatedTypeOf(node, "returnType");
+        var parameters = Inner(node)
+            .Where(c => Text(c, "kind") == "ParmVarDecl")
+            .Select(ReadParameter)
+            .ToList();
+        string returnSpelling = node.TryGetProperty("returnType", out var returned) ? Text(returned, "qualType") ?? "" : "";
+
+        return new CObjCMethod(Text(node, "name") ?? "", Flag(node, "instance"), result, parameters)
+        {
+            ResultNullability = nullability,
+            IsVariadic = Flag(node, "variadic"),
+            ReturnsRetained = ReadReturnsRetained(node, returnSpelling),
+            Availability = ReadAvailability(node),
+            Line = line,
+        };
+    }
+
+    private static CObjCProperty ReadObjCProperty(JsonElement node)
+    {
+        var (type, nullability) = AnnotatedTypeOf(node);
+        return new CObjCProperty(Text(node, "name") ?? "", type)
+        {
+            Nullability = nullability,
+            IsClass = Flag(node, "class"),
+            IsReadOnly = Flag(node, "readonly"),
+            Getter = node.TryGetProperty("getter", out var getter) ? Text(getter, "name") : null,
+            Setter = node.TryGetProperty("setter", out var setter) ? Text(setter, "name") : null,
+            IsOptional = Text(node, "control") == "optional",
+            Availability = ReadAvailability(node),
+        };
+    }
+
+    /// <summary>A header's lines, or null when it cannot be read; a relative path is beside the dump.</summary>
+    private string[]? SourceLines(string file)
+    {
+        if (_sources.TryGetValue(file, out var known)) return known;
+
+        string path = Path.IsPathRooted(file) ? file : Path.Combine(_directory, file);
+        string[]? lines = File.Exists(path) ? File.ReadAllLines(path) : null;
+        _sources[file] = lines;
+        return lines;
+    }
+
+    /// <summary>
+    /// <c>@class NSError;</c> and <c>@protocol NSCopying;</c>, which the dump
+    /// writes as it writes the definition. The line says which it is.
+    /// </summary>
+    private bool IsForwardDeclaration(string file, int line, string keyword)
+    {
+        if (SourceLines(file) is not { } lines || line < 1 || line > lines.Length) return false;
+
+        string text = lines[line - 1];
+        int at = text.IndexOf(keyword, StringComparison.Ordinal);
+        if (at < 0) return false;
+        if (keyword == "@class") return true;
+
+        // `@protocol Name;` or `@protocol A, B;`, and not `@protocol Name <Base>`.
+        string rest = text[(at + keyword.Length)..].Trim();
+        int end = rest.IndexOfAny(['<', '{', ';']);
+        return end >= 0 && rest[end] == ';';
+    }
+
+    /// <summary>
+    /// Whether a protocol's member at <paramref name="memberLine"/> follows
+    /// an <c>@optional</c> rather than an <c>@required</c>: the dump says so
+    /// of a property and not of a method.
+    /// </summary>
+    private bool IsUnderOptional(string file, int protocolLine, int memberLine)
+    {
+        if (SourceLines(file) is not { } lines) return false;
+
+        for (int at = Math.Min(memberLine, lines.Length) - 1; at >= protocolLine && at >= 0; at--)
+        {
+            string text = lines[at];
+            int comment = text.IndexOf("//", StringComparison.Ordinal);
+            if (comment >= 0) text = text[..comment];
+            if (text.Contains("@optional", StringComparison.Ordinal)) return true;
+            if (text.Contains("@required", StringComparison.Ordinal)) return false;
+        }
+
+        return false;
     }
 
     private CRecordDecl? ReadRecord(JsonElement node, string file, string where)
@@ -337,7 +561,7 @@ public sealed class AstReader
         // The record's range is written before its children.
         if (node.TryGetProperty("range", out var range)) Track(range);
 
-        bool packed = false, pragmaPack = false;
+        bool packed = false, pragmaPack = false, bridged = false;
         int? alignment = null;
         CRecordDecl? pendingAnonymous = null;
 
@@ -353,6 +577,11 @@ public sealed class AstReader
 
                 case "MaxFieldAlignmentAttr":
                     pragmaPack = true;
+                    Track(child);
+                    break;
+
+                case "ObjCBridgeAttr" or "ObjCBridgeMutableAttr" or "ObjCBridgeRelatedAttr":
+                    bridged = true;
                     Track(child);
                     break;
 
@@ -411,7 +640,7 @@ public sealed class AstReader
             }
         }
 
-        return record with { IsPacked = packed, Alignment = alignment, HasPragmaPack = pragmaPack };
+        return record with { IsPacked = packed, Alignment = alignment, HasPragmaPack = pragmaPack, IsBridged = bridged };
     }
 
     private CEnumDecl ReadEnum(JsonElement node, string file, string where)
@@ -445,13 +674,23 @@ public sealed class AstReader
     }
 
     private static CTypedefDecl? ReadTypedef(JsonElement node, string file) =>
-        Text(node, "name") is { } name ? new CTypedefDecl(name, file, TypeOf(node)) : null;
-
-    private static CVariableDecl? ReadVariable(JsonElement node, string file) =>
-        Text(node, "name") is { } name &&
-        (Text(node, "storageClass") == "extern" || name.StartsWith(Macros.TypePrefix, StringComparison.Ordinal))
-            ? new CVariableDecl(name, file, TypeOf(node))
+        Text(node, "name") is { } name
+            ? new CTypedefDecl(name, file, TypeOf(node))
+            {
+                PointsToConst = QualType(node).TrimStart().StartsWith("const struct", StringComparison.Ordinal),
+            }
             : null;
+
+    private static CVariableDecl? ReadVariable(JsonElement node, string file)
+    {
+        if (Text(node, "name") is not { } name ||
+            !(Text(node, "storageClass") == "extern" || name.StartsWith(Macros.TypePrefix, StringComparison.Ordinal)))
+            return null;
+
+        var (type, nullability) = AnnotatedTypeOf(node);
+        if (QualType(node).Contains("typeof", StringComparison.Ordinal)) type = TypeOf(node);
+        return new CVariableDecl(name, file, type) { Nullability = nullability };
+    }
 
     /// <summary>
     /// What an <c>aligned</c> attribute asks for: its argument, or with none

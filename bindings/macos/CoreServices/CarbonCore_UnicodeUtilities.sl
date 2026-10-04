@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -202,7 +203,7 @@ public const int kUCTSOptionsNoneMask = 0;
 public const int kUCTSOptionsReleaseStringMask = 1;
 public const int kUCTSOptionsDataIsOrderedMask = 2;
 
-public delegate Boolean IndexToUCStringProcPtr(UInt32 arg0, void* arg1, void* arg2, CFStringRef* arg3, UCTypeSelectOptions* arg4);
+public delegate Boolean IndexToUCStringProcPtr(UInt32 arg0, void* arg1, void* arg2, __CFString** arg3, UCTypeSelectOptions* arg4);
 
 public using IndexToUCStringUPP = IndexToUCStringProcPtr;
 
@@ -210,7 +211,7 @@ public extern "C" IndexToUCStringUPP NewIndexToUCStringUPP(IndexToUCStringProcPt
 
 public extern "C" void DisposeIndexToUCStringUPP(IndexToUCStringUPP userUPP);
 
-public extern "C" Boolean InvokeIndexToUCStringUPP(UInt32 index, void* listDataPtr, void* refcon, CFStringRef* outString, UCTypeSelectOptions* tsOptions, IndexToUCStringUPP userUPP);
+public extern "C" Boolean InvokeIndexToUCStringUPP(UInt32 index, void* listDataPtr, void* refcon, __CFString** outString, UCTypeSelectOptions* tsOptions, IndexToUCStringUPP userUPP);
 
 public const uint kUCTypeSelectMaxListSize = 4294967295u;
 
@@ -265,14 +266,14 @@ public extern "C" OSStatus UCTypeSelectFlushSelectorData(UCTypeSelectRef @ref);
 
 public extern "C" OSStatus UCTypeSelectReleaseSelector(UCTypeSelectRef* @ref);
 
-public extern "C" Boolean UCTypeSelectWouldResetBuffer(UCTypeSelectRef inRef, CFStringRef inText, double inEventTime);
+public extern "C" Boolean UCTypeSelectWouldResetBuffer(UCTypeSelectRef inRef, CFStringRef? inText, double inEventTime);
 
-public extern "C" OSStatus UCTypeSelectAddKeyToSelector(UCTypeSelectRef inRef, CFStringRef inText, double inEventTime, Boolean* updateFlag);
+public extern "C" OSStatus UCTypeSelectAddKeyToSelector(UCTypeSelectRef inRef, CFStringRef? inText, double inEventTime, Boolean* updateFlag);
 
-public extern "C" OSStatus UCTypeSelectCompare(UCTypeSelectRef @ref, CFStringRef inText, UCTypeSelectCompareResult* result);
+public extern "C" OSStatus UCTypeSelectCompare(UCTypeSelectRef @ref, CFStringRef? inText, UCTypeSelectCompareResult* result);
 
 public extern "C" OSStatus UCTypeSelectFindItem(UCTypeSelectRef @ref, UInt32 listSize, void* listDataPtr, void* refcon, IndexToUCStringUPP userUPP, UInt32* closestItem);
 
-public extern "C" OSStatus UCTypeSelectWalkList(UCTypeSelectRef @ref, CFStringRef currSelect, UCTSWalkDirection direction, UInt32 listSize, void* listDataPtr, void* refcon, IndexToUCStringUPP userUPP, UInt32* closestItem);
+public extern "C" OSStatus UCTypeSelectWalkList(UCTypeSelectRef @ref, CFStringRef? currSelect, UCTSWalkDirection direction, UInt32 listSize, void* listDataPtr, void* refcon, IndexToUCStringUPP userUPP, UInt32* closestItem);
 
 #endif

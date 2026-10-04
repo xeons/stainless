@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,13 +33,13 @@ import MacOS.System;
 
 public extern "C" CFTypeID SecCodeGetTypeID();
 
-public extern "C" OSStatus SecCodeCopySelf(SecCSFlags flags, SecCodeRef* self);
+public extern "C" OSStatus SecCodeCopySelf(SecCSFlags flags, __SecCode** self);
 
 public const uint kSecCSUseAllArchitectures = 1;
 
-public extern "C" OSStatus SecCodeCopyStaticCode(SecCodeRef code, SecCSFlags flags, SecStaticCodeRef* staticCode);
+public extern "C" OSStatus SecCodeCopyStaticCode(SecCodeRef code, SecCSFlags flags, __SecCode** staticCode);
 
-public extern "C" OSStatus SecCodeCopyHost(SecCodeRef guest, SecCSFlags flags, SecCodeRef* host);
+public extern "C" OSStatus SecCodeCopyHost(SecCodeRef guest, SecCSFlags flags, __SecCode** host);
 
 public extern "C" CFStringRef kSecGuestAttributeCanonical;
 
@@ -58,17 +59,19 @@ public extern "C" CFStringRef kSecGuestAttributeArchitecture;
 
 public extern "C" CFStringRef kSecGuestAttributeSubarchitecture;
 
-public extern "C" OSStatus SecCodeCopyGuestWithAttributes(SecCodeRef host, CFDictionaryRef attributes, SecCSFlags flags, SecCodeRef* guest);
+public extern "C" OSStatus SecCodeCopyGuestWithAttributes(SecCodeRef? host, CFDictionaryRef? attributes, SecCSFlags flags, __SecCode** guest);
 
-public extern "C" OSStatus SecCodeCheckValidity(SecCodeRef code, SecCSFlags flags, SecRequirementRef requirement);
+public extern "C" OSStatus SecCodeCreateWithXPCMessage(xpc_object_t message, SecCSFlags flags, __SecCode** target);
 
-public extern "C" OSStatus SecCodeCheckValidityWithErrors(SecCodeRef code, SecCSFlags flags, SecRequirementRef requirement, CFErrorRef* errors);
+public extern "C" OSStatus SecCodeCheckValidity(SecCodeRef code, SecCSFlags flags, SecRequirementRef? requirement);
+
+public extern "C" OSStatus SecCodeCheckValidityWithErrors(SecCodeRef code, SecCSFlags flags, SecRequirementRef? requirement, __CFError** errors);
 
 public extern "C" OSStatus SecCodeValidateFileResource(SecStaticCodeRef code, CFStringRef relativePath, CFDataRef fileData, SecCSFlags flags);
 
-public extern "C" OSStatus SecCodeCopyPath(SecStaticCodeRef staticCode, SecCSFlags flags, CFURLRef* path);
+public extern "C" OSStatus SecCodeCopyPath(SecStaticCodeRef staticCode, SecCSFlags flags, __CFURL** path);
 
-public extern "C" OSStatus SecCodeCopyDesignatedRequirement(SecStaticCodeRef code, SecCSFlags flags, SecRequirementRef* requirement);
+public extern "C" OSStatus SecCodeCopyDesignatedRequirement(SecStaticCodeRef code, SecCSFlags flags, __SecRequirement** requirement);
 
 public const uint kSecCSInternalInformation = 1;
 public const uint kSecCSSigningInformation = 2;
@@ -134,7 +137,7 @@ public extern "C" CFStringRef kSecCodeInfoRuntimeVersion;
 
 public extern "C" CFStringRef kSecCodeInfoStapledNotarizationTicket;
 
-public extern "C" OSStatus SecCodeCopySigningInformation(SecStaticCodeRef code, SecCSFlags flags, CFDictionaryRef* information);
+public extern "C" OSStatus SecCodeCopySigningInformation(SecStaticCodeRef code, SecCSFlags flags, __CFDictionary** information);
 
 public extern "C" OSStatus SecCodeMapMemory(SecStaticCodeRef code, SecCSFlags flags);
 

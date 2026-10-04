@@ -27,6 +27,7 @@ import MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -271,7 +272,7 @@ public using DataBrowserReceiveDragUPP = DataBrowserReceiveDragProcPtr;
 
 public using DataBrowserPostProcessDragUPP = DataBrowserPostProcessDragProcPtr;
 
-public delegate void DataBrowserGetContextualMenuProcPtr(ControlRef arg0, MenuRef* arg1, UInt32* arg2, CFStringRef* arg3, AEDesc* arg4);
+public delegate void DataBrowserGetContextualMenuProcPtr(ControlRef arg0, MenuRef* arg1, UInt32* arg2, __CFString** arg3, AEDesc* arg4);
 
 public delegate void DataBrowserSelectContextualMenuProcPtr(ControlRef arg0, MenuRef arg1, UInt32 arg2, SInt16 arg3, MenuItemIndex arg4);
 
@@ -343,7 +344,7 @@ public extern "C" Boolean InvokeDataBrowserReceiveDragUPP(ControlRef browser, Dr
 
 public extern "C" void InvokeDataBrowserPostProcessDragUPP(ControlRef browser, DragReference theDrag, OSStatus trackDragResult, DataBrowserPostProcessDragUPP userUPP);
 
-public extern "C" void InvokeDataBrowserGetContextualMenuUPP(ControlRef browser, MenuRef* menu, UInt32* helpType, CFStringRef* helpItemString, AEDesc* selection, DataBrowserGetContextualMenuUPP userUPP);
+public extern "C" void InvokeDataBrowserGetContextualMenuUPP(ControlRef browser, MenuRef* menu, UInt32* helpType, __CFString** helpItemString, AEDesc* selection, DataBrowserGetContextualMenuUPP userUPP);
 
 public extern "C" void InvokeDataBrowserSelectContextualMenuUPP(ControlRef browser, MenuRef menu, UInt32 selectionType, SInt16 menuID, MenuItemIndex menuItem, DataBrowserSelectContextualMenuUPP userUPP);
 
@@ -397,7 +398,7 @@ public const int kDataBrowserStopTracking = -1;
 
 public delegate void DataBrowserDrawItemProcPtr(ControlRef arg0, DataBrowserItemID arg1, DataBrowserPropertyID arg2, DataBrowserItemState arg3, Rect* arg4, SInt16 arg5, Boolean arg6);
 
-public delegate Boolean DataBrowserEditItemProcPtr(ControlRef arg0, DataBrowserItemID arg1, DataBrowserPropertyID arg2, CFStringRef arg3, Rect* arg4, Boolean* arg5);
+public delegate Boolean DataBrowserEditItemProcPtr(ControlRef arg0, DataBrowserItemID arg1, DataBrowserPropertyID arg2, __CFString* arg3, Rect* arg4, Boolean* arg5);
 
 public delegate Boolean DataBrowserHitTestProcPtr(ControlRef arg0, DataBrowserItemID arg1, DataBrowserPropertyID arg2, Rect* arg3, Rect* arg4);
 
@@ -453,7 +454,7 @@ public extern "C" void DisposeDataBrowserItemReceiveDragUPP(DataBrowserItemRecei
 
 public extern "C" void InvokeDataBrowserDrawItemUPP(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID property, DataBrowserItemState itemState, Rect* theRect, SInt16 gdDepth, Boolean colorDevice, DataBrowserDrawItemUPP userUPP);
 
-public extern "C" Boolean InvokeDataBrowserEditItemUPP(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID property, CFStringRef theString, Rect* maxEditTextRect, Boolean* shrinkToFit, DataBrowserEditItemUPP userUPP);
+public extern "C" Boolean InvokeDataBrowserEditItemUPP(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID property, CFStringRef? theString, Rect* maxEditTextRect, Boolean* shrinkToFit, DataBrowserEditItemUPP userUPP);
 
 public extern "C" Boolean InvokeDataBrowserHitTestUPP(ControlRef browser, DataBrowserItemID itemID, DataBrowserPropertyID property, Rect* theRect, Rect* mouseRect, DataBrowserHitTestUPP userUPP);
 
@@ -529,7 +530,7 @@ public struct DataBrowserListViewHeaderDesc
     public UInt16 minimumWidth;
     public UInt16 maximumWidth;
     public SInt16 titleOffset;
-    public CFStringRef titleString;
+    public __CFString* titleString;
     public DataBrowserSortOrder initialOrder;
     public ControlFontStyleRec btnFontStyle;
     public ControlButtonContentInfo btnContentInfo;

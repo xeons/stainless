@@ -25,6 +25,7 @@ module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
 import MacOS.OpenGL;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,34 +33,29 @@ import MacOS.OpenGL;
 
 public struct __CVOpenGLTextureCache;
 
-public using CVOpenGLTextureCacheRef = __CVOpenGLTextureCache*;
+[CFType("CVOpenGLTextureCacheGetTypeID")]
+public extern objc class CVOpenGLTextureCacheRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLTextureCacheChromaSamplingModeKey;
+public extern "C" CFStringRef? kCVOpenGLTextureCacheChromaSamplingModeKey;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLTextureCacheChromaSamplingModeAutomatic;
+public extern "C" CFStringRef? kCVOpenGLTextureCacheChromaSamplingModeAutomatic;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLTextureCacheChromaSamplingModeHighestQuality;
+public extern "C" CFStringRef? kCVOpenGLTextureCacheChromaSamplingModeHighestQuality;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLTextureCacheChromaSamplingModeBestPerformance;
+public extern "C" CFStringRef? kCVOpenGLTextureCacheChromaSamplingModeBestPerformance;
 
 /// Deprecated in macOS 10.14.
 public extern "C" CFTypeID CVOpenGLTextureCacheGetTypeID();
 
 /// Deprecated in macOS 10.14.
-public extern "C" CVOpenGLTextureCacheRef CVOpenGLTextureCacheRetain(CVOpenGLTextureCacheRef textureCache);
+public extern "C" CVReturn CVOpenGLTextureCacheCreate(CFAllocatorRef? allocator, CFDictionaryRef? cacheAttributes, CGLContextObj cglContext, CGLPixelFormatObj cglPixelFormat, CFDictionaryRef? textureAttributes, __CVOpenGLTextureCache** cacheOut);
 
 /// Deprecated in macOS 10.14.
-public extern "C" void CVOpenGLTextureCacheRelease(CVOpenGLTextureCacheRef textureCache);
-
-/// Deprecated in macOS 10.14.
-public extern "C" CVReturn CVOpenGLTextureCacheCreate(CFAllocatorRef allocator, CFDictionaryRef cacheAttributes, CGLContextObj cglContext, CGLPixelFormatObj cglPixelFormat, CFDictionaryRef textureAttributes, CVOpenGLTextureCacheRef* cacheOut);
-
-/// Deprecated in macOS 10.14.
-public extern "C" CVReturn CVOpenGLTextureCacheCreateTextureFromImage(CFAllocatorRef allocator, CVOpenGLTextureCacheRef textureCache, CVImageBufferRef sourceImage, CFDictionaryRef attributes, CVOpenGLTextureRef* textureOut);
+public extern "C" CVReturn CVOpenGLTextureCacheCreateTextureFromImage(CFAllocatorRef? allocator, CVOpenGLTextureCacheRef textureCache, CVImageBufferRef sourceImage, CFDictionaryRef? attributes, void** textureOut);
 
 /// Deprecated in macOS 10.14.
 public extern "C" void CVOpenGLTextureCacheFlush(CVOpenGLTextureCacheRef textureCache, CVOptionFlags options);

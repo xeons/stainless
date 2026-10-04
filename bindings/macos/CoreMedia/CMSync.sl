@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,11 +33,13 @@ import MacOS.System;
 
 public struct OpaqueCMClock;
 
-public using CMClockRef = OpaqueCMClock*;
+[CFType("CMClockGetTypeID")]
+public extern objc class CMClockRef : CFTypeRef { }
 
 public struct OpaqueCMTimebase;
 
-public using CMTimebaseRef = OpaqueCMTimebase*;
+[CFType("CMTimebaseGetTypeID")]
+public extern objc class CMTimebaseRef : CFTypeRef { }
 
 public using CMClockOrTimebaseRef = CFTypeRef;
 
@@ -74,29 +77,29 @@ public extern "C" void CMClockInvalidate(CMClockRef clock);
 
 public extern "C" CFTypeID CMTimebaseGetTypeID();
 
-public extern "C" OSStatus CMTimebaseCreateWithSourceClock(CFAllocatorRef allocator, CMClockRef sourceClock, CMTimebaseRef* timebaseOut);
+public extern "C" OSStatus CMTimebaseCreateWithSourceClock(CFAllocatorRef? allocator, CMClockRef sourceClock, OpaqueCMTimebase** timebaseOut);
 
-public extern "C" OSStatus CMTimebaseCreateWithSourceTimebase(CFAllocatorRef allocator, CMTimebaseRef sourceTimebase, CMTimebaseRef* timebaseOut);
+public extern "C" OSStatus CMTimebaseCreateWithSourceTimebase(CFAllocatorRef? allocator, CMTimebaseRef sourceTimebase, OpaqueCMTimebase** timebaseOut);
 
-public extern "C" CMTimebaseRef CMTimebaseCopySourceTimebase(CMTimebaseRef timebase);
+[ReturnsRetained] public extern "C" CMTimebaseRef? CMTimebaseCopySourceTimebase(CMTimebaseRef timebase);
 
-public extern "C" CMClockRef CMTimebaseCopySourceClock(CMTimebaseRef timebase);
+[ReturnsRetained] public extern "C" CMClockRef? CMTimebaseCopySourceClock(CMTimebaseRef timebase);
 
-public extern "C" CMClockOrTimebaseRef CMTimebaseCopySource(CMTimebaseRef timebase);
+[ReturnsRetained] public extern "C" CMClockOrTimebaseRef CMTimebaseCopySource(CMTimebaseRef timebase);
 
-public extern "C" CMClockRef CMTimebaseCopyUltimateSourceClock(CMTimebaseRef timebase);
-
-/// Deprecated in macOS 10.11.
-public extern "C" CMTimebaseRef CMTimebaseGetMasterTimebase(CMTimebaseRef timebase);
+[ReturnsRetained] public extern "C" CMClockRef CMTimebaseCopyUltimateSourceClock(CMTimebaseRef timebase);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CMClockRef CMTimebaseGetMasterClock(CMTimebaseRef timebase);
+public extern "C" CMTimebaseRef? CMTimebaseGetMasterTimebase(CMTimebaseRef timebase);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CMClockOrTimebaseRef CMTimebaseGetMaster(CMTimebaseRef timebase);
+public extern "C" CMClockRef? CMTimebaseGetMasterClock(CMTimebaseRef timebase);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CMClockRef CMTimebaseGetUltimateMasterClock(CMTimebaseRef timebase);
+public extern "C" CMClockOrTimebaseRef? CMTimebaseGetMaster(CMTimebaseRef timebase);
+
+/// Deprecated in macOS 10.11.
+public extern "C" CMClockRef? CMTimebaseGetUltimateMasterClock(CMTimebaseRef timebase);
 
 public extern "C" OSStatus CMTimebaseSetSourceClock(CMTimebaseRef timebase, CMClockRef newSourceClock);
 
@@ -127,6 +130,14 @@ public extern "C" OSStatus CMTimebaseRemoveTimer(CMTimebaseRef timebase, CFRunLo
 public extern "C" OSStatus CMTimebaseSetTimerNextFireTime(CMTimebaseRef timebase, CFRunLoopTimerRef timer, CMTime fireTime, uint flags);
 
 public extern "C" OSStatus CMTimebaseSetTimerToFireImmediately(CMTimebaseRef timebase, CFRunLoopTimerRef timer);
+
+public extern "C" OSStatus CMTimebaseAddTimerDispatchSource(CMTimebaseRef timebase, dispatch_source_t timerSource);
+
+public extern "C" OSStatus CMTimebaseRemoveTimerDispatchSource(CMTimebaseRef timebase, dispatch_source_t timerSource);
+
+public extern "C" OSStatus CMTimebaseSetTimerDispatchSourceNextFireTime(CMTimebaseRef timebase, dispatch_source_t timerSource, CMTime fireTime, uint flags);
+
+public extern "C" OSStatus CMTimebaseSetTimerDispatchSourceToFireImmediately(CMTimebaseRef timebase, dispatch_source_t timerSource);
 
 public extern "C" Float64 CMSyncGetRelativeRate(CMClockOrTimebaseRef ofClockOrTimebase, CMClockOrTimebaseRef relativeToClockOrTimebase);
 

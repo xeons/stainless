@@ -24,101 +24,102 @@
 module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CFNetwork")
 
-public extern "C" CFDictionaryRef CFNetworkCopySystemProxySettings();
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFNetworkCopySystemProxySettings();
 
-public extern "C" CFArrayRef CFNetworkCopyProxiesForURL(CFURLRef url, CFDictionaryRef proxySettings);
+[ReturnsRetained] public extern "C" CFArrayRef CFNetworkCopyProxiesForURL(CFURLRef url, CFDictionaryRef proxySettings);
 
-public delegate void CFProxyAutoConfigurationResultCallback(void* arg0, CFArrayRef arg1, CFErrorRef arg2);
+public delegate void CFProxyAutoConfigurationResultCallback(void* arg0, __CFArray* arg1, __CFError* arg2);
 
-public extern "C" CFArrayRef CFNetworkCopyProxiesForAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFArrayRef? CFNetworkCopyProxiesForAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, __CFError** error);
 
-public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationScript(CFStringRef proxyAutoConfigurationScript, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
 
-public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationURL(CFURLRef proxyAutoConfigURL, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef CFNetworkExecuteProxyAutoConfigurationURL(CFURLRef proxyAutoConfigURL, CFURLRef targetURL, CFProxyAutoConfigurationResultCallback cb, CFStreamClientContext* clientContext);
 
-public extern "C" CFStringRef kCFProxyTypeKey;
+public extern "C" CFStringRef? kCFProxyTypeKey;
 
-public extern "C" CFStringRef kCFProxyHostNameKey;
+public extern "C" CFStringRef? kCFProxyHostNameKey;
 
-public extern "C" CFStringRef kCFProxyPortNumberKey;
+public extern "C" CFStringRef? kCFProxyPortNumberKey;
 
-public extern "C" CFStringRef kCFProxyAutoConfigurationURLKey;
+public extern "C" CFStringRef? kCFProxyAutoConfigurationURLKey;
 
-public extern "C" CFStringRef kCFProxyAutoConfigurationJavaScriptKey;
+public extern "C" CFStringRef? kCFProxyAutoConfigurationJavaScriptKey;
 
-public extern "C" CFStringRef kCFProxyUsernameKey;
+public extern "C" CFStringRef? kCFProxyUsernameKey;
 
-public extern "C" CFStringRef kCFProxyPasswordKey;
+public extern "C" CFStringRef? kCFProxyPasswordKey;
 
-public extern "C" CFStringRef kCFProxyTypeNone;
+public extern "C" CFStringRef? kCFProxyTypeNone;
 
-public extern "C" CFStringRef kCFProxyTypeHTTP;
+public extern "C" CFStringRef? kCFProxyTypeHTTP;
 
-public extern "C" CFStringRef kCFProxyTypeHTTPS;
+public extern "C" CFStringRef? kCFProxyTypeHTTPS;
 
-public extern "C" CFStringRef kCFProxyTypeSOCKS;
+public extern "C" CFStringRef? kCFProxyTypeSOCKS;
 
-public extern "C" CFStringRef kCFProxyTypeFTP;
+public extern "C" CFStringRef? kCFProxyTypeFTP;
 
-public extern "C" CFStringRef kCFProxyTypeAutoConfigurationURL;
+public extern "C" CFStringRef? kCFProxyTypeAutoConfigurationURL;
 
-public extern "C" CFStringRef kCFProxyTypeAutoConfigurationJavaScript;
+public extern "C" CFStringRef? kCFProxyTypeAutoConfigurationJavaScript;
 
-public extern "C" CFStringRef kCFProxyAutoConfigurationHTTPResponseKey;
+public extern "C" CFStringRef? kCFProxyAutoConfigurationHTTPResponseKey;
 
-public extern "C" CFStringRef kCFNetworkProxiesExceptionsList;
+public extern "C" CFStringRef? kCFNetworkProxiesExceptionsList;
 
-public extern "C" CFStringRef kCFNetworkProxiesExcludeSimpleHostnames;
+public extern "C" CFStringRef? kCFNetworkProxiesExcludeSimpleHostnames;
 
-public extern "C" CFStringRef kCFNetworkProxiesFTPEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesFTPEnable;
 
-public extern "C" CFStringRef kCFNetworkProxiesFTPPassive;
+public extern "C" CFStringRef? kCFNetworkProxiesFTPPassive;
 
-public extern "C" CFStringRef kCFNetworkProxiesFTPPort;
+public extern "C" CFStringRef? kCFNetworkProxiesFTPPort;
 
-public extern "C" CFStringRef kCFNetworkProxiesFTPProxy;
+public extern "C" CFStringRef? kCFNetworkProxiesFTPProxy;
 
-public extern "C" CFStringRef kCFNetworkProxiesGopherEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesGopherEnable;
 
-public extern "C" CFStringRef kCFNetworkProxiesGopherPort;
+public extern "C" CFStringRef? kCFNetworkProxiesGopherPort;
 
-public extern "C" CFStringRef kCFNetworkProxiesGopherProxy;
+public extern "C" CFStringRef? kCFNetworkProxiesGopherProxy;
 
-public extern "C" CFStringRef kCFNetworkProxiesHTTPEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesHTTPEnable;
 
-public extern "C" CFStringRef kCFNetworkProxiesHTTPPort;
+public extern "C" CFStringRef? kCFNetworkProxiesHTTPPort;
 
-public extern "C" CFStringRef kCFNetworkProxiesHTTPProxy;
+public extern "C" CFStringRef? kCFNetworkProxiesHTTPProxy;
 
-public extern "C" CFStringRef kCFNetworkProxiesHTTPSEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesHTTPSEnable;
 
-public extern "C" CFStringRef kCFNetworkProxiesHTTPSPort;
+public extern "C" CFStringRef? kCFNetworkProxiesHTTPSPort;
 
-public extern "C" CFStringRef kCFNetworkProxiesHTTPSProxy;
+public extern "C" CFStringRef? kCFNetworkProxiesHTTPSProxy;
 
-public extern "C" CFStringRef kCFNetworkProxiesRTSPEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesRTSPEnable;
 
-public extern "C" CFStringRef kCFNetworkProxiesRTSPPort;
+public extern "C" CFStringRef? kCFNetworkProxiesRTSPPort;
 
-public extern "C" CFStringRef kCFNetworkProxiesRTSPProxy;
+public extern "C" CFStringRef? kCFNetworkProxiesRTSPProxy;
 
-public extern "C" CFStringRef kCFNetworkProxiesSOCKSEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesSOCKSEnable;
 
-public extern "C" CFStringRef kCFNetworkProxiesSOCKSPort;
+public extern "C" CFStringRef? kCFNetworkProxiesSOCKSPort;
 
-public extern "C" CFStringRef kCFNetworkProxiesSOCKSProxy;
+public extern "C" CFStringRef? kCFNetworkProxiesSOCKSProxy;
 
-public extern "C" CFStringRef kCFNetworkProxiesProxyAutoConfigEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesProxyAutoConfigEnable;
 
-public extern "C" CFStringRef kCFNetworkProxiesProxyAutoConfigURLString;
+public extern "C" CFStringRef? kCFNetworkProxiesProxyAutoConfigURLString;
 
-public extern "C" CFStringRef kCFNetworkProxiesProxyAutoConfigJavaScript;
+public extern "C" CFStringRef? kCFNetworkProxiesProxyAutoConfigJavaScript;
 
-public extern "C" CFStringRef kCFNetworkProxiesProxyAutoDiscoveryEnable;
+public extern "C" CFStringRef? kCFNetworkProxiesProxyAutoDiscoveryEnable;
 
 #endif

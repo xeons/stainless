@@ -25,75 +25,77 @@ module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CFNetwork")
 
-public extern "C" CFStringRef kCFHTTPVersion1_0;
+public extern "C" CFStringRef? kCFHTTPVersion1_0;
 
-public extern "C" CFStringRef kCFHTTPVersion1_1;
+public extern "C" CFStringRef? kCFHTTPVersion1_1;
 
-public extern "C" CFStringRef kCFHTTPVersion2_0;
+public extern "C" CFStringRef? kCFHTTPVersion2_0;
 
-public extern "C" CFStringRef kCFHTTPVersion3_0;
+public extern "C" CFStringRef? kCFHTTPVersion3_0;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationSchemeBasic;
+public extern "C" CFStringRef? kCFHTTPAuthenticationSchemeBasic;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationSchemeDigest;
+public extern "C" CFStringRef? kCFHTTPAuthenticationSchemeDigest;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationSchemeNTLM;
+public extern "C" CFStringRef? kCFHTTPAuthenticationSchemeNTLM;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationSchemeKerberos;
+public extern "C" CFStringRef? kCFHTTPAuthenticationSchemeKerberos;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationSchemeNegotiate;
+public extern "C" CFStringRef? kCFHTTPAuthenticationSchemeNegotiate;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationSchemeNegotiate2;
+public extern "C" CFStringRef? kCFHTTPAuthenticationSchemeNegotiate2;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationSchemeXMobileMeAuthToken;
+public extern "C" CFStringRef? kCFHTTPAuthenticationSchemeXMobileMeAuthToken;
 
 public struct __CFHTTPMessage;
 
-public using CFHTTPMessageRef = __CFHTTPMessage*;
+[CFType("CFHTTPMessageGetTypeID")]
+public extern objc class CFHTTPMessageRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFHTTPMessageGetTypeID();
 
-public extern "C" CFHTTPMessageRef CFHTTPMessageCreateRequest(CFAllocatorRef alloc, CFStringRef requestMethod, CFURLRef url, CFStringRef httpVersion);
+[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateRequest(CFAllocatorRef? alloc, CFStringRef requestMethod, CFURLRef url, CFStringRef httpVersion);
 
-public extern "C" CFHTTPMessageRef CFHTTPMessageCreateResponse(CFAllocatorRef alloc, CFIndex statusCode, CFStringRef statusDescription, CFStringRef httpVersion);
+[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateResponse(CFAllocatorRef? alloc, CFIndex statusCode, CFStringRef? statusDescription, CFStringRef httpVersion);
 
-public extern "C" CFHTTPMessageRef CFHTTPMessageCreateEmpty(CFAllocatorRef alloc, Boolean isRequest);
+[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateEmpty(CFAllocatorRef? alloc, Boolean isRequest);
 
-public extern "C" CFHTTPMessageRef CFHTTPMessageCreateCopy(CFAllocatorRef alloc, CFHTTPMessageRef message);
+[ReturnsRetained] public extern "C" CFHTTPMessageRef CFHTTPMessageCreateCopy(CFAllocatorRef? alloc, CFHTTPMessageRef message);
 
 public extern "C" Boolean CFHTTPMessageIsRequest(CFHTTPMessageRef message);
 
-public extern "C" CFStringRef CFHTTPMessageCopyVersion(CFHTTPMessageRef message);
+[ReturnsRetained] public extern "C" CFStringRef CFHTTPMessageCopyVersion(CFHTTPMessageRef message);
 
-public extern "C" CFDataRef CFHTTPMessageCopyBody(CFHTTPMessageRef message);
+[ReturnsRetained] public extern "C" CFDataRef? CFHTTPMessageCopyBody(CFHTTPMessageRef message);
 
 public extern "C" void CFHTTPMessageSetBody(CFHTTPMessageRef message, CFDataRef bodyData);
 
-public extern "C" CFStringRef CFHTTPMessageCopyHeaderFieldValue(CFHTTPMessageRef message, CFStringRef headerField);
+[ReturnsRetained] public extern "C" CFStringRef? CFHTTPMessageCopyHeaderFieldValue(CFHTTPMessageRef message, CFStringRef headerField);
 
-public extern "C" CFDictionaryRef CFHTTPMessageCopyAllHeaderFields(CFHTTPMessageRef message);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFHTTPMessageCopyAllHeaderFields(CFHTTPMessageRef message);
 
-public extern "C" void CFHTTPMessageSetHeaderFieldValue(CFHTTPMessageRef message, CFStringRef headerField, CFStringRef value);
+public extern "C" void CFHTTPMessageSetHeaderFieldValue(CFHTTPMessageRef message, CFStringRef headerField, CFStringRef? value);
 
 public extern "C" Boolean CFHTTPMessageAppendBytes(CFHTTPMessageRef message, UInt8* newBytes, CFIndex numBytes);
 
 public extern "C" Boolean CFHTTPMessageIsHeaderComplete(CFHTTPMessageRef message);
 
-public extern "C" CFDataRef CFHTTPMessageCopySerializedMessage(CFHTTPMessageRef message);
+[ReturnsRetained] public extern "C" CFDataRef? CFHTTPMessageCopySerializedMessage(CFHTTPMessageRef message);
 
-public extern "C" CFURLRef CFHTTPMessageCopyRequestURL(CFHTTPMessageRef request);
+[ReturnsRetained] public extern "C" CFURLRef? CFHTTPMessageCopyRequestURL(CFHTTPMessageRef request);
 
-public extern "C" CFStringRef CFHTTPMessageCopyRequestMethod(CFHTTPMessageRef request);
+[ReturnsRetained] public extern "C" CFStringRef? CFHTTPMessageCopyRequestMethod(CFHTTPMessageRef request);
 
-public extern "C" Boolean CFHTTPMessageAddAuthentication(CFHTTPMessageRef request, CFHTTPMessageRef authenticationFailureResponse, CFStringRef username, CFStringRef password, CFStringRef authenticationScheme, Boolean forProxy);
+public extern "C" Boolean CFHTTPMessageAddAuthentication(CFHTTPMessageRef request, CFHTTPMessageRef? authenticationFailureResponse, CFStringRef username, CFStringRef password, CFStringRef? authenticationScheme, Boolean forProxy);
 
 public extern "C" CFIndex CFHTTPMessageGetResponseStatusCode(CFHTTPMessageRef response);
 
-public extern "C" CFStringRef CFHTTPMessageCopyResponseStatusLine(CFHTTPMessageRef response);
+[ReturnsRetained] public extern "C" CFStringRef? CFHTTPMessageCopyResponseStatusLine(CFHTTPMessageRef response);
 
 #endif

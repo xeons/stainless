@@ -25,6 +25,7 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -36,6 +37,6 @@ public extern "C" Boolean CNMarkPortalOnline(CFStringRef interfaceName);
 
 public extern "C" Boolean CNMarkPortalOffline(CFStringRef interfaceName);
 
-public extern "C" CFArrayRef CNCopySupportedInterfaces();
+[ReturnsRetained] public extern "C" CFArrayRef? CNCopySupportedInterfaces();
 
 #endif

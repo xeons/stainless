@@ -24,6 +24,7 @@
 module MacOS.Security;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 

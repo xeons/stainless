@@ -24,6 +24,7 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,26 +32,27 @@ import MacOS.CoreFoundation;
 
 public struct __SKSummary;
 
-public using SKSummaryRef = __SKSummary*;
+[CFType("SKSummaryGetTypeID")]
+public extern objc class SKSummaryRef : CFTypeRef { }
 
 public extern "C" CFTypeID SKSummaryGetTypeID();
 
-public extern "C" SKSummaryRef SKSummaryCreateWithString(CFStringRef inString);
+[ReturnsRetained] public extern "C" SKSummaryRef? SKSummaryCreateWithString(CFStringRef? inString);
 
-public extern "C" CFIndex SKSummaryGetSentenceCount(SKSummaryRef summary);
+public extern "C" CFIndex SKSummaryGetSentenceCount(SKSummaryRef? summary);
 
-public extern "C" CFIndex SKSummaryGetParagraphCount(SKSummaryRef summary);
+public extern "C" CFIndex SKSummaryGetParagraphCount(SKSummaryRef? summary);
 
-public extern "C" CFStringRef SKSummaryCopySentenceAtIndex(SKSummaryRef summary, CFIndex i);
+[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopySentenceAtIndex(SKSummaryRef? summary, CFIndex i);
 
-public extern "C" CFStringRef SKSummaryCopyParagraphAtIndex(SKSummaryRef summary, CFIndex i);
+[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopyParagraphAtIndex(SKSummaryRef? summary, CFIndex i);
 
-public extern "C" CFStringRef SKSummaryCopySentenceSummaryString(SKSummaryRef summary, CFIndex numSentences);
+[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopySentenceSummaryString(SKSummaryRef? summary, CFIndex numSentences);
 
-public extern "C" CFStringRef SKSummaryCopyParagraphSummaryString(SKSummaryRef summary, CFIndex numParagraphs);
+[ReturnsRetained] public extern "C" CFStringRef? SKSummaryCopyParagraphSummaryString(SKSummaryRef? summary, CFIndex numParagraphs);
 
-public extern "C" CFIndex SKSummaryGetSentenceSummaryInfo(SKSummaryRef summary, CFIndex numSentencesInSummary, CFIndex* outRankOrderOfSentences, CFIndex* outSentenceIndexOfSentences, CFIndex* outParagraphIndexOfSentences);
+public extern "C" CFIndex SKSummaryGetSentenceSummaryInfo(SKSummaryRef? summary, CFIndex numSentencesInSummary, CFIndex* outRankOrderOfSentences, CFIndex* outSentenceIndexOfSentences, CFIndex* outParagraphIndexOfSentences);
 
-public extern "C" CFIndex SKSummaryGetParagraphSummaryInfo(SKSummaryRef summary, CFIndex numParagraphsInSummary, CFIndex* outRankOrderOfParagraphs, CFIndex* outParagraphIndexOfParagraphs);
+public extern "C" CFIndex SKSummaryGetParagraphSummaryInfo(SKSummaryRef? summary, CFIndex numParagraphsInSummary, CFIndex* outRankOrderOfParagraphs, CFIndex* outParagraphIndexOfParagraphs);
 
 #endif

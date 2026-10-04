@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,7 +34,7 @@ public delegate void* CFBinaryHeapCompareContextRetainFunction(void* arg0);
 
 public delegate void CFBinaryHeapCompareContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFBinaryHeapCompareContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFBinaryHeapCompareContextCopyDescriptionFunction(void* arg0);
 
 public struct CFBinaryHeapCompareContext
 {
@@ -44,11 +45,11 @@ public struct CFBinaryHeapCompareContext
     public CFBinaryHeapCompareContextCopyDescriptionFunction copyDescription;
 }
 
-public delegate void* CFBinaryHeapCallBacksRetainFunction(CFAllocatorRef arg0, void* arg1);
+public delegate void* CFBinaryHeapCallBacksRetainFunction(__CFAllocator* arg0, void* arg1);
 
-public delegate void CFBinaryHeapCallBacksReleaseFunction(CFAllocatorRef arg0, void* arg1);
+public delegate void CFBinaryHeapCallBacksReleaseFunction(__CFAllocator* arg0, void* arg1);
 
-public delegate CFStringRef CFBinaryHeapCallBacksCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFBinaryHeapCallBacksCopyDescriptionFunction(void* arg0);
 
 public delegate CFComparisonResult CFBinaryHeapCallBacksCompareFunction(void* arg0, void* arg1, void* arg2);
 
@@ -67,32 +68,33 @@ public delegate void CFBinaryHeapApplierFunction(void* arg0, void* arg1);
 
 public struct __CFBinaryHeap;
 
-public using CFBinaryHeapRef = __CFBinaryHeap*;
+[CFType("CFBinaryHeapGetTypeID")]
+public extern objc class CFBinaryHeapRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFBinaryHeapGetTypeID();
 
-public extern "C" CFBinaryHeapRef CFBinaryHeapCreate(CFAllocatorRef allocator, CFIndex capacity, CFBinaryHeapCallBacks* callBacks, CFBinaryHeapCompareContext* compareContext);
+[ReturnsRetained] public extern "C" CFBinaryHeapRef? CFBinaryHeapCreate(CFAllocatorRef? allocator, CFIndex capacity, CFBinaryHeapCallBacks* callBacks, CFBinaryHeapCompareContext* compareContext);
 
-public extern "C" CFBinaryHeapRef CFBinaryHeapCreateCopy(CFAllocatorRef allocator, CFIndex capacity, CFBinaryHeapRef heap);
+[ReturnsRetained] public extern "C" CFBinaryHeapRef? CFBinaryHeapCreateCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBinaryHeapRef? heap);
 
-public extern "C" CFIndex CFBinaryHeapGetCount(CFBinaryHeapRef heap);
+public extern "C" CFIndex CFBinaryHeapGetCount(CFBinaryHeapRef? heap);
 
-public extern "C" CFIndex CFBinaryHeapGetCountOfValue(CFBinaryHeapRef heap, void* value);
+public extern "C" CFIndex CFBinaryHeapGetCountOfValue(CFBinaryHeapRef? heap, void* value);
 
-public extern "C" Boolean CFBinaryHeapContainsValue(CFBinaryHeapRef heap, void* value);
+public extern "C" Boolean CFBinaryHeapContainsValue(CFBinaryHeapRef? heap, void* value);
 
-public extern "C" void* CFBinaryHeapGetMinimum(CFBinaryHeapRef heap);
+public extern "C" void* CFBinaryHeapGetMinimum(CFBinaryHeapRef? heap);
 
-public extern "C" Boolean CFBinaryHeapGetMinimumIfPresent(CFBinaryHeapRef heap, void** value);
+public extern "C" Boolean CFBinaryHeapGetMinimumIfPresent(CFBinaryHeapRef? heap, void** value);
 
-public extern "C" void CFBinaryHeapGetValues(CFBinaryHeapRef heap, void** values);
+public extern "C" void CFBinaryHeapGetValues(CFBinaryHeapRef? heap, void** values);
 
-public extern "C" void CFBinaryHeapApplyFunction(CFBinaryHeapRef heap, CFBinaryHeapApplierFunction applier, void* context);
+public extern "C" void CFBinaryHeapApplyFunction(CFBinaryHeapRef? heap, CFBinaryHeapApplierFunction applier, void* context);
 
-public extern "C" void CFBinaryHeapAddValue(CFBinaryHeapRef heap, void* value);
+public extern "C" void CFBinaryHeapAddValue(CFBinaryHeapRef? heap, void* value);
 
-public extern "C" void CFBinaryHeapRemoveMinimumValue(CFBinaryHeapRef heap);
+public extern "C" void CFBinaryHeapRemoveMinimumValue(CFBinaryHeapRef? heap);
 
-public extern "C" void CFBinaryHeapRemoveAllValues(CFBinaryHeapRef heap);
+public extern "C" void CFBinaryHeapRemoveAllValues(CFBinaryHeapRef? heap);
 
 #endif

@@ -24,6 +24,8 @@
 module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
+import MacOS.Metal;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,5 +35,8 @@ public using CVMetalBufferRef = CVBufferRef;
 
 /// macOS 15.0 and later.
 public extern "C" CFTypeID CVMetalBufferGetTypeID();
+
+/// macOS 15.0 and later.
+public extern "C" MTLBuffer? CVMetalBufferGetBuffer(CVMetalBufferRef buffer);
 
 #endif

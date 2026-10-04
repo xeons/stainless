@@ -25,13 +25,14 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "SystemConfiguration")
 
-public extern "C" Boolean SCPreferencesSetComputerName(SCPreferencesRef prefs, CFStringRef name, CFStringEncoding nameEncoding);
+public extern "C" Boolean SCPreferencesSetComputerName(SCPreferencesRef prefs, CFStringRef? name, CFStringEncoding nameEncoding);
 
-public extern "C" Boolean SCPreferencesSetLocalHostName(SCPreferencesRef prefs, CFStringRef name);
+public extern "C" Boolean SCPreferencesSetLocalHostName(SCPreferencesRef prefs, CFStringRef? name);
 
 #endif

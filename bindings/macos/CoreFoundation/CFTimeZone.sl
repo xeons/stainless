@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,39 +32,39 @@ import MacOS.System;
 
 public extern "C" CFTypeID CFTimeZoneGetTypeID();
 
-public extern "C" CFTimeZoneRef CFTimeZoneCopySystem();
+[ReturnsRetained] public extern "C" CFTimeZoneRef? CFTimeZoneCopySystem();
 
 public extern "C" void CFTimeZoneResetSystem();
 
-public extern "C" CFTimeZoneRef CFTimeZoneCopyDefault();
+[ReturnsRetained] public extern "C" CFTimeZoneRef? CFTimeZoneCopyDefault();
 
-public extern "C" void CFTimeZoneSetDefault(CFTimeZoneRef tz);
+public extern "C" void CFTimeZoneSetDefault(CFTimeZoneRef? tz);
 
-public extern "C" CFArrayRef CFTimeZoneCopyKnownNames();
+[ReturnsRetained] public extern "C" CFArrayRef? CFTimeZoneCopyKnownNames();
 
-public extern "C" CFDictionaryRef CFTimeZoneCopyAbbreviationDictionary();
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFTimeZoneCopyAbbreviationDictionary();
 
-public extern "C" void CFTimeZoneSetAbbreviationDictionary(CFDictionaryRef dict);
+public extern "C" void CFTimeZoneSetAbbreviationDictionary(CFDictionaryRef? dict);
 
-public extern "C" CFTimeZoneRef CFTimeZoneCreate(CFAllocatorRef allocator, CFStringRef name, CFDataRef data);
+[ReturnsRetained] public extern "C" CFTimeZoneRef? CFTimeZoneCreate(CFAllocatorRef? allocator, CFStringRef? name, CFDataRef? data);
 
-public extern "C" CFTimeZoneRef CFTimeZoneCreateWithTimeIntervalFromGMT(CFAllocatorRef allocator, CFTimeInterval ti);
+[ReturnsRetained] public extern "C" CFTimeZoneRef? CFTimeZoneCreateWithTimeIntervalFromGMT(CFAllocatorRef? allocator, CFTimeInterval ti);
 
-public extern "C" CFTimeZoneRef CFTimeZoneCreateWithName(CFAllocatorRef allocator, CFStringRef name, Boolean tryAbbrev);
+[ReturnsRetained] public extern "C" CFTimeZoneRef? CFTimeZoneCreateWithName(CFAllocatorRef? allocator, CFStringRef? name, Boolean tryAbbrev);
 
-public extern "C" CFStringRef CFTimeZoneGetName(CFTimeZoneRef tz);
+public extern "C" CFStringRef? CFTimeZoneGetName(CFTimeZoneRef? tz);
 
-public extern "C" CFDataRef CFTimeZoneGetData(CFTimeZoneRef tz);
+public extern "C" CFDataRef? CFTimeZoneGetData(CFTimeZoneRef? tz);
 
-public extern "C" CFTimeInterval CFTimeZoneGetSecondsFromGMT(CFTimeZoneRef tz, CFAbsoluteTime at);
+public extern "C" CFTimeInterval CFTimeZoneGetSecondsFromGMT(CFTimeZoneRef? tz, CFAbsoluteTime at);
 
-public extern "C" CFStringRef CFTimeZoneCopyAbbreviation(CFTimeZoneRef tz, CFAbsoluteTime at);
+[ReturnsRetained] public extern "C" CFStringRef? CFTimeZoneCopyAbbreviation(CFTimeZoneRef? tz, CFAbsoluteTime at);
 
-public extern "C" Boolean CFTimeZoneIsDaylightSavingTime(CFTimeZoneRef tz, CFAbsoluteTime at);
+public extern "C" Boolean CFTimeZoneIsDaylightSavingTime(CFTimeZoneRef? tz, CFAbsoluteTime at);
 
-public extern "C" CFTimeInterval CFTimeZoneGetDaylightSavingTimeOffset(CFTimeZoneRef tz, CFAbsoluteTime at);
+public extern "C" CFTimeInterval CFTimeZoneGetDaylightSavingTimeOffset(CFTimeZoneRef? tz, CFAbsoluteTime at);
 
-public extern "C" CFAbsoluteTime CFTimeZoneGetNextDaylightSavingTimeTransition(CFTimeZoneRef tz, CFAbsoluteTime at);
+public extern "C" CFAbsoluteTime CFTimeZoneGetNextDaylightSavingTimeTransition(CFTimeZoneRef? tz, CFAbsoluteTime at);
 
 public enum CFTimeZoneNameStyle : long
 {
@@ -75,8 +76,8 @@ public enum CFTimeZoneNameStyle : long
     ShortGeneric = 5,
 }
 
-public extern "C" CFStringRef CFTimeZoneCopyLocalizedName(CFTimeZoneRef tz, CFTimeZoneNameStyle style, CFLocaleRef locale);
+[ReturnsRetained] public extern "C" CFStringRef? CFTimeZoneCopyLocalizedName(CFTimeZoneRef? tz, CFTimeZoneNameStyle style, CFLocaleRef? locale);
 
-public extern "C" CFNotificationName kCFTimeZoneSystemTimeZoneDidChangeNotification;
+public extern "C" CFNotificationName? kCFTimeZoneSystemTimeZoneDidChangeNotification;
 
 #endif

@@ -23,6 +23,8 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreFoundation;
 
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
@@ -31,48 +33,49 @@ public using CFErrorDomain = CFStringRef;
 
 public struct __CFError;
 
-public using CFErrorRef = __CFError*;
+[CFType("CFErrorGetTypeID")]
+public extern objc class CFErrorRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFErrorGetTypeID();
 
-public extern "C" CFErrorDomain kCFErrorDomainPOSIX;
+public extern "C" CFErrorDomain? kCFErrorDomainPOSIX;
 
-public extern "C" CFErrorDomain kCFErrorDomainOSStatus;
+public extern "C" CFErrorDomain? kCFErrorDomainOSStatus;
 
-public extern "C" CFErrorDomain kCFErrorDomainMach;
+public extern "C" CFErrorDomain? kCFErrorDomainMach;
 
-public extern "C" CFErrorDomain kCFErrorDomainCocoa;
+public extern "C" CFErrorDomain? kCFErrorDomainCocoa;
 
-public extern "C" CFStringRef kCFErrorLocalizedDescriptionKey;
+public extern "C" CFStringRef? kCFErrorLocalizedDescriptionKey;
 
-public extern "C" CFStringRef kCFErrorLocalizedFailureKey;
+public extern "C" CFStringRef? kCFErrorLocalizedFailureKey;
 
-public extern "C" CFStringRef kCFErrorLocalizedFailureReasonKey;
+public extern "C" CFStringRef? kCFErrorLocalizedFailureReasonKey;
 
-public extern "C" CFStringRef kCFErrorLocalizedRecoverySuggestionKey;
+public extern "C" CFStringRef? kCFErrorLocalizedRecoverySuggestionKey;
 
-public extern "C" CFStringRef kCFErrorDescriptionKey;
+public extern "C" CFStringRef? kCFErrorDescriptionKey;
 
-public extern "C" CFStringRef kCFErrorUnderlyingErrorKey;
+public extern "C" CFStringRef? kCFErrorUnderlyingErrorKey;
 
-public extern "C" CFStringRef kCFErrorURLKey;
+public extern "C" CFStringRef? kCFErrorURLKey;
 
-public extern "C" CFStringRef kCFErrorFilePathKey;
+public extern "C" CFStringRef? kCFErrorFilePathKey;
 
-public extern "C" CFErrorRef CFErrorCreate(CFAllocatorRef allocator, CFErrorDomain domain, CFIndex code, CFDictionaryRef userInfo);
+[ReturnsRetained] public extern "C" CFErrorRef? CFErrorCreate(CFAllocatorRef? allocator, CFErrorDomain? domain, CFIndex code, CFDictionaryRef? userInfo);
 
-public extern "C" CFErrorRef CFErrorCreateWithUserInfoKeysAndValues(CFAllocatorRef allocator, CFErrorDomain domain, CFIndex code, void** userInfoKeys, void** userInfoValues, CFIndex numUserInfoValues);
+[ReturnsRetained] public extern "C" CFErrorRef? CFErrorCreateWithUserInfoKeysAndValues(CFAllocatorRef? allocator, CFErrorDomain? domain, CFIndex code, void** userInfoKeys, void** userInfoValues, CFIndex numUserInfoValues);
 
-public extern "C" CFErrorDomain CFErrorGetDomain(CFErrorRef err);
+public extern "C" CFErrorDomain? CFErrorGetDomain(CFErrorRef? err);
 
-public extern "C" CFIndex CFErrorGetCode(CFErrorRef err);
+public extern "C" CFIndex CFErrorGetCode(CFErrorRef? err);
 
-public extern "C" CFDictionaryRef CFErrorCopyUserInfo(CFErrorRef err);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFErrorCopyUserInfo(CFErrorRef? err);
 
-public extern "C" CFStringRef CFErrorCopyDescription(CFErrorRef err);
+[ReturnsRetained] public extern "C" CFStringRef? CFErrorCopyDescription(CFErrorRef? err);
 
-public extern "C" CFStringRef CFErrorCopyFailureReason(CFErrorRef err);
+[ReturnsRetained] public extern "C" CFStringRef? CFErrorCopyFailureReason(CFErrorRef? err);
 
-public extern "C" CFStringRef CFErrorCopyRecoverySuggestion(CFErrorRef err);
+[ReturnsRetained] public extern "C" CFStringRef? CFErrorCopyRecoverySuggestion(CFErrorRef? err);
 
 #endif

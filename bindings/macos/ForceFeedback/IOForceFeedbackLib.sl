@@ -67,7 +67,7 @@ public delegate HRESULT IOForceFeedbackDeviceInterfaceInitializeTerminateFunctio
 
 public delegate HRESULT IOForceFeedbackDeviceInterfaceDestroyEffectFunction(void* arg0, FFEffectDownloadID arg1);
 
-public delegate HRESULT IOForceFeedbackDeviceInterfaceDownloadEffectFunction(void* arg0, CFUUIDRef arg1, FFEffectDownloadID* arg2, FFEFFECT* arg3, FFEffectParameterFlag arg4);
+public delegate HRESULT IOForceFeedbackDeviceInterfaceDownloadEffectFunction(void* arg0, __CFUUID* arg1, FFEffectDownloadID* arg2, FFEFFECT* arg3, FFEffectParameterFlag arg4);
 
 public delegate HRESULT IOForceFeedbackDeviceInterfaceEscapeFunction(void* arg0, FFEffectDownloadID arg1, FFEFFESCAPE* arg2);
 

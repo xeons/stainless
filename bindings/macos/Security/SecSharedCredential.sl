@@ -24,6 +24,7 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,16 +32,16 @@ import MacOS.CoreFoundation;
 
 public extern "C" CFStringRef kSecSharedPassword;
 
-public objc closure void SecAddSharedWebCredentialCompletionHandlerBlock(CFErrorRef arg0);
+public objc closure void SecAddSharedWebCredentialCompletionHandlerBlock(CFErrorRef? arg0);
 
 /// Deprecated in macOS 26.2.
-public extern "C" void SecAddSharedWebCredential(CFStringRef fqdn, CFStringRef account, CFStringRef password, SecAddSharedWebCredentialCompletionHandlerBlock completionHandler);
+public extern "C" void SecAddSharedWebCredential(CFStringRef fqdn, CFStringRef account, CFStringRef? password, SecAddSharedWebCredentialCompletionHandlerBlock completionHandler);
 
-public objc closure void SecRequestSharedWebCredentialCompletionHandlerBlock(CFArrayRef arg0, CFErrorRef arg1);
+public objc closure void SecRequestSharedWebCredentialCompletionHandlerBlock(CFArrayRef? arg0, CFErrorRef? arg1);
 
 /// Deprecated in macOS 11.0.
-public extern "C" void SecRequestSharedWebCredential(CFStringRef fqdn, CFStringRef account, SecRequestSharedWebCredentialCompletionHandlerBlock completionHandler);
+public extern "C" void SecRequestSharedWebCredential(CFStringRef? fqdn, CFStringRef? account, SecRequestSharedWebCredentialCompletionHandlerBlock completionHandler);
 
-public extern "C" CFStringRef SecCreateSharedWebCredentialPassword();
+[ReturnsRetained] public extern "C" CFStringRef? SecCreateSharedWebCredentialPassword();
 
 #endif

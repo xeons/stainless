@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -41,7 +42,7 @@ public extern "C" CGPDFContentStreamRef CGPDFContentStreamRetain(CGPDFContentStr
 
 public extern "C" void CGPDFContentStreamRelease(CGPDFContentStreamRef cs);
 
-public extern "C" CFArrayRef CGPDFContentStreamGetStreams(CGPDFContentStreamRef cs);
+public extern "C" CFArrayRef? CGPDFContentStreamGetStreams(CGPDFContentStreamRef cs);
 
 public extern "C" CGPDFObjectRef CGPDFContentStreamGetResource(CGPDFContentStreamRef cs, byte* category, byte* name);
 

@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,11 +33,12 @@ import MacOS.System;
 
 public struct _CMSEncoder;
 
-public using CMSEncoderRef = _CMSEncoder*;
+[CFType("CMSEncoderGetTypeID")]
+public extern objc class CMSEncoderRef : CFTypeRef { }
 
 public extern "C" CFTypeID CMSEncoderGetTypeID();
 
-public extern "C" OSStatus CMSEncoderCreate(CMSEncoderRef* cmsEncoderOut);
+public extern "C" OSStatus CMSEncoderCreate(_CMSEncoder** cmsEncoderOut);
 
 public extern "C" CFStringRef kCMSEncoderDigestAlgorithmSHA1;
 
@@ -46,11 +48,11 @@ public extern "C" OSStatus CMSEncoderSetSignerAlgorithm(CMSEncoderRef cmsEncoder
 
 public extern "C" OSStatus CMSEncoderAddSigners(CMSEncoderRef cmsEncoder, CFTypeRef signerOrArray);
 
-public extern "C" OSStatus CMSEncoderCopySigners(CMSEncoderRef cmsEncoder, CFArrayRef* signersOut);
+public extern "C" OSStatus CMSEncoderCopySigners(CMSEncoderRef cmsEncoder, __CFArray** signersOut);
 
 public extern "C" OSStatus CMSEncoderAddRecipients(CMSEncoderRef cmsEncoder, CFTypeRef recipientOrArray);
 
-public extern "C" OSStatus CMSEncoderCopyRecipients(CMSEncoderRef cmsEncoder, CFArrayRef* recipientsOut);
+public extern "C" OSStatus CMSEncoderCopyRecipients(CMSEncoderRef cmsEncoder, __CFArray** recipientsOut);
 
 public extern "C" OSStatus CMSEncoderSetHasDetachedContent(CMSEncoderRef cmsEncoder, Boolean detachedContent);
 
@@ -61,11 +63,11 @@ public extern "C" OSStatus CMSEncoderSetEncapsulatedContentType(CMSEncoderRef cm
 
 public extern "C" OSStatus CMSEncoderSetEncapsulatedContentTypeOID(CMSEncoderRef cmsEncoder, CFTypeRef eContentTypeOID);
 
-public extern "C" OSStatus CMSEncoderCopyEncapsulatedContentType(CMSEncoderRef cmsEncoder, CFDataRef* eContentTypeOut);
+public extern "C" OSStatus CMSEncoderCopyEncapsulatedContentType(CMSEncoderRef cmsEncoder, __CFData** eContentTypeOut);
 
 public extern "C" OSStatus CMSEncoderAddSupportingCerts(CMSEncoderRef cmsEncoder, CFTypeRef certOrArray);
 
-public extern "C" OSStatus CMSEncoderCopySupportingCerts(CMSEncoderRef cmsEncoder, CFArrayRef* certsOut);
+public extern "C" OSStatus CMSEncoderCopySupportingCerts(CMSEncoderRef cmsEncoder, __CFArray** certsOut);
 
 [Flags]
 public enum CMSSignedAttributes : uint
@@ -97,15 +99,15 @@ public extern "C" OSStatus CMSEncoderGetCertificateChainMode(CMSEncoderRef cmsEn
 
 public extern "C" OSStatus CMSEncoderUpdateContent(CMSEncoderRef cmsEncoder, void* content, nuint contentLen);
 
-public extern "C" OSStatus CMSEncoderCopyEncodedContent(CMSEncoderRef cmsEncoder, CFDataRef* encodedContentOut);
+public extern "C" OSStatus CMSEncoderCopyEncodedContent(CMSEncoderRef cmsEncoder, __CFData** encodedContentOut);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus CMSEncode(CFTypeRef signers, CFTypeRef recipients, SecAsn1Oid* eContentType, Boolean detachedContent, CMSSignedAttributes signedAttributes, void* content, nuint contentLen, CFDataRef* encodedContentOut);
+public extern "C" OSStatus CMSEncode(CFTypeRef? signers, CFTypeRef? recipients, SecAsn1Oid* eContentType, Boolean detachedContent, CMSSignedAttributes signedAttributes, void* content, nuint contentLen, __CFData** encodedContentOut);
 
-public extern "C" OSStatus CMSEncodeContent(CFTypeRef signers, CFTypeRef recipients, CFTypeRef eContentTypeOID, Boolean detachedContent, CMSSignedAttributes signedAttributes, void* content, nuint contentLen, CFDataRef* encodedContentOut);
+public extern "C" OSStatus CMSEncodeContent(CFTypeRef? signers, CFTypeRef? recipients, CFTypeRef? eContentTypeOID, Boolean detachedContent, CMSSignedAttributes signedAttributes, void* content, nuint contentLen, __CFData** encodedContentOut);
 
 public extern "C" OSStatus CMSEncoderCopySignerTimestamp(CMSEncoderRef cmsEncoder, nuint signerIndex, CFAbsoluteTime* timestamp);
 
-public extern "C" OSStatus CMSEncoderCopySignerTimestampWithPolicy(CMSEncoderRef cmsEncoder, CFTypeRef timeStampPolicy, nuint signerIndex, CFAbsoluteTime* timestamp);
+public extern "C" OSStatus CMSEncoderCopySignerTimestampWithPolicy(CMSEncoderRef cmsEncoder, CFTypeRef? timeStampPolicy, nuint signerIndex, CFAbsoluteTime* timestamp);
 
 #endif

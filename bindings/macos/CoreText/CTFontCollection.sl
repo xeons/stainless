@@ -24,6 +24,7 @@
 module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,43 +32,45 @@ import MacOS.CoreFoundation;
 
 public struct __CTFontCollection;
 
-public using CTFontCollectionRef = __CTFontCollection*;
+[CFType("CTFontCollectionGetTypeID")]
+public extern objc class CTFontCollectionRef : CFTypeRef { }
 
-public using CTMutableFontCollectionRef = __CTFontCollection*;
+[CFType]
+public extern objc class CTMutableFontCollectionRef : CTFontCollectionRef { }
 
 public extern "C" CFTypeID CTFontCollectionGetTypeID();
 
-public delegate CFComparisonResult CTFontCollectionSortDescriptorsCallback(CTFontDescriptorRef arg0, CTFontDescriptorRef arg1, void* arg2);
+public delegate CFComparisonResult CTFontCollectionSortDescriptorsCallback(__CTFontDescriptor* arg0, __CTFontDescriptor* arg1, void* arg2);
 
 public extern "C" CFStringRef kCTFontCollectionRemoveDuplicatesOption;
 
-public extern "C" CFStringRef kCTFontCollectionIncludeDisabledFontsOption;
+public extern "C" CFStringRef? kCTFontCollectionIncludeDisabledFontsOption;
 
-public extern "C" CFStringRef kCTFontCollectionDisallowAutoActivationOption;
+public extern "C" CFStringRef? kCTFontCollectionDisallowAutoActivationOption;
 
-public extern "C" CTFontCollectionRef CTFontCollectionCreateFromAvailableFonts(CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CTFontCollectionRef CTFontCollectionCreateFromAvailableFonts(CFDictionaryRef? options);
 
-public extern "C" CTFontCollectionRef CTFontCollectionCreateWithFontDescriptors(CFArrayRef queryDescriptors, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CTFontCollectionRef CTFontCollectionCreateWithFontDescriptors(CFArrayRef? queryDescriptors, CFDictionaryRef? options);
 
-public extern "C" CTFontCollectionRef CTFontCollectionCreateCopyWithFontDescriptors(CTFontCollectionRef original, CFArrayRef queryDescriptors, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CTFontCollectionRef CTFontCollectionCreateCopyWithFontDescriptors(CTFontCollectionRef original, CFArrayRef? queryDescriptors, CFDictionaryRef? options);
 
-public extern "C" CTMutableFontCollectionRef CTFontCollectionCreateMutableCopy(CTFontCollectionRef original);
+[ReturnsRetained] public extern "C" CTMutableFontCollectionRef CTFontCollectionCreateMutableCopy(CTFontCollectionRef original);
 
-public extern "C" CFArrayRef CTFontCollectionCopyQueryDescriptors(CTFontCollectionRef collection);
+[ReturnsRetained] public extern "C" CFArrayRef? CTFontCollectionCopyQueryDescriptors(CTFontCollectionRef collection);
 
-public extern "C" void CTFontCollectionSetQueryDescriptors(CTMutableFontCollectionRef collection, CFArrayRef descriptors);
+public extern "C" void CTFontCollectionSetQueryDescriptors(CTMutableFontCollectionRef collection, CFArrayRef? descriptors);
 
-public extern "C" CFArrayRef CTFontCollectionCopyExclusionDescriptors(CTFontCollectionRef collection);
+[ReturnsRetained] public extern "C" CFArrayRef? CTFontCollectionCopyExclusionDescriptors(CTFontCollectionRef collection);
 
-public extern "C" void CTFontCollectionSetExclusionDescriptors(CTMutableFontCollectionRef collection, CFArrayRef descriptors);
+public extern "C" void CTFontCollectionSetExclusionDescriptors(CTMutableFontCollectionRef collection, CFArrayRef? descriptors);
 
-public extern "C" CFArrayRef CTFontCollectionCreateMatchingFontDescriptors(CTFontCollectionRef collection);
+[ReturnsRetained] public extern "C" CFArrayRef? CTFontCollectionCreateMatchingFontDescriptors(CTFontCollectionRef collection);
 
-public extern "C" CFArrayRef CTFontCollectionCreateMatchingFontDescriptorsSortedWithCallback(CTFontCollectionRef collection, CTFontCollectionSortDescriptorsCallback sortCallback, void* refCon);
+[ReturnsRetained] public extern "C" CFArrayRef? CTFontCollectionCreateMatchingFontDescriptorsSortedWithCallback(CTFontCollectionRef collection, CTFontCollectionSortDescriptorsCallback sortCallback, void* refCon);
 
-public extern "C" CFArrayRef CTFontCollectionCreateMatchingFontDescriptorsWithOptions(CTFontCollectionRef collection, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CFArrayRef? CTFontCollectionCreateMatchingFontDescriptorsWithOptions(CTFontCollectionRef collection, CFDictionaryRef? options);
 
-public extern "C" CFArrayRef CTFontCollectionCreateMatchingFontDescriptorsForFamily(CTFontCollectionRef collection, CFStringRef familyName, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CFArrayRef? CTFontCollectionCreateMatchingFontDescriptorsForFamily(CTFontCollectionRef collection, CFStringRef familyName, CFDictionaryRef? options);
 
 [Flags]
 public enum CTFontCollectionCopyOptions : uint
@@ -77,8 +80,8 @@ public enum CTFontCollectionCopyOptions : uint
     StandardSort = 2,
 }
 
-public extern "C" CFArrayRef CTFontCollectionCopyFontAttribute(CTFontCollectionRef collection, CFStringRef attributeName, CTFontCollectionCopyOptions options);
+[ReturnsRetained] public extern "C" CFArrayRef CTFontCollectionCopyFontAttribute(CTFontCollectionRef collection, CFStringRef attributeName, CTFontCollectionCopyOptions options);
 
-public extern "C" CFArrayRef CTFontCollectionCopyFontAttributes(CTFontCollectionRef collection, CFSetRef attributeNames, CTFontCollectionCopyOptions options);
+[ReturnsRetained] public extern "C" CFArrayRef CTFontCollectionCopyFontAttributes(CTFontCollectionRef collection, CFSetRef attributeNames, CTFontCollectionCopyOptions options);
 
 #endif

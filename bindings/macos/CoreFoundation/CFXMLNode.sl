@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,7 +34,8 @@ public const long kCFXMLNodeCurrentVersion = 1;
 
 public struct __CFXMLNode;
 
-public using CFXMLNodeRef = __CFXMLNode*;
+[CFType("CFXMLNodeGetTypeID")]
+public extern objc class CFXMLNodeRef : CFTypeRef { }
 
 public using CFXMLTreeRef = CFTreeRef;
 
@@ -58,27 +60,27 @@ public enum CFXMLNodeTypeCode : long
 
 public struct CFXMLElementInfo
 {
-    public CFDictionaryRef attributes;
-    public CFArrayRef attributeOrder;
+    public __CFDictionary* attributes;
+    public __CFArray* attributeOrder;
     public Boolean isEmpty;
     public byte[3] _reserved;
 }
 
 public struct CFXMLProcessingInstructionInfo
 {
-    public CFStringRef dataString;
+    public __CFString* dataString;
 }
 
 public struct CFXMLDocumentInfo
 {
-    public CFURLRef sourceURL;
+    public __CFURL* sourceURL;
     public CFStringEncoding encoding;
 }
 
 public struct CFXMLExternalID
 {
-    public CFURLRef systemID;
-    public CFStringRef publicID;
+    public __CFURL* systemID;
+    public __CFString* publicID;
 }
 
 public struct CFXMLDocumentTypeInfo
@@ -93,14 +95,14 @@ public struct CFXMLNotationInfo
 
 public struct CFXMLElementTypeDeclarationInfo
 {
-    public CFStringRef contentDescription;
+    public __CFString* contentDescription;
 }
 
 public struct CFXMLAttributeDeclarationInfo
 {
-    public CFStringRef attributeName;
-    public CFStringRef typeString;
-    public CFStringRef defaultString;
+    public __CFString* attributeName;
+    public __CFString* typeString;
+    public __CFString* defaultString;
 }
 
 public struct CFXMLAttributeListDeclarationInfo
@@ -121,9 +123,9 @@ public enum CFXMLEntityTypeCode : long
 public struct CFXMLEntityInfo
 {
     public CFXMLEntityTypeCode entityType;
-    public CFStringRef replacementText;
+    public __CFString* replacementText;
     public CFXMLExternalID entityID;
-    public CFStringRef notationName;
+    public __CFString* notationName;
 }
 
 public struct CFXMLEntityReferenceInfo
@@ -135,27 +137,27 @@ public struct CFXMLEntityReferenceInfo
 public extern "C" CFTypeID CFXMLNodeGetTypeID();
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFXMLNodeRef CFXMLNodeCreate(CFAllocatorRef alloc, CFXMLNodeTypeCode xmlType, CFStringRef dataString, void* additionalInfoPtr, CFIndex version);
+[ReturnsRetained] public extern "C" CFXMLNodeRef? CFXMLNodeCreate(CFAllocatorRef? alloc, CFXMLNodeTypeCode xmlType, CFStringRef? dataString, void* additionalInfoPtr, CFIndex version);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFXMLNodeRef CFXMLNodeCreateCopy(CFAllocatorRef alloc, CFXMLNodeRef origNode);
+[ReturnsRetained] public extern "C" CFXMLNodeRef? CFXMLNodeCreateCopy(CFAllocatorRef? alloc, CFXMLNodeRef? origNode);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFXMLNodeTypeCode CFXMLNodeGetTypeCode(CFXMLNodeRef node);
+public extern "C" CFXMLNodeTypeCode CFXMLNodeGetTypeCode(CFXMLNodeRef? node);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef CFXMLNodeGetString(CFXMLNodeRef node);
+public extern "C" CFStringRef? CFXMLNodeGetString(CFXMLNodeRef? node);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void* CFXMLNodeGetInfoPtr(CFXMLNodeRef node);
+public extern "C" void* CFXMLNodeGetInfoPtr(CFXMLNodeRef? node);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFIndex CFXMLNodeGetVersion(CFXMLNodeRef node);
+public extern "C" CFIndex CFXMLNodeGetVersion(CFXMLNodeRef? node);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFXMLTreeRef CFXMLTreeCreateWithNode(CFAllocatorRef allocator, CFXMLNodeRef node);
+[ReturnsRetained] public extern "C" CFXMLTreeRef? CFXMLTreeCreateWithNode(CFAllocatorRef? allocator, CFXMLNodeRef? node);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFXMLNodeRef CFXMLTreeGetNode(CFXMLTreeRef xmlTree);
+public extern "C" CFXMLNodeRef? CFXMLTreeGetNode(CFXMLTreeRef? xmlTree);
 
 #endif

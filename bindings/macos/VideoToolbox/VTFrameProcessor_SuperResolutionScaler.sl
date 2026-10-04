@@ -23,6 +23,10 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.VideoToolbox;
 
+import MacOS.Foundation;
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
@@ -54,6 +58,43 @@ public enum VTSuperResolutionScalerParametersSubmissionMode : long
 {
     Random = 1,
     Sequential = 2,
+}
+
+public objc closure void VTSuperResolutionScalerConfigurationDownloadConfigurationModelWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
+
+/// macOS 26.0 and later.
+public extern objc class VTSuperResolutionScalerConfiguration : NSObject, VTFrameProcessorConfiguration
+{
+    [Selector("frameWidth")] public NSInteger FrameWidth { get; }
+    [Selector("frameHeight")] public NSInteger FrameHeight { get; }
+    [Selector("inputType")] public VTSuperResolutionScalerConfigurationInputType InputType { get; }
+    [Selector("usesPrecomputedFlow")] public bool PrecomputedFlow { get; }
+    [Selector("scaleFactor")] public NSInteger ScaleFactor { get; }
+    [Selector("qualityPrioritization")] public VTSuperResolutionScalerConfigurationQualityPrioritization QualityPrioritization { get; }
+    [Selector("revision")] public VTSuperResolutionScalerConfigurationRevision Revision { get; }
+    [Selector("supportedRevisions")] public static NSIndexSet SupportedRevisions { get; }
+    [Selector("defaultRevision")] public static VTSuperResolutionScalerConfigurationRevision DefaultRevision { get; }
+    [Selector("frameSupportedPixelFormats")] public NSArray? FrameSupportedPixelFormats { get; }
+    [Selector("sourcePixelBufferAttributes")] public NSDictionary SourcePixelBufferAttributes { get; }
+    [Selector("destinationPixelBufferAttributes")] public NSDictionary DestinationPixelBufferAttributes { get; }
+    [Selector("configurationModelStatus")] public VTSuperResolutionScalerConfigurationModelStatus ConfigurationModelStatus { get; }
+    [Selector("configurationModelPercentageAvailable")] public float ConfigurationModelPercentageAvailable { get; }
+    [Selector("isSupported")] public static bool Supported { get; }
+    [Selector("supportedScaleFactors")] public static NSArray? SupportedScaleFactors { get; }
+    [Selector("initWithFrameWidth:frameHeight:scaleFactor:inputType:usePrecomputedFlow:qualityPrioritization:revision:")] public Self? InitWithFrameWidthFrameHeightScaleFactorInputTypeUsePrecomputedFlowQualityPrioritizationRevision(NSInteger frameWidth, NSInteger frameHeight, NSInteger scaleFactor, VTSuperResolutionScalerConfigurationInputType inputType, bool usePrecomputedFlow, VTSuperResolutionScalerConfigurationQualityPrioritization qualityPrioritization, VTSuperResolutionScalerConfigurationRevision revision);
+    [Selector("downloadConfigurationModelWithCompletionHandler:")] public void DownloadConfigurationModelWithCompletionHandler(VTSuperResolutionScalerConfigurationDownloadConfigurationModelWithCompletionHandlerCompletionHandlerBlock completionHandler);
+}
+
+/// macOS 26.0 and later.
+public extern objc class VTSuperResolutionScalerParameters : NSObject, VTFrameProcessorParameters
+{
+    [Selector("sourceFrame")] public VTFrameProcessorFrame SourceFrame { get; }
+    [Selector("previousFrame")] public VTFrameProcessorFrame? PreviousFrame { get; }
+    [Selector("previousOutputFrame")] public VTFrameProcessorFrame? PreviousOutputFrame { get; }
+    [Selector("opticalFlow")] public VTFrameProcessorOpticalFlow? OpticalFlow { get; }
+    [Selector("submissionMode")] public VTSuperResolutionScalerParametersSubmissionMode SubmissionMode { get; }
+    [Selector("destinationFrame")] public VTFrameProcessorFrame DestinationFrame { get; }
+    [Selector("initWithSourceFrame:previousFrame:previousOutputFrame:opticalFlow:submissionMode:destinationFrame:")] public Self? InitWithSourceFramePreviousFramePreviousOutputFrameOpticalFlowSubmissionModeDestinationFrame(VTFrameProcessorFrame sourceFrame, VTFrameProcessorFrame? previousFrame, VTFrameProcessorFrame? previousOutputFrame, VTFrameProcessorOpticalFlow? opticalFlow, VTSuperResolutionScalerParametersSubmissionMode submissionMode, VTFrameProcessorFrame destinationFrame);
 }
 
 #endif

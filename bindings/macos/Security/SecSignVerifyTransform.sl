@@ -24,6 +24,7 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,19 +35,19 @@ public extern "C" CFStringRef kSecKeyAttributeName;
 public extern "C" CFStringRef kSecSignatureAttributeName;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecInputIsAttributeName;
+public extern "C" CFStringRef? kSecInputIsAttributeName;
 
 public extern "C" CFStringRef kSecInputIsPlainText;
 
 public extern "C" CFStringRef kSecInputIsDigest;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecInputIsRaw;
+public extern "C" CFStringRef? kSecInputIsRaw;
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecSignTransformCreate(SecKeyRef key, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef? SecSignTransformCreate(SecKeyRef key, __CFError** error);
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecVerifyTransformCreate(SecKeyRef key, CFDataRef signature, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef? SecVerifyTransformCreate(SecKeyRef key, CFDataRef? signature, __CFError** error);
 
 #endif

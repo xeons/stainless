@@ -24,6 +24,7 @@
 module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct __CTTypesetter;
 
-public using CTTypesetterRef = __CTTypesetter*;
+[CFType("CTTypesetterGetTypeID")]
+public extern objc class CTTypesetterRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTTypesetterGetTypeID();
 
@@ -42,13 +44,13 @@ public extern "C" CFStringRef kCTTypesetterOptionDisableBidiProcessing;
 
 public extern "C" CFStringRef kCTTypesetterOptionForcedEmbeddingLevel;
 
-public extern "C" CTTypesetterRef CTTypesetterCreateWithAttributedString(CFAttributedStringRef string);
+[ReturnsRetained] public extern "C" CTTypesetterRef CTTypesetterCreateWithAttributedString(CFAttributedStringRef string);
 
-public extern "C" CTTypesetterRef CTTypesetterCreateWithAttributedStringAndOptions(CFAttributedStringRef string, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CTTypesetterRef? CTTypesetterCreateWithAttributedStringAndOptions(CFAttributedStringRef string, CFDictionaryRef? options);
 
-public extern "C" CTLineRef CTTypesetterCreateLineWithOffset(CTTypesetterRef typesetter, CFRange stringRange, double offset);
+[ReturnsRetained] public extern "C" CTLineRef CTTypesetterCreateLineWithOffset(CTTypesetterRef typesetter, CFRange stringRange, double offset);
 
-public extern "C" CTLineRef CTTypesetterCreateLine(CTTypesetterRef typesetter, CFRange stringRange);
+[ReturnsRetained] public extern "C" CTLineRef CTTypesetterCreateLine(CTTypesetterRef typesetter, CFRange stringRange);
 
 public extern "C" CFIndex CTTypesetterSuggestLineBreakWithOffset(CTTypesetterRef typesetter, CFIndex startIndex, double width, double offset);
 

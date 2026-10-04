@@ -26,6 +26,7 @@ module MacOS.CoreGraphics;
 import MacOS.CoreFoundation;
 import MacOS.IOKit;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -39,7 +40,7 @@ public extern "C" CGError CGBeginDisplayConfiguration(CGDisplayConfigRef* config
 
 public extern "C" CGError CGConfigureDisplayOrigin(CGDisplayConfigRef config, CGDirectDisplayID display, int x, int y);
 
-public extern "C" CGError CGConfigureDisplayWithDisplayMode(CGDisplayConfigRef config, CGDirectDisplayID display, CGDisplayModeRef mode, CFDictionaryRef options);
+public extern "C" CGError CGConfigureDisplayWithDisplayMode(CGDisplayConfigRef config, CGDirectDisplayID display, CGDisplayModeRef? mode, CFDictionaryRef? options);
 
 public extern "C" CGError CGConfigureDisplayStereoOperation(CGDisplayConfigRef config, CGDirectDisplayID display, boolean_t stereo, boolean_t forceBlueLine);
 
@@ -122,9 +123,9 @@ public extern "C" CGSize CGDisplayScreenSize(CGDirectDisplayID display);
 
 public extern "C" double CGDisplayRotation(CGDirectDisplayID display);
 
-public extern "C" CGColorSpaceRef CGDisplayCopyColorSpace(CGDirectDisplayID display);
+[ReturnsRetained] public extern "C" CGColorSpaceRef CGDisplayCopyColorSpace(CGDirectDisplayID display);
 
 /// Deprecated in macOS 10.6.
-public extern "C" CGError CGConfigureDisplayMode(CGDisplayConfigRef config, CGDirectDisplayID display, CFDictionaryRef mode);
+public extern "C" CGError CGConfigureDisplayMode(CGDisplayConfigRef config, CGDirectDisplayID display, CFDictionaryRef? mode);
 
 #endif

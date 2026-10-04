@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -48,28 +49,28 @@ public enum _SecureDownloadTrustCallbackResult : int
 public using SecureDownloadTrustCallbackResult = _SecureDownloadTrustCallbackResult;
 
 /// Deprecated in macOS 12.0.
-public delegate SecureDownloadTrustCallbackResult SecureDownloadTrustSetupCallback(SecTrustRef arg0, void* arg1);
+public delegate SecureDownloadTrustCallbackResult SecureDownloadTrustSetupCallback(__SecTrust* arg0, void* arg1);
 
 /// Deprecated in macOS 12.0.
-public delegate SecTrustResultType SecureDownloadTrustEvaluateCallback(SecTrustRef arg0, SecTrustResultType arg1, void* arg2);
+public delegate SecTrustResultType SecureDownloadTrustEvaluateCallback(__SecTrust* arg0, SecTrustResultType arg1, void* arg2);
 
 /// Deprecated in macOS 12.0.
-public extern "C" OSStatus SecureDownloadCreateWithTicket(CFDataRef ticket, SecureDownloadTrustSetupCallback setup, void* setupContext, SecureDownloadTrustEvaluateCallback evaluate, void* evaluateContext, SecureDownloadRef* downloadRef);
+public extern "C" OSStatus SecureDownloadCreateWithTicket(CFDataRef? ticket, SecureDownloadTrustSetupCallback setup, void* setupContext, SecureDownloadTrustEvaluateCallback evaluate, void* evaluateContext, SecureDownloadRef* downloadRef);
 
 /// Deprecated in macOS 12.0.
-public extern "C" OSStatus SecureDownloadCopyURLs(SecureDownloadRef downloadRef, CFArrayRef* urls);
+public extern "C" OSStatus SecureDownloadCopyURLs(SecureDownloadRef downloadRef, __CFArray** urls);
 
 /// Deprecated in macOS 12.0.
-public extern "C" OSStatus SecureDownloadCopyName(SecureDownloadRef downloadRef, CFStringRef* name);
+public extern "C" OSStatus SecureDownloadCopyName(SecureDownloadRef downloadRef, __CFString** name);
 
 /// Deprecated in macOS 12.0.
-public extern "C" OSStatus SecureDownloadCopyCreationDate(SecureDownloadRef downloadRef, CFDateRef* date);
+public extern "C" OSStatus SecureDownloadCopyCreationDate(SecureDownloadRef downloadRef, __CFDate** date);
 
 /// Deprecated in macOS 12.0.
 public extern "C" OSStatus SecureDownloadGetDownloadSize(SecureDownloadRef downloadRef, SInt64* downloadSize);
 
 /// Deprecated in macOS 12.0.
-public extern "C" OSStatus SecureDownloadUpdateWithData(SecureDownloadRef downloadRef, CFDataRef data);
+public extern "C" OSStatus SecureDownloadUpdateWithData(SecureDownloadRef downloadRef, CFDataRef? data);
 
 /// Deprecated in macOS 12.0.
 public extern "C" OSStatus SecureDownloadFinished(SecureDownloadRef downloadRef);
@@ -78,6 +79,6 @@ public extern "C" OSStatus SecureDownloadFinished(SecureDownloadRef downloadRef)
 public extern "C" OSStatus SecureDownloadRelease(SecureDownloadRef downloadRef);
 
 /// Deprecated in macOS 12.0.
-public extern "C" OSStatus SecureDownloadCopyTicketLocation(CFURLRef url, CFURLRef* ticketLocation);
+public extern "C" OSStatus SecureDownloadCopyTicketLocation(CFURLRef? url, __CFURL** ticketLocation);
 
 #endif

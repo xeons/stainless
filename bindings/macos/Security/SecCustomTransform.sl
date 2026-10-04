@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -53,69 +54,69 @@ public using SecTransformAttributeRef = CFTypeRef;
 public using SecTransformStringOrAttributeRef = CFTypeRef;
 
 /// Deprecated in macOS 13.0.
-public objc closure CFTypeRef SecTransformActionBlock();
+public objc closure CFTypeRef? SecTransformActionBlock();
 
 /// Deprecated in macOS 13.0.
-public objc closure CFTypeRef SecTransformAttributeActionBlock(SecTransformAttributeRef arg0, CFTypeRef arg1);
+public objc closure CFTypeRef? SecTransformAttributeActionBlock(SecTransformAttributeRef arg0, CFTypeRef arg1);
 
-public objc closure CFTypeRef SecTransformDataBlock(CFTypeRef arg0);
+public objc closure CFTypeRef? SecTransformDataBlock(CFTypeRef arg0);
 
-public objc closure CFErrorRef SecTransformInstanceBlock();
+public objc closure CFErrorRef? SecTransformInstanceBlock();
 
 public struct OpaqueSecTransformImplementation;
 
 public using SecTransformImplementationRef = OpaqueSecTransformImplementation*;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFErrorRef SecTransformSetAttributeAction(SecTransformImplementationRef @ref, CFStringRef action, SecTransformStringOrAttributeRef @attribute, SecTransformAttributeActionBlock newAction);
+public extern "C" CFErrorRef? SecTransformSetAttributeAction(SecTransformImplementationRef @ref, CFStringRef action, SecTransformStringOrAttributeRef? @attribute, SecTransformAttributeActionBlock newAction);
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFErrorRef SecTransformSetDataAction(SecTransformImplementationRef @ref, CFStringRef action, SecTransformDataBlock newAction);
+public extern "C" CFErrorRef? SecTransformSetDataAction(SecTransformImplementationRef @ref, CFStringRef action, SecTransformDataBlock newAction);
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFErrorRef SecTransformSetTransformAction(SecTransformImplementationRef @ref, CFStringRef action, SecTransformActionBlock newAction);
+public extern "C" CFErrorRef? SecTransformSetTransformAction(SecTransformImplementationRef @ref, CFStringRef action, SecTransformActionBlock newAction);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFTypeRef SecTranformCustomGetAttribute(SecTransformImplementationRef @ref, SecTransformStringOrAttributeRef @attribute, SecTransformMetaAttributeType type);
+public extern "C" CFTypeRef? SecTranformCustomGetAttribute(SecTransformImplementationRef @ref, SecTransformStringOrAttributeRef @attribute, SecTransformMetaAttributeType type);
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFTypeRef SecTransformCustomSetAttribute(SecTransformImplementationRef @ref, SecTransformStringOrAttributeRef @attribute, SecTransformMetaAttributeType type, CFTypeRef value);
+public extern "C" CFTypeRef? SecTransformCustomSetAttribute(SecTransformImplementationRef @ref, SecTransformStringOrAttributeRef @attribute, SecTransformMetaAttributeType type, CFTypeRef? value);
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFTypeRef SecTransformPushbackAttribute(SecTransformImplementationRef @ref, SecTransformStringOrAttributeRef @attribute, CFTypeRef value);
+public extern "C" CFTypeRef? SecTransformPushbackAttribute(SecTransformImplementationRef @ref, SecTransformStringOrAttributeRef @attribute, CFTypeRef value);
 
 /// Deprecated in macOS 13.0.
-public delegate SecTransformInstanceBlock SecTransformCreateFP(CFStringRef arg0, SecTransformRef arg1, SecTransformImplementationRef arg2);
+public delegate void* SecTransformCreateFP(__CFString* arg0, void* arg1, SecTransformImplementationRef arg2);
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionCanExecute;
+public extern "C" CFStringRef? kSecTransformActionCanExecute;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionStartingExecution;
+public extern "C" CFStringRef? kSecTransformActionStartingExecution;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionFinalize;
+public extern "C" CFStringRef? kSecTransformActionFinalize;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionExternalizeExtraData;
+public extern "C" CFStringRef? kSecTransformActionExternalizeExtraData;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionProcessData;
+public extern "C" CFStringRef? kSecTransformActionProcessData;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionInternalizeExtraData;
+public extern "C" CFStringRef? kSecTransformActionInternalizeExtraData;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionAttributeNotification;
+public extern "C" CFStringRef? kSecTransformActionAttributeNotification;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecTransformActionAttributeValidation;
+public extern "C" CFStringRef? kSecTransformActionAttributeValidation;
 
 /// Deprecated in macOS 13.0.
-public extern "C" Boolean SecTransformRegister(CFStringRef uniqueName, SecTransformCreateFP createTransformFunction, CFErrorRef* error);
+public extern "C" Boolean SecTransformRegister(CFStringRef uniqueName, SecTransformCreateFP createTransformFunction, __CFError** error);
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecTransformCreate(CFStringRef name, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef? SecTransformCreate(CFStringRef name, __CFError** error);
 
 /// Deprecated in macOS 13.0.
 public extern "C" CFTypeRef SecTransformNoData();

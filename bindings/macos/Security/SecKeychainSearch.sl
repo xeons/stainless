@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,9 +35,9 @@ import MacOS.System;
 public extern "C" CFTypeID SecKeychainSearchGetTypeID();
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecKeychainSearchCreateFromAttributes(CFTypeRef keychainOrArray, SecItemClass itemClass, SecKeychainAttributeList* attrList, SecKeychainSearchRef* searchRef);
+public extern "C" OSStatus SecKeychainSearchCreateFromAttributes(CFTypeRef? keychainOrArray, SecItemClass itemClass, SecKeychainAttributeList* attrList, __SecKeychainSearch** searchRef);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecKeychainSearchCopyNext(SecKeychainSearchRef searchRef, SecKeychainItemRef* itemRef);
+public extern "C" OSStatus SecKeychainSearchCopyNext(SecKeychainSearchRef searchRef, __SecKeychainItem** itemRef);
 
 #endif

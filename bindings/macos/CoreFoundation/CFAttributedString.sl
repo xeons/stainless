@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,53 +32,55 @@ import MacOS.System;
 
 public struct __CFAttributedString;
 
-public using CFAttributedStringRef = __CFAttributedString*;
+[CFType("CFAttributedStringGetTypeID")]
+public extern objc class CFAttributedStringRef : CFTypeRef { }
 
-public using CFMutableAttributedStringRef = __CFAttributedString*;
+[CFType]
+public extern objc class CFMutableAttributedStringRef : CFAttributedStringRef { }
 
 public extern "C" CFTypeID CFAttributedStringGetTypeID();
 
-public extern "C" CFAttributedStringRef CFAttributedStringCreate(CFAllocatorRef alloc, CFStringRef str, CFDictionaryRef attributes);
+[ReturnsRetained] public extern "C" CFAttributedStringRef? CFAttributedStringCreate(CFAllocatorRef? alloc, CFStringRef? str, CFDictionaryRef? attributes);
 
-public extern "C" CFAttributedStringRef CFAttributedStringCreateWithSubstring(CFAllocatorRef alloc, CFAttributedStringRef aStr, CFRange range);
+[ReturnsRetained] public extern "C" CFAttributedStringRef? CFAttributedStringCreateWithSubstring(CFAllocatorRef? alloc, CFAttributedStringRef? aStr, CFRange range);
 
-public extern "C" CFAttributedStringRef CFAttributedStringCreateCopy(CFAllocatorRef alloc, CFAttributedStringRef aStr);
+[ReturnsRetained] public extern "C" CFAttributedStringRef? CFAttributedStringCreateCopy(CFAllocatorRef? alloc, CFAttributedStringRef? aStr);
 
-public extern "C" CFStringRef CFAttributedStringGetString(CFAttributedStringRef aStr);
+public extern "C" CFStringRef? CFAttributedStringGetString(CFAttributedStringRef? aStr);
 
-public extern "C" CFIndex CFAttributedStringGetLength(CFAttributedStringRef aStr);
+public extern "C" CFIndex CFAttributedStringGetLength(CFAttributedStringRef? aStr);
 
-public extern "C" CFDictionaryRef CFAttributedStringGetAttributes(CFAttributedStringRef aStr, CFIndex loc, CFRange* effectiveRange);
+public extern "C" CFDictionaryRef? CFAttributedStringGetAttributes(CFAttributedStringRef? aStr, CFIndex loc, CFRange* effectiveRange);
 
-public extern "C" CFTypeRef CFAttributedStringGetAttribute(CFAttributedStringRef aStr, CFIndex loc, CFStringRef attrName, CFRange* effectiveRange);
+public extern "C" CFTypeRef? CFAttributedStringGetAttribute(CFAttributedStringRef? aStr, CFIndex loc, CFStringRef? attrName, CFRange* effectiveRange);
 
-public extern "C" CFDictionaryRef CFAttributedStringGetAttributesAndLongestEffectiveRange(CFAttributedStringRef aStr, CFIndex loc, CFRange inRange, CFRange* longestEffectiveRange);
+public extern "C" CFDictionaryRef? CFAttributedStringGetAttributesAndLongestEffectiveRange(CFAttributedStringRef? aStr, CFIndex loc, CFRange inRange, CFRange* longestEffectiveRange);
 
-public extern "C" CFTypeRef CFAttributedStringGetAttributeAndLongestEffectiveRange(CFAttributedStringRef aStr, CFIndex loc, CFStringRef attrName, CFRange inRange, CFRange* longestEffectiveRange);
+public extern "C" CFTypeRef? CFAttributedStringGetAttributeAndLongestEffectiveRange(CFAttributedStringRef? aStr, CFIndex loc, CFStringRef? attrName, CFRange inRange, CFRange* longestEffectiveRange);
 
-public extern "C" CFMutableAttributedStringRef CFAttributedStringCreateMutableCopy(CFAllocatorRef alloc, CFIndex maxLength, CFAttributedStringRef aStr);
+[ReturnsRetained] public extern "C" CFMutableAttributedStringRef? CFAttributedStringCreateMutableCopy(CFAllocatorRef? alloc, CFIndex maxLength, CFAttributedStringRef? aStr);
 
-public extern "C" CFMutableAttributedStringRef CFAttributedStringCreateMutable(CFAllocatorRef alloc, CFIndex maxLength);
+[ReturnsRetained] public extern "C" CFMutableAttributedStringRef? CFAttributedStringCreateMutable(CFAllocatorRef? alloc, CFIndex maxLength);
 
-public extern "C" void CFAttributedStringReplaceString(CFMutableAttributedStringRef aStr, CFRange range, CFStringRef replacement);
+public extern "C" void CFAttributedStringReplaceString(CFMutableAttributedStringRef? aStr, CFRange range, CFStringRef? replacement);
 
-public extern "C" CFMutableStringRef CFAttributedStringGetMutableString(CFMutableAttributedStringRef aStr);
+public extern "C" CFMutableStringRef? CFAttributedStringGetMutableString(CFMutableAttributedStringRef? aStr);
 
-public extern "C" void CFAttributedStringSetAttributes(CFMutableAttributedStringRef aStr, CFRange range, CFDictionaryRef replacement, Boolean clearOtherAttributes);
+public extern "C" void CFAttributedStringSetAttributes(CFMutableAttributedStringRef? aStr, CFRange range, CFDictionaryRef? replacement, Boolean clearOtherAttributes);
 
-public extern "C" void CFAttributedStringSetAttribute(CFMutableAttributedStringRef aStr, CFRange range, CFStringRef attrName, CFTypeRef value);
+public extern "C" void CFAttributedStringSetAttribute(CFMutableAttributedStringRef? aStr, CFRange range, CFStringRef? attrName, CFTypeRef? value);
 
-public extern "C" void CFAttributedStringRemoveAttribute(CFMutableAttributedStringRef aStr, CFRange range, CFStringRef attrName);
+public extern "C" void CFAttributedStringRemoveAttribute(CFMutableAttributedStringRef? aStr, CFRange range, CFStringRef? attrName);
 
-public extern "C" void CFAttributedStringReplaceAttributedString(CFMutableAttributedStringRef aStr, CFRange range, CFAttributedStringRef replacement);
+public extern "C" void CFAttributedStringReplaceAttributedString(CFMutableAttributedStringRef? aStr, CFRange range, CFAttributedStringRef? replacement);
 
-public extern "C" void CFAttributedStringBeginEditing(CFMutableAttributedStringRef aStr);
+public extern "C" void CFAttributedStringBeginEditing(CFMutableAttributedStringRef? aStr);
 
-public extern "C" void CFAttributedStringEndEditing(CFMutableAttributedStringRef aStr);
+public extern "C" void CFAttributedStringEndEditing(CFMutableAttributedStringRef? aStr);
 
-public extern "C" bool CFAttributedStringGetBidiLevelsAndResolvedDirections(CFAttributedStringRef attributedString, CFRange range, sbyte baseDirection, byte* bidiLevels, byte* baseDirections);
+public extern "C" bool CFAttributedStringGetBidiLevelsAndResolvedDirections(CFAttributedStringRef? attributedString, CFRange range, sbyte baseDirection, byte* bidiLevels, byte* baseDirections);
 
 /// macOS 26.0 and later.
-public extern "C" bool CFAttributedStringGetStatisticalWritingDirections(CFAttributedStringRef attributedString, CFRange range, sbyte baseDirection, byte* bidiLevels, byte* baseDirections);
+public extern "C" bool CFAttributedStringGetStatisticalWritingDirections(CFAttributedStringRef? attributedString, CFRange range, sbyte baseDirection, byte* bidiLevels, byte* baseDirections);
 
 #endif

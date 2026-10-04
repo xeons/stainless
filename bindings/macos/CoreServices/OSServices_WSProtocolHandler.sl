@@ -24,6 +24,7 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,43 +32,44 @@ import MacOS.CoreFoundation;
 
 public struct OpaqueWSProtocolHandlerRef;
 
-public using WSProtocolHandlerRef = OpaqueWSProtocolHandlerRef*;
+[CFType("WSProtocolHandlerGetTypeID")]
+public extern objc class WSProtocolHandlerRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.8.
 public extern "C" CFTypeID WSProtocolHandlerGetTypeID();
 
 /// Deprecated in macOS 10.8.
-public extern "C" WSProtocolHandlerRef WSProtocolHandlerCreate(CFAllocatorRef allocator, CFStringRef protocol);
+[ReturnsRetained] public extern "C" WSProtocolHandlerRef? WSProtocolHandlerCreate(CFAllocatorRef? allocator, CFStringRef? protocol);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDictionaryRef WSProtocolHandlerCopyRequestDictionary(WSProtocolHandlerRef @ref, CFDataRef data);
+[ReturnsRetained] public extern "C" CFDictionaryRef? WSProtocolHandlerCopyRequestDictionary(WSProtocolHandlerRef? @ref, CFDataRef? data);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDictionaryRef WSProtocolHandlerCopyReplyDictionary(WSProtocolHandlerRef @ref, CFStringRef methodName, CFDataRef data);
+[ReturnsRetained] public extern "C" CFDictionaryRef? WSProtocolHandlerCopyReplyDictionary(WSProtocolHandlerRef? @ref, CFStringRef? methodName, CFDataRef? data);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDataRef WSProtocolHandlerCopyReplyDocument(WSProtocolHandlerRef @ref, CFDictionaryRef methodContext, CFTypeRef resultValue);
+[ReturnsRetained] public extern "C" CFDataRef? WSProtocolHandlerCopyReplyDocument(WSProtocolHandlerRef? @ref, CFDictionaryRef? methodContext, CFTypeRef? resultValue);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDataRef WSProtocolHandlerCopyFaultDocument(WSProtocolHandlerRef @ref, CFDictionaryRef methodContext, CFDictionaryRef faultDict);
+[ReturnsRetained] public extern "C" CFDataRef? WSProtocolHandlerCopyFaultDocument(WSProtocolHandlerRef? @ref, CFDictionaryRef? methodContext, CFDictionaryRef? faultDict);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDataRef WSProtocolHandlerCopyRequestDocument(WSProtocolHandlerRef @ref, CFStringRef methodName, CFDictionaryRef methodParams, CFArrayRef methodParamOrder, CFDictionaryRef methodExtras);
+[ReturnsRetained] public extern "C" CFDataRef? WSProtocolHandlerCopyRequestDocument(WSProtocolHandlerRef? @ref, CFStringRef? methodName, CFDictionaryRef? methodParams, CFArrayRef? methodParamOrder, CFDictionaryRef? methodExtras);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFTypeRef WSProtocolHandlerCopyProperty(WSProtocolHandlerRef @ref, CFStringRef propertyName);
+[ReturnsRetained] public extern "C" CFTypeRef? WSProtocolHandlerCopyProperty(WSProtocolHandlerRef? @ref, CFStringRef? propertyName);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSProtocolHandlerSetProperty(WSProtocolHandlerRef @ref, CFStringRef propertyName, CFTypeRef propertyValue);
+public extern "C" void WSProtocolHandlerSetProperty(WSProtocolHandlerRef? @ref, CFStringRef? propertyName, CFTypeRef? propertyValue);
 
-public delegate CFStringRef WSProtocolHandlerSerializationProcPtr(WSProtocolHandlerRef arg0, CFTypeRef arg1, void* arg2);
-
-/// Deprecated in macOS 10.8.
-public extern "C" void WSProtocolHandlerSetSerializationOverride(WSProtocolHandlerRef protocol, CFTypeID objType, WSProtocolHandlerSerializationProcPtr serializationProc, WSClientContext* context);
-
-public delegate CFTypeRef WSProtocolHandlerDeserializationProcPtr(WSProtocolHandlerRef arg0, CFXMLTreeRef arg1, CFXMLTreeRef arg2, void* arg3);
+public delegate __CFString* WSProtocolHandlerSerializationProcPtr(OpaqueWSProtocolHandlerRef* arg0, void* arg1, void* arg2);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSProtocolHandlerSetDeserializationOverride(WSProtocolHandlerRef protocol, CFStringRef typeNamespace, CFStringRef typeName, WSProtocolHandlerDeserializationProcPtr deserializationProc, WSClientContext* context);
+public extern "C" void WSProtocolHandlerSetSerializationOverride(WSProtocolHandlerRef? protocol, CFTypeID objType, WSProtocolHandlerSerializationProcPtr serializationProc, WSClientContext* context);
+
+public delegate void* WSProtocolHandlerDeserializationProcPtr(OpaqueWSProtocolHandlerRef* arg0, void* arg1, void* arg2, void* arg3);
+
+/// Deprecated in macOS 10.8.
+public extern "C" void WSProtocolHandlerSetDeserializationOverride(WSProtocolHandlerRef? protocol, CFStringRef? typeNamespace, CFStringRef? typeName, WSProtocolHandlerDeserializationProcPtr deserializationProc, WSClientContext* context);
 
 #endif

@@ -23,9 +23,20 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Hypervisor;
 
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Hypervisor")
+
+#if ARM64
+public objc interface OS_hv_vm_config : NSObjectProtocol { }
+#endif
+
+#if ARM64
+public using hv_vm_config_t = NSObject;
+#endif
 
 #if ARM64
 public using hv_ipa_t = ulong;

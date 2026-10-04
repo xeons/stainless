@@ -26,6 +26,7 @@ module MacOS.CoreVideo;
 import MacOS.CoreFoundation;
 import MacOS.OpenGL;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -37,10 +38,7 @@ public using CVOpenGLTextureRef = CVImageBufferRef;
 public extern "C" CFTypeID CVOpenGLTextureGetTypeID();
 
 /// Deprecated in macOS 10.14.
-public extern "C" CVOpenGLTextureRef CVOpenGLTextureRetain(CVOpenGLTextureRef texture);
-
-/// Deprecated in macOS 10.14.
-public extern "C" void CVOpenGLTextureRelease(CVOpenGLTextureRef texture);
+public extern "C" CVOpenGLTextureRef? CVOpenGLTextureRetain(CVOpenGLTextureRef? texture);
 
 /// Deprecated in macOS 10.14.
 public extern "C" GLenum CVOpenGLTextureGetTarget(CVOpenGLTextureRef image);

@@ -25,6 +25,7 @@ module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,72 +34,72 @@ import MacOS.System;
 public extern "C" SInt32 kCFStreamErrorDomainFTP;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPUserName;
+public extern "C" CFStringRef? kCFStreamPropertyFTPUserName;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPPassword;
+public extern "C" CFStringRef? kCFStreamPropertyFTPPassword;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPUsePassiveMode;
+public extern "C" CFStringRef? kCFStreamPropertyFTPUsePassiveMode;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPResourceSize;
+public extern "C" CFStringRef? kCFStreamPropertyFTPResourceSize;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPFetchResourceInfo;
+public extern "C" CFStringRef? kCFStreamPropertyFTPFetchResourceInfo;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPFileTransferOffset;
+public extern "C" CFStringRef? kCFStreamPropertyFTPFileTransferOffset;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPAttemptPersistentConnection;
+public extern "C" CFStringRef? kCFStreamPropertyFTPAttemptPersistentConnection;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPProxy;
+public extern "C" CFStringRef? kCFStreamPropertyFTPProxy;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPProxyHost;
+public extern "C" CFStringRef? kCFStreamPropertyFTPProxyHost;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPProxyPort;
+public extern "C" CFStringRef? kCFStreamPropertyFTPProxyPort;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPProxyUser;
+public extern "C" CFStringRef? kCFStreamPropertyFTPProxyUser;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyFTPProxyPassword;
+public extern "C" CFStringRef? kCFStreamPropertyFTPProxyPassword;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceMode;
+public extern "C" CFStringRef? kCFFTPResourceMode;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceName;
+public extern "C" CFStringRef? kCFFTPResourceName;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceOwner;
+public extern "C" CFStringRef? kCFFTPResourceOwner;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceGroup;
+public extern "C" CFStringRef? kCFFTPResourceGroup;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceLink;
+public extern "C" CFStringRef? kCFFTPResourceLink;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceSize;
+public extern "C" CFStringRef? kCFFTPResourceSize;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceType;
+public extern "C" CFStringRef? kCFFTPResourceType;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFFTPResourceModDate;
+public extern "C" CFStringRef? kCFFTPResourceModDate;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFReadStreamRef CFReadStreamCreateWithFTPURL(CFAllocatorRef alloc, CFURLRef ftpURL);
+[ReturnsRetained] public extern "C" CFReadStreamRef CFReadStreamCreateWithFTPURL(CFAllocatorRef? alloc, CFURLRef ftpURL);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFIndex CFFTPCreateParsedResourceListing(CFAllocatorRef alloc, UInt8* buffer, CFIndex bufferLength, CFDictionaryRef* parsed);
+public extern "C" CFIndex CFFTPCreateParsedResourceListing(CFAllocatorRef? alloc, UInt8* buffer, CFIndex bufferLength, __CFDictionary** parsed);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFWriteStreamRef CFWriteStreamCreateWithFTPURL(CFAllocatorRef alloc, CFURLRef ftpURL);
+[ReturnsRetained] public extern "C" CFWriteStreamRef CFWriteStreamCreateWithFTPURL(CFAllocatorRef? alloc, CFURLRef ftpURL);
 
 #endif

@@ -25,6 +25,7 @@ module MacOS.CoreMIDI;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -45,7 +46,7 @@ public extern "C" OSStatus MIDISetupInstall(MIDISetupRef setup);
 public extern "C" OSStatus MIDISetupGetCurrent(MIDISetupRef* outSetup);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus MIDISetupToData(MIDISetupRef setup, CFDataRef* outData);
+public extern "C" OSStatus MIDISetupToData(MIDISetupRef setup, __CFData** outData);
 
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus MIDISetupFromData(CFDataRef data, MIDISetupRef* outSetup);
@@ -68,13 +69,13 @@ public extern "C" OSStatus MIDISetupAddExternalDevice(MIDIDeviceRef device);
 public extern "C" OSStatus MIDISetupRemoveExternalDevice(MIDIDeviceRef device);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus MIDIGetSerialPortOwner(CFStringRef portName, CFStringRef* outDriverName);
+public extern "C" OSStatus MIDIGetSerialPortOwner(CFStringRef portName, __CFString** outDriverName);
 
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus MIDISetSerialPortOwner(CFStringRef portName, CFStringRef driverName);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus MIDIGetSerialPortDrivers(CFArrayRef* outDriverNames);
+public extern "C" OSStatus MIDIGetSerialPortDrivers(__CFArray** outDriverNames);
 
 public extern "C" OSStatus MIDIExternalDeviceCreate(CFStringRef name, CFStringRef manufacturer, CFStringRef model, MIDIDeviceRef* outDevice);
 

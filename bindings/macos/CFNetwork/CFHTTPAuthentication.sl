@@ -25,6 +25,7 @@ module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct _CFHTTPAuthentication;
 
-public using CFHTTPAuthenticationRef = _CFHTTPAuthentication*;
+[CFType("CFHTTPAuthenticationGetTypeID")]
+public extern objc class CFHTTPAuthenticationRef : CFTypeRef { }
 
 public enum CFStreamErrorHTTPAuthentication : int
 {
@@ -41,15 +43,15 @@ public enum CFStreamErrorHTTPAuthentication : int
     BadPassword = -1002,
 }
 
-public extern "C" CFStringRef kCFHTTPAuthenticationUsername;
+public extern "C" CFStringRef? kCFHTTPAuthenticationUsername;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationPassword;
+public extern "C" CFStringRef? kCFHTTPAuthenticationPassword;
 
-public extern "C" CFStringRef kCFHTTPAuthenticationAccountDomain;
+public extern "C" CFStringRef? kCFHTTPAuthenticationAccountDomain;
 
 public extern "C" CFTypeID CFHTTPAuthenticationGetTypeID();
 
-public extern "C" CFHTTPAuthenticationRef CFHTTPAuthenticationCreateFromResponse(CFAllocatorRef alloc, CFHTTPMessageRef response);
+[ReturnsRetained] public extern "C" CFHTTPAuthenticationRef CFHTTPAuthenticationCreateFromResponse(CFAllocatorRef? alloc, CFHTTPMessageRef response);
 
 public extern "C" Boolean CFHTTPAuthenticationIsValid(CFHTTPAuthenticationRef auth, CFStreamError* error);
 
@@ -57,15 +59,15 @@ public extern "C" Boolean CFHTTPAuthenticationAppliesToRequest(CFHTTPAuthenticat
 
 public extern "C" Boolean CFHTTPAuthenticationRequiresOrderedRequests(CFHTTPAuthenticationRef auth);
 
-public extern "C" Boolean CFHTTPMessageApplyCredentials(CFHTTPMessageRef request, CFHTTPAuthenticationRef auth, CFStringRef username, CFStringRef password, CFStreamError* error);
+public extern "C" Boolean CFHTTPMessageApplyCredentials(CFHTTPMessageRef request, CFHTTPAuthenticationRef auth, CFStringRef? username, CFStringRef? password, CFStreamError* error);
 
 public extern "C" Boolean CFHTTPMessageApplyCredentialDictionary(CFHTTPMessageRef request, CFHTTPAuthenticationRef auth, CFDictionaryRef dict, CFStreamError* error);
 
-public extern "C" CFStringRef CFHTTPAuthenticationCopyRealm(CFHTTPAuthenticationRef auth);
+[ReturnsRetained] public extern "C" CFStringRef CFHTTPAuthenticationCopyRealm(CFHTTPAuthenticationRef auth);
 
-public extern "C" CFArrayRef CFHTTPAuthenticationCopyDomains(CFHTTPAuthenticationRef auth);
+[ReturnsRetained] public extern "C" CFArrayRef CFHTTPAuthenticationCopyDomains(CFHTTPAuthenticationRef auth);
 
-public extern "C" CFStringRef CFHTTPAuthenticationCopyMethod(CFHTTPAuthenticationRef auth);
+[ReturnsRetained] public extern "C" CFStringRef CFHTTPAuthenticationCopyMethod(CFHTTPAuthenticationRef auth);
 
 public extern "C" Boolean CFHTTPAuthenticationRequiresUserNameAndPassword(CFHTTPAuthenticationRef auth);
 

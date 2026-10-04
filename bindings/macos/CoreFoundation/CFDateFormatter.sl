@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,9 +34,10 @@ public using CFDateFormatterKey = CFStringRef;
 
 public struct __CFDateFormatter;
 
-public using CFDateFormatterRef = __CFDateFormatter*;
+[CFType("CFDateFormatterGetTypeID")]
+public extern objc class CFDateFormatterRef : CFTypeRef { }
 
-public extern "C" CFStringRef CFDateFormatterCreateDateFormatFromTemplate(CFAllocatorRef allocator, CFStringRef tmplate, CFOptionFlags options, CFLocaleRef locale);
+[ReturnsRetained] public extern "C" CFStringRef? CFDateFormatterCreateDateFormatFromTemplate(CFAllocatorRef? allocator, CFStringRef? tmplate, CFOptionFlags options, CFLocaleRef? locale);
 
 public extern "C" CFTypeID CFDateFormatterGetTypeID();
 
@@ -67,88 +69,88 @@ public enum CFISO8601DateFormatOptions : ulong
     InternetDateTime = 1907,
 }
 
-public extern "C" CFDateFormatterRef CFDateFormatterCreateISO8601Formatter(CFAllocatorRef allocator, CFISO8601DateFormatOptions formatOptions);
+[ReturnsRetained] public extern "C" CFDateFormatterRef? CFDateFormatterCreateISO8601Formatter(CFAllocatorRef? allocator, CFISO8601DateFormatOptions formatOptions);
 
-public extern "C" CFDateFormatterRef CFDateFormatterCreate(CFAllocatorRef allocator, CFLocaleRef locale, CFDateFormatterStyle dateStyle, CFDateFormatterStyle timeStyle);
+[ReturnsRetained] public extern "C" CFDateFormatterRef? CFDateFormatterCreate(CFAllocatorRef? allocator, CFLocaleRef? locale, CFDateFormatterStyle dateStyle, CFDateFormatterStyle timeStyle);
 
-public extern "C" CFLocaleRef CFDateFormatterGetLocale(CFDateFormatterRef formatter);
+public extern "C" CFLocaleRef? CFDateFormatterGetLocale(CFDateFormatterRef? formatter);
 
-public extern "C" CFDateFormatterStyle CFDateFormatterGetDateStyle(CFDateFormatterRef formatter);
+public extern "C" CFDateFormatterStyle CFDateFormatterGetDateStyle(CFDateFormatterRef? formatter);
 
-public extern "C" CFDateFormatterStyle CFDateFormatterGetTimeStyle(CFDateFormatterRef formatter);
+public extern "C" CFDateFormatterStyle CFDateFormatterGetTimeStyle(CFDateFormatterRef? formatter);
 
-public extern "C" CFStringRef CFDateFormatterGetFormat(CFDateFormatterRef formatter);
+public extern "C" CFStringRef? CFDateFormatterGetFormat(CFDateFormatterRef? formatter);
 
-public extern "C" void CFDateFormatterSetFormat(CFDateFormatterRef formatter, CFStringRef formatString);
+public extern "C" void CFDateFormatterSetFormat(CFDateFormatterRef? formatter, CFStringRef? formatString);
 
-public extern "C" CFStringRef CFDateFormatterCreateStringWithDate(CFAllocatorRef allocator, CFDateFormatterRef formatter, CFDateRef date);
+[ReturnsRetained] public extern "C" CFStringRef? CFDateFormatterCreateStringWithDate(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFDateRef? date);
 
-public extern "C" CFStringRef CFDateFormatterCreateStringWithAbsoluteTime(CFAllocatorRef allocator, CFDateFormatterRef formatter, CFAbsoluteTime at);
+[ReturnsRetained] public extern "C" CFStringRef? CFDateFormatterCreateStringWithAbsoluteTime(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFAbsoluteTime at);
 
-public extern "C" CFDateRef CFDateFormatterCreateDateFromString(CFAllocatorRef allocator, CFDateFormatterRef formatter, CFStringRef string, CFRange* rangep);
+[ReturnsRetained] public extern "C" CFDateRef? CFDateFormatterCreateDateFromString(CFAllocatorRef? allocator, CFDateFormatterRef? formatter, CFStringRef? string, CFRange* rangep);
 
-public extern "C" Boolean CFDateFormatterGetAbsoluteTimeFromString(CFDateFormatterRef formatter, CFStringRef string, CFRange* rangep, CFAbsoluteTime* atp);
+public extern "C" Boolean CFDateFormatterGetAbsoluteTimeFromString(CFDateFormatterRef? formatter, CFStringRef? string, CFRange* rangep, CFAbsoluteTime* atp);
 
-public extern "C" void CFDateFormatterSetProperty(CFDateFormatterRef formatter, CFStringRef key, CFTypeRef value);
+public extern "C" void CFDateFormatterSetProperty(CFDateFormatterRef? formatter, CFStringRef? key, CFTypeRef? value);
 
-public extern "C" CFTypeRef CFDateFormatterCopyProperty(CFDateFormatterRef formatter, CFDateFormatterKey key);
+[ReturnsRetained] public extern "C" CFTypeRef? CFDateFormatterCopyProperty(CFDateFormatterRef? formatter, CFDateFormatterKey? key);
 
-public extern "C" CFDateFormatterKey kCFDateFormatterIsLenient;
+public extern "C" CFDateFormatterKey? kCFDateFormatterIsLenient;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterTimeZone;
+public extern "C" CFDateFormatterKey? kCFDateFormatterTimeZone;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterCalendarName;
+public extern "C" CFDateFormatterKey? kCFDateFormatterCalendarName;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterDefaultFormat;
+public extern "C" CFDateFormatterKey? kCFDateFormatterDefaultFormat;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterTwoDigitStartDate;
+public extern "C" CFDateFormatterKey? kCFDateFormatterTwoDigitStartDate;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterDefaultDate;
+public extern "C" CFDateFormatterKey? kCFDateFormatterDefaultDate;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterCalendar;
+public extern "C" CFDateFormatterKey? kCFDateFormatterCalendar;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterEraSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterEraSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterMonthSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterMonthSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterShortMonthSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterShortMonthSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterWeekdaySymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterWeekdaySymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterShortWeekdaySymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterShortWeekdaySymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterAMSymbol;
+public extern "C" CFDateFormatterKey? kCFDateFormatterAMSymbol;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterPMSymbol;
+public extern "C" CFDateFormatterKey? kCFDateFormatterPMSymbol;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterLongEraSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterLongEraSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterVeryShortMonthSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterVeryShortMonthSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterStandaloneMonthSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterStandaloneMonthSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterShortStandaloneMonthSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterShortStandaloneMonthSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterVeryShortStandaloneMonthSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterVeryShortStandaloneMonthSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterVeryShortWeekdaySymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterVeryShortWeekdaySymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterStandaloneWeekdaySymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterStandaloneWeekdaySymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterShortStandaloneWeekdaySymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterShortStandaloneWeekdaySymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterVeryShortStandaloneWeekdaySymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterVeryShortStandaloneWeekdaySymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterQuarterSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterQuarterSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterShortQuarterSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterShortQuarterSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterStandaloneQuarterSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterStandaloneQuarterSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterShortStandaloneQuarterSymbols;
+public extern "C" CFDateFormatterKey? kCFDateFormatterShortStandaloneQuarterSymbols;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterGregorianStartDate;
+public extern "C" CFDateFormatterKey? kCFDateFormatterGregorianStartDate;
 
-public extern "C" CFDateFormatterKey kCFDateFormatterDoesRelativeDateFormattingKey;
+public extern "C" CFDateFormatterKey? kCFDateFormatterDoesRelativeDateFormattingKey;
 
 #endif

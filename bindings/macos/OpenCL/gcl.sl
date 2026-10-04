@@ -24,6 +24,8 @@
 module MacOS.OpenCL;
 
 import MacOS.OpenGL;
+import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -73,11 +75,11 @@ public enum clk_sampler_type : int
     __CLK_FILTER_BITS = 2,
 }
 
+public extern "C" dispatch_queue_t? gcl_create_dispatch_queue(cl_queue_flags flags, cl_device_id device_id);
+
 public extern "C" void* gcl_malloc(nuint bytes, void* host_ptr, cl_malloc_flags flags);
 
 public extern "C" void gcl_free(void* ptr);
-
-public extern "C" cl_image gcl_create_image(cl_image_format* image_format, nuint image_width, nuint image_height, nuint image_depth, IOSurfaceRef io_surface);
 
 public extern "C" void gcl_retain_image(cl_image image);
 
@@ -104,6 +106,8 @@ public extern "C" void gcl_unmap(void* arg0);
 public extern "C" cl_kernel gcl_create_kernel_from_block(void* kernel_block_ptr);
 
 public extern "C" void gcl_get_kernel_block_workgroup_info(void* kernel_block_ptr, cl_kernel_work_group_info param_name, nuint param_value_size, void* param_value, nuint* param_value_size_ret);
+
+public extern "C" cl_device_id gcl_get_device_id_with_dispatch_queue(dispatch_queue_t queue);
 
 public delegate void gcl_set_finalizerCl_pfn_finalizerFunction(void* arg0, void* arg1);
 

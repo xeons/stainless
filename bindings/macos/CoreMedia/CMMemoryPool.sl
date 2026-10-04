@@ -24,6 +24,7 @@
 module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct OpaqueCMMemoryPool;
 
-public using CMMemoryPoolRef = OpaqueCMMemoryPool*;
+[CFType("CMMemoryPoolGetTypeID")]
+public extern objc class CMMemoryPoolRef : CFTypeRef { }
 
 public const int kCMMemoryPoolError_AllocationFailed = -15490;
 public const int kCMMemoryPoolError_InvalidParameter = -15491;
@@ -40,7 +42,7 @@ public extern "C" CFTypeID CMMemoryPoolGetTypeID();
 
 public extern "C" CFStringRef kCMMemoryPoolOption_AgeOutPeriod;
 
-public extern "C" CMMemoryPoolRef CMMemoryPoolCreate(CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CMMemoryPoolRef CMMemoryPoolCreate(CFDictionaryRef? options);
 
 public extern "C" CFAllocatorRef CMMemoryPoolGetAllocator(CMMemoryPoolRef pool);
 

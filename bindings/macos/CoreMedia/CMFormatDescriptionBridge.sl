@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -48,11 +49,11 @@ public extern "C" CMImageDescriptionFlavor kCMImageDescriptionFlavor_3GPFamily;
 
 public extern "C" CMImageDescriptionFlavor kCMImageDescriptionFlavor_ISOFamilyWithAppleExtensions;
 
-public extern "C" OSStatus CMVideoFormatDescriptionCreateFromBigEndianImageDescriptionData(CFAllocatorRef allocator, byte* imageDescriptionData, nuint size, CFStringEncoding stringEncoding, CMImageDescriptionFlavor flavor, CMVideoFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCreateFromBigEndianImageDescriptionData(CFAllocatorRef? allocator, byte* imageDescriptionData, nuint size, CFStringEncoding stringEncoding, CMImageDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMVideoFormatDescriptionCreateFromBigEndianImageDescriptionBlockBuffer(CFAllocatorRef allocator, CMBlockBufferRef imageDescriptionBlockBuffer, CFStringEncoding stringEncoding, CMImageDescriptionFlavor flavor, CMVideoFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCreateFromBigEndianImageDescriptionBlockBuffer(CFAllocatorRef? allocator, CMBlockBufferRef imageDescriptionBlockBuffer, CFStringEncoding stringEncoding, CMImageDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMVideoFormatDescriptionCopyAsBigEndianImageDescriptionBlockBuffer(CFAllocatorRef allocator, CMVideoFormatDescriptionRef videoFormatDescription, CFStringEncoding stringEncoding, CMImageDescriptionFlavor flavor, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCopyAsBigEndianImageDescriptionBlockBuffer(CFAllocatorRef? allocator, CMVideoFormatDescriptionRef videoFormatDescription, CFStringEncoding stringEncoding, CMImageDescriptionFlavor? flavor, OpaqueCMBlockBuffer** blockBufferOut);
 
 public extern "C" OSStatus CMSwapBigEndianImageDescriptionToHost(byte* imageDescriptionData, nuint imageDescriptionSize);
 
@@ -68,13 +69,13 @@ public extern "C" CMSoundDescriptionFlavor kCMSoundDescriptionFlavor_ISOFamily;
 
 public extern "C" CMSoundDescriptionFlavor kCMSoundDescriptionFlavor_3GPFamily;
 
-public extern "C" OSStatus CMAudioFormatDescriptionCreateFromBigEndianSoundDescriptionData(CFAllocatorRef allocator, byte* soundDescriptionData, nuint size, CMSoundDescriptionFlavor flavor, CMAudioFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMAudioFormatDescriptionCreateFromBigEndianSoundDescriptionData(CFAllocatorRef? allocator, byte* soundDescriptionData, nuint size, CMSoundDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMAudioFormatDescriptionCreateFromBigEndianSoundDescriptionBlockBuffer(CFAllocatorRef allocator, CMBlockBufferRef soundDescriptionBlockBuffer, CMSoundDescriptionFlavor flavor, CMAudioFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMAudioFormatDescriptionCreateFromBigEndianSoundDescriptionBlockBuffer(CFAllocatorRef? allocator, CMBlockBufferRef soundDescriptionBlockBuffer, CMSoundDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMAudioFormatDescriptionCopyAsBigEndianSoundDescriptionBlockBuffer(CFAllocatorRef allocator, CMAudioFormatDescriptionRef audioFormatDescription, CMSoundDescriptionFlavor flavor, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMAudioFormatDescriptionCopyAsBigEndianSoundDescriptionBlockBuffer(CFAllocatorRef? allocator, CMAudioFormatDescriptionRef audioFormatDescription, CMSoundDescriptionFlavor? flavor, OpaqueCMBlockBuffer** blockBufferOut);
 
-public extern "C" Boolean CMDoesBigEndianSoundDescriptionRequireLegacyCBRSampleTableLayout(CMBlockBufferRef soundDescriptionBlockBuffer, CMSoundDescriptionFlavor flavor);
+public extern "C" Boolean CMDoesBigEndianSoundDescriptionRequireLegacyCBRSampleTableLayout(CMBlockBufferRef soundDescriptionBlockBuffer, CMSoundDescriptionFlavor? flavor);
 
 public extern "C" OSStatus CMSwapBigEndianSoundDescriptionToHost(byte* soundDescriptionData, nuint soundDescriptionSize);
 
@@ -82,11 +83,11 @@ public extern "C" OSStatus CMSwapHostEndianSoundDescriptionToBig(byte* soundDesc
 
 public using CMTextDescriptionFlavor = CFStringRef;
 
-public extern "C" OSStatus CMTextFormatDescriptionCreateFromBigEndianTextDescriptionData(CFAllocatorRef allocator, byte* textDescriptionData, nuint size, CMTextDescriptionFlavor flavor, CMMediaType mediaType, CMTextFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMTextFormatDescriptionCreateFromBigEndianTextDescriptionData(CFAllocatorRef? allocator, byte* textDescriptionData, nuint size, CMTextDescriptionFlavor? flavor, CMMediaType mediaType, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMTextFormatDescriptionCreateFromBigEndianTextDescriptionBlockBuffer(CFAllocatorRef allocator, CMBlockBufferRef textDescriptionBlockBuffer, CMTextDescriptionFlavor flavor, CMMediaType mediaType, CMTextFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMTextFormatDescriptionCreateFromBigEndianTextDescriptionBlockBuffer(CFAllocatorRef? allocator, CMBlockBufferRef textDescriptionBlockBuffer, CMTextDescriptionFlavor? flavor, CMMediaType mediaType, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMTextFormatDescriptionCopyAsBigEndianTextDescriptionBlockBuffer(CFAllocatorRef allocator, CMTextFormatDescriptionRef textFormatDescription, CMTextDescriptionFlavor flavor, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMTextFormatDescriptionCopyAsBigEndianTextDescriptionBlockBuffer(CFAllocatorRef? allocator, CMTextFormatDescriptionRef textFormatDescription, CMTextDescriptionFlavor? flavor, OpaqueCMBlockBuffer** blockBufferOut);
 
 public extern "C" OSStatus CMSwapBigEndianTextDescriptionToHost(byte* textDescriptionData, nuint textDescriptionSize);
 
@@ -94,11 +95,11 @@ public extern "C" OSStatus CMSwapHostEndianTextDescriptionToBig(byte* textDescri
 
 public using CMClosedCaptionDescriptionFlavor = CFStringRef;
 
-public extern "C" OSStatus CMClosedCaptionFormatDescriptionCreateFromBigEndianClosedCaptionDescriptionData(CFAllocatorRef allocator, byte* closedCaptionDescriptionData, nuint size, CMClosedCaptionDescriptionFlavor flavor, CMClosedCaptionFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMClosedCaptionFormatDescriptionCreateFromBigEndianClosedCaptionDescriptionData(CFAllocatorRef? allocator, byte* closedCaptionDescriptionData, nuint size, CMClosedCaptionDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMClosedCaptionFormatDescriptionCreateFromBigEndianClosedCaptionDescriptionBlockBuffer(CFAllocatorRef allocator, CMBlockBufferRef closedCaptionDescriptionBlockBuffer, CMClosedCaptionDescriptionFlavor flavor, CMClosedCaptionFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMClosedCaptionFormatDescriptionCreateFromBigEndianClosedCaptionDescriptionBlockBuffer(CFAllocatorRef? allocator, CMBlockBufferRef closedCaptionDescriptionBlockBuffer, CMClosedCaptionDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMClosedCaptionFormatDescriptionCopyAsBigEndianClosedCaptionDescriptionBlockBuffer(CFAllocatorRef allocator, CMClosedCaptionFormatDescriptionRef closedCaptionFormatDescription, CMClosedCaptionDescriptionFlavor flavor, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMClosedCaptionFormatDescriptionCopyAsBigEndianClosedCaptionDescriptionBlockBuffer(CFAllocatorRef? allocator, CMClosedCaptionFormatDescriptionRef closedCaptionFormatDescription, CMClosedCaptionDescriptionFlavor? flavor, OpaqueCMBlockBuffer** blockBufferOut);
 
 public extern "C" OSStatus CMSwapBigEndianClosedCaptionDescriptionToHost(byte* closedCaptionDescriptionData, nuint closedCaptionDescriptionSize);
 
@@ -106,11 +107,11 @@ public extern "C" OSStatus CMSwapHostEndianClosedCaptionDescriptionToBig(byte* c
 
 public using CMTimeCodeDescriptionFlavor = CFStringRef;
 
-public extern "C" OSStatus CMTimeCodeFormatDescriptionCreateFromBigEndianTimeCodeDescriptionData(CFAllocatorRef allocator, byte* timeCodeDescriptionData, nuint size, CMTimeCodeDescriptionFlavor flavor, CMTimeCodeFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMTimeCodeFormatDescriptionCreateFromBigEndianTimeCodeDescriptionData(CFAllocatorRef? allocator, byte* timeCodeDescriptionData, nuint size, CMTimeCodeDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMTimeCodeFormatDescriptionCreateFromBigEndianTimeCodeDescriptionBlockBuffer(CFAllocatorRef allocator, CMBlockBufferRef timeCodeDescriptionBlockBuffer, CMTimeCodeDescriptionFlavor flavor, CMTimeCodeFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMTimeCodeFormatDescriptionCreateFromBigEndianTimeCodeDescriptionBlockBuffer(CFAllocatorRef? allocator, CMBlockBufferRef timeCodeDescriptionBlockBuffer, CMTimeCodeDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMTimeCodeFormatDescriptionCopyAsBigEndianTimeCodeDescriptionBlockBuffer(CFAllocatorRef allocator, CMTimeCodeFormatDescriptionRef timeCodeFormatDescription, CMTimeCodeDescriptionFlavor flavor, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMTimeCodeFormatDescriptionCopyAsBigEndianTimeCodeDescriptionBlockBuffer(CFAllocatorRef? allocator, CMTimeCodeFormatDescriptionRef timeCodeFormatDescription, CMTimeCodeDescriptionFlavor? flavor, OpaqueCMBlockBuffer** blockBufferOut);
 
 public extern "C" OSStatus CMSwapBigEndianTimeCodeDescriptionToHost(byte* timeCodeDescriptionData, nuint timeCodeDescriptionSize);
 
@@ -118,11 +119,11 @@ public extern "C" OSStatus CMSwapHostEndianTimeCodeDescriptionToBig(byte* timeCo
 
 public using CMMetadataDescriptionFlavor = CFStringRef;
 
-public extern "C" OSStatus CMMetadataFormatDescriptionCreateFromBigEndianMetadataDescriptionData(CFAllocatorRef allocator, byte* metadataDescriptionData, nuint size, CMMetadataDescriptionFlavor flavor, CMMetadataFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMMetadataFormatDescriptionCreateFromBigEndianMetadataDescriptionData(CFAllocatorRef? allocator, byte* metadataDescriptionData, nuint size, CMMetadataDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMMetadataFormatDescriptionCreateFromBigEndianMetadataDescriptionBlockBuffer(CFAllocatorRef allocator, CMBlockBufferRef metadataDescriptionBlockBuffer, CMMetadataDescriptionFlavor flavor, CMMetadataFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMMetadataFormatDescriptionCreateFromBigEndianMetadataDescriptionBlockBuffer(CFAllocatorRef? allocator, CMBlockBufferRef metadataDescriptionBlockBuffer, CMMetadataDescriptionFlavor? flavor, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMMetadataFormatDescriptionCopyAsBigEndianMetadataDescriptionBlockBuffer(CFAllocatorRef allocator, CMMetadataFormatDescriptionRef metadataFormatDescription, CMMetadataDescriptionFlavor flavor, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMMetadataFormatDescriptionCopyAsBigEndianMetadataDescriptionBlockBuffer(CFAllocatorRef? allocator, CMMetadataFormatDescriptionRef metadataFormatDescription, CMMetadataDescriptionFlavor? flavor, OpaqueCMBlockBuffer** blockBufferOut);
 
 public extern "C" OSStatus CMSwapBigEndianMetadataDescriptionToHost(byte* metadataDescriptionData, nuint metadataDescriptionSize);
 

@@ -25,20 +25,21 @@ module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreVideo")
 
-public extern "C" CFStringRef kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey;
+public extern "C" CFStringRef? kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey;
 
-public extern "C" CFStringRef kCVPixelBufferIOSurfaceOpenGLFBOCompatibilityKey;
+public extern "C" CFStringRef? kCVPixelBufferIOSurfaceOpenGLFBOCompatibilityKey;
 
-public extern "C" CFStringRef kCVPixelBufferIOSurfaceCoreAnimationCompatibilityKey;
+public extern "C" CFStringRef? kCVPixelBufferIOSurfaceCoreAnimationCompatibilityKey;
 
-public extern "C" IOSurfaceRef CVPixelBufferGetIOSurface(CVPixelBufferRef pixelBuffer);
+public extern "C" IOSurfaceRef? CVPixelBufferGetIOSurface(CVPixelBufferRef? pixelBuffer);
 
-public extern "C" CVReturn CVPixelBufferCreateWithIOSurface(CFAllocatorRef allocator, IOSurfaceRef surface, CFDictionaryRef pixelBufferAttributes, CVPixelBufferRef* pixelBufferOut);
+public extern "C" CVReturn CVPixelBufferCreateWithIOSurface(CFAllocatorRef? allocator, IOSurfaceRef surface, CFDictionaryRef? pixelBufferAttributes, void** pixelBufferOut);
 
 public const int COREVIDEO_INCLUDED_IOSURFACE_HEADER_FILE = 1;
 

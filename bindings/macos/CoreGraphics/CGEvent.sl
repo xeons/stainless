@@ -25,6 +25,7 @@ module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,73 +33,73 @@ import MacOS.System;
 
 public extern "C" CFTypeID CGEventGetTypeID();
 
-public extern "C" CGEventRef CGEventCreate(CGEventSourceRef source);
+[ReturnsRetained] public extern "C" CGEventRef? CGEventCreate(CGEventSourceRef? source);
 
-public extern "C" CFDataRef CGEventCreateData(CFAllocatorRef allocator, CGEventRef event);
+[ReturnsRetained] public extern "C" CFDataRef? CGEventCreateData(CFAllocatorRef? allocator, CGEventRef? event);
 
-public extern "C" CGEventRef CGEventCreateFromData(CFAllocatorRef allocator, CFDataRef data);
+[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateFromData(CFAllocatorRef? allocator, CFDataRef? data);
 
-public extern "C" CGEventRef CGEventCreateMouseEvent(CGEventSourceRef source, CGEventType mouseType, CGPoint mouseCursorPosition, CGMouseButton mouseButton);
+[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateMouseEvent(CGEventSourceRef? source, CGEventType mouseType, CGPoint mouseCursorPosition, CGMouseButton mouseButton);
 
-public extern "C" CGEventRef CGEventCreateKeyboardEvent(CGEventSourceRef source, CGKeyCode virtualKey, bool keyDown);
+[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateKeyboardEvent(CGEventSourceRef? source, CGKeyCode virtualKey, bool keyDown);
 
-public extern "C" CGEventRef CGEventCreateScrollWheelEvent(CGEventSourceRef source, CGScrollEventUnit units, uint wheelCount, int wheel1, ...);
+[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateScrollWheelEvent(CGEventSourceRef? source, CGScrollEventUnit units, uint wheelCount, int wheel1, ...);
 
-public extern "C" CGEventRef CGEventCreateScrollWheelEvent2(CGEventSourceRef source, CGScrollEventUnit units, uint wheelCount, int wheel1, int wheel2, int wheel3);
+[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateScrollWheelEvent2(CGEventSourceRef? source, CGScrollEventUnit units, uint wheelCount, int wheel1, int wheel2, int wheel3);
 
-public extern "C" CGEventRef CGEventCreateCopy(CGEventRef event);
+[ReturnsRetained] public extern "C" CGEventRef? CGEventCreateCopy(CGEventRef? event);
 
-public extern "C" CGEventSourceRef CGEventCreateSourceFromEvent(CGEventRef event);
+[ReturnsRetained] public extern "C" CGEventSourceRef? CGEventCreateSourceFromEvent(CGEventRef? event);
 
-public extern "C" void CGEventSetSource(CGEventRef event, CGEventSourceRef source);
+public extern "C" void CGEventSetSource(CGEventRef? event, CGEventSourceRef? source);
 
-public extern "C" CGEventType CGEventGetType(CGEventRef event);
+public extern "C" CGEventType CGEventGetType(CGEventRef? event);
 
-public extern "C" void CGEventSetType(CGEventRef event, CGEventType type);
+public extern "C" void CGEventSetType(CGEventRef? event, CGEventType type);
 
-public extern "C" CGEventTimestamp CGEventGetTimestamp(CGEventRef event);
+public extern "C" CGEventTimestamp CGEventGetTimestamp(CGEventRef? event);
 
-public extern "C" void CGEventSetTimestamp(CGEventRef event, CGEventTimestamp timestamp);
+public extern "C" void CGEventSetTimestamp(CGEventRef? event, CGEventTimestamp timestamp);
 
-public extern "C" CGPoint CGEventGetLocation(CGEventRef event);
+public extern "C" CGPoint CGEventGetLocation(CGEventRef? event);
 
-public extern "C" CGPoint CGEventGetUnflippedLocation(CGEventRef event);
+public extern "C" CGPoint CGEventGetUnflippedLocation(CGEventRef? event);
 
-public extern "C" void CGEventSetLocation(CGEventRef event, CGPoint location);
+public extern "C" void CGEventSetLocation(CGEventRef? event, CGPoint location);
 
-public extern "C" CGEventFlags CGEventGetFlags(CGEventRef event);
+public extern "C" CGEventFlags CGEventGetFlags(CGEventRef? event);
 
-public extern "C" void CGEventSetFlags(CGEventRef event, CGEventFlags flags);
+public extern "C" void CGEventSetFlags(CGEventRef? event, CGEventFlags flags);
 
-public extern "C" void CGEventKeyboardGetUnicodeString(CGEventRef event, UniCharCount maxStringLength, UniCharCount* actualStringLength, UniChar* unicodeString);
+public extern "C" void CGEventKeyboardGetUnicodeString(CGEventRef? event, UniCharCount maxStringLength, UniCharCount* actualStringLength, UniChar* unicodeString);
 
-public extern "C" void CGEventKeyboardSetUnicodeString(CGEventRef event, UniCharCount stringLength, UniChar* unicodeString);
+public extern "C" void CGEventKeyboardSetUnicodeString(CGEventRef? event, UniCharCount stringLength, UniChar* unicodeString);
 
-public extern "C" long CGEventGetIntegerValueField(CGEventRef event, CGEventField field);
+public extern "C" long CGEventGetIntegerValueField(CGEventRef? event, CGEventField field);
 
-public extern "C" void CGEventSetIntegerValueField(CGEventRef event, CGEventField field, long value);
+public extern "C" void CGEventSetIntegerValueField(CGEventRef? event, CGEventField field, long value);
 
-public extern "C" double CGEventGetDoubleValueField(CGEventRef event, CGEventField field);
+public extern "C" double CGEventGetDoubleValueField(CGEventRef? event, CGEventField field);
 
-public extern "C" void CGEventSetDoubleValueField(CGEventRef event, CGEventField field, double value);
+public extern "C" void CGEventSetDoubleValueField(CGEventRef? event, CGEventField field, double value);
 
-public extern "C" CFMachPortRef CGEventTapCreate(CGEventTapLocation tap, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
+[ReturnsRetained] public extern "C" CFMachPortRef? CGEventTapCreate(CGEventTapLocation tap, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
 
-public extern "C" CFMachPortRef CGEventTapCreateForPSN(void* processSerialNumber, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
+[ReturnsRetained] public extern "C" CFMachPortRef? CGEventTapCreateForPSN(void* processSerialNumber, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
 
-public extern "C" CFMachPortRef CGEventTapCreateForPid(pid_t pid, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
+[ReturnsRetained] public extern "C" CFMachPortRef? CGEventTapCreateForPid(pid_t pid, CGEventTapPlacement place, CGEventTapOptions options, CGEventMask eventsOfInterest, CGEventTapCallBack callback, void* userInfo);
 
 public extern "C" void CGEventTapEnable(CFMachPortRef tap, bool enable);
 
 public extern "C" bool CGEventTapIsEnabled(CFMachPortRef tap);
 
-public extern "C" void CGEventTapPostEvent(CGEventTapProxy proxy, CGEventRef event);
+public extern "C" void CGEventTapPostEvent(CGEventTapProxy proxy, CGEventRef? event);
 
-public extern "C" void CGEventPost(CGEventTapLocation tap, CGEventRef event);
+public extern "C" void CGEventPost(CGEventTapLocation tap, CGEventRef? event);
 
-public extern "C" void CGEventPostToPSN(void* processSerialNumber, CGEventRef event);
+public extern "C" void CGEventPostToPSN(void* processSerialNumber, CGEventRef? event);
 
-public extern "C" void CGEventPostToPid(pid_t pid, CGEventRef event);
+public extern "C" void CGEventPostToPid(pid_t pid, CGEventRef? event);
 
 public extern "C" CGError CGGetEventTapList(uint maxNumberOfTaps, CGEventTapInformation* tapList, uint* eventTapCount);
 

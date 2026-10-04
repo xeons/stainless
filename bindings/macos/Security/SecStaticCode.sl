@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,7 @@ import MacOS.System;
 
 public extern "C" CFTypeID SecStaticCodeGetTypeID();
 
-public extern "C" OSStatus SecStaticCodeCreateWithPath(CFURLRef path, SecCSFlags flags, SecStaticCodeRef* staticCode);
+public extern "C" OSStatus SecStaticCodeCreateWithPath(CFURLRef path, SecCSFlags flags, __SecCode** staticCode);
 
 public extern "C" CFStringRef kSecCodeAttributeArchitecture;
 
@@ -42,7 +43,7 @@ public extern "C" CFStringRef kSecCodeAttributeUniversalFileOffset;
 
 public extern "C" CFStringRef kSecCodeAttributeBundleVersion;
 
-public extern "C" OSStatus SecStaticCodeCreateWithPathAndAttributes(CFURLRef path, SecCSFlags flags, CFDictionaryRef attributes, SecStaticCodeRef* staticCode);
+public extern "C" OSStatus SecStaticCodeCreateWithPathAndAttributes(CFURLRef path, SecCSFlags flags, CFDictionaryRef attributes, __SecCode** staticCode);
 
 public const uint kSecCSCheckAllArchitectures = 1;
 public const uint kSecCSDoNotValidateExecutable = 2;
@@ -61,8 +62,8 @@ public const uint kSecCSSingleThreaded = 4096;
 public const uint kSecCSAllowNetworkAccess = 65536;
 public const uint kSecCSFastExecutableValidation = 131072;
 
-public extern "C" OSStatus SecStaticCodeCheckValidity(SecStaticCodeRef staticCode, SecCSFlags flags, SecRequirementRef requirement);
+public extern "C" OSStatus SecStaticCodeCheckValidity(SecStaticCodeRef staticCode, SecCSFlags flags, SecRequirementRef? requirement);
 
-public extern "C" OSStatus SecStaticCodeCheckValidityWithErrors(SecStaticCodeRef staticCode, SecCSFlags flags, SecRequirementRef requirement, CFErrorRef* errors);
+public extern "C" OSStatus SecStaticCodeCheckValidityWithErrors(SecStaticCodeRef staticCode, SecCSFlags flags, SecRequirementRef? requirement, __CFError** errors);
 
 #endif

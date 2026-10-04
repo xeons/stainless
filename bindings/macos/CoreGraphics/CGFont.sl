@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGFont;
 
-public using CGFontRef = CGFont*;
+[CFType("CGFontGetTypeID")]
+public extern objc class CGFontRef : CFTypeRef { }
 
 public using CGFontIndex = ushort;
 
@@ -47,63 +49,59 @@ public enum CGFontPostScriptFormat : int
 public extern "C" CFTypeID CGFontGetTypeID();
 
 /// Deprecated in macOS 10.6.
-public extern "C" CGFontRef CGFontCreateWithPlatformFont(void* platformFontReference);
+[ReturnsRetained] public extern "C" CGFontRef? CGFontCreateWithPlatformFont(void* platformFontReference);
 
-public extern "C" CGFontRef CGFontCreateWithDataProvider(CGDataProviderRef provider);
+[ReturnsRetained] public extern "C" CGFontRef? CGFontCreateWithDataProvider(CGDataProviderRef? provider);
 
-public extern "C" CGFontRef CGFontCreateWithFontName(CFStringRef name);
+[ReturnsRetained] public extern "C" CGFontRef? CGFontCreateWithFontName(CFStringRef? name);
 
-public extern "C" CGFontRef CGFontCreateCopyWithVariations(CGFontRef font, CFDictionaryRef variations);
+[ReturnsRetained] public extern "C" CGFontRef? CGFontCreateCopyWithVariations(CGFontRef? font, CFDictionaryRef? variations);
 
-public extern "C" CGFontRef CGFontRetain(CGFontRef font);
+public extern "C" nuint CGFontGetNumberOfGlyphs(CGFontRef? font);
 
-public extern "C" void CGFontRelease(CGFontRef font);
+public extern "C" int CGFontGetUnitsPerEm(CGFontRef? font);
 
-public extern "C" nuint CGFontGetNumberOfGlyphs(CGFontRef font);
+[ReturnsRetained] public extern "C" CFStringRef? CGFontCopyPostScriptName(CGFontRef? font);
 
-public extern "C" int CGFontGetUnitsPerEm(CGFontRef font);
+[ReturnsRetained] public extern "C" CFStringRef? CGFontCopyFullName(CGFontRef? font);
 
-public extern "C" CFStringRef CGFontCopyPostScriptName(CGFontRef font);
+public extern "C" int CGFontGetAscent(CGFontRef? font);
 
-public extern "C" CFStringRef CGFontCopyFullName(CGFontRef font);
+public extern "C" int CGFontGetDescent(CGFontRef? font);
 
-public extern "C" int CGFontGetAscent(CGFontRef font);
+public extern "C" int CGFontGetLeading(CGFontRef? font);
 
-public extern "C" int CGFontGetDescent(CGFontRef font);
+public extern "C" int CGFontGetCapHeight(CGFontRef? font);
 
-public extern "C" int CGFontGetLeading(CGFontRef font);
+public extern "C" int CGFontGetXHeight(CGFontRef? font);
 
-public extern "C" int CGFontGetCapHeight(CGFontRef font);
+public extern "C" CGRect CGFontGetFontBBox(CGFontRef? font);
 
-public extern "C" int CGFontGetXHeight(CGFontRef font);
+public extern "C" CGFloat CGFontGetItalicAngle(CGFontRef? font);
 
-public extern "C" CGRect CGFontGetFontBBox(CGFontRef font);
+public extern "C" CGFloat CGFontGetStemV(CGFontRef? font);
 
-public extern "C" CGFloat CGFontGetItalicAngle(CGFontRef font);
+[ReturnsRetained] public extern "C" CFArrayRef? CGFontCopyVariationAxes(CGFontRef? font);
 
-public extern "C" CGFloat CGFontGetStemV(CGFontRef font);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CGFontCopyVariations(CGFontRef? font);
 
-public extern "C" CFArrayRef CGFontCopyVariationAxes(CGFontRef font);
+public extern "C" bool CGFontGetGlyphAdvances(CGFontRef? font, CGGlyph* glyphs, nuint count, int* advances);
 
-public extern "C" CFDictionaryRef CGFontCopyVariations(CGFontRef font);
+public extern "C" bool CGFontGetGlyphBBoxes(CGFontRef? font, CGGlyph* glyphs, nuint count, CGRect* bboxes);
 
-public extern "C" bool CGFontGetGlyphAdvances(CGFontRef font, CGGlyph* glyphs, nuint count, int* advances);
+public extern "C" CGGlyph CGFontGetGlyphWithGlyphName(CGFontRef? font, CFStringRef? name);
 
-public extern "C" bool CGFontGetGlyphBBoxes(CGFontRef font, CGGlyph* glyphs, nuint count, CGRect* bboxes);
+[ReturnsRetained] public extern "C" CFStringRef? CGFontCopyGlyphNameForGlyph(CGFontRef? font, CGGlyph glyph);
 
-public extern "C" CGGlyph CGFontGetGlyphWithGlyphName(CGFontRef font, CFStringRef name);
+public extern "C" bool CGFontCanCreatePostScriptSubset(CGFontRef? font, CGFontPostScriptFormat format);
 
-public extern "C" CFStringRef CGFontCopyGlyphNameForGlyph(CGFontRef font, CGGlyph glyph);
+[ReturnsRetained] public extern "C" CFDataRef? CGFontCreatePostScriptSubset(CGFontRef? font, CFStringRef? subsetName, CGFontPostScriptFormat format, CGGlyph* glyphs, nuint count, CGGlyph* encoding);
 
-public extern "C" bool CGFontCanCreatePostScriptSubset(CGFontRef font, CGFontPostScriptFormat format);
+[ReturnsRetained] public extern "C" CFDataRef? CGFontCreatePostScriptEncoding(CGFontRef? font, CGGlyph* encoding);
 
-public extern "C" CFDataRef CGFontCreatePostScriptSubset(CGFontRef font, CFStringRef subsetName, CGFontPostScriptFormat format, CGGlyph* glyphs, nuint count, CGGlyph* encoding);
+[ReturnsRetained] public extern "C" CFArrayRef? CGFontCopyTableTags(CGFontRef? font);
 
-public extern "C" CFDataRef CGFontCreatePostScriptEncoding(CGFontRef font, CGGlyph* encoding);
-
-public extern "C" CFArrayRef CGFontCopyTableTags(CGFontRef font);
-
-public extern "C" CFDataRef CGFontCopyTableForTag(CGFontRef font, uint tag);
+[ReturnsRetained] public extern "C" CFDataRef? CGFontCopyTableForTag(CGFontRef? font, uint tag);
 
 public extern "C" CFStringRef kCGFontVariationAxisName;
 

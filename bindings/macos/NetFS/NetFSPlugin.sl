@@ -25,6 +25,7 @@ module MacOS.NetFS;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -38,23 +39,23 @@ public delegate ULONG NetFSMountInterface_V1ReleaseFunction(void* arg0);
 
 public delegate netfsError NetFSMountInterface_V1CreateSessionRefFunction(void** arg0);
 
-public delegate netfsError NetFSMountInterface_V1GetServerInfoFunction(CFURLRef arg0, void* arg1, CFDictionaryRef arg2, CFDictionaryRef* arg3);
+public delegate netfsError NetFSMountInterface_V1GetServerInfoFunction(__CFURL* arg0, void* arg1, __CFDictionary* arg2, __CFDictionary** arg3);
 
-public delegate netfsError NetFSMountInterface_V1ParseURLFunction(CFURLRef arg0, CFDictionaryRef* arg1);
+public delegate netfsError NetFSMountInterface_V1ParseURLFunction(__CFURL* arg0, __CFDictionary** arg1);
 
-public delegate netfsError NetFSMountInterface_V1CreateURLFunction(CFDictionaryRef arg0, CFURLRef* arg1);
+public delegate netfsError NetFSMountInterface_V1CreateURLFunction(__CFDictionary* arg0, __CFURL** arg1);
 
-public delegate netfsError NetFSMountInterface_V1OpenSessionFunction(CFURLRef arg0, void* arg1, CFDictionaryRef arg2, CFDictionaryRef* arg3);
+public delegate netfsError NetFSMountInterface_V1OpenSessionFunction(__CFURL* arg0, void* arg1, __CFDictionary* arg2, __CFDictionary** arg3);
 
-public delegate netfsError NetFSMountInterface_V1EnumerateSharesFunction(void* arg0, CFDictionaryRef arg1, CFDictionaryRef* arg2);
+public delegate netfsError NetFSMountInterface_V1EnumerateSharesFunction(void* arg0, __CFDictionary* arg1, __CFDictionary** arg2);
 
-public delegate netfsError NetFSMountInterface_V1MountFunction(void* arg0, CFURLRef arg1, CFStringRef arg2, CFDictionaryRef arg3, CFDictionaryRef* arg4);
+public delegate netfsError NetFSMountInterface_V1MountFunction(void* arg0, __CFURL* arg1, __CFString* arg2, __CFDictionary* arg3, __CFDictionary** arg4);
 
 public delegate netfsError NetFSMountInterface_V1CancelFunction(void* arg0);
 
 public delegate netfsError NetFSMountInterface_V1CloseSessionFunction(void* arg0);
 
-public delegate netfsError NetFSMountInterface_V1GetMountInfoFunction(CFStringRef arg0, CFDictionaryRef* arg1);
+public delegate netfsError NetFSMountInterface_V1GetMountInfoFunction(__CFString* arg0, __CFDictionary** arg1);
 
 public struct NetFSMountInterface_V1
 {
@@ -77,7 +78,7 @@ public struct NetFSMountInterface_V1
 public struct NetFSInterface
 {
     public void* _interface;
-    public CFUUIDRef _factoryID;
+    public __CFUUID* _factoryID;
     public UInt32 _refCount;
 }
 
@@ -85,7 +86,7 @@ public extern "C" ULONG NetFSInterface_AddRef(void* arg0);
 
 public extern "C" ULONG NetFSInterface_Release(void* arg0);
 
-public extern "C" NetFSInterface* NetFS_CreateInterface(CFUUIDRef factoryID, void* interfaceFTbl);
+public extern "C" NetFSInterface* NetFS_CreateInterface(CFUUIDRef? factoryID, void* interfaceFTbl);
 
 public extern "C" HRESULT NetFSQueryInterface(void* arg0, REFIID iid, LPVOID* ppv);
 

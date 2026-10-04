@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.System;
 
 public struct __CFUUID;
 
-public using CFUUIDRef = __CFUUID*;
+[CFType("CFUUIDGetTypeID")]
+public extern objc class CFUUIDRef : CFTypeRef { }
 
 public struct CFUUIDBytes
 {
@@ -55,18 +57,18 @@ public struct CFUUIDBytes
 
 public extern "C" CFTypeID CFUUIDGetTypeID();
 
-public extern "C" CFUUIDRef CFUUIDCreate(CFAllocatorRef alloc);
+[ReturnsRetained] public extern "C" CFUUIDRef? CFUUIDCreate(CFAllocatorRef? alloc);
 
-public extern "C" CFUUIDRef CFUUIDCreateWithBytes(CFAllocatorRef alloc, UInt8 byte0, UInt8 byte1, UInt8 byte2, UInt8 byte3, UInt8 byte4, UInt8 byte5, UInt8 byte6, UInt8 byte7, UInt8 byte8, UInt8 byte9, UInt8 byte10, UInt8 byte11, UInt8 byte12, UInt8 byte13, UInt8 byte14, UInt8 byte15);
+[ReturnsRetained] public extern "C" CFUUIDRef? CFUUIDCreateWithBytes(CFAllocatorRef? alloc, UInt8 byte0, UInt8 byte1, UInt8 byte2, UInt8 byte3, UInt8 byte4, UInt8 byte5, UInt8 byte6, UInt8 byte7, UInt8 byte8, UInt8 byte9, UInt8 byte10, UInt8 byte11, UInt8 byte12, UInt8 byte13, UInt8 byte14, UInt8 byte15);
 
-public extern "C" CFUUIDRef CFUUIDCreateFromString(CFAllocatorRef alloc, CFStringRef uuidStr);
+[ReturnsRetained] public extern "C" CFUUIDRef? CFUUIDCreateFromString(CFAllocatorRef? alloc, CFStringRef? uuidStr);
 
-public extern "C" CFStringRef CFUUIDCreateString(CFAllocatorRef alloc, CFUUIDRef uuid);
+[ReturnsRetained] public extern "C" CFStringRef? CFUUIDCreateString(CFAllocatorRef? alloc, CFUUIDRef? uuid);
 
-public extern "C" CFUUIDRef CFUUIDGetConstantUUIDWithBytes(CFAllocatorRef alloc, UInt8 byte0, UInt8 byte1, UInt8 byte2, UInt8 byte3, UInt8 byte4, UInt8 byte5, UInt8 byte6, UInt8 byte7, UInt8 byte8, UInt8 byte9, UInt8 byte10, UInt8 byte11, UInt8 byte12, UInt8 byte13, UInt8 byte14, UInt8 byte15);
+public extern "C" CFUUIDRef? CFUUIDGetConstantUUIDWithBytes(CFAllocatorRef? alloc, UInt8 byte0, UInt8 byte1, UInt8 byte2, UInt8 byte3, UInt8 byte4, UInt8 byte5, UInt8 byte6, UInt8 byte7, UInt8 byte8, UInt8 byte9, UInt8 byte10, UInt8 byte11, UInt8 byte12, UInt8 byte13, UInt8 byte14, UInt8 byte15);
 
-public extern "C" CFUUIDBytes CFUUIDGetUUIDBytes(CFUUIDRef uuid);
+public extern "C" CFUUIDBytes CFUUIDGetUUIDBytes(CFUUIDRef? uuid);
 
-public extern "C" CFUUIDRef CFUUIDCreateFromUUIDBytes(CFAllocatorRef alloc, CFUUIDBytes bytes);
+[ReturnsRetained] public extern "C" CFUUIDRef? CFUUIDCreateFromUUIDBytes(CFAllocatorRef? alloc, CFUUIDBytes bytes);
 
 #endif

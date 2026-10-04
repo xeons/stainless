@@ -1282,8 +1282,8 @@ public using CMDeviceClass = OSType;
 
 public struct CMDeviceScope
 {
-    public CFStringRef deviceUser;
-    public CFStringRef deviceHost;
+    public __CFString* deviceUser;
+    public __CFString* deviceHost;
 }
 
 /// Deprecated in macOS 10.6.
@@ -1297,7 +1297,7 @@ public struct CMDeviceInfo
     public CMDeviceScope deviceScope;
     public CMDeviceState deviceState;
     public CMDeviceProfileID defaultProfileID;
-    public CFDictionaryRef* deviceName;
+    public __CFDictionary** deviceName;
     public UInt32 profileCount;
     public UInt32 reserved;
 }
@@ -1310,7 +1310,7 @@ public struct CMDeviceProfileInfo
     public UInt32 dataVersion;
     public CMDeviceProfileID profileID;
     public CMProfileLocation profileLoc;
-    public CFDictionaryRef profileName;
+    public __CFDictionary* profileName;
     public UInt32 reserved;
 }
 
@@ -1319,7 +1319,7 @@ public struct NCMDeviceProfileInfo
     public UInt32 dataVersion;
     public CMDeviceProfileID profileID;
     public CMProfileLocation profileLoc;
-    public CFDictionaryRef profileName;
+    public __CFDictionary* profileName;
     public CMDeviceProfileScope profileScope;
     public UInt32 reserved;
 }

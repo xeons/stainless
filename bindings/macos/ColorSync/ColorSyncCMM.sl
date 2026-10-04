@@ -24,6 +24,7 @@
 module MacOS.ColorSync;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,29 +32,30 @@ import MacOS.CoreFoundation;
 
 public struct ColorSyncCMM;
 
-public using ColorSyncCMMRef = ColorSyncCMM*;
+[CFType("ColorSyncCMMGetTypeID")]
+public extern objc class ColorSyncCMMRef : CFTypeRef { }
 
 public extern "C" CFTypeID ColorSyncCMMGetTypeID();
 
-public extern "C" ColorSyncCMMRef ColorSyncCMMCreate(CFBundleRef cmmBundle);
+[ReturnsRetained] public extern "C" ColorSyncCMMRef? ColorSyncCMMCreate(CFBundleRef cmmBundle);
 
-public extern "C" CFBundleRef ColorSyncCMMGetBundle(ColorSyncCMMRef arg0);
+public extern "C" CFBundleRef? ColorSyncCMMGetBundle(ColorSyncCMMRef arg0);
 
-public extern "C" CFStringRef ColorSyncCMMCopyLocalizedName(ColorSyncCMMRef arg0);
+[ReturnsRetained] public extern "C" CFStringRef? ColorSyncCMMCopyLocalizedName(ColorSyncCMMRef arg0);
 
-public extern "C" CFStringRef ColorSyncCMMCopyCMMIdentifier(ColorSyncCMMRef arg0);
+[ReturnsRetained] public extern "C" CFStringRef? ColorSyncCMMCopyCMMIdentifier(ColorSyncCMMRef arg0);
 
-public delegate bool ColorSyncCMMIterateCallback(ColorSyncCMMRef arg0, void* arg1);
+public delegate bool ColorSyncCMMIterateCallback(ColorSyncCMM* arg0, void* arg1);
 
 public extern "C" void ColorSyncIterateInstalledCMMs(ColorSyncCMMIterateCallback callBack, void* userInfo);
 
-public delegate bool CMMInitializeLinkProfileProc(ColorSyncMutableProfileRef arg0, CFArrayRef arg1, CFDictionaryRef arg2);
+public delegate bool CMMInitializeLinkProfileProc(ColorSyncProfile* arg0, __CFArray* arg1, __CFDictionary* arg2);
 
-public delegate bool CMMInitializeTransformProc(ColorSyncTransformRef arg0, CFArrayRef arg1, CFDictionaryRef arg2);
+public delegate bool CMMInitializeTransformProc(ColorSyncTransform* arg0, __CFArray* arg1, __CFDictionary* arg2);
 
-public delegate bool CMMApplyTransformProc(ColorSyncTransformRef arg0, nuint arg1, nuint arg2, nuint arg3, void** arg4, ColorSyncDataDepth arg5, ColorSyncDataLayout arg6, nuint arg7, nuint arg8, void** arg9, ColorSyncDataDepth arg10, ColorSyncDataLayout arg11, nuint arg12, CFDictionaryRef arg13);
+public delegate bool CMMApplyTransformProc(ColorSyncTransform* arg0, nuint arg1, nuint arg2, nuint arg3, void** arg4, ColorSyncDataDepth arg5, ColorSyncDataLayout arg6, nuint arg7, nuint arg8, void** arg9, ColorSyncDataDepth arg10, ColorSyncDataLayout arg11, nuint arg12, __CFDictionary* arg13);
 
-public delegate CFTypeRef CMMCreateTransformPropertyProc(ColorSyncTransformRef arg0, CFTypeRef arg1, CFDictionaryRef arg2);
+public delegate void* CMMCreateTransformPropertyProc(ColorSyncTransform* arg0, void* arg1, __CFDictionary* arg2);
 
 public extern "C" CFStringRef kCMMInitializeLinkProfileProcName;
 

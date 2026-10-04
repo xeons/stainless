@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGDataConsumer;
 
-public using CGDataConsumerRef = CGDataConsumer*;
+[CFType("CGDataConsumerGetTypeID")]
+public extern objc class CGDataConsumerRef : CFTypeRef { }
 
 public delegate nuint CGDataConsumerPutBytesCallback(void* arg0, void* arg1, nuint arg2);
 
@@ -45,14 +47,10 @@ public struct CGDataConsumerCallbacks
 
 public extern "C" CFTypeID CGDataConsumerGetTypeID();
 
-public extern "C" CGDataConsumerRef CGDataConsumerCreate(void* info, CGDataConsumerCallbacks* cbks);
+[ReturnsRetained] public extern "C" CGDataConsumerRef? CGDataConsumerCreate(void* info, CGDataConsumerCallbacks* cbks);
 
-public extern "C" CGDataConsumerRef CGDataConsumerCreateWithURL(CFURLRef url);
+[ReturnsRetained] public extern "C" CGDataConsumerRef? CGDataConsumerCreateWithURL(CFURLRef? url);
 
-public extern "C" CGDataConsumerRef CGDataConsumerCreateWithCFData(CFMutableDataRef data);
-
-public extern "C" CGDataConsumerRef CGDataConsumerRetain(CGDataConsumerRef consumer);
-
-public extern "C" void CGDataConsumerRelease(CGDataConsumerRef consumer);
+[ReturnsRetained] public extern "C" CGDataConsumerRef? CGDataConsumerCreateWithCFData(CFMutableDataRef? data);
 
 #endif

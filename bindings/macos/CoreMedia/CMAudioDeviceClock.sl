@@ -26,19 +26,20 @@ module MacOS.CoreMedia;
 import MacOS.CoreAudio;
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreMedia")
 
-public extern "C" OSStatus CMAudioDeviceClockCreate(CFAllocatorRef allocator, CFStringRef deviceUID, CMClockRef* clockOut);
+public extern "C" OSStatus CMAudioDeviceClockCreate(CFAllocatorRef? allocator, CFStringRef? deviceUID, OpaqueCMClock** clockOut);
 
-public extern "C" OSStatus CMAudioDeviceClockCreateFromAudioDeviceID(CFAllocatorRef allocator, AudioDeviceID deviceID, CMClockRef* clockOut);
+public extern "C" OSStatus CMAudioDeviceClockCreateFromAudioDeviceID(CFAllocatorRef? allocator, AudioDeviceID deviceID, OpaqueCMClock** clockOut);
 
-public extern "C" OSStatus CMAudioDeviceClockSetAudioDeviceUID(CMClockRef clock, CFStringRef deviceUID);
+public extern "C" OSStatus CMAudioDeviceClockSetAudioDeviceUID(CMClockRef clock, CFStringRef? deviceUID);
 
 public extern "C" OSStatus CMAudioDeviceClockSetAudioDeviceID(CMClockRef clock, AudioDeviceID deviceID);
 
-public extern "C" OSStatus CMAudioDeviceClockGetAudioDevice(CMClockRef clock, CFStringRef* deviceUIDOut, AudioDeviceID* deviceIDOut, Boolean* trackingDefaultDeviceOut);
+public extern "C" OSStatus CMAudioDeviceClockGetAudioDevice(CMClockRef clock, __CFString** deviceUIDOut, AudioDeviceID* deviceIDOut, Boolean* trackingDefaultDeviceOut);
 
 #endif

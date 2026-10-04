@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,18 +34,19 @@ public using CFFileDescriptorNativeDescriptor = int;
 
 public struct __CFFileDescriptor;
 
-public using CFFileDescriptorRef = __CFFileDescriptor*;
+[CFType("CFFileDescriptorGetTypeID")]
+public extern objc class CFFileDescriptorRef : CFTypeRef { }
 
 public const ulong kCFFileDescriptorReadCallBack = 1;
 public const ulong kCFFileDescriptorWriteCallBack = 2;
 
-public delegate void CFFileDescriptorCallBack(CFFileDescriptorRef arg0, CFOptionFlags arg1, void* arg2);
+public delegate void CFFileDescriptorCallBack(__CFFileDescriptor* arg0, CFOptionFlags arg1, void* arg2);
 
 public delegate void* CFFileDescriptorContextRetainFunction(void* arg0);
 
 public delegate void CFFileDescriptorContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFFileDescriptorContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFFileDescriptorContextCopyDescriptionFunction(void* arg0);
 
 public struct CFFileDescriptorContext
 {
@@ -57,20 +59,20 @@ public struct CFFileDescriptorContext
 
 public extern "C" CFTypeID CFFileDescriptorGetTypeID();
 
-public extern "C" CFFileDescriptorRef CFFileDescriptorCreate(CFAllocatorRef allocator, CFFileDescriptorNativeDescriptor fd, Boolean closeOnInvalidate, CFFileDescriptorCallBack callout, CFFileDescriptorContext* context);
+[ReturnsRetained] public extern "C" CFFileDescriptorRef? CFFileDescriptorCreate(CFAllocatorRef? allocator, CFFileDescriptorNativeDescriptor fd, Boolean closeOnInvalidate, CFFileDescriptorCallBack callout, CFFileDescriptorContext* context);
 
-public extern "C" CFFileDescriptorNativeDescriptor CFFileDescriptorGetNativeDescriptor(CFFileDescriptorRef f);
+public extern "C" CFFileDescriptorNativeDescriptor CFFileDescriptorGetNativeDescriptor(CFFileDescriptorRef? f);
 
-public extern "C" void CFFileDescriptorGetContext(CFFileDescriptorRef f, CFFileDescriptorContext* context);
+public extern "C" void CFFileDescriptorGetContext(CFFileDescriptorRef? f, CFFileDescriptorContext* context);
 
-public extern "C" void CFFileDescriptorEnableCallBacks(CFFileDescriptorRef f, CFOptionFlags callBackTypes);
+public extern "C" void CFFileDescriptorEnableCallBacks(CFFileDescriptorRef? f, CFOptionFlags callBackTypes);
 
-public extern "C" void CFFileDescriptorDisableCallBacks(CFFileDescriptorRef f, CFOptionFlags callBackTypes);
+public extern "C" void CFFileDescriptorDisableCallBacks(CFFileDescriptorRef? f, CFOptionFlags callBackTypes);
 
-public extern "C" void CFFileDescriptorInvalidate(CFFileDescriptorRef f);
+public extern "C" void CFFileDescriptorInvalidate(CFFileDescriptorRef? f);
 
-public extern "C" Boolean CFFileDescriptorIsValid(CFFileDescriptorRef f);
+public extern "C" Boolean CFFileDescriptorIsValid(CFFileDescriptorRef? f);
 
-public extern "C" CFRunLoopSourceRef CFFileDescriptorCreateRunLoopSource(CFAllocatorRef allocator, CFFileDescriptorRef f, CFIndex order);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFFileDescriptorCreateRunLoopSource(CFAllocatorRef? allocator, CFFileDescriptorRef? f, CFIndex order);
 
 #endif

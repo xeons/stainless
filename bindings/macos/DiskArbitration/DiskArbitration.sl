@@ -25,6 +25,7 @@ module MacOS.DiskArbitration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -58,63 +59,63 @@ public const int kDADiskOptionDefault = 0;
 
 public using DADiskOptions = UInt32;
 
-public extern "C" CFDictionaryRef kDADiskDescriptionMatchMediaUnformatted;
+public extern "C" CFDictionaryRef? kDADiskDescriptionMatchMediaUnformatted;
 
-public extern "C" CFDictionaryRef kDADiskDescriptionMatchMediaWhole;
+public extern "C" CFDictionaryRef? kDADiskDescriptionMatchMediaWhole;
 
-public extern "C" CFDictionaryRef kDADiskDescriptionMatchVolumeMountable;
+public extern "C" CFDictionaryRef? kDADiskDescriptionMatchVolumeMountable;
 
-public extern "C" CFDictionaryRef kDADiskDescriptionMatchVolumeUnrecognized;
+public extern "C" CFDictionaryRef? kDADiskDescriptionMatchVolumeUnrecognized;
 
-public extern "C" CFArrayRef kDADiskDescriptionWatchVolumeName;
+public extern "C" CFArrayRef? kDADiskDescriptionWatchVolumeName;
 
-public extern "C" CFArrayRef kDADiskDescriptionWatchVolumePath;
+public extern "C" CFArrayRef? kDADiskDescriptionWatchVolumePath;
 
-public delegate void DADiskAppearedCallback(DADiskRef arg0, void* arg1);
+public delegate void DADiskAppearedCallback(__DADisk* arg0, void* arg1);
 
-public extern "C" void DARegisterDiskAppearedCallback(DASessionRef session, CFDictionaryRef match, DADiskAppearedCallback callback, void* context);
+public extern "C" void DARegisterDiskAppearedCallback(DASessionRef session, CFDictionaryRef? match, DADiskAppearedCallback callback, void* context);
 
-public delegate void DADiskDescriptionChangedCallback(DADiskRef arg0, CFArrayRef arg1, void* arg2);
+public delegate void DADiskDescriptionChangedCallback(__DADisk* arg0, __CFArray* arg1, void* arg2);
 
-public extern "C" void DARegisterDiskDescriptionChangedCallback(DASessionRef session, CFDictionaryRef match, CFArrayRef watch, DADiskDescriptionChangedCallback callback, void* context);
+public extern "C" void DARegisterDiskDescriptionChangedCallback(DASessionRef session, CFDictionaryRef? match, CFArrayRef? watch, DADiskDescriptionChangedCallback callback, void* context);
 
-public delegate void DADiskDisappearedCallback(DADiskRef arg0, void* arg1);
+public delegate void DADiskDisappearedCallback(__DADisk* arg0, void* arg1);
 
-public extern "C" void DARegisterDiskDisappearedCallback(DASessionRef session, CFDictionaryRef match, DADiskDisappearedCallback callback, void* context);
+public extern "C" void DARegisterDiskDisappearedCallback(DASessionRef session, CFDictionaryRef? match, DADiskDisappearedCallback callback, void* context);
 
-public delegate void DADiskMountCallback(DADiskRef arg0, DADissenterRef arg1, void* arg2);
+public delegate void DADiskMountCallback(__DADisk* arg0, __DADissenter* arg1, void* arg2);
 
-public extern "C" void DADiskMount(DADiskRef disk, CFURLRef path, DADiskMountOptions options, DADiskMountCallback callback, void* context);
+public extern "C" void DADiskMount(DADiskRef disk, CFURLRef? path, DADiskMountOptions options, DADiskMountCallback callback, void* context);
 
-public extern "C" void DADiskMountWithArguments(DADiskRef disk, CFURLRef path, DADiskMountOptions options, DADiskMountCallback callback, void* context, CFStringRef* arguments);
+public extern "C" void DADiskMountWithArguments(DADiskRef disk, CFURLRef? path, DADiskMountOptions options, DADiskMountCallback callback, void* context, __CFString** arguments);
 
-public delegate DADissenterRef DADiskMountApprovalCallback(DADiskRef arg0, void* arg1);
+public delegate __DADissenter* DADiskMountApprovalCallback(__DADisk* arg0, void* arg1);
 
-public extern "C" void DARegisterDiskMountApprovalCallback(DASessionRef session, CFDictionaryRef match, DADiskMountApprovalCallback callback, void* context);
+public extern "C" void DARegisterDiskMountApprovalCallback(DASessionRef session, CFDictionaryRef? match, DADiskMountApprovalCallback callback, void* context);
 
-public delegate void DADiskRenameCallback(DADiskRef arg0, DADissenterRef arg1, void* arg2);
+public delegate void DADiskRenameCallback(__DADisk* arg0, __DADissenter* arg1, void* arg2);
 
 public extern "C" void DADiskRename(DADiskRef disk, CFStringRef name, DADiskRenameOptions options, DADiskRenameCallback callback, void* context);
 
-public delegate void DADiskUnmountCallback(DADiskRef arg0, DADissenterRef arg1, void* arg2);
+public delegate void DADiskUnmountCallback(__DADisk* arg0, __DADissenter* arg1, void* arg2);
 
 public extern "C" void DADiskUnmount(DADiskRef disk, DADiskUnmountOptions options, DADiskUnmountCallback callback, void* context);
 
-public delegate DADissenterRef DADiskUnmountApprovalCallback(DADiskRef arg0, void* arg1);
+public delegate __DADissenter* DADiskUnmountApprovalCallback(__DADisk* arg0, void* arg1);
 
-public extern "C" void DARegisterDiskUnmountApprovalCallback(DASessionRef session, CFDictionaryRef match, DADiskUnmountApprovalCallback callback, void* context);
+public extern "C" void DARegisterDiskUnmountApprovalCallback(DASessionRef session, CFDictionaryRef? match, DADiskUnmountApprovalCallback callback, void* context);
 
-public delegate void DADiskEjectCallback(DADiskRef arg0, DADissenterRef arg1, void* arg2);
+public delegate void DADiskEjectCallback(__DADisk* arg0, __DADissenter* arg1, void* arg2);
 
 public extern "C" void DADiskEject(DADiskRef disk, DADiskEjectOptions options, DADiskEjectCallback callback, void* context);
 
-public delegate DADissenterRef DADiskEjectApprovalCallback(DADiskRef arg0, void* arg1);
+public delegate __DADissenter* DADiskEjectApprovalCallback(__DADisk* arg0, void* arg1);
 
-public extern "C" void DARegisterDiskEjectApprovalCallback(DASessionRef session, CFDictionaryRef match, DADiskEjectApprovalCallback callback, void* context);
+public extern "C" void DARegisterDiskEjectApprovalCallback(DASessionRef session, CFDictionaryRef? match, DADiskEjectApprovalCallback callback, void* context);
 
-public delegate void DADiskClaimCallback(DADiskRef arg0, DADissenterRef arg1, void* arg2);
+public delegate void DADiskClaimCallback(__DADisk* arg0, __DADissenter* arg1, void* arg2);
 
-public delegate DADissenterRef DADiskClaimReleaseCallback(DADiskRef arg0, void* arg1);
+public delegate __DADissenter* DADiskClaimReleaseCallback(__DADisk* arg0, void* arg1);
 
 public extern "C" void DADiskClaim(DADiskRef disk, DADiskClaimOptions options, DADiskClaimReleaseCallback release, void* releaseContext, DADiskClaimCallback callback, void* callbackContext);
 
@@ -122,9 +123,9 @@ public extern "C" Boolean DADiskIsClaimed(DADiskRef disk);
 
 public extern "C" void DADiskUnclaim(DADiskRef disk);
 
-public delegate void DADiskPeekCallback(DADiskRef arg0, void* arg1);
+public delegate void DADiskPeekCallback(__DADisk* arg0, void* arg1);
 
-public extern "C" void DARegisterDiskPeekCallback(DASessionRef session, CFDictionaryRef match, CFIndex order, DADiskPeekCallback callback, void* context);
+public extern "C" void DARegisterDiskPeekCallback(DASessionRef session, CFDictionaryRef? match, CFIndex order, DADiskPeekCallback callback, void* context);
 
 public extern "C" DADiskOptions DADiskGetOptions(DADiskRef disk);
 

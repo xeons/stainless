@@ -144,7 +144,7 @@ public union ControlImageContentInfoU
 {
     public SInt16 resID;
     public IconRef iconRef;
-    public CGImageRef imageRef;
+    public CGImage* imageRef;
 }
 
 [Pack(2)]

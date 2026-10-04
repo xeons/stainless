@@ -23,6 +23,8 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreFoundation;
 
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
@@ -31,7 +33,7 @@ public delegate void* CFTreeRetainCallBack(void* arg0);
 
 public delegate void CFTreeReleaseCallBack(void* arg0);
 
-public delegate CFStringRef CFTreeCopyDescriptionCallBack(void* arg0);
+public delegate __CFString* CFTreeCopyDescriptionCallBack(void* arg0);
 
 public struct CFTreeContext
 {
@@ -46,42 +48,43 @@ public delegate void CFTreeApplierFunction(void* arg0, void* arg1);
 
 public struct __CFTree;
 
-public using CFTreeRef = __CFTree*;
+[CFType("CFTreeGetTypeID")]
+public extern objc class CFTreeRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFTreeGetTypeID();
 
-public extern "C" CFTreeRef CFTreeCreate(CFAllocatorRef allocator, CFTreeContext* context);
+[ReturnsRetained] public extern "C" CFTreeRef? CFTreeCreate(CFAllocatorRef? allocator, CFTreeContext* context);
 
-public extern "C" CFTreeRef CFTreeGetParent(CFTreeRef tree);
+public extern "C" CFTreeRef? CFTreeGetParent(CFTreeRef? tree);
 
-public extern "C" CFTreeRef CFTreeGetNextSibling(CFTreeRef tree);
+public extern "C" CFTreeRef? CFTreeGetNextSibling(CFTreeRef? tree);
 
-public extern "C" CFTreeRef CFTreeGetFirstChild(CFTreeRef tree);
+public extern "C" CFTreeRef? CFTreeGetFirstChild(CFTreeRef? tree);
 
-public extern "C" void CFTreeGetContext(CFTreeRef tree, CFTreeContext* context);
+public extern "C" void CFTreeGetContext(CFTreeRef? tree, CFTreeContext* context);
 
-public extern "C" CFIndex CFTreeGetChildCount(CFTreeRef tree);
+public extern "C" CFIndex CFTreeGetChildCount(CFTreeRef? tree);
 
-public extern "C" CFTreeRef CFTreeGetChildAtIndex(CFTreeRef tree, CFIndex idx);
+public extern "C" CFTreeRef? CFTreeGetChildAtIndex(CFTreeRef? tree, CFIndex idx);
 
-public extern "C" void CFTreeGetChildren(CFTreeRef tree, CFTreeRef* children);
+public extern "C" void CFTreeGetChildren(CFTreeRef? tree, __CFTree** children);
 
-public extern "C" void CFTreeApplyFunctionToChildren(CFTreeRef tree, CFTreeApplierFunction applier, void* context);
+public extern "C" void CFTreeApplyFunctionToChildren(CFTreeRef? tree, CFTreeApplierFunction applier, void* context);
 
-public extern "C" CFTreeRef CFTreeFindRoot(CFTreeRef tree);
+public extern "C" CFTreeRef? CFTreeFindRoot(CFTreeRef? tree);
 
-public extern "C" void CFTreeSetContext(CFTreeRef tree, CFTreeContext* context);
+public extern "C" void CFTreeSetContext(CFTreeRef? tree, CFTreeContext* context);
 
-public extern "C" void CFTreePrependChild(CFTreeRef tree, CFTreeRef newChild);
+public extern "C" void CFTreePrependChild(CFTreeRef? tree, CFTreeRef? newChild);
 
-public extern "C" void CFTreeAppendChild(CFTreeRef tree, CFTreeRef newChild);
+public extern "C" void CFTreeAppendChild(CFTreeRef? tree, CFTreeRef? newChild);
 
-public extern "C" void CFTreeInsertSibling(CFTreeRef tree, CFTreeRef newSibling);
+public extern "C" void CFTreeInsertSibling(CFTreeRef? tree, CFTreeRef? newSibling);
 
-public extern "C" void CFTreeRemove(CFTreeRef tree);
+public extern "C" void CFTreeRemove(CFTreeRef? tree);
 
-public extern "C" void CFTreeRemoveAllChildren(CFTreeRef tree);
+public extern "C" void CFTreeRemoveAllChildren(CFTreeRef? tree);
 
-public extern "C" void CFTreeSortChildren(CFTreeRef tree, CFComparatorFunction comparator, void* context);
+public extern "C" void CFTreeSortChildren(CFTreeRef? tree, CFComparatorFunction comparator, void* context);
 
 #endif

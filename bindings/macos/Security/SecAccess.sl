@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -37,77 +38,77 @@ public const int kSecUseOnlyGID = 2;
 public const int kSecHonorRoot = 256;
 public const int kSecMatchBits = 3;
 
-public extern "C" CFStringRef kSecACLAuthorizationAny;
+public extern "C" CFStringRef? kSecACLAuthorizationAny;
 
-public extern "C" CFStringRef kSecACLAuthorizationLogin;
+public extern "C" CFStringRef? kSecACLAuthorizationLogin;
 
-public extern "C" CFStringRef kSecACLAuthorizationGenKey;
+public extern "C" CFStringRef? kSecACLAuthorizationGenKey;
 
-public extern "C" CFStringRef kSecACLAuthorizationDelete;
+public extern "C" CFStringRef? kSecACLAuthorizationDelete;
 
-public extern "C" CFStringRef kSecACLAuthorizationExportWrapped;
+public extern "C" CFStringRef? kSecACLAuthorizationExportWrapped;
 
-public extern "C" CFStringRef kSecACLAuthorizationExportClear;
+public extern "C" CFStringRef? kSecACLAuthorizationExportClear;
 
-public extern "C" CFStringRef kSecACLAuthorizationImportWrapped;
+public extern "C" CFStringRef? kSecACLAuthorizationImportWrapped;
 
-public extern "C" CFStringRef kSecACLAuthorizationImportClear;
+public extern "C" CFStringRef? kSecACLAuthorizationImportClear;
 
-public extern "C" CFStringRef kSecACLAuthorizationSign;
+public extern "C" CFStringRef? kSecACLAuthorizationSign;
 
-public extern "C" CFStringRef kSecACLAuthorizationEncrypt;
+public extern "C" CFStringRef? kSecACLAuthorizationEncrypt;
 
-public extern "C" CFStringRef kSecACLAuthorizationDecrypt;
+public extern "C" CFStringRef? kSecACLAuthorizationDecrypt;
 
-public extern "C" CFStringRef kSecACLAuthorizationMAC;
+public extern "C" CFStringRef? kSecACLAuthorizationMAC;
 
-public extern "C" CFStringRef kSecACLAuthorizationDerive;
+public extern "C" CFStringRef? kSecACLAuthorizationDerive;
 
-public extern "C" CFStringRef kSecACLAuthorizationKeychainCreate;
+public extern "C" CFStringRef? kSecACLAuthorizationKeychainCreate;
 
-public extern "C" CFStringRef kSecACLAuthorizationKeychainDelete;
+public extern "C" CFStringRef? kSecACLAuthorizationKeychainDelete;
 
-public extern "C" CFStringRef kSecACLAuthorizationKeychainItemRead;
+public extern "C" CFStringRef? kSecACLAuthorizationKeychainItemRead;
 
-public extern "C" CFStringRef kSecACLAuthorizationKeychainItemInsert;
+public extern "C" CFStringRef? kSecACLAuthorizationKeychainItemInsert;
 
-public extern "C" CFStringRef kSecACLAuthorizationKeychainItemModify;
+public extern "C" CFStringRef? kSecACLAuthorizationKeychainItemModify;
 
-public extern "C" CFStringRef kSecACLAuthorizationKeychainItemDelete;
+public extern "C" CFStringRef? kSecACLAuthorizationKeychainItemDelete;
 
-public extern "C" CFStringRef kSecACLAuthorizationChangeACL;
+public extern "C" CFStringRef? kSecACLAuthorizationChangeACL;
 
-public extern "C" CFStringRef kSecACLAuthorizationChangeOwner;
+public extern "C" CFStringRef? kSecACLAuthorizationChangeOwner;
 
-public extern "C" CFStringRef kSecACLAuthorizationPartitionID;
+public extern "C" CFStringRef? kSecACLAuthorizationPartitionID;
 
-public extern "C" CFStringRef kSecACLAuthorizationIntegrity;
+public extern "C" CFStringRef? kSecACLAuthorizationIntegrity;
 
 /// Deprecated in macOS 10.10.
 public extern "C" CFTypeID SecAccessGetTypeID();
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecAccessCreate(CFStringRef descriptor, CFArrayRef trustedlist, SecAccessRef* accessRef);
+public extern "C" OSStatus SecAccessCreate(CFStringRef descriptor, CFArrayRef? trustedlist, __SecAccess** accessRef);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecAccessCreateFromOwnerAndACL(CSSM_ACL_OWNER_PROTOTYPE* owner, uint32 aclCount, CSSM_ACL_ENTRY_INFO* acls, SecAccessRef* accessRef);
+public extern "C" OSStatus SecAccessCreateFromOwnerAndACL(CSSM_ACL_OWNER_PROTOTYPE* owner, uint32 aclCount, CSSM_ACL_ENTRY_INFO* acls, __SecAccess** accessRef);
 
 /// Deprecated in macOS 10.10.
-public extern "C" SecAccessRef SecAccessCreateWithOwnerAndACL(uid_t userId, gid_t groupId, SecAccessOwnerType ownerType, CFArrayRef acls, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecAccessRef? SecAccessCreateWithOwnerAndACL(uid_t userId, gid_t groupId, SecAccessOwnerType ownerType, CFArrayRef? acls, __CFError** error);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecAccessGetOwnerAndACL(SecAccessRef accessRef, CSSM_ACL_OWNER_PROTOTYPE_PTR* owner, uint32* aclCount, CSSM_ACL_ENTRY_INFO_PTR* acls);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecAccessCopyOwnerAndACL(SecAccessRef accessRef, uid_t* userId, gid_t* groupId, SecAccessOwnerType* ownerType, CFArrayRef* aclList);
+public extern "C" OSStatus SecAccessCopyOwnerAndACL(SecAccessRef accessRef, uid_t* userId, gid_t* groupId, SecAccessOwnerType* ownerType, __CFArray** aclList);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecAccessCopyACLList(SecAccessRef accessRef, CFArrayRef* aclList);
+public extern "C" OSStatus SecAccessCopyACLList(SecAccessRef accessRef, __CFArray** aclList);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecAccessCopySelectedACLList(SecAccessRef accessRef, CSSM_ACL_AUTHORIZATION_TAG action, CFArrayRef* aclList);
+public extern "C" OSStatus SecAccessCopySelectedACLList(SecAccessRef accessRef, CSSM_ACL_AUTHORIZATION_TAG action, __CFArray** aclList);
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFArrayRef SecAccessCopyMatchingACLList(SecAccessRef accessRef, CFTypeRef authorizationTag);
+[ReturnsRetained] public extern "C" CFArrayRef? SecAccessCopyMatchingACLList(SecAccessRef accessRef, CFTypeRef authorizationTag);
 
 #endif

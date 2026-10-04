@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -61,8 +62,8 @@ public extern "C" OSAError OSAGetHandlerNames(ComponentInstance scriptingCompone
 
 public extern "C" OSAError OSAGetSysTerminology(ComponentInstance scriptingComponent, SInt32 modeFlags, short terminologyID, AEDesc* terminologyList);
 
-public extern "C" OSAError OSACopyScriptingDefinition(FSRef* @ref, SInt32 modeFlags, CFDataRef* sdef);
+public extern "C" OSAError OSACopyScriptingDefinition(FSRef* @ref, SInt32 modeFlags, __CFData** sdef);
 
-public extern "C" OSAError OSACopyScriptingDefinitionFromURL(CFURLRef url, SInt32 modeFlags, CFDataRef* sdef);
+public extern "C" OSAError OSACopyScriptingDefinitionFromURL(CFURLRef? url, SInt32 modeFlags, __CFData** sdef);
 
 #endif

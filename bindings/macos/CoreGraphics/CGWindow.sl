@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -45,32 +46,32 @@ public enum CGWindowBackingType : uint
     Buffered = 2,
 }
 
-public extern "C" CFStringRef kCGWindowNumber;
+public extern "C" CFStringRef? kCGWindowNumber;
 
-public extern "C" CFStringRef kCGWindowStoreType;
+public extern "C" CFStringRef? kCGWindowStoreType;
 
-public extern "C" CFStringRef kCGWindowLayer;
+public extern "C" CFStringRef? kCGWindowLayer;
 
-public extern "C" CFStringRef kCGWindowBounds;
+public extern "C" CFStringRef? kCGWindowBounds;
 
-public extern "C" CFStringRef kCGWindowSharingState;
+public extern "C" CFStringRef? kCGWindowSharingState;
 
-public extern "C" CFStringRef kCGWindowAlpha;
+public extern "C" CFStringRef? kCGWindowAlpha;
 
-public extern "C" CFStringRef kCGWindowOwnerPID;
+public extern "C" CFStringRef? kCGWindowOwnerPID;
 
-public extern "C" CFStringRef kCGWindowMemoryUsage;
+public extern "C" CFStringRef? kCGWindowMemoryUsage;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kCGWindowWorkspace;
+public extern "C" CFStringRef? kCGWindowWorkspace;
 
-public extern "C" CFStringRef kCGWindowOwnerName;
+public extern "C" CFStringRef? kCGWindowOwnerName;
 
-public extern "C" CFStringRef kCGWindowName;
+public extern "C" CFStringRef? kCGWindowName;
 
-public extern "C" CFStringRef kCGWindowIsOnscreen;
+public extern "C" CFStringRef? kCGWindowIsOnscreen;
 
-public extern "C" CFStringRef kCGWindowBackingLocationVideoMemory;
+public extern "C" CFStringRef? kCGWindowBackingLocationVideoMemory;
 
 [Flags]
 public enum CGWindowListOption : uint
@@ -83,11 +84,11 @@ public enum CGWindowListOption : uint
     ExcludeDesktopElements = 16,
 }
 
-public extern "C" CFArrayRef CGWindowListCopyWindowInfo(CGWindowListOption option, CGWindowID relativeToWindow);
+[ReturnsRetained] public extern "C" CFArrayRef? CGWindowListCopyWindowInfo(CGWindowListOption option, CGWindowID relativeToWindow);
 
-public extern "C" CFArrayRef CGWindowListCreate(CGWindowListOption option, CGWindowID relativeToWindow);
+[ReturnsRetained] public extern "C" CFArrayRef? CGWindowListCreate(CGWindowListOption option, CGWindowID relativeToWindow);
 
-public extern "C" CFArrayRef CGWindowListCreateDescriptionFromArray(CFArrayRef windowArray);
+[ReturnsRetained] public extern "C" CFArrayRef? CGWindowListCreateDescriptionFromArray(CFArrayRef? windowArray);
 
 [Flags]
 public enum CGWindowImageOption : uint

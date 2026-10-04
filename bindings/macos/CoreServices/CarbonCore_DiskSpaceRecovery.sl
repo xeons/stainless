@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,10 +35,12 @@ public const int kCSDiskSpaceRecoveryOptionNoUI = 1;
 
 public using CSDiskSpaceRecoveryOptions = int;
 
-public objc closure void CSDiskSpaceRecoveryCallback(Boolean arg0, UInt64 arg1, CFErrorRef arg2);
+public objc closure void CSDiskSpaceRecoveryCallback(Boolean arg0, UInt64 arg1, CFErrorRef? arg2);
 
-public extern "C" void CSDiskSpaceCancelRecovery(CFUUIDRef operationUUID);
+public extern "C" void CSDiskSpaceStartRecovery(CFURLRef? volumeURL, UInt64 bytesNeeded, CSDiskSpaceRecoveryOptions options, __CFUUID** outOperationUUID, dispatch_queue_t? callbackQueue, CSDiskSpaceRecoveryCallback? callback);
 
-public extern "C" UInt64 CSDiskSpaceGetRecoveryEstimate(CFURLRef volumeURL);
+public extern "C" void CSDiskSpaceCancelRecovery(CFUUIDRef? operationUUID);
+
+public extern "C" UInt64 CSDiskSpaceGetRecoveryEstimate(CFURLRef? volumeURL);
 
 #endif

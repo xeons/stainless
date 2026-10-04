@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,19 +34,23 @@ public using CFRunLoopMode = CFStringRef;
 
 public struct __CFRunLoop;
 
-public using CFRunLoopRef = __CFRunLoop*;
+[CFType("CFRunLoopGetTypeID")]
+public extern objc class CFRunLoopRef : CFTypeRef { }
 
 public struct __CFRunLoopSource;
 
-public using CFRunLoopSourceRef = __CFRunLoopSource*;
+[CFType("CFRunLoopSourceGetTypeID")]
+public extern objc class CFRunLoopSourceRef : CFTypeRef { }
 
 public struct __CFRunLoopObserver;
 
-public using CFRunLoopObserverRef = __CFRunLoopObserver*;
+[CFType("CFRunLoopObserverGetTypeID")]
+public extern objc class CFRunLoopObserverRef : CFTypeRef { }
 
 public struct __CFRunLoopTimer;
 
-public using CFRunLoopTimerRef = __CFRunLoopTimer*;
+[CFType("CFRunLoopTimerGetTypeID")]
+public extern objc class CFRunLoopTimerRef : CFTypeRef { }
 
 public enum CFRunLoopRunResult : int
 {
@@ -67,69 +72,69 @@ public enum CFRunLoopActivity : ulong
     AllActivities = 268435455,
 }
 
-public extern "C" CFRunLoopMode kCFRunLoopDefaultMode;
+public extern "C" CFRunLoopMode? kCFRunLoopDefaultMode;
 
-public extern "C" CFRunLoopMode kCFRunLoopCommonModes;
+public extern "C" CFRunLoopMode? kCFRunLoopCommonModes;
 
 public extern "C" CFTypeID CFRunLoopGetTypeID();
 
-public extern "C" CFRunLoopRef CFRunLoopGetCurrent();
+public extern "C" CFRunLoopRef? CFRunLoopGetCurrent();
 
-public extern "C" CFRunLoopRef CFRunLoopGetMain();
+public extern "C" CFRunLoopRef? CFRunLoopGetMain();
 
-public extern "C" CFRunLoopMode CFRunLoopCopyCurrentMode(CFRunLoopRef rl);
+[ReturnsRetained] public extern "C" CFRunLoopMode? CFRunLoopCopyCurrentMode(CFRunLoopRef? rl);
 
-public extern "C" CFArrayRef CFRunLoopCopyAllModes(CFRunLoopRef rl);
+[ReturnsRetained] public extern "C" CFArrayRef? CFRunLoopCopyAllModes(CFRunLoopRef? rl);
 
-public extern "C" void CFRunLoopAddCommonMode(CFRunLoopRef rl, CFRunLoopMode mode);
+public extern "C" void CFRunLoopAddCommonMode(CFRunLoopRef? rl, CFRunLoopMode? mode);
 
-public extern "C" CFAbsoluteTime CFRunLoopGetNextTimerFireDate(CFRunLoopRef rl, CFRunLoopMode mode);
+public extern "C" CFAbsoluteTime CFRunLoopGetNextTimerFireDate(CFRunLoopRef? rl, CFRunLoopMode? mode);
 
 public extern "C" void CFRunLoopRun();
 
-public extern "C" CFRunLoopRunResult CFRunLoopRunInMode(CFRunLoopMode mode, CFTimeInterval seconds, Boolean returnAfterSourceHandled);
+public extern "C" CFRunLoopRunResult CFRunLoopRunInMode(CFRunLoopMode? mode, CFTimeInterval seconds, Boolean returnAfterSourceHandled);
 
-public extern "C" Boolean CFRunLoopIsWaiting(CFRunLoopRef rl);
+public extern "C" Boolean CFRunLoopIsWaiting(CFRunLoopRef? rl);
 
-public extern "C" void CFRunLoopWakeUp(CFRunLoopRef rl);
+public extern "C" void CFRunLoopWakeUp(CFRunLoopRef? rl);
 
-public extern "C" void CFRunLoopStop(CFRunLoopRef rl);
+public extern "C" void CFRunLoopStop(CFRunLoopRef? rl);
 
 public objc closure void CFRunLoopPerformBlockBlock();
 
-public extern "C" void CFRunLoopPerformBlock(CFRunLoopRef rl, CFTypeRef mode, CFRunLoopPerformBlockBlock block);
+public extern "C" void CFRunLoopPerformBlock(CFRunLoopRef? rl, CFTypeRef? mode, CFRunLoopPerformBlockBlock? block);
 
-public extern "C" Boolean CFRunLoopContainsSource(CFRunLoopRef rl, CFRunLoopSourceRef source, CFRunLoopMode mode);
+public extern "C" Boolean CFRunLoopContainsSource(CFRunLoopRef? rl, CFRunLoopSourceRef? source, CFRunLoopMode? mode);
 
-public extern "C" void CFRunLoopAddSource(CFRunLoopRef rl, CFRunLoopSourceRef source, CFRunLoopMode mode);
+public extern "C" void CFRunLoopAddSource(CFRunLoopRef? rl, CFRunLoopSourceRef? source, CFRunLoopMode? mode);
 
-public extern "C" void CFRunLoopRemoveSource(CFRunLoopRef rl, CFRunLoopSourceRef source, CFRunLoopMode mode);
+public extern "C" void CFRunLoopRemoveSource(CFRunLoopRef? rl, CFRunLoopSourceRef? source, CFRunLoopMode? mode);
 
-public extern "C" Boolean CFRunLoopContainsObserver(CFRunLoopRef rl, CFRunLoopObserverRef observer, CFRunLoopMode mode);
+public extern "C" Boolean CFRunLoopContainsObserver(CFRunLoopRef? rl, CFRunLoopObserverRef? observer, CFRunLoopMode? mode);
 
-public extern "C" void CFRunLoopAddObserver(CFRunLoopRef rl, CFRunLoopObserverRef observer, CFRunLoopMode mode);
+public extern "C" void CFRunLoopAddObserver(CFRunLoopRef? rl, CFRunLoopObserverRef? observer, CFRunLoopMode? mode);
 
-public extern "C" void CFRunLoopRemoveObserver(CFRunLoopRef rl, CFRunLoopObserverRef observer, CFRunLoopMode mode);
+public extern "C" void CFRunLoopRemoveObserver(CFRunLoopRef? rl, CFRunLoopObserverRef? observer, CFRunLoopMode? mode);
 
-public extern "C" Boolean CFRunLoopContainsTimer(CFRunLoopRef rl, CFRunLoopTimerRef timer, CFRunLoopMode mode);
+public extern "C" Boolean CFRunLoopContainsTimer(CFRunLoopRef? rl, CFRunLoopTimerRef? timer, CFRunLoopMode? mode);
 
-public extern "C" void CFRunLoopAddTimer(CFRunLoopRef rl, CFRunLoopTimerRef timer, CFRunLoopMode mode);
+public extern "C" void CFRunLoopAddTimer(CFRunLoopRef? rl, CFRunLoopTimerRef? timer, CFRunLoopMode? mode);
 
-public extern "C" void CFRunLoopRemoveTimer(CFRunLoopRef rl, CFRunLoopTimerRef timer, CFRunLoopMode mode);
+public extern "C" void CFRunLoopRemoveTimer(CFRunLoopRef? rl, CFRunLoopTimerRef? timer, CFRunLoopMode? mode);
 
 public delegate void* CFRunLoopSourceContextRetainFunction(void* arg0);
 
 public delegate void CFRunLoopSourceContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFRunLoopSourceContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFRunLoopSourceContextCopyDescriptionFunction(void* arg0);
 
 public delegate Boolean CFRunLoopSourceContextEqualFunction(void* arg0, void* arg1);
 
 public delegate CFHashCode CFRunLoopSourceContextHashFunction(void* arg0);
 
-public delegate void CFRunLoopSourceContextScheduleFunction(void* arg0, CFRunLoopRef arg1, CFRunLoopMode arg2);
+public delegate void CFRunLoopSourceContextScheduleFunction(void* arg0, __CFRunLoop* arg1, void* arg2);
 
-public delegate void CFRunLoopSourceContextCancelFunction(void* arg0, CFRunLoopRef arg1, CFRunLoopMode arg2);
+public delegate void CFRunLoopSourceContextCancelFunction(void* arg0, __CFRunLoop* arg1, void* arg2);
 
 public delegate void CFRunLoopSourceContextPerformFunction(void* arg0);
 
@@ -151,7 +156,7 @@ public delegate void* CFRunLoopSourceContext1RetainFunction(void* arg0);
 
 public delegate void CFRunLoopSourceContext1ReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFRunLoopSourceContext1CopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFRunLoopSourceContext1CopyDescriptionFunction(void* arg0);
 
 public delegate Boolean CFRunLoopSourceContext1EqualFunction(void* arg0, void* arg1);
 
@@ -159,7 +164,7 @@ public delegate CFHashCode CFRunLoopSourceContext1HashFunction(void* arg0);
 
 public delegate mach_port_t CFRunLoopSourceContext1GetPortFunction(void* arg0);
 
-public delegate void* CFRunLoopSourceContext1PerformFunction(void* arg0, CFIndex arg1, CFAllocatorRef arg2, void* arg3);
+public delegate void* CFRunLoopSourceContext1PerformFunction(void* arg0, CFIndex arg1, __CFAllocator* arg2, void* arg3);
 
 public struct CFRunLoopSourceContext1
 {
@@ -176,23 +181,23 @@ public struct CFRunLoopSourceContext1
 
 public extern "C" CFTypeID CFRunLoopSourceGetTypeID();
 
-public extern "C" CFRunLoopSourceRef CFRunLoopSourceCreate(CFAllocatorRef allocator, CFIndex order, CFRunLoopSourceContext* context);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFRunLoopSourceCreate(CFAllocatorRef? allocator, CFIndex order, CFRunLoopSourceContext* context);
 
-public extern "C" CFIndex CFRunLoopSourceGetOrder(CFRunLoopSourceRef source);
+public extern "C" CFIndex CFRunLoopSourceGetOrder(CFRunLoopSourceRef? source);
 
-public extern "C" void CFRunLoopSourceInvalidate(CFRunLoopSourceRef source);
+public extern "C" void CFRunLoopSourceInvalidate(CFRunLoopSourceRef? source);
 
-public extern "C" Boolean CFRunLoopSourceIsValid(CFRunLoopSourceRef source);
+public extern "C" Boolean CFRunLoopSourceIsValid(CFRunLoopSourceRef? source);
 
-public extern "C" void CFRunLoopSourceGetContext(CFRunLoopSourceRef source, CFRunLoopSourceContext* context);
+public extern "C" void CFRunLoopSourceGetContext(CFRunLoopSourceRef? source, CFRunLoopSourceContext* context);
 
-public extern "C" void CFRunLoopSourceSignal(CFRunLoopSourceRef source);
+public extern "C" void CFRunLoopSourceSignal(CFRunLoopSourceRef? source);
 
 public delegate void* CFRunLoopObserverContextRetainFunction(void* arg0);
 
 public delegate void CFRunLoopObserverContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFRunLoopObserverContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFRunLoopObserverContextCopyDescriptionFunction(void* arg0);
 
 public struct CFRunLoopObserverContext
 {
@@ -203,33 +208,33 @@ public struct CFRunLoopObserverContext
     public CFRunLoopObserverContextCopyDescriptionFunction copyDescription;
 }
 
-public delegate void CFRunLoopObserverCallBack(CFRunLoopObserverRef arg0, CFRunLoopActivity arg1, void* arg2);
+public delegate void CFRunLoopObserverCallBack(__CFRunLoopObserver* arg0, CFRunLoopActivity arg1, void* arg2);
 
 public extern "C" CFTypeID CFRunLoopObserverGetTypeID();
 
-public extern "C" CFRunLoopObserverRef CFRunLoopObserverCreate(CFAllocatorRef allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCallBack callout, CFRunLoopObserverContext* context);
+[ReturnsRetained] public extern "C" CFRunLoopObserverRef? CFRunLoopObserverCreate(CFAllocatorRef? allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCallBack callout, CFRunLoopObserverContext* context);
 
-public objc closure void CFRunLoopObserverCreateWithHandlerBlock(CFRunLoopObserverRef arg0, CFRunLoopActivity arg1);
+public objc closure void CFRunLoopObserverCreateWithHandlerBlock(CFRunLoopObserverRef? arg0, CFRunLoopActivity arg1);
 
-public extern "C" CFRunLoopObserverRef CFRunLoopObserverCreateWithHandler(CFAllocatorRef allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCreateWithHandlerBlock block);
+[ReturnsRetained] public extern "C" CFRunLoopObserverRef? CFRunLoopObserverCreateWithHandler(CFAllocatorRef? allocator, CFOptionFlags activities, Boolean repeats, CFIndex order, CFRunLoopObserverCreateWithHandlerBlock? block);
 
-public extern "C" CFOptionFlags CFRunLoopObserverGetActivities(CFRunLoopObserverRef observer);
+public extern "C" CFOptionFlags CFRunLoopObserverGetActivities(CFRunLoopObserverRef? observer);
 
-public extern "C" Boolean CFRunLoopObserverDoesRepeat(CFRunLoopObserverRef observer);
+public extern "C" Boolean CFRunLoopObserverDoesRepeat(CFRunLoopObserverRef? observer);
 
-public extern "C" CFIndex CFRunLoopObserverGetOrder(CFRunLoopObserverRef observer);
+public extern "C" CFIndex CFRunLoopObserverGetOrder(CFRunLoopObserverRef? observer);
 
-public extern "C" void CFRunLoopObserverInvalidate(CFRunLoopObserverRef observer);
+public extern "C" void CFRunLoopObserverInvalidate(CFRunLoopObserverRef? observer);
 
-public extern "C" Boolean CFRunLoopObserverIsValid(CFRunLoopObserverRef observer);
+public extern "C" Boolean CFRunLoopObserverIsValid(CFRunLoopObserverRef? observer);
 
-public extern "C" void CFRunLoopObserverGetContext(CFRunLoopObserverRef observer, CFRunLoopObserverContext* context);
+public extern "C" void CFRunLoopObserverGetContext(CFRunLoopObserverRef? observer, CFRunLoopObserverContext* context);
 
 public delegate void* CFRunLoopTimerContextRetainFunction(void* arg0);
 
 public delegate void CFRunLoopTimerContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFRunLoopTimerContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFRunLoopTimerContextCopyDescriptionFunction(void* arg0);
 
 public struct CFRunLoopTimerContext
 {
@@ -240,34 +245,34 @@ public struct CFRunLoopTimerContext
     public CFRunLoopTimerContextCopyDescriptionFunction copyDescription;
 }
 
-public delegate void CFRunLoopTimerCallBack(CFRunLoopTimerRef arg0, void* arg1);
+public delegate void CFRunLoopTimerCallBack(__CFRunLoopTimer* arg0, void* arg1);
 
 public extern "C" CFTypeID CFRunLoopTimerGetTypeID();
 
-public extern "C" CFRunLoopTimerRef CFRunLoopTimerCreate(CFAllocatorRef allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCallBack callout, CFRunLoopTimerContext* context);
+[ReturnsRetained] public extern "C" CFRunLoopTimerRef? CFRunLoopTimerCreate(CFAllocatorRef? allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCallBack callout, CFRunLoopTimerContext* context);
 
-public objc closure void CFRunLoopTimerCreateWithHandlerBlock(CFRunLoopTimerRef arg0);
+public objc closure void CFRunLoopTimerCreateWithHandlerBlock(CFRunLoopTimerRef? arg0);
 
-public extern "C" CFRunLoopTimerRef CFRunLoopTimerCreateWithHandler(CFAllocatorRef allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCreateWithHandlerBlock block);
+[ReturnsRetained] public extern "C" CFRunLoopTimerRef? CFRunLoopTimerCreateWithHandler(CFAllocatorRef? allocator, CFAbsoluteTime fireDate, CFTimeInterval interval, CFOptionFlags flags, CFIndex order, CFRunLoopTimerCreateWithHandlerBlock? block);
 
-public extern "C" CFAbsoluteTime CFRunLoopTimerGetNextFireDate(CFRunLoopTimerRef timer);
+public extern "C" CFAbsoluteTime CFRunLoopTimerGetNextFireDate(CFRunLoopTimerRef? timer);
 
-public extern "C" void CFRunLoopTimerSetNextFireDate(CFRunLoopTimerRef timer, CFAbsoluteTime fireDate);
+public extern "C" void CFRunLoopTimerSetNextFireDate(CFRunLoopTimerRef? timer, CFAbsoluteTime fireDate);
 
-public extern "C" CFTimeInterval CFRunLoopTimerGetInterval(CFRunLoopTimerRef timer);
+public extern "C" CFTimeInterval CFRunLoopTimerGetInterval(CFRunLoopTimerRef? timer);
 
-public extern "C" Boolean CFRunLoopTimerDoesRepeat(CFRunLoopTimerRef timer);
+public extern "C" Boolean CFRunLoopTimerDoesRepeat(CFRunLoopTimerRef? timer);
 
-public extern "C" CFIndex CFRunLoopTimerGetOrder(CFRunLoopTimerRef timer);
+public extern "C" CFIndex CFRunLoopTimerGetOrder(CFRunLoopTimerRef? timer);
 
-public extern "C" void CFRunLoopTimerInvalidate(CFRunLoopTimerRef timer);
+public extern "C" void CFRunLoopTimerInvalidate(CFRunLoopTimerRef? timer);
 
-public extern "C" Boolean CFRunLoopTimerIsValid(CFRunLoopTimerRef timer);
+public extern "C" Boolean CFRunLoopTimerIsValid(CFRunLoopTimerRef? timer);
 
-public extern "C" void CFRunLoopTimerGetContext(CFRunLoopTimerRef timer, CFRunLoopTimerContext* context);
+public extern "C" void CFRunLoopTimerGetContext(CFRunLoopTimerRef? timer, CFRunLoopTimerContext* context);
 
-public extern "C" CFTimeInterval CFRunLoopTimerGetTolerance(CFRunLoopTimerRef timer);
+public extern "C" CFTimeInterval CFRunLoopTimerGetTolerance(CFRunLoopTimerRef? timer);
 
-public extern "C" void CFRunLoopTimerSetTolerance(CFRunLoopTimerRef timer, CFTimeInterval tolerance);
+public extern "C" void CFRunLoopTimerSetTolerance(CFRunLoopTimerRef? timer, CFTimeInterval tolerance);
 
 #endif

@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,9 +32,11 @@ import MacOS.System;
 
 public struct __CFCharacterSet;
 
-public using CFCharacterSetRef = __CFCharacterSet*;
+[CFType("CFCharacterSetGetTypeID")]
+public extern objc class CFCharacterSetRef : CFTypeRef { }
 
-public using CFMutableCharacterSetRef = __CFCharacterSet*;
+[CFType]
+public extern objc class CFMutableCharacterSetRef : CFCharacterSetRef { }
 
 public enum CFCharacterSetPredefinedSet : long
 {
@@ -56,44 +59,44 @@ public enum CFCharacterSetPredefinedSet : long
 
 public extern "C" CFTypeID CFCharacterSetGetTypeID();
 
-public extern "C" CFCharacterSetRef CFCharacterSetGetPredefined(CFCharacterSetPredefinedSet theSetIdentifier);
+public extern "C" CFCharacterSetRef? CFCharacterSetGetPredefined(CFCharacterSetPredefinedSet theSetIdentifier);
 
-public extern "C" CFCharacterSetRef CFCharacterSetCreateWithCharactersInRange(CFAllocatorRef alloc, CFRange theRange);
+[ReturnsRetained] public extern "C" CFCharacterSetRef? CFCharacterSetCreateWithCharactersInRange(CFAllocatorRef? alloc, CFRange theRange);
 
-public extern "C" CFCharacterSetRef CFCharacterSetCreateWithCharactersInString(CFAllocatorRef alloc, CFStringRef theString);
+[ReturnsRetained] public extern "C" CFCharacterSetRef? CFCharacterSetCreateWithCharactersInString(CFAllocatorRef? alloc, CFStringRef? theString);
 
-public extern "C" CFCharacterSetRef CFCharacterSetCreateWithBitmapRepresentation(CFAllocatorRef alloc, CFDataRef theData);
+[ReturnsRetained] public extern "C" CFCharacterSetRef? CFCharacterSetCreateWithBitmapRepresentation(CFAllocatorRef? alloc, CFDataRef? theData);
 
-public extern "C" CFCharacterSetRef CFCharacterSetCreateInvertedSet(CFAllocatorRef alloc, CFCharacterSetRef theSet);
+[ReturnsRetained] public extern "C" CFCharacterSetRef? CFCharacterSetCreateInvertedSet(CFAllocatorRef? alloc, CFCharacterSetRef? theSet);
 
-public extern "C" Boolean CFCharacterSetIsSupersetOfSet(CFCharacterSetRef theSet, CFCharacterSetRef theOtherset);
+public extern "C" Boolean CFCharacterSetIsSupersetOfSet(CFCharacterSetRef? theSet, CFCharacterSetRef? theOtherset);
 
-public extern "C" Boolean CFCharacterSetHasMemberInPlane(CFCharacterSetRef theSet, CFIndex thePlane);
+public extern "C" Boolean CFCharacterSetHasMemberInPlane(CFCharacterSetRef? theSet, CFIndex thePlane);
 
-public extern "C" CFMutableCharacterSetRef CFCharacterSetCreateMutable(CFAllocatorRef alloc);
+[ReturnsRetained] public extern "C" CFMutableCharacterSetRef? CFCharacterSetCreateMutable(CFAllocatorRef? alloc);
 
-public extern "C" CFCharacterSetRef CFCharacterSetCreateCopy(CFAllocatorRef alloc, CFCharacterSetRef theSet);
+[ReturnsRetained] public extern "C" CFCharacterSetRef? CFCharacterSetCreateCopy(CFAllocatorRef? alloc, CFCharacterSetRef? theSet);
 
-public extern "C" CFMutableCharacterSetRef CFCharacterSetCreateMutableCopy(CFAllocatorRef alloc, CFCharacterSetRef theSet);
+[ReturnsRetained] public extern "C" CFMutableCharacterSetRef? CFCharacterSetCreateMutableCopy(CFAllocatorRef? alloc, CFCharacterSetRef? theSet);
 
-public extern "C" Boolean CFCharacterSetIsCharacterMember(CFCharacterSetRef theSet, UniChar theChar);
+public extern "C" Boolean CFCharacterSetIsCharacterMember(CFCharacterSetRef? theSet, UniChar theChar);
 
-public extern "C" Boolean CFCharacterSetIsLongCharacterMember(CFCharacterSetRef theSet, UTF32Char theChar);
+public extern "C" Boolean CFCharacterSetIsLongCharacterMember(CFCharacterSetRef? theSet, UTF32Char theChar);
 
-public extern "C" CFDataRef CFCharacterSetCreateBitmapRepresentation(CFAllocatorRef alloc, CFCharacterSetRef theSet);
+[ReturnsRetained] public extern "C" CFDataRef? CFCharacterSetCreateBitmapRepresentation(CFAllocatorRef? alloc, CFCharacterSetRef? theSet);
 
-public extern "C" void CFCharacterSetAddCharactersInRange(CFMutableCharacterSetRef theSet, CFRange theRange);
+public extern "C" void CFCharacterSetAddCharactersInRange(CFMutableCharacterSetRef? theSet, CFRange theRange);
 
-public extern "C" void CFCharacterSetRemoveCharactersInRange(CFMutableCharacterSetRef theSet, CFRange theRange);
+public extern "C" void CFCharacterSetRemoveCharactersInRange(CFMutableCharacterSetRef? theSet, CFRange theRange);
 
-public extern "C" void CFCharacterSetAddCharactersInString(CFMutableCharacterSetRef theSet, CFStringRef theString);
+public extern "C" void CFCharacterSetAddCharactersInString(CFMutableCharacterSetRef? theSet, CFStringRef? theString);
 
-public extern "C" void CFCharacterSetRemoveCharactersInString(CFMutableCharacterSetRef theSet, CFStringRef theString);
+public extern "C" void CFCharacterSetRemoveCharactersInString(CFMutableCharacterSetRef? theSet, CFStringRef? theString);
 
-public extern "C" void CFCharacterSetUnion(CFMutableCharacterSetRef theSet, CFCharacterSetRef theOtherSet);
+public extern "C" void CFCharacterSetUnion(CFMutableCharacterSetRef? theSet, CFCharacterSetRef? theOtherSet);
 
-public extern "C" void CFCharacterSetIntersect(CFMutableCharacterSetRef theSet, CFCharacterSetRef theOtherSet);
+public extern "C" void CFCharacterSetIntersect(CFMutableCharacterSetRef? theSet, CFCharacterSetRef? theOtherSet);
 
-public extern "C" void CFCharacterSetInvert(CFMutableCharacterSetRef theSet);
+public extern "C" void CFCharacterSetInvert(CFMutableCharacterSetRef? theSet);
 
 #endif

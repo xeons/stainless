@@ -26,6 +26,7 @@ module MacOS.CoreAudio;
 import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 

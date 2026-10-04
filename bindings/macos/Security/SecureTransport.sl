@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct SSLContext;
 
-public using SSLContextRef = SSLContext*;
+[CFType("SSLContextGetTypeID")]
+public extern objc class SSLContextRef : CFTypeRef { }
 
 public using SSLConnectionRef = void*;
 
@@ -123,10 +125,10 @@ public extern "C" CFStringRef kSSLSessionConfig_TLSv1_3DES_fallback;
 public extern "C" CFTypeID SSLContextGetTypeID();
 
 /// Deprecated in macOS 10.15.
-public extern "C" SSLContextRef SSLCreateContext(CFAllocatorRef alloc, SSLProtocolSide protocolSide, SSLConnectionType connectionType);
+[ReturnsRetained] public extern "C" SSLContextRef? SSLCreateContext(CFAllocatorRef? alloc, SSLProtocolSide protocolSide, SSLConnectionType connectionType);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SSLNewContext(Boolean isServer, SSLContextRef* contextPtr);
+public extern "C" OSStatus SSLNewContext(Boolean isServer, SSLContext** contextPtr);
 
 /// Deprecated in macOS 10.9.
 public extern "C" OSStatus SSLDisposeContext(SSLContextRef context);
@@ -171,7 +173,7 @@ public extern "C" OSStatus SSLSetProtocolVersion(SSLContextRef context, SSLProto
 public extern "C" OSStatus SSLGetProtocolVersion(SSLContextRef context, SSLProtocol* protocol);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSStatus SSLSetCertificate(SSLContextRef context, CFArrayRef certRefs);
+public extern "C" OSStatus SSLSetCertificate(SSLContextRef context, CFArrayRef? certRefs);
 
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus SSLSetConnection(SSLContextRef context, SSLConnectionRef connection);
@@ -252,13 +254,13 @@ public extern "C" OSStatus SSLGetAllowsAnyRoot(SSLContextRef context, Boolean* a
 public extern "C" OSStatus SSLSetTrustedRoots(SSLContextRef context, CFArrayRef trustedRoots, Boolean replaceExisting);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SSLCopyTrustedRoots(SSLContextRef context, CFArrayRef* trustedRoots);
+public extern "C" OSStatus SSLCopyTrustedRoots(SSLContextRef context, __CFArray** trustedRoots);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus SSLCopyPeerCertificates(SSLContextRef context, CFArrayRef* certs);
+public extern "C" OSStatus SSLCopyPeerCertificates(SSLContextRef context, __CFArray** certs);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSStatus SSLCopyPeerTrust(SSLContextRef context, SecTrustRef* trust);
+public extern "C" OSStatus SSLCopyPeerTrust(SSLContextRef context, __SecTrust** trust);
 
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus SSLSetPeerID(SSLContextRef context, void* peerID, nuint peerIDLen);
@@ -273,7 +275,7 @@ public extern "C" OSStatus SSLGetNegotiatedCipher(SSLContextRef context, SSLCiph
 public extern "C" OSStatus SSLSetALPNProtocols(SSLContextRef context, CFArrayRef protocols);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSStatus SSLCopyALPNProtocols(SSLContextRef context, CFArrayRef* protocols);
+public extern "C" OSStatus SSLCopyALPNProtocols(SSLContextRef context, __CFArray** protocols);
 
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus SSLSetOCSPResponse(SSLContextRef context, CFDataRef response);
@@ -298,10 +300,10 @@ public extern "C" OSStatus SSLAddDistinguishedName(SSLContextRef context, void* 
 public extern "C" OSStatus SSLSetCertificateAuthorities(SSLContextRef context, CFTypeRef certificateOrArray, Boolean replaceExisting);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSStatus SSLCopyCertificateAuthorities(SSLContextRef context, CFArrayRef* certificates);
+public extern "C" OSStatus SSLCopyCertificateAuthorities(SSLContextRef context, __CFArray** certificates);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSStatus SSLCopyDistinguishedNames(SSLContextRef context, CFArrayRef* names);
+public extern "C" OSStatus SSLCopyDistinguishedNames(SSLContextRef context, __CFArray** names);
 
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus SSLGetClientCertificateState(SSLContextRef context, SSLClientCertificateState* clientState);

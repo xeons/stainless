@@ -26,39 +26,40 @@ module MacOS.VideoToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreMedia;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
 
-public extern "C" OSStatus VTCopyVideoEncoderList(CFDictionaryRef options, CFArrayRef* listOfVideoEncodersOut);
+public extern "C" OSStatus VTCopyVideoEncoderList(CFDictionaryRef? options, __CFArray** listOfVideoEncodersOut);
 
-public extern "C" CFStringRef kVTVideoEncoderListOption_IncludeStandardDefinitionDVEncoders;
+public extern "C" CFStringRef? kVTVideoEncoderListOption_IncludeStandardDefinitionDVEncoders;
 
-public extern "C" CFStringRef kVTVideoEncoderList_CodecType;
+public extern "C" CFStringRef? kVTVideoEncoderList_CodecType;
 
-public extern "C" CFStringRef kVTVideoEncoderList_EncoderID;
+public extern "C" CFStringRef? kVTVideoEncoderList_EncoderID;
 
-public extern "C" CFStringRef kVTVideoEncoderList_CodecName;
+public extern "C" CFStringRef? kVTVideoEncoderList_CodecName;
 
-public extern "C" CFStringRef kVTVideoEncoderList_EncoderName;
+public extern "C" CFStringRef? kVTVideoEncoderList_EncoderName;
 
-public extern "C" CFStringRef kVTVideoEncoderList_DisplayName;
+public extern "C" CFStringRef? kVTVideoEncoderList_DisplayName;
 
-public extern "C" CFStringRef kVTVideoEncoderList_GPURegistryID;
+public extern "C" CFStringRef? kVTVideoEncoderList_GPURegistryID;
 
-public extern "C" CFStringRef kVTVideoEncoderList_SupportedSelectionProperties;
+public extern "C" CFStringRef? kVTVideoEncoderList_SupportedSelectionProperties;
 
-public extern "C" CFStringRef kVTVideoEncoderList_PerformanceRating;
+public extern "C" CFStringRef? kVTVideoEncoderList_PerformanceRating;
 
-public extern "C" CFStringRef kVTVideoEncoderList_QualityRating;
+public extern "C" CFStringRef? kVTVideoEncoderList_QualityRating;
 
-public extern "C" CFStringRef kVTVideoEncoderList_InstanceLimit;
+public extern "C" CFStringRef? kVTVideoEncoderList_InstanceLimit;
 
-public extern "C" CFStringRef kVTVideoEncoderList_IsHardwareAccelerated;
+public extern "C" CFStringRef? kVTVideoEncoderList_IsHardwareAccelerated;
 
-public extern "C" CFStringRef kVTVideoEncoderList_SupportsFrameReordering;
+public extern "C" CFStringRef? kVTVideoEncoderList_SupportsFrameReordering;
 
-public extern "C" OSStatus VTCopySupportedPropertyDictionaryForEncoder(int width, int height, CMVideoCodecType codecType, CFDictionaryRef encoderSpecification, CFStringRef* encoderIDOut, CFDictionaryRef* supportedPropertiesOut);
+public extern "C" OSStatus VTCopySupportedPropertyDictionaryForEncoder(int width, int height, CMVideoCodecType codecType, CFDictionaryRef? encoderSpecification, __CFString** encoderIDOut, __CFDictionary** supportedPropertiesOut);
 
 #endif

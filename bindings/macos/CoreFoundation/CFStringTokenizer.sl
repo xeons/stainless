@@ -23,15 +23,18 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreFoundation;
 
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
 
-public extern "C" CFStringRef CFStringTokenizerCopyBestStringLanguage(CFStringRef string, CFRange range);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringTokenizerCopyBestStringLanguage(CFStringRef? string, CFRange range);
 
 public struct __CFStringTokenizer;
 
-public using CFStringTokenizerRef = __CFStringTokenizer*;
+[CFType("CFStringTokenizerGetTypeID")]
+public extern objc class CFStringTokenizerRef : CFTypeRef { }
 
 public const ulong kCFStringTokenizerUnitWord = 0;
 public const ulong kCFStringTokenizerUnitSentence = 1;
@@ -55,18 +58,18 @@ public enum CFStringTokenizerTokenType : ulong
 
 public extern "C" CFTypeID CFStringTokenizerGetTypeID();
 
-public extern "C" CFStringTokenizerRef CFStringTokenizerCreate(CFAllocatorRef alloc, CFStringRef string, CFRange range, CFOptionFlags options, CFLocaleRef locale);
+[ReturnsRetained] public extern "C" CFStringTokenizerRef? CFStringTokenizerCreate(CFAllocatorRef? alloc, CFStringRef? string, CFRange range, CFOptionFlags options, CFLocaleRef? locale);
 
-public extern "C" void CFStringTokenizerSetString(CFStringTokenizerRef tokenizer, CFStringRef string, CFRange range);
+public extern "C" void CFStringTokenizerSetString(CFStringTokenizerRef? tokenizer, CFStringRef? string, CFRange range);
 
-public extern "C" CFStringTokenizerTokenType CFStringTokenizerGoToTokenAtIndex(CFStringTokenizerRef tokenizer, CFIndex index);
+public extern "C" CFStringTokenizerTokenType CFStringTokenizerGoToTokenAtIndex(CFStringTokenizerRef? tokenizer, CFIndex index);
 
-public extern "C" CFStringTokenizerTokenType CFStringTokenizerAdvanceToNextToken(CFStringTokenizerRef tokenizer);
+public extern "C" CFStringTokenizerTokenType CFStringTokenizerAdvanceToNextToken(CFStringTokenizerRef? tokenizer);
 
-public extern "C" CFRange CFStringTokenizerGetCurrentTokenRange(CFStringTokenizerRef tokenizer);
+public extern "C" CFRange CFStringTokenizerGetCurrentTokenRange(CFStringTokenizerRef? tokenizer);
 
-public extern "C" CFTypeRef CFStringTokenizerCopyCurrentTokenAttribute(CFStringTokenizerRef tokenizer, CFOptionFlags @attribute);
+[ReturnsRetained] public extern "C" CFTypeRef? CFStringTokenizerCopyCurrentTokenAttribute(CFStringTokenizerRef? tokenizer, CFOptionFlags @attribute);
 
-public extern "C" CFIndex CFStringTokenizerGetCurrentSubTokens(CFStringTokenizerRef tokenizer, CFRange* ranges, CFIndex maxRangeLength, CFMutableArrayRef derivedSubTokens);
+public extern "C" CFIndex CFStringTokenizerGetCurrentSubTokens(CFStringTokenizerRef? tokenizer, CFRange* ranges, CFIndex maxRangeLength, CFMutableArrayRef? derivedSubTokens);
 
 #endif

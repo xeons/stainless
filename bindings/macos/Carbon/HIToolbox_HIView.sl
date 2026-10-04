@@ -128,9 +128,9 @@ public union HIViewContentInfoU
 {
     public IconRef iconRef;
     public HITypeAndCreator iconTypeAndCreator;
-    public CGImageRef imageRef;
-    public CFStringRef imageResource;
-    public CFURLRef imageFile;
+    public CGImage* imageRef;
+    public __CFString* imageResource;
+    public __CFURL* imageFile;
 }
 
 [Pack(2)]

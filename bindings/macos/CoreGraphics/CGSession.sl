@@ -24,11 +24,12 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreGraphics")
 
-public extern "C" CFDictionaryRef CGSessionCopyCurrentDictionary();
+[ReturnsRetained] public extern "C" CFDictionaryRef? CGSessionCopyCurrentDictionary();
 
 #endif

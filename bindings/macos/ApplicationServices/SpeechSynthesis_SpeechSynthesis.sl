@@ -26,6 +26,7 @@ module MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -196,143 +197,143 @@ public struct DelimiterInfo
     public Byte[2] endDelimiter;
 }
 
-public extern "C" CFStringRef kSpeechStatusProperty;
+public extern "C" CFStringRef? kSpeechStatusProperty;
 
-public extern "C" CFStringRef kSpeechErrorsProperty;
+public extern "C" CFStringRef? kSpeechErrorsProperty;
 
-public extern "C" CFStringRef kSpeechInputModeProperty;
+public extern "C" CFStringRef? kSpeechInputModeProperty;
 
-public extern "C" CFStringRef kSpeechCharacterModeProperty;
+public extern "C" CFStringRef? kSpeechCharacterModeProperty;
 
-public extern "C" CFStringRef kSpeechNumberModeProperty;
+public extern "C" CFStringRef? kSpeechNumberModeProperty;
 
-public extern "C" CFStringRef kSpeechRateProperty;
+public extern "C" CFStringRef? kSpeechRateProperty;
 
-public extern "C" CFStringRef kSpeechPitchBaseProperty;
+public extern "C" CFStringRef? kSpeechPitchBaseProperty;
 
-public extern "C" CFStringRef kSpeechPitchModProperty;
+public extern "C" CFStringRef? kSpeechPitchModProperty;
 
-public extern "C" CFStringRef kSpeechVolumeProperty;
+public extern "C" CFStringRef? kSpeechVolumeProperty;
 
-public extern "C" CFStringRef kSpeechSynthesizerInfoProperty;
+public extern "C" CFStringRef? kSpeechSynthesizerInfoProperty;
 
-public extern "C" CFStringRef kSpeechRecentSyncProperty;
+public extern "C" CFStringRef? kSpeechRecentSyncProperty;
 
-public extern "C" CFStringRef kSpeechPhonemeSymbolsProperty;
+public extern "C" CFStringRef? kSpeechPhonemeSymbolsProperty;
 
-public extern "C" CFStringRef kSpeechCurrentVoiceProperty;
+public extern "C" CFStringRef? kSpeechCurrentVoiceProperty;
 
-public extern "C" CFStringRef kSpeechCommandDelimiterProperty;
+public extern "C" CFStringRef? kSpeechCommandDelimiterProperty;
 
-public extern "C" CFStringRef kSpeechResetProperty;
+public extern "C" CFStringRef? kSpeechResetProperty;
 
-public extern "C" CFStringRef kSpeechOutputToFileURLProperty;
+public extern "C" CFStringRef? kSpeechOutputToFileURLProperty;
 
-public extern "C" CFStringRef kSpeechOutputToExtAudioFileProperty;
+public extern "C" CFStringRef? kSpeechOutputToExtAudioFileProperty;
 
-public extern "C" CFStringRef kSpeechOutputToAudioDeviceProperty;
+public extern "C" CFStringRef? kSpeechOutputToAudioDeviceProperty;
 
-public extern "C" CFStringRef kSpeechOutputToFileDescriptorProperty;
+public extern "C" CFStringRef? kSpeechOutputToFileDescriptorProperty;
 
-public extern "C" CFStringRef kSpeechAudioOutputFormatProperty;
+public extern "C" CFStringRef? kSpeechAudioOutputFormatProperty;
 
-public extern "C" CFStringRef kSpeechOutputChannelMapProperty;
+public extern "C" CFStringRef? kSpeechOutputChannelMapProperty;
 
-public extern "C" CFStringRef kSpeechRefConProperty;
+public extern "C" CFStringRef? kSpeechRefConProperty;
 
-public extern "C" CFStringRef kSpeechTextDoneCallBack;
+public extern "C" CFStringRef? kSpeechTextDoneCallBack;
 
-public extern "C" CFStringRef kSpeechSpeechDoneCallBack;
+public extern "C" CFStringRef? kSpeechSpeechDoneCallBack;
 
-public extern "C" CFStringRef kSpeechSyncCallBack;
+public extern "C" CFStringRef? kSpeechSyncCallBack;
 
-public extern "C" CFStringRef kSpeechPhonemeCallBack;
+public extern "C" CFStringRef? kSpeechPhonemeCallBack;
 
-public extern "C" CFStringRef kSpeechErrorCFCallBack;
+public extern "C" CFStringRef? kSpeechErrorCFCallBack;
 
-public extern "C" CFStringRef kSpeechWordCFCallBack;
+public extern "C" CFStringRef? kSpeechWordCFCallBack;
 
-public extern "C" CFStringRef kSpeechPhonemeOptionsProperty;
+public extern "C" CFStringRef? kSpeechPhonemeOptionsProperty;
 
-public extern "C" CFStringRef kSpeechAudioUnitProperty;
+public extern "C" CFStringRef? kSpeechAudioUnitProperty;
 
-public extern "C" CFStringRef kSpeechAudioGraphProperty;
+public extern "C" CFStringRef? kSpeechAudioGraphProperty;
 
-public extern "C" CFStringRef kSpeechSynthExtensionProperty;
+public extern "C" CFStringRef? kSpeechSynthExtensionProperty;
 
-public extern "C" CFStringRef kSpeechModeText;
+public extern "C" CFStringRef? kSpeechModeText;
 
-public extern "C" CFStringRef kSpeechModePhoneme;
+public extern "C" CFStringRef? kSpeechModePhoneme;
 
-public extern "C" CFStringRef kSpeechModeTune;
+public extern "C" CFStringRef? kSpeechModeTune;
 
-public extern "C" CFStringRef kSpeechModeNormal;
+public extern "C" CFStringRef? kSpeechModeNormal;
 
-public extern "C" CFStringRef kSpeechModeLiteral;
+public extern "C" CFStringRef? kSpeechModeLiteral;
 
-public extern "C" CFStringRef kSpeechNoEndingProsody;
+public extern "C" CFStringRef? kSpeechNoEndingProsody;
 
-public extern "C" CFStringRef kSpeechNoSpeechInterrupt;
+public extern "C" CFStringRef? kSpeechNoSpeechInterrupt;
 
-public extern "C" CFStringRef kSpeechPreflightThenPause;
+public extern "C" CFStringRef? kSpeechPreflightThenPause;
 
-public extern "C" CFStringRef kSpeechStatusOutputBusy;
+public extern "C" CFStringRef? kSpeechStatusOutputBusy;
 
-public extern "C" CFStringRef kSpeechStatusOutputPaused;
+public extern "C" CFStringRef? kSpeechStatusOutputPaused;
 
-public extern "C" CFStringRef kSpeechStatusNumberOfCharactersLeft;
+public extern "C" CFStringRef? kSpeechStatusNumberOfCharactersLeft;
 
-public extern "C" CFStringRef kSpeechStatusPhonemeCode;
+public extern "C" CFStringRef? kSpeechStatusPhonemeCode;
 
-public extern "C" CFStringRef kSpeechErrorCount;
+public extern "C" CFStringRef? kSpeechErrorCount;
 
-public extern "C" CFStringRef kSpeechErrorOldest;
+public extern "C" CFStringRef? kSpeechErrorOldest;
 
-public extern "C" CFStringRef kSpeechErrorOldestCharacterOffset;
+public extern "C" CFStringRef? kSpeechErrorOldestCharacterOffset;
 
-public extern "C" CFStringRef kSpeechErrorNewest;
+public extern "C" CFStringRef? kSpeechErrorNewest;
 
-public extern "C" CFStringRef kSpeechErrorNewestCharacterOffset;
+public extern "C" CFStringRef? kSpeechErrorNewestCharacterOffset;
 
-public extern "C" CFStringRef kSpeechSynthesizerInfoIdentifier;
+public extern "C" CFStringRef? kSpeechSynthesizerInfoIdentifier;
 
-public extern "C" CFStringRef kSpeechSynthesizerInfoManufacturer;
+public extern "C" CFStringRef? kSpeechSynthesizerInfoManufacturer;
 
-public extern "C" CFStringRef kSpeechSynthesizerInfoVersion;
+public extern "C" CFStringRef? kSpeechSynthesizerInfoVersion;
 
-public extern "C" CFStringRef kSpeechPhonemeInfoOpcode;
+public extern "C" CFStringRef? kSpeechPhonemeInfoOpcode;
 
-public extern "C" CFStringRef kSpeechPhonemeInfoSymbol;
+public extern "C" CFStringRef? kSpeechPhonemeInfoSymbol;
 
-public extern "C" CFStringRef kSpeechPhonemeInfoExample;
+public extern "C" CFStringRef? kSpeechPhonemeInfoExample;
 
-public extern "C" CFStringRef kSpeechPhonemeInfoHiliteStart;
+public extern "C" CFStringRef? kSpeechPhonemeInfoHiliteStart;
 
-public extern "C" CFStringRef kSpeechPhonemeInfoHiliteEnd;
+public extern "C" CFStringRef? kSpeechPhonemeInfoHiliteEnd;
 
-public extern "C" CFStringRef kSpeechVoiceCreator;
+public extern "C" CFStringRef? kSpeechVoiceCreator;
 
-public extern "C" CFStringRef kSpeechVoiceID;
+public extern "C" CFStringRef? kSpeechVoiceID;
 
-public extern "C" CFStringRef kSpeechCommandPrefix;
+public extern "C" CFStringRef? kSpeechCommandPrefix;
 
-public extern "C" CFStringRef kSpeechCommandSuffix;
+public extern "C" CFStringRef? kSpeechCommandSuffix;
 
-public extern "C" CFStringRef kSpeechDictionaryLocaleIdentifier;
+public extern "C" CFStringRef? kSpeechDictionaryLocaleIdentifier;
 
-public extern "C" CFStringRef kSpeechDictionaryModificationDate;
+public extern "C" CFStringRef? kSpeechDictionaryModificationDate;
 
-public extern "C" CFStringRef kSpeechDictionaryPronunciations;
+public extern "C" CFStringRef? kSpeechDictionaryPronunciations;
 
-public extern "C" CFStringRef kSpeechDictionaryAbbreviations;
+public extern "C" CFStringRef? kSpeechDictionaryAbbreviations;
 
-public extern "C" CFStringRef kSpeechDictionaryEntrySpelling;
+public extern "C" CFStringRef? kSpeechDictionaryEntrySpelling;
 
-public extern "C" CFStringRef kSpeechDictionaryEntryPhonemes;
+public extern "C" CFStringRef? kSpeechDictionaryEntryPhonemes;
 
-public extern "C" CFStringRef kSpeechErrorCallbackSpokenString;
+public extern "C" CFStringRef? kSpeechErrorCallbackSpokenString;
 
-public extern "C" CFStringRef kSpeechErrorCallbackCharacterOffset;
+public extern "C" CFStringRef? kSpeechErrorCallbackCharacterOffset;
 
 public delegate void SpeechTextDoneProcPtr(SpeechChannel arg0, SRefCon arg1, void** arg2, ulong* arg3, SInt32* arg4);
 
@@ -412,9 +413,9 @@ public extern "C" void InvokeSpeechPhonemeUPP(SpeechChannel chan, SRefCon refCon
 /// Deprecated in macOS 10.8.
 public extern "C" void InvokeSpeechWordUPP(SpeechChannel chan, SRefCon refCon, ulong wordPos, UInt16 wordLen, SpeechWordUPP userUPP);
 
-public delegate void SpeechErrorCFProcPtr(SpeechChannel arg0, SRefCon arg1, CFErrorRef arg2);
+public delegate void SpeechErrorCFProcPtr(SpeechChannel arg0, SRefCon arg1, __CFError* arg2);
 
-public delegate void SpeechWordCFProcPtr(SpeechChannel arg0, SRefCon arg1, CFStringRef arg2, CFRange arg3);
+public delegate void SpeechWordCFProcPtr(SpeechChannel arg0, SRefCon arg1, __CFString* arg2, CFRange arg3);
 
 /// Deprecated in macOS 13.0.
 public extern "C" NumVersion SpeechManagerVersion();
@@ -492,19 +493,19 @@ public extern "C" OSErr TextToPhonemes(SpeechChannel chan, void* textBuf, ulong 
 public extern "C" OSErr UseDictionary(SpeechChannel chan, Handle dictionary);
 
 /// Deprecated in macOS 13.0.
-public extern "C" OSErr SpeakCFString(SpeechChannel chan, CFStringRef aString, CFDictionaryRef options);
+public extern "C" OSErr SpeakCFString(SpeechChannel chan, CFStringRef aString, CFDictionaryRef? options);
 
 /// Deprecated in macOS 13.0.
 public extern "C" OSErr UseSpeechDictionary(SpeechChannel chan, CFDictionaryRef speechDictionary);
 
 /// Deprecated in macOS 13.0.
-public extern "C" OSErr CopyPhonemesFromText(SpeechChannel chan, CFStringRef text, CFStringRef* phonemes);
+public extern "C" OSErr CopyPhonemesFromText(SpeechChannel chan, CFStringRef text, __CFString** phonemes);
 
 /// Deprecated in macOS 13.0.
-public extern "C" OSErr CopySpeechProperty(SpeechChannel chan, CFStringRef property, CFTypeRef* object);
+public extern "C" OSErr CopySpeechProperty(SpeechChannel chan, CFStringRef property, void** object);
 
 /// Deprecated in macOS 13.0.
-public extern "C" OSErr SetSpeechProperty(SpeechChannel chan, CFStringRef property, CFTypeRef object);
+public extern "C" OSErr SetSpeechProperty(SpeechChannel chan, CFStringRef property, CFTypeRef? object);
 
 /// Deprecated in macOS 13.0.
 public extern "C" OSErr SpeechSynthesisRegisterModuleURL(CFURLRef url);

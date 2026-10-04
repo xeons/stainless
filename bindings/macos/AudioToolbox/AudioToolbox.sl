@@ -26,17 +26,18 @@ module MacOS.AudioToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "AudioToolbox")
 
 /// Deprecated in macOS 10.5.
-public extern "C" OSStatus GetNameFromSoundBank(FSRef* inSoundBankRef, CFStringRef* outName);
+public extern "C" OSStatus GetNameFromSoundBank(FSRef* inSoundBankRef, __CFString** outName);
 
-public extern "C" OSStatus CopyNameFromSoundBank(CFURLRef inURL, CFStringRef* outName);
+public extern "C" OSStatus CopyNameFromSoundBank(CFURLRef inURL, __CFString** outName);
 
-public extern "C" OSStatus CopyInstrumentInfoFromSoundBank(CFURLRef inURL, CFArrayRef* outInstrumentInfo);
+public extern "C" OSStatus CopyInstrumentInfoFromSoundBank(CFURLRef inURL, __CFArray** outInstrumentInfo);
 
 public const int AUDIO_TOOLBOX_VERSION = 1060;
 

@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -44,28 +45,29 @@ public enum SecTrustResultType : uint
 
 public struct __SecTrust;
 
-public using SecTrustRef = __SecTrust*;
+[CFType("SecTrustGetTypeID")]
+public extern objc class SecTrustRef : CFTypeRef { }
 
-public extern "C" CFStringRef kSecPropertyTypeTitle;
+public extern "C" CFStringRef? kSecPropertyTypeTitle;
 
-public extern "C" CFStringRef kSecPropertyTypeError;
+public extern "C" CFStringRef? kSecPropertyTypeError;
 
-public extern "C" CFStringRef kSecTrustEvaluationDate;
+public extern "C" CFStringRef? kSecTrustEvaluationDate;
 
-public extern "C" CFStringRef kSecTrustExtendedValidation;
+public extern "C" CFStringRef? kSecTrustExtendedValidation;
 
-public extern "C" CFStringRef kSecTrustOrganizationName;
+public extern "C" CFStringRef? kSecTrustOrganizationName;
 
-public extern "C" CFStringRef kSecTrustResultValue;
+public extern "C" CFStringRef? kSecTrustResultValue;
 
-public extern "C" CFStringRef kSecTrustRevocationChecked;
+public extern "C" CFStringRef? kSecTrustRevocationChecked;
 
-public extern "C" CFStringRef kSecTrustRevocationValidUntilDate;
+public extern "C" CFStringRef? kSecTrustRevocationValidUntilDate;
 
-public extern "C" CFStringRef kSecTrustCertificateTransparency;
+public extern "C" CFStringRef? kSecTrustCertificateTransparency;
 
 /// Deprecated in macOS 10.13.
-public extern "C" CFStringRef kSecTrustCertificateTransparencyWhiteList;
+public extern "C" CFStringRef? kSecTrustCertificateTransparencyWhiteList;
 
 /// macOS 15.4 and later.
 public extern "C" CFStringRef kSecTrustQCStatements;
@@ -77,21 +79,21 @@ public objc closure void SecTrustCallback(SecTrustRef arg0, SecTrustResultType a
 
 public extern "C" CFTypeID SecTrustGetTypeID();
 
-public extern "C" OSStatus SecTrustCreateWithCertificates(CFTypeRef certificates, CFTypeRef policies, SecTrustRef* trust);
+public extern "C" OSStatus SecTrustCreateWithCertificates(CFTypeRef certificates, CFTypeRef? policies, __SecTrust** trust);
 
 public extern "C" OSStatus SecTrustSetPolicies(SecTrustRef trust, CFTypeRef policies);
 
-public extern "C" OSStatus SecTrustCopyPolicies(SecTrustRef trust, CFArrayRef* policies);
+public extern "C" OSStatus SecTrustCopyPolicies(SecTrustRef trust, __CFArray** policies);
 
 public extern "C" OSStatus SecTrustSetNetworkFetchAllowed(SecTrustRef trust, Boolean allowFetch);
 
 public extern "C" OSStatus SecTrustGetNetworkFetchAllowed(SecTrustRef trust, Boolean* allowFetch);
 
-public extern "C" OSStatus SecTrustSetAnchorCertificates(SecTrustRef trust, CFArrayRef anchorCertificates);
+public extern "C" OSStatus SecTrustSetAnchorCertificates(SecTrustRef trust, CFArrayRef? anchorCertificates);
 
 public extern "C" OSStatus SecTrustSetAnchorCertificatesOnly(SecTrustRef trust, Boolean anchorCertificatesOnly);
 
-public extern "C" OSStatus SecTrustCopyCustomAnchorCertificates(SecTrustRef trust, CFArrayRef* anchors);
+public extern "C" OSStatus SecTrustCopyCustomAnchorCertificates(SecTrustRef trust, __CFArray** anchors);
 
 public extern "C" OSStatus SecTrustSetVerifyDate(SecTrustRef trust, CFDateRef verifyDate);
 
@@ -100,36 +102,41 @@ public extern "C" CFAbsoluteTime SecTrustGetVerifyTime(SecTrustRef trust);
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus SecTrustEvaluate(SecTrustRef trust, SecTrustResultType* result);
 
-public extern "C" bool SecTrustEvaluateWithError(SecTrustRef trust, CFErrorRef* error);
+/// Deprecated in macOS 10.15.
+public extern "C" OSStatus SecTrustEvaluateAsync(SecTrustRef trust, dispatch_queue_t? queue, SecTrustCallback result);
 
-public objc closure void SecTrustWithErrorCallback(SecTrustRef arg0, bool arg1, CFErrorRef arg2);
+public extern "C" bool SecTrustEvaluateWithError(SecTrustRef trust, __CFError** error);
+
+public objc closure void SecTrustWithErrorCallback(SecTrustRef arg0, bool arg1, CFErrorRef? arg2);
+
+public extern "C" OSStatus SecTrustEvaluateAsyncWithError(SecTrustRef trust, dispatch_queue_t queue, SecTrustWithErrorCallback result);
 
 public extern "C" OSStatus SecTrustGetTrustResult(SecTrustRef trust, SecTrustResultType* result);
 
 /// Deprecated in macOS 11.0.
-public extern "C" SecKeyRef SecTrustCopyPublicKey(SecTrustRef trust);
+[ReturnsRetained] public extern "C" SecKeyRef? SecTrustCopyPublicKey(SecTrustRef trust);
 
-public extern "C" SecKeyRef SecTrustCopyKey(SecTrustRef trust);
+[ReturnsRetained] public extern "C" SecKeyRef? SecTrustCopyKey(SecTrustRef trust);
 
 public extern "C" CFIndex SecTrustGetCertificateCount(SecTrustRef trust);
 
 /// Deprecated in macOS 12.0.
-public extern "C" SecCertificateRef SecTrustGetCertificateAtIndex(SecTrustRef trust, CFIndex ix);
+public extern "C" SecCertificateRef? SecTrustGetCertificateAtIndex(SecTrustRef trust, CFIndex ix);
 
-public extern "C" CFDataRef SecTrustCopyExceptions(SecTrustRef trust);
+[ReturnsRetained] public extern "C" CFDataRef? SecTrustCopyExceptions(SecTrustRef trust);
 
-public extern "C" bool SecTrustSetExceptions(SecTrustRef trust, CFDataRef exceptions);
+public extern "C" bool SecTrustSetExceptions(SecTrustRef trust, CFDataRef? exceptions);
 
 /// Deprecated in macOS 12.0.
-public extern "C" CFArrayRef SecTrustCopyProperties(SecTrustRef trust);
+[ReturnsRetained] public extern "C" CFArrayRef? SecTrustCopyProperties(SecTrustRef trust);
 
-public extern "C" CFDictionaryRef SecTrustCopyResult(SecTrustRef trust);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SecTrustCopyResult(SecTrustRef trust);
 
-public extern "C" OSStatus SecTrustSetOCSPResponse(SecTrustRef trust, CFTypeRef responseData);
+public extern "C" OSStatus SecTrustSetOCSPResponse(SecTrustRef trust, CFTypeRef? responseData);
 
-public extern "C" OSStatus SecTrustSetSignedCertificateTimestamps(SecTrustRef trust, CFArrayRef sctArray);
+public extern "C" OSStatus SecTrustSetSignedCertificateTimestamps(SecTrustRef trust, CFArrayRef? sctArray);
 
-public extern "C" CFArrayRef SecTrustCopyCertificateChain(SecTrustRef trust);
+[ReturnsRetained] public extern "C" CFArrayRef? SecTrustCopyCertificateChain(SecTrustRef trust);
 
 /// Deprecated in macOS 10.9.
 public using SecTrustUserSetting = SecTrustResultType;
@@ -152,10 +159,10 @@ public extern "C" OSStatus SecTrustSetOptions(SecTrustRef trustRef, SecTrustOpti
 public extern "C" OSStatus SecTrustSetParameters(SecTrustRef trustRef, CSSM_TP_ACTION action, CFDataRef actionData);
 
 /// Deprecated in macOS 10.13.
-public extern "C" OSStatus SecTrustSetKeychains(SecTrustRef trust, CFTypeRef keychainOrArray);
+public extern "C" OSStatus SecTrustSetKeychains(SecTrustRef trust, CFTypeRef? keychainOrArray);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecTrustGetResult(SecTrustRef trustRef, SecTrustResultType* result, CFArrayRef* certChain, CSSM_TP_APPLE_EVIDENCE_INFO** statusChain);
+public extern "C" OSStatus SecTrustGetResult(SecTrustRef trustRef, SecTrustResultType* result, __CFArray** certChain, CSSM_TP_APPLE_EVIDENCE_INFO** statusChain);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecTrustGetCssmResult(SecTrustRef trust, CSSM_TP_VERIFY_CONTEXT_RESULT_PTR* result);
@@ -166,6 +173,6 @@ public extern "C" OSStatus SecTrustGetCssmResultCode(SecTrustRef trust, OSStatus
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecTrustGetTPHandle(SecTrustRef trust, CSSM_TP_HANDLE* handle);
 
-public extern "C" OSStatus SecTrustCopyAnchorCertificates(CFArrayRef* anchors);
+public extern "C" OSStatus SecTrustCopyAnchorCertificates(__CFArray** anchors);
 
 #endif

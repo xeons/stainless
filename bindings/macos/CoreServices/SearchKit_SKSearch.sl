@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct __SKSearch;
 
-public using SKSearchRef = __SKSearch*;
+[CFType("SKSearchGetTypeID")]
+public extern objc class SKSearchRef : CFTypeRef { }
 
 public extern "C" CFTypeID SKSearchGetTypeID();
 
@@ -43,28 +45,30 @@ public const int kSKSearchOptionNoRelevanceScores = 1;
 public const int kSKSearchOptionSpaceMeansOR = 2;
 public const int kSKSearchOptionFindSimilar = 4;
 
-public extern "C" SKSearchRef SKSearchCreate(SKIndexRef inIndex, CFStringRef inQuery, SKSearchOptions inSearchOptions);
+[ReturnsRetained] public extern "C" SKSearchRef? SKSearchCreate(SKIndexRef? inIndex, CFStringRef? inQuery, SKSearchOptions inSearchOptions);
 
-public extern "C" void SKSearchCancel(SKSearchRef inSearch);
+public extern "C" void SKSearchCancel(SKSearchRef? inSearch);
 
-public extern "C" Boolean SKSearchFindMatches(SKSearchRef inSearch, CFIndex inMaximumCount, SKDocumentID* outDocumentIDsArray, float* outScoresArray, CFTimeInterval maximumTime, CFIndex* outFoundCount);
+public extern "C" Boolean SKSearchFindMatches(SKSearchRef? inSearch, CFIndex inMaximumCount, SKDocumentID* outDocumentIDsArray, float* outScoresArray, CFTimeInterval maximumTime, CFIndex* outFoundCount);
 
-public extern "C" void SKIndexCopyInfoForDocumentIDs(SKIndexRef inIndex, CFIndex inCount, SKDocumentID* inDocumentIDsArray, CFStringRef* outNamesArray, SKDocumentID* outParentIDsArray);
+public extern "C" void SKIndexCopyInfoForDocumentIDs(SKIndexRef? inIndex, CFIndex inCount, SKDocumentID* inDocumentIDsArray, __CFString** outNamesArray, SKDocumentID* outParentIDsArray);
 
-public extern "C" void SKIndexCopyDocumentRefsForDocumentIDs(SKIndexRef inIndex, CFIndex inCount, SKDocumentID* inDocumentIDsArray, SKDocumentRef* outDocumentRefsArray);
+public extern "C" void SKIndexCopyDocumentRefsForDocumentIDs(SKIndexRef? inIndex, CFIndex inCount, SKDocumentID* inDocumentIDsArray, void** outDocumentRefsArray);
 
-public extern "C" void SKIndexCopyDocumentURLsForDocumentIDs(SKIndexRef inIndex, CFIndex inCount, SKDocumentID* inDocumentIDsArray, CFURLRef* outDocumentURLsArray);
+public extern "C" void SKIndexCopyDocumentURLsForDocumentIDs(SKIndexRef? inIndex, CFIndex inCount, SKDocumentID* inDocumentIDsArray, __CFURL** outDocumentURLsArray);
 
 public struct __SKSearchGroup;
 
-public using SKSearchGroupRef = __SKSearchGroup*;
+[CFType("SKSearchGroupGetTypeID")]
+public extern objc class SKSearchGroupRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.4.
 public extern "C" CFTypeID SKSearchGroupGetTypeID();
 
 public struct __SKSearchResults;
 
-public using SKSearchResultsRef = __SKSearchResults*;
+[CFType("SKSearchResultsGetTypeID")]
+public extern objc class SKSearchResultsRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.4.
 public extern "C" CFTypeID SKSearchResultsGetTypeID();
@@ -77,27 +81,27 @@ public enum SKSearchType : int
     PrefixRanked = 3,
 }
 
-public delegate Boolean SKSearchResultsFilterCallBack(SKIndexRef arg0, SKDocumentRef arg1, void* arg2);
+public delegate Boolean SKSearchResultsFilterCallBack(__SKIndex* arg0, void* arg1, void* arg2);
 
 /// Deprecated in macOS 10.4.
-public extern "C" SKSearchGroupRef SKSearchGroupCreate(CFArrayRef inArrayOfInIndexes);
+[ReturnsRetained] public extern "C" SKSearchGroupRef? SKSearchGroupCreate(CFArrayRef? inArrayOfInIndexes);
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFArrayRef SKSearchGroupCopyIndexes(SKSearchGroupRef inSearchGroup);
+[ReturnsRetained] public extern "C" CFArrayRef? SKSearchGroupCopyIndexes(SKSearchGroupRef? inSearchGroup);
 
 /// Deprecated in macOS 10.4.
-public extern "C" SKSearchResultsRef SKSearchResultsCreateWithQuery(SKSearchGroupRef inSearchGroup, CFStringRef inQuery, SKSearchType inSearchType, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
+[ReturnsRetained] public extern "C" SKSearchResultsRef? SKSearchResultsCreateWithQuery(SKSearchGroupRef? inSearchGroup, CFStringRef? inQuery, SKSearchType inSearchType, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
 
 /// Deprecated in macOS 10.4.
-public extern "C" SKSearchResultsRef SKSearchResultsCreateWithDocuments(SKSearchGroupRef inSearchGroup, CFArrayRef inExampleDocuments, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
+[ReturnsRetained] public extern "C" SKSearchResultsRef? SKSearchResultsCreateWithDocuments(SKSearchGroupRef? inSearchGroup, CFArrayRef? inExampleDocuments, CFIndex inMaxFoundDocuments, void* inContext, SKSearchResultsFilterCallBack inFilterCallBack);
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFIndex SKSearchResultsGetCount(SKSearchResultsRef inSearchResults);
+public extern "C" CFIndex SKSearchResultsGetCount(SKSearchResultsRef? inSearchResults);
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFIndex SKSearchResultsGetInfoInRange(SKSearchResultsRef inSearchResults, CFRange inRange, SKDocumentRef* outDocumentsArray, SKIndexRef* outIndexesArray, float* outScoresArray);
+public extern "C" CFIndex SKSearchResultsGetInfoInRange(SKSearchResultsRef? inSearchResults, CFRange inRange, void** outDocumentsArray, __SKIndex** outIndexesArray, float* outScoresArray);
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFArrayRef SKSearchResultsCopyMatchingTerms(SKSearchResultsRef inSearchResults, CFIndex inItem);
+[ReturnsRetained] public extern "C" CFArrayRef? SKSearchResultsCopyMatchingTerms(SKSearchResultsRef? inSearchResults, CFIndex inItem);
 
 #endif

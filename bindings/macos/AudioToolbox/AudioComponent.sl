@@ -23,9 +23,11 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AudioToolbox;
 
+import MacOS.AppKit;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -68,11 +70,14 @@ public extern "C" AudioComponent AudioComponentFindNext(AudioComponent inCompone
 
 public extern "C" UInt32 AudioComponentCount(AudioComponentDescription* inDesc);
 
-public extern "C" OSStatus AudioComponentCopyName(AudioComponent inComponent, CFStringRef* outName);
+public extern "C" OSStatus AudioComponentCopyName(AudioComponent inComponent, __CFString** outName);
 
 public extern "C" OSStatus AudioComponentGetDescription(AudioComponent inComponent, AudioComponentDescription* outDesc);
 
 public extern "C" OSStatus AudioComponentGetVersion(AudioComponent inComponent, UInt32* outVersion);
+
+/// Deprecated in macOS 11.0.
+public extern "C" NSImage? AudioComponentGetIcon(AudioComponent comp);
 
 public extern "C" OSStatus AudioComponentInstanceNew(AudioComponent inComponent, AudioComponentInstance* outInstance);
 
@@ -86,7 +91,7 @@ public extern "C" AudioComponent AudioComponentInstanceGetComponent(AudioCompone
 
 public extern "C" Boolean AudioComponentInstanceCanDo(AudioComponentInstance inInstance, SInt16 inSelectorID);
 
-public extern "C" OSStatus AudioComponentCopyConfigurationInfo(AudioComponent inComponent, CFDictionaryRef* outConfigurationInfo);
+public extern "C" OSStatus AudioComponentCopyConfigurationInfo(AudioComponent inComponent, __CFDictionary** outConfigurationInfo);
 
 public enum AudioComponentValidationResult : uint
 {
@@ -98,10 +103,10 @@ public enum AudioComponentValidationResult : uint
     UnauthorizedError_Init = 5,
 }
 
-public extern "C" OSStatus AudioComponentValidate(AudioComponent inComponent, CFDictionaryRef inValidationParameters, AudioComponentValidationResult* outValidationResult);
+public extern "C" OSStatus AudioComponentValidate(AudioComponent inComponent, CFDictionaryRef? inValidationParameters, AudioComponentValidationResult* outValidationResult);
 
 public objc closure void AudioComponentValidateWithResultsInCompletionHandlerBlock(AudioComponentValidationResult arg0, CFDictionaryRef arg1);
 
-public extern "C" OSStatus AudioComponentValidateWithResults(AudioComponent inComponent, CFDictionaryRef inValidationParameters, AudioComponentValidateWithResultsInCompletionHandlerBlock inCompletionHandler);
+public extern "C" OSStatus AudioComponentValidateWithResults(AudioComponent inComponent, CFDictionaryRef? inValidationParameters, AudioComponentValidateWithResultsInCompletionHandlerBlock inCompletionHandler);
 
 #endif

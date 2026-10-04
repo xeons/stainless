@@ -25,151 +25,153 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreServices")
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSMethodInvocationResult;
+public extern "C" CFStringRef? kWSMethodInvocationResult;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSFaultString;
+public extern "C" CFStringRef? kWSFaultString;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSFaultCode;
+public extern "C" CFStringRef? kWSFaultCode;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSFaultExtra;
+public extern "C" CFStringRef? kWSFaultExtra;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSNetworkStreamFaultString;
+public extern "C" CFStringRef? kWSNetworkStreamFaultString;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSStreamErrorMessage;
+public extern "C" CFStringRef? kWSStreamErrorMessage;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSStreamErrorDomain;
+public extern "C" CFStringRef? kWSStreamErrorDomain;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSStreamErrorError;
+public extern "C" CFStringRef? kWSStreamErrorError;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSHTTPMessage;
+public extern "C" CFStringRef? kWSHTTPMessage;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSHTTPResponseMessage;
+public extern "C" CFStringRef? kWSHTTPResponseMessage;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSHTTPExtraHeaders;
+public extern "C" CFStringRef? kWSHTTPExtraHeaders;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSHTTPVersion;
+public extern "C" CFStringRef? kWSHTTPVersion;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSHTTPProxy;
+public extern "C" CFStringRef? kWSHTTPProxy;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSHTTPFollowsRedirects;
+public extern "C" CFStringRef? kWSHTTPFollowsRedirects;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSDebugOutgoingHeaders;
+public extern "C" CFStringRef? kWSDebugOutgoingHeaders;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSDebugOutgoingBody;
+public extern "C" CFStringRef? kWSDebugOutgoingBody;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSDebugIncomingHeaders;
+public extern "C" CFStringRef? kWSDebugIncomingHeaders;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSDebugIncomingBody;
+public extern "C" CFStringRef? kWSDebugIncomingBody;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSSOAPBodyEncodingStyle;
+public extern "C" CFStringRef? kWSSOAPBodyEncodingStyle;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSSOAPMethodNamespaceURI;
+public extern "C" CFStringRef? kWSSOAPMethodNamespaceURI;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSSOAPStyleDoc;
+public extern "C" CFStringRef? kWSSOAPStyleDoc;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSSOAPStyleRPC;
+public extern "C" CFStringRef? kWSSOAPStyleRPC;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSSOAPMessageHeaders;
+public extern "C" CFStringRef? kWSSOAPMessageHeaders;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSRecordParameterOrder;
+public extern "C" CFStringRef? kWSRecordParameterOrder;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSRecordNamespaceURI;
+public extern "C" CFStringRef? kWSRecordNamespaceURI;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSRecordType;
+public extern "C" CFStringRef? kWSRecordType;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSMethodInvocationResultParameterName;
+public extern "C" CFStringRef? kWSMethodInvocationResultParameterName;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSMethodInvocationTimeoutValue;
+public extern "C" CFStringRef? kWSMethodInvocationTimeoutValue;
 
 public struct OpaqueWSMethodInvocationRef;
 
-public using WSMethodInvocationRef = OpaqueWSMethodInvocationRef*;
+[CFType("WSMethodInvocationGetTypeID")]
+public extern objc class WSMethodInvocationRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.8.
 public extern "C" CFTypeID WSMethodInvocationGetTypeID();
 
 /// Deprecated in macOS 10.8.
-public extern "C" WSMethodInvocationRef WSMethodInvocationCreate(CFURLRef url, CFStringRef methodName, CFStringRef protocol);
+[ReturnsRetained] public extern "C" WSMethodInvocationRef? WSMethodInvocationCreate(CFURLRef? url, CFStringRef? methodName, CFStringRef? protocol);
 
 /// Deprecated in macOS 10.8.
-public extern "C" WSMethodInvocationRef WSMethodInvocationCreateFromSerialization(CFDataRef contract);
+[ReturnsRetained] public extern "C" WSMethodInvocationRef? WSMethodInvocationCreateFromSerialization(CFDataRef? contract);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDataRef WSMethodInvocationCopySerialization(WSMethodInvocationRef invocation);
+[ReturnsRetained] public extern "C" CFDataRef? WSMethodInvocationCopySerialization(WSMethodInvocationRef? invocation);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSMethodInvocationSetParameters(WSMethodInvocationRef invocation, CFDictionaryRef parameters, CFArrayRef parameterOrder);
+public extern "C" void WSMethodInvocationSetParameters(WSMethodInvocationRef? invocation, CFDictionaryRef? parameters, CFArrayRef? parameterOrder);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDictionaryRef WSMethodInvocationCopyParameters(WSMethodInvocationRef invocation, CFArrayRef* parameterOrder);
+[ReturnsRetained] public extern "C" CFDictionaryRef? WSMethodInvocationCopyParameters(WSMethodInvocationRef? invocation, __CFArray** parameterOrder);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSMethodInvocationSetProperty(WSMethodInvocationRef invocation, CFStringRef propertyName, CFTypeRef propertyValue);
+public extern "C" void WSMethodInvocationSetProperty(WSMethodInvocationRef? invocation, CFStringRef? propertyName, CFTypeRef? propertyValue);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFTypeRef WSMethodInvocationCopyProperty(WSMethodInvocationRef invocation, CFStringRef propertyName);
+[ReturnsRetained] public extern "C" CFTypeRef? WSMethodInvocationCopyProperty(WSMethodInvocationRef? invocation, CFStringRef? propertyName);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFDictionaryRef WSMethodInvocationInvoke(WSMethodInvocationRef invocation);
+[ReturnsRetained] public extern "C" CFDictionaryRef? WSMethodInvocationInvoke(WSMethodInvocationRef? invocation);
 
 /// Deprecated in macOS 10.8.
-public delegate void WSMethodInvocationCallBackProcPtr(WSMethodInvocationRef arg0, void* arg1, CFDictionaryRef arg2);
+public delegate void WSMethodInvocationCallBackProcPtr(OpaqueWSMethodInvocationRef* arg0, void* arg1, __CFDictionary* arg2);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSMethodInvocationSetCallBack(WSMethodInvocationRef invocation, WSMethodInvocationCallBackProcPtr clientCB, WSClientContext* context);
+public extern "C" void WSMethodInvocationSetCallBack(WSMethodInvocationRef? invocation, WSMethodInvocationCallBackProcPtr clientCB, WSClientContext* context);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSMethodInvocationScheduleWithRunLoop(WSMethodInvocationRef invocation, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+public extern "C" void WSMethodInvocationScheduleWithRunLoop(WSMethodInvocationRef? invocation, CFRunLoopRef? runLoop, CFStringRef? runLoopMode);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSMethodInvocationUnscheduleFromRunLoop(WSMethodInvocationRef invocation, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+public extern "C" void WSMethodInvocationUnscheduleFromRunLoop(WSMethodInvocationRef? invocation, CFRunLoopRef? runLoop, CFStringRef? runLoopMode);
 
 /// Deprecated in macOS 10.8.
-public extern "C" Boolean WSMethodResultIsFault(CFDictionaryRef methodResult);
+public extern "C" Boolean WSMethodResultIsFault(CFDictionaryRef? methodResult);
 
 /// Deprecated in macOS 10.8.
-public delegate CFStringRef WSMethodInvocationSerializationProcPtr(WSMethodInvocationRef arg0, CFTypeRef arg1, void* arg2);
+public delegate __CFString* WSMethodInvocationSerializationProcPtr(OpaqueWSMethodInvocationRef* arg0, void* arg1, void* arg2);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSMethodInvocationAddSerializationOverride(WSMethodInvocationRef invocation, CFTypeID objType, WSMethodInvocationSerializationProcPtr serializationProc, WSClientContext* context);
+public extern "C" void WSMethodInvocationAddSerializationOverride(WSMethodInvocationRef? invocation, CFTypeID objType, WSMethodInvocationSerializationProcPtr serializationProc, WSClientContext* context);
 
 /// Deprecated in macOS 10.8.
-public delegate CFTypeRef WSMethodInvocationDeserializationProcPtr(WSMethodInvocationRef arg0, CFXMLTreeRef arg1, CFXMLTreeRef arg2, void* arg3);
+public delegate void* WSMethodInvocationDeserializationProcPtr(OpaqueWSMethodInvocationRef* arg0, void* arg1, void* arg2, void* arg3);
 
 /// Deprecated in macOS 10.8.
-public extern "C" void WSMethodInvocationAddDeserializationOverride(WSMethodInvocationRef invocation, CFStringRef typeNamespace, CFStringRef typeName, WSMethodInvocationDeserializationProcPtr deserializationProc, WSClientContext* context);
+public extern "C" void WSMethodInvocationAddDeserializationOverride(WSMethodInvocationRef? invocation, CFStringRef? typeNamespace, CFStringRef? typeName, WSMethodInvocationDeserializationProcPtr deserializationProc, WSClientContext* context);
 
 #endif

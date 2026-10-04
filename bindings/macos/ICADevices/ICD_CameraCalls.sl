@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.DiskArbitration;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -89,7 +90,7 @@ public delegate void ICDNewObjectCreatedCompletion(ObjectInfo* arg0);
 
 public extern "C" ICAError ICDNewObjectCreated(ObjectInfo* parentInfo, ObjectInfo* objectInfo, ICDNewObjectCreatedCompletion completion);
 
-public extern "C" ICAError ICDCopyDeviceInfoDictionary(byte* deviceName, CFDictionaryRef* theDict);
+public extern "C" ICAError ICDCopyDeviceInfoDictionary(byte* deviceName, __CFDictionary** theDict);
 
 /// Deprecated in macOS 10.7.
 public extern "C" ICAError ICDCreateICAThumbnailFromICNS(byte* fileName, void* thumbnail);
@@ -118,13 +119,13 @@ public extern "C" ICAError ICDDisconnectFWDevice(UInt64 guid);
 
 public extern "C" ICAError ICDDisconnectFWDeviceWithIORegPath(UInt64 guid, byte* ioregPath);
 
-public extern "C" ICAError ICDConnectBluetoothDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDConnectBluetoothDevice(CFDictionaryRef? params);
 
-public extern "C" ICAError ICDDisconnectBluetoothDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDDisconnectBluetoothDevice(CFDictionaryRef? params);
 
-public extern "C" ICAError ICDConnectTCPIPDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDConnectTCPIPDevice(CFDictionaryRef? params);
 
-public extern "C" ICAError ICDDisconnectTCPIPDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDDisconnectTCPIPDevice(CFDictionaryRef? params);
 
 public delegate ICAError ICD_callback_functionsF_ICD_OpenUSBDeviceFunction(UInt32 arg0, ObjectInfo* arg1);
 
@@ -146,7 +147,7 @@ public delegate ICAError ICD_callback_functionsF_ICD_WriteFileDataFunction(Objec
 
 public delegate ICAError ICD_callback_functionsF_ICD_SendMessageFunction(ObjectInfo* arg0, ICD_ObjectSendMessagePB* arg1, ICDCompletion arg2);
 
-public delegate ICAError ICD_callback_functionsF_ICD_AddPropertiesToCFDictionaryFunction(ObjectInfo* arg0, CFMutableDictionaryRef arg1);
+public delegate ICAError ICD_callback_functionsF_ICD_AddPropertiesToCFDictionaryFunction(ObjectInfo* arg0, __CFDictionary* arg1);
 
 public delegate ICAError ICD_callback_functionsF_ICD_OpenFireWireDeviceFunction(UInt64 arg0, ObjectInfo* arg1);
 
@@ -154,13 +155,13 @@ public delegate ICAError ICD_callback_functionsF_ICD_OpenUSBDeviceWithIORegPathF
 
 public delegate ICAError ICD_callback_functionsF_ICD_OpenFireWireDeviceWithIORegPathFunction(UInt64 arg0, byte* arg1, ObjectInfo* arg2);
 
-public delegate ICAError ICD_callback_functionsF_ICD_OpenBluetoothDeviceFunction(CFDictionaryRef arg0, ObjectInfo* arg1);
+public delegate ICAError ICD_callback_functionsF_ICD_OpenBluetoothDeviceFunction(__CFDictionary* arg0, ObjectInfo* arg1);
 
-public delegate ICAError ICD_callback_functionsF_ICD_OpenTCPIPDeviceFunction(CFDictionaryRef arg0, ObjectInfo* arg1);
+public delegate ICAError ICD_callback_functionsF_ICD_OpenTCPIPDeviceFunction(__CFDictionary* arg0, ObjectInfo* arg1);
 
 public delegate ICAError ICD_callback_functionsF_ICD_WriteDataToFileFunction(ObjectInfo* arg0, FILE* arg1, UInt32 arg2, long* arg3);
 
-public delegate ICAError ICD_callback_functionsF_ICD_OpenMassStorageDeviceFunction(CFStringRef arg0, DASessionRef arg1, ObjectInfo* arg2);
+public delegate ICAError ICD_callback_functionsF_ICD_OpenMassStorageDeviceFunction(__CFString* arg0, __DASession* arg1, ObjectInfo* arg2);
 
 public delegate ICAError ICD_callback_functionsF_ICD_WriteDataToFileDescriptorFunction(ObjectInfo* arg0, int arg1, UInt32 arg2, long* arg3);
 

@@ -23,6 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Accelerate;
 
+import MacOS.CoreFoundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Accelerate")
@@ -157,13 +160,16 @@ public const int kvImageUseFP16Accumulator = 4096;
 
 public struct vImageConverter;
 
-public using vImageConverterRef = vImageConverter*;
+[CFType]
+public extern objc class vImageConverterRef : CFTypeRef { }
 
 public struct vImageCVImageFormat;
 
-public using vImageCVImageFormatRef = vImageCVImageFormat*;
+[CFType]
+public extern objc class vImageCVImageFormatRef : vImageConstCVImageFormatRef { }
 
-public using vImageConstCVImageFormatRef = vImageCVImageFormat*;
+[CFType]
+public extern objc class vImageConstCVImageFormatRef : CFTypeRef { }
 
 public enum vImageARGBType : int
 {

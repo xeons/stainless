@@ -25,13 +25,14 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreServices")
 
-public extern "C" OSStatus CSBackupSetItemExcluded(CFURLRef item, Boolean exclude, Boolean excludeByPath);
+public extern "C" OSStatus CSBackupSetItemExcluded(CFURLRef? item, Boolean exclude, Boolean excludeByPath);
 
-public extern "C" Boolean CSBackupIsItemExcluded(CFURLRef item, Boolean* excludeByPath);
+public extern "C" Boolean CSBackupIsItemExcluded(CFURLRef? item, Boolean* excludeByPath);
 
 #endif

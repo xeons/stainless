@@ -26,6 +26,7 @@ module MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,9 +35,9 @@ import MacOS.System;
 /// Deprecated in macOS 10.9.
 public extern "C" Boolean AXAPIEnabled();
 
-public extern "C" Boolean AXIsProcessTrustedWithOptions(CFDictionaryRef options);
+public extern "C" Boolean AXIsProcessTrustedWithOptions(CFDictionaryRef? options);
 
-public extern "C" CFStringRef kAXTrustedCheckOptionPrompt;
+public extern "C" CFStringRef? kAXTrustedCheckOptionPrompt;
 
 public extern "C" Boolean AXIsProcessTrusted();
 
@@ -45,7 +46,8 @@ public extern "C" AXError AXMakeProcessTrusted(CFStringRef executablePath);
 
 public struct __AXUIElement;
 
-public using AXUIElementRef = __AXUIElement*;
+[CFType("AXUIElementGetTypeID")]
+public extern objc class AXUIElementRef : CFTypeRef { }
 
 [Flags]
 public enum AXCopyMultipleAttributeOptions : uint
@@ -55,35 +57,35 @@ public enum AXCopyMultipleAttributeOptions : uint
 
 public extern "C" CFTypeID AXUIElementGetTypeID();
 
-public extern "C" AXError AXUIElementCopyAttributeNames(AXUIElementRef element, CFArrayRef* names);
+public extern "C" AXError AXUIElementCopyAttributeNames(AXUIElementRef element, __CFArray** names);
 
-public extern "C" AXError AXUIElementCopyAttributeValue(AXUIElementRef element, CFStringRef @attribute, CFTypeRef* value);
+public extern "C" AXError AXUIElementCopyAttributeValue(AXUIElementRef element, CFStringRef @attribute, void** value);
 
 public extern "C" AXError AXUIElementGetAttributeValueCount(AXUIElementRef element, CFStringRef @attribute, CFIndex* count);
 
-public extern "C" AXError AXUIElementCopyAttributeValues(AXUIElementRef element, CFStringRef @attribute, CFIndex index, CFIndex maxValues, CFArrayRef* values);
+public extern "C" AXError AXUIElementCopyAttributeValues(AXUIElementRef element, CFStringRef @attribute, CFIndex index, CFIndex maxValues, __CFArray** values);
 
 public extern "C" AXError AXUIElementIsAttributeSettable(AXUIElementRef element, CFStringRef @attribute, Boolean* settable);
 
 public extern "C" AXError AXUIElementSetAttributeValue(AXUIElementRef element, CFStringRef @attribute, CFTypeRef value);
 
-public extern "C" AXError AXUIElementCopyMultipleAttributeValues(AXUIElementRef element, CFArrayRef attributes, AXCopyMultipleAttributeOptions options, CFArrayRef* values);
+public extern "C" AXError AXUIElementCopyMultipleAttributeValues(AXUIElementRef element, CFArrayRef attributes, AXCopyMultipleAttributeOptions options, __CFArray** values);
 
-public extern "C" AXError AXUIElementCopyParameterizedAttributeNames(AXUIElementRef element, CFArrayRef* names);
+public extern "C" AXError AXUIElementCopyParameterizedAttributeNames(AXUIElementRef element, __CFArray** names);
 
-public extern "C" AXError AXUIElementCopyParameterizedAttributeValue(AXUIElementRef element, CFStringRef parameterizedAttribute, CFTypeRef parameter, CFTypeRef* result);
+public extern "C" AXError AXUIElementCopyParameterizedAttributeValue(AXUIElementRef element, CFStringRef parameterizedAttribute, CFTypeRef parameter, void** result);
 
-public extern "C" AXError AXUIElementCopyActionNames(AXUIElementRef element, CFArrayRef* names);
+public extern "C" AXError AXUIElementCopyActionNames(AXUIElementRef element, __CFArray** names);
 
-public extern "C" AXError AXUIElementCopyActionDescription(AXUIElementRef element, CFStringRef action, CFStringRef* description);
+public extern "C" AXError AXUIElementCopyActionDescription(AXUIElementRef element, CFStringRef action, __CFString** description);
 
 public extern "C" AXError AXUIElementPerformAction(AXUIElementRef element, CFStringRef action);
 
-public extern "C" AXError AXUIElementCopyElementAtPosition(AXUIElementRef application, float x, float y, AXUIElementRef* element);
+public extern "C" AXError AXUIElementCopyElementAtPosition(AXUIElementRef application, float x, float y, __AXUIElement** element);
 
-public extern "C" AXUIElementRef AXUIElementCreateApplication(pid_t pid);
+[ReturnsRetained] public extern "C" AXUIElementRef AXUIElementCreateApplication(pid_t pid);
 
-public extern "C" AXUIElementRef AXUIElementCreateSystemWide();
+[ReturnsRetained] public extern "C" AXUIElementRef AXUIElementCreateSystemWide();
 
 public extern "C" AXError AXUIElementGetPid(AXUIElementRef element, pid_t* pid);
 
@@ -94,11 +96,12 @@ public extern "C" AXError AXUIElementPostKeyboardEvent(AXUIElementRef applicatio
 
 public struct __AXTextMarker;
 
-public using AXTextMarkerRef = __AXTextMarker*;
+[CFType("AXTextMarkerGetTypeID")]
+public extern objc class AXTextMarkerRef : CFTypeRef { }
 
 public extern "C" CFTypeID AXTextMarkerGetTypeID();
 
-public extern "C" AXTextMarkerRef AXTextMarkerCreate(CFAllocatorRef allocator, UInt8* bytes, CFIndex length);
+[ReturnsRetained] public extern "C" AXTextMarkerRef AXTextMarkerCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length);
 
 public extern "C" CFIndex AXTextMarkerGetLength(AXTextMarkerRef marker);
 
@@ -106,31 +109,33 @@ public extern "C" UInt8* AXTextMarkerGetBytePtr(AXTextMarkerRef theTextMarker);
 
 public struct __AXTextMarkerRange;
 
-public using AXTextMarkerRangeRef = __AXTextMarkerRange*;
+[CFType("AXTextMarkerRangeGetTypeID")]
+public extern objc class AXTextMarkerRangeRef : CFTypeRef { }
 
 public extern "C" CFTypeID AXTextMarkerRangeGetTypeID();
 
-public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreate(CFAllocatorRef allocator, AXTextMarkerRef startMarker, AXTextMarkerRef endMarker);
+[ReturnsRetained] public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreate(CFAllocatorRef? allocator, AXTextMarkerRef startMarker, AXTextMarkerRef endMarker);
 
-public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreateWithBytes(CFAllocatorRef allocator, UInt8* startMarkerBytes, CFIndex startMarkerLength, UInt8* endMarkerBytes, CFIndex endMarkerLength);
+[ReturnsRetained] public extern "C" AXTextMarkerRangeRef AXTextMarkerRangeCreateWithBytes(CFAllocatorRef? allocator, UInt8* startMarkerBytes, CFIndex startMarkerLength, UInt8* endMarkerBytes, CFIndex endMarkerLength);
 
-public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyStartMarker(AXTextMarkerRangeRef textMarkerRange);
+[ReturnsRetained] public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyStartMarker(AXTextMarkerRangeRef textMarkerRange);
 
-public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyEndMarker(AXTextMarkerRangeRef textMarkerRange);
+[ReturnsRetained] public extern "C" AXTextMarkerRef AXTextMarkerRangeCopyEndMarker(AXTextMarkerRangeRef textMarkerRange);
 
 public struct __AXObserver;
 
-public using AXObserverRef = __AXObserver*;
+[CFType("AXObserverGetTypeID")]
+public extern objc class AXObserverRef : CFTypeRef { }
 
-public delegate void AXObserverCallback(AXObserverRef arg0, AXUIElementRef arg1, CFStringRef arg2, void* arg3);
+public delegate void AXObserverCallback(__AXObserver* arg0, __AXUIElement* arg1, __CFString* arg2, void* arg3);
 
-public delegate void AXObserverCallbackWithInfo(AXObserverRef arg0, AXUIElementRef arg1, CFStringRef arg2, CFDictionaryRef arg3, void* arg4);
+public delegate void AXObserverCallbackWithInfo(__AXObserver* arg0, __AXUIElement* arg1, __CFString* arg2, __CFDictionary* arg3, void* arg4);
 
 public extern "C" CFTypeID AXObserverGetTypeID();
 
-public extern "C" AXError AXObserverCreate(pid_t application, AXObserverCallback callback, AXObserverRef* outObserver);
+public extern "C" AXError AXObserverCreate(pid_t application, AXObserverCallback callback, __AXObserver** outObserver);
 
-public extern "C" AXError AXObserverCreateWithInfoCallback(pid_t application, AXObserverCallbackWithInfo callback, AXObserverRef* outObserver);
+public extern "C" AXError AXObserverCreateWithInfoCallback(pid_t application, AXObserverCallbackWithInfo callback, __AXObserver** outObserver);
 
 public extern "C" AXError AXObserverAddNotification(AXObserverRef observer, AXUIElementRef element, CFStringRef notification, void* refcon);
 

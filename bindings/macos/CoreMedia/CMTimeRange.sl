@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -65,7 +66,7 @@ public extern "C" CMTime CMTimeFoldIntoRange(CMTime time, CMTimeRange foldRange)
 
 public extern "C" CMTimeRange CMTimeRangeFromTimeToTime(CMTime start, CMTime end);
 
-public extern "C" CFDictionaryRef CMTimeRangeCopyAsDictionary(CMTimeRange range, CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CMTimeRangeCopyAsDictionary(CMTimeRange range, CFAllocatorRef? allocator);
 
 public extern "C" CMTimeRange CMTimeRangeMakeFromDictionary(CFDictionaryRef dictionaryRepresentation);
 
@@ -73,7 +74,7 @@ public extern "C" CFStringRef kCMTimeRangeStartKey;
 
 public extern "C" CFStringRef kCMTimeRangeDurationKey;
 
-public extern "C" CFStringRef CMTimeRangeCopyDescription(CFAllocatorRef allocator, CMTimeRange range);
+[ReturnsRetained] public extern "C" CFStringRef? CMTimeRangeCopyDescription(CFAllocatorRef? allocator, CMTimeRange range);
 
 public extern "C" void CMTimeRangeShow(CMTimeRange range);
 
@@ -90,7 +91,7 @@ public extern "C" CMTimeMapping CMTimeMappingMake(CMTimeRange source, CMTimeRang
 
 public extern "C" CMTimeMapping CMTimeMappingMakeEmpty(CMTimeRange target);
 
-public extern "C" CFDictionaryRef CMTimeMappingCopyAsDictionary(CMTimeMapping mapping, CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CMTimeMappingCopyAsDictionary(CMTimeMapping mapping, CFAllocatorRef? allocator);
 
 public extern "C" CMTimeMapping CMTimeMappingMakeFromDictionary(CFDictionaryRef dictionaryRepresentation);
 
@@ -98,7 +99,7 @@ public extern "C" CFStringRef kCMTimeMappingSourceKey;
 
 public extern "C" CFStringRef kCMTimeMappingTargetKey;
 
-public extern "C" CFStringRef CMTimeMappingCopyDescription(CFAllocatorRef allocator, CMTimeMapping mapping);
+[ReturnsRetained] public extern "C" CFStringRef? CMTimeMappingCopyDescription(CFAllocatorRef? allocator, CMTimeMapping mapping);
 
 public extern "C" void CMTimeMappingShow(CMTimeMapping mapping);
 

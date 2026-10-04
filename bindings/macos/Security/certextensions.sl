@@ -345,6 +345,7 @@ public enum __CE_DataType : int
 
 public using CE_DataType = __CE_DataType;
 
+/// Deprecated in macOS 10.7.
 public union CE_Data
 {
     public CE_AuthorityKeyID authorityKeyID;

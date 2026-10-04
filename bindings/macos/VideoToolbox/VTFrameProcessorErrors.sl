@@ -23,9 +23,15 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.VideoToolbox;
 
+import MacOS.Foundation;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
+
+/// macOS 15.4 and later.
+public extern "C" NSErrorDomain VTFrameProcessorErrorDomain;
 
 public enum VTFrameProcessorError : long
 {

@@ -24,6 +24,7 @@
 module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 

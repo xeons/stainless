@@ -24,6 +24,7 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,16 +32,17 @@ import MacOS.CoreFoundation;
 
 public struct __CSIdentityAuthority;
 
-public using CSIdentityAuthorityRef = __CSIdentityAuthority*;
+[CFType("CSIdentityAuthorityGetTypeID")]
+public extern objc class CSIdentityAuthorityRef : CFTypeRef { }
 
 public extern "C" CFTypeID CSIdentityAuthorityGetTypeID();
 
-public extern "C" CSIdentityAuthorityRef CSGetDefaultIdentityAuthority();
+public extern "C" CSIdentityAuthorityRef? CSGetDefaultIdentityAuthority();
 
-public extern "C" CSIdentityAuthorityRef CSGetLocalIdentityAuthority();
+public extern "C" CSIdentityAuthorityRef? CSGetLocalIdentityAuthority();
 
-public extern "C" CSIdentityAuthorityRef CSGetManagedIdentityAuthority();
+public extern "C" CSIdentityAuthorityRef? CSGetManagedIdentityAuthority();
 
-public extern "C" CFStringRef CSIdentityAuthorityCopyLocalizedName(CSIdentityAuthorityRef authority);
+[ReturnsRetained] public extern "C" CFStringRef? CSIdentityAuthorityCopyLocalizedName(CSIdentityAuthorityRef? authority);
 
 #endif

@@ -28,6 +28,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.CoreText;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -427,29 +428,29 @@ public struct HIThemeBackgroundDrawInfo
 
 public using HIThemeBackgroundDrawInfoPtr = HIThemeBackgroundDrawInfo*;
 
-public extern "C" OSStatus HIThemeDrawButton(HIRect* inBounds, HIThemeButtonDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation, HIRect* outLabelRect);
+public extern "C" OSStatus HIThemeDrawButton(HIRect* inBounds, HIThemeButtonDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation, HIRect* outLabelRect);
 
-public extern "C" OSStatus HIThemeGetButtonShape(HIRect* inBounds, HIThemeButtonDrawInfo* inDrawInfo, HIShapeRef* outShape);
+public extern "C" OSStatus HIThemeGetButtonShape(HIRect* inBounds, HIThemeButtonDrawInfo* inDrawInfo, __HIShape** outShape);
 
 public extern "C" OSStatus HIThemeGetButtonContentBounds(HIRect* inBounds, HIThemeButtonDrawInfo* inDrawInfo, HIRect* outBounds);
 
 public extern "C" OSStatus HIThemeGetButtonBackgroundBounds(HIRect* inBounds, HIThemeButtonDrawInfo* inDrawInfo, HIRect* outBounds);
 
-public extern "C" OSStatus HIThemeDrawChasingArrows(HIRect* inBounds, HIThemeChasingArrowsDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawChasingArrows(HIRect* inBounds, HIThemeChasingArrowsDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawPopupArrow(HIRect* inBounds, HIThemePopupArrowDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawPopupArrow(HIRect* inBounds, HIThemePopupArrowDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawMenuBarBackground(HIRect* inBounds, HIThemeMenuBarDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawMenuBarBackground(HIRect* inBounds, HIThemeMenuBarDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawMenuTitle(HIRect* inMenuBarRect, HIRect* inTitleRect, HIThemeMenuTitleDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation, HIRect* outLabelRect);
+public extern "C" OSStatus HIThemeDrawMenuTitle(HIRect* inMenuBarRect, HIRect* inTitleRect, HIThemeMenuTitleDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation, HIRect* outLabelRect);
 
-public extern "C" OSStatus HIThemeDrawMenuBackground(HIRect* inMenuRect, HIThemeMenuDrawInfo* inMenuDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawMenuBackground(HIRect* inMenuRect, HIThemeMenuDrawInfo* inMenuDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawMenuItem(HIRect* inMenuRect, HIRect* inItemRect, HIThemeMenuItemDrawInfo* inItemDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation, HIRect* outContentRect);
+public extern "C" OSStatus HIThemeDrawMenuItem(HIRect* inMenuRect, HIRect* inItemRect, HIThemeMenuItemDrawInfo* inItemDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation, HIRect* outContentRect);
 
-public extern "C" OSStatus HIThemeDrawMenuSeparator(HIRect* inMenuRect, HIRect* inItemRect, HIThemeMenuItemDrawInfo* inItemDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawMenuSeparator(HIRect* inMenuRect, HIRect* inItemRect, HIThemeMenuItemDrawInfo* inItemDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeGetMenuBackgroundShape(HIRect* inMenuRect, HIThemeMenuDrawInfo* inMenuDrawInfo, HIShapeRef* outShape);
+public extern "C" OSStatus HIThemeGetMenuBackgroundShape(HIRect* inMenuRect, HIThemeMenuDrawInfo* inMenuDrawInfo, __HIShape** outShape);
 
 public const int kHIThemeSegmentPositionFirst = 0;
 public const int kHIThemeSegmentPositionMiddle = 1;
@@ -491,19 +492,19 @@ public struct HIThemeSegmentDrawInfo
 
 public using HIThemeSegmentDrawInfoPtr = HIThemeSegmentDrawInfo*;
 
-public extern "C" OSStatus HIThemeDrawSegment(HIRect* inBounds, HIThemeSegmentDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawSegment(HIRect* inBounds, HIThemeSegmentDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawTabPane(HIRect* inRect, HIThemeTabPaneDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawTabPane(HIRect* inRect, HIThemeTabPaneDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawTab(HIRect* inRect, HIThemeTabDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation, HIRect* outLabelRect);
+public extern "C" OSStatus HIThemeDrawTab(HIRect* inRect, HIThemeTabDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation, HIRect* outLabelRect);
 
-public extern "C" OSStatus HIThemeGetTabPaneDrawShape(HIRect* inRect, ThemeTabDirection inDirection, HIThemeTabSize inTabSize, HIShapeRef* outShape);
+public extern "C" OSStatus HIThemeGetTabPaneDrawShape(HIRect* inRect, ThemeTabDirection inDirection, HIThemeTabSize inTabSize, __HIShape** outShape);
 
-public extern "C" OSStatus HIThemeGetTabPaneContentShape(HIRect* inRect, ThemeTabDirection inDirection, HIThemeTabSize inTabSize, HIShapeRef* outShape);
+public extern "C" OSStatus HIThemeGetTabPaneContentShape(HIRect* inRect, ThemeTabDirection inDirection, HIThemeTabSize inTabSize, __HIShape** outShape);
 
-public extern "C" OSStatus HIThemeGetTabDrawShape(HIRect* inRect, HIThemeTabDrawInfo* inDrawInfo, HIShapeRef* outShape);
+public extern "C" OSStatus HIThemeGetTabDrawShape(HIRect* inRect, HIThemeTabDrawInfo* inDrawInfo, __HIShape** outShape);
 
-public extern "C" OSStatus HIThemeGetTabShape(HIRect* inRect, HIThemeTabDrawInfo* inDrawInfo, HIShapeRef* outShape);
+public extern "C" OSStatus HIThemeGetTabShape(HIRect* inRect, HIThemeTabDrawInfo* inDrawInfo, __HIShape** outShape);
 
 public const int kHIThemeTextTruncationNone = 0;
 public const int kHIThemeTextTruncationMiddle = 1;
@@ -549,22 +550,22 @@ public struct HIThemeTextInfo
     public UInt32 truncationMaxLines;
     public Boolean truncationHappened;
     public UInt8 filler1;
-    public CTFontRef font;
+    public __CTFont* font;
 }
 
-public extern "C" OSStatus HIThemeGetTextDimensions(CFTypeRef inString, CGFloat inWidth, HIThemeTextInfo* inTextInfo, CGFloat* outWidth, CGFloat* outHeight, CGFloat* outBaseline);
+public extern "C" OSStatus HIThemeGetTextDimensions(CFTypeRef? inString, CGFloat inWidth, HIThemeTextInfo* inTextInfo, CGFloat* outWidth, CGFloat* outHeight, CGFloat* outBaseline);
 
-public extern "C" OSStatus HIThemeDrawTextBox(CFTypeRef inString, HIRect* inBounds, HIThemeTextInfo* inTextInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawTextBox(CFTypeRef? inString, HIRect* inBounds, HIThemeTextInfo* inTextInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
 public extern "C" CTFontUIFontType HIThemeGetUIFontType(ThemeFontID inFontID);
 
-public extern "C" OSStatus HIThemeDrawTrack(HIThemeTrackDrawInfo* inDrawInfo, HIRect* inGhostRect, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawTrack(HIThemeTrackDrawInfo* inDrawInfo, HIRect* inGhostRect, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawTrackTickMarks(HIThemeTrackDrawInfo* inDrawInfo, ItemCount inNumTicks, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawTrackTickMarks(HIThemeTrackDrawInfo* inDrawInfo, ItemCount inNumTicks, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawTickMark(HIRect* inBounds, HIThemeTickMarkDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawTickMark(HIRect* inBounds, HIThemeTickMarkDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeGetTrackThumbShape(HIThemeTrackDrawInfo* inDrawInfo, HIShapeRef* outThumbShape);
+public extern "C" OSStatus HIThemeGetTrackThumbShape(HIThemeTrackDrawInfo* inDrawInfo, __HIShape** outThumbShape);
 
 public extern "C" Boolean HIThemeHitTestTrack(HIThemeTrackDrawInfo* inDrawInfo, HIPoint* inMousePoint, ControlPartCode* outPartHit);
 
@@ -586,35 +587,35 @@ public extern "C" OSStatus HIThemeGetScrollBarTrackRect(HIRect* inBounds, HIScro
 
 public extern "C" Boolean HIThemeHitTestScrollBarArrows(HIRect* inScrollBarBounds, HIScrollBarTrackInfo* inTrackInfo, Boolean inIsHoriz, HIPoint* inPtHit, HIRect* outTrackBounds, ControlPartCode* outPartCode);
 
-public extern "C" OSStatus HIThemeDrawScrollBarDelimiters(HIRect* inContRect, HIThemeScrollBarDelimitersDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawScrollBarDelimiters(HIRect* inContRect, HIThemeScrollBarDelimitersDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawWindowFrame(HIRect* inContRect, HIThemeWindowDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation, HIRect* outTitleRect);
+public extern "C" OSStatus HIThemeDrawWindowFrame(HIRect* inContRect, HIThemeWindowDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation, HIRect* outTitleRect);
 
-public extern "C" OSStatus HIThemeDrawTitleBarWidget(HIRect* inContRect, HIThemeWindowWidgetDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawTitleBarWidget(HIRect* inContRect, HIThemeWindowWidgetDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawGrowBox(HIPoint* inOrigin, HIThemeGrowBoxDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawGrowBox(HIPoint* inOrigin, HIThemeGrowBoxDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
 public extern "C" OSStatus HIThemeGetGrowBoxBounds(HIPoint* inOrigin, HIThemeGrowBoxDrawInfo* inDrawInfo, HIRect* outBounds);
 
-public extern "C" OSStatus HIThemeGetWindowShape(HIRect* inContRect, HIThemeWindowDrawInfo* inDrawInfo, WindowRegionCode inWinRegion, HIShapeRef* outShape);
+public extern "C" OSStatus HIThemeGetWindowShape(HIRect* inContRect, HIThemeWindowDrawInfo* inDrawInfo, WindowRegionCode inWinRegion, __HIShape** outShape);
 
 public extern "C" Boolean HIThemeGetWindowRegionHit(HIRect* inContRect, HIThemeWindowDrawInfo* inDrawInfo, HIPoint* inPoint, WindowRegionCode* outRegionHit);
 
-public extern "C" OSStatus HIThemeDrawFrame(HIRect* inRect, HIThemeFrameDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawFrame(HIRect* inRect, HIThemeFrameDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawGroupBox(HIRect* inRect, HIThemeGroupBoxDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawGroupBox(HIRect* inRect, HIThemeGroupBoxDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawGenericWell(HIRect* inRect, HIThemeButtonDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawGenericWell(HIRect* inRect, HIThemeButtonDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawPaneSplitter(HIRect* inRect, HIThemeSplitterDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawPaneSplitter(HIRect* inRect, HIThemeSplitterDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawGrabber(HIRect* inRect, HIThemeGrabberDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawGrabber(HIRect* inRect, HIThemeGrabberDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawPlacard(HIRect* inRect, HIThemePlacardDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawPlacard(HIRect* inRect, HIThemePlacardDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawHeader(HIRect* inRect, HIThemeHeaderDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawHeader(HIRect* inRect, HIThemeHeaderDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawFocusRect(HIRect* inRect, Boolean inHasFocus, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawFocusRect(HIRect* inRect, Boolean inHasFocus, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
 public const int kHIThemeFocusRingOnly = 0;
 public const int kHIThemeFocusRingAbove = 1;
@@ -622,23 +623,23 @@ public const int kHIThemeFocusRingBelow = 2;
 
 public using HIThemeFocusRing = UInt32;
 
-public extern "C" OSStatus HIThemeBeginFocus(CGContextRef inContext, HIThemeFocusRing inRing, void* inReserved);
+public extern "C" OSStatus HIThemeBeginFocus(CGContextRef? inContext, HIThemeFocusRing inRing, void* inReserved);
 
-public extern "C" OSStatus HIThemeEndFocus(CGContextRef inContext);
+public extern "C" OSStatus HIThemeEndFocus(CGContextRef? inContext);
 
-public extern "C" OSStatus HIThemeDrawSeparator(HIRect* inRect, HIThemeSeparatorDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawSeparator(HIRect* inRect, HIThemeSeparatorDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeSetFill(ThemeBrush inBrush, void* inInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeSetFill(ThemeBrush inBrush, void* inInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeSetStroke(ThemeBrush inBrush, void* inInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeSetStroke(ThemeBrush inBrush, void* inInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeSetTextFill(ThemeTextColor inColor, void* inInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeSetTextFill(ThemeTextColor inColor, void* inInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeApplyBackground(HIRect* inBounds, HIThemeBackgroundDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeApplyBackground(HIRect* inBounds, HIThemeBackgroundDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeDrawBackground(HIRect* inBounds, HIThemeBackgroundDrawInfo* inDrawInfo, CGContextRef inContext, HIThemeOrientation inOrientation);
+public extern "C" OSStatus HIThemeDrawBackground(HIRect* inBounds, HIThemeBackgroundDrawInfo* inDrawInfo, CGContextRef? inContext, HIThemeOrientation inOrientation);
 
-public extern "C" OSStatus HIThemeBrushCreateCGColor(ThemeBrush inBrush, CGColorRef* outColor);
+public extern "C" OSStatus HIThemeBrushCreateCGColor(ThemeBrush inBrush, CGColor** outColor);
 
 public extern "C" OSStatus HIThemeGetTextColorForThemeBrush(ThemeBrush inBrush, Boolean inWindowIsActive, ThemeTextColor* outColor);
 
@@ -798,7 +799,7 @@ public using ThemeMetric = UInt32;
 
 public extern "C" OSStatus GetThemeMetric(ThemeMetric inMetric, SInt32* outMetric);
 
-public extern "C" OSStatus CopyThemeIdentifier(CFStringRef* outIdentifier);
+public extern "C" OSStatus CopyThemeIdentifier(__CFString** outIdentifier);
 
 public const int kThemeMetricCheckBoxGlyphHeight = 2;
 public const int kThemeMetricRadioButtonGlyphHeight = 3;

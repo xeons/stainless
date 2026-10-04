@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreMedia;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,9 +35,10 @@ import MacOS.System;
 
 public struct OpaqueVTDecompressionSession;
 
-public using VTDecompressionSessionRef = OpaqueVTDecompressionSession*;
+[CFType("VTDecompressionSessionGetTypeID")]
+public extern objc class VTDecompressionSessionRef : CFTypeRef { }
 
-public delegate void VTDecompressionOutputCallback(void* arg0, void* arg1, OSStatus arg2, VTDecodeInfoFlags arg3, CVImageBufferRef arg4, CMTime arg5, CMTime arg6);
+public delegate void VTDecompressionOutputCallback(void* arg0, void* arg1, OSStatus arg2, VTDecodeInfoFlags arg3, void* arg4, CMTime arg5, CMTime arg6);
 
 [Pack(4)]
 public struct VTDecompressionOutputCallbackRecord
@@ -45,7 +47,7 @@ public struct VTDecompressionOutputCallbackRecord
     public void* decompressionOutputRefCon;
 }
 
-public extern "C" OSStatus VTDecompressionSessionCreate(CFAllocatorRef allocator, CMVideoFormatDescriptionRef videoFormatDescription, CFDictionaryRef videoDecoderSpecification, CFDictionaryRef destinationImageBufferAttributes, VTDecompressionOutputCallbackRecord* outputCallback, VTDecompressionSessionRef* decompressionSessionOut);
+public extern "C" OSStatus VTDecompressionSessionCreate(CFAllocatorRef? allocator, CMVideoFormatDescriptionRef videoFormatDescription, CFDictionaryRef? videoDecoderSpecification, CFDictionaryRef? destinationImageBufferAttributes, VTDecompressionOutputCallbackRecord* outputCallback, OpaqueVTDecompressionSession** decompressionSessionOut);
 
 public extern "C" void VTDecompressionSessionInvalidate(VTDecompressionSessionRef session);
 
@@ -53,7 +55,7 @@ public extern "C" CFTypeID VTDecompressionSessionGetTypeID();
 
 public extern "C" OSStatus VTDecompressionSessionDecodeFrame(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, void* sourceFrameRefCon, VTDecodeInfoFlags* infoFlagsOut);
 
-public objc closure void VTDecompressionOutputHandler(OSStatus arg0, VTDecodeInfoFlags arg1, CVImageBufferRef arg2, CMTime arg3, CMTime arg4);
+public objc closure void VTDecompressionOutputHandler(OSStatus arg0, VTDecodeInfoFlags arg1, CVImageBufferRef? arg2, CMTime arg3, CMTime arg4);
 
 public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithOutputHandler(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, VTDecodeInfoFlags* infoFlagsOut, VTDecompressionOutputHandler outputHandler);
 
@@ -63,7 +65,7 @@ public extern "C" Boolean VTDecompressionSessionCanAcceptFormatDescription(VTDec
 
 public extern "C" OSStatus VTDecompressionSessionWaitForAsynchronousFrames(VTDecompressionSessionRef session);
 
-public extern "C" OSStatus VTDecompressionSessionCopyBlackPixelBuffer(VTDecompressionSessionRef session, CVPixelBufferRef* pixelBufferOut);
+public extern "C" OSStatus VTDecompressionSessionCopyBlackPixelBuffer(VTDecompressionSessionRef session, void** pixelBufferOut);
 
 public extern "C" Boolean VTIsHardwareDecodeSupported(CMVideoCodecType codecType);
 
@@ -71,21 +73,21 @@ public extern "C" Boolean VTIsHardwareDecodeSupported(CMVideoCodecType codecType
 public extern "C" Boolean VTIsStereoMVHEVCDecodeSupported();
 
 /// macOS 14.0 and later.
-public delegate void VTDecompressionOutputMultiImageCallback(void* arg0, void* arg1, OSStatus arg2, VTDecodeInfoFlags arg3, CMTaggedBufferGroupRef arg4, CMTime arg5, CMTime arg6);
+public delegate void VTDecompressionOutputMultiImageCallback(void* arg0, void* arg1, OSStatus arg2, VTDecodeInfoFlags arg3, OpaqueCMTaggedBufferGroup* arg4, CMTime arg5, CMTime arg6);
 
 /// macOS 14.0 and later.
 public extern "C" OSStatus VTDecompressionSessionSetMultiImageCallback(VTDecompressionSessionRef decompressionSession, VTDecompressionOutputMultiImageCallback outputMultiImageCallback, void* outputMultiImageRefcon);
 
 /// macOS 14.0 and later.
-public objc closure void VTDecompressionMultiImageCapableOutputHandler(OSStatus arg0, VTDecodeInfoFlags arg1, CVImageBufferRef arg2, CMTaggedBufferGroupRef arg3, CMTime arg4, CMTime arg5);
+public objc closure void VTDecompressionMultiImageCapableOutputHandler(OSStatus arg0, VTDecodeInfoFlags arg1, CVImageBufferRef? arg2, CMTaggedBufferGroupRef? arg3, CMTime arg4, CMTime arg5);
 
 /// macOS 14.0 and later.
 public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithMultiImageCapableOutputHandler(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, VTDecodeInfoFlags* infoFlagsOut, VTDecompressionMultiImageCapableOutputHandler multiImageCapableOutputHandler);
 
 /// macOS 15.0 and later.
-public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithOptions(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, CFDictionaryRef frameOptions, void* sourceFrameRefCon, VTDecodeInfoFlags* infoFlagsOut);
+public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithOptions(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, CFDictionaryRef? frameOptions, void* sourceFrameRefCon, VTDecodeInfoFlags* infoFlagsOut);
 
 /// macOS 15.0 and later.
-public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithOptionsAndOutputHandler(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, CFDictionaryRef frameOptions, VTDecodeInfoFlags* infoFlagsOut, VTDecompressionOutputHandler outputHandler);
+public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithOptionsAndOutputHandler(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, CFDictionaryRef? frameOptions, VTDecodeInfoFlags* infoFlagsOut, VTDecompressionOutputHandler outputHandler);
 
 #endif

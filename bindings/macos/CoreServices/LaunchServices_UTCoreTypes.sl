@@ -24,6 +24,7 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 

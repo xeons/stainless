@@ -25,6 +25,7 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,13 +33,14 @@ import MacOS.System;
 
 public struct __SCDynamicStore;
 
-public using SCDynamicStoreRef = __SCDynamicStore*;
+[CFType("SCDynamicStoreGetTypeID")]
+public extern objc class SCDynamicStoreRef : CFTypeRef { }
 
 public delegate void* SCDynamicStoreContextRetainFunction(void* arg0);
 
 public delegate void SCDynamicStoreContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef SCDynamicStoreContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* SCDynamicStoreContextCopyDescriptionFunction(void* arg0);
 
 public struct SCDynamicStoreContext
 {
@@ -49,38 +51,40 @@ public struct SCDynamicStoreContext
     public SCDynamicStoreContextCopyDescriptionFunction copyDescription;
 }
 
-public delegate void SCDynamicStoreCallBack(SCDynamicStoreRef arg0, CFArrayRef arg1, void* arg2);
+public delegate void SCDynamicStoreCallBack(__SCDynamicStore* arg0, __CFArray* arg1, void* arg2);
 
 public extern "C" CFTypeID SCDynamicStoreGetTypeID();
 
-public extern "C" SCDynamicStoreRef SCDynamicStoreCreate(CFAllocatorRef allocator, CFStringRef name, SCDynamicStoreCallBack callout, SCDynamicStoreContext* context);
+[ReturnsRetained] public extern "C" SCDynamicStoreRef? SCDynamicStoreCreate(CFAllocatorRef? allocator, CFStringRef name, SCDynamicStoreCallBack callout, SCDynamicStoreContext* context);
 
-public extern "C" SCDynamicStoreRef SCDynamicStoreCreateWithOptions(CFAllocatorRef allocator, CFStringRef name, CFDictionaryRef storeOptions, SCDynamicStoreCallBack callout, SCDynamicStoreContext* context);
+[ReturnsRetained] public extern "C" SCDynamicStoreRef? SCDynamicStoreCreateWithOptions(CFAllocatorRef? allocator, CFStringRef name, CFDictionaryRef? storeOptions, SCDynamicStoreCallBack callout, SCDynamicStoreContext* context);
 
-public extern "C" CFStringRef kSCDynamicStoreUseSessionKeys;
+public extern "C" CFStringRef? kSCDynamicStoreUseSessionKeys;
 
-public extern "C" CFRunLoopSourceRef SCDynamicStoreCreateRunLoopSource(CFAllocatorRef allocator, SCDynamicStoreRef store, CFIndex order);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef? SCDynamicStoreCreateRunLoopSource(CFAllocatorRef? allocator, SCDynamicStoreRef store, CFIndex order);
 
-public extern "C" CFArrayRef SCDynamicStoreCopyKeyList(SCDynamicStoreRef store, CFStringRef pattern);
+public extern "C" Boolean SCDynamicStoreSetDispatchQueue(SCDynamicStoreRef store, dispatch_queue_t? queue);
 
-public extern "C" Boolean SCDynamicStoreAddValue(SCDynamicStoreRef store, CFStringRef key, CFPropertyListRef value);
+[ReturnsRetained] public extern "C" CFArrayRef? SCDynamicStoreCopyKeyList(SCDynamicStoreRef? store, CFStringRef pattern);
+
+public extern "C" Boolean SCDynamicStoreAddValue(SCDynamicStoreRef? store, CFStringRef key, CFPropertyListRef value);
 
 public extern "C" Boolean SCDynamicStoreAddTemporaryValue(SCDynamicStoreRef store, CFStringRef key, CFPropertyListRef value);
 
-public extern "C" CFPropertyListRef SCDynamicStoreCopyValue(SCDynamicStoreRef store, CFStringRef key);
+[ReturnsRetained] public extern "C" CFPropertyListRef? SCDynamicStoreCopyValue(SCDynamicStoreRef? store, CFStringRef key);
 
-public extern "C" CFDictionaryRef SCDynamicStoreCopyMultiple(SCDynamicStoreRef store, CFArrayRef keys, CFArrayRef patterns);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SCDynamicStoreCopyMultiple(SCDynamicStoreRef? store, CFArrayRef? keys, CFArrayRef? patterns);
 
-public extern "C" Boolean SCDynamicStoreSetValue(SCDynamicStoreRef store, CFStringRef key, CFPropertyListRef value);
+public extern "C" Boolean SCDynamicStoreSetValue(SCDynamicStoreRef? store, CFStringRef key, CFPropertyListRef value);
 
-public extern "C" Boolean SCDynamicStoreSetMultiple(SCDynamicStoreRef store, CFDictionaryRef keysToSet, CFArrayRef keysToRemove, CFArrayRef keysToNotify);
+public extern "C" Boolean SCDynamicStoreSetMultiple(SCDynamicStoreRef? store, CFDictionaryRef? keysToSet, CFArrayRef? keysToRemove, CFArrayRef? keysToNotify);
 
-public extern "C" Boolean SCDynamicStoreRemoveValue(SCDynamicStoreRef store, CFStringRef key);
+public extern "C" Boolean SCDynamicStoreRemoveValue(SCDynamicStoreRef? store, CFStringRef key);
 
-public extern "C" Boolean SCDynamicStoreNotifyValue(SCDynamicStoreRef store, CFStringRef key);
+public extern "C" Boolean SCDynamicStoreNotifyValue(SCDynamicStoreRef? store, CFStringRef key);
 
-public extern "C" Boolean SCDynamicStoreSetNotificationKeys(SCDynamicStoreRef store, CFArrayRef keys, CFArrayRef patterns);
+public extern "C" Boolean SCDynamicStoreSetNotificationKeys(SCDynamicStoreRef store, CFArrayRef? keys, CFArrayRef? patterns);
 
-public extern "C" CFArrayRef SCDynamicStoreCopyNotifiedKeys(SCDynamicStoreRef store);
+[ReturnsRetained] public extern "C" CFArrayRef? SCDynamicStoreCopyNotifiedKeys(SCDynamicStoreRef store);
 
 #endif

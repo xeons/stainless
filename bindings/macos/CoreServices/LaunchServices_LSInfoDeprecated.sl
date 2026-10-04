@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -68,11 +69,11 @@ public struct LSItemInfoRecord
     public LSItemInfoFlags flags;
     public OSType filetype;
     public OSType creator;
-    public CFStringRef extension;
+    public __CFString* extension;
 }
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus LSCopyItemInfoForURL(CFURLRef inURL, LSRequestedInfo inWhichInfo, LSItemInfoRecord* outItemInfo);
+public extern "C" OSStatus LSCopyItemInfoForURL(CFURLRef? inURL, LSRequestedInfo inWhichInfo, LSItemInfoRecord* outItemInfo);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus LSCopyItemInfoForRef(FSRef* inItemRef, LSRequestedInfo inWhichInfo, LSItemInfoRecord* outItemInfo);
@@ -81,43 +82,43 @@ public extern "C" OSStatus LSCopyItemInfoForRef(FSRef* inItemRef, LSRequestedInf
 public extern "C" OSStatus LSGetExtensionInfo(UniCharCount inNameLen, UniChar* inNameBuffer, UniCharCount* outExtStartIndex);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSCopyDisplayNameForRef(FSRef* inRef, CFStringRef* outDisplayName);
+public extern "C" OSStatus LSCopyDisplayNameForRef(FSRef* inRef, __CFString** outDisplayName);
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus LSCopyDisplayNameForURL(CFURLRef inURL, CFStringRef* outDisplayName);
+public extern "C" OSStatus LSCopyDisplayNameForURL(CFURLRef? inURL, __CFString** outDisplayName);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus LSSetExtensionHiddenForRef(FSRef* inRef, Boolean inHide);
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus LSSetExtensionHiddenForURL(CFURLRef inURL, Boolean inHide);
+public extern "C" OSStatus LSSetExtensionHiddenForURL(CFURLRef? inURL, Boolean inHide);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSCopyKindStringForRef(FSRef* inFSRef, CFStringRef* outKindString);
+public extern "C" OSStatus LSCopyKindStringForRef(FSRef* inFSRef, __CFString** outKindString);
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus LSCopyKindStringForURL(CFURLRef inURL, CFStringRef* outKindString);
+public extern "C" OSStatus LSCopyKindStringForURL(CFURLRef? inURL, __CFString** outKindString);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSCopyKindStringForTypeInfo(OSType inType, OSType inCreator, CFStringRef inExtension, CFStringRef* outKindString);
+public extern "C" OSStatus LSCopyKindStringForTypeInfo(OSType inType, OSType inCreator, CFStringRef? inExtension, __CFString** outKindString);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSCopyKindStringForMIMEType(CFStringRef inMIMEType, CFStringRef* outKindString);
+public extern "C" OSStatus LSCopyKindStringForMIMEType(CFStringRef? inMIMEType, __CFString** outKindString);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSGetApplicationForItem(FSRef* inItemRef, LSRolesMask inRoleMask, FSRef* outAppRef, CFURLRef* outAppURL);
+public extern "C" OSStatus LSGetApplicationForItem(FSRef* inItemRef, LSRolesMask inRoleMask, FSRef* outAppRef, __CFURL** outAppURL);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSGetApplicationForInfo(OSType inType, OSType inCreator, CFStringRef inExtension, LSRolesMask inRoleMask, FSRef* outAppRef, CFURLRef* outAppURL);
+public extern "C" OSStatus LSGetApplicationForInfo(OSType inType, OSType inCreator, CFStringRef? inExtension, LSRolesMask inRoleMask, FSRef* outAppRef, __CFURL** outAppURL);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSCopyApplicationForMIMEType(CFStringRef inMIMEType, LSRolesMask inRoleMask, CFURLRef* outAppURL);
+public extern "C" OSStatus LSCopyApplicationForMIMEType(CFStringRef? inMIMEType, LSRolesMask inRoleMask, __CFURL** outAppURL);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSGetApplicationForURL(CFURLRef inURL, LSRolesMask inRoleMask, FSRef* outAppRef, CFURLRef* outAppURL);
+public extern "C" OSStatus LSGetApplicationForURL(CFURLRef? inURL, LSRolesMask inRoleMask, FSRef* outAppRef, __CFURL** outAppURL);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSFindApplicationForInfo(OSType inCreator, CFStringRef inBundleID, CFStringRef inName, FSRef* outAppRef, CFURLRef* outAppURL);
+public extern "C" OSStatus LSFindApplicationForInfo(OSType inCreator, CFStringRef? inBundleID, CFStringRef? inName, FSRef* outAppRef, __CFURL** outAppURL);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus LSCanRefAcceptItem(FSRef* inItemFSRef, FSRef* inTargetRef, LSRolesMask inRoleMask, LSAcceptanceFlags inFlags, Boolean* outAcceptsItem);
@@ -126,43 +127,43 @@ public extern "C" OSStatus LSCanRefAcceptItem(FSRef* inItemFSRef, FSRef* inTarge
 public extern "C" OSStatus LSRegisterFSRef(FSRef* inRef, Boolean inUpdate);
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemContentType;
+public extern "C" CFStringRef? kLSItemContentType;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemFileType;
+public extern "C" CFStringRef? kLSItemFileType;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemFileCreator;
+public extern "C" CFStringRef? kLSItemFileCreator;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemExtension;
+public extern "C" CFStringRef? kLSItemExtension;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemDisplayName;
+public extern "C" CFStringRef? kLSItemDisplayName;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemDisplayKind;
+public extern "C" CFStringRef? kLSItemDisplayKind;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemRoleHandlerDisplayName;
+public extern "C" CFStringRef? kLSItemRoleHandlerDisplayName;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemIsInvisible;
+public extern "C" CFStringRef? kLSItemIsInvisible;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemExtensionIsHidden;
+public extern "C" CFStringRef? kLSItemExtensionIsHidden;
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFStringRef kLSItemQuarantineProperties;
+public extern "C" CFStringRef? kLSItemQuarantineProperties;
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSCopyItemAttribute(FSRef* inItem, LSRolesMask inRoles, CFStringRef inAttributeName, CFTypeRef* outValue);
+public extern "C" OSStatus LSCopyItemAttribute(FSRef* inItem, LSRolesMask inRoles, CFStringRef? inAttributeName, void** outValue);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSCopyItemAttributes(FSRef* inItem, LSRolesMask inRoles, CFArrayRef inAttributeNames, CFDictionaryRef* outValues);
+public extern "C" OSStatus LSCopyItemAttributes(FSRef* inItem, LSRolesMask inRoles, CFArrayRef? inAttributeNames, __CFDictionary** outValues);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSSetItemAttribute(FSRef* inItem, LSRolesMask inRoles, CFStringRef inAttributeName, CFTypeRef inValue);
+public extern "C" OSStatus LSSetItemAttribute(FSRef* inItem, LSRolesMask inRoles, CFStringRef? inAttributeName, CFTypeRef? inValue);
 
 [Flags]
 public enum LSHandlerOptions : uint
@@ -172,10 +173,10 @@ public enum LSHandlerOptions : uint
 }
 
 /// Deprecated in macOS 10.11.
-public extern "C" LSHandlerOptions LSGetHandlerOptionsForContentType(CFStringRef inContentType);
+public extern "C" LSHandlerOptions LSGetHandlerOptionsForContentType(CFStringRef? inContentType);
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus LSSetHandlerOptionsForContentType(CFStringRef inContentType, LSHandlerOptions inOptions);
+public extern "C" OSStatus LSSetHandlerOptionsForContentType(CFStringRef? inContentType, LSHandlerOptions inOptions);
 
 public const ulong kLSInvalidExtensionIndex = 18446744073709551615u;
 

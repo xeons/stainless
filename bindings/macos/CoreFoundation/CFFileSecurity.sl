@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,37 +32,38 @@ import MacOS.System;
 
 public struct __CFFileSecurity;
 
-public using CFFileSecurityRef = __CFFileSecurity*;
+[CFType("CFFileSecurityGetTypeID")]
+public extern objc class CFFileSecurityRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFFileSecurityGetTypeID();
 
-public extern "C" CFFileSecurityRef CFFileSecurityCreate(CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" CFFileSecurityRef? CFFileSecurityCreate(CFAllocatorRef? allocator);
 
-public extern "C" CFFileSecurityRef CFFileSecurityCreateCopy(CFAllocatorRef allocator, CFFileSecurityRef fileSec);
+[ReturnsRetained] public extern "C" CFFileSecurityRef? CFFileSecurityCreateCopy(CFAllocatorRef? allocator, CFFileSecurityRef? fileSec);
 
-public extern "C" Boolean CFFileSecurityCopyOwnerUUID(CFFileSecurityRef fileSec, CFUUIDRef* ownerUUID);
+public extern "C" Boolean CFFileSecurityCopyOwnerUUID(CFFileSecurityRef? fileSec, __CFUUID** ownerUUID);
 
-public extern "C" Boolean CFFileSecuritySetOwnerUUID(CFFileSecurityRef fileSec, CFUUIDRef ownerUUID);
+public extern "C" Boolean CFFileSecuritySetOwnerUUID(CFFileSecurityRef? fileSec, CFUUIDRef? ownerUUID);
 
-public extern "C" Boolean CFFileSecurityCopyGroupUUID(CFFileSecurityRef fileSec, CFUUIDRef* groupUUID);
+public extern "C" Boolean CFFileSecurityCopyGroupUUID(CFFileSecurityRef? fileSec, __CFUUID** groupUUID);
 
-public extern "C" Boolean CFFileSecuritySetGroupUUID(CFFileSecurityRef fileSec, CFUUIDRef groupUUID);
+public extern "C" Boolean CFFileSecuritySetGroupUUID(CFFileSecurityRef? fileSec, CFUUIDRef? groupUUID);
 
-public extern "C" Boolean CFFileSecurityCopyAccessControlList(CFFileSecurityRef fileSec, acl_t* accessControlList);
+public extern "C" Boolean CFFileSecurityCopyAccessControlList(CFFileSecurityRef? fileSec, acl_t* accessControlList);
 
-public extern "C" Boolean CFFileSecuritySetAccessControlList(CFFileSecurityRef fileSec, acl_t accessControlList);
+public extern "C" Boolean CFFileSecuritySetAccessControlList(CFFileSecurityRef? fileSec, acl_t accessControlList);
 
-public extern "C" Boolean CFFileSecurityGetOwner(CFFileSecurityRef fileSec, uid_t* owner);
+public extern "C" Boolean CFFileSecurityGetOwner(CFFileSecurityRef? fileSec, uid_t* owner);
 
-public extern "C" Boolean CFFileSecuritySetOwner(CFFileSecurityRef fileSec, uid_t owner);
+public extern "C" Boolean CFFileSecuritySetOwner(CFFileSecurityRef? fileSec, uid_t owner);
 
-public extern "C" Boolean CFFileSecurityGetGroup(CFFileSecurityRef fileSec, gid_t* group);
+public extern "C" Boolean CFFileSecurityGetGroup(CFFileSecurityRef? fileSec, gid_t* group);
 
-public extern "C" Boolean CFFileSecuritySetGroup(CFFileSecurityRef fileSec, gid_t group);
+public extern "C" Boolean CFFileSecuritySetGroup(CFFileSecurityRef? fileSec, gid_t group);
 
-public extern "C" Boolean CFFileSecurityGetMode(CFFileSecurityRef fileSec, mode_t* mode);
+public extern "C" Boolean CFFileSecurityGetMode(CFFileSecurityRef? fileSec, mode_t* mode);
 
-public extern "C" Boolean CFFileSecuritySetMode(CFFileSecurityRef fileSec, mode_t mode);
+public extern "C" Boolean CFFileSecuritySetMode(CFFileSecurityRef? fileSec, mode_t mode);
 
 [Flags]
 public enum CFFileSecurityClearOptions : ulong
@@ -74,6 +76,6 @@ public enum CFFileSecurityClearOptions : ulong
     AccessControlList = 32,
 }
 
-public extern "C" Boolean CFFileSecurityClearProperties(CFFileSecurityRef fileSec, CFFileSecurityClearOptions clearPropertyMask);
+public extern "C" Boolean CFFileSecurityClearProperties(CFFileSecurityRef? fileSec, CFFileSecurityClearOptions clearPropertyMask);
 
 #endif

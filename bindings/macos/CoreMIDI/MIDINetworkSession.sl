@@ -23,15 +23,62 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreMIDI;
 
+import MacOS.Foundation;
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "CoreMIDI")
+
+public extern "C" NSString MIDINetworkBonjourServiceType;
+
+public extern "C" NSString MIDINetworkNotificationContactsDidChange;
+
+public extern "C" NSString MIDINetworkNotificationSessionDidChange;
 
 public enum MIDINetworkConnectionPolicy : ulong
 {
     NoOne = 0,
     HostsInContactList = 1,
     Anyone = 2,
+}
+
+public extern objc class MIDINetworkHost : NSObject
+{
+    [Selector("name")] public NSString Name { get; }
+    [Selector("address")] public NSString Address { get; }
+    [Selector("port")] public NSUInteger Port { get; }
+    [Selector("netServiceName")] public NSString? NetServiceName { get; }
+    [Selector("netServiceDomain")] public NSString? NetServiceDomain { get; }
+    [Selector("hostWithName:address:port:")] public static Self HostWithNameAddressPort(NSString name, NSString address, NSUInteger port);
+    [Selector("hostWithName:netService:")] public static Self HostWithNameNetService(NSString name, NSNetService netService);
+    [Selector("hostWithName:netServiceName:netServiceDomain:")] public static Self HostWithNameNetServiceNameNetServiceDomain(NSString name, NSString netServiceName, NSString netServiceDomain);
+    [Selector("hasSameAddressAs:")] public bool HasSameAddressAs(MIDINetworkHost other);
+}
+
+public extern objc class MIDINetworkConnection : NSObject
+{
+    [Selector("host")] public MIDINetworkHost Host { get; }
+    [Selector("connectionWithHost:")] public static Self ConnectionWithHost(MIDINetworkHost host);
+}
+
+public extern objc class MIDINetworkSession : NSObject
+{
+    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
+    [Selector("networkPort")] public NSUInteger NetworkPort { get; }
+    [Selector("networkName")] public NSString NetworkName { get; }
+    [Selector("localName")] public NSString LocalName { get; }
+    [Selector("connectionPolicy", "setConnectionPolicy:")] public MIDINetworkConnectionPolicy ConnectionPolicy { get; set; }
+    [Selector("defaultSession")] public static MIDINetworkSession DefaultSession();
+    [Selector("contacts")] public NSSet Contacts();
+    [Selector("addContact:")] public bool AddContact(MIDINetworkHost contact);
+    [Selector("removeContact:")] public bool RemoveContact(MIDINetworkHost contact);
+    [Selector("connections")] public NSSet Connections();
+    [Selector("addConnection:")] public bool AddConnection(MIDINetworkConnection connection);
+    [Selector("removeConnection:")] public bool RemoveConnection(MIDINetworkConnection connection);
+    [Selector("sourceEndpoint")] public MIDIEndpointRef SourceEndpoint();
+    [Selector("destinationEndpoint")] public MIDIEndpointRef DestinationEndpoint();
 }
 
 #endif

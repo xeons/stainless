@@ -24,16 +24,17 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
 
-public delegate void* CFDictionaryRetainCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void* CFDictionaryRetainCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate void CFDictionaryReleaseCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void CFDictionaryReleaseCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate CFStringRef CFDictionaryCopyDescriptionCallBack(void* arg0);
+public delegate __CFString* CFDictionaryCopyDescriptionCallBack(void* arg0);
 
 public delegate Boolean CFDictionaryEqualCallBack(void* arg0, void* arg1);
 
@@ -68,46 +69,48 @@ public delegate void CFDictionaryApplierFunction(void* arg0, void* arg1, void* a
 
 public struct __CFDictionary;
 
-public using CFDictionaryRef = __CFDictionary*;
+[CFType("CFDictionaryGetTypeID")]
+public extern objc class CFDictionaryRef : CFTypeRef { }
 
-public using CFMutableDictionaryRef = __CFDictionary*;
+[CFType]
+public extern objc class CFMutableDictionaryRef : CFDictionaryRef { }
 
 public extern "C" CFTypeID CFDictionaryGetTypeID();
 
-public extern "C" CFDictionaryRef CFDictionaryCreate(CFAllocatorRef allocator, void** keys, void** values, CFIndex numValues, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFDictionaryCreate(CFAllocatorRef? allocator, void** keys, void** values, CFIndex numValues, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
 
-public extern "C" CFDictionaryRef CFDictionaryCreateCopy(CFAllocatorRef allocator, CFDictionaryRef theDict);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFDictionaryCreateCopy(CFAllocatorRef? allocator, CFDictionaryRef? theDict);
 
-public extern "C" CFMutableDictionaryRef CFDictionaryCreateMutable(CFAllocatorRef allocator, CFIndex capacity, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
+[ReturnsRetained] public extern "C" CFMutableDictionaryRef? CFDictionaryCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFDictionaryKeyCallBacks* keyCallBacks, CFDictionaryValueCallBacks* valueCallBacks);
 
-public extern "C" CFMutableDictionaryRef CFDictionaryCreateMutableCopy(CFAllocatorRef allocator, CFIndex capacity, CFDictionaryRef theDict);
+[ReturnsRetained] public extern "C" CFMutableDictionaryRef? CFDictionaryCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFDictionaryRef? theDict);
 
-public extern "C" CFIndex CFDictionaryGetCount(CFDictionaryRef theDict);
+public extern "C" CFIndex CFDictionaryGetCount(CFDictionaryRef? theDict);
 
-public extern "C" CFIndex CFDictionaryGetCountOfKey(CFDictionaryRef theDict, void* key);
+public extern "C" CFIndex CFDictionaryGetCountOfKey(CFDictionaryRef? theDict, void* key);
 
-public extern "C" CFIndex CFDictionaryGetCountOfValue(CFDictionaryRef theDict, void* value);
+public extern "C" CFIndex CFDictionaryGetCountOfValue(CFDictionaryRef? theDict, void* value);
 
-public extern "C" Boolean CFDictionaryContainsKey(CFDictionaryRef theDict, void* key);
+public extern "C" Boolean CFDictionaryContainsKey(CFDictionaryRef? theDict, void* key);
 
-public extern "C" Boolean CFDictionaryContainsValue(CFDictionaryRef theDict, void* value);
+public extern "C" Boolean CFDictionaryContainsValue(CFDictionaryRef? theDict, void* value);
 
-public extern "C" void* CFDictionaryGetValue(CFDictionaryRef theDict, void* key);
+public extern "C" void* CFDictionaryGetValue(CFDictionaryRef? theDict, void* key);
 
-public extern "C" Boolean CFDictionaryGetValueIfPresent(CFDictionaryRef theDict, void* key, void** value);
+public extern "C" Boolean CFDictionaryGetValueIfPresent(CFDictionaryRef? theDict, void* key, void** value);
 
-public extern "C" void CFDictionaryGetKeysAndValues(CFDictionaryRef theDict, void** keys, void** values);
+public extern "C" void CFDictionaryGetKeysAndValues(CFDictionaryRef? theDict, void** keys, void** values);
 
-public extern "C" void CFDictionaryApplyFunction(CFDictionaryRef theDict, CFDictionaryApplierFunction applier, void* context);
+public extern "C" void CFDictionaryApplyFunction(CFDictionaryRef? theDict, CFDictionaryApplierFunction applier, void* context);
 
-public extern "C" void CFDictionaryAddValue(CFMutableDictionaryRef theDict, void* key, void* value);
+public extern "C" void CFDictionaryAddValue(CFMutableDictionaryRef? theDict, void* key, void* value);
 
-public extern "C" void CFDictionarySetValue(CFMutableDictionaryRef theDict, void* key, void* value);
+public extern "C" void CFDictionarySetValue(CFMutableDictionaryRef? theDict, void* key, void* value);
 
-public extern "C" void CFDictionaryReplaceValue(CFMutableDictionaryRef theDict, void* key, void* value);
+public extern "C" void CFDictionaryReplaceValue(CFMutableDictionaryRef? theDict, void* key, void* value);
 
-public extern "C" void CFDictionaryRemoveValue(CFMutableDictionaryRef theDict, void* key);
+public extern "C" void CFDictionaryRemoveValue(CFMutableDictionaryRef? theDict, void* key);
 
-public extern "C" void CFDictionaryRemoveAllValues(CFMutableDictionaryRef theDict);
+public extern "C" void CFDictionaryRemoveAllValues(CFMutableDictionaryRef? theDict);
 
 #endif

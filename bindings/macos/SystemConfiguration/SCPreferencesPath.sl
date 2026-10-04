@@ -25,16 +25,17 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "SystemConfiguration")
 
-public extern "C" CFStringRef SCPreferencesPathCreateUniqueChild(SCPreferencesRef prefs, CFStringRef prefix);
+[ReturnsRetained] public extern "C" CFStringRef? SCPreferencesPathCreateUniqueChild(SCPreferencesRef prefs, CFStringRef prefix);
 
-public extern "C" CFDictionaryRef SCPreferencesPathGetValue(SCPreferencesRef prefs, CFStringRef path);
+public extern "C" CFDictionaryRef? SCPreferencesPathGetValue(SCPreferencesRef prefs, CFStringRef path);
 
-public extern "C" CFStringRef SCPreferencesPathGetLink(SCPreferencesRef prefs, CFStringRef path);
+public extern "C" CFStringRef? SCPreferencesPathGetLink(SCPreferencesRef prefs, CFStringRef path);
 
 public extern "C" Boolean SCPreferencesPathSetValue(SCPreferencesRef prefs, CFStringRef path, CFDictionaryRef value);
 

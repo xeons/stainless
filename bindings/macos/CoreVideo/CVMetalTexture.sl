@@ -24,7 +24,9 @@
 module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
+import MacOS.Metal;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,12 +36,14 @@ public using CVMetalTextureRef = CVImageBufferRef;
 
 public extern "C" CFTypeID CVMetalTextureGetTypeID();
 
+public extern "C" MTLTexture? CVMetalTextureGetTexture(CVMetalTextureRef image);
+
 public extern "C" Boolean CVMetalTextureIsFlipped(CVMetalTextureRef image);
 
 public extern "C" void CVMetalTextureGetCleanTexCoords(CVMetalTextureRef image, float* lowerLeft, float* lowerRight, float* upperRight, float* upperLeft);
 
-public extern "C" CFStringRef kCVMetalTextureUsage;
+public extern "C" CFStringRef? kCVMetalTextureUsage;
 
-public extern "C" CFStringRef kCVMetalTextureStorageMode;
+public extern "C" CFStringRef? kCVMetalTextureStorageMode;
 
 #endif

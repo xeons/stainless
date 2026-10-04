@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -172,7 +173,7 @@ public extern "C" OSAError OSAExecute(ComponentInstance scriptingComponent, OSAI
 
 public extern "C" OSAError OSADisplay(ComponentInstance scriptingComponent, OSAID scriptValueID, DescType desiredType, SInt32 modeFlags, AEDesc* resultingText);
 
-public extern "C" OSAError OSACopyDisplayString(ComponentInstance scriptingComponent, OSAID scriptID, SInt32 modeFlags, CFAttributedStringRef* result);
+public extern "C" OSAError OSACopyDisplayString(ComponentInstance scriptingComponent, OSAID scriptID, SInt32 modeFlags, __CFAttributedString** result);
 
 public extern "C" OSAError OSAScriptError(ComponentInstance scriptingComponent, OSType selector, DescType desiredType, AEDesc* resultingErrorDescription);
 
@@ -222,7 +223,7 @@ public extern "C" OSAError OSACopyScript(ComponentInstance scriptingComponent, O
 
 public extern "C" OSAError OSAGetSource(ComponentInstance scriptingComponent, OSAID scriptID, DescType desiredType, AEDesc* resultingSourceData);
 
-public extern "C" OSAError OSACopySourceString(ComponentInstance scriptingComponent, OSAID scriptID, SInt32 modeFlags, CFAttributedStringRef* result);
+public extern "C" OSAError OSACopySourceString(ComponentInstance scriptingComponent, OSAID scriptID, SInt32 modeFlags, __CFAttributedString** result);
 
 public extern "C" OSAError OSACoerceFromDesc(ComponentInstance scriptingComponent, AEDesc* scriptData, SInt32 modeFlags, OSAID* resultingScriptID);
 
@@ -274,9 +275,9 @@ public extern "C" OSAError OSADoEvent(ComponentInstance scriptingComponent, Appl
 
 public extern "C" OSAError OSAMakeContext(ComponentInstance scriptingComponent, AEDesc* contextName, OSAID parentContext, OSAID* resultingContextID);
 
-public extern "C" OSAError OSAGetScriptDataFromURL(CFURLRef scriptURL, Boolean* storable, SInt32 modeFlags, AEDesc* resultingScriptData);
+public extern "C" OSAError OSAGetScriptDataFromURL(CFURLRef? scriptURL, Boolean* storable, SInt32 modeFlags, AEDesc* resultingScriptData);
 
-public extern "C" OSAError OSALoadScriptData(ComponentInstance scriptingComponent, AEDesc* scriptData, CFURLRef fromURL, SInt32 modeFlags, OSAID* resultingScriptID);
+public extern "C" OSAError OSALoadScriptData(ComponentInstance scriptingComponent, AEDesc* scriptData, CFURLRef? fromURL, SInt32 modeFlags, OSAID* resultingScriptID);
 
 public extern "C" OSAError OSALoadFile(ComponentInstance scriptingComponent, FSRef* scriptFile, Boolean* storable, SInt32 modeFlags, OSAID* resultingScriptID);
 

@@ -24,6 +24,7 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -140,13 +141,16 @@ public extern "C" CFStringRef kSecCFErrorPath;
 
 public struct __SecCode;
 
-public using SecCodeRef = __SecCode*;
+[CFType]
+public extern objc class SecCodeRef : SecStaticCodeRef { }
 
-public using SecStaticCodeRef = __SecCode*;
+[CFType("SecStaticCodeGetTypeID")]
+public extern objc class SecStaticCodeRef : CFTypeRef { }
 
 public struct __SecRequirement;
 
-public using SecRequirementRef = __SecRequirement*;
+[CFType("SecRequirementGetTypeID")]
+public extern objc class SecRequirementRef : CFTypeRef { }
 
 public using SecGuestRef = uint;
 

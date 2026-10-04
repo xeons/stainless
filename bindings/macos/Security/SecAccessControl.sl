@@ -24,6 +24,7 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -48,6 +49,6 @@ public enum SecAccessControlCreateFlags : ulong
     ApplicationPassword = 2147483648u,
 }
 
-public extern "C" SecAccessControlRef SecAccessControlCreateWithFlags(CFAllocatorRef allocator, CFTypeRef protection, SecAccessControlCreateFlags flags, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecAccessControlRef? SecAccessControlCreateWithFlags(CFAllocatorRef? allocator, CFTypeRef protection, SecAccessControlCreateFlags flags, __CFError** error);
 
 #endif

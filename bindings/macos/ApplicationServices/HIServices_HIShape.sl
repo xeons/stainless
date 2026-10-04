@@ -26,6 +26,7 @@ module MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,9 +34,11 @@ import MacOS.System;
 
 public struct __HIShape;
 
-public using HIShapeRef = __HIShape*;
+[CFType("HIShapeGetTypeID")]
+public extern objc class HIShapeRef : CFTypeRef { }
 
-public using HIMutableShapeRef = __HIShape*;
+[CFType]
+public extern objc class HIMutableShapeRef : HIShapeRef { }
 
 public const int kHIShapeEnumerateInit = 1;
 public const int kHIShapeEnumerateRect = 2;
@@ -48,64 +51,64 @@ public const int kHIShapeParseFromRight = 2;
 public const int kHIShapeParseFromTopLeft = 0;
 public const int kHIShapeParseFromBottomRight = 3;
 
-public delegate OSStatus HIShapeEnumerateProcPtr(int arg0, HIShapeRef arg1, CGRect* arg2, void* arg3);
+public delegate OSStatus HIShapeEnumerateProcPtr(int arg0, __HIShape* arg1, CGRect* arg2, void* arg3);
 
 public extern "C" CFTypeID HIShapeGetTypeID();
 
-public extern "C" HIShapeRef HIShapeCreateEmpty();
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateEmpty();
 
-public extern "C" HIShapeRef HIShapeCreateWithQDRgn(RgnHandle inRgn);
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateWithQDRgn(RgnHandle inRgn);
 
-public extern "C" HIShapeRef HIShapeCreateWithRect(CGRect* inRect);
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateWithRect(CGRect* inRect);
 
-public extern "C" HIShapeRef HIShapeCreateCopy(HIShapeRef inShape);
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateCopy(HIShapeRef? inShape);
 
-public extern "C" HIShapeRef HIShapeCreateIntersection(HIShapeRef inShape1, HIShapeRef inShape2);
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateIntersection(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
-public extern "C" HIShapeRef HIShapeCreateDifference(HIShapeRef inShape1, HIShapeRef inShape2);
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateDifference(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
-public extern "C" HIShapeRef HIShapeCreateUnion(HIShapeRef inShape1, HIShapeRef inShape2);
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateUnion(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
-public extern "C" HIShapeRef HIShapeCreateXor(HIShapeRef inShape1, HIShapeRef inShape2);
+[ReturnsRetained] public extern "C" HIShapeRef? HIShapeCreateXor(HIShapeRef? inShape1, HIShapeRef? inShape2);
 
-public extern "C" Boolean HIShapeIsEmpty(HIShapeRef inShape);
+public extern "C" Boolean HIShapeIsEmpty(HIShapeRef? inShape);
 
-public extern "C" Boolean HIShapeIsRectangular(HIShapeRef inShape);
+public extern "C" Boolean HIShapeIsRectangular(HIShapeRef? inShape);
 
-public extern "C" Boolean HIShapeContainsPoint(HIShapeRef inShape, CGPoint* inPoint);
+public extern "C" Boolean HIShapeContainsPoint(HIShapeRef? inShape, CGPoint* inPoint);
 
-public extern "C" Boolean HIShapeIntersectsRect(HIShapeRef inShape, CGRect* inRect);
+public extern "C" Boolean HIShapeIntersectsRect(HIShapeRef? inShape, CGRect* inRect);
 
-public extern "C" CGRect* HIShapeGetBounds(HIShapeRef inShape, CGRect* outRect);
+public extern "C" CGRect* HIShapeGetBounds(HIShapeRef? inShape, CGRect* outRect);
 
-public extern "C" OSStatus HIShapeGetAsQDRgn(HIShapeRef inShape, RgnHandle outRgn);
+public extern "C" OSStatus HIShapeGetAsQDRgn(HIShapeRef? inShape, RgnHandle outRgn);
 
-public extern "C" OSStatus HIShapeReplacePathInCGContext(HIShapeRef inShape, CGContextRef inContext);
+public extern "C" OSStatus HIShapeReplacePathInCGContext(HIShapeRef? inShape, CGContextRef? inContext);
 
-public extern "C" OSStatus HIShapeEnumerate(HIShapeRef inShape, OptionBits inOptions, HIShapeEnumerateProcPtr inProc, void* inRefcon);
+public extern "C" OSStatus HIShapeEnumerate(HIShapeRef? inShape, OptionBits inOptions, HIShapeEnumerateProcPtr inProc, void* inRefcon);
 
-public extern "C" HIMutableShapeRef HIShapeCreateMutable();
+[ReturnsRetained] public extern "C" HIMutableShapeRef? HIShapeCreateMutable();
 
-public extern "C" HIMutableShapeRef HIShapeCreateMutableCopy(HIShapeRef inOrig);
+[ReturnsRetained] public extern "C" HIMutableShapeRef? HIShapeCreateMutableCopy(HIShapeRef? inOrig);
 
-public extern "C" HIMutableShapeRef HIShapeCreateMutableWithRect(CGRect* inRect);
+[ReturnsRetained] public extern "C" HIMutableShapeRef? HIShapeCreateMutableWithRect(CGRect* inRect);
 
-public extern "C" OSStatus HIShapeSetEmpty(HIMutableShapeRef inShape);
+public extern "C" OSStatus HIShapeSetEmpty(HIMutableShapeRef? inShape);
 
-public extern "C" OSStatus HIShapeSetWithShape(HIMutableShapeRef inDestShape, HIShapeRef inSrcShape);
+public extern "C" OSStatus HIShapeSetWithShape(HIMutableShapeRef? inDestShape, HIShapeRef? inSrcShape);
 
-public extern "C" OSStatus HIShapeIntersect(HIShapeRef inShape1, HIShapeRef inShape2, HIMutableShapeRef outResult);
+public extern "C" OSStatus HIShapeIntersect(HIShapeRef? inShape1, HIShapeRef? inShape2, HIMutableShapeRef? outResult);
 
-public extern "C" OSStatus HIShapeDifference(HIShapeRef inShape1, HIShapeRef inShape2, HIMutableShapeRef outResult);
+public extern "C" OSStatus HIShapeDifference(HIShapeRef? inShape1, HIShapeRef? inShape2, HIMutableShapeRef? outResult);
 
-public extern "C" OSStatus HIShapeUnion(HIShapeRef inShape1, HIShapeRef inShape2, HIMutableShapeRef outResult);
+public extern "C" OSStatus HIShapeUnion(HIShapeRef? inShape1, HIShapeRef? inShape2, HIMutableShapeRef? outResult);
 
-public extern "C" OSStatus HIShapeXor(HIShapeRef inShape1, HIShapeRef inShape2, HIMutableShapeRef outResult);
+public extern "C" OSStatus HIShapeXor(HIShapeRef? inShape1, HIShapeRef? inShape2, HIMutableShapeRef? outResult);
 
-public extern "C" OSStatus HIShapeOffset(HIMutableShapeRef inShape, CGFloat inDX, CGFloat inDY);
+public extern "C" OSStatus HIShapeOffset(HIMutableShapeRef? inShape, CGFloat inDX, CGFloat inDY);
 
-public extern "C" OSStatus HIShapeInset(HIMutableShapeRef inShape, CGFloat inDX, CGFloat inDY);
+public extern "C" OSStatus HIShapeInset(HIMutableShapeRef? inShape, CGFloat inDX, CGFloat inDY);
 
-public extern "C" OSStatus HIShapeUnionWithRect(HIMutableShapeRef inShape, CGRect* inRect);
+public extern "C" OSStatus HIShapeUnionWithRect(HIMutableShapeRef? inShape, CGRect* inRect);
 
 #endif

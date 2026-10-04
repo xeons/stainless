@@ -24,16 +24,17 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
 
-public delegate void* CFSetRetainCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void* CFSetRetainCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate void CFSetReleaseCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void CFSetReleaseCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate CFStringRef CFSetCopyDescriptionCallBack(void* arg0);
+public delegate __CFString* CFSetCopyDescriptionCallBack(void* arg0);
 
 public delegate Boolean CFSetEqualCallBack(void* arg0, void* arg1);
 
@@ -57,42 +58,44 @@ public delegate void CFSetApplierFunction(void* arg0, void* arg1);
 
 public struct __CFSet;
 
-public using CFSetRef = __CFSet*;
+[CFType("CFSetGetTypeID")]
+public extern objc class CFSetRef : CFTypeRef { }
 
-public using CFMutableSetRef = __CFSet*;
+[CFType]
+public extern objc class CFMutableSetRef : CFSetRef { }
 
 public extern "C" CFTypeID CFSetGetTypeID();
 
-public extern "C" CFSetRef CFSetCreate(CFAllocatorRef allocator, void** values, CFIndex numValues, CFSetCallBacks* callBacks);
+[ReturnsRetained] public extern "C" CFSetRef? CFSetCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFSetCallBacks* callBacks);
 
-public extern "C" CFSetRef CFSetCreateCopy(CFAllocatorRef allocator, CFSetRef theSet);
+[ReturnsRetained] public extern "C" CFSetRef? CFSetCreateCopy(CFAllocatorRef? allocator, CFSetRef? theSet);
 
-public extern "C" CFMutableSetRef CFSetCreateMutable(CFAllocatorRef allocator, CFIndex capacity, CFSetCallBacks* callBacks);
+[ReturnsRetained] public extern "C" CFMutableSetRef? CFSetCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFSetCallBacks* callBacks);
 
-public extern "C" CFMutableSetRef CFSetCreateMutableCopy(CFAllocatorRef allocator, CFIndex capacity, CFSetRef theSet);
+[ReturnsRetained] public extern "C" CFMutableSetRef? CFSetCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFSetRef? theSet);
 
-public extern "C" CFIndex CFSetGetCount(CFSetRef theSet);
+public extern "C" CFIndex CFSetGetCount(CFSetRef? theSet);
 
-public extern "C" CFIndex CFSetGetCountOfValue(CFSetRef theSet, void* value);
+public extern "C" CFIndex CFSetGetCountOfValue(CFSetRef? theSet, void* value);
 
-public extern "C" Boolean CFSetContainsValue(CFSetRef theSet, void* value);
+public extern "C" Boolean CFSetContainsValue(CFSetRef? theSet, void* value);
 
-public extern "C" void* CFSetGetValue(CFSetRef theSet, void* value);
+public extern "C" void* CFSetGetValue(CFSetRef? theSet, void* value);
 
-public extern "C" Boolean CFSetGetValueIfPresent(CFSetRef theSet, void* candidate, void** value);
+public extern "C" Boolean CFSetGetValueIfPresent(CFSetRef? theSet, void* candidate, void** value);
 
-public extern "C" void CFSetGetValues(CFSetRef theSet, void** values);
+public extern "C" void CFSetGetValues(CFSetRef? theSet, void** values);
 
-public extern "C" void CFSetApplyFunction(CFSetRef theSet, CFSetApplierFunction applier, void* context);
+public extern "C" void CFSetApplyFunction(CFSetRef? theSet, CFSetApplierFunction applier, void* context);
 
-public extern "C" void CFSetAddValue(CFMutableSetRef theSet, void* value);
+public extern "C" void CFSetAddValue(CFMutableSetRef? theSet, void* value);
 
-public extern "C" void CFSetReplaceValue(CFMutableSetRef theSet, void* value);
+public extern "C" void CFSetReplaceValue(CFMutableSetRef? theSet, void* value);
 
-public extern "C" void CFSetSetValue(CFMutableSetRef theSet, void* value);
+public extern "C" void CFSetSetValue(CFMutableSetRef? theSet, void* value);
 
-public extern "C" void CFSetRemoveValue(CFMutableSetRef theSet, void* value);
+public extern "C" void CFSetRemoveValue(CFMutableSetRef? theSet, void* value);
 
-public extern "C" void CFSetRemoveAllValues(CFMutableSetRef theSet);
+public extern "C" void CFSetRemoveAllValues(CFMutableSetRef? theSet);
 
 #endif

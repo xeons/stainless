@@ -24,34 +24,35 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreGraphics")
 
-public extern "C" CGContextRef CGPDFContextCreate(CGDataConsumerRef consumer, CGRect* mediaBox, CFDictionaryRef auxiliaryInfo);
+[ReturnsRetained] public extern "C" CGContextRef? CGPDFContextCreate(CGDataConsumerRef? consumer, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo);
 
-public extern "C" CGContextRef CGPDFContextCreateWithURL(CFURLRef url, CGRect* mediaBox, CFDictionaryRef auxiliaryInfo);
+[ReturnsRetained] public extern "C" CGContextRef? CGPDFContextCreateWithURL(CFURLRef? url, CGRect* mediaBox, CFDictionaryRef? auxiliaryInfo);
 
-public extern "C" void CGPDFContextClose(CGContextRef context);
+public extern "C" void CGPDFContextClose(CGContextRef? context);
 
-public extern "C" void CGPDFContextBeginPage(CGContextRef context, CFDictionaryRef pageInfo);
+public extern "C" void CGPDFContextBeginPage(CGContextRef? context, CFDictionaryRef? pageInfo);
 
-public extern "C" void CGPDFContextEndPage(CGContextRef context);
+public extern "C" void CGPDFContextEndPage(CGContextRef? context);
 
-public extern "C" void CGPDFContextAddDocumentMetadata(CGContextRef context, CFDataRef metadata);
+public extern "C" void CGPDFContextAddDocumentMetadata(CGContextRef? context, CFDataRef? metadata);
 
-public extern "C" void CGPDFContextSetParentTree(CGContextRef context, CGPDFDictionaryRef parentTreeDictionary);
+public extern "C" void CGPDFContextSetParentTree(CGContextRef? context, CGPDFDictionaryRef parentTreeDictionary);
 
-public extern "C" void CGPDFContextSetIDTree(CGContextRef context, CGPDFDictionaryRef IDTreeDictionary);
+public extern "C" void CGPDFContextSetIDTree(CGContextRef? context, CGPDFDictionaryRef IDTreeDictionary);
 
-public extern "C" void CGPDFContextSetPageTagStructureTree(CGContextRef context, CFDictionaryRef pageTagStructureTreeDictionary);
+public extern "C" void CGPDFContextSetPageTagStructureTree(CGContextRef? context, CFDictionaryRef pageTagStructureTreeDictionary);
 
-public extern "C" void CGPDFContextSetURLForRect(CGContextRef context, CFURLRef url, CGRect rect);
+public extern "C" void CGPDFContextSetURLForRect(CGContextRef? context, CFURLRef url, CGRect rect);
 
-public extern "C" void CGPDFContextAddDestinationAtPoint(CGContextRef context, CFStringRef name, CGPoint point);
+public extern "C" void CGPDFContextAddDestinationAtPoint(CGContextRef? context, CFStringRef name, CGPoint point);
 
-public extern "C" void CGPDFContextSetDestinationForRect(CGContextRef context, CFStringRef name, CGRect rect);
+public extern "C" void CGPDFContextSetDestinationForRect(CGContextRef? context, CFStringRef name, CGRect rect);
 
 public extern "C" CFStringRef kCGPDFContextMediaBox;
 
@@ -101,7 +102,7 @@ public extern "C" CFStringRef kCGPDFContextOutputIntents;
 
 public extern "C" CFStringRef kCGPDFContextAccessPermissions;
 
-public extern "C" void CGPDFContextSetOutline(CGContextRef context, CFDictionaryRef outline);
+public extern "C" void CGPDFContextSetOutline(CGContextRef context, CFDictionaryRef? outline);
 
 public extern "C" CFStringRef kCGPDFContextCreateLinearizedPDF;
 
@@ -173,7 +174,7 @@ public extern "C" CGPDFTagProperty kCGPDFTagPropertyTitleText;
 
 public extern "C" CGPDFTagProperty kCGPDFTagPropertyLanguageText;
 
-public extern "C" void CGPDFContextBeginTag(CGContextRef context, CGPDFTagType tagType, CFDictionaryRef tagProperties);
+public extern "C" void CGPDFContextBeginTag(CGContextRef context, CGPDFTagType tagType, CFDictionaryRef? tagProperties);
 
 public extern "C" void CGPDFContextEndTag(CGContextRef context);
 

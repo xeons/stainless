@@ -25,6 +25,7 @@ module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct __CFHost;
 
-public using CFHostRef = __CFHost*;
+[CFType("CFHostGetTypeID")]
+public extern objc class CFHostRef : CFTypeRef { }
 
 public extern "C" SInt32 kCFStreamErrorDomainNetDB;
 
@@ -55,31 +57,31 @@ public struct CFHostClientContext
     public CFAllocatorCopyDescriptionCallBack copyDescription;
 }
 
-public delegate void CFHostClientCallBack(CFHostRef arg0, CFHostInfoType arg1, CFStreamError* arg2, void* arg3);
+public delegate void CFHostClientCallBack(__CFHost* arg0, CFHostInfoType arg1, CFStreamError* arg2, void* arg3);
 
 /// Deprecated in macOS 100000.
 public extern "C" CFTypeID CFHostGetTypeID();
 
 /// Deprecated in macOS 100000.
-public extern "C" CFHostRef CFHostCreateWithName(CFAllocatorRef allocator, CFStringRef hostname);
+[ReturnsRetained] public extern "C" CFHostRef CFHostCreateWithName(CFAllocatorRef? allocator, CFStringRef hostname);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFHostRef CFHostCreateWithAddress(CFAllocatorRef allocator, CFDataRef addr);
+[ReturnsRetained] public extern "C" CFHostRef CFHostCreateWithAddress(CFAllocatorRef? allocator, CFDataRef addr);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFHostRef CFHostCreateCopy(CFAllocatorRef alloc, CFHostRef host);
+[ReturnsRetained] public extern "C" CFHostRef CFHostCreateCopy(CFAllocatorRef? alloc, CFHostRef host);
 
 /// Deprecated in macOS 100000.
 public extern "C" Boolean CFHostStartInfoResolution(CFHostRef theHost, CFHostInfoType info, CFStreamError* error);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFArrayRef CFHostGetAddressing(CFHostRef theHost, Boolean* hasBeenResolved);
+public extern "C" CFArrayRef? CFHostGetAddressing(CFHostRef theHost, Boolean* hasBeenResolved);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFArrayRef CFHostGetNames(CFHostRef theHost, Boolean* hasBeenResolved);
+public extern "C" CFArrayRef? CFHostGetNames(CFHostRef theHost, Boolean* hasBeenResolved);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFDataRef CFHostGetReachability(CFHostRef theHost, Boolean* hasBeenResolved);
+public extern "C" CFDataRef? CFHostGetReachability(CFHostRef theHost, Boolean* hasBeenResolved);
 
 /// Deprecated in macOS 100000.
 public extern "C" void CFHostCancelInfoResolution(CFHostRef theHost, CFHostInfoType info);

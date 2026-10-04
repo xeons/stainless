@@ -26,6 +26,7 @@ module MacOS.VideoToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,9 +34,10 @@ import MacOS.System;
 
 public struct OpaqueVTPixelTransferSession;
 
-public using VTPixelTransferSessionRef = OpaqueVTPixelTransferSession*;
+[CFType("VTPixelTransferSessionGetTypeID")]
+public extern objc class VTPixelTransferSessionRef : CFTypeRef { }
 
-public extern "C" OSStatus VTPixelTransferSessionCreate(CFAllocatorRef allocator, VTPixelTransferSessionRef* pixelTransferSessionOut);
+public extern "C" OSStatus VTPixelTransferSessionCreate(CFAllocatorRef? allocator, OpaqueVTPixelTransferSession** pixelTransferSessionOut);
 
 public extern "C" void VTPixelTransferSessionInvalidate(VTPixelTransferSessionRef session);
 

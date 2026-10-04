@@ -24,14 +24,15 @@
 module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CFNetwork")
 
-public extern "C" CFStringRef kCFErrorDomainCFNetwork;
+public extern "C" CFStringRef? kCFErrorDomainCFNetwork;
 
-public extern "C" CFStringRef kCFErrorDomainWinSock;
+public extern "C" CFStringRef? kCFErrorDomainWinSock;
 
 public enum CFNetworkErrors : int
 {
@@ -121,20 +122,20 @@ public enum CFNetworkErrors : int
     NetServiceErrorDNSServiceFailure = -73000,
 }
 
-public extern "C" CFStringRef kCFURLErrorFailingURLErrorKey;
+public extern "C" CFStringRef? kCFURLErrorFailingURLErrorKey;
 
-public extern "C" CFStringRef kCFURLErrorFailingURLStringErrorKey;
+public extern "C" CFStringRef? kCFURLErrorFailingURLStringErrorKey;
 
-public extern "C" CFStringRef kCFGetAddrInfoFailureKey;
+public extern "C" CFStringRef? kCFGetAddrInfoFailureKey;
 
-public extern "C" CFStringRef kCFSOCKSStatusCodeKey;
+public extern "C" CFStringRef? kCFSOCKSStatusCodeKey;
 
-public extern "C" CFStringRef kCFSOCKSVersionKey;
+public extern "C" CFStringRef? kCFSOCKSVersionKey;
 
-public extern "C" CFStringRef kCFSOCKSNegotiationMethodKey;
+public extern "C" CFStringRef? kCFSOCKSNegotiationMethodKey;
 
-public extern "C" CFStringRef kCFDNSServiceFailureKey;
+public extern "C" CFStringRef? kCFDNSServiceFailureKey;
 
-public extern "C" CFStringRef kCFFTPStatusCodeKey;
+public extern "C" CFStringRef? kCFFTPStatusCodeKey;
 
 #endif

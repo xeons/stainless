@@ -26,6 +26,7 @@ module MacOS.AudioToolbox;
 import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -141,7 +142,7 @@ public using AudioQueueProcessingTapRef = OpaqueAudioQueueProcessingTap*;
 
 public struct AudioQueueChannelAssignment
 {
-    public CFStringRef mDeviceUID;
+    public __CFString* mDeviceUID;
     public UInt32 mChannelNumber;
 }
 
@@ -157,9 +158,13 @@ public delegate void AudioQueuePropertyListenerProc(void* arg0, AudioQueueRef ar
 
 public delegate void AudioQueueProcessingTapCallback(void* arg0, AudioQueueProcessingTapRef arg1, UInt32 arg2, AudioTimeStamp* arg3, AudioQueueProcessingTapFlags* arg4, UInt32* arg5, AudioBufferList* arg6);
 
-public extern "C" OSStatus AudioQueueNewOutput(AudioStreamBasicDescription* inFormat, AudioQueueOutputCallback inCallbackProc, void* inUserData, CFRunLoopRef inCallbackRunLoop, CFStringRef inCallbackRunLoopMode, UInt32 inFlags, AudioQueueRef* outAQ);
+public extern "C" OSStatus AudioQueueNewOutput(AudioStreamBasicDescription* inFormat, AudioQueueOutputCallback inCallbackProc, void* inUserData, CFRunLoopRef? inCallbackRunLoop, CFStringRef? inCallbackRunLoopMode, UInt32 inFlags, AudioQueueRef* outAQ);
 
-public extern "C" OSStatus AudioQueueNewInput(AudioStreamBasicDescription* inFormat, AudioQueueInputCallback inCallbackProc, void* inUserData, CFRunLoopRef inCallbackRunLoop, CFStringRef inCallbackRunLoopMode, UInt32 inFlags, AudioQueueRef* outAQ);
+public extern "C" OSStatus AudioQueueNewInput(AudioStreamBasicDescription* inFormat, AudioQueueInputCallback inCallbackProc, void* inUserData, CFRunLoopRef? inCallbackRunLoop, CFStringRef? inCallbackRunLoopMode, UInt32 inFlags, AudioQueueRef* outAQ);
+
+public extern "C" OSStatus AudioQueueNewOutputWithDispatchQueue(AudioQueueRef* outAQ, AudioStreamBasicDescription* inFormat, UInt32 inFlags, dispatch_queue_t inCallbackDispatchQueue, AudioQueueOutputCallbackBlock inCallbackBlock);
+
+public extern "C" OSStatus AudioQueueNewInputWithDispatchQueue(AudioQueueRef* outAQ, AudioStreamBasicDescription* inFormat, UInt32 inFlags, dispatch_queue_t inCallbackDispatchQueue, AudioQueueInputCallbackBlock inCallbackBlock);
 
 public extern "C" OSStatus AudioQueueDispose(AudioQueueRef inAQ, Boolean inImmediate);
 

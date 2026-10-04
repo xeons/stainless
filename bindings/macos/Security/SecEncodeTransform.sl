@@ -24,36 +24,37 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Security")
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecBase64Encoding;
+public extern "C" CFStringRef? kSecBase64Encoding;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecBase32Encoding;
+public extern "C" CFStringRef? kSecBase32Encoding;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecZLibEncoding;
+public extern "C" CFStringRef? kSecZLibEncoding;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecEncodeTypeAttribute;
+public extern "C" CFStringRef? kSecEncodeTypeAttribute;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecLineLength64;
+public extern "C" CFStringRef? kSecLineLength64;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecLineLength76;
+public extern "C" CFStringRef? kSecLineLength76;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecEncodeLineLengthAttribute;
+public extern "C" CFStringRef? kSecEncodeLineLengthAttribute;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecCompressionRatio;
+public extern "C" CFStringRef? kSecCompressionRatio;
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecEncodeTransformCreate(CFTypeRef encodeType, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef? SecEncodeTransformCreate(CFTypeRef encodeType, __CFError** error);
 
 #endif

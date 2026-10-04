@@ -26,6 +26,7 @@ module MacOS.ForceFeedback;
 import MacOS.CoreFoundation;
 import MacOS.IOKit;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -157,7 +158,7 @@ public extern "C" HRESULT FFReleaseDevice(FFDeviceObjectReference deviceReferenc
 
 public extern "C" HRESULT FFIsForceFeedback(io_service_t hidDevice);
 
-public extern "C" HRESULT FFDeviceCreateEffect(FFDeviceObjectReference deviceReference, CFUUIDRef uuidRef, FFEFFECT* pEffectDefinition, FFEffectObjectReference* pEffectReference);
+public extern "C" HRESULT FFDeviceCreateEffect(FFDeviceObjectReference deviceReference, CFUUIDRef? uuidRef, FFEFFECT* pEffectDefinition, FFEffectObjectReference* pEffectReference);
 
 public extern "C" HRESULT FFDeviceReleaseEffect(FFDeviceObjectReference deviceReference, FFEffectObjectReference effectReference);
 

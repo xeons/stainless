@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -84,7 +85,7 @@ public extern "C" CFTypeID SecKeychainItemGetTypeID();
 public extern "C" OSStatus SecKeychainItemModifyAttributesAndData(SecKeychainItemRef itemRef, SecKeychainAttributeList* attrList, UInt32 length, void* data);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainItemCreateFromContent(SecItemClass itemClass, SecKeychainAttributeList* attrList, UInt32 length, void* data, SecKeychainRef keychainRef, SecAccessRef initialAccess, SecKeychainItemRef* itemRef);
+public extern "C" OSStatus SecKeychainItemCreateFromContent(SecItemClass itemClass, SecKeychainAttributeList* attrList, UInt32 length, void* data, SecKeychainRef? keychainRef, SecAccessRef? initialAccess, __SecKeychainItem** itemRef);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecKeychainItemModifyContent(SecKeychainItemRef itemRef, SecKeychainAttributeList* attrList, UInt32 length, void* data);
@@ -105,16 +106,16 @@ public extern "C" OSStatus SecKeychainItemFreeAttributesAndData(SecKeychainAttri
 public extern "C" OSStatus SecKeychainItemDelete(SecKeychainItemRef itemRef);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainItemCopyKeychain(SecKeychainItemRef itemRef, SecKeychainRef* keychainRef);
+public extern "C" OSStatus SecKeychainItemCopyKeychain(SecKeychainItemRef itemRef, __SecKeychain** keychainRef);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainItemCreateCopy(SecKeychainItemRef itemRef, SecKeychainRef destKeychainRef, SecAccessRef initialAccess, SecKeychainItemRef* itemCopy);
+public extern "C" OSStatus SecKeychainItemCreateCopy(SecKeychainItemRef itemRef, SecKeychainRef? destKeychainRef, SecAccessRef? initialAccess, __SecKeychainItem** itemCopy);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainItemCreatePersistentReference(SecKeychainItemRef itemRef, CFDataRef* persistentItemRef);
+public extern "C" OSStatus SecKeychainItemCreatePersistentReference(SecKeychainItemRef itemRef, __CFData** persistentItemRef);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainItemCopyFromPersistentReference(CFDataRef persistentItemRef, SecKeychainItemRef* itemRef);
+public extern "C" OSStatus SecKeychainItemCopyFromPersistentReference(CFDataRef persistentItemRef, __SecKeychainItem** itemRef);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecKeychainItemGetDLDBHandle(SecKeychainItemRef keyItemRef, CSSM_DL_DB_HANDLE* dldbHandle);
@@ -123,7 +124,7 @@ public extern "C" OSStatus SecKeychainItemGetDLDBHandle(SecKeychainItemRef keyIt
 public extern "C" OSStatus SecKeychainItemGetUniqueRecordID(SecKeychainItemRef itemRef, CSSM_DB_UNIQUE_RECORD** uniqueRecordID);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainItemCopyAccess(SecKeychainItemRef itemRef, SecAccessRef* access);
+public extern "C" OSStatus SecKeychainItemCopyAccess(SecKeychainItemRef itemRef, __SecAccess** access);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecKeychainItemSetAccess(SecKeychainItemRef itemRef, SecAccessRef access);

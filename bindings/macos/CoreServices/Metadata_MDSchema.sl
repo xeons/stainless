@@ -24,33 +24,34 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreServices")
 
-public extern "C" CFDictionaryRef MDSchemaCopyAttributesForContentType(CFStringRef contentTypeUTI);
+[ReturnsRetained] public extern "C" CFDictionaryRef? MDSchemaCopyAttributesForContentType(CFStringRef? contentTypeUTI);
 
-public extern "C" CFDictionaryRef MDSchemaCopyMetaAttributesForAttribute(CFStringRef name);
+[ReturnsRetained] public extern "C" CFDictionaryRef? MDSchemaCopyMetaAttributesForAttribute(CFStringRef? name);
 
-public extern "C" CFArrayRef MDSchemaCopyAllAttributes();
+[ReturnsRetained] public extern "C" CFArrayRef? MDSchemaCopyAllAttributes();
 
-public extern "C" CFStringRef MDSchemaCopyDisplayNameForAttribute(CFStringRef name);
+[ReturnsRetained] public extern "C" CFStringRef? MDSchemaCopyDisplayNameForAttribute(CFStringRef? name);
 
-public extern "C" CFStringRef MDSchemaCopyDisplayDescriptionForAttribute(CFStringRef name);
+[ReturnsRetained] public extern "C" CFStringRef? MDSchemaCopyDisplayDescriptionForAttribute(CFStringRef? name);
 
-public extern "C" CFStringRef kMDAttributeDisplayValues;
+public extern "C" CFStringRef? kMDAttributeDisplayValues;
 
-public extern "C" CFStringRef kMDAttributeAllValues;
+public extern "C" CFStringRef? kMDAttributeAllValues;
 
-public extern "C" CFStringRef kMDAttributeReadOnlyValues;
+public extern "C" CFStringRef? kMDAttributeReadOnlyValues;
 
-public extern "C" CFStringRef kMDExporterAvaliable;
+public extern "C" CFStringRef? kMDExporterAvaliable;
 
-public extern "C" CFStringRef kMDAttributeName;
+public extern "C" CFStringRef? kMDAttributeName;
 
-public extern "C" CFStringRef kMDAttributeType;
+public extern "C" CFStringRef? kMDAttributeType;
 
-public extern "C" CFStringRef kMDAttributeMultiValued;
+public extern "C" CFStringRef? kMDAttributeMultiValued;
 
 #endif

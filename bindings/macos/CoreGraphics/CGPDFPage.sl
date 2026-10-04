@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGPDFPage;
 
-public using CGPDFPageRef = CGPDFPage*;
+[CFType("CGPDFPageGetTypeID")]
+public extern objc class CGPDFPageRef : CFTypeRef { }
 
 public enum CGPDFBox : int
 {
@@ -42,21 +44,17 @@ public enum CGPDFBox : int
     ArtBox = 4,
 }
 
-public extern "C" CGPDFPageRef CGPDFPageRetain(CGPDFPageRef page);
+public extern "C" CGPDFDocumentRef? CGPDFPageGetDocument(CGPDFPageRef? page);
 
-public extern "C" void CGPDFPageRelease(CGPDFPageRef page);
+public extern "C" nuint CGPDFPageGetPageNumber(CGPDFPageRef? page);
 
-public extern "C" CGPDFDocumentRef CGPDFPageGetDocument(CGPDFPageRef page);
+public extern "C" CGRect CGPDFPageGetBoxRect(CGPDFPageRef? page, CGPDFBox box);
 
-public extern "C" nuint CGPDFPageGetPageNumber(CGPDFPageRef page);
+public extern "C" int CGPDFPageGetRotationAngle(CGPDFPageRef? page);
 
-public extern "C" CGRect CGPDFPageGetBoxRect(CGPDFPageRef page, CGPDFBox box);
+public extern "C" CGAffineTransform CGPDFPageGetDrawingTransform(CGPDFPageRef? page, CGPDFBox box, CGRect rect, int rotate, bool preserveAspectRatio);
 
-public extern "C" int CGPDFPageGetRotationAngle(CGPDFPageRef page);
-
-public extern "C" CGAffineTransform CGPDFPageGetDrawingTransform(CGPDFPageRef page, CGPDFBox box, CGRect rect, int rotate, bool preserveAspectRatio);
-
-public extern "C" CGPDFDictionaryRef CGPDFPageGetDictionary(CGPDFPageRef page);
+public extern "C" CGPDFDictionaryRef CGPDFPageGetDictionary(CGPDFPageRef? page);
 
 public extern "C" CFTypeID CGPDFPageGetTypeID();
 

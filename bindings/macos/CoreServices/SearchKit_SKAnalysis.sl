@@ -24,28 +24,29 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreServices")
 
-public extern "C" CFStringRef kSKMinTermLength;
+public extern "C" CFStringRef? kSKMinTermLength;
 
-public extern "C" CFStringRef kSKSubstitutions;
+public extern "C" CFStringRef? kSKSubstitutions;
 
-public extern "C" CFStringRef kSKStopWords;
+public extern "C" CFStringRef? kSKStopWords;
 
-public extern "C" CFStringRef kSKProximityIndexing;
+public extern "C" CFStringRef? kSKProximityIndexing;
 
-public extern "C" CFStringRef kSKMaximumTerms;
+public extern "C" CFStringRef? kSKMaximumTerms;
 
-public extern "C" CFStringRef kSKTermChars;
+public extern "C" CFStringRef? kSKTermChars;
 
-public extern "C" CFStringRef kSKStartTermChars;
+public extern "C" CFStringRef? kSKStartTermChars;
 
-public extern "C" CFStringRef kSKEndTermChars;
+public extern "C" CFStringRef? kSKEndTermChars;
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFStringRef kSKLanguageTypes;
+public extern "C" CFStringRef? kSKLanguageTypes;
 
 #endif

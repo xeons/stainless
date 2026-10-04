@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGPattern;
 
-public using CGPatternRef = CGPattern*;
+[CFType("CGPatternGetTypeID")]
+public extern objc class CGPatternRef : CFTypeRef { }
 
 public enum CGPatternTiling : int
 {
@@ -40,7 +42,7 @@ public enum CGPatternTiling : int
     ConstantSpacing = 2,
 }
 
-public delegate void CGPatternDrawPatternCallback(void* arg0, CGContextRef arg1);
+public delegate void CGPatternDrawPatternCallback(void* arg0, CGContext* arg1);
 
 public delegate void CGPatternReleaseInfoCallback(void* arg0);
 
@@ -53,10 +55,6 @@ public struct CGPatternCallbacks
 
 public extern "C" CFTypeID CGPatternGetTypeID();
 
-public extern "C" CGPatternRef CGPatternCreate(void* info, CGRect bounds, CGAffineTransform matrix, CGFloat xStep, CGFloat yStep, CGPatternTiling tiling, bool isColored, CGPatternCallbacks* callbacks);
-
-public extern "C" CGPatternRef CGPatternRetain(CGPatternRef pattern);
-
-public extern "C" void CGPatternRelease(CGPatternRef pattern);
+[ReturnsRetained] public extern "C" CGPatternRef? CGPatternCreate(void* info, CGRect bounds, CGAffineTransform matrix, CGFloat xStep, CGFloat yStep, CGPatternTiling tiling, bool isColored, CGPatternCallbacks* callbacks);
 
 #endif

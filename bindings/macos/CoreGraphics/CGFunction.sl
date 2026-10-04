@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGFunction;
 
-public using CGFunctionRef = CGFunction*;
+[CFType("CGFunctionGetTypeID")]
+public extern objc class CGFunctionRef : CFTypeRef { }
 
 public delegate void CGFunctionEvaluateCallback(void* arg0, CGFloat* arg1, CGFloat* arg2);
 
@@ -46,10 +48,6 @@ public struct CGFunctionCallbacks
 
 public extern "C" CFTypeID CGFunctionGetTypeID();
 
-public extern "C" CGFunctionRef CGFunctionCreate(void* info, nuint domainDimension, CGFloat* domain, nuint rangeDimension, CGFloat* range, CGFunctionCallbacks* callbacks);
-
-public extern "C" CGFunctionRef CGFunctionRetain(CGFunctionRef function);
-
-public extern "C" void CGFunctionRelease(CGFunctionRef function);
+[ReturnsRetained] public extern "C" CGFunctionRef? CGFunctionCreate(void* info, nuint domainDimension, CGFloat* domain, nuint rangeDimension, CGFloat* range, CGFunctionCallbacks* callbacks);
 
 #endif

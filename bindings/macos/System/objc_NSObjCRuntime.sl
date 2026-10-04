@@ -25,6 +25,8 @@ module MacOS.System;
 
 #if MACOS
 
+public using NSUInteger = ulong;
+
 public using NSInteger = long;
 
 #endif

@@ -26,6 +26,7 @@ module MacOS.ImageIO;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -48,8 +49,8 @@ public extern "C" CFStringRef kCGImageAnimationLoopCount;
 
 public objc closure void CGImageSourceAnimationBlock(nuint arg0, CGImageRef arg1, bool* arg2);
 
-public extern "C" OSStatus CGAnimateImageAtURLWithBlock(CFURLRef url, CFDictionaryRef options, CGImageSourceAnimationBlock block);
+public extern "C" OSStatus CGAnimateImageAtURLWithBlock(CFURLRef url, CFDictionaryRef? options, CGImageSourceAnimationBlock block);
 
-public extern "C" OSStatus CGAnimateImageDataWithBlock(CFDataRef data, CFDictionaryRef options, CGImageSourceAnimationBlock block);
+public extern "C" OSStatus CGAnimateImageDataWithBlock(CFDataRef data, CFDictionaryRef? options, CGImageSourceAnimationBlock block);
 
 #endif

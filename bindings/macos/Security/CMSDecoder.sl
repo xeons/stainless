@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct _CMSDecoder;
 
-public using CMSDecoderRef = _CMSDecoder*;
+[CFType("CMSDecoderGetTypeID")]
+public extern objc class CMSDecoderRef : CFTypeRef { }
 
 public extern "C" CFTypeID CMSDecoderGetTypeID();
 
@@ -46,7 +48,7 @@ public enum CMSSignerStatus : uint
     InvalidIndex = 5,
 }
 
-public extern "C" OSStatus CMSDecoderCreate(CMSDecoderRef* cmsDecoderOut);
+public extern "C" OSStatus CMSDecoderCreate(_CMSDecoder** cmsDecoderOut);
 
 public extern "C" OSStatus CMSDecoderUpdateMessage(CMSDecoderRef cmsDecoder, void* msgBytes, nuint msgBytesLen);
 
@@ -54,33 +56,33 @@ public extern "C" OSStatus CMSDecoderFinalizeMessage(CMSDecoderRef cmsDecoder);
 
 public extern "C" OSStatus CMSDecoderSetDetachedContent(CMSDecoderRef cmsDecoder, CFDataRef detachedContent);
 
-public extern "C" OSStatus CMSDecoderCopyDetachedContent(CMSDecoderRef cmsDecoder, CFDataRef* detachedContentOut);
+public extern "C" OSStatus CMSDecoderCopyDetachedContent(CMSDecoderRef cmsDecoder, __CFData** detachedContentOut);
 
 /// Deprecated in macOS 10.13.
 public extern "C" OSStatus CMSDecoderSetSearchKeychain(CMSDecoderRef cmsDecoder, CFTypeRef keychainOrArray);
 
 public extern "C" OSStatus CMSDecoderGetNumSigners(CMSDecoderRef cmsDecoder, nuint* numSignersOut);
 
-public extern "C" OSStatus CMSDecoderCopySignerStatus(CMSDecoderRef cmsDecoder, nuint signerIndex, CFTypeRef policyOrArray, Boolean evaluateSecTrust, CMSSignerStatus* signerStatusOut, SecTrustRef* secTrustOut, OSStatus* certVerifyResultCodeOut);
+public extern "C" OSStatus CMSDecoderCopySignerStatus(CMSDecoderRef cmsDecoder, nuint signerIndex, CFTypeRef policyOrArray, Boolean evaluateSecTrust, CMSSignerStatus* signerStatusOut, __SecTrust** secTrustOut, OSStatus* certVerifyResultCodeOut);
 
-public extern "C" OSStatus CMSDecoderCopySignerEmailAddress(CMSDecoderRef cmsDecoder, nuint signerIndex, CFStringRef* signerEmailAddressOut);
+public extern "C" OSStatus CMSDecoderCopySignerEmailAddress(CMSDecoderRef cmsDecoder, nuint signerIndex, __CFString** signerEmailAddressOut);
 
-public extern "C" OSStatus CMSDecoderCopySignerCert(CMSDecoderRef cmsDecoder, nuint signerIndex, SecCertificateRef* signerCertOut);
+public extern "C" OSStatus CMSDecoderCopySignerCert(CMSDecoderRef cmsDecoder, nuint signerIndex, __SecCertificate** signerCertOut);
 
 public extern "C" OSStatus CMSDecoderIsContentEncrypted(CMSDecoderRef cmsDecoder, Boolean* isEncryptedOut);
 
-public extern "C" OSStatus CMSDecoderCopyEncapsulatedContentType(CMSDecoderRef cmsDecoder, CFDataRef* eContentTypeOut);
+public extern "C" OSStatus CMSDecoderCopyEncapsulatedContentType(CMSDecoderRef cmsDecoder, __CFData** eContentTypeOut);
 
-public extern "C" OSStatus CMSDecoderCopyAllCerts(CMSDecoderRef cmsDecoder, CFArrayRef* certsOut);
+public extern "C" OSStatus CMSDecoderCopyAllCerts(CMSDecoderRef cmsDecoder, __CFArray** certsOut);
 
-public extern "C" OSStatus CMSDecoderCopyContent(CMSDecoderRef cmsDecoder, CFDataRef* contentOut);
+public extern "C" OSStatus CMSDecoderCopyContent(CMSDecoderRef cmsDecoder, __CFData** contentOut);
 
 public extern "C" OSStatus CMSDecoderCopySignerSigningTime(CMSDecoderRef cmsDecoder, nuint signerIndex, CFAbsoluteTime* signingTime);
 
 public extern "C" OSStatus CMSDecoderCopySignerTimestamp(CMSDecoderRef cmsDecoder, nuint signerIndex, CFAbsoluteTime* timestamp);
 
-public extern "C" OSStatus CMSDecoderCopySignerTimestampWithPolicy(CMSDecoderRef cmsDecoder, CFTypeRef timeStampPolicy, nuint signerIndex, CFAbsoluteTime* timestamp);
+public extern "C" OSStatus CMSDecoderCopySignerTimestampWithPolicy(CMSDecoderRef cmsDecoder, CFTypeRef? timeStampPolicy, nuint signerIndex, CFAbsoluteTime* timestamp);
 
-public extern "C" OSStatus CMSDecoderCopySignerTimestampCertificates(CMSDecoderRef cmsDecoder, nuint signerIndex, CFArrayRef* certificateRefs);
+public extern "C" OSStatus CMSDecoderCopySignerTimestampCertificates(CMSDecoderRef cmsDecoder, nuint signerIndex, __CFArray** certificateRefs);
 
 #endif

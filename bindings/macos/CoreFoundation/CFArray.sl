@@ -24,16 +24,17 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
 
-public delegate void* CFArrayRetainCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void* CFArrayRetainCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate void CFArrayReleaseCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void CFArrayReleaseCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate CFStringRef CFArrayCopyDescriptionCallBack(void* arg0);
+public delegate __CFString* CFArrayCopyDescriptionCallBack(void* arg0);
 
 public delegate Boolean CFArrayEqualCallBack(void* arg0, void* arg1);
 
@@ -52,54 +53,56 @@ public delegate void CFArrayApplierFunction(void* arg0, void* arg1);
 
 public struct __CFArray;
 
-public using CFArrayRef = __CFArray*;
+[CFType("CFArrayGetTypeID")]
+public extern objc class CFArrayRef : CFTypeRef { }
 
-public using CFMutableArrayRef = __CFArray*;
+[CFType]
+public extern objc class CFMutableArrayRef : CFArrayRef { }
 
 public extern "C" CFTypeID CFArrayGetTypeID();
 
-public extern "C" CFArrayRef CFArrayCreate(CFAllocatorRef allocator, void** values, CFIndex numValues, CFArrayCallBacks* callBacks);
+[ReturnsRetained] public extern "C" CFArrayRef? CFArrayCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFArrayCallBacks* callBacks);
 
-public extern "C" CFArrayRef CFArrayCreateCopy(CFAllocatorRef allocator, CFArrayRef theArray);
+[ReturnsRetained] public extern "C" CFArrayRef? CFArrayCreateCopy(CFAllocatorRef? allocator, CFArrayRef? theArray);
 
-public extern "C" CFMutableArrayRef CFArrayCreateMutable(CFAllocatorRef allocator, CFIndex capacity, CFArrayCallBacks* callBacks);
+[ReturnsRetained] public extern "C" CFMutableArrayRef? CFArrayCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFArrayCallBacks* callBacks);
 
-public extern "C" CFMutableArrayRef CFArrayCreateMutableCopy(CFAllocatorRef allocator, CFIndex capacity, CFArrayRef theArray);
+[ReturnsRetained] public extern "C" CFMutableArrayRef? CFArrayCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFArrayRef? theArray);
 
-public extern "C" CFIndex CFArrayGetCount(CFArrayRef theArray);
+public extern "C" CFIndex CFArrayGetCount(CFArrayRef? theArray);
 
-public extern "C" CFIndex CFArrayGetCountOfValue(CFArrayRef theArray, CFRange range, void* value);
+public extern "C" CFIndex CFArrayGetCountOfValue(CFArrayRef? theArray, CFRange range, void* value);
 
-public extern "C" Boolean CFArrayContainsValue(CFArrayRef theArray, CFRange range, void* value);
+public extern "C" Boolean CFArrayContainsValue(CFArrayRef? theArray, CFRange range, void* value);
 
-public extern "C" void* CFArrayGetValueAtIndex(CFArrayRef theArray, CFIndex idx);
+public extern "C" void* CFArrayGetValueAtIndex(CFArrayRef? theArray, CFIndex idx);
 
-public extern "C" void CFArrayGetValues(CFArrayRef theArray, CFRange range, void** values);
+public extern "C" void CFArrayGetValues(CFArrayRef? theArray, CFRange range, void** values);
 
-public extern "C" void CFArrayApplyFunction(CFArrayRef theArray, CFRange range, CFArrayApplierFunction applier, void* context);
+public extern "C" void CFArrayApplyFunction(CFArrayRef? theArray, CFRange range, CFArrayApplierFunction applier, void* context);
 
-public extern "C" CFIndex CFArrayGetFirstIndexOfValue(CFArrayRef theArray, CFRange range, void* value);
+public extern "C" CFIndex CFArrayGetFirstIndexOfValue(CFArrayRef? theArray, CFRange range, void* value);
 
-public extern "C" CFIndex CFArrayGetLastIndexOfValue(CFArrayRef theArray, CFRange range, void* value);
+public extern "C" CFIndex CFArrayGetLastIndexOfValue(CFArrayRef? theArray, CFRange range, void* value);
 
-public extern "C" CFIndex CFArrayBSearchValues(CFArrayRef theArray, CFRange range, void* value, CFComparatorFunction comparator, void* context);
+public extern "C" CFIndex CFArrayBSearchValues(CFArrayRef? theArray, CFRange range, void* value, CFComparatorFunction comparator, void* context);
 
-public extern "C" void CFArrayAppendValue(CFMutableArrayRef theArray, void* value);
+public extern "C" void CFArrayAppendValue(CFMutableArrayRef? theArray, void* value);
 
-public extern "C" void CFArrayInsertValueAtIndex(CFMutableArrayRef theArray, CFIndex idx, void* value);
+public extern "C" void CFArrayInsertValueAtIndex(CFMutableArrayRef? theArray, CFIndex idx, void* value);
 
-public extern "C" void CFArraySetValueAtIndex(CFMutableArrayRef theArray, CFIndex idx, void* value);
+public extern "C" void CFArraySetValueAtIndex(CFMutableArrayRef? theArray, CFIndex idx, void* value);
 
-public extern "C" void CFArrayRemoveValueAtIndex(CFMutableArrayRef theArray, CFIndex idx);
+public extern "C" void CFArrayRemoveValueAtIndex(CFMutableArrayRef? theArray, CFIndex idx);
 
-public extern "C" void CFArrayRemoveAllValues(CFMutableArrayRef theArray);
+public extern "C" void CFArrayRemoveAllValues(CFMutableArrayRef? theArray);
 
-public extern "C" void CFArrayReplaceValues(CFMutableArrayRef theArray, CFRange range, void** newValues, CFIndex newCount);
+public extern "C" void CFArrayReplaceValues(CFMutableArrayRef? theArray, CFRange range, void** newValues, CFIndex newCount);
 
-public extern "C" void CFArrayExchangeValuesAtIndices(CFMutableArrayRef theArray, CFIndex idx1, CFIndex idx2);
+public extern "C" void CFArrayExchangeValuesAtIndices(CFMutableArrayRef? theArray, CFIndex idx1, CFIndex idx2);
 
-public extern "C" void CFArraySortValues(CFMutableArrayRef theArray, CFRange range, CFComparatorFunction comparator, void* context);
+public extern "C" void CFArraySortValues(CFMutableArrayRef? theArray, CFRange range, CFComparatorFunction comparator, void* context);
 
-public extern "C" void CFArrayAppendArray(CFMutableArrayRef theArray, CFArrayRef otherArray, CFRange otherRange);
+public extern "C" void CFArrayAppendArray(CFMutableArrayRef? theArray, CFArrayRef? otherArray, CFRange otherRange);
 
 #endif

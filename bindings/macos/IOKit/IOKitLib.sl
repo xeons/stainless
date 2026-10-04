@@ -25,6 +25,7 @@ module MacOS.IOKit;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -52,11 +53,13 @@ public extern "C" IONotificationPortRef IONotificationPortCreate(mach_port_t mai
 
 public extern "C" void IONotificationPortDestroy(IONotificationPortRef notify);
 
-public extern "C" CFRunLoopSourceRef IONotificationPortGetRunLoopSource(IONotificationPortRef notify);
+public extern "C" CFRunLoopSourceRef? IONotificationPortGetRunLoopSource(IONotificationPortRef notify);
 
 public extern "C" mach_port_t IONotificationPortGetMachPort(IONotificationPortRef notify);
 
 public extern "C" kern_return_t IONotificationPortSetImportanceReceiver(IONotificationPortRef notify);
+
+public extern "C" void IONotificationPortSetDispatchQueue(IONotificationPortRef notify, dispatch_queue_t? queue);
 
 public extern "C" void IODispatchCalloutFromMessage(void* unused, mach_msg_header_t* msg, void* reference);
 
@@ -68,11 +71,11 @@ public extern "C" kern_return_t IOObjectRetain(io_object_t object);
 
 public extern "C" kern_return_t IOObjectGetClass(io_object_t object, byte* className);
 
-public extern "C" CFStringRef IOObjectCopyClass(io_object_t object);
+[ReturnsRetained] public extern "C" CFStringRef? IOObjectCopyClass(io_object_t object);
 
-public extern "C" CFStringRef IOObjectCopySuperclassForClass(CFStringRef classname);
+[ReturnsRetained] public extern "C" CFStringRef? IOObjectCopySuperclassForClass(CFStringRef? classname);
 
-public extern "C" CFStringRef IOObjectCopyBundleIdentifierForClass(CFStringRef classname);
+[ReturnsRetained] public extern "C" CFStringRef? IOObjectCopyBundleIdentifierForClass(CFStringRef? classname);
 
 public extern "C" boolean_t IOObjectConformsTo(io_object_t object, byte* className);
 
@@ -90,17 +93,11 @@ public extern "C" void IOIteratorReset(io_iterator_t iterator);
 
 public extern "C" boolean_t IOIteratorIsValid(io_iterator_t iterator);
 
-public extern "C" io_service_t IOServiceGetMatchingService(mach_port_t mainPort, CFDictionaryRef matching);
-
-public extern "C" kern_return_t IOServiceGetMatchingServices(mach_port_t mainPort, CFDictionaryRef matching, io_iterator_t* existing);
-
-public extern "C" kern_return_t IOServiceAddNotification(mach_port_t mainPort, byte* notificationType, CFDictionaryRef matching, mach_port_t wakePort, nuint reference, io_iterator_t* notification);
-
-public extern "C" kern_return_t IOServiceAddMatchingNotification(IONotificationPortRef notifyPort, byte* notificationType, CFDictionaryRef matching, IOServiceMatchingCallback callback, void* refCon, io_iterator_t* notification);
+public extern "C" kern_return_t IOServiceAddNotification(mach_port_t mainPort, byte* notificationType, CFDictionaryRef? matching, mach_port_t wakePort, nuint reference, io_iterator_t* notification);
 
 public extern "C" kern_return_t IOServiceAddInterestNotification(IONotificationPortRef notifyPort, io_service_t service, byte* interestType, IOServiceInterestCallback callback, void* refCon, io_object_t* notification);
 
-public extern "C" kern_return_t IOServiceMatchPropertyTable(io_service_t service, CFDictionaryRef matching, boolean_t* matches);
+public extern "C" kern_return_t IOServiceMatchPropertyTable(io_service_t service, CFDictionaryRef? matching, boolean_t* matches);
 
 public extern "C" kern_return_t IOServiceGetBusyState(io_service_t service, uint* busyState);
 
@@ -138,9 +135,9 @@ public extern "C" kern_return_t IOConnectUnmapMemory(io_connect_t connect, uint 
 
 public extern "C" kern_return_t IOConnectUnmapMemory64(io_connect_t connect, uint memoryType, task_port_t fromTask, mach_vm_address_t atAddress);
 
-public extern "C" kern_return_t IOConnectSetCFProperties(io_connect_t connect, CFTypeRef properties);
+public extern "C" kern_return_t IOConnectSetCFProperties(io_connect_t connect, CFTypeRef? properties);
 
-public extern "C" kern_return_t IOConnectSetCFProperty(io_connect_t connect, CFStringRef propertyName, CFTypeRef property);
+public extern "C" kern_return_t IOConnectSetCFProperty(io_connect_t connect, CFStringRef? propertyName, CFTypeRef? property);
 
 public extern "C" kern_return_t IOConnectCallMethod(mach_port_t connection, uint selector, ulong* input, uint inputCnt, void* inputStruct, nuint inputStructCnt, ulong* output, uint* outputCnt, void* outputStruct, nuint* outputStructCnt);
 
@@ -174,7 +171,7 @@ public extern "C" io_registry_entry_t IORegistryGetRootEntry(mach_port_t mainPor
 
 public extern "C" io_registry_entry_t IORegistryEntryFromPath(mach_port_t mainPort, byte* path);
 
-public extern "C" io_registry_entry_t IORegistryEntryCopyFromPath(mach_port_t mainPort, CFStringRef path);
+public extern "C" io_registry_entry_t IORegistryEntryCopyFromPath(mach_port_t mainPort, CFStringRef? path);
 
 public const int kIORegistryIterateRecursively = 1;
 public const int kIORegistryIterateParents = 2;
@@ -195,21 +192,21 @@ public extern "C" kern_return_t IORegistryEntryGetLocationInPlane(io_registry_en
 
 public extern "C" kern_return_t IORegistryEntryGetPath(io_registry_entry_t entry, byte* plane, byte* path);
 
-public extern "C" CFStringRef IORegistryEntryCopyPath(io_registry_entry_t entry, byte* plane);
+[ReturnsRetained] public extern "C" CFStringRef? IORegistryEntryCopyPath(io_registry_entry_t entry, byte* plane);
 
 public extern "C" kern_return_t IORegistryEntryGetRegistryEntryID(io_registry_entry_t entry, ulong* entryID);
 
-public extern "C" kern_return_t IORegistryEntryCreateCFProperties(io_registry_entry_t entry, CFMutableDictionaryRef* properties, CFAllocatorRef allocator, IOOptionBits options);
+public extern "C" kern_return_t IORegistryEntryCreateCFProperties(io_registry_entry_t entry, __CFDictionary** properties, CFAllocatorRef? allocator, IOOptionBits options);
 
-public extern "C" CFTypeRef IORegistryEntryCreateCFProperty(io_registry_entry_t entry, CFStringRef key, CFAllocatorRef allocator, IOOptionBits options);
+[ReturnsRetained] public extern "C" CFTypeRef? IORegistryEntryCreateCFProperty(io_registry_entry_t entry, CFStringRef? key, CFAllocatorRef? allocator, IOOptionBits options);
 
-public extern "C" CFTypeRef IORegistryEntrySearchCFProperty(io_registry_entry_t entry, byte* plane, CFStringRef key, CFAllocatorRef allocator, IOOptionBits options);
+[ReturnsRetained] public extern "C" CFTypeRef? IORegistryEntrySearchCFProperty(io_registry_entry_t entry, byte* plane, CFStringRef? key, CFAllocatorRef? allocator, IOOptionBits options);
 
 public extern "C" kern_return_t IORegistryEntryGetProperty(io_registry_entry_t entry, byte* propertyName, byte* buffer, uint* size);
 
-public extern "C" kern_return_t IORegistryEntrySetCFProperties(io_registry_entry_t entry, CFTypeRef properties);
+public extern "C" kern_return_t IORegistryEntrySetCFProperties(io_registry_entry_t entry, CFTypeRef? properties);
 
-public extern "C" kern_return_t IORegistryEntrySetCFProperty(io_registry_entry_t entry, CFStringRef propertyName, CFTypeRef property);
+public extern "C" kern_return_t IORegistryEntrySetCFProperty(io_registry_entry_t entry, CFStringRef? propertyName, CFTypeRef? property);
 
 public extern "C" kern_return_t IORegistryEntryGetChildIterator(io_registry_entry_t entry, byte* plane, io_iterator_t* iterator);
 
@@ -221,15 +218,15 @@ public extern "C" kern_return_t IORegistryEntryGetParentEntry(io_registry_entry_
 
 public extern "C" boolean_t IORegistryEntryInPlane(io_registry_entry_t entry, byte* plane);
 
-public extern "C" CFMutableDictionaryRef IOServiceMatching(byte* name);
+[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IOServiceMatching(byte* name);
 
-public extern "C" CFMutableDictionaryRef IOServiceNameMatching(byte* name);
+[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IOServiceNameMatching(byte* name);
 
-public extern "C" CFMutableDictionaryRef IOBSDNameMatching(mach_port_t mainPort, uint options, byte* bsdName);
+[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IOBSDNameMatching(mach_port_t mainPort, uint options, byte* bsdName);
 
-public extern "C" CFMutableDictionaryRef IOOpenFirmwarePathMatching(mach_port_t mainPort, uint options, byte* path);
+public extern "C" CFMutableDictionaryRef? IOOpenFirmwarePathMatching(mach_port_t mainPort, uint options, byte* path);
 
-public extern "C" CFMutableDictionaryRef IORegistryEntryIDMatching(ulong entryID);
+[ReturnsRetained] public extern "C" CFMutableDictionaryRef? IORegistryEntryIDMatching(ulong entryID);
 
 public extern "C" kern_return_t IOServiceOFPathToBSDName(mach_port_t mainPort, byte* openFirmwarePath, byte* bsdName);
 

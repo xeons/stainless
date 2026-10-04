@@ -28,40 +28,41 @@ import MacOS.CoreGraphics;
 import MacOS.CoreMedia;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
 
-public extern "C" OSStatus VTCreateCGImageFromCVPixelBuffer(CVPixelBufferRef pixelBuffer, CFDictionaryRef options, CGImageRef* imageOut);
+public extern "C" OSStatus VTCreateCGImageFromCVPixelBuffer(CVPixelBufferRef pixelBuffer, CFDictionaryRef? options, CGImage** imageOut);
 
 public extern "C" void VTRegisterSupplementalVideoDecoderIfAvailable(CMVideoCodecType codecType);
 
 /// macOS 15.0 and later.
-public extern "C" OSStatus VTCopyVideoDecoderExtensionProperties(CMFormatDescriptionRef formatDesc, CFDictionaryRef* mediaExtensionPropertiesOut);
+public extern "C" OSStatus VTCopyVideoDecoderExtensionProperties(CMFormatDescriptionRef formatDesc, __CFDictionary** mediaExtensionPropertiesOut);
 
 /// macOS 15.0 and later.
-public extern "C" OSStatus VTCopyRAWProcessorExtensionProperties(CMFormatDescriptionRef formatDesc, CFDictionaryRef* mediaExtensionPropertiesOut);
+public extern "C" OSStatus VTCopyRAWProcessorExtensionProperties(CMFormatDescriptionRef formatDesc, __CFDictionary** mediaExtensionPropertiesOut);
 
 /// macOS 15.0 and later.
 public using VTExtensionPropertiesKey = CFStringRef;
 
 /// macOS 15.0 and later.
-public extern "C" VTExtensionPropertiesKey kVTExtensionProperties_ExtensionIdentifierKey;
+public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ExtensionIdentifierKey;
 
 /// macOS 15.0 and later.
-public extern "C" VTExtensionPropertiesKey kVTExtensionProperties_ExtensionNameKey;
+public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ExtensionNameKey;
 
 /// macOS 15.0 and later.
-public extern "C" VTExtensionPropertiesKey kVTExtensionProperties_ContainingBundleNameKey;
+public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ContainingBundleNameKey;
 
 /// macOS 15.0 and later.
-public extern "C" VTExtensionPropertiesKey kVTExtensionProperties_ExtensionURLKey;
+public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ExtensionURLKey;
 
 /// macOS 15.0 and later.
-public extern "C" VTExtensionPropertiesKey kVTExtensionProperties_ContainingBundleURLKey;
+public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ContainingBundleURLKey;
 
 /// macOS 15.0 and later.
-public extern "C" VTExtensionPropertiesKey kVTExtensionProperties_CodecNameKey;
+public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_CodecNameKey;
 
 #endif

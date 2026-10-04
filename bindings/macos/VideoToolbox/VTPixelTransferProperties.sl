@@ -24,40 +24,41 @@
 module MacOS.VideoToolbox;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_ScalingMode;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_ScalingMode;
 
-public extern "C" CFStringRef kVTScalingMode_Normal;
+public extern "C" CFStringRef? kVTScalingMode_Normal;
 
-public extern "C" CFStringRef kVTScalingMode_CropSourceToCleanAperture;
+public extern "C" CFStringRef? kVTScalingMode_CropSourceToCleanAperture;
 
-public extern "C" CFStringRef kVTScalingMode_Letterbox;
+public extern "C" CFStringRef? kVTScalingMode_Letterbox;
 
-public extern "C" CFStringRef kVTScalingMode_Trim;
+public extern "C" CFStringRef? kVTScalingMode_Trim;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_DestinationCleanAperture;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_DestinationCleanAperture;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_DestinationPixelAspectRatio;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_DestinationPixelAspectRatio;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_DownsamplingMode;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_DownsamplingMode;
 
-public extern "C" CFStringRef kVTDownsamplingMode_Decimate;
+public extern "C" CFStringRef? kVTDownsamplingMode_Decimate;
 
-public extern "C" CFStringRef kVTDownsamplingMode_Average;
+public extern "C" CFStringRef? kVTDownsamplingMode_Average;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_DestinationColorPrimaries;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_DestinationColorPrimaries;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_DestinationTransferFunction;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_DestinationTransferFunction;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_DestinationICCProfile;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_DestinationICCProfile;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_DestinationYCbCrMatrix;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_DestinationYCbCrMatrix;
 
-public extern "C" CFStringRef kVTPixelTransferPropertyKey_RealTime;
+public extern "C" CFStringRef? kVTPixelTransferPropertyKey_RealTime;
 
 public const int VT_SUPPORT_COLORSYNC_PIXEL_TRANSFER = 1;
 

@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGRenderingBufferProvider;
 
-public using CGRenderingBufferProviderRef = CGRenderingBufferProvider*;
+[CFType("CGRenderingBufferProviderGetTypeID")]
+public extern objc class CGRenderingBufferProviderRef : CFTypeRef { }
 
 public objc closure void* CGRenderingBufferProviderCreateLockPointerBlock(void* arg0);
 
@@ -40,10 +42,10 @@ public objc closure void CGRenderingBufferProviderCreateUnlockPointerBlock(void*
 public objc closure void CGRenderingBufferProviderCreateReleaseInfoBlock(void* arg0);
 
 /// macOS 26.0 and later.
-public extern "C" CGRenderingBufferProviderRef CGRenderingBufferProviderCreate(void* info, nuint size, CGRenderingBufferProviderCreateLockPointerBlock lockPointer, CGRenderingBufferProviderCreateUnlockPointerBlock unlockPointer, CGRenderingBufferProviderCreateReleaseInfoBlock releaseInfo);
+[ReturnsRetained] public extern "C" CGRenderingBufferProviderRef? CGRenderingBufferProviderCreate(void* info, nuint size, CGRenderingBufferProviderCreateLockPointerBlock lockPointer, CGRenderingBufferProviderCreateUnlockPointerBlock? unlockPointer, CGRenderingBufferProviderCreateReleaseInfoBlock? releaseInfo);
 
 /// macOS 26.0 and later.
-public extern "C" CGRenderingBufferProviderRef CGRenderingBufferProviderCreateWithCFData(CFMutableDataRef data);
+[ReturnsRetained] public extern "C" CGRenderingBufferProviderRef? CGRenderingBufferProviderCreateWithCFData(CFMutableDataRef data);
 
 /// macOS 26.0 and later.
 public extern "C" nuint CGRenderingBufferProviderGetSize(CGRenderingBufferProviderRef provider);

@@ -25,6 +25,7 @@ module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.CoreGraphics;
 
 public struct __CTFrame;
 
-public using CTFrameRef = __CTFrame*;
+[CFType("CTFrameGetTypeID")]
+public extern objc class CTFrameRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTFrameGetTypeID();
 
@@ -65,7 +67,7 @@ public extern "C" CFRange CTFrameGetVisibleStringRange(CTFrameRef frame);
 
 public extern "C" CGPathRef CTFrameGetPath(CTFrameRef frame);
 
-public extern "C" CFDictionaryRef CTFrameGetFrameAttributes(CTFrameRef frame);
+public extern "C" CFDictionaryRef? CTFrameGetFrameAttributes(CTFrameRef frame);
 
 public extern "C" CFArrayRef CTFrameGetLines(CTFrameRef frame);
 

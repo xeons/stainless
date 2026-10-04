@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -59,9 +60,9 @@ public extern "C" OSAError ASSetSourceStyles(ComponentInstance scriptingComponen
 /// Deprecated in macOS 10.5.
 public extern "C" OSAError ASGetSourceStyles(ComponentInstance scriptingComponent, STHandle* resultingSourceStyles);
 
-public extern "C" OSAError ASCopySourceAttributes(ComponentInstance scriptingComponent, CFArrayRef* resultingSourceAttributes);
+public extern "C" OSAError ASCopySourceAttributes(ComponentInstance scriptingComponent, __CFArray** resultingSourceAttributes);
 
-public extern "C" OSAError ASSetSourceAttributes(ComponentInstance scriptingComponent, CFArrayRef sourceAttributes);
+public extern "C" OSAError ASSetSourceAttributes(ComponentInstance scriptingComponent, CFArrayRef? sourceAttributes);
 
 public extern "C" OSAError ASGetSourceStyleNames(ComponentInstance scriptingComponent, SInt32 modeFlags, AEDescList* resultingSourceStyleNamesList);
 

@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -55,27 +56,27 @@ public const int kEventParamFontColor = 1717791858;
 public const int kEventParamDictionary = 1684628340;
 public const int kEventParamViewAttributesDictionary = 1684104291;
 
-public extern "C" CFStringRef kFontPanelATSUFontIDKey;
+public extern "C" CFStringRef? kFontPanelATSUFontIDKey;
 
-public extern "C" CFStringRef kFontPanelVariationAxesKey;
+public extern "C" CFStringRef? kFontPanelVariationAxesKey;
 
-public extern "C" CFStringRef kFontPanelVariationValuesKey;
+public extern "C" CFStringRef? kFontPanelVariationValuesKey;
 
-public extern "C" CFStringRef kFontPanelFeatureTypesKey;
+public extern "C" CFStringRef? kFontPanelFeatureTypesKey;
 
-public extern "C" CFStringRef kFontPanelFeatureSelectorsKey;
+public extern "C" CFStringRef? kFontPanelFeatureSelectorsKey;
 
-public extern "C" CFStringRef kFontPanelAttributesKey;
+public extern "C" CFStringRef? kFontPanelAttributesKey;
 
-public extern "C" CFStringRef kFontPanelAttributeTagsKey;
+public extern "C" CFStringRef? kFontPanelAttributeTagsKey;
 
-public extern "C" CFStringRef kFontPanelAttributeSizesKey;
+public extern "C" CFStringRef? kFontPanelAttributeSizesKey;
 
-public extern "C" CFStringRef kFontPanelAttributeValuesKey;
+public extern "C" CFStringRef? kFontPanelAttributeValuesKey;
 
-public extern "C" CFStringRef kFontPanelMouseTrackingState;
+public extern "C" CFStringRef? kFontPanelMouseTrackingState;
 
-public extern "C" CFStringRef kFontPanelBackgroundColorAttributeName;
+public extern "C" CFStringRef? kFontPanelBackgroundColorAttributeName;
 
 public const int fontPanelShowErr = -8880;
 public const int fontPanelSelectionStyleErr = -8881;
@@ -110,32 +111,32 @@ public struct OpaqueFCFontDescriptorRef;
 
 public using FCFontDescriptorRef = OpaqueFCFontDescriptorRef*;
 
-public extern "C" CFArrayRef FCCopyCollectionNames();
+[ReturnsRetained] public extern "C" CFArrayRef? FCCopyCollectionNames();
 
-public extern "C" CFArrayRef FCCopyFontDescriptorsInCollection(CFStringRef iCollection);
+[ReturnsRetained] public extern "C" CFArrayRef? FCCopyFontDescriptorsInCollection(CFStringRef? iCollection);
 
-public extern "C" OSStatus FCAddCollection(CFStringRef iCollection, OptionBits iCollectionOptions);
+public extern "C" OSStatus FCAddCollection(CFStringRef? iCollection, OptionBits iCollectionOptions);
 
-public extern "C" OSStatus FCRemoveCollection(CFStringRef iCollection);
+public extern "C" OSStatus FCRemoveCollection(CFStringRef? iCollection);
 
-public extern "C" OSStatus FCAddFontDescriptorToCollection(FCFontDescriptorRef iDescriptor, CFStringRef iCollection);
+public extern "C" OSStatus FCAddFontDescriptorToCollection(FCFontDescriptorRef iDescriptor, CFStringRef? iCollection);
 
-public extern "C" OSStatus FCRemoveFontDescriptorFromCollection(FCFontDescriptorRef iDescriptor, CFStringRef iCollection);
+public extern "C" OSStatus FCRemoveFontDescriptorFromCollection(FCFontDescriptorRef iDescriptor, CFStringRef? iCollection);
 
-public extern "C" CFStringRef kFCFontFamilyAttribute;
+public extern "C" CFStringRef? kFCFontFamilyAttribute;
 
-public extern "C" CFStringRef kFCFontNameAttribute;
+public extern "C" CFStringRef? kFCFontNameAttribute;
 
-public extern "C" CFStringRef kFCFontFaceAttribute;
+public extern "C" CFStringRef? kFCFontFaceAttribute;
 
-public extern "C" CFStringRef kFCFontSizeAttribute;
+public extern "C" CFStringRef? kFCFontSizeAttribute;
 
-public extern "C" CFStringRef kFCFontVisibleNameAttribute;
+public extern "C" CFStringRef? kFCFontVisibleNameAttribute;
 
-public extern "C" CFStringRef kFCFontCGColorAttribute;
+public extern "C" CFStringRef? kFCFontCGColorAttribute;
 
-public extern "C" FCFontDescriptorRef FCFontDescriptorCreateWithFontAttributes(CFDictionaryRef iAttributes);
+public extern "C" FCFontDescriptorRef FCFontDescriptorCreateWithFontAttributes(CFDictionaryRef? iAttributes);
 
-public extern "C" FCFontDescriptorRef FCFontDescriptorCreateWithName(CFStringRef iFontName, CGFloat iSize);
+public extern "C" FCFontDescriptorRef FCFontDescriptorCreateWithName(CFStringRef? iFontName, CGFloat iSize);
 
 #endif

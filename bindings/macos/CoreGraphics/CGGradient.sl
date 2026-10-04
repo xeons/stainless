@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGGradient;
 
-public using CGGradientRef = CGGradient*;
+[CFType("CGGradientGetTypeID")]
+public extern objc class CGGradientRef : CFTypeRef { }
 
 [Flags]
 public enum CGGradientDrawingOptions : uint
@@ -42,18 +44,14 @@ public enum CGGradientDrawingOptions : uint
 
 public extern "C" CFTypeID CGGradientGetTypeID();
 
-public extern "C" CGGradientRef CGGradientCreateWithColorComponents(CGColorSpaceRef space, CGFloat* components, CGFloat* locations, nuint count);
+[ReturnsRetained] public extern "C" CGGradientRef? CGGradientCreateWithColorComponents(CGColorSpaceRef? space, CGFloat* components, CGFloat* locations, nuint count);
 
 /// macOS 26.0 and later.
-public extern "C" CGGradientRef CGGradientCreateWithContentHeadroom(float headroom, CGColorSpaceRef space, CGFloat* components, CGFloat* locations, nuint count);
+[ReturnsRetained] public extern "C" CGGradientRef? CGGradientCreateWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGFloat* components, CGFloat* locations, nuint count);
 
-public extern "C" CGGradientRef CGGradientCreateWithColors(CGColorSpaceRef space, CFArrayRef colors, CGFloat* locations);
-
-public extern "C" CGGradientRef CGGradientRetain(CGGradientRef gradient);
-
-public extern "C" void CGGradientRelease(CGGradientRef gradient);
+[ReturnsRetained] public extern "C" CGGradientRef? CGGradientCreateWithColors(CGColorSpaceRef? space, CFArrayRef? colors, CGFloat* locations);
 
 /// macOS 26.0 and later.
-public extern "C" float CGGradientGetContentHeadroom(CGGradientRef gradient);
+public extern "C" float CGGradientGetContentHeadroom(CGGradientRef? gradient);
 
 #endif

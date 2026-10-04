@@ -23,6 +23,8 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.GSS;
 
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "GSS")

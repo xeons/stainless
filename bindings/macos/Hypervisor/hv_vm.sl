@@ -24,6 +24,7 @@
 module MacOS.Hypervisor;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,6 +32,12 @@ import MacOS.System;
 
 #if ARM64
 public extern "C" hv_return_t hv_vm_get_max_vcpu_count(uint* max_vcpu_count);
+#endif
+
+#if ARM64
+public extern "C" hv_return_t hv_vm_create(hv_vm_config_t? config);
+#else
+public extern "C" hv_return_t hv_vm_create(hv_vm_options_t flags);
 #endif
 
 public extern "C" hv_return_t hv_vm_destroy();

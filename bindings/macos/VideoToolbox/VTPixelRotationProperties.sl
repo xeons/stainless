@@ -24,23 +24,24 @@
 module MacOS.VideoToolbox;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
 
-public extern "C" CFStringRef kVTPixelRotationPropertyKey_Rotation;
+public extern "C" CFStringRef? kVTPixelRotationPropertyKey_Rotation;
 
-public extern "C" CFStringRef kVTRotation_0;
+public extern "C" CFStringRef? kVTRotation_0;
 
-public extern "C" CFStringRef kVTRotation_CW90;
+public extern "C" CFStringRef? kVTRotation_CW90;
 
-public extern "C" CFStringRef kVTRotation_180;
+public extern "C" CFStringRef? kVTRotation_180;
 
-public extern "C" CFStringRef kVTRotation_CCW90;
+public extern "C" CFStringRef? kVTRotation_CCW90;
 
-public extern "C" CFStringRef kVTPixelRotationPropertyKey_FlipHorizontalOrientation;
+public extern "C" CFStringRef? kVTPixelRotationPropertyKey_FlipHorizontalOrientation;
 
-public extern "C" CFStringRef kVTPixelRotationPropertyKey_FlipVerticalOrientation;
+public extern "C" CFStringRef? kVTPixelRotationPropertyKey_FlipVerticalOrientation;
 
 #endif

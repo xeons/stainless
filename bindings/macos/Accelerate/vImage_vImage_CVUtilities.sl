@@ -26,24 +26,21 @@ module MacOS.Accelerate;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.CoreVideo;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Accelerate")
 
-public extern "C" vImage_Error vImageBuffer_InitWithCVPixelBuffer(vImage_Buffer* buffer, vImage_CGImageFormat* desiredFormat, CVPixelBufferRef cvPixelBuffer, vImageCVImageFormatRef cvImageFormat, CGFloat* backgroundColor, vImage_Flags flags);
+public extern "C" vImage_Error vImageBuffer_InitWithCVPixelBuffer(vImage_Buffer* buffer, vImage_CGImageFormat* desiredFormat, CVPixelBufferRef? cvPixelBuffer, vImageCVImageFormatRef? cvImageFormat, CGFloat* backgroundColor, vImage_Flags flags);
 
-public extern "C" vImage_Error vImageBuffer_CopyToCVPixelBuffer(vImage_Buffer* buffer, vImage_CGImageFormat* bufferFormat, CVPixelBufferRef cvPixelBuffer, vImageCVImageFormatRef cvImageFormat, CGFloat* backgroundColor, vImage_Flags flags);
+public extern "C" vImage_Error vImageBuffer_CopyToCVPixelBuffer(vImage_Buffer* buffer, vImage_CGImageFormat* bufferFormat, CVPixelBufferRef? cvPixelBuffer, vImageCVImageFormatRef? cvImageFormat, CGFloat* backgroundColor, vImage_Flags flags);
 
-public extern "C" vImageCVImageFormatRef vImageCVImageFormat_CreateWithCVPixelBuffer(CVPixelBufferRef buffer);
+[ReturnsRetained] public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_CreateWithCVPixelBuffer(CVPixelBufferRef? buffer);
 
-public extern "C" vImageCVImageFormatRef vImageCVImageFormat_Create(uint imageFormatType, vImage_ARGBToYpCbCrMatrix* matrix, CFStringRef cvImageBufferChromaLocation, CGColorSpaceRef baseColorspace, int alphaIsOneHint);
+[ReturnsRetained] public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_Create(uint imageFormatType, vImage_ARGBToYpCbCrMatrix* matrix, CFStringRef? cvImageBufferChromaLocation, CGColorSpaceRef? baseColorspace, int alphaIsOneHint);
 
-public extern "C" vImageCVImageFormatRef vImageCVImageFormat_Copy(vImageConstCVImageFormatRef format);
-
-public extern "C" void vImageCVImageFormat_Retain(vImageCVImageFormatRef fmt);
-
-public extern "C" void vImageCVImageFormat_Release(vImageCVImageFormatRef fmt);
+[ReturnsRetained] public extern "C" vImageCVImageFormatRef? vImageCVImageFormat_Copy(vImageConstCVImageFormatRef? format);
 
 public using vImageCVImageFormatError = nint;
 
@@ -67,37 +64,37 @@ public using vImageMatrixType = uint;
 public const int kvImageMatrixType_None = 0;
 public const int kvImageMatrixType_ARGBToYpCbCrMatrix = 1;
 
-public extern "C" uint vImageCVImageFormat_GetFormatCode(vImageConstCVImageFormatRef format);
+public extern "C" uint vImageCVImageFormat_GetFormatCode(vImageConstCVImageFormatRef? format);
 
-public extern "C" uint vImageCVImageFormat_GetChannelCount(vImageConstCVImageFormatRef format);
+public extern "C" uint vImageCVImageFormat_GetChannelCount(vImageConstCVImageFormatRef? format);
 
-public extern "C" vImageBufferTypeCode* vImageCVImageFormat_GetChannelNames(vImageConstCVImageFormatRef format);
+public extern "C" vImageBufferTypeCode* vImageCVImageFormat_GetChannelNames(vImageConstCVImageFormatRef? format);
 
-public extern "C" CGColorSpaceRef vImageCVImageFormat_GetColorSpace(vImageConstCVImageFormatRef format);
+public extern "C" CGColorSpaceRef? vImageCVImageFormat_GetColorSpace(vImageConstCVImageFormatRef? format);
 
-public extern "C" vImage_Error vImageCVImageFormat_SetColorSpace(vImageCVImageFormatRef format, CGColorSpaceRef colorspace);
+public extern "C" vImage_Error vImageCVImageFormat_SetColorSpace(vImageCVImageFormatRef? format, CGColorSpaceRef? colorspace);
 
-public extern "C" CFStringRef vImageCVImageFormat_GetChromaSiting(vImageConstCVImageFormatRef format);
+public extern "C" CFStringRef? vImageCVImageFormat_GetChromaSiting(vImageConstCVImageFormatRef? format);
 
-public extern "C" vImage_Error vImageCVImageFormat_SetChromaSiting(vImageCVImageFormatRef format, CFStringRef siting);
+public extern "C" vImage_Error vImageCVImageFormat_SetChromaSiting(vImageCVImageFormatRef? format, CFStringRef? siting);
 
-public extern "C" void* vImageCVImageFormat_GetConversionMatrix(vImageConstCVImageFormatRef format, vImageMatrixType* outType);
+public extern "C" void* vImageCVImageFormat_GetConversionMatrix(vImageConstCVImageFormatRef? format, vImageMatrixType* outType);
 
-public extern "C" vImage_Error vImageCVImageFormat_CopyConversionMatrix(vImageCVImageFormatRef format, void* matrix, vImageMatrixType inType);
+public extern "C" vImage_Error vImageCVImageFormat_CopyConversionMatrix(vImageCVImageFormatRef? format, void* matrix, vImageMatrixType inType);
 
-public extern "C" int vImageCVImageFormat_GetAlphaHint(vImageConstCVImageFormatRef format);
+public extern "C" int vImageCVImageFormat_GetAlphaHint(vImageConstCVImageFormatRef? format);
 
-public extern "C" vImage_Error vImageCVImageFormat_SetAlphaHint(vImageCVImageFormatRef format, int alphaIsOne);
+public extern "C" vImage_Error vImageCVImageFormat_SetAlphaHint(vImageCVImageFormatRef? format, int alphaIsOne);
 
-public extern "C" vImageChannelDescription* vImageCVImageFormat_GetChannelDescription(vImageConstCVImageFormatRef format, vImageBufferTypeCode type);
+public extern "C" vImageChannelDescription* vImageCVImageFormat_GetChannelDescription(vImageConstCVImageFormatRef? format, vImageBufferTypeCode type);
 
-public extern "C" vImage_Error vImageCVImageFormat_CopyChannelDescription(vImageCVImageFormatRef format, vImageChannelDescription* desc, vImageBufferTypeCode type);
+public extern "C" vImage_Error vImageCVImageFormat_CopyChannelDescription(vImageCVImageFormatRef? format, vImageChannelDescription* desc, vImageBufferTypeCode type);
 
-public extern "C" void* vImageCVImageFormat_GetUserData(vImageConstCVImageFormatRef format);
+public extern "C" void* vImageCVImageFormat_GetUserData(vImageConstCVImageFormatRef? format);
 
-public delegate void vImageCVImageFormat_SetUserDataUserDataReleaseCallbackFunction(vImageCVImageFormatRef arg0, void* arg1);
+public delegate void vImageCVImageFormat_SetUserDataUserDataReleaseCallbackFunction(vImageCVImageFormat* arg0, void* arg1);
 
-public extern "C" vImage_Error vImageCVImageFormat_SetUserData(vImageCVImageFormatRef format, void* userData, vImageCVImageFormat_SetUserDataUserDataReleaseCallbackFunction userDataReleaseCallback);
+public extern "C" vImage_Error vImageCVImageFormat_SetUserData(vImageCVImageFormatRef? format, void* userData, vImageCVImageFormat_SetUserDataUserDataReleaseCallbackFunction userDataReleaseCallback);
 
 public struct vImageTransferFunction
 {
@@ -123,7 +120,7 @@ public struct vImageRGBPrimaries
     public float white_y;
 }
 
-public extern "C" CGColorSpaceRef vImageCreateRGBColorSpaceWithPrimariesAndTransferFunction(vImageRGBPrimaries* primaries, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained] public extern "C" CGColorSpaceRef? vImageCreateRGBColorSpaceWithPrimariesAndTransferFunction(vImageRGBPrimaries* primaries, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
 
 public struct vImageWhitePoint
 {
@@ -131,15 +128,15 @@ public struct vImageWhitePoint
     public float white_y;
 }
 
-public extern "C" CGColorSpaceRef vImageCreateMonochromeColorSpaceWithWhitePointAndTransferFunction(vImageWhitePoint* whitePoint, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained] public extern "C" CGColorSpaceRef? vImageCreateMonochromeColorSpaceWithWhitePointAndTransferFunction(vImageWhitePoint* whitePoint, vImageTransferFunction* tf, CGColorRenderingIntent intent, vImage_Flags flags, vImage_Error* error);
 
-public extern "C" vImageConverterRef vImageConverter_CreateForCGToCVImageFormat(vImage_CGImageFormat* srcFormat, vImageCVImageFormatRef destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateForCGToCVImageFormat(vImage_CGImageFormat* srcFormat, vImageCVImageFormatRef? destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
-public extern "C" vImageConverterRef vImageConverter_CreateForCVToCGImageFormat(vImageCVImageFormatRef srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateForCVToCGImageFormat(vImageCVImageFormatRef? srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
-public extern "C" vImage_Error vImageBuffer_InitForCopyToCVPixelBuffer(vImage_Buffer* buffers, vImageConverterRef converter, CVPixelBufferRef pixelBuffer, vImage_Flags flags);
+public extern "C" vImage_Error vImageBuffer_InitForCopyToCVPixelBuffer(vImage_Buffer* buffers, vImageConverterRef? converter, CVPixelBufferRef? pixelBuffer, vImage_Flags flags);
 
-public extern "C" vImage_Error vImageBuffer_InitForCopyFromCVPixelBuffer(vImage_Buffer* buffers, vImageConverterRef converter, CVPixelBufferRef pixelBuffer, vImage_Flags flags);
+public extern "C" vImage_Error vImageBuffer_InitForCopyFromCVPixelBuffer(vImage_Buffer* buffers, vImageConverterRef? converter, CVPixelBufferRef? pixelBuffer, vImage_Flags flags);
 
 public const int vImage_CVUtilities_h = 1;
 

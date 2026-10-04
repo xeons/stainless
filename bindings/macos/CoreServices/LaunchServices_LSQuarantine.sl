@@ -24,33 +24,34 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreServices")
 
-public extern "C" CFStringRef kLSQuarantineAgentNameKey;
+public extern "C" CFStringRef? kLSQuarantineAgentNameKey;
 
-public extern "C" CFStringRef kLSQuarantineAgentBundleIdentifierKey;
+public extern "C" CFStringRef? kLSQuarantineAgentBundleIdentifierKey;
 
-public extern "C" CFStringRef kLSQuarantineTimeStampKey;
+public extern "C" CFStringRef? kLSQuarantineTimeStampKey;
 
-public extern "C" CFStringRef kLSQuarantineTypeKey;
+public extern "C" CFStringRef? kLSQuarantineTypeKey;
 
-public extern "C" CFStringRef kLSQuarantineTypeWebDownload;
+public extern "C" CFStringRef? kLSQuarantineTypeWebDownload;
 
-public extern "C" CFStringRef kLSQuarantineTypeOtherDownload;
+public extern "C" CFStringRef? kLSQuarantineTypeOtherDownload;
 
-public extern "C" CFStringRef kLSQuarantineTypeEmailAttachment;
+public extern "C" CFStringRef? kLSQuarantineTypeEmailAttachment;
 
-public extern "C" CFStringRef kLSQuarantineTypeInstantMessageAttachment;
+public extern "C" CFStringRef? kLSQuarantineTypeInstantMessageAttachment;
 
-public extern "C" CFStringRef kLSQuarantineTypeCalendarEventAttachment;
+public extern "C" CFStringRef? kLSQuarantineTypeCalendarEventAttachment;
 
-public extern "C" CFStringRef kLSQuarantineTypeOtherAttachment;
+public extern "C" CFStringRef? kLSQuarantineTypeOtherAttachment;
 
-public extern "C" CFStringRef kLSQuarantineOriginURLKey;
+public extern "C" CFStringRef? kLSQuarantineOriginURLKey;
 
-public extern "C" CFStringRef kLSQuarantineDataURLKey;
+public extern "C" CFStringRef? kLSQuarantineDataURLKey;
 
 #endif

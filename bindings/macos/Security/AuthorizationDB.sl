@@ -25,14 +25,15 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Security")
 
-public extern "C" OSStatus AuthorizationRightGet(byte* rightName, CFDictionaryRef* rightDefinition);
+public extern "C" OSStatus AuthorizationRightGet(byte* rightName, __CFDictionary** rightDefinition);
 
-public extern "C" OSStatus AuthorizationRightSet(AuthorizationRef authRef, byte* rightName, CFTypeRef rightDefinition, CFStringRef descriptionKey, CFBundleRef bundle, CFStringRef localeTableName);
+public extern "C" OSStatus AuthorizationRightSet(AuthorizationRef authRef, byte* rightName, CFTypeRef rightDefinition, CFStringRef? descriptionKey, CFBundleRef? bundle, CFStringRef? localeTableName);
 
 public extern "C" OSStatus AuthorizationRightRemove(AuthorizationRef authRef, byte* rightName);
 

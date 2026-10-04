@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -43,13 +44,17 @@ public using CFHashCode = ulong;
 
 public using CFIndex = long;
 
-public using CFTypeRef = void*;
+/// Any Core Foundation object.
+[CFType]
+public extern objc class CFTypeRef { }
 
 public struct __CFString;
 
-public using CFStringRef = __CFString*;
+[CFType("CFStringGetTypeID")]
+public extern objc class CFStringRef : CFTypeRef { }
 
-public using CFMutableStringRef = __CFString*;
+[CFType]
+public extern objc class CFMutableStringRef : CFStringRef { }
 
 public using CFPropertyListRef = CFTypeRef;
 
@@ -72,33 +77,35 @@ public extern "C" CFRange __CFRangeMake(CFIndex loc, CFIndex len);
 
 public struct __CFNull;
 
-public using CFNullRef = __CFNull*;
+[CFType("CFNullGetTypeID")]
+public extern objc class CFNullRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFNullGetTypeID();
 
-public extern "C" CFNullRef kCFNull;
+public extern "C" CFNullRef? kCFNull;
 
 public struct __CFAllocator;
 
-public using CFAllocatorRef = __CFAllocator*;
+[CFType("CFAllocatorGetTypeID")]
+public extern objc class CFAllocatorRef : CFTypeRef { }
 
-public extern "C" CFAllocatorRef kCFAllocatorDefault;
+public extern "C" CFAllocatorRef? kCFAllocatorDefault;
 
-public extern "C" CFAllocatorRef kCFAllocatorSystemDefault;
+public extern "C" CFAllocatorRef? kCFAllocatorSystemDefault;
 
-public extern "C" CFAllocatorRef kCFAllocatorMalloc;
+public extern "C" CFAllocatorRef? kCFAllocatorMalloc;
 
-public extern "C" CFAllocatorRef kCFAllocatorMallocZone;
+public extern "C" CFAllocatorRef? kCFAllocatorMallocZone;
 
-public extern "C" CFAllocatorRef kCFAllocatorNull;
+public extern "C" CFAllocatorRef? kCFAllocatorNull;
 
-public extern "C" CFAllocatorRef kCFAllocatorUseContext;
+public extern "C" CFAllocatorRef? kCFAllocatorUseContext;
 
 public delegate void* CFAllocatorRetainCallBack(void* arg0);
 
 public delegate void CFAllocatorReleaseCallBack(void* arg0);
 
-public delegate CFStringRef CFAllocatorCopyDescriptionCallBack(void* arg0);
+public delegate __CFString* CFAllocatorCopyDescriptionCallBack(void* arg0);
 
 public delegate void* CFAllocatorAllocateCallBack(CFIndex arg0, CFOptionFlags arg1, void* arg2);
 
@@ -123,53 +130,47 @@ public struct CFAllocatorContext
 
 public extern "C" CFTypeID CFAllocatorGetTypeID();
 
-public extern "C" void CFAllocatorSetDefault(CFAllocatorRef allocator);
+public extern "C" void CFAllocatorSetDefault(CFAllocatorRef? allocator);
 
-public extern "C" CFAllocatorRef CFAllocatorGetDefault();
+public extern "C" CFAllocatorRef? CFAllocatorGetDefault();
 
-public extern "C" CFAllocatorRef CFAllocatorCreate(CFAllocatorRef allocator, CFAllocatorContext* context);
-
-/// macOS 15.0 and later.
-public extern "C" void* CFAllocatorAllocateTyped(CFAllocatorRef allocator, CFIndex size, CFAllocatorTypeID descriptor, CFOptionFlags hint);
+[ReturnsRetained] public extern "C" CFAllocatorRef? CFAllocatorCreate(CFAllocatorRef? allocator, CFAllocatorContext* context);
 
 /// macOS 15.0 and later.
-public extern "C" void* CFAllocatorReallocateTyped(CFAllocatorRef allocator, void* ptr, CFIndex newsize, CFAllocatorTypeID descriptor, CFOptionFlags hint);
+public extern "C" void* CFAllocatorAllocateTyped(CFAllocatorRef? allocator, CFIndex size, CFAllocatorTypeID descriptor, CFOptionFlags hint);
 
 /// macOS 15.0 and later.
-public extern "C" void* CFAllocatorAllocateBytes(CFAllocatorRef allocator, CFIndex size, CFOptionFlags hint);
+public extern "C" void* CFAllocatorReallocateTyped(CFAllocatorRef? allocator, void* ptr, CFIndex newsize, CFAllocatorTypeID descriptor, CFOptionFlags hint);
 
 /// macOS 15.0 and later.
-public extern "C" void* CFAllocatorReallocateBytes(CFAllocatorRef allocator, void* ptr, CFIndex newsize, CFOptionFlags hint);
+public extern "C" void* CFAllocatorAllocateBytes(CFAllocatorRef? allocator, CFIndex size, CFOptionFlags hint);
 
-public extern "C" void* CFAllocatorAllocate(CFAllocatorRef allocator, CFIndex size, CFOptionFlags hint);
+/// macOS 15.0 and later.
+public extern "C" void* CFAllocatorReallocateBytes(CFAllocatorRef? allocator, void* ptr, CFIndex newsize, CFOptionFlags hint);
 
-public extern "C" void* CFAllocatorReallocate(CFAllocatorRef allocator, void* ptr, CFIndex newsize, CFOptionFlags hint);
+public extern "C" void* CFAllocatorAllocate(CFAllocatorRef? allocator, CFIndex size, CFOptionFlags hint);
 
-public extern "C" void CFAllocatorDeallocate(CFAllocatorRef allocator, void* ptr);
+public extern "C" void* CFAllocatorReallocate(CFAllocatorRef? allocator, void* ptr, CFIndex newsize, CFOptionFlags hint);
 
-public extern "C" CFIndex CFAllocatorGetPreferredSizeForSize(CFAllocatorRef allocator, CFIndex size, CFOptionFlags hint);
+public extern "C" void CFAllocatorDeallocate(CFAllocatorRef? allocator, void* ptr);
 
-public extern "C" void CFAllocatorGetContext(CFAllocatorRef allocator, CFAllocatorContext* context);
+public extern "C" CFIndex CFAllocatorGetPreferredSizeForSize(CFAllocatorRef? allocator, CFIndex size, CFOptionFlags hint);
 
-public extern "C" CFTypeID CFGetTypeID(CFTypeRef cf);
+public extern "C" void CFAllocatorGetContext(CFAllocatorRef? allocator, CFAllocatorContext* context);
 
-public extern "C" CFStringRef CFCopyTypeIDDescription(CFTypeID type_id);
+public extern "C" CFTypeID CFGetTypeID(CFTypeRef? cf);
 
-public extern "C" CFTypeRef CFRetain(CFTypeRef cf);
+[ReturnsRetained] public extern "C" CFStringRef? CFCopyTypeIDDescription(CFTypeID type_id);
 
-public extern "C" void CFRelease(CFTypeRef cf);
+public extern "C" CFIndex CFGetRetainCount(CFTypeRef? cf);
 
-public extern "C" CFTypeRef CFAutorelease(CFTypeRef arg);
+public extern "C" Boolean CFEqual(CFTypeRef? cf1, CFTypeRef? cf2);
 
-public extern "C" CFIndex CFGetRetainCount(CFTypeRef cf);
+public extern "C" CFHashCode CFHash(CFTypeRef? cf);
 
-public extern "C" Boolean CFEqual(CFTypeRef cf1, CFTypeRef cf2);
+[ReturnsRetained] public extern "C" CFStringRef? CFCopyDescription(CFTypeRef? cf);
 
-public extern "C" CFHashCode CFHash(CFTypeRef cf);
-
-public extern "C" CFStringRef CFCopyDescription(CFTypeRef cf);
-
-public extern "C" CFAllocatorRef CFGetAllocator(CFTypeRef cf);
+public extern "C" CFAllocatorRef? CFGetAllocator(CFTypeRef? cf);
 
 public const int CF_HAS_TYPED_ALLOCATOR = 0;
 

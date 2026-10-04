@@ -1,4 +1,56 @@
 # Declarations tools/Stainless.Bindgen could not bind, and why. Regenerated with the bindings.
+AVFAudio/AVAudioSequencer: AVMakeBeatRange -- inline in the header, so nothing exports it
+AVFAudio/AVAudioSequencer: AVMusicTimeStampEndOfTrack -- a double macro that is not a literal (DBL_MAX)
+AVFAudio/AVAudioSession: AVAudioSessionHardwareConfiguration -- it uses 'AVAudioSession', which is unavailable on macOS
+AVFAudio/AVAudioSession: Activation -- it uses 'AVAudioSession', which is unavailable on macOS
+AVFAudio/AVAudioSession: MicrophoneInjection -- it uses 'AVAudioSession', which is unavailable on macOS
+AVFAudio/AVAudioSession: Observation -- it uses 'AVAudioSession', which is unavailable on macOS
+AVFAudio/AVAudioSession: RoutingConfiguration -- it uses 'AVAudioSession', which is unavailable on macOS
+AVFAudio/AVAudioSessionDeprecated: AVAudioSessionDeprecated -- it uses 'AVAudioSession', which is unavailable on macOS
+AVFAudio/AVAudioSessionRoute: BluetoothMicrophoneExtension -- it uses 'AVAudioSessionPortDescription', which is unavailable on macOS
+AVFAudio/AVAudioSettings: AVLinearPCMIsNonInterleavedKey -- a macro of type 'CPointer { Pointee = CTypedef { Name = NSString } }', which a const cannot hold
+AVFAudio/AVAudioTypes: AVAudioMake3DAngularOrientation -- inline in the header, so nothing exports it
+AVFAudio/AVAudioTypes: AVAudioMake3DPoint -- inline in the header, so nothing exports it
+AVFAudio/AVAudioTypes: AVAudioMake3DVector -- inline in the header, so nothing exports it
+AVFAudio/AVAudioTypes: AVAudioMake3DVectorOrientation -- inline in the header, so nothing exports it
+AVFoundation/AVAudioMix: AVF_AUDIO_PROCESSING_TAP_AVAILABLE -- a macro of type 'CUnsupported { Why = a typeof type }', which a const cannot hold
+AVFoundation/AVCameraCalibrationData: AVCameraCalibrationData.extrinsicMatrix -- it uses 'matrix_float4x3', which is skipped: it uses 'simd_float4x3', which is skipped: it uses 'simd_float3', which is skipped: a vector type
+AVFoundation/AVCameraCalibrationData: AVCameraCalibrationData.intrinsicMatrix -- it uses 'matrix_float3x3', which is skipped: it uses 'simd_float3x3', which is skipped: it uses 'simd_float3', which is skipped: a vector type
+Accelerate/vImage_vImage_CVUtilities: vImageCVImageFormat_Release -- manual reference counting, which ARC does
+Accelerate/vImage_vImage_CVUtilities: vImageCVImageFormat_Retain -- manual reference counting, which ARC does
+Accelerate/vImage_vImage_Utilities: vImageConverter_Release -- manual reference counting, which ARC does
+Accelerate/vImage_vImage_Utilities: vImageConverter_Retain -- manual reference counting, which ARC does
+AppKit/NSAlert: NSAlert.alertWithMessageText:defaultButton:alternateButton:otherButton:informativeTextWithFormat: -- a variadic message, which Stainless cannot send
+AppKit/NSAnimation: NSAnimatablePropertyContainer.defaultAnimationForKey: -- a class method of a protocol, which has no class to send it to
+AppKit/NSApplication: NSApplicationDelegate.application:handlerForIntent: -- 'INIntent', which no header defines
+AppKit/NSApplication: NSApplicationDelegate.application:userDidAcceptCloudKitShareWithMetadata: -- 'CKShareMetadata', which no header defines
+AppKit/NSCollectionViewCompositionalLayout: NSDirectionalEdgeInsetsMake -- inline in the header, so nothing exports it
+AppKit/NSDiffableDataSource: NSCollectionViewDiffableDataSource.initWithCollectionView:itemProvider: -- it uses 'NSCollectionViewDiffableDataSourceItemProvider', which is skipped: the type 'ItemIdentifierType', which no header declares
+AppKit/NSDiffableDataSource: NSCollectionViewDiffableDataSourceItemProvider -- the type 'ItemIdentifierType', which no header declares
+AppKit/NSEvent: NSEventMaskFromType -- inline in the header, so nothing exports it
+AppKit/NSGradient: NSGradient.initWithColorsAndLocations: -- a variadic message, which Stainless cannot send
+AppKit/NSImageRep: NSImageRepRegistryChangedNotification -- a macro of type 'CPointer { Pointee = CTypedef { Name = NSString } }', which a const cannot hold
+AppKit/NSImageView: NSImageView.addSymbolEffect: -- it uses 'NSSymbolEffect' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.addSymbolEffect:options: -- it uses 'NSSymbolEffect' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.addSymbolEffect:options:animated: -- it uses 'NSSymbolEffect' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.removeAllSymbolEffectsWithOptions: -- it uses 'NSSymbolEffectOptions' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.removeAllSymbolEffectsWithOptions:animated: -- it uses 'NSSymbolEffectOptions' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.removeSymbolEffectOfType: -- it uses 'NSSymbolEffect' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.removeSymbolEffectOfType:options: -- it uses 'NSSymbolEffect' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.removeSymbolEffectOfType:options:animated: -- it uses 'NSSymbolEffect' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.setSymbolImage:withContentTransition: -- it uses 'NSSymbolContentTransition' from Symbols, which is not generated
+AppKit/NSImageView: NSImageView.setSymbolImage:withContentTransition:options: -- it uses 'NSSymbolContentTransition' from Symbols, which is not generated
+AppKit/NSMovie: NSMovie.QTMovie -- 'QTMovie', which no header defines
+AppKit/NSMovie: NSMovie.initWithMovie: -- 'QTMovie', which no header defines
+AppKit/NSPasteboard: NSPasteboardReading.readableTypesForPasteboard: -- a class method of a protocol, which has no class to send it to
+AppKit/NSPasteboard: NSPasteboardReading.readingOptionsForType:pasteboard: -- a class method of a protocol, which has no class to send it to
+AppKit/NSSharingService: NSCloudSharingServiceDelegate.sharingService:didSaveShare: -- 'CKShare', which no header defines
+AppKit/NSSharingService: NSCloudSharingServiceDelegate.sharingService:didStopSharing: -- 'CKShare', which no header defines
+AppKit/NSSharingService: NSItemProvider.registerCloudKitShare:container: -- 'CKShare', which no header defines
+AppKit/NSSharingService: NSItemProvider.registerCloudKitShareWithPreparationHandler: -- 'CKShare', which no header defines
+AppKit/NSToolbarItem: NSCloudSharingValidation.cloudShareForUserInterfaceItem: -- 'CKShare', which no header defines
+AppKit/NSTouch: NSTouchTypeMaskFromType -- inline in the header, so nothing exports it
+AppKit/NSWindowRestoration: NSWindowRestoration.restoreWindowWithIdentifier:state:completionHandler: -- a class method of a protocol, which has no class to send it to
 ApplicationServices/ATS_ATSFont: kATSFontNameTableBytes -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 ApplicationServices/ATS_ATSFont: kATSFontNameTableCode -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 ApplicationServices/ATS_ATSFont: kATSFontNameTableLanguage -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
@@ -747,14 +799,6 @@ ApplicationServices/QD_ColorSyncDeprecated: kCMDeviceStateNotification -- a macr
 ApplicationServices/QD_ColorSyncDeprecated: kCMDeviceUnregisteredNotification -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 ApplicationServices/QD_ColorSyncDeprecated: kCMDisplayDeviceProfilesNotification -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 ApplicationServices/QD_ColorSyncDeprecated: kCMPrefsChangedNotification -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
-AudioToolbox/AUAudioUnit: AUMIDICIProfileChangedBlock -- the type 'MIDICIProfile', which no header declares
-AudioToolbox/AUAudioUnit: CallHostBlock -- the type 'NSDictionary', which no header declares
-AudioToolbox/AUAudioUnitImplementation: AUImplementorDisplayNameWithLengthCallback -- the type 'NSString', which no header declares
-AudioToolbox/AUAudioUnitImplementation: AUImplementorStringFromValueCallback -- the type 'NSString', which no header declares
-AudioToolbox/AUAudioUnitImplementation: AUImplementorValueFromStringCallback -- the type 'AUParameter', which no header declares
-AudioToolbox/AUAudioUnitImplementation: AUImplementorValueObserver -- the type 'AUParameter', which no header declares
-AudioToolbox/AUAudioUnitImplementation: AUImplementorValueProvider -- the type 'AUParameter', which no header declares
-AudioToolbox/AUComponent: AudioComponentCopyIcon -- the type 'NSImage', which no header declares
 AudioToolbox/AudioCodec: kAudioSettings_AvailableValues -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 17 }', which a const cannot hold
 AudioToolbox/AudioCodec: kAudioSettings_CurrentValue -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 14 }', which a const cannot hold
 AudioToolbox/AudioCodec: kAudioSettings_Hint -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 5 }', which a const cannot hold
@@ -768,7 +812,6 @@ AudioToolbox/AudioCodec: kAudioSettings_Unit -- a macro of type 'CArray { Elemen
 AudioToolbox/AudioCodec: kAudioSettings_ValueType -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 11 }', which a const cannot hold
 AudioToolbox/AudioCodec: kAudioSettings_Version -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 8 }', which a const cannot hold
 AudioToolbox/AudioComponent: AudioComponentFactoryFunction -- it uses 'AudioComponentPlugInInterface', which is skipped: it uses 'AudioComponentMethod', which is skipped: a variadic function pointer, which a delegate cannot be
-AudioToolbox/AudioComponent: AudioComponentGetIcon -- the type 'NSImage', which no header declares
 AudioToolbox/AudioComponent: AudioComponentMethod -- a variadic function pointer, which a delegate cannot be
 AudioToolbox/AudioComponent: AudioComponentPlugInInterface -- it uses 'AudioComponentMethod', which is skipped: a variadic function pointer, which a delegate cannot be
 AudioToolbox/AudioComponent: AudioComponentRegister -- it uses 'AudioComponentFactoryFunction', which is skipped: it uses 'AudioComponentPlugInInterface', which is skipped: it uses 'AudioComponentMethod', which is skipped: a variadic function pointer, which a delegate cannot be
@@ -801,16 +844,12 @@ AudioToolbox/AudioFile: kAFInfoDictionary_TimeSignature -- a macro of type 'CArr
 AudioToolbox/AudioFile: kAFInfoDictionary_Title -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 6 }', which a const cannot hold
 AudioToolbox/AudioFile: kAFInfoDictionary_TrackNumber -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 13 }', which a const cannot hold
 AudioToolbox/AudioFile: kAFInfoDictionary_Year -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 5 }', which a const cannot hold
-AudioToolbox/AudioQueue: AudioQueueNewInputWithDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-AudioToolbox/AudioQueue: AudioQueueNewOutputWithDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 AudioToolbox/AudioSession: kAudioSession_AudioRouteChangeKey_OldRoute -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 31 }', which a const cannot hold
 AudioToolbox/AudioSession: kAudioSession_AudioRouteChangeKey_Reason -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 29 }', which a const cannot hold
 AudioToolbox/AudioToolbox: kInstrumentInfoKey_LSB -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 4 }', which a const cannot hold
 AudioToolbox/AudioToolbox: kInstrumentInfoKey_MSB -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 4 }', which a const cannot hold
 AudioToolbox/AudioToolbox: kInstrumentInfoKey_Name -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 5 }', which a const cannot hold
 AudioToolbox/AudioToolbox: kInstrumentInfoKey_Program -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 8 }', which a const cannot hold
-AudioToolbox/AudioUnitProperties: AURenderContextObserver -- it uses 'AudioUnitRenderContext', which is skipped: it uses 'os_workgroup_t', which is skipped: the type 'OS_os_workgroup', which no header declares
-AudioToolbox/AudioUnitProperties: AudioUnitRenderContext -- it uses 'os_workgroup_t', which is skipped: the type 'OS_os_workgroup', which no header declares
 AudioToolbox/AudioUnitProperties: GetAudioUnitParameterDisplayType -- inline in the header, so nothing exports it
 AudioToolbox/AudioUnitProperties: SetAudioUnitParameterDisplayType -- inline in the header, so nothing exports it
 AudioToolbox/AudioUnitProperties: kAUPresetCPULoadKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 9 }', which a const cannot hold
@@ -838,9 +877,6 @@ AudioToolbox/AudioUnitProperties: kAudioUnitConfigurationInfo_InitialOutputs -- 
 AudioToolbox/AudioUnitProperties: kAudioUnitConfigurationInfo_MIDIProtocol -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 13 }', which a const cannot hold
 AudioToolbox/AudioUnitProperties: kAudioUnitConfigurationInfo_MigrateFromPlugin -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 18 }', which a const cannot hold
 AudioToolbox/AudioUnitProperties: kAudioUnitConfigurationInfo_SupportedChannelLayoutTags -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 27 }', which a const cannot hold
-AudioToolbox/AudioUnitUtilities: AUEventListenerCreateWithDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-AudioToolbox/AudioUnitUtilities: AUListenerCreateWithDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-AudioToolbox/AudioWorkInterval: AudioWorkIntervalCreate -- it uses 'os_workgroup_interval_t', which is skipped: an Objective-C object qualified by protocols
 AudioToolbox/MusicPlayer: MusicSequenceGetSMPTEResolution -- inline in the header, so nothing exports it
 AudioToolbox/MusicPlayer: MusicSequenceSetSMPTEResolution -- inline in the header, so nothing exports it
 AudioToolbox/MusicPlayer: kMusicTimeStamp_EndOfTrack -- a double macro that is not a literal (DBL_MAX)
@@ -915,7 +951,6 @@ Carbon/HIToolbox_HIToolbar: kHIToolbarSeparatorIdentifier -- a macro of type 'CP
 Carbon/HIToolbox_HIToolbar: kHIToolbarSpaceIdentifier -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 Carbon/HIToolbox_HIView: kHIViewClassID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 Carbon/HIToolbox_HIWindowViews: kHIGrowBoxViewClassID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
-Carbon/HIToolbox_IMKInputSession: IMKTextOrientationName -- the type 'NSString', which no header declares
 Carbon/HIToolbox_MacApplication: kHIAboutBoxCopyrightKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 Carbon/HIToolbox_MacApplication: kHIAboutBoxDescriptionKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 Carbon/HIToolbox_MacApplication: kHIAboutBoxNameKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
@@ -1011,9 +1046,6 @@ Carbon/SecurityHI_URLAccess: kURLTotalItems -- a macro of type 'CArray { Element
 Carbon/SecurityHI_URLAccess: kURLURL -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 10 }', which a const cannot hold
 Carbon/SecurityHI_URLAccess: kURLUserName -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 12 }', which a const cannot hold
 ColorSync/ColorSyncProfile: COLORSYNC_PROFILE_INSTALL_ENTITLEMENT -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 46 }', which a const cannot hold
-CoreAudio/AudioHardware: AudioDeviceCreateIOProcIDWithBlock -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-CoreAudio/AudioHardware: AudioObjectAddPropertyListenerBlock -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-CoreAudio/AudioHardware: AudioObjectRemovePropertyListenerBlock -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 CoreAudio/AudioHardware: kAudioAggregateDeviceClockDeviceKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 6 }', which a const cannot hold
 CoreAudio/AudioHardware: kAudioAggregateDeviceIsPrivateKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 8 }', which a const cannot hold
 CoreAudio/AudioHardware: kAudioAggregateDeviceIsStackedKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 8 }', which a const cannot hold
@@ -1048,11 +1080,22 @@ CoreAudio/AudioHardwareBase: kAudioEndPointOutputChannelsKey -- a macro of type 
 CoreAudio/AudioHardwareBase: kAudioEndPointUIDKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 4 }', which a const cannot hold
 CoreAudio/AudioHardwareDeprecated: kAudioAggregateDeviceMasterSubDeviceKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 7 }', which a const cannot hold
 CoreAudio/AudioHardwareDeprecated: kAudioHardwareRunLoopMode -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 26 }', which a const cannot hold
-CoreAudio/AudioHardwareTapping: AudioHardwareCreateProcessTap -- the type 'CATapDescription', which no header declares
 CoreAudio/AudioServerPlugIn: kAudioServerPlugInDriverInterfaceUUID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 CoreAudio/AudioServerPlugIn: kAudioServerPlugInTypeUUID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 CoreAudioTypes/CoreAudioBaseTypes: AudioChannelLayoutTag_GetNumberOfChannels -- inline in the header, so nothing exports it
+CoreData/NSCoreDataCoreSpotlightDelegate: NSCoreDataCoreSpotlightDelegate.attributeSetForObject: -- 'CSSearchableItemAttributeSet', which no header defines
+CoreData/NSCoreDataCoreSpotlightDelegate: NSCoreDataCoreSpotlightDelegate.searchableIndex:reindexAllSearchableItemsWithAcknowledgementHandler: -- 'CSSearchableIndex', which no header defines
+CoreData/NSCoreDataCoreSpotlightDelegate: NSCoreDataCoreSpotlightDelegate.searchableIndex:reindexSearchableItemsWithIdentifiers:acknowledgementHandler: -- 'CSSearchableIndex', which no header defines
+CoreData/NSPersistentCloudKitContainer: NSPersistentCloudKitContainer.recordForManagedObjectID: -- it uses 'CKRecord' from CloudKit, which is not generated
+CoreData/NSPersistentCloudKitContainer: NSPersistentCloudKitContainer.recordIDForManagedObjectID: -- 'CKRecordID', which no header defines
+CoreData/NSPersistentCloudKitContainerOptions: NSPersistentCloudKitContainerOptions.databaseScope -- it uses 'CKDatabaseScope' from CloudKit, which is not generated
+CoreData/NSPersistentCloudKitContainer_Sharing: NSPersistentCloudKitContainer.persistUpdatedShare:inPersistentStore:completion: -- 'CKShare', which no header defines
+CoreData/NSPersistentCloudKitContainer_Sharing: NSPersistentCloudKitContainer.purgeObjectsAndRecordsInZoneWithID:inPersistentStore:completion: -- 'CKRecordZoneID', which no header defines
+CoreData/NSPersistentCloudKitContainer_Sharing: NSPersistentCloudKitContainer.shareManagedObjects:toShare:completion: -- 'CKShare', which no header defines
+CoreFoundation/CFBase: CFAutorelease -- manual reference counting, which ARC does
 CoreFoundation/CFBase: CFRangeMake -- inline in the header, so nothing exports it
+CoreFoundation/CFBase: CFRelease -- manual reference counting, which ARC does
+CoreFoundation/CFBase: CFRetain -- manual reference counting, which ARC does
 CoreFoundation/CFByteOrder: CFByteOrderGetCurrent -- inline in the header, so nothing exports it
 CoreFoundation/CFByteOrder: CFConvertDoubleHostToSwapped -- inline in the header, so nothing exports it
 CoreFoundation/CFByteOrder: CFConvertDoubleSwappedToHost -- inline in the header, so nothing exports it
@@ -1081,12 +1124,7 @@ CoreFoundation/CFCGTypes: CGFLOAT_EPSILON -- a double macro that is not a litera
 CoreFoundation/CFCGTypes: CGFLOAT_MAX -- a double macro that is not a literal (DBL_MAX)
 CoreFoundation/CFCGTypes: CGFLOAT_MIN -- a double macro that is not a literal (DBL_MIN)
 CoreFoundation/CFFileSecurity: kCFFileSecurityRemoveACL -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = _acl } }', which a const cannot hold
-CoreFoundation/CFMessagePort: CFMessagePortSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 CoreFoundation/CFPlugInCOM: IUnknownUUID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
-CoreFoundation/CFStream: CFReadStreamCopyDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-CoreFoundation/CFStream: CFReadStreamSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-CoreFoundation/CFStream: CFWriteStreamCopyDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-CoreFoundation/CFStream: CFWriteStreamSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 CoreFoundation/CFString: CFStringAppendFormatAndArguments -- a va_list, which Stainless cannot make
 CoreFoundation/CFString: CFStringCreateStringWithValidatedFormatAndArguments -- a va_list, which Stainless cannot make
 CoreFoundation/CFString: CFStringCreateWithFormatAndArguments -- a va_list, which Stainless cannot make
@@ -1102,7 +1140,19 @@ CoreFoundation/CFUserNotification: CFUserNotificationSecureTextField -- inline i
 CoreGraphics/CGAffineTransform: __CGAffineTransformMake -- inline in the header, so nothing exports it
 CoreGraphics/CGAffineTransform: __CGPointApplyAffineTransform -- inline in the header, so nothing exports it
 CoreGraphics/CGAffineTransform: __CGSizeApplyAffineTransform -- inline in the header, so nothing exports it
+CoreGraphics/CGColor: CGColorRelease -- manual reference counting, which ARC does
+CoreGraphics/CGColor: CGColorRetain -- manual reference counting, which ARC does
 CoreGraphics/CGColorConversionInfo: CGColorConversionInfoCreateFromListWithArguments -- a va_list, which Stainless cannot make
+CoreGraphics/CGColorSpace: CGColorSpaceRelease -- manual reference counting, which ARC does
+CoreGraphics/CGColorSpace: CGColorSpaceRetain -- manual reference counting, which ARC does
+CoreGraphics/CGContext: CGContextRelease -- manual reference counting, which ARC does
+CoreGraphics/CGContext: CGContextRetain -- manual reference counting, which ARC does
+CoreGraphics/CGDataConsumer: CGDataConsumerRelease -- manual reference counting, which ARC does
+CoreGraphics/CGDataConsumer: CGDataConsumerRetain -- manual reference counting, which ARC does
+CoreGraphics/CGDataProvider: CGDataProviderRelease -- manual reference counting, which ARC does
+CoreGraphics/CGDataProvider: CGDataProviderRetain -- manual reference counting, which ARC does
+CoreGraphics/CGDirectDisplay: CGDisplayModeRelease -- manual reference counting, which ARC does
+CoreGraphics/CGDirectDisplay: CGDisplayModeRetain -- manual reference counting, which ARC does
 CoreGraphics/CGDirectDisplay: kCGDisplayBitsPerPixel -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreGraphics/CGDirectDisplay: kCGDisplayBitsPerSample -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreGraphics/CGDirectDisplay: kCGDisplayBytesPerRow -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
@@ -1118,17 +1168,34 @@ CoreGraphics/CGDirectDisplay: kCGDisplayRefreshRate -- a macro of type 'CPointer
 CoreGraphics/CGDirectDisplay: kCGDisplaySamplesPerPixel -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreGraphics/CGDirectDisplay: kCGDisplayWidth -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreGraphics/CGDirectDisplay: kCGIODisplayModeID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
-CoreGraphics/CGDirectDisplayMetal: CGDirectDisplayCopyCurrentMetalDevice -- an Objective-C object qualified by protocols
 CoreGraphics/CGDisplayFade: kCGMaxDisplayReservationInterval -- a float macro that is not a literal (((CGDisplayReservationInterval)(15.0)))
 CoreGraphics/CGEventTypes: kCGNotifyEventTapAdded -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 37 }', which a const cannot hold
 CoreGraphics/CGEventTypes: kCGNotifyEventTapRemoved -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 39 }', which a const cannot hold
+CoreGraphics/CGFont: CGFontRelease -- manual reference counting, which ARC does
+CoreGraphics/CGFont: CGFontRetain -- manual reference counting, which ARC does
+CoreGraphics/CGFunction: CGFunctionRelease -- manual reference counting, which ARC does
+CoreGraphics/CGFunction: CGFunctionRetain -- manual reference counting, which ARC does
 CoreGraphics/CGGeometry: CGPointMake -- inline in the header, so nothing exports it
 CoreGraphics/CGGeometry: CGRectMake -- inline in the header, so nothing exports it
 CoreGraphics/CGGeometry: CGSizeMake -- inline in the header, so nothing exports it
 CoreGraphics/CGGeometry: CGVectorMake -- inline in the header, so nothing exports it
 CoreGraphics/CGGeometry: __CGPointEqualToPoint -- inline in the header, so nothing exports it
 CoreGraphics/CGGeometry: __CGSizeEqualToSize -- inline in the header, so nothing exports it
+CoreGraphics/CGGradient: CGGradientRelease -- manual reference counting, which ARC does
+CoreGraphics/CGGradient: CGGradientRetain -- manual reference counting, which ARC does
 CoreGraphics/CGImage: CGBitmapInfoMake -- inline in the header, so nothing exports it
+CoreGraphics/CGImage: CGImageRelease -- manual reference counting, which ARC does
+CoreGraphics/CGImage: CGImageRetain -- manual reference counting, which ARC does
+CoreGraphics/CGLayer: CGLayerRelease -- manual reference counting, which ARC does
+CoreGraphics/CGLayer: CGLayerRetain -- manual reference counting, which ARC does
+CoreGraphics/CGPDFDocument: CGPDFDocumentRelease -- manual reference counting, which ARC does
+CoreGraphics/CGPDFDocument: CGPDFDocumentRetain -- manual reference counting, which ARC does
+CoreGraphics/CGPDFPage: CGPDFPageRelease -- manual reference counting, which ARC does
+CoreGraphics/CGPDFPage: CGPDFPageRetain -- manual reference counting, which ARC does
+CoreGraphics/CGPath: CGPathRelease -- manual reference counting, which ARC does
+CoreGraphics/CGPath: CGPathRetain -- manual reference counting, which ARC does
+CoreGraphics/CGPattern: CGPatternRelease -- manual reference counting, which ARC does
+CoreGraphics/CGPattern: CGPatternRetain -- manual reference counting, which ARC does
 CoreGraphics/CGSession: kCGNotifyGUIConsoleSessionChanged -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 48 }', which a const cannot hold
 CoreGraphics/CGSession: kCGNotifyGUISessionUserChanged -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 45 }', which a const cannot hold
 CoreGraphics/CGSession: kCGSessionConsoleSetKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
@@ -1136,19 +1203,16 @@ CoreGraphics/CGSession: kCGSessionLoginDoneKey -- a macro of type 'CPointer { Po
 CoreGraphics/CGSession: kCGSessionOnConsoleKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreGraphics/CGSession: kCGSessionUserIDKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreGraphics/CGSession: kCGSessionUserNameKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
-CoreMIDI/MIDICIDeviceManager: MIDICIDeviceManagerDictionaryKey -- the type 'NSString', which no header declares
-CoreMIDI/MIDICIDeviceManager: MIDICIDeviceObjectKey -- it uses 'MIDICIDeviceManagerDictionaryKey', which is skipped: the type 'NSString', which no header declares
-CoreMIDI/MIDICIDeviceManager: MIDICIDeviceWasAddedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMIDI/MIDICIDeviceManager: MIDICIDeviceWasRemovedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMIDI/MIDICIDeviceManager: MIDICIProfileObjectKey -- it uses 'MIDICIDeviceManagerDictionaryKey', which is skipped: the type 'NSString', which no header declares
-CoreMIDI/MIDICIDeviceManager: MIDICIProfileWasRemovedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMIDI/MIDICIDeviceManager: MIDICIProfileWasUpdatedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMIDI/MIDICapabilityInquiry: MIDICIDiscoveryResponseBlock -- an Objective-C object qualified by protocols
-CoreMIDI/MIDICapabilityInquiry: MIDICIInitiatiorMUID -- the type 'NSNumber', which no header declares
-CoreMIDI/MIDICapabilityInquiry: MIDICIProfileChangedBlock -- the type 'MIDICISession', which no header declares
-CoreMIDI/MIDICapabilityInquiry: MIDICIProfileSpecificDataBlock -- the type 'MIDICISession', which no header declares
-CoreMIDI/MIDICapabilityInquiry: MIDICIProfileStateList -- an Objective-C object qualified by protocols
-CoreMIDI/MIDICapabilityInquiry: MIDICISessionDisconnectBlock -- the type 'MIDICISession', which no header declares
+CoreGraphics/CGShading: CGShadingRelease -- manual reference counting, which ARC does
+CoreGraphics/CGShading: CGShadingRetain -- manual reference counting, which ARC does
+CoreImage/CIFilter: CIFilter.apply: -- a variadic message, which Stainless cannot send
+CoreImage/CIFilter: CIFilter.customAttributes -- a class method of a protocol, which has no class to send it to
+CoreImage/CIFilter: CIFilter.filterWithName:keysAndValues: -- a variadic message, which Stainless cannot send
+CoreImage/CIFilterBuiltins: CICoreMLModel.model -- 'MLModel', which no header defines
+CoreImage/CISampler: CISampler.initWithImage:keysAndValues: -- a variadic message, which Stainless cannot send
+CoreImage/CISampler: CISampler.samplerWithImage:keysAndValues: -- a variadic message, which Stainless cannot send
+CoreMIDI/MIDICapabilityInquiry: MIDICIProfileStateList -- the type CObjCQualified { Base = CTypedef { Name = NSArray }, Arguments = System.Collections.Generic.List`1[Stainless.Bindgen.CType] }
+CoreMIDI/MIDICapabilityInquiry: MIDICIResponder.initWithDeviceInfo:profileDelegate:profileStates:supportProperties: -- it uses 'MIDICIProfileStateList', which is skipped: the type CObjCQualified { Base = CTypedef { Name = NSArray }, Arguments = System.Collections.Generic.List`1[Stainless.Bindgen.CType] }
 CoreMIDI/MIDIDriver: kMIDIDriverInterface2ID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 CoreMIDI/MIDIDriver: kMIDIDriverInterface3ID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 CoreMIDI/MIDIDriver: kMIDIDriverInterfaceID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
@@ -1203,31 +1267,19 @@ CoreMIDI/MIDIMessages: MIDINoOpMessage -- inline in the header, so nothing expor
 CoreMIDI/MIDIMessages: MIDITicksSinceLastEventMessage -- inline in the header, so nothing exports it
 CoreMIDI/MIDIMessages: __builtin___memcpy_chk -- the type '__size_t', which no header declares
 CoreMIDI/MIDIMessages: __builtin_object_size -- the type '__size_t', which no header declares
-CoreMIDI/MIDINetworkSession: MIDINetworkBonjourServiceType -- the type 'NSString', which no header declares
-CoreMIDI/MIDINetworkSession: MIDINetworkNotificationContactsDidChange -- the type 'NSString', which no header declares
-CoreMIDI/MIDINetworkSession: MIDINetworkNotificationSessionDidChange -- the type 'NSString', which no header declares
 CoreMIDI/MIDIServices: MIDIEventPacketNext -- inline in the header, so nothing exports it
 CoreMIDI/MIDIServices: MIDIPacketNext -- inline in the header, so nothing exports it
 CoreMIDI/MIDIThruConnection: MIDIThruConnectionParamsSize -- inline in the header, so nothing exports it
-CoreMIDI/MIDIUMPEndpointManager: MIDIUMPEndpointManagerDictionaryKey -- the type 'NSString', which no header declares
-CoreMIDI/MIDIUMPEndpointManager: MIDIUMPEndpointObjectKey -- it uses 'MIDIUMPEndpointManagerDictionaryKey', which is skipped: the type 'NSString', which no header declares
-CoreMIDI/MIDIUMPEndpointManager: MIDIUMPEndpointWasAddedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMIDI/MIDIUMPEndpointManager: MIDIUMPEndpointWasRemovedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMIDI/MIDIUMPEndpointManager: MIDIUMPEndpointWasUpdatedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMIDI/MIDIUMPEndpointManager: MIDIUMPFunctionBlockObjectKey -- it uses 'MIDIUMPEndpointManagerDictionaryKey', which is skipped: the type 'NSString', which no header declares
-CoreMIDI/MIDIUMPEndpointManager: MIDIUMPFunctionBlockWasUpdatedNotification -- it uses 'NSNotificationName' from Foundation, which is not generated
-CoreMedia/CMSync: CMTimebaseAddTimerDispatchSource -- it uses 'dispatch_source_t', which is skipped: an Objective-C object qualified by protocols
+CoreMedia/CMBufferQueue: CMBufferQueueDequeueAndRetain -- manual reference counting, which ARC does
+CoreMedia/CMBufferQueue: CMBufferQueueDequeueIfDataReadyAndRetain -- manual reference counting, which ARC does
 CoreMedia/CMSync: CMTimebaseCopyMaster -- inline in the header, so nothing exports it
 CoreMedia/CMSync: CMTimebaseCopyMasterClock -- inline in the header, so nothing exports it
 CoreMedia/CMSync: CMTimebaseCopyMasterTimebase -- inline in the header, so nothing exports it
 CoreMedia/CMSync: CMTimebaseCopyUltimateMasterClock -- inline in the header, so nothing exports it
 CoreMedia/CMSync: CMTimebaseCreateWithMasterClock -- inline in the header, so nothing exports it
 CoreMedia/CMSync: CMTimebaseCreateWithMasterTimebase -- inline in the header, so nothing exports it
-CoreMedia/CMSync: CMTimebaseRemoveTimerDispatchSource -- it uses 'dispatch_source_t', which is skipped: an Objective-C object qualified by protocols
 CoreMedia/CMSync: CMTimebaseSetMasterClock -- inline in the header, so nothing exports it
 CoreMedia/CMSync: CMTimebaseSetMasterTimebase -- inline in the header, so nothing exports it
-CoreMedia/CMSync: CMTimebaseSetTimerDispatchSourceNextFireTime -- it uses 'dispatch_source_t', which is skipped: an Objective-C object qualified by protocols
-CoreMedia/CMSync: CMTimebaseSetTimerDispatchSourceToFireImmediately -- it uses 'dispatch_source_t', which is skipped: an Objective-C object qualified by protocols
 CoreMedia/CMSync: kCMTimebaseFarFutureCFAbsoluteTime -- a double macro that is not a literal (((CFAbsoluteTime)kCMTimebaseVeryLongCFTimeInterval))
 CoreMedia/CMSync: kCMTimebaseVeryLongCFTimeInterval -- a double macro that is not a literal ((CFTimeInterval)(256.0 * 365.0 * 24.0 * 60.0 * 60.0))
 CoreMedia/CMTag: CMTagCategoryEqualToTagCategory -- inline in the header, so nothing exports it
@@ -1246,7 +1298,6 @@ CoreServices/CarbonCore_AIFF: MACE6to1Name -- a macro of type 'CArray { Element 
 CoreServices/CarbonCore_AIFF: NoneName -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 16 }', which a const cannot hold
 CoreServices/CarbonCore_Debugging: DEBUG_ASSERT_COMPONENT_NAME_STRING -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 19 }', which a const cannot hold
 CoreServices/CarbonCore_Debugging: kComponentSignatureString -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 19 }', which a const cannot hold
-CoreServices/CarbonCore_DiskSpaceRecovery: CSDiskSpaceStartRecovery -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 CoreServices/CarbonCore_Files: ParamBlockRec -- an incomplete union, which only a struct can be
 CoreServices/CarbonCore_Files: kFSFileSecurityRemoveACL -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = _acl } }', which a const cannot hold
 CoreServices/CarbonCore_MachineExceptions: DisposeExceptionHandlerUPP -- it uses 'ExceptionHandlerUPP', which is skipped: it uses 'ExceptionHandlerProcPtr', which is skipped: it uses 'ExceptionInformation', which is skipped: it uses 'VectorInformation', which is skipped: it uses 'VectorInformationIntel64', which is skipped: it uses 'Vector128Intel', which is skipped: '__attribute__((__vector_size__(4 * sizeof(float)))) float' has more after the type
@@ -1328,7 +1379,6 @@ CoreServices/CarbonCore_fp: ldtox80 -- a long double
 CoreServices/CarbonCore_fp: num2decl -- a long double
 CoreServices/CarbonCore_fp: relationl -- a long double
 CoreServices/CarbonCore_fp: x80told -- a long double
-CoreServices/FSEvents_FSEvents: FSEventStreamSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 CoreServices/FSEvents_FSEvents: kFSEventStreamEventExtendedDataPathKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreServices/FSEvents_FSEvents: kFSEventStreamEventExtendedDocIDKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreServices/FSEvents_FSEvents: kFSEventStreamEventExtendedFileIDKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
@@ -1337,17 +1387,22 @@ CoreServices/Metadata_MDImporter: kMDImporterBundleWrapperURLInterfaceID -- a ma
 CoreServices/Metadata_MDImporter: kMDImporterInterfaceID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 CoreServices/Metadata_MDImporter: kMDImporterTypeID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 CoreServices/Metadata_MDImporter: kMDImporterURLInterfaceID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
-CoreServices/Metadata_MDQuery: MDQuerySetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 CoreServices/OSServices_WSProtocolHandler: kWSMethodName -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreServices/OSServices_WSProtocolHandler: kWSMethodParameterOrder -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 CoreServices/OSServices_WSProtocolHandler: kWSMethodParameters -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
-CoreText/CTFont: CTFontDrawImageFromAdaptiveImageProviderAtPoint -- an Objective-C object qualified by protocols
-CoreText/CTFont: CTFontGetTypographicBoundsForAdaptiveImageProvider -- an Objective-C object qualified by protocols
-CoreVideo/CVMetalBuffer: CVMetalBufferGetBuffer -- an Objective-C object qualified by protocols
-CoreVideo/CVMetalBufferCache: CVMetalBufferCacheCreate -- an Objective-C object qualified by protocols
-CoreVideo/CVMetalTexture: CVMetalTextureGetTexture -- an Objective-C object qualified by protocols
-CoreVideo/CVMetalTextureCache: CVMetalTextureCacheCreate -- an Objective-C object qualified by protocols
-CoreVideo/CVMetalTextureCache: CVMetalTextureCacheCreateTextureFromImage -- it uses 'MTLPixelFormat' from Metal, which is not generated
+CoreVideo/CVBuffer: CVBufferRelease -- manual reference counting, which ARC does
+CoreVideo/CVBuffer: CVBufferRetain -- manual reference counting, which ARC does
+CoreVideo/CVDisplayLink: CVDisplayLinkRelease -- manual reference counting, which ARC does
+CoreVideo/CVDisplayLink: CVDisplayLinkRetain -- manual reference counting, which ARC does
+CoreVideo/CVOpenGLBuffer: CVOpenGLBufferRelease -- it takes ownership of 'buffer', which a binding cannot hand over
+CoreVideo/CVOpenGLBufferPool: CVOpenGLBufferPoolRelease -- manual reference counting, which ARC does
+CoreVideo/CVOpenGLBufferPool: CVOpenGLBufferPoolRetain -- manual reference counting, which ARC does
+CoreVideo/CVOpenGLTexture: CVOpenGLTextureRelease -- it takes ownership of 'texture', which a binding cannot hand over
+CoreVideo/CVOpenGLTextureCache: CVOpenGLTextureCacheRelease -- manual reference counting, which ARC does
+CoreVideo/CVOpenGLTextureCache: CVOpenGLTextureCacheRetain -- manual reference counting, which ARC does
+CoreVideo/CVPixelBuffer: CVPixelBufferRelease -- it takes ownership of 'texture', which a binding cannot hand over
+CoreVideo/CVPixelBufferPool: CVPixelBufferPoolRelease -- manual reference counting, which ARC does
+CoreVideo/CVPixelBufferPool: CVPixelBufferPoolRetain -- manual reference counting, which ARC does
 DirectoryService/DirServicesConst: kDS1AttrAdminLimits -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 31 }', which a const cannot hold
 DirectoryService/DirServicesConst: kDS1AttrAdminStatus -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 31 }', which a const cannot hold
 DirectoryService/DirServicesConst: kDS1AttrAlias -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 25 }', which a const cannot hold
@@ -1730,7 +1785,6 @@ DirectoryService/DirServicesConst: kDSValueNonCryptPasswordMarker -- a macro of 
 DirectoryService/DirServicesConst: kStandardSourceAlias -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 40 }', which a const cannot hold
 DirectoryService/DirServicesConst: kStandardTargetAlias -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 40 }', which a const cannot hold
 DirectoryService/DirServicesUtils: dsBuildListFromStringsAllocV -- a va_list, which Stainless cannot make
-DiskArbitration/DASession: DASessionSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 ForceFeedback/ForceFeedbackConstants: kFFEffectType_ConstantForce_ID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 ForceFeedback/ForceFeedbackConstants: kFFEffectType_CustomForce_ID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 ForceFeedback/ForceFeedbackConstants: kFFEffectType_Damper_ID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
@@ -1745,6 +1799,127 @@ ForceFeedback/ForceFeedbackConstants: kFFEffectType_Square_ID -- a macro of type
 ForceFeedback/ForceFeedbackConstants: kFFEffectType_Triangle_ID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 ForceFeedback/IOForceFeedbackLib: kIOForceFeedbackDeviceInterfaceID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 ForceFeedback/IOForceFeedbackLib: kIOForceFeedbackLibTypeID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
+Foundation/NSArray: NSArray.arrayWithObjects: -- a variadic message, which Stainless cannot send
+Foundation/NSArray: NSArray.initWithObjects: -- a variadic message, which Stainless cannot send
+Foundation/NSAttributedString: NSAttributedString.initWithFormat:options:locale: -- a variadic message, which Stainless cannot send
+Foundation/NSAttributedString: NSAttributedString.initWithFormat:options:locale:arguments: -- a va_list, which Stainless cannot make
+Foundation/NSAttributedString: NSAttributedString.initWithFormat:options:locale:context: -- a variadic message, which Stainless cannot send
+Foundation/NSAttributedString: NSAttributedString.initWithFormat:options:locale:context:arguments: -- a va_list, which Stainless cannot make
+Foundation/NSAttributedString: NSAttributedString.localizedAttributedStringWithFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSAttributedString: NSAttributedString.localizedAttributedStringWithFormat:context: -- a variadic message, which Stainless cannot send
+Foundation/NSAttributedString: NSAttributedString.localizedAttributedStringWithFormat:options: -- a variadic message, which Stainless cannot send
+Foundation/NSAttributedString: NSAttributedString.localizedAttributedStringWithFormat:options:context: -- a variadic message, which Stainless cannot send
+Foundation/NSAttributedString: NSMutableAttributedString.appendLocalizedFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSByteOrder: NSConvertHostDoubleToSwapped -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSConvertHostFloatToSwapped -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSConvertSwappedDoubleToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSConvertSwappedFloatToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSHostByteOrder -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapBigDoubleToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapBigFloatToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapBigIntToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapBigLongLongToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapBigLongToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapBigShortToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapDouble -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapFloat -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostDoubleToBig -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostDoubleToLittle -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostFloatToBig -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostFloatToLittle -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostIntToBig -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostIntToLittle -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostLongLongToBig -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostLongLongToLittle -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostLongToBig -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostLongToLittle -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostShortToBig -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapHostShortToLittle -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapInt -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLittleDoubleToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLittleFloatToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLittleIntToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLittleLongLongToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLittleLongToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLittleShortToHost -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLong -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapLongLong -- inline in the header, so nothing exports it
+Foundation/NSByteOrder: NSSwapShort -- inline in the header, so nothing exports it
+Foundation/NSCoder: NSCoder.decodeValuesOfObjCTypes: -- a variadic message, which Stainless cannot send
+Foundation/NSCoder: NSCoder.encodeValuesOfObjCTypes: -- a variadic message, which Stainless cannot send
+Foundation/NSDebug: NSAutoreleasePoolDebugging -- it uses 'NSAutoreleasePool', which is unavailable on macOS
+Foundation/NSDecimal: NSDecimalIsNotANumber -- inline in the header, so nothing exports it
+Foundation/NSDictionary: NSDictionary.dictionaryWithObjectsAndKeys: -- a variadic message, which Stainless cannot send
+Foundation/NSDictionary: NSDictionary.initWithObjectsAndKeys: -- a variadic message, which Stainless cannot send
+Foundation/NSDistantObject: NSDistantObject.setProtocolForProxy: -- 'Protocol', which only the compiler declares
+Foundation/NSException: NSAssertionHandler.handleFailureInFunction:file:lineNumber:description: -- a variadic message, which Stainless cannot send
+Foundation/NSException: NSAssertionHandler.handleFailureInMethod:object:file:lineNumber:description: -- a variadic message, which Stainless cannot send
+Foundation/NSException: NSException.raise:format: -- a variadic message, which Stainless cannot send
+Foundation/NSException: NSException.raise:format:arguments: -- a va_list, which Stainless cannot make
+Foundation/NSExpression: NSExpression.expressionWithFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSExpression: NSExpression.expressionWithFormat:arguments: -- a va_list, which Stainless cannot make
+Foundation/NSGeometry: NSEdgeInsetsMake -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSHeight -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMakePoint -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMakeRect -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMakeSize -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMaxX -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMaxY -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMidX -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMidY -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMinX -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSMinY -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSPointFromCGPoint -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSPointToCGPoint -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSRectFromCGRect -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSRectToCGRect -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSSizeFromCGSize -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSSizeToCGSize -- inline in the header, so nothing exports it
+Foundation/NSGeometry: NSWidth -- inline in the header, so nothing exports it
+Foundation/NSItemProvider: NSItemProviderReading.objectWithItemProviderData:typeIdentifier:error: -- a class method of a protocol, which has no class to send it to
+Foundation/NSItemProvider: NSItemProviderReading.readableTypeIdentifiersForItemProvider -- a class property of a protocol, which has no class to send it to
+Foundation/NSItemProvider: NSItemProviderWriting.itemProviderVisibilityForRepresentationWithTypeIdentifier: -- a class method of a protocol, which has no class to send it to
+Foundation/NSItemProvider: NSItemProviderWriting.writableTypeIdentifiersForItemProvider -- a class property of a protocol, which has no class to send it to
+Foundation/NSKeyedArchiver: NSKeyedUnarchiverDelegate.unarchiver:didDecodeObject: -- it takes ownership of 'object', which a binding cannot hand over
+Foundation/NSMapTable: NSFreeMapTable -- it takes ownership of 'table', which a binding cannot hand over
+Foundation/NSMapTable: NSNotAPointerMapKey -- a macro of type 'CPointer { Pointee = CBuiltin { Name = void } }', which a const cannot hold
+Foundation/NSMapTable: NSNotAnIntMapKey -- a macro of type 'CPointer { Pointee = CBuiltin { Name = void } }', which a const cannot hold
+Foundation/NSMapTable: NSNotAnIntegerMapKey -- a macro of type 'CPointer { Pointee = CBuiltin { Name = void } }', which a const cannot hold
+Foundation/NSObjCRuntime: NSLogv -- a va_list, which Stainless cannot make
+Foundation/NSObjCRuntime: NSProtocolFromString -- 'Protocol', which only the compiler declares
+Foundation/NSObjCRuntime: NSStringFromProtocol -- 'Protocol', which only the compiler declares
+Foundation/NSObject: CFBridgingRelease -- inline in the header, so nothing exports it
+Foundation/NSObject: CFBridgingRetain -- inline in the header, so nothing exports it
+Foundation/NSObject: NSSecureCoding.supportsSecureCoding -- a class property of a protocol, which has no class to send it to
+Foundation/NSOrderedSet: NSOrderedSet.initWithObjects: -- a variadic message, which Stainless cannot send
+Foundation/NSOrderedSet: NSOrderedSet.orderedSetWithObjects: -- a variadic message, which Stainless cannot send
+Foundation/NSPredicate: NSPredicate.predicateWithFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSPredicate: NSPredicate.predicateWithFormat:arguments: -- a va_list, which Stainless cannot make
+Foundation/NSProtocolChecker: NSProtocolChecker.initWithTarget:protocol: -- 'Protocol', which only the compiler declares
+Foundation/NSProtocolChecker: NSProtocolChecker.protocol -- 'Protocol', which only the compiler declares
+Foundation/NSProtocolChecker: NSProtocolChecker.protocolCheckerWithTarget:protocol: -- 'Protocol', which only the compiler declares
+Foundation/NSRange: NSEqualRanges -- inline in the header, so nothing exports it
+Foundation/NSRange: NSLocationInRange -- inline in the header, so nothing exports it
+Foundation/NSRange: NSMakeRange -- inline in the header, so nothing exports it
+Foundation/NSRange: NSMaxRange -- inline in the header, so nothing exports it
+Foundation/NSSet: NSSet.initWithObjects: -- a variadic message, which Stainless cannot send
+Foundation/NSSet: NSSet.setWithObjects: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSMutableString.appendFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.initWithFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.initWithFormat:arguments: -- a va_list, which Stainless cannot make
+Foundation/NSString: NSString.initWithFormat:locale: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.initWithFormat:locale:arguments: -- a va_list, which Stainless cannot make
+Foundation/NSString: NSString.initWithValidatedFormat:validFormatSpecifiers:arguments:error: -- a va_list, which Stainless cannot make
+Foundation/NSString: NSString.initWithValidatedFormat:validFormatSpecifiers:error: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error: -- a va_list, which Stainless cannot make
+Foundation/NSString: NSString.initWithValidatedFormat:validFormatSpecifiers:locale:error: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.localizedStringWithFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.localizedStringWithValidatedFormat:validFormatSpecifiers:error: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.stringByAppendingFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.stringWithFormat: -- a variadic message, which Stainless cannot send
+Foundation/NSString: NSString.stringWithValidatedFormat:validFormatSpecifiers:error: -- a variadic message, which Stainless cannot send
+Foundation/NSXPCConnection: NSXPCInterface.interfaceWithProtocol: -- 'Protocol', which only the compiler declares
+Foundation/NSXPCConnection: NSXPCInterface.protocol -- 'Protocol', which only the compiler declares
 GLUT/GLUT: GLUT_BITMAP_8_BY_13 -- a macro of type 'CPointer { Pointee = CPointer { Pointee = CBuiltin { Name = void } } }', which a const cannot hold
 GLUT/GLUT: GLUT_BITMAP_9_BY_15 -- a macro of type 'CPointer { Pointee = CPointer { Pointee = CBuiltin { Name = void } } }', which a const cannot hold
 GLUT/GLUT: GLUT_BITMAP_HELVETICA_10 -- a macro of type 'CPointer { Pointee = CPointer { Pointee = CBuiltin { Name = void } } }', which a const cannot hold
@@ -1891,37 +2066,12 @@ GSS/gssapi_oid: GSS_SASL_DIGEST_MD5_MECHANISM -- a macro of type 'CPointer { Poi
 GSS/gssapi_oid: GSS_SCRAM_MECHANISM -- a macro of type 'CPointer { Pointee = CTypedef { Name = gss_OID_desc } }', which a const cannot hold
 GSS/gssapi_spnego: GSS_SPNEGO_MECHANISM -- a macro of type 'CPointer { Pointee = CTypedef { Name = gss_OID_desc } }', which a const cannot hold
 GSS/gssapi_spnego: gss_mech_spnego -- a macro of type 'CPointer { Pointee = CTypedef { Name = gss_OID_desc } }', which a const cannot hold
-Hypervisor/hv_gic: hv_gic_create -- it uses 'hv_gic_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_config: hv_gic_config_create -- it uses 'hv_gic_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_config: hv_gic_config_set_distributor_base -- it uses 'hv_gic_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_config: hv_gic_config_set_msi_interrupt_range -- it uses 'hv_gic_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_config: hv_gic_config_set_msi_region_base -- it uses 'hv_gic_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_config: hv_gic_config_set_redistributor_base -- it uses 'hv_gic_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_state: hv_gic_state_create -- it uses 'hv_gic_state_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_state: hv_gic_state_get_data -- it uses 'hv_gic_state_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_state: hv_gic_state_get_size -- it uses 'hv_gic_state_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_gic_types: hv_gic_config_t -- an Objective-C object qualified by protocols
-Hypervisor/hv_gic_types: hv_gic_state_t -- an Objective-C object qualified by protocols
-Hypervisor/hv_vcpu: hv_vcpu_create -- it uses 'hv_vcpu_config_t', which is skipped: an Objective-C object qualified by protocols
 Hypervisor/hv_vcpu: hv_vcpu_get_simd_fp_reg -- it uses 'hv_simd_fp_uchar16_t', which is skipped: a vector type
 Hypervisor/hv_vcpu: hv_vcpu_get_sme_zt0_reg -- it uses 'hv_sme_zt0_uchar64_t', which is skipped: a vector type
 Hypervisor/hv_vcpu: hv_vcpu_set_simd_fp_reg -- it uses 'hv_simd_fp_uchar16_t', which is skipped: a vector type
 Hypervisor/hv_vcpu: hv_vcpu_set_sme_zt0_reg -- it uses 'hv_sme_zt0_uchar64_t', which is skipped: a vector type
-Hypervisor/hv_vcpu_config: hv_vcpu_config_create -- it uses 'hv_vcpu_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vcpu_config: hv_vcpu_config_get_ccsidr_el1_sys_reg_values -- it uses 'hv_vcpu_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vcpu_config: hv_vcpu_config_get_feature_reg -- it uses 'hv_vcpu_config_t', which is skipped: an Objective-C object qualified by protocols
 Hypervisor/hv_vcpu_types: hv_simd_fp_uchar16_t -- a vector type
 Hypervisor/hv_vcpu_types: hv_sme_zt0_uchar64_t -- a vector type
-Hypervisor/hv_vcpu_types: hv_vcpu_config_t -- an Objective-C object qualified by protocols
-Hypervisor/hv_vm: hv_vm_create -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_config: hv_vm_config_create -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_config: hv_vm_config_get_el2_enabled -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_config: hv_vm_config_get_ipa_granule -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_config: hv_vm_config_get_ipa_size -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_config: hv_vm_config_set_el2_enabled -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_config: hv_vm_config_set_ipa_granule -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_config: hv_vm_config_set_ipa_size -- it uses 'hv_vm_config_t', which is skipped: an Objective-C object qualified by protocols
-Hypervisor/hv_vm_types: hv_vm_config_t -- an Objective-C object qualified by protocols
 IOKit/IOBSD: kIOBSDKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 6 }', which a const cannot hold
 IOKit/IOBSD: kIOBSDMajorKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 10 }', which a const cannot hold
 IOKit/IOBSD: kIOBSDMinorKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 10 }', which a const cannot hold
@@ -2076,38 +2226,14 @@ IOKit/IOKitKeys: kIOUserServicePropertiesKey -- a macro of type 'CArray { Elemen
 IOKit/IOKitKeys: kIOUserUserClientKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 17 }', which a const cannot hold
 IOKit/IOKitKeys: kIOWillTerminateNotification -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 23 }', which a const cannot hold
 IOKit/IOKitKeys: kOSBuildVersionKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 17 }', which a const cannot hold
-IOKit/IOKitLib: IONotificationPortSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
+IOKit/IOKitLib: IOServiceAddMatchingNotification -- it takes ownership of 'matching', which a binding cannot hand over
+IOKit/IOKitLib: IOServiceGetMatchingService -- it takes ownership of 'matching', which a binding cannot hand over
+IOKit/IOKitLib: IOServiceGetMatchingServices -- it takes ownership of 'matching', which a binding cannot hand over
 IOKit/IOTypes: PRIIOByteCount -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 4 }', which a const cannot hold
 IOKit/IOUserServer: kIOUserServerCDHashKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 19 }', which a const cannot hold
 IOKit/IOUserServer: kIOUserServerClassKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 13 }', which a const cannot hold
 IOKit/IOUserServer: kIOUserServerNameKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 17 }', which a const cannot hold
 IOKit/IOUserServer: kIOUserServerTagKey -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 16 }', which a const cannot hold
-IOSurface/IOSurfaceAPI: IOSurfaceCreateXPCObject -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-IOSurface/IOSurfaceAPI: IOSurfaceLookupFromXPCObject -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-IOSurface/IOSurfaceObjC: IOSurfacePropertyAllocSizeKey -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKey -- the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyAllocSize -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyBytesPerElement -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyBytesPerRow -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyCacheMode -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyElementHeight -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyElementWidth -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyHeight -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyName -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyOffset -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPixelFormat -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPixelSizeCastingAllowed -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneBase -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneBytesPerElement -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneBytesPerRow -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneElementHeight -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneElementWidth -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneHeight -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneInfo -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneOffset -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneSize -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyPlaneWidth -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
-IOSurface/IOSurfaceObjC: IOSurfacePropertyKeyWidth -- it uses 'IOSurfacePropertyKey', which is skipped: the type 'NSString', which no header declares
 IOSurface/IOSurfaceObjC: _IOSurfaceObjToRef -- inline in the header, so nothing exports it
 IOSurface/IOSurfaceObjC: _IOSurfaceRefToObj -- inline in the header, so nothing exports it
 Kerberos/com_err: com_err_handler_t -- a va_list, which Stainless cannot make
@@ -2147,7 +2273,33 @@ LatentSemanticMapping/LatentSemanticMapping: kLSMPrecisionFloat -- a macro of ty
 LatentSemanticMapping/LatentSemanticMapping: kLSMPrecisionKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 LatentSemanticMapping/LatentSemanticMapping: kLSMSweepAgeKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 LatentSemanticMapping/LatentSemanticMapping: kLSMSweepCutoffKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
-NetFS/NetFS: NetFSMountURLAsync -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
+Metal/MTL4BufferRange: MTL4BufferRangeMake -- inline in the header, so nothing exports it
+Metal/MTLAccelerationStructureTypes: MTLPackedFloat3Make -- inline in the header, so nothing exports it
+Metal/MTLAccelerationStructureTypes: MTLPackedFloatQuaternionMake -- inline in the header, so nothing exports it
+Metal/MTLIndirectCommandBuffer: MTLIndirectCommandBufferExecutionRangeMake -- inline in the header, so nothing exports it
+Metal/MTLRenderPass: MTLClearColorMake -- inline in the header, so nothing exports it
+Metal/MTLTexture: MTLTextureSwizzleChannelsDefault -- a macro of type 'CTag { Kind = Struct, Name = MTLTextureSwizzleChannels }', which a const cannot hold
+Metal/MTLTexture: MTLTextureSwizzleChannelsMake -- inline in the header, so nothing exports it
+Metal/MTLTypes: MTLCoordinate2DMake -- inline in the header, so nothing exports it
+Metal/MTLTypes: MTLOriginMake -- inline in the header, so nothing exports it
+Metal/MTLTypes: MTLRegionMake1D -- inline in the header, so nothing exports it
+Metal/MTLTypes: MTLRegionMake2D -- inline in the header, so nothing exports it
+Metal/MTLTypes: MTLRegionMake3D -- inline in the header, so nothing exports it
+Metal/MTLTypes: MTLSamplePositionMake -- inline in the header, so nothing exports it
+Metal/MTLTypes: MTLSizeMake -- inline in the header, so nothing exports it
+MetalKit/MTKModel: MTKMesh.initWithMesh:device:error: -- it uses 'MDLMesh' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKMesh.newMeshesFromAsset:device:sourceMeshes:error: -- it uses 'MDLAsset' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKMesh.vertexDescriptor -- it uses 'MDLVertexDescriptor' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKMeshBuffer.type -- it uses 'MDLMeshBufferType' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKMeshBuffer.zone -- it uses 'MDLMeshBufferZone' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKMetalVertexDescriptorFromModelIO -- it uses 'MDLVertexDescriptor' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKMetalVertexDescriptorFromModelIOWithError -- it uses 'MDLVertexDescriptor' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKMetalVertexFormatFromModelIO -- it uses 'MDLVertexFormat' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKModelIOVertexDescriptorFromMetal -- it uses 'MDLVertexDescriptor' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKModelIOVertexDescriptorFromMetalWithError -- it uses 'MDLVertexDescriptor' from ModelIO, which is not generated
+MetalKit/MTKModel: MTKModelIOVertexFormatFromMetal -- it uses 'MDLVertexFormat' from ModelIO, which is not generated
+MetalKit/MTKTextureLoader: MTKTextureLoader.newTextureWithMDLTexture:options:completionHandler: -- it uses 'MDLTexture' from ModelIO, which is not generated
+MetalKit/MTKTextureLoader: MTKTextureLoader.newTextureWithMDLTexture:options:error: -- it uses 'MDLTexture' from ModelIO, which is not generated
 NetFS/NetFS: kNAUIOptionAllowUI -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 NetFS/NetFS: kNAUIOptionForceUI -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 NetFS/NetFS: kNAUIOptionKey -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
@@ -2201,6 +2353,8 @@ NetFS/NetFS: kNetFSUserNameKey -- a macro of type 'CPointer { Pointee = CTag { K
 NetFS/NetFSPlugin: kNetFSTypeID -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 NetFS/NetFSPlugin: kfs_NetFSMountInterfaceID_V1 -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFUUID } }', which a const cannot hold
 OpenCL/cl_ext: clSetKernelArgsVaListAPPLE -- a va_list, which Stainless cannot make
+OpenCL/cl_gl_ext: IOSurfaceRef -- 'CFTypeRef', which no header declares
+OpenCL/cl_gl_ext: clCreateImageFromIOSurface2DAPPLE -- it uses 'IOSurfaceRef', which is skipped: 'CFTypeRef', which no header declares
 OpenCL/cl_platform: CL_DBL_EPSILON -- a double macro that is not a literal (0x1.0p-52)
 OpenCL/cl_platform: CL_DBL_MAX -- a double macro that is not a literal (0x1.fffffffffffffp1023)
 OpenCL/cl_platform: CL_DBL_MIN -- a double macro that is not a literal (0x1.0p-1022)
@@ -2253,8 +2407,9 @@ OpenCL/cl_platform: cl_ushort16 -- aligned to 32 bytes, more than [Align] allows
 OpenCL/cl_platform: cl_ushort3 -- it uses 'cl_ushort4', which is skipped: a vector type
 OpenCL/cl_platform: cl_ushort4 -- a vector type
 OpenCL/cl_platform: cl_ushort8 -- it uses 'cl_ushort4', which is skipped: a vector type
-OpenCL/gcl: gcl_create_dispatch_queue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-OpenCL/gcl: gcl_get_device_id_with_dispatch_queue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
+OpenCL/gcl: gcl_create_image -- it uses 'IOSurfaceRef', which is skipped: 'CFTypeRef', which no header declares
+OpenGL/CGLIOSurface: CGLTexImageIOSurface2D -- it uses 'IOSurfaceRef', which is skipped: 'CFTypeRef', which no header declares
+OpenGL/CGLIOSurface: IOSurfaceRef -- 'CFTypeRef', which no header declares
 PCSC/musclecard: MSC_TOKEN_EMPTY_STR -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 14 }', which a const cannot hold
 PCSC/musclecard: MSC_TOKEN_UNKNOWN_STR -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 14 }', which a const cannot hold
 PCSC/pcsclite: PCSCLITE_CONFIG_DIR -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 5 }', which a const cannot hold
@@ -2284,79 +2439,7 @@ Security/AuthorizationTags: kAuthorizationPamResult -- a macro of type 'CArray {
 Security/AuthorizationTags: kAuthorizationRightExecute -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 23 }', which a const cannot hold
 Security/SecCertificate: SecCertificateCopyPublicKey -- linked as '?', and an extern cannot be renamed
 Security/SecCertificate: SecCertificateCopySerialNumber -- linked as '?', and an extern cannot be renamed
-Security/SecCode: SecCodeCreateWithXPCMessage -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
 Security/SecCustomTransform: SecTransformCustomGetAttribute -- linked as '?', and an extern cannot be renamed
-Security/SecKey: SecKeyGeneratePairAsync -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_access_distinguished_names -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_access_ocsp_response -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_access_peer_certificate_chain -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_access_pre_shared_keys -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_access_supported_signature_algorithms -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_challenge_parameters_are_equal -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_copy_negotiated_protocol -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_copy_peer_public_key -- it uses 'dispatch_data_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_copy_server_name -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_create_secret -- it uses 'dispatch_data_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_create_secret_with_context -- it uses 'dispatch_data_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_get_early_data_accepted -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_get_negotiated_ciphersuite -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_get_negotiated_protocol -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_get_negotiated_protocol_version -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_get_negotiated_tls_ciphersuite -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_get_negotiated_tls_protocol_version -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_get_server_name -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_peers_are_equal -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolMetadata: sec_protocol_metadata_t -- an Objective-C object qualified by protocols
-Security/SecProtocolObject: sec_object_t -- an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_challenge_complete_t -- it uses 'sec_identity_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_challenge_t -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_key_update_t -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_add_pre_shared_key -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_add_tls_application_protocol -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_add_tls_ciphersuite -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_add_tls_ciphersuite_group -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_append_tls_ciphersuite -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_append_tls_ciphersuite_group -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_are_equal -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_challenge_block -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_key_update_block -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_local_identity -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_max_tls_protocol_version -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_min_tls_protocol_version -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_peer_authentication_required -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_pre_shared_key_selection_block -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_diffie_hellman_parameters -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_false_start_enabled -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_is_fallback_attempt -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_max_version -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_min_version -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_ocsp_enabled -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_pre_shared_key_identity_hint -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_renegotiation_enabled -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_resumption_enabled -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_sct_enabled -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_server_name -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_tls_tickets_enabled -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_set_verify_block -- it uses 'sec_protocol_options_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_options_t -- an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_pre_shared_key_selection_complete_t -- it uses 'dispatch_data_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_pre_shared_key_selection_t -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolOptions: sec_protocol_verify_t -- it uses 'sec_protocol_metadata_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_certificate_copy_ref -- it uses 'sec_certificate_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_certificate_create -- it uses 'sec_certificate_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_certificate_t -- an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_identity_access_certificates -- it uses 'sec_identity_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_identity_copy_certificates_ref -- it uses 'sec_identity_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_identity_copy_ref -- it uses 'sec_identity_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_identity_create -- it uses 'sec_identity_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_identity_create_with_certificates -- it uses 'sec_identity_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_identity_t -- an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_trust_copy_ref -- it uses 'sec_trust_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_trust_create -- it uses 'sec_trust_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecProtocolTypes: sec_trust_t -- an Objective-C object qualified by protocols
-Security/SecTransform: SecTransformExecuteAsync -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecTrust: SecTrustEvaluateAsync -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-Security/SecTrust: SecTrustEvaluateAsyncWithError -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 Security/SecTrustSettings: kSecTrustSettingsAllowedError -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 Security/SecTrustSettings: kSecTrustSettingsApplication -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 Security/SecTrustSettings: kSecTrustSettingsDefaultRootCertSetting -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __SecCertificate } }', which a const cannot hold
@@ -2375,8 +2458,7 @@ Security/cssmapple: kSystemKeychainPath -- a macro of type 'CArray { Element = C
 Security/cssmapple: kSystemUnlockFile -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 18 }', which a const cannot hold
 Security/mds_schema: MDS_CDSA_DIRECTORY_NAME -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 19 }', which a const cannot hold
 Security/mds_schema: MDS_OBJECT_DIRECTORY_NAME -- a macro of type 'CArray { Element = CBuiltin { Name = char }, Length = 21 }', which a const cannot hold
-SystemConfiguration/SCDynamicStore: SCDynamicStoreSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-SystemConfiguration/SCNetworkConnection: SCNetworkConnectionSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
+System/objc_NSObject: NSObject.conformsToProtocol: -- 'Protocol', which only the compiler declares
 SystemConfiguration/SCNetworkConnection: kSCNetworkConnectionBytesIn -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 SystemConfiguration/SCNetworkConnection: kSCNetworkConnectionBytesOut -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 SystemConfiguration/SCNetworkConnection: kSCNetworkConnectionErrorsIn -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
@@ -2385,8 +2467,6 @@ SystemConfiguration/SCNetworkConnection: kSCNetworkConnectionPacketsIn -- a macr
 SystemConfiguration/SCNetworkConnection: kSCNetworkConnectionPacketsOut -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 SystemConfiguration/SCNetworkConnection: kSCNetworkConnectionSelectionOptionOnDemandHostName -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
 SystemConfiguration/SCNetworkConnection: kSCNetworkConnectionSelectionOptionOnDemandRetry -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = __CFString } }', which a const cannot hold
-SystemConfiguration/SCNetworkReachability: SCNetworkReachabilitySetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-SystemConfiguration/SCPreferences: SCPreferencesSetDispatchQueue -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
 Tcl/Tcl: TCL_CHANNEL_VERSION_1 -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = Tcl_ChannelTypeVersion_ } }', which a const cannot hold
 Tcl/Tcl: TCL_CHANNEL_VERSION_2 -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = Tcl_ChannelTypeVersion_ } }', which a const cannot hold
 Tcl/Tcl: TCL_CHANNEL_VERSION_3 -- a macro of type 'CPointer { Pointee = CTag { Kind = Struct, Name = Tcl_ChannelTypeVersion_ } }', which a const cannot hold
@@ -2565,19 +2645,12 @@ Tk/tkDecls: Tk_SizeOfBitmap -- it uses 'Display', which is skipped: it uses '_XD
 Tk/tkDecls: Tk_UnderlineChars -- it uses 'Display', which is skipped: it uses '_XDisplay', which is skipped: a function type where a value is wanted (CFunction { Result = CFunction { Result = CBuiltin { Name = int }, Parameters = System.Collections.Generic.List`1[Stainless.Bindgen.CType], Variadic = False }, Parameters = System.Collections.Generic.List`1[Stainless.Bindgen.CType], Variadic = False })
 Tk/tkDecls: Tk_UnderlineTextLayout -- it uses 'Display', which is skipped: it uses '_XDisplay', which is skipped: a function type where a value is wanted (CFunction { Result = CFunction { Result = CBuiltin { Name = int }, Parameters = System.Collections.Generic.List`1[Stainless.Bindgen.CType], Variadic = False }, Parameters = System.Collections.Generic.List`1[Stainless.Bindgen.CType], Variadic = False })
 Tk/tkDecls: tkStubsPtr -- it uses 'TkStubs', which is skipped: it uses 'XEvent', which is skipped: it uses '_XEvent', which is skipped: it uses 'XAnyEvent', which is skipped: it uses 'Display', which is skipped: it uses '_XDisplay', which is skipped: a function type where a value is wanted (CFunction { Result = CFunction { Result = CBuiltin { Name = int }, Parameters = System.Collections.Generic.List`1[Stainless.Bindgen.CType], Variadic = False }, Parameters = System.Collections.Generic.List`1[Stainless.Bindgen.CType], Variadic = False })
-VideoToolbox/VTFrameProcessorErrors: VTFrameProcessorErrorDomain -- it uses 'NSErrorDomain' from Foundation, which is not generated
-vmnet/vmnet: vmnet_copy_shared_interface_list -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_interface_event_callback_t -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_interface_get_ip_port_forwarding_rules -- it uses 'vmnet_interface_get_ip_port_forwarding_rules_handler_t', which is skipped: it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_interface_get_ip_port_forwarding_rules_handler_t -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_interface_get_port_forwarding_rules -- it uses 'vmnet_interface_get_port_forwarding_rules_handler_t', which is skipped: it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_interface_get_port_forwarding_rules_handler_t -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_interface_set_event_callback -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_interface_start_with_network -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_ip_port_forwarding_rule_get_details -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_network_copy_serialization -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_network_create_with_serialization -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_port_forwarding_rule_get_details -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_start_interface -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_start_interface_completion_handler_t -- it uses 'xpc_object_t', which is skipped: an Objective-C object qualified by protocols
-vmnet/vmnet: vmnet_stop_interface -- it uses 'dispatch_queue_t', which is skipped: an Objective-C object qualified by protocols
+VideoToolbox/VTFrameProcessorConfiguration: VTFrameProcessorConfiguration.maximumDimensions -- a class property of a protocol, which has no class to send it to
+VideoToolbox/VTFrameProcessorConfiguration: VTFrameProcessorConfiguration.minimumDimensions -- a class property of a protocol, which has no class to send it to
+VideoToolbox/VTFrameProcessorConfiguration: VTFrameProcessorConfiguration.supported -- a class property of a protocol, which has no class to send it to
+WebKit/WebFrame: WebFrame.globalContext -- it uses 'JSGlobalContextRef' from JavaScriptCore, which is not generated
+WebKit/WebFrame: WebFrame.javaScriptContext -- 'JSContext', which no header defines
+WebKit/WebFrameLoadDelegate: WebFrameLoadDelegate.webView:didCreateJavaScriptContext:forFrame: -- 'JSContext', which no header defines
+WebKit/WebPluginViewFactory: WebPlugInViewFactory.plugInViewWithArguments: -- a class method of a protocol, which has no class to send it to
+WebKit/WebScriptObject: WebScriptObject.JSObject -- it uses 'JSObjectRef' from JavaScriptCore, which is not generated
+WebKit/WebScriptObject: WebScriptObject.JSValue -- 'JSValue', which no header defines

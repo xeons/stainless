@@ -58,7 +58,7 @@ public const int kControlTabSizeMini = 3;
 public struct ControlTabEntry
 {
     public ControlButtonContentInfo* icon;
-    public CFStringRef name;
+    public __CFString* name;
     public Boolean enabled;
 }
 
@@ -86,7 +86,7 @@ public struct ControlTabInfoRecV1
 {
     public SInt16 version;
     public SInt16 iconSuiteID;
-    public CFStringRef name;
+    public __CFString* name;
 }
 
 public const int kControlTabListResType = 1952539171;

@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGPDFDocument;
 
-public using CGPDFDocumentRef = CGPDFDocument*;
+[CFType("CGPDFDocumentGetTypeID")]
+public extern objc class CGPDFDocumentRef : CFTypeRef { }
 
 [Flags]
 public enum CGPDFAccessPermissions : uint
@@ -54,58 +56,54 @@ public extern "C" CFStringRef kCGPDFOutlineDestination;
 
 public extern "C" CFStringRef kCGPDFOutlineDestinationRect;
 
-public extern "C" CGPDFDocumentRef CGPDFDocumentCreateWithProvider(CGDataProviderRef provider);
+[ReturnsRetained] public extern "C" CGPDFDocumentRef? CGPDFDocumentCreateWithProvider(CGDataProviderRef? provider);
 
-public extern "C" CGPDFDocumentRef CGPDFDocumentCreateWithURL(CFURLRef url);
+[ReturnsRetained] public extern "C" CGPDFDocumentRef? CGPDFDocumentCreateWithURL(CFURLRef? url);
 
-public extern "C" CGPDFDocumentRef CGPDFDocumentRetain(CGPDFDocumentRef document);
+public extern "C" void CGPDFDocumentGetVersion(CGPDFDocumentRef? document, int* majorVersion, int* minorVersion);
 
-public extern "C" void CGPDFDocumentRelease(CGPDFDocumentRef document);
+public extern "C" bool CGPDFDocumentIsEncrypted(CGPDFDocumentRef? document);
 
-public extern "C" void CGPDFDocumentGetVersion(CGPDFDocumentRef document, int* majorVersion, int* minorVersion);
+public extern "C" bool CGPDFDocumentUnlockWithPassword(CGPDFDocumentRef? document, byte* password);
 
-public extern "C" bool CGPDFDocumentIsEncrypted(CGPDFDocumentRef document);
+public extern "C" bool CGPDFDocumentIsUnlocked(CGPDFDocumentRef? document);
 
-public extern "C" bool CGPDFDocumentUnlockWithPassword(CGPDFDocumentRef document, byte* password);
+public extern "C" bool CGPDFDocumentAllowsPrinting(CGPDFDocumentRef? document);
 
-public extern "C" bool CGPDFDocumentIsUnlocked(CGPDFDocumentRef document);
+public extern "C" bool CGPDFDocumentAllowsCopying(CGPDFDocumentRef? document);
 
-public extern "C" bool CGPDFDocumentAllowsPrinting(CGPDFDocumentRef document);
+public extern "C" nuint CGPDFDocumentGetNumberOfPages(CGPDFDocumentRef? document);
 
-public extern "C" bool CGPDFDocumentAllowsCopying(CGPDFDocumentRef document);
+public extern "C" CGPDFPageRef? CGPDFDocumentGetPage(CGPDFDocumentRef? document, nuint pageNumber);
 
-public extern "C" nuint CGPDFDocumentGetNumberOfPages(CGPDFDocumentRef document);
+public extern "C" CGPDFDictionaryRef CGPDFDocumentGetCatalog(CGPDFDocumentRef? document);
 
-public extern "C" CGPDFPageRef CGPDFDocumentGetPage(CGPDFDocumentRef document, nuint pageNumber);
+public extern "C" CGPDFDictionaryRef CGPDFDocumentGetInfo(CGPDFDocumentRef? document);
 
-public extern "C" CGPDFDictionaryRef CGPDFDocumentGetCatalog(CGPDFDocumentRef document);
-
-public extern "C" CGPDFDictionaryRef CGPDFDocumentGetInfo(CGPDFDocumentRef document);
-
-public extern "C" CGPDFArrayRef CGPDFDocumentGetID(CGPDFDocumentRef document);
+public extern "C" CGPDFArrayRef CGPDFDocumentGetID(CGPDFDocumentRef? document);
 
 public extern "C" CFTypeID CGPDFDocumentGetTypeID();
 
-public extern "C" CFDictionaryRef CGPDFDocumentGetOutline(CGPDFDocumentRef document);
+public extern "C" CFDictionaryRef? CGPDFDocumentGetOutline(CGPDFDocumentRef document);
 
 public extern "C" CGPDFAccessPermissions CGPDFDocumentGetAccessPermissions(CGPDFDocumentRef document);
 
 /// Deprecated in macOS 10.5.
-public extern "C" CGRect CGPDFDocumentGetMediaBox(CGPDFDocumentRef document, int page);
+public extern "C" CGRect CGPDFDocumentGetMediaBox(CGPDFDocumentRef? document, int page);
 
 /// Deprecated in macOS 10.5.
-public extern "C" CGRect CGPDFDocumentGetCropBox(CGPDFDocumentRef document, int page);
+public extern "C" CGRect CGPDFDocumentGetCropBox(CGPDFDocumentRef? document, int page);
 
 /// Deprecated in macOS 10.5.
-public extern "C" CGRect CGPDFDocumentGetBleedBox(CGPDFDocumentRef document, int page);
+public extern "C" CGRect CGPDFDocumentGetBleedBox(CGPDFDocumentRef? document, int page);
 
 /// Deprecated in macOS 10.5.
-public extern "C" CGRect CGPDFDocumentGetTrimBox(CGPDFDocumentRef document, int page);
+public extern "C" CGRect CGPDFDocumentGetTrimBox(CGPDFDocumentRef? document, int page);
 
 /// Deprecated in macOS 10.5.
-public extern "C" CGRect CGPDFDocumentGetArtBox(CGPDFDocumentRef document, int page);
+public extern "C" CGRect CGPDFDocumentGetArtBox(CGPDFDocumentRef? document, int page);
 
 /// Deprecated in macOS 10.5.
-public extern "C" int CGPDFDocumentGetRotationAngle(CGPDFDocumentRef document, int page);
+public extern "C" int CGPDFDocumentGetRotationAngle(CGPDFDocumentRef? document, int page);
 
 #endif

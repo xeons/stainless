@@ -25,6 +25,7 @@ module MacOS.CoreMIDI;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -113,14 +114,14 @@ public struct MIDIThruConnectionParams
 
 public extern "C" void MIDIThruConnectionParamsInitialize(MIDIThruConnectionParams* inConnectionParams);
 
-public extern "C" OSStatus MIDIThruConnectionCreate(CFStringRef inPersistentOwnerID, CFDataRef inConnectionParams, MIDIThruConnectionRef* outConnection);
+public extern "C" OSStatus MIDIThruConnectionCreate(CFStringRef? inPersistentOwnerID, CFDataRef inConnectionParams, MIDIThruConnectionRef* outConnection);
 
 public extern "C" OSStatus MIDIThruConnectionDispose(MIDIThruConnectionRef connection);
 
-public extern "C" OSStatus MIDIThruConnectionGetParams(MIDIThruConnectionRef connection, CFDataRef* outConnectionParams);
+public extern "C" OSStatus MIDIThruConnectionGetParams(MIDIThruConnectionRef connection, __CFData** outConnectionParams);
 
 public extern "C" OSStatus MIDIThruConnectionSetParams(MIDIThruConnectionRef connection, CFDataRef inConnectionParams);
 
-public extern "C" OSStatus MIDIThruConnectionFind(CFStringRef inPersistentOwnerID, CFDataRef* outConnectionList);
+public extern "C" OSStatus MIDIThruConnectionFind(CFStringRef inPersistentOwnerID, __CFData** outConnectionList);
 
 #endif

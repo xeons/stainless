@@ -25,6 +25,7 @@ module MacOS.CoreMIDI;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -78,7 +79,7 @@ public struct MIDIDriverInterface
     public MIDIDriverInterfaceMonitorEventsFunction MonitorEvents;
 }
 
-public extern "C" CFStringRef kMIDIDriverPropertyUsesSerial;
+public extern "C" CFStringRef? kMIDIDriverPropertyUsesSerial;
 
 public extern "C" OSStatus MIDIDeviceCreate(MIDIDriverRef owner, CFStringRef name, CFStringRef manufacturer, CFStringRef model, MIDIDeviceRef* outDevice);
 

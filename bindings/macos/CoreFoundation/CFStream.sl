@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -64,7 +65,7 @@ public delegate void* CFStreamClientContextRetainFunction(void* arg0);
 
 public delegate void CFStreamClientContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFStreamClientContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFStreamClientContextCopyDescriptionFunction(void* arg0);
 
 public struct CFStreamClientContext
 {
@@ -77,134 +78,144 @@ public struct CFStreamClientContext
 
 public struct __CFReadStream;
 
-public using CFReadStreamRef = __CFReadStream*;
+[CFType("CFReadStreamGetTypeID")]
+public extern objc class CFReadStreamRef : CFTypeRef { }
 
 public struct __CFWriteStream;
 
-public using CFWriteStreamRef = __CFWriteStream*;
+[CFType("CFWriteStreamGetTypeID")]
+public extern objc class CFWriteStreamRef : CFTypeRef { }
 
-public delegate void CFReadStreamClientCallBack(CFReadStreamRef arg0, CFStreamEventType arg1, void* arg2);
+public delegate void CFReadStreamClientCallBack(__CFReadStream* arg0, CFStreamEventType arg1, void* arg2);
 
-public delegate void CFWriteStreamClientCallBack(CFWriteStreamRef arg0, CFStreamEventType arg1, void* arg2);
+public delegate void CFWriteStreamClientCallBack(__CFWriteStream* arg0, CFStreamEventType arg1, void* arg2);
 
 public extern "C" CFTypeID CFReadStreamGetTypeID();
 
 public extern "C" CFTypeID CFWriteStreamGetTypeID();
 
-public extern "C" CFStreamPropertyKey kCFStreamPropertyDataWritten;
+public extern "C" CFStreamPropertyKey? kCFStreamPropertyDataWritten;
 
-public extern "C" CFReadStreamRef CFReadStreamCreateWithBytesNoCopy(CFAllocatorRef alloc, UInt8* bytes, CFIndex length, CFAllocatorRef bytesDeallocator);
+[ReturnsRetained] public extern "C" CFReadStreamRef? CFReadStreamCreateWithBytesNoCopy(CFAllocatorRef? alloc, UInt8* bytes, CFIndex length, CFAllocatorRef? bytesDeallocator);
 
-public extern "C" CFWriteStreamRef CFWriteStreamCreateWithBuffer(CFAllocatorRef alloc, UInt8* buffer, CFIndex bufferCapacity);
+[ReturnsRetained] public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithBuffer(CFAllocatorRef? alloc, UInt8* buffer, CFIndex bufferCapacity);
 
-public extern "C" CFWriteStreamRef CFWriteStreamCreateWithAllocatedBuffers(CFAllocatorRef alloc, CFAllocatorRef bufferAllocator);
+[ReturnsRetained] public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithAllocatedBuffers(CFAllocatorRef? alloc, CFAllocatorRef? bufferAllocator);
 
-public extern "C" CFReadStreamRef CFReadStreamCreateWithFile(CFAllocatorRef alloc, CFURLRef fileURL);
+[ReturnsRetained] public extern "C" CFReadStreamRef? CFReadStreamCreateWithFile(CFAllocatorRef? alloc, CFURLRef? fileURL);
 
-public extern "C" CFWriteStreamRef CFWriteStreamCreateWithFile(CFAllocatorRef alloc, CFURLRef fileURL);
+[ReturnsRetained] public extern "C" CFWriteStreamRef? CFWriteStreamCreateWithFile(CFAllocatorRef? alloc, CFURLRef? fileURL);
 
-public extern "C" void CFStreamCreateBoundPair(CFAllocatorRef alloc, CFReadStreamRef* readStream, CFWriteStreamRef* writeStream, CFIndex transferBufferSize);
+public extern "C" void CFStreamCreateBoundPair(CFAllocatorRef? alloc, __CFReadStream** readStream, __CFWriteStream** writeStream, CFIndex transferBufferSize);
 
-public extern "C" CFStreamPropertyKey kCFStreamPropertyAppendToFile;
+public extern "C" CFStreamPropertyKey? kCFStreamPropertyAppendToFile;
 
-public extern "C" CFStreamPropertyKey kCFStreamPropertyFileCurrentOffset;
+public extern "C" CFStreamPropertyKey? kCFStreamPropertyFileCurrentOffset;
 
-public extern "C" CFStreamPropertyKey kCFStreamPropertySocketNativeHandle;
+public extern "C" CFStreamPropertyKey? kCFStreamPropertySocketNativeHandle;
 
-public extern "C" CFStreamPropertyKey kCFStreamPropertySocketRemoteHostName;
+public extern "C" CFStreamPropertyKey? kCFStreamPropertySocketRemoteHostName;
 
-public extern "C" CFStreamPropertyKey kCFStreamPropertySocketRemotePortNumber;
+public extern "C" CFStreamPropertyKey? kCFStreamPropertySocketRemotePortNumber;
 
 public extern "C" int kCFStreamErrorDomainSOCKS;
 
-public extern "C" CFStringRef kCFStreamPropertySOCKSProxy;
+public extern "C" CFStringRef? kCFStreamPropertySOCKSProxy;
 
-public extern "C" CFStringRef kCFStreamPropertySOCKSProxyHost;
+public extern "C" CFStringRef? kCFStreamPropertySOCKSProxyHost;
 
-public extern "C" CFStringRef kCFStreamPropertySOCKSProxyPort;
+public extern "C" CFStringRef? kCFStreamPropertySOCKSProxyPort;
 
-public extern "C" CFStringRef kCFStreamPropertySOCKSVersion;
+public extern "C" CFStringRef? kCFStreamPropertySOCKSVersion;
 
-public extern "C" CFStringRef kCFStreamSocketSOCKSVersion4;
+public extern "C" CFStringRef? kCFStreamSocketSOCKSVersion4;
 
-public extern "C" CFStringRef kCFStreamSocketSOCKSVersion5;
+public extern "C" CFStringRef? kCFStreamSocketSOCKSVersion5;
 
-public extern "C" CFStringRef kCFStreamPropertySOCKSUser;
+public extern "C" CFStringRef? kCFStreamPropertySOCKSUser;
 
-public extern "C" CFStringRef kCFStreamPropertySOCKSPassword;
+public extern "C" CFStringRef? kCFStreamPropertySOCKSPassword;
 
 public extern "C" int kCFStreamErrorDomainSSL;
 
-public extern "C" CFStringRef kCFStreamPropertySocketSecurityLevel;
+public extern "C" CFStringRef? kCFStreamPropertySocketSecurityLevel;
 
-public extern "C" CFStringRef kCFStreamSocketSecurityLevelNone;
-
-/// Deprecated in macOS 10.12.
-public extern "C" CFStringRef kCFStreamSocketSecurityLevelSSLv2;
+public extern "C" CFStringRef? kCFStreamSocketSecurityLevelNone;
 
 /// Deprecated in macOS 10.12.
-public extern "C" CFStringRef kCFStreamSocketSecurityLevelSSLv3;
+public extern "C" CFStringRef? kCFStreamSocketSecurityLevelSSLv2;
 
-public extern "C" CFStringRef kCFStreamSocketSecurityLevelTLSv1;
+/// Deprecated in macOS 10.12.
+public extern "C" CFStringRef? kCFStreamSocketSecurityLevelSSLv3;
 
-public extern "C" CFStringRef kCFStreamSocketSecurityLevelNegotiatedSSL;
+public extern "C" CFStringRef? kCFStreamSocketSecurityLevelTLSv1;
 
-public extern "C" CFStringRef kCFStreamPropertyShouldCloseNativeSocket;
+public extern "C" CFStringRef? kCFStreamSocketSecurityLevelNegotiatedSSL;
 
-/// Deprecated in macOS 100000.
-public extern "C" void CFStreamCreatePairWithSocket(CFAllocatorRef alloc, CFSocketNativeHandle sock, CFReadStreamRef* readStream, CFWriteStreamRef* writeStream);
-
-/// Deprecated in macOS 100000.
-public extern "C" void CFStreamCreatePairWithSocketToHost(CFAllocatorRef alloc, CFStringRef host, UInt32 port, CFReadStreamRef* readStream, CFWriteStreamRef* writeStream);
+public extern "C" CFStringRef? kCFStreamPropertyShouldCloseNativeSocket;
 
 /// Deprecated in macOS 100000.
-public extern "C" void CFStreamCreatePairWithPeerSocketSignature(CFAllocatorRef alloc, CFSocketSignature* signature, CFReadStreamRef* readStream, CFWriteStreamRef* writeStream);
+public extern "C" void CFStreamCreatePairWithSocket(CFAllocatorRef? alloc, CFSocketNativeHandle sock, __CFReadStream** readStream, __CFWriteStream** writeStream);
 
-public extern "C" CFStreamStatus CFReadStreamGetStatus(CFReadStreamRef stream);
+/// Deprecated in macOS 100000.
+public extern "C" void CFStreamCreatePairWithSocketToHost(CFAllocatorRef? alloc, CFStringRef? host, UInt32 port, __CFReadStream** readStream, __CFWriteStream** writeStream);
 
-public extern "C" CFStreamStatus CFWriteStreamGetStatus(CFWriteStreamRef stream);
+/// Deprecated in macOS 100000.
+public extern "C" void CFStreamCreatePairWithPeerSocketSignature(CFAllocatorRef? alloc, CFSocketSignature* signature, __CFReadStream** readStream, __CFWriteStream** writeStream);
 
-public extern "C" CFErrorRef CFReadStreamCopyError(CFReadStreamRef stream);
+public extern "C" CFStreamStatus CFReadStreamGetStatus(CFReadStreamRef? stream);
 
-public extern "C" CFErrorRef CFWriteStreamCopyError(CFWriteStreamRef stream);
+public extern "C" CFStreamStatus CFWriteStreamGetStatus(CFWriteStreamRef? stream);
 
-public extern "C" Boolean CFReadStreamOpen(CFReadStreamRef stream);
+[ReturnsRetained] public extern "C" CFErrorRef? CFReadStreamCopyError(CFReadStreamRef? stream);
 
-public extern "C" Boolean CFWriteStreamOpen(CFWriteStreamRef stream);
+[ReturnsRetained] public extern "C" CFErrorRef? CFWriteStreamCopyError(CFWriteStreamRef? stream);
 
-public extern "C" void CFReadStreamClose(CFReadStreamRef stream);
+public extern "C" Boolean CFReadStreamOpen(CFReadStreamRef? stream);
 
-public extern "C" void CFWriteStreamClose(CFWriteStreamRef stream);
+public extern "C" Boolean CFWriteStreamOpen(CFWriteStreamRef? stream);
 
-public extern "C" Boolean CFReadStreamHasBytesAvailable(CFReadStreamRef stream);
+public extern "C" void CFReadStreamClose(CFReadStreamRef? stream);
 
-public extern "C" CFIndex CFReadStreamRead(CFReadStreamRef stream, UInt8* buffer, CFIndex bufferLength);
+public extern "C" void CFWriteStreamClose(CFWriteStreamRef? stream);
 
-public extern "C" UInt8* CFReadStreamGetBuffer(CFReadStreamRef stream, CFIndex maxBytesToRead, CFIndex* numBytesRead);
+public extern "C" Boolean CFReadStreamHasBytesAvailable(CFReadStreamRef? stream);
 
-public extern "C" Boolean CFWriteStreamCanAcceptBytes(CFWriteStreamRef stream);
+public extern "C" CFIndex CFReadStreamRead(CFReadStreamRef? stream, UInt8* buffer, CFIndex bufferLength);
 
-public extern "C" CFIndex CFWriteStreamWrite(CFWriteStreamRef stream, UInt8* buffer, CFIndex bufferLength);
+public extern "C" UInt8* CFReadStreamGetBuffer(CFReadStreamRef? stream, CFIndex maxBytesToRead, CFIndex* numBytesRead);
 
-public extern "C" CFTypeRef CFReadStreamCopyProperty(CFReadStreamRef stream, CFStreamPropertyKey propertyName);
+public extern "C" Boolean CFWriteStreamCanAcceptBytes(CFWriteStreamRef? stream);
 
-public extern "C" CFTypeRef CFWriteStreamCopyProperty(CFWriteStreamRef stream, CFStreamPropertyKey propertyName);
+public extern "C" CFIndex CFWriteStreamWrite(CFWriteStreamRef? stream, UInt8* buffer, CFIndex bufferLength);
 
-public extern "C" Boolean CFReadStreamSetProperty(CFReadStreamRef stream, CFStreamPropertyKey propertyName, CFTypeRef propertyValue);
+[ReturnsRetained] public extern "C" CFTypeRef? CFReadStreamCopyProperty(CFReadStreamRef? stream, CFStreamPropertyKey? propertyName);
 
-public extern "C" Boolean CFWriteStreamSetProperty(CFWriteStreamRef stream, CFStreamPropertyKey propertyName, CFTypeRef propertyValue);
+[ReturnsRetained] public extern "C" CFTypeRef? CFWriteStreamCopyProperty(CFWriteStreamRef? stream, CFStreamPropertyKey? propertyName);
 
-public extern "C" Boolean CFReadStreamSetClient(CFReadStreamRef stream, CFOptionFlags streamEvents, CFReadStreamClientCallBack clientCB, CFStreamClientContext* clientContext);
+public extern "C" Boolean CFReadStreamSetProperty(CFReadStreamRef? stream, CFStreamPropertyKey? propertyName, CFTypeRef? propertyValue);
 
-public extern "C" Boolean CFWriteStreamSetClient(CFWriteStreamRef stream, CFOptionFlags streamEvents, CFWriteStreamClientCallBack clientCB, CFStreamClientContext* clientContext);
+public extern "C" Boolean CFWriteStreamSetProperty(CFWriteStreamRef? stream, CFStreamPropertyKey? propertyName, CFTypeRef? propertyValue);
 
-public extern "C" void CFReadStreamScheduleWithRunLoop(CFReadStreamRef stream, CFRunLoopRef runLoop, CFRunLoopMode runLoopMode);
+public extern "C" Boolean CFReadStreamSetClient(CFReadStreamRef? stream, CFOptionFlags streamEvents, CFReadStreamClientCallBack clientCB, CFStreamClientContext* clientContext);
 
-public extern "C" void CFWriteStreamScheduleWithRunLoop(CFWriteStreamRef stream, CFRunLoopRef runLoop, CFRunLoopMode runLoopMode);
+public extern "C" Boolean CFWriteStreamSetClient(CFWriteStreamRef? stream, CFOptionFlags streamEvents, CFWriteStreamClientCallBack clientCB, CFStreamClientContext* clientContext);
 
-public extern "C" void CFReadStreamUnscheduleFromRunLoop(CFReadStreamRef stream, CFRunLoopRef runLoop, CFRunLoopMode runLoopMode);
+public extern "C" void CFReadStreamScheduleWithRunLoop(CFReadStreamRef? stream, CFRunLoopRef? runLoop, CFRunLoopMode? runLoopMode);
 
-public extern "C" void CFWriteStreamUnscheduleFromRunLoop(CFWriteStreamRef stream, CFRunLoopRef runLoop, CFRunLoopMode runLoopMode);
+public extern "C" void CFWriteStreamScheduleWithRunLoop(CFWriteStreamRef? stream, CFRunLoopRef? runLoop, CFRunLoopMode? runLoopMode);
+
+public extern "C" void CFReadStreamUnscheduleFromRunLoop(CFReadStreamRef? stream, CFRunLoopRef? runLoop, CFRunLoopMode? runLoopMode);
+
+public extern "C" void CFWriteStreamUnscheduleFromRunLoop(CFWriteStreamRef? stream, CFRunLoopRef? runLoop, CFRunLoopMode? runLoopMode);
+
+public extern "C" void CFReadStreamSetDispatchQueue(CFReadStreamRef? stream, dispatch_queue_t? q);
+
+public extern "C" void CFWriteStreamSetDispatchQueue(CFWriteStreamRef? stream, dispatch_queue_t? q);
+
+public extern "C" dispatch_queue_t? CFReadStreamCopyDispatchQueue(CFReadStreamRef? stream);
+
+public extern "C" dispatch_queue_t? CFWriteStreamCopyDispatchQueue(CFWriteStreamRef? stream);
 
 public enum CFStreamErrorDomain : long
 {
@@ -213,8 +224,8 @@ public enum CFStreamErrorDomain : long
     MacOSStatus = 2,
 }
 
-public extern "C" CFStreamError CFReadStreamGetError(CFReadStreamRef stream);
+public extern "C" CFStreamError CFReadStreamGetError(CFReadStreamRef? stream);
 
-public extern "C" CFStreamError CFWriteStreamGetError(CFWriteStreamRef stream);
+public extern "C" CFStreamError CFWriteStreamGetError(CFWriteStreamRef? stream);
 
 #endif

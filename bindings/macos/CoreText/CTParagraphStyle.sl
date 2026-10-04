@@ -24,6 +24,7 @@
 module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct __CTParagraphStyle;
 
-public using CTParagraphStyleRef = __CTParagraphStyle*;
+[CFType("CTParagraphStyleGetTypeID")]
+public extern objc class CTParagraphStyleRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTParagraphStyleGetTypeID();
 
@@ -96,9 +98,9 @@ public struct CTParagraphStyleSetting
     public void* value;
 }
 
-public extern "C" CTParagraphStyleRef CTParagraphStyleCreate(CTParagraphStyleSetting* settings, nuint settingCount);
+[ReturnsRetained] public extern "C" CTParagraphStyleRef CTParagraphStyleCreate(CTParagraphStyleSetting* settings, nuint settingCount);
 
-public extern "C" CTParagraphStyleRef CTParagraphStyleCreateCopy(CTParagraphStyleRef paragraphStyle);
+[ReturnsRetained] public extern "C" CTParagraphStyleRef CTParagraphStyleCreateCopy(CTParagraphStyleRef paragraphStyle);
 
 public extern "C" bool CTParagraphStyleGetValueForSpecifier(CTParagraphStyleRef paragraphStyle, CTParagraphStyleSpecifier spec, nuint valueBufferSize, void* valueBuffer);
 

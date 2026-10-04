@@ -23,6 +23,8 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreGraphics;
 
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "CoreGraphics")
@@ -55,6 +57,6 @@ public extern "C" bool CGPDFArrayGetStream(CGPDFArrayRef array, nuint index, CGP
 
 public objc closure bool CGPDFArrayApplierBlock(nuint arg0, CGPDFObjectRef arg1, void* arg2);
 
-public extern "C" void CGPDFArrayApplyBlock(CGPDFArrayRef array, CGPDFArrayApplierBlock block, void* info);
+public extern "C" void CGPDFArrayApplyBlock(CGPDFArrayRef array, CGPDFArrayApplierBlock? block, void* info);
 
 #endif

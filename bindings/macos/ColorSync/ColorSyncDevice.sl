@@ -24,66 +24,67 @@
 module MacOS.ColorSync;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "ColorSync")
 
-public extern "C" CFStringRef kColorSyncDeviceID;
+public extern "C" CFStringRef? kColorSyncDeviceID;
 
-public extern "C" CFStringRef kColorSyncDeviceClass;
+public extern "C" CFStringRef? kColorSyncDeviceClass;
 
-public extern "C" CFStringRef kColorSyncCameraDeviceClass;
+public extern "C" CFStringRef? kColorSyncCameraDeviceClass;
 
-public extern "C" CFStringRef kColorSyncDisplayDeviceClass;
+public extern "C" CFStringRef? kColorSyncDisplayDeviceClass;
 
-public extern "C" CFStringRef kColorSyncPrinterDeviceClass;
+public extern "C" CFStringRef? kColorSyncPrinterDeviceClass;
 
-public extern "C" CFStringRef kColorSyncScannerDeviceClass;
+public extern "C" CFStringRef? kColorSyncScannerDeviceClass;
 
-public extern "C" CFStringRef kColorSyncDeviceProfileURL;
+public extern "C" CFStringRef? kColorSyncDeviceProfileURL;
 
-public extern "C" CFStringRef kColorSyncDeviceDescription;
+public extern "C" CFStringRef? kColorSyncDeviceDescription;
 
-public extern "C" CFStringRef kColorSyncDeviceDescriptions;
+public extern "C" CFStringRef? kColorSyncDeviceDescriptions;
 
-public extern "C" CFStringRef kColorSyncFactoryProfiles;
+public extern "C" CFStringRef? kColorSyncFactoryProfiles;
 
-public extern "C" CFStringRef kColorSyncCustomProfiles;
+public extern "C" CFStringRef? kColorSyncCustomProfiles;
 
-public extern "C" CFStringRef kColorSyncDeviceModeDescription;
+public extern "C" CFStringRef? kColorSyncDeviceModeDescription;
 
-public extern "C" CFStringRef kColorSyncDeviceModeDescriptions;
+public extern "C" CFStringRef? kColorSyncDeviceModeDescriptions;
 
-public extern "C" CFStringRef kColorSyncDeviceDefaultProfileID;
+public extern "C" CFStringRef? kColorSyncDeviceDefaultProfileID;
 
-public extern "C" CFStringRef kColorSyncDeviceHostScope;
+public extern "C" CFStringRef? kColorSyncDeviceHostScope;
 
-public extern "C" CFStringRef kColorSyncDeviceUserScope;
+public extern "C" CFStringRef? kColorSyncDeviceUserScope;
 
-public extern "C" CFStringRef kColorSyncProfileHostScope;
+public extern "C" CFStringRef? kColorSyncProfileHostScope;
 
-public extern "C" CFStringRef kColorSyncProfileUserScope;
+public extern "C" CFStringRef? kColorSyncProfileUserScope;
 
-public extern "C" CFStringRef kColorSyncDeviceProfileIsFactory;
+public extern "C" CFStringRef? kColorSyncDeviceProfileIsFactory;
 
-public extern "C" CFStringRef kColorSyncDeviceProfileIsDefault;
+public extern "C" CFStringRef? kColorSyncDeviceProfileIsDefault;
 
-public extern "C" CFStringRef kColorSyncDeviceProfileIsCurrent;
+public extern "C" CFStringRef? kColorSyncDeviceProfileIsCurrent;
 
-public extern "C" CFStringRef kColorSyncDeviceProfileID;
+public extern "C" CFStringRef? kColorSyncDeviceProfileID;
 
-public extern "C" CFStringRef kColorSyncDeviceRegisteredNotification;
+public extern "C" CFStringRef? kColorSyncDeviceRegisteredNotification;
 
-public extern "C" CFStringRef kColorSyncDeviceUnregisteredNotification;
+public extern "C" CFStringRef? kColorSyncDeviceUnregisteredNotification;
 
-public extern "C" CFStringRef kColorSyncDeviceProfilesNotification;
+public extern "C" CFStringRef? kColorSyncDeviceProfilesNotification;
 
-public extern "C" CFStringRef kColorSyncDisplayDeviceProfilesNotification;
+public extern "C" CFStringRef? kColorSyncDisplayDeviceProfilesNotification;
 
-public extern "C" CFStringRef kColorSyncProfileRepositoryChangeNotification;
+public extern "C" CFStringRef? kColorSyncProfileRepositoryChangeNotification;
 
-public extern "C" CFStringRef kColorSyncRegistrationUpdateWindowServer;
+public extern "C" CFStringRef? kColorSyncRegistrationUpdateWindowServer;
 
 public extern "C" bool ColorSyncRegisterDevice(CFStringRef deviceClass, CFUUIDRef deviceID, CFDictionaryRef deviceInfo);
 
@@ -91,13 +92,13 @@ public extern "C" bool ColorSyncUnregisterDevice(CFStringRef deviceClass, CFUUID
 
 public extern "C" bool ColorSyncDeviceSetCustomProfiles(CFStringRef deviceClass, CFUUIDRef deviceID, CFDictionaryRef profileInfo);
 
-public extern "C" CFDictionaryRef ColorSyncDeviceCopyDeviceInfo(CFStringRef deviceClass, CFUUIDRef devID);
+[ReturnsRetained] public extern "C" CFDictionaryRef? ColorSyncDeviceCopyDeviceInfo(CFStringRef deviceClass, CFUUIDRef devID);
 
-public delegate bool ColorSyncDeviceProfileIterateCallback(CFDictionaryRef arg0, void* arg1);
+public delegate bool ColorSyncDeviceProfileIterateCallback(__CFDictionary* arg0, void* arg1);
 
 public extern "C" void ColorSyncIterateDeviceProfiles(ColorSyncDeviceProfileIterateCallback callBack, void* userInfo);
 
-public extern "C" CFUUIDRef CGDisplayCreateUUIDFromDisplayID(uint displayID);
+[ReturnsRetained] public extern "C" CFUUIDRef CGDisplayCreateUUIDFromDisplayID(uint displayID);
 
 public extern "C" uint CGDisplayGetDisplayIDFromUUID(CFUUIDRef uuid);
 

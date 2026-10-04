@@ -25,6 +25,7 @@ module MacOS.ApplicationServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct OpaquePasteboardRef;
 
-public using PasteboardRef = OpaquePasteboardRef*;
+[CFType("PasteboardGetTypeID")]
+public extern objc class PasteboardRef : CFTypeRef { }
 
 public using PasteboardItemID = void*;
 
@@ -71,31 +73,31 @@ public enum PasteboardStandardLocation : uint
 
 public extern "C" CFTypeID PasteboardGetTypeID();
 
-public extern "C" OSStatus PasteboardCreate(CFStringRef inName, PasteboardRef* outPasteboard);
+public extern "C" OSStatus PasteboardCreate(CFStringRef? inName, OpaquePasteboardRef** outPasteboard);
 
 public extern "C" PasteboardSyncFlags PasteboardSynchronize(PasteboardRef inPasteboard);
 
 public extern "C" OSStatus PasteboardClear(PasteboardRef inPasteboard);
 
-public extern "C" OSStatus PasteboardCopyName(PasteboardRef inPasteboard, CFStringRef* outName);
+public extern "C" OSStatus PasteboardCopyName(PasteboardRef inPasteboard, __CFString** outName);
 
 public extern "C" OSStatus PasteboardGetItemCount(PasteboardRef inPasteboard, ItemCount* outItemCount);
 
 public extern "C" OSStatus PasteboardGetItemIdentifier(PasteboardRef inPasteboard, CFIndex inIndex, PasteboardItemID* outItem);
 
-public extern "C" OSStatus PasteboardCopyItemFlavors(PasteboardRef inPasteboard, PasteboardItemID inItem, CFArrayRef* outFlavorTypes);
+public extern "C" OSStatus PasteboardCopyItemFlavors(PasteboardRef inPasteboard, PasteboardItemID inItem, __CFArray** outFlavorTypes);
 
 public extern "C" OSStatus PasteboardGetItemFlavorFlags(PasteboardRef inPasteboard, PasteboardItemID inItem, CFStringRef inFlavorType, PasteboardFlavorFlags* outFlags);
 
-public extern "C" OSStatus PasteboardCopyItemFlavorData(PasteboardRef inPasteboard, PasteboardItemID inItem, CFStringRef inFlavorType, CFDataRef* outData);
+public extern "C" OSStatus PasteboardCopyItemFlavorData(PasteboardRef inPasteboard, PasteboardItemID inItem, CFStringRef inFlavorType, __CFData** outData);
 
-public extern "C" OSStatus PasteboardPutItemFlavor(PasteboardRef inPasteboard, PasteboardItemID inItem, CFStringRef inFlavorType, CFDataRef inData, PasteboardFlavorFlags inFlags);
+public extern "C" OSStatus PasteboardPutItemFlavor(PasteboardRef inPasteboard, PasteboardItemID inItem, CFStringRef inFlavorType, CFDataRef? inData, PasteboardFlavorFlags inFlags);
 
-public extern "C" OSStatus PasteboardCopyPasteLocation(PasteboardRef inPasteboard, CFURLRef* outPasteLocation);
+public extern "C" OSStatus PasteboardCopyPasteLocation(PasteboardRef inPasteboard, __CFURL** outPasteLocation);
 
 public extern "C" OSStatus PasteboardSetPasteLocation(PasteboardRef inPasteboard, CFURLRef inPasteLocation);
 
-public delegate OSStatus PasteboardPromiseKeeperProcPtr(PasteboardRef arg0, PasteboardItemID arg1, CFStringRef arg2, void* arg3);
+public delegate OSStatus PasteboardPromiseKeeperProcPtr(OpaquePasteboardRef* arg0, PasteboardItemID arg1, __CFString* arg2, void* arg3);
 
 public extern "C" OSStatus PasteboardSetPromiseKeeper(PasteboardRef inPasteboard, PasteboardPromiseKeeperProcPtr inPromiseKeeper, void* inContext);
 

@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,44 +34,46 @@ public using CFBit = UInt32;
 
 public struct __CFBitVector;
 
-public using CFBitVectorRef = __CFBitVector*;
+[CFType("CFBitVectorGetTypeID")]
+public extern objc class CFBitVectorRef : CFTypeRef { }
 
-public using CFMutableBitVectorRef = __CFBitVector*;
+[CFType]
+public extern objc class CFMutableBitVectorRef : CFBitVectorRef { }
 
 public extern "C" CFTypeID CFBitVectorGetTypeID();
 
-public extern "C" CFBitVectorRef CFBitVectorCreate(CFAllocatorRef allocator, UInt8* bytes, CFIndex numBits);
+[ReturnsRetained] public extern "C" CFBitVectorRef? CFBitVectorCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex numBits);
 
-public extern "C" CFBitVectorRef CFBitVectorCreateCopy(CFAllocatorRef allocator, CFBitVectorRef bv);
+[ReturnsRetained] public extern "C" CFBitVectorRef? CFBitVectorCreateCopy(CFAllocatorRef? allocator, CFBitVectorRef? bv);
 
-public extern "C" CFMutableBitVectorRef CFBitVectorCreateMutable(CFAllocatorRef allocator, CFIndex capacity);
+[ReturnsRetained] public extern "C" CFMutableBitVectorRef? CFBitVectorCreateMutable(CFAllocatorRef? allocator, CFIndex capacity);
 
-public extern "C" CFMutableBitVectorRef CFBitVectorCreateMutableCopy(CFAllocatorRef allocator, CFIndex capacity, CFBitVectorRef bv);
+[ReturnsRetained] public extern "C" CFMutableBitVectorRef? CFBitVectorCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBitVectorRef? bv);
 
-public extern "C" CFIndex CFBitVectorGetCount(CFBitVectorRef bv);
+public extern "C" CFIndex CFBitVectorGetCount(CFBitVectorRef? bv);
 
-public extern "C" CFIndex CFBitVectorGetCountOfBit(CFBitVectorRef bv, CFRange range, CFBit value);
+public extern "C" CFIndex CFBitVectorGetCountOfBit(CFBitVectorRef? bv, CFRange range, CFBit value);
 
-public extern "C" Boolean CFBitVectorContainsBit(CFBitVectorRef bv, CFRange range, CFBit value);
+public extern "C" Boolean CFBitVectorContainsBit(CFBitVectorRef? bv, CFRange range, CFBit value);
 
-public extern "C" CFBit CFBitVectorGetBitAtIndex(CFBitVectorRef bv, CFIndex idx);
+public extern "C" CFBit CFBitVectorGetBitAtIndex(CFBitVectorRef? bv, CFIndex idx);
 
-public extern "C" void CFBitVectorGetBits(CFBitVectorRef bv, CFRange range, UInt8* bytes);
+public extern "C" void CFBitVectorGetBits(CFBitVectorRef? bv, CFRange range, UInt8* bytes);
 
-public extern "C" CFIndex CFBitVectorGetFirstIndexOfBit(CFBitVectorRef bv, CFRange range, CFBit value);
+public extern "C" CFIndex CFBitVectorGetFirstIndexOfBit(CFBitVectorRef? bv, CFRange range, CFBit value);
 
-public extern "C" CFIndex CFBitVectorGetLastIndexOfBit(CFBitVectorRef bv, CFRange range, CFBit value);
+public extern "C" CFIndex CFBitVectorGetLastIndexOfBit(CFBitVectorRef? bv, CFRange range, CFBit value);
 
-public extern "C" void CFBitVectorSetCount(CFMutableBitVectorRef bv, CFIndex count);
+public extern "C" void CFBitVectorSetCount(CFMutableBitVectorRef? bv, CFIndex count);
 
-public extern "C" void CFBitVectorFlipBitAtIndex(CFMutableBitVectorRef bv, CFIndex idx);
+public extern "C" void CFBitVectorFlipBitAtIndex(CFMutableBitVectorRef? bv, CFIndex idx);
 
-public extern "C" void CFBitVectorFlipBits(CFMutableBitVectorRef bv, CFRange range);
+public extern "C" void CFBitVectorFlipBits(CFMutableBitVectorRef? bv, CFRange range);
 
-public extern "C" void CFBitVectorSetBitAtIndex(CFMutableBitVectorRef bv, CFIndex idx, CFBit value);
+public extern "C" void CFBitVectorSetBitAtIndex(CFMutableBitVectorRef? bv, CFIndex idx, CFBit value);
 
-public extern "C" void CFBitVectorSetBits(CFMutableBitVectorRef bv, CFRange range, CFBit value);
+public extern "C" void CFBitVectorSetBits(CFMutableBitVectorRef? bv, CFRange range, CFBit value);
 
-public extern "C" void CFBitVectorSetAllBits(CFMutableBitVectorRef bv, CFBit value);
+public extern "C" void CFBitVectorSetAllBits(CFMutableBitVectorRef? bv, CFBit value);
 
 #endif

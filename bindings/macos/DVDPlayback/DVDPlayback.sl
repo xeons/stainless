@@ -29,6 +29,7 @@ import MacOS.CoreGraphics;
 import MacOS.CoreServices;
 import MacOS.Security;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -527,7 +528,7 @@ public extern "C" OSStatus DVDGetAudioOutputMode(DVDAudioMode* outMode);
 public extern "C" OSStatus DVDGetSPDIFDataOutDeviceCount(UInt32* outCount);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSStatus DVDGetSPDIFDataOutDeviceCFName(UInt32 inIndex, CFStringRef* outName);
+public extern "C" OSStatus DVDGetSPDIFDataOutDeviceCFName(UInt32 inIndex, __CFString** outName);
 
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus DVDSetSPDIFDataOutDevice(UInt32 inIndex);
@@ -632,7 +633,7 @@ public extern "C" OSStatus DVDGetMediaUniqueID(UInt8* outDiscID);
 public extern "C" OSStatus DVDGetMediaVolumeName(byte** outDiscVolumeName);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSStatus DVDGetMediaVolumeCFName(CFStringRef* outDiscVolumeCFName);
+public extern "C" OSStatus DVDGetMediaVolumeCFName(__CFString** outDiscVolumeCFName);
 
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus DVDSetTitle(UInt16 inTitleNum);

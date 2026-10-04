@@ -24,6 +24,8 @@
 module MacOS.DiskArbitration;
 
 import MacOS.CoreFoundation;
+import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,21 +33,25 @@ import MacOS.CoreFoundation;
 
 public struct __DASession;
 
-public using DASessionRef = __DASession*;
+[CFType("DASessionGetTypeID")]
+public extern objc class DASessionRef : CFTypeRef { }
 
 public extern "C" CFTypeID DASessionGetTypeID();
 
-public extern "C" DASessionRef DASessionCreate(CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" DASessionRef? DASessionCreate(CFAllocatorRef? allocator);
 
 public extern "C" void DASessionScheduleWithRunLoop(DASessionRef session, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
 public extern "C" void DASessionUnscheduleFromRunLoop(DASessionRef session, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
-public using DAApprovalSessionRef = __DASession*;
+public extern "C" void DASessionSetDispatchQueue(DASessionRef session, dispatch_queue_t? queue);
+
+[CFType("DAApprovalSessionGetTypeID")]
+public extern objc class DAApprovalSessionRef : CFTypeRef { }
 
 public extern "C" CFTypeID DAApprovalSessionGetTypeID();
 
-public extern "C" DAApprovalSessionRef DAApprovalSessionCreate(CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" DAApprovalSessionRef? DAApprovalSessionCreate(CFAllocatorRef? allocator);
 
 public extern "C" void DAApprovalSessionScheduleWithRunLoop(DAApprovalSessionRef session, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 

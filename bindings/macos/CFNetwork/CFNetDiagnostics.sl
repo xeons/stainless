@@ -24,6 +24,7 @@
 module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -47,7 +48,7 @@ public enum CFNetDiagnosticStatusValues : int
 public using CFNetDiagnosticStatus = CFIndex;
 
 /// Deprecated in macOS 10.13.
-public extern "C" CFNetDiagnosticRef CFNetDiagnosticCreateWithStreams(CFAllocatorRef alloc, CFReadStreamRef readStream, CFWriteStreamRef writeStream);
+public extern "C" CFNetDiagnosticRef CFNetDiagnosticCreateWithStreams(CFAllocatorRef? alloc, CFReadStreamRef? readStream, CFWriteStreamRef? writeStream);
 
 /// Deprecated in macOS 10.13.
 public extern "C" CFNetDiagnosticRef CFNetDiagnosticCreateWithURL(CFAllocatorRef alloc, CFURLRef url);
@@ -59,6 +60,6 @@ public extern "C" void CFNetDiagnosticSetName(CFNetDiagnosticRef details, CFStri
 public extern "C" CFNetDiagnosticStatus CFNetDiagnosticDiagnoseProblemInteractively(CFNetDiagnosticRef details);
 
 /// Deprecated in macOS 10.13.
-public extern "C" CFNetDiagnosticStatus CFNetDiagnosticCopyNetworkStatusPassively(CFNetDiagnosticRef details, CFStringRef* description);
+public extern "C" CFNetDiagnosticStatus CFNetDiagnosticCopyNetworkStatusPassively(CFNetDiagnosticRef details, __CFString** description);
 
 #endif

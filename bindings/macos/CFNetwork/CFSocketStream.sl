@@ -25,49 +25,50 @@ module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CFNetwork")
 
-public extern "C" CFStringRef kCFStreamPropertySSLContext;
+public extern "C" CFStringRef? kCFStreamPropertySSLContext;
 
-public extern "C" CFStringRef kCFStreamPropertySSLPeerTrust;
+public extern "C" CFStringRef? kCFStreamPropertySSLPeerTrust;
 
-public extern "C" CFStringRef kCFStreamSSLValidatesCertificateChain;
+public extern "C" CFStringRef? kCFStreamSSLValidatesCertificateChain;
 
-public extern "C" CFStringRef kCFStreamPropertySSLSettings;
+public extern "C" CFStringRef? kCFStreamPropertySSLSettings;
 
-public extern "C" CFStringRef kCFStreamSSLLevel;
+public extern "C" CFStringRef? kCFStreamSSLLevel;
 
-public extern "C" CFStringRef kCFStreamSSLPeerName;
+public extern "C" CFStringRef? kCFStreamSSLPeerName;
 
-public extern "C" CFStringRef kCFStreamSSLCertificates;
+public extern "C" CFStringRef? kCFStreamSSLCertificates;
 
-public extern "C" CFStringRef kCFStreamSSLIsServer;
+public extern "C" CFStringRef? kCFStreamSSLIsServer;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceType;
+public extern "C" CFStringRef? kCFStreamNetworkServiceType;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeVideo;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeVideo;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeVoice;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeVoice;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeBackground;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeBackground;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeResponsiveData;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeResponsiveData;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeCallSignaling;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeCallSignaling;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeAVStreaming;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeAVStreaming;
 
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeResponsiveAV;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeResponsiveAV;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamNetworkServiceTypeVoIP;
+public extern "C" CFStringRef? kCFStreamNetworkServiceTypeVoIP;
 
-public extern "C" CFStringRef kCFStreamPropertyNoCellular;
+public extern "C" CFStringRef? kCFStreamPropertyNoCellular;
 
-public extern "C" CFStringRef kCFStreamPropertyConnectionIsCellular;
+public extern "C" CFStringRef? kCFStreamPropertyConnectionIsCellular;
 
 public extern "C" CFStringRef kCFStreamPropertyAllowExpensiveNetworkAccess;
 
@@ -94,30 +95,30 @@ public const int kCFStreamErrorSOCKS4IdConflict = 93;
 
 public const int kSOCKS5NoAcceptableMethod = 255;
 
-public extern "C" CFStringRef kCFStreamPropertyProxyLocalBypass;
+public extern "C" CFStringRef? kCFStreamPropertyProxyLocalBypass;
 
-public extern "C" CFStringRef kCFStreamPropertySocketRemoteHost;
+public extern "C" CFStringRef? kCFStreamPropertySocketRemoteHost;
 
-public extern "C" CFStringRef kCFStreamPropertySocketRemoteNetService;
+public extern "C" CFStringRef? kCFStreamPropertySocketRemoteNetService;
 
-public extern "C" CFStringRef kCFStreamPropertySocketExtendedBackgroundIdleMode;
-
-/// Deprecated in macOS 100000.
-public extern "C" void CFStreamCreatePairWithSocketToCFHost(CFAllocatorRef alloc, CFHostRef host, SInt32 port, CFReadStreamRef* readStream, CFWriteStreamRef* writeStream);
+public extern "C" CFStringRef? kCFStreamPropertySocketExtendedBackgroundIdleMode;
 
 /// Deprecated in macOS 100000.
-public extern "C" void CFStreamCreatePairWithSocketToNetService(CFAllocatorRef alloc, CFNetServiceRef service, CFReadStreamRef* readStream, CFWriteStreamRef* writeStream);
+public extern "C" void CFStreamCreatePairWithSocketToCFHost(CFAllocatorRef? alloc, CFHostRef host, SInt32 port, __CFReadStream** readStream, __CFWriteStream** writeStream);
+
+/// Deprecated in macOS 100000.
+public extern "C" void CFStreamCreatePairWithSocketToNetService(CFAllocatorRef? alloc, CFNetServiceRef service, __CFReadStream** readStream, __CFWriteStream** writeStream);
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFStringRef kCFStreamPropertySSLPeerCertificates;
+public extern "C" CFStringRef? kCFStreamPropertySSLPeerCertificates;
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFStringRef kCFStreamSSLAllowsExpiredCertificates;
+public extern "C" CFStringRef? kCFStreamSSLAllowsExpiredCertificates;
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFStringRef kCFStreamSSLAllowsExpiredRoots;
+public extern "C" CFStringRef? kCFStreamSSLAllowsExpiredRoots;
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFStringRef kCFStreamSSLAllowsAnyRoot;
+public extern "C" CFStringRef? kCFStreamSSLAllowsAnyRoot;
 
 #endif

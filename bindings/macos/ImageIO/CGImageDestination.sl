@@ -25,6 +25,7 @@ module MacOS.ImageIO;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.CoreGraphics;
 
 public struct CGImageDestination;
 
-public using CGImageDestinationRef = CGImageDestination*;
+[CFType("CGImageDestinationGetTypeID")]
+public extern objc class CGImageDestinationRef : CFTypeRef { }
 
 public extern "C" CFStringRef kCGImageDestinationLossyCompressionQuality;
 
@@ -46,23 +48,23 @@ public extern "C" CFStringRef kCGImageDestinationOptimizeColorForSharing;
 
 public extern "C" CFTypeID CGImageDestinationGetTypeID();
 
-public extern "C" CFArrayRef CGImageDestinationCopyTypeIdentifiers();
+[ReturnsRetained] public extern "C" CFArrayRef CGImageDestinationCopyTypeIdentifiers();
 
-public extern "C" CGImageDestinationRef CGImageDestinationCreateWithDataConsumer(CGDataConsumerRef consumer, CFStringRef type, nuint count, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithDataConsumer(CGDataConsumerRef consumer, CFStringRef type, nuint count, CFDictionaryRef? options);
 
-public extern "C" CGImageDestinationRef CGImageDestinationCreateWithData(CFMutableDataRef data, CFStringRef type, nuint count, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithData(CFMutableDataRef data, CFStringRef type, nuint count, CFDictionaryRef? options);
 
-public extern "C" CGImageDestinationRef CGImageDestinationCreateWithURL(CFURLRef url, CFStringRef type, nuint count, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CGImageDestinationRef? CGImageDestinationCreateWithURL(CFURLRef url, CFStringRef type, nuint count, CFDictionaryRef? options);
 
-public extern "C" void CGImageDestinationSetProperties(CGImageDestinationRef idst, CFDictionaryRef properties);
+public extern "C" void CGImageDestinationSetProperties(CGImageDestinationRef idst, CFDictionaryRef? properties);
 
-public extern "C" void CGImageDestinationAddImage(CGImageDestinationRef idst, CGImageRef image, CFDictionaryRef properties);
+public extern "C" void CGImageDestinationAddImage(CGImageDestinationRef idst, CGImageRef image, CFDictionaryRef? properties);
 
-public extern "C" void CGImageDestinationAddImageFromSource(CGImageDestinationRef idst, CGImageSourceRef isrc, nuint index, CFDictionaryRef properties);
+public extern "C" void CGImageDestinationAddImageFromSource(CGImageDestinationRef idst, CGImageSourceRef isrc, nuint index, CFDictionaryRef? properties);
 
 public extern "C" bool CGImageDestinationFinalize(CGImageDestinationRef idst);
 
-public extern "C" void CGImageDestinationAddImageAndMetadata(CGImageDestinationRef idst, CGImageRef image, CGImageMetadataRef metadata, CFDictionaryRef options);
+public extern "C" void CGImageDestinationAddImageAndMetadata(CGImageDestinationRef idst, CGImageRef image, CGImageMetadataRef? metadata, CFDictionaryRef? options);
 
 public extern "C" CFStringRef kCGImageDestinationPreserveGainMap;
 
@@ -96,7 +98,7 @@ public extern "C" CFStringRef kCGImagePropertyASTCBlockSize4x4;
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kCGImagePropertyASTCBlockSize8x8;
 
-public extern "C" bool CGImageDestinationCopyImageSource(CGImageDestinationRef idst, CGImageSourceRef isrc, CFDictionaryRef options, CFErrorRef* err);
+public extern "C" bool CGImageDestinationCopyImageSource(CGImageDestinationRef idst, CGImageSourceRef isrc, CFDictionaryRef? options, __CFError** err);
 
 public extern "C" void CGImageDestinationAddAuxiliaryDataInfo(CGImageDestinationRef idst, CFStringRef auxiliaryImageDataType, CFDictionaryRef auxiliaryDataInfoDictionary);
 

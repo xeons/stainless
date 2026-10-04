@@ -25,41 +25,42 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Security")
 
-public extern "C" CFStringRef kSecPolicyAppleX509Basic;
+public extern "C" CFStringRef? kSecPolicyAppleX509Basic;
 
-public extern "C" CFStringRef kSecPolicyAppleSSL;
+public extern "C" CFStringRef? kSecPolicyAppleSSL;
 
-public extern "C" CFStringRef kSecPolicyAppleSMIME;
+public extern "C" CFStringRef? kSecPolicyAppleSMIME;
 
-public extern "C" CFStringRef kSecPolicyAppleEAP;
+public extern "C" CFStringRef? kSecPolicyAppleEAP;
 
-public extern "C" CFStringRef kSecPolicyAppleIPsec;
+public extern "C" CFStringRef? kSecPolicyAppleIPsec;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSecPolicyAppleiChat;
+public extern "C" CFStringRef? kSecPolicyAppleiChat;
 
-public extern "C" CFStringRef kSecPolicyApplePKINITClient;
+public extern "C" CFStringRef? kSecPolicyApplePKINITClient;
 
-public extern "C" CFStringRef kSecPolicyApplePKINITServer;
+public extern "C" CFStringRef? kSecPolicyApplePKINITServer;
 
-public extern "C" CFStringRef kSecPolicyAppleCodeSigning;
+public extern "C" CFStringRef? kSecPolicyAppleCodeSigning;
 
-public extern "C" CFStringRef kSecPolicyMacAppStoreReceipt;
+public extern "C" CFStringRef? kSecPolicyMacAppStoreReceipt;
 
-public extern "C" CFStringRef kSecPolicyAppleIDValidation;
+public extern "C" CFStringRef? kSecPolicyAppleIDValidation;
 
-public extern "C" CFStringRef kSecPolicyAppleTimeStamping;
+public extern "C" CFStringRef? kSecPolicyAppleTimeStamping;
 
-public extern "C" CFStringRef kSecPolicyAppleRevocation;
+public extern "C" CFStringRef? kSecPolicyAppleRevocation;
 
-public extern "C" CFStringRef kSecPolicyApplePassbookSigning;
+public extern "C" CFStringRef? kSecPolicyApplePassbookSigning;
 
-public extern "C" CFStringRef kSecPolicyApplePayIssuerEncryption;
+public extern "C" CFStringRef? kSecPolicyApplePayIssuerEncryption;
 
 /// macOS 15.4 and later.
 public extern "C" CFStringRef kSecPolicyAppleSSLServer;
@@ -79,23 +80,23 @@ public extern "C" CFStringRef kSecPolicyAppleIPSecServer;
 /// macOS 15.4 and later.
 public extern "C" CFStringRef kSecPolicyAppleIPSecClient;
 
-public extern "C" CFStringRef kSecPolicyOid;
+public extern "C" CFStringRef? kSecPolicyOid;
 
-public extern "C" CFStringRef kSecPolicyName;
+public extern "C" CFStringRef? kSecPolicyName;
 
-public extern "C" CFStringRef kSecPolicyClient;
+public extern "C" CFStringRef? kSecPolicyClient;
 
-public extern "C" CFStringRef kSecPolicyRevocationFlags;
+public extern "C" CFStringRef? kSecPolicyRevocationFlags;
 
-public extern "C" CFStringRef kSecPolicyTeamIdentifier;
+public extern "C" CFStringRef? kSecPolicyTeamIdentifier;
 
 public extern "C" CFTypeID SecPolicyGetTypeID();
 
-public extern "C" CFDictionaryRef SecPolicyCopyProperties(SecPolicyRef policyRef);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SecPolicyCopyProperties(SecPolicyRef policyRef);
 
-public extern "C" SecPolicyRef SecPolicyCreateBasicX509();
+[ReturnsRetained] public extern "C" SecPolicyRef SecPolicyCreateBasicX509();
 
-public extern "C" SecPolicyRef SecPolicyCreateSSL(Boolean server, CFStringRef hostname);
+[ReturnsRetained] public extern "C" SecPolicyRef SecPolicyCreateSSL(Boolean server, CFStringRef? hostname);
 
 public const ulong kSecRevocationOCSPMethod = 1;
 public const ulong kSecRevocationCRLMethod = 2;
@@ -104,30 +105,30 @@ public const ulong kSecRevocationRequirePositiveResponse = 8;
 public const ulong kSecRevocationNetworkAccessDisabled = 16;
 public const ulong kSecRevocationUseAnyAvailableMethod = 3;
 
-public extern "C" SecPolicyRef SecPolicyCreateRevocation(CFOptionFlags revocationFlags);
+[ReturnsRetained] public extern "C" SecPolicyRef? SecPolicyCreateRevocation(CFOptionFlags revocationFlags);
 
-public extern "C" SecPolicyRef SecPolicyCreateWithProperties(CFTypeRef policyIdentifier, CFDictionaryRef properties);
+[ReturnsRetained] public extern "C" SecPolicyRef? SecPolicyCreateWithProperties(CFTypeRef policyIdentifier, CFDictionaryRef? properties);
 
-public extern "C" CFStringRef kSecPolicyKU_DigitalSignature;
+public extern "C" CFStringRef? kSecPolicyKU_DigitalSignature;
 
-public extern "C" CFStringRef kSecPolicyKU_NonRepudiation;
+public extern "C" CFStringRef? kSecPolicyKU_NonRepudiation;
 
-public extern "C" CFStringRef kSecPolicyKU_KeyEncipherment;
+public extern "C" CFStringRef? kSecPolicyKU_KeyEncipherment;
 
-public extern "C" CFStringRef kSecPolicyKU_DataEncipherment;
+public extern "C" CFStringRef? kSecPolicyKU_DataEncipherment;
 
-public extern "C" CFStringRef kSecPolicyKU_KeyAgreement;
+public extern "C" CFStringRef? kSecPolicyKU_KeyAgreement;
 
-public extern "C" CFStringRef kSecPolicyKU_KeyCertSign;
+public extern "C" CFStringRef? kSecPolicyKU_KeyCertSign;
 
-public extern "C" CFStringRef kSecPolicyKU_CRLSign;
+public extern "C" CFStringRef? kSecPolicyKU_CRLSign;
 
-public extern "C" CFStringRef kSecPolicyKU_EncipherOnly;
+public extern "C" CFStringRef? kSecPolicyKU_EncipherOnly;
 
-public extern "C" CFStringRef kSecPolicyKU_DecipherOnly;
+public extern "C" CFStringRef? kSecPolicyKU_DecipherOnly;
 
 /// Deprecated in macOS 10.9.
-public extern "C" SecPolicyRef SecPolicyCreateWithOID(CFTypeRef policyOID);
+[ReturnsRetained] public extern "C" SecPolicyRef? SecPolicyCreateWithOID(CFTypeRef policyOID);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecPolicyGetOID(SecPolicyRef policyRef, SecAsn1Oid* oid);

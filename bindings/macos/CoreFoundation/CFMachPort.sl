@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,13 +32,14 @@ import MacOS.System;
 
 public struct __CFMachPort;
 
-public using CFMachPortRef = __CFMachPort*;
+[CFType("CFMachPortGetTypeID")]
+public extern objc class CFMachPortRef : CFTypeRef { }
 
 public delegate void* CFMachPortContextRetainFunction(void* arg0);
 
 public delegate void CFMachPortContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFMachPortContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFMachPortContextCopyDescriptionFunction(void* arg0);
 
 public struct CFMachPortContext
 {
@@ -48,28 +50,28 @@ public struct CFMachPortContext
     public CFMachPortContextCopyDescriptionFunction copyDescription;
 }
 
-public delegate void CFMachPortCallBack(CFMachPortRef arg0, void* arg1, CFIndex arg2, void* arg3);
+public delegate void CFMachPortCallBack(__CFMachPort* arg0, void* arg1, CFIndex arg2, void* arg3);
 
-public delegate void CFMachPortInvalidationCallBack(CFMachPortRef arg0, void* arg1);
+public delegate void CFMachPortInvalidationCallBack(__CFMachPort* arg0, void* arg1);
 
 public extern "C" CFTypeID CFMachPortGetTypeID();
 
-public extern "C" CFMachPortRef CFMachPortCreate(CFAllocatorRef allocator, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
+[ReturnsRetained] public extern "C" CFMachPortRef? CFMachPortCreate(CFAllocatorRef? allocator, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
 
-public extern "C" CFMachPortRef CFMachPortCreateWithPort(CFAllocatorRef allocator, mach_port_t portNum, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
+[ReturnsRetained] public extern "C" CFMachPortRef? CFMachPortCreateWithPort(CFAllocatorRef? allocator, mach_port_t portNum, CFMachPortCallBack callout, CFMachPortContext* context, Boolean* shouldFreeInfo);
 
-public extern "C" mach_port_t CFMachPortGetPort(CFMachPortRef port);
+public extern "C" mach_port_t CFMachPortGetPort(CFMachPortRef? port);
 
-public extern "C" void CFMachPortGetContext(CFMachPortRef port, CFMachPortContext* context);
+public extern "C" void CFMachPortGetContext(CFMachPortRef? port, CFMachPortContext* context);
 
-public extern "C" void CFMachPortInvalidate(CFMachPortRef port);
+public extern "C" void CFMachPortInvalidate(CFMachPortRef? port);
 
-public extern "C" Boolean CFMachPortIsValid(CFMachPortRef port);
+public extern "C" Boolean CFMachPortIsValid(CFMachPortRef? port);
 
-public extern "C" CFMachPortInvalidationCallBack CFMachPortGetInvalidationCallBack(CFMachPortRef port);
+public extern "C" CFMachPortInvalidationCallBack CFMachPortGetInvalidationCallBack(CFMachPortRef? port);
 
-public extern "C" void CFMachPortSetInvalidationCallBack(CFMachPortRef port, CFMachPortInvalidationCallBack callout);
+public extern "C" void CFMachPortSetInvalidationCallBack(CFMachPortRef? port, CFMachPortInvalidationCallBack callout);
 
-public extern "C" CFRunLoopSourceRef CFMachPortCreateRunLoopSource(CFAllocatorRef allocator, CFMachPortRef port, CFIndex order);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFMachPortCreateRunLoopSource(CFAllocatorRef? allocator, CFMachPortRef? port, CFIndex order);
 
 #endif

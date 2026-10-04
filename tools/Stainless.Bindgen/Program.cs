@@ -39,7 +39,23 @@ internal static class Program
         string clang = Environment.GetEnvironmentVariable("STAINLESS_CLANG") ?? "clang";
         string? sdk = null;
         string? probeCase = null;
+        string? runtimeCase = null;
         var frameworks = new List<string>();
+
+        // `--show dump.json`: what one dump's own declarations are written as,
+        // for reading; nothing is compiled and nothing is written to disk.
+        if (args is ["--show", var dump])
+        {
+            var translation = AstReader.ReadFile(dump);
+            var writer = new Writer(translation, new HashSet<string>(StringComparer.Ordinal));
+            string own = Path.GetFileNameWithoutExtension(dump) + ".h";
+            foreach (var declaration in translation.Declarations.Where(d => Path.GetFileName(d.File) == own))
+                if (writer.Write(declaration) is { } emitted)
+                    Console.WriteLine($"// {emitted.Key}\n{emitted.Text}");
+            foreach (var skip in writer.Skips)
+                Console.WriteLine($"// skipped {skip.Name}: {skip.Reason}");
+            return 0;
+        }
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -49,6 +65,7 @@ internal static class Program
                 case "--clang": clang = args[++i]; break;
                 case "--sdk": sdk = args[++i]; break;
                 case "--case": probeCase = args[++i]; break;
+                case "--runtime-case": runtimeCase = args[++i]; break;
                 default: frameworks.Add(args[i]); break;
             }
         }
@@ -69,11 +86,26 @@ internal static class Program
             var written = new List<Emitted>();
             var system = new Dictionary<string, Emitted>(StringComparer.Ordinal);
 
+            // One class's members are named once, whichever framework adds them.
+            var names = new ObjCNames();
+
+            // Every framework is read before any is written: a class one
+            // framework only forward-declares is defined by another, which
+            // may itself name the first.
+            var translations = new Dictionary<string, Translation>(StringComparer.Ordinal);
             foreach (string framework in frameworks)
             {
                 Console.Error.WriteLine($"{framework} for {target}");
-                var translation = Compile(clang, sdk, framework, triple);
-                var writer = new Writer(translation, frameworks.ToHashSet(StringComparer.Ordinal));
+                translations[framework] = Compile(clang, sdk, framework, triple);
+            }
+
+            ShareObjCDefinitions(translations.Values);
+
+            foreach (string framework in frameworks)
+            {
+                var translation = translations[framework];
+                translations.Remove(framework);
+                var writer = new Writer(translation, frameworks.ToHashSet(StringComparer.Ordinal), names);
 
                 // On what was written: a forward declaration writes nothing
                 // once its definition is known, and the definition is kept.
@@ -116,7 +148,37 @@ internal static class Program
         WriteSkipped(output, skips.Values, frameworks);
         if (probeCase is not null)
             LayoutCase.Write(probeCase, output, frameworks, perTarget["arm64"], perTarget["x64"], Includes);
+        if (runtimeCase is not null)
+            RuntimeCase.Write(runtimeCase, output, perTarget["arm64"], ReadUnanswered(output));
         return 0;
+    }
+
+    /// <summary>
+    /// Gives every translation the Objective-C classes and protocols any of
+    /// them defines, where it has only a forward declaration or nothing.
+    /// </summary>
+    private static void ShareObjCDefinitions(IEnumerable<Translation> translations)
+    {
+        var all = translations.ToList();
+        var classes = new Dictionary<string, CObjCInterface>(StringComparer.Ordinal);
+        var protocols = new Dictionary<string, CObjCProtocol>(StringComparer.Ordinal);
+        foreach (var translation in all)
+        {
+            foreach (var (name, objcClass) in translation.Interfaces.Where(e => e.Value.IsDefinition))
+                classes.TryAdd(name, objcClass);
+            foreach (var (name, protocol) in translation.Protocols.Where(e => e.Value.IsDefinition))
+                protocols.TryAdd(name, protocol);
+        }
+
+        foreach (var translation in all)
+        {
+            foreach (var (name, objcClass) in classes)
+                if (!translation.Interfaces.TryGetValue(name, out var known) || !known.IsDefinition)
+                    translation.Interfaces[name] = objcClass;
+            foreach (var (name, protocol) in protocols)
+                if (!translation.Protocols.TryGetValue(name, out var known) || !known.IsDefinition)
+                    translation.Protocols[name] = protocol;
+        }
     }
 
     /// <summary>
@@ -373,6 +435,21 @@ internal static class Program
 
             File.WriteAllText(Path.Combine(output, owner, header + ".sl"), file.ToString().ReplaceLineEndings("\n"));
         }
+    }
+
+    /// <summary>
+    /// <c>unanswered.txt</c>: messages the headers declare and the runtime
+    /// does not answer, each with why, which the runtime case does not ask.
+    /// </summary>
+    private static HashSet<string> ReadUnanswered(string output)
+    {
+        string path = Path.Combine(output, "unanswered.txt");
+        return File.Exists(path)
+            ? File.ReadAllLines(path)
+                .Where(l => l.Length > 0 && !l.StartsWith('#'))
+                .Select(l => l.Split(" -- ")[0].Trim())
+                .ToHashSet(StringComparer.Ordinal)
+            : [];
     }
 
     private static string DescribeSource(string owner, string header) =>

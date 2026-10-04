@@ -26,6 +26,7 @@ module MacOS.CoreServices;
 import MacOS.CoreFoundation;
 import MacOS.DiskArbitration;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -212,7 +213,8 @@ public using FSRefPtr = FSRef*;
 
 public struct __FSFileSecurity;
 
-public using FSFileSecurityRef = __FSFileSecurity*;
+[CFType("FSFileSecurityGetTypeID")]
+public extern objc class FSFileSecurityRef : CFTypeRef { }
 
 [Pack(2)]
 public struct CatPositionRec
@@ -249,7 +251,7 @@ public struct FSPermissionInfo
     public UInt8 reserved1;
     public UInt8 userAccess;
     public UInt16 mode;
-    public FSFileSecurityRef fileSec;
+    public __FSFileSecurity* fileSec;
 }
 
 public using FSCatalogInfoBitmap = UInt32;
@@ -825,10 +827,10 @@ public const int kFSReplaceObjectPreservePermissionInfo = 8;
 public const int kFSReplaceObjectDoNotCheckObjectWriteAccess = 16;
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSReplaceObject(FSRef* originalObject, FSRef* replacementObject, CFStringRef newName, CFStringRef temporaryName, FSRef* temporaryDirectory, OptionBits flags, FSRef* resultObject);
+public extern "C" OSStatus FSReplaceObject(FSRef* originalObject, FSRef* replacementObject, CFStringRef? newName, CFStringRef? temporaryName, FSRef* temporaryDirectory, OptionBits flags, FSRef* resultObject);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSPathReplaceObject(byte* originalObjectPath, byte* replacementObjectPath, CFStringRef newName, CFStringRef temporaryName, byte* temporaryDirectoryPath, OptionBits flags);
+public extern "C" OSStatus FSPathReplaceObject(byte* originalObjectPath, byte* replacementObjectPath, CFStringRef? newName, CFStringRef? temporaryName, byte* temporaryDirectoryPath, OptionBits flags);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSGetTemporaryDirectoryForReplaceObject(FSRef* originalObject, FSRef* temporaryDirectory, OptionBits flags);
@@ -1209,16 +1211,16 @@ public extern "C" OSStatus FSCreateVolumeOperation(FSVolumeOperation* volumeOp);
 public extern "C" OSStatus FSDisposeVolumeOperation(FSVolumeOperation volumeOp);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSMountLocalVolumeSync(CFStringRef diskID, CFURLRef mountDir, FSVolumeRefNum* mountedVolumeRefNum, OptionBits flags);
+public extern "C" OSStatus FSMountLocalVolumeSync(CFStringRef? diskID, CFURLRef? mountDir, FSVolumeRefNum* mountedVolumeRefNum, OptionBits flags);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSMountLocalVolumeAsync(CFStringRef diskID, CFURLRef mountDir, FSVolumeOperation volumeOp, void* clientData, OptionBits flags, FSVolumeMountUPP callback, CFRunLoopRef runloop, CFStringRef runloopMode);
+public extern "C" OSStatus FSMountLocalVolumeAsync(CFStringRef? diskID, CFURLRef? mountDir, FSVolumeOperation volumeOp, void* clientData, OptionBits flags, FSVolumeMountUPP callback, CFRunLoopRef? runloop, CFStringRef? runloopMode);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSMountServerVolumeSync(CFURLRef url, CFURLRef mountDir, CFStringRef user, CFStringRef password, FSVolumeRefNum* mountedVolumeRefNum, OptionBits flags);
+public extern "C" OSStatus FSMountServerVolumeSync(CFURLRef? url, CFURLRef? mountDir, CFStringRef? user, CFStringRef? password, FSVolumeRefNum* mountedVolumeRefNum, OptionBits flags);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSMountServerVolumeAsync(CFURLRef url, CFURLRef mountDir, CFStringRef user, CFStringRef password, FSVolumeOperation volumeOp, void* clientData, OptionBits flags, FSVolumeMountUPP callback, CFRunLoopRef runloop, CFStringRef runloopMode);
+public extern "C" OSStatus FSMountServerVolumeAsync(CFURLRef? url, CFURLRef? mountDir, CFStringRef? user, CFStringRef? password, FSVolumeOperation volumeOp, void* clientData, OptionBits flags, FSVolumeMountUPP callback, CFRunLoopRef? runloop, CFStringRef? runloopMode);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSGetAsyncMountStatus(FSVolumeOperation volumeOp, FSMountStatus* status, OSStatus* volumeOpStatus, FSVolumeRefNum* mountedVolumeRefNum, void** clientData);
@@ -1227,7 +1229,7 @@ public extern "C" OSStatus FSGetAsyncMountStatus(FSVolumeOperation volumeOp, FSM
 public extern "C" OSStatus FSUnmountVolumeSync(FSVolumeRefNum vRefNum, OptionBits flags, pid_t* dissenter);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSUnmountVolumeAsync(FSVolumeRefNum vRefNum, OptionBits flags, FSVolumeOperation volumeOp, void* clientData, FSVolumeUnmountUPP callback, CFRunLoopRef runloop, CFStringRef runloopMode);
+public extern "C" OSStatus FSUnmountVolumeAsync(FSVolumeRefNum vRefNum, OptionBits flags, FSVolumeOperation volumeOp, void* clientData, FSVolumeUnmountUPP callback, CFRunLoopRef? runloop, CFStringRef? runloopMode);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSGetAsyncUnmountStatus(FSVolumeOperation volumeOp, FSUnmountStatus* status, OSStatus* volumeOpStatus, FSVolumeRefNum* volumeRefNum, pid_t* dissenter, void** clientData);
@@ -1239,29 +1241,30 @@ public extern "C" OSStatus FSCancelVolumeOperation(FSVolumeOperation volumeOp);
 public extern "C" OSStatus FSEjectVolumeSync(FSVolumeRefNum vRefNum, OptionBits flags, pid_t* dissenter);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSEjectVolumeAsync(FSVolumeRefNum vRefNum, OptionBits flags, FSVolumeOperation volumeOp, void* clientData, FSVolumeEjectUPP callback, CFRunLoopRef runloop, CFStringRef runloopMode);
+public extern "C" OSStatus FSEjectVolumeAsync(FSVolumeRefNum vRefNum, OptionBits flags, FSVolumeOperation volumeOp, void* clientData, FSVolumeEjectUPP callback, CFRunLoopRef? runloop, CFStringRef? runloopMode);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSGetAsyncEjectStatus(FSVolumeOperation volumeOp, FSEjectStatus* status, OSStatus* volumeOpStatus, FSVolumeRefNum* volumeRefNum, pid_t* dissenter, void** clientData);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSCopyDiskIDForVolume(FSVolumeRefNum vRefNum, CFStringRef* diskID);
+public extern "C" OSStatus FSCopyDiskIDForVolume(FSVolumeRefNum vRefNum, __CFString** diskID);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSCopyURLForVolume(FSVolumeRefNum vRefNum, CFURLRef* url);
+public extern "C" OSStatus FSCopyURLForVolume(FSVolumeRefNum vRefNum, __CFURL** url);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSGetVolumeForDiskID(CFStringRef diskID, FSVolumeRefNum* vRefNum);
+public extern "C" OSStatus FSGetVolumeForDiskID(CFStringRef? diskID, FSVolumeRefNum* vRefNum);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSCopyDADiskForVolume(FSVolumeRefNum vRefNum, DADiskRef* disk);
+public extern "C" OSStatus FSCopyDADiskForVolume(FSVolumeRefNum vRefNum, __DADisk** disk);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSGetVolumeForDADisk(DADiskRef disk, FSVolumeRefNum* vRefNum);
+public extern "C" OSStatus FSGetVolumeForDADisk(DADiskRef? disk, FSVolumeRefNum* vRefNum);
 
 public struct __FSFileOperation;
 
-public using FSFileOperationRef = __FSFileOperation*;
+[CFType("FSFileOperationGetTypeID")]
+public extern objc class FSFileOperationRef : CFTypeRef { }
 
 public using FSFileOperationStage = UInt32;
 
@@ -1275,9 +1278,9 @@ public struct FSFileOperationClientContext
     public CFAllocatorCopyDescriptionCallBack copyDescription;
 }
 
-public delegate void FSFileOperationStatusProcPtr(FSFileOperationRef arg0, FSRef* arg1, FSFileOperationStage arg2, OSStatus arg3, CFDictionaryRef arg4, void* arg5);
+public delegate void FSFileOperationStatusProcPtr(__FSFileOperation* arg0, FSRef* arg1, FSFileOperationStage arg2, OSStatus arg3, __CFDictionary* arg4, void* arg5);
 
-public delegate void FSPathFileOperationStatusProcPtr(FSFileOperationRef arg0, byte* arg1, FSFileOperationStage arg2, OSStatus arg3, CFDictionaryRef arg4, void* arg5);
+public delegate void FSPathFileOperationStatusProcPtr(__FSFileOperation* arg0, byte* arg1, FSFileOperationStage arg2, OSStatus arg3, __CFDictionary* arg4, void* arg5);
 
 public const int kFSFileOperationDefaultOptions = 0;
 public const int kFSFileOperationOverwrite = 1;
@@ -1291,49 +1294,49 @@ public const int kFSOperationStageRunning = 2;
 public const int kFSOperationStageComplete = 3;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationTotalBytesKey;
+public extern "C" CFStringRef? kFSOperationTotalBytesKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationBytesCompleteKey;
+public extern "C" CFStringRef? kFSOperationBytesCompleteKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationBytesRemainingKey;
+public extern "C" CFStringRef? kFSOperationBytesRemainingKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationTotalObjectsKey;
+public extern "C" CFStringRef? kFSOperationTotalObjectsKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationObjectsCompleteKey;
+public extern "C" CFStringRef? kFSOperationObjectsCompleteKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationObjectsRemainingKey;
+public extern "C" CFStringRef? kFSOperationObjectsRemainingKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationTotalUserVisibleObjectsKey;
+public extern "C" CFStringRef? kFSOperationTotalUserVisibleObjectsKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationUserVisibleObjectsCompleteKey;
+public extern "C" CFStringRef? kFSOperationUserVisibleObjectsCompleteKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationUserVisibleObjectsRemainingKey;
+public extern "C" CFStringRef? kFSOperationUserVisibleObjectsRemainingKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kFSOperationThroughputKey;
+public extern "C" CFStringRef? kFSOperationThroughputKey;
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSCopyObjectSync(FSRef* source, FSRef* destDir, CFStringRef destName, FSRef* target, OptionBits options);
+public extern "C" OSStatus FSCopyObjectSync(FSRef* source, FSRef* destDir, CFStringRef? destName, FSRef* target, OptionBits options);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSMoveObjectSync(FSRef* source, FSRef* destDir, CFStringRef destName, FSRef* target, OptionBits options);
+public extern "C" OSStatus FSMoveObjectSync(FSRef* source, FSRef* destDir, CFStringRef? destName, FSRef* target, OptionBits options);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSMoveObjectToTrashSync(FSRef* source, FSRef* target, OptionBits options);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSPathCopyObjectSync(byte* sourcePath, byte* destDirPath, CFStringRef destName, byte** targetPath, OptionBits options);
+public extern "C" OSStatus FSPathCopyObjectSync(byte* sourcePath, byte* destDirPath, CFStringRef? destName, byte** targetPath, OptionBits options);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSPathMoveObjectSync(byte* sourcePath, byte* destDirPath, CFStringRef destName, byte** targetPath, OptionBits options);
+public extern "C" OSStatus FSPathMoveObjectSync(byte* sourcePath, byte* destDirPath, CFStringRef? destName, byte** targetPath, OptionBits options);
 
 /// Deprecated in macOS 10.8.
 public extern "C" OSStatus FSPathMoveObjectToTrashSync(byte* sourcePath, byte** targetPath, OptionBits options);
@@ -1342,94 +1345,94 @@ public extern "C" OSStatus FSPathMoveObjectToTrashSync(byte* sourcePath, byte** 
 public extern "C" CFTypeID FSFileOperationGetTypeID();
 
 /// Deprecated in macOS 10.8.
-public extern "C" FSFileOperationRef FSFileOperationCreate(CFAllocatorRef alloc);
+[ReturnsRetained] public extern "C" FSFileOperationRef? FSFileOperationCreate(CFAllocatorRef? alloc);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileOperationScheduleWithRunLoop(FSFileOperationRef fileOp, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+public extern "C" OSStatus FSFileOperationScheduleWithRunLoop(FSFileOperationRef? fileOp, CFRunLoopRef? runLoop, CFStringRef? runLoopMode);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileOperationUnscheduleFromRunLoop(FSFileOperationRef fileOp, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+public extern "C" OSStatus FSFileOperationUnscheduleFromRunLoop(FSFileOperationRef? fileOp, CFRunLoopRef? runLoop, CFStringRef? runLoopMode);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSCopyObjectAsync(FSFileOperationRef fileOp, FSRef* source, FSRef* destDir, CFStringRef destName, OptionBits flags, FSFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
+public extern "C" OSStatus FSCopyObjectAsync(FSFileOperationRef? fileOp, FSRef* source, FSRef* destDir, CFStringRef? destName, OptionBits flags, FSFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSMoveObjectAsync(FSFileOperationRef fileOp, FSRef* source, FSRef* destDir, CFStringRef destName, OptionBits flags, FSFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
+public extern "C" OSStatus FSMoveObjectAsync(FSFileOperationRef? fileOp, FSRef* source, FSRef* destDir, CFStringRef? destName, OptionBits flags, FSFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSMoveObjectToTrashAsync(FSFileOperationRef fileOp, FSRef* source, OptionBits flags, FSFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
+public extern "C" OSStatus FSMoveObjectToTrashAsync(FSFileOperationRef? fileOp, FSRef* source, OptionBits flags, FSFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSPathCopyObjectAsync(FSFileOperationRef fileOp, byte* sourcePath, byte* destDirPath, CFStringRef destName, OptionBits flags, FSPathFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
+public extern "C" OSStatus FSPathCopyObjectAsync(FSFileOperationRef? fileOp, byte* sourcePath, byte* destDirPath, CFStringRef? destName, OptionBits flags, FSPathFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSPathMoveObjectAsync(FSFileOperationRef fileOp, byte* sourcePath, byte* destDirPath, CFStringRef destName, OptionBits flags, FSPathFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
+public extern "C" OSStatus FSPathMoveObjectAsync(FSFileOperationRef? fileOp, byte* sourcePath, byte* destDirPath, CFStringRef? destName, OptionBits flags, FSPathFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSPathMoveObjectToTrashAsync(FSFileOperationRef fileOp, byte* sourcePath, OptionBits flags, FSPathFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
+public extern "C" OSStatus FSPathMoveObjectToTrashAsync(FSFileOperationRef? fileOp, byte* sourcePath, OptionBits flags, FSPathFileOperationStatusProcPtr callback, CFTimeInterval statusChangeInterval, FSFileOperationClientContext* clientContext);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileOperationCancel(FSFileOperationRef fileOp);
+public extern "C" OSStatus FSFileOperationCancel(FSFileOperationRef? fileOp);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileOperationCopyStatus(FSFileOperationRef fileOp, FSRef* currentItem, FSFileOperationStage* stage, OSStatus* error, CFDictionaryRef* statusDictionary, void** info);
+public extern "C" OSStatus FSFileOperationCopyStatus(FSFileOperationRef? fileOp, FSRef* currentItem, FSFileOperationStage* stage, OSStatus* error, __CFDictionary** statusDictionary, void** info);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSPathFileOperationCopyStatus(FSFileOperationRef fileOp, byte** currentItem, FSFileOperationStage* stage, OSStatus* error, CFDictionaryRef* statusDictionary, void** info);
+public extern "C" OSStatus FSPathFileOperationCopyStatus(FSFileOperationRef? fileOp, byte** currentItem, FSFileOperationStage* stage, OSStatus* error, __CFDictionary** statusDictionary, void** info);
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef FSCreateStringFromHFSUniStr(CFAllocatorRef alloc, HFSUniStr255* uniStr);
+[ReturnsRetained] public extern "C" CFStringRef? FSCreateStringFromHFSUniStr(CFAllocatorRef? alloc, HFSUniStr255* uniStr);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSGetHFSUniStrFromString(CFStringRef theString, HFSUniStr255* uniStr);
+public extern "C" OSStatus FSGetHFSUniStrFromString(CFStringRef? theString, HFSUniStr255* uniStr);
 
 /// Deprecated in macOS 10.8.
 public extern "C" CFTypeID FSFileSecurityGetTypeID();
 
 /// Deprecated in macOS 10.8.
-public extern "C" FSFileSecurityRef FSFileSecurityCreate(CFAllocatorRef alloc);
+[ReturnsRetained] public extern "C" FSFileSecurityRef? FSFileSecurityCreate(CFAllocatorRef? alloc);
 
 /// Deprecated in macOS 10.8.
-public extern "C" FSFileSecurityRef FSFileSecurityCreateWithFSPermissionInfo(CFAllocatorRef alloc, FSPermissionInfo* permissions);
+[ReturnsRetained] public extern "C" FSFileSecurityRef? FSFileSecurityCreateWithFSPermissionInfo(CFAllocatorRef? alloc, FSPermissionInfo* permissions);
 
 /// Deprecated in macOS 10.8.
-public extern "C" FSFileSecurityRef FSFileSecurityRefCreateCopy(CFAllocatorRef alloc, FSFileSecurityRef fileSec);
+[ReturnsRetained] public extern "C" FSFileSecurityRef? FSFileSecurityRefCreateCopy(CFAllocatorRef? alloc, FSFileSecurityRef? fileSec);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecurityGetOwnerUUID(FSFileSecurityRef fileSec, CFUUIDBytes* owner);
+public extern "C" OSStatus FSFileSecurityGetOwnerUUID(FSFileSecurityRef? fileSec, CFUUIDBytes* owner);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecuritySetOwnerUUID(FSFileSecurityRef fileSec, CFUUIDBytes* owner);
+public extern "C" OSStatus FSFileSecuritySetOwnerUUID(FSFileSecurityRef? fileSec, CFUUIDBytes* owner);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecurityGetGroupUUID(FSFileSecurityRef fileSec, CFUUIDBytes* group);
+public extern "C" OSStatus FSFileSecurityGetGroupUUID(FSFileSecurityRef? fileSec, CFUUIDBytes* group);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecuritySetGroupUUID(FSFileSecurityRef fileSec, CFUUIDBytes* group);
+public extern "C" OSStatus FSFileSecuritySetGroupUUID(FSFileSecurityRef? fileSec, CFUUIDBytes* group);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecurityCopyAccessControlList(FSFileSecurityRef fileSec, acl_t* accessControlList);
+public extern "C" OSStatus FSFileSecurityCopyAccessControlList(FSFileSecurityRef? fileSec, acl_t* accessControlList);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecuritySetAccessControlList(FSFileSecurityRef fileSec, acl_t accessControlList);
+public extern "C" OSStatus FSFileSecuritySetAccessControlList(FSFileSecurityRef? fileSec, acl_t accessControlList);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecurityGetOwner(FSFileSecurityRef fileSec, UInt32* owner);
+public extern "C" OSStatus FSFileSecurityGetOwner(FSFileSecurityRef? fileSec, UInt32* owner);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecuritySetOwner(FSFileSecurityRef fileSec, UInt32 owner);
+public extern "C" OSStatus FSFileSecuritySetOwner(FSFileSecurityRef? fileSec, UInt32 owner);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecurityGetGroup(FSFileSecurityRef fileSec, UInt32* group);
+public extern "C" OSStatus FSFileSecurityGetGroup(FSFileSecurityRef? fileSec, UInt32* group);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecuritySetGroup(FSFileSecurityRef fileSec, UInt32 group);
+public extern "C" OSStatus FSFileSecuritySetGroup(FSFileSecurityRef? fileSec, UInt32 group);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecurityGetMode(FSFileSecurityRef fileSec, UInt16* mode);
+public extern "C" OSStatus FSFileSecurityGetMode(FSFileSecurityRef? fileSec, UInt16* mode);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSFileSecuritySetMode(FSFileSecurityRef fileSec, UInt16 mode);
+public extern "C" OSStatus FSFileSecuritySetMode(FSFileSecurityRef? fileSec, UInt16 mode);
 
 public const int pleaseCacheBit = 4;
 public const int pleaseCacheMask = 16;

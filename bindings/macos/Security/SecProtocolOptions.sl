@@ -23,20 +23,98 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Security;
 
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Security")
+
+public objc interface OS_sec_protocol_options : NSObjectProtocol { }
+
+public using sec_protocol_options_t = NSObject;
+
+public extern "C" bool sec_protocol_options_are_equal(sec_protocol_options_t optionsA, sec_protocol_options_t optionsB);
+
+public extern "C" void sec_protocol_options_set_local_identity(sec_protocol_options_t options, sec_identity_t identity);
+
+public extern "C" void sec_protocol_options_append_tls_ciphersuite(sec_protocol_options_t options, tls_ciphersuite_t ciphersuite);
+
+/// Deprecated in macOS 10.15.
+public extern "C" void sec_protocol_options_add_tls_ciphersuite(sec_protocol_options_t options, SSLCipherSuite ciphersuite);
+
+public extern "C" void sec_protocol_options_append_tls_ciphersuite_group(sec_protocol_options_t options, tls_ciphersuite_group_t group);
+
+/// Deprecated in macOS 10.15.
+public extern "C" void sec_protocol_options_add_tls_ciphersuite_group(sec_protocol_options_t options, SSLCiphersuiteGroup group);
+
+/// Deprecated in macOS 10.15.
+public extern "C" void sec_protocol_options_set_tls_min_version(sec_protocol_options_t options, SSLProtocol version);
+
+public extern "C" void sec_protocol_options_set_min_tls_protocol_version(sec_protocol_options_t options, tls_protocol_version_t version);
 
 public extern "C" tls_protocol_version_t sec_protocol_options_get_default_min_tls_protocol_version();
 
 public extern "C" tls_protocol_version_t sec_protocol_options_get_default_min_dtls_protocol_version();
 
+/// Deprecated in macOS 10.15.
+public extern "C" void sec_protocol_options_set_tls_max_version(sec_protocol_options_t options, SSLProtocol version);
+
+public extern "C" void sec_protocol_options_set_max_tls_protocol_version(sec_protocol_options_t options, tls_protocol_version_t version);
+
 public extern "C" tls_protocol_version_t sec_protocol_options_get_default_max_tls_protocol_version();
 
 public extern "C" tls_protocol_version_t sec_protocol_options_get_default_max_dtls_protocol_version();
 
+public extern "C" void sec_protocol_options_add_tls_application_protocol(sec_protocol_options_t options, byte* application_protocol);
+
+public extern "C" void sec_protocol_options_set_tls_server_name(sec_protocol_options_t options, byte* server_name);
+
+/// Deprecated in macOS 10.15.
+public extern "C" void sec_protocol_options_set_tls_diffie_hellman_parameters(sec_protocol_options_t options, dispatch_data_t params);
+
+public extern "C" void sec_protocol_options_add_pre_shared_key(sec_protocol_options_t options, dispatch_data_t psk, dispatch_data_t psk_identity);
+
+public extern "C" void sec_protocol_options_set_tls_pre_shared_key_identity_hint(sec_protocol_options_t options, dispatch_data_t psk_identity_hint);
+
+public objc closure void sec_protocol_pre_shared_key_selection_complete_t(dispatch_data_t? arg0);
+
+public objc closure void sec_protocol_pre_shared_key_selection_t(sec_protocol_metadata_t arg0, dispatch_data_t? arg1, sec_protocol_pre_shared_key_selection_complete_t arg2);
+
+public extern "C" void sec_protocol_options_set_pre_shared_key_selection_block(sec_protocol_options_t options, sec_protocol_pre_shared_key_selection_t psk_selection_block, dispatch_queue_t psk_selection_queue);
+
+public extern "C" void sec_protocol_options_set_tls_tickets_enabled(sec_protocol_options_t options, bool tickets_enabled);
+
+public extern "C" void sec_protocol_options_set_tls_is_fallback_attempt(sec_protocol_options_t options, bool is_fallback_attempt);
+
+public extern "C" void sec_protocol_options_set_tls_resumption_enabled(sec_protocol_options_t options, bool resumption_enabled);
+
+public extern "C" void sec_protocol_options_set_tls_false_start_enabled(sec_protocol_options_t options, bool false_start_enabled);
+
+public extern "C" void sec_protocol_options_set_tls_ocsp_enabled(sec_protocol_options_t options, bool ocsp_enabled);
+
+public extern "C" void sec_protocol_options_set_tls_sct_enabled(sec_protocol_options_t options, bool sct_enabled);
+
+public extern "C" void sec_protocol_options_set_tls_renegotiation_enabled(sec_protocol_options_t options, bool renegotiation_enabled);
+
+public extern "C" void sec_protocol_options_set_peer_authentication_required(sec_protocol_options_t options, bool peer_authentication_required);
+
 public objc closure void sec_protocol_key_update_complete_t();
 
+public objc closure void sec_protocol_key_update_t(sec_protocol_metadata_t arg0, sec_protocol_key_update_complete_t arg1);
+
+public objc closure void sec_protocol_challenge_complete_t(sec_identity_t? arg0);
+
+public objc closure void sec_protocol_challenge_t(sec_protocol_metadata_t arg0, sec_protocol_challenge_complete_t arg1);
+
 public objc closure void sec_protocol_verify_complete_t(bool arg0);
+
+public objc closure void sec_protocol_verify_t(sec_protocol_metadata_t arg0, sec_trust_t arg1, sec_protocol_verify_complete_t arg2);
+
+public extern "C" void sec_protocol_options_set_key_update_block(sec_protocol_options_t options, sec_protocol_key_update_t key_update_block, dispatch_queue_t key_update_queue);
+
+public extern "C" void sec_protocol_options_set_challenge_block(sec_protocol_options_t options, sec_protocol_challenge_t challenge_block, dispatch_queue_t challenge_queue);
+
+public extern "C" void sec_protocol_options_set_verify_block(sec_protocol_options_t options, sec_protocol_verify_t verify_block, dispatch_queue_t verify_block_queue);
 
 #endif

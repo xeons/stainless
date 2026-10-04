@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -56,7 +57,7 @@ public const int kEventTextShouldChangeInRange = 2;
 
 public const int kEventTextDidChange = 3;
 
-public extern "C" CFStringRef kHITextViewClassID;
+public extern "C" CFStringRef? kHITextViewClassID;
 
 public const int kControlKindHITextView = 1751741560;
 

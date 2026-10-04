@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -135,8 +136,8 @@ public extern "C" OSStatus TECClearSnifferContextInfo(TECSnifferObjectRef encodi
 
 public extern "C" OSStatus TECSetBasicOptions(TECObjectRef encodingConverter, OptionBits controlFlags);
 
-public extern "C" OSStatus TECCopyTextEncodingInternetNameAndMIB(TextEncoding textEncoding, TECInternetNameUsageMask usage, CFStringRef* encodingNamePtr, SInt32* mibEnumPtr);
+public extern "C" OSStatus TECCopyTextEncodingInternetNameAndMIB(TextEncoding textEncoding, TECInternetNameUsageMask usage, __CFString** encodingNamePtr, SInt32* mibEnumPtr);
 
-public extern "C" OSStatus TECGetTextEncodingFromInternetNameOrMIB(TextEncoding* textEncodingPtr, TECInternetNameUsageMask usage, CFStringRef encodingName, SInt32 mibEnum);
+public extern "C" OSStatus TECGetTextEncodingFromInternetNameOrMIB(TextEncoding* textEncodingPtr, TECInternetNameUsageMask usage, CFStringRef? encodingName, SInt32 mibEnum);
 
 #endif

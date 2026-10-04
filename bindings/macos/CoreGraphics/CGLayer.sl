@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,21 +32,18 @@ import MacOS.CoreFoundation;
 
 public struct CGLayer;
 
-public using CGLayerRef = CGLayer*;
+[CFType("CGLayerGetTypeID")]
+public extern objc class CGLayerRef : CFTypeRef { }
 
-public extern "C" CGLayerRef CGLayerCreateWithContext(CGContextRef context, CGSize size, CFDictionaryRef auxiliaryInfo);
+[ReturnsRetained] public extern "C" CGLayerRef? CGLayerCreateWithContext(CGContextRef? context, CGSize size, CFDictionaryRef? auxiliaryInfo);
 
-public extern "C" CGLayerRef CGLayerRetain(CGLayerRef layer);
+public extern "C" CGSize CGLayerGetSize(CGLayerRef? layer);
 
-public extern "C" void CGLayerRelease(CGLayerRef layer);
+public extern "C" CGContextRef? CGLayerGetContext(CGLayerRef? layer);
 
-public extern "C" CGSize CGLayerGetSize(CGLayerRef layer);
+public extern "C" void CGContextDrawLayerInRect(CGContextRef? context, CGRect rect, CGLayerRef? layer);
 
-public extern "C" CGContextRef CGLayerGetContext(CGLayerRef layer);
-
-public extern "C" void CGContextDrawLayerInRect(CGContextRef context, CGRect rect, CGLayerRef layer);
-
-public extern "C" void CGContextDrawLayerAtPoint(CGContextRef context, CGPoint point, CGLayerRef layer);
+public extern "C" void CGContextDrawLayerAtPoint(CGContextRef? context, CGPoint point, CGLayerRef? layer);
 
 public extern "C" CFTypeID CGLayerGetTypeID();
 

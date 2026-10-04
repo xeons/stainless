@@ -117,7 +117,7 @@ public struct HMStringResType
 [Pack(2)]
 public union HMHelpContentU
 {
-    public CFStringRef tagCFString;
+    public __CFString* tagCFString;
     public Str255 tagString;
     public HMStringResType tagStringRes;
     public TEHandle tagTEHandle;

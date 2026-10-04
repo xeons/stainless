@@ -25,16 +25,17 @@ module MacOS.IOKit;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "IOKit")
 
-public extern "C" CFTypeRef IOURLCreatePropertyFromResource(CFAllocatorRef alloc, CFURLRef url, CFStringRef property, SInt32* errorCode);
+[ReturnsRetained] public extern "C" CFTypeRef? IOURLCreatePropertyFromResource(CFAllocatorRef? alloc, CFURLRef? url, CFStringRef? property, SInt32* errorCode);
 
-public extern "C" Boolean IOURLCreateDataAndPropertiesFromResource(CFAllocatorRef alloc, CFURLRef url, CFDataRef* resourceData, CFDictionaryRef* properties, CFArrayRef desiredProperties, SInt32* errorCode);
+public extern "C" Boolean IOURLCreateDataAndPropertiesFromResource(CFAllocatorRef? alloc, CFURLRef? url, __CFData** resourceData, __CFDictionary** properties, CFArrayRef? desiredProperties, SInt32* errorCode);
 
-public extern "C" Boolean IOURLWriteDataAndPropertiesToResource(CFURLRef url, CFDataRef dataToWrite, CFDictionaryRef propertiesToWrite, int* errorCode);
+public extern "C" Boolean IOURLWriteDataAndPropertiesToResource(CFURLRef? url, CFDataRef? dataToWrite, CFDictionaryRef? propertiesToWrite, int* errorCode);
 
 public enum IOURLError : int
 {

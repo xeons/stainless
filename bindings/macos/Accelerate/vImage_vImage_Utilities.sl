@@ -26,6 +26,7 @@ module MacOS.Accelerate;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -37,7 +38,7 @@ public struct vImage_CGImageFormat
 {
     public uint bitsPerComponent;
     public uint bitsPerPixel;
-    public CGColorSpaceRef colorSpace;
+    public CGColorSpace* colorSpace;
     public CGBitmapInfo bitmapInfo;
     public uint version;
     public CGFloat* decode;
@@ -52,27 +53,23 @@ public extern "C" uint vImageCGImageFormat_GetComponentCount(vImage_CGImageForma
 
 public extern "C" Boolean vImageCGImageFormat_IsEqual(vImage_CGImageFormat* f1, vImage_CGImageFormat* f2);
 
-public extern "C" vImage_Error vImageBuffer_InitWithCGImage(vImage_Buffer* buf, vImage_CGImageFormat* format, CGFloat* backgroundColor, CGImageRef image, vImage_Flags flags);
+public extern "C" vImage_Error vImageBuffer_InitWithCGImage(vImage_Buffer* buf, vImage_CGImageFormat* format, CGFloat* backgroundColor, CGImageRef? image, vImage_Flags flags);
 
 public delegate void vImageCreateCGImageFromBufferCallbackFunction(void* arg0, void* arg1);
 
-public extern "C" CGImageRef vImageCreateCGImageFromBuffer(vImage_Buffer* buf, vImage_CGImageFormat* format, vImageCreateCGImageFromBufferCallbackFunction callback, void* userData, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained] public extern "C" CGImageRef? vImageCreateCGImageFromBuffer(vImage_Buffer* buf, vImage_CGImageFormat* format, vImageCreateCGImageFromBufferCallbackFunction callback, void* userData, vImage_Flags flags, vImage_Error* error);
 
-public extern "C" void vImageConverter_Retain(vImageConverterRef converter);
+[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateWithCGImageFormat(vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
-public extern "C" void vImageConverter_Release(vImageConverterRef converter);
+[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateWithColorSyncCodeFragment(CFTypeRef? codeFragment, vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
 
-public extern "C" vImageConverterRef vImageConverter_CreateWithCGImageFormat(vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+[ReturnsRetained] public extern "C" vImageConverterRef? vImageConverter_CreateWithCGColorConversionInfo(CGColorConversionInfoRef? colorConversionInfoRef, vImage_CGImageFormat* sFormat, vImage_CGImageFormat* dFormat, CGFloat* bg, vImage_Flags flags, vImage_Error* error);
 
-public extern "C" vImageConverterRef vImageConverter_CreateWithColorSyncCodeFragment(CFTypeRef codeFragment, vImage_CGImageFormat* srcFormat, vImage_CGImageFormat* destFormat, CGFloat* backgroundColor, vImage_Flags flags, vImage_Error* error);
+public extern "C" vImage_Error vImageConverter_MustOperateOutOfPlace(vImageConverterRef? converter, vImage_Buffer* srcs, vImage_Buffer* dests, vImage_Flags flags);
 
-public extern "C" vImageConverterRef vImageConverter_CreateWithCGColorConversionInfo(CGColorConversionInfoRef colorConversionInfoRef, vImage_CGImageFormat* sFormat, vImage_CGImageFormat* dFormat, CGFloat* bg, vImage_Flags flags, vImage_Error* error);
+public extern "C" ulong vImageConverter_GetNumberOfSourceBuffers(vImageConverterRef? converter);
 
-public extern "C" vImage_Error vImageConverter_MustOperateOutOfPlace(vImageConverterRef converter, vImage_Buffer* srcs, vImage_Buffer* dests, vImage_Flags flags);
-
-public extern "C" ulong vImageConverter_GetNumberOfSourceBuffers(vImageConverterRef converter);
-
-public extern "C" ulong vImageConverter_GetNumberOfDestinationBuffers(vImageConverterRef converter);
+public extern "C" ulong vImageConverter_GetNumberOfDestinationBuffers(vImageConverterRef? converter);
 
 public using vImageBufferTypeCode = uint;
 
@@ -118,10 +115,10 @@ public const int kvImageBufferTypeCode_LAB_L = 1;
 public const int kvImageBufferTypeCode_LAB_A = 2;
 public const int kvImageBufferTypeCode_LAB_B = 3;
 
-public extern "C" vImageBufferTypeCode* vImageConverter_GetSourceBufferOrder(vImageConverterRef converter);
+public extern "C" vImageBufferTypeCode* vImageConverter_GetSourceBufferOrder(vImageConverterRef? converter);
 
-public extern "C" vImageBufferTypeCode* vImageConverter_GetDestinationBufferOrder(vImageConverterRef converter);
+public extern "C" vImageBufferTypeCode* vImageConverter_GetDestinationBufferOrder(vImageConverterRef? converter);
 
-public extern "C" vImage_Error vImageConvert_AnyToAny(vImageConverterRef converter, vImage_Buffer* srcs, vImage_Buffer* dests, void* tempBuffer, vImage_Flags flags);
+public extern "C" vImage_Error vImageConvert_AnyToAny(vImageConverterRef? converter, vImage_Buffer* srcs, vImage_Buffer* dests, void* tempBuffer, vImage_Flags flags);
 
 #endif

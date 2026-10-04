@@ -25,6 +25,7 @@ module MacOS.VideoToolbox;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,38 +33,38 @@ import MacOS.System;
 
 public using VTSessionRef = CFTypeRef;
 
-public extern "C" OSStatus VTSessionCopySupportedPropertyDictionary(VTSessionRef session, CFDictionaryRef* supportedPropertyDictionaryOut);
+public extern "C" OSStatus VTSessionCopySupportedPropertyDictionary(VTSessionRef session, __CFDictionary** supportedPropertyDictionaryOut);
 
-public extern "C" CFStringRef kVTPropertyTypeKey;
+public extern "C" CFStringRef? kVTPropertyTypeKey;
 
-public extern "C" CFStringRef kVTPropertyType_Enumeration;
+public extern "C" CFStringRef? kVTPropertyType_Enumeration;
 
-public extern "C" CFStringRef kVTPropertyType_Boolean;
+public extern "C" CFStringRef? kVTPropertyType_Boolean;
 
-public extern "C" CFStringRef kVTPropertyType_Number;
+public extern "C" CFStringRef? kVTPropertyType_Number;
 
-public extern "C" CFStringRef kVTPropertyReadWriteStatusKey;
+public extern "C" CFStringRef? kVTPropertyReadWriteStatusKey;
 
-public extern "C" CFStringRef kVTPropertyReadWriteStatus_ReadOnly;
+public extern "C" CFStringRef? kVTPropertyReadWriteStatus_ReadOnly;
 
-public extern "C" CFStringRef kVTPropertyReadWriteStatus_ReadWrite;
+public extern "C" CFStringRef? kVTPropertyReadWriteStatus_ReadWrite;
 
-public extern "C" CFStringRef kVTPropertyShouldBeSerializedKey;
+public extern "C" CFStringRef? kVTPropertyShouldBeSerializedKey;
 
-public extern "C" CFStringRef kVTPropertySupportedValueMinimumKey;
+public extern "C" CFStringRef? kVTPropertySupportedValueMinimumKey;
 
-public extern "C" CFStringRef kVTPropertySupportedValueMaximumKey;
+public extern "C" CFStringRef? kVTPropertySupportedValueMaximumKey;
 
-public extern "C" CFStringRef kVTPropertySupportedValueListKey;
+public extern "C" CFStringRef? kVTPropertySupportedValueListKey;
 
-public extern "C" CFStringRef kVTPropertyDocumentationKey;
+public extern "C" CFStringRef? kVTPropertyDocumentationKey;
 
-public extern "C" OSStatus VTSessionSetProperty(VTSessionRef session, CFStringRef propertyKey, CFTypeRef propertyValue);
+public extern "C" OSStatus VTSessionSetProperty(VTSessionRef session, CFStringRef propertyKey, CFTypeRef? propertyValue);
 
-public extern "C" OSStatus VTSessionCopyProperty(VTSessionRef session, CFStringRef propertyKey, CFAllocatorRef allocator, void* propertyValueOut);
+public extern "C" OSStatus VTSessionCopyProperty(VTSessionRef session, CFStringRef propertyKey, CFAllocatorRef? allocator, void* propertyValueOut);
 
 public extern "C" OSStatus VTSessionSetProperties(VTSessionRef session, CFDictionaryRef propertyDictionary);
 
-public extern "C" OSStatus VTSessionCopySerializableProperties(VTSessionRef session, CFAllocatorRef allocator, CFDictionaryRef* dictionaryOut);
+public extern "C" OSStatus VTSessionCopySerializableProperties(VTSessionRef session, CFAllocatorRef? allocator, __CFDictionary** dictionaryOut);
 
 #endif

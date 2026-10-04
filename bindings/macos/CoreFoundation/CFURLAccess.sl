@@ -24,22 +24,23 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
 
 /// Deprecated in macOS 10.9.
-public extern "C" Boolean CFURLCreateDataAndPropertiesFromResource(CFAllocatorRef alloc, CFURLRef url, CFDataRef* resourceData, CFDictionaryRef* properties, CFArrayRef desiredProperties, SInt32* errorCode);
+public extern "C" Boolean CFURLCreateDataAndPropertiesFromResource(CFAllocatorRef? alloc, CFURLRef? url, __CFData** resourceData, __CFDictionary** properties, CFArrayRef? desiredProperties, SInt32* errorCode);
 
 /// Deprecated in macOS 10.9.
-public extern "C" Boolean CFURLWriteDataAndPropertiesToResource(CFURLRef url, CFDataRef dataToWrite, CFDictionaryRef propertiesToWrite, SInt32* errorCode);
+public extern "C" Boolean CFURLWriteDataAndPropertiesToResource(CFURLRef? url, CFDataRef? dataToWrite, CFDictionaryRef? propertiesToWrite, SInt32* errorCode);
 
 /// Deprecated in macOS 10.9.
-public extern "C" Boolean CFURLDestroyResource(CFURLRef url, SInt32* errorCode);
+public extern "C" Boolean CFURLDestroyResource(CFURLRef? url, SInt32* errorCode);
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFTypeRef CFURLCreatePropertyFromResource(CFAllocatorRef alloc, CFURLRef url, CFStringRef property, SInt32* errorCode);
+[ReturnsRetained] public extern "C" CFTypeRef? CFURLCreatePropertyFromResource(CFAllocatorRef? alloc, CFURLRef? url, CFStringRef? property, SInt32* errorCode);
 
 /// Deprecated in macOS 10.9.
 public enum CFURLError : long
@@ -56,27 +57,27 @@ public enum CFURLError : long
 }
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLFileExists;
+public extern "C" CFStringRef? kCFURLFileExists;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLFileDirectoryContents;
+public extern "C" CFStringRef? kCFURLFileDirectoryContents;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLFileLength;
+public extern "C" CFStringRef? kCFURLFileLength;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLFileLastModificationTime;
+public extern "C" CFStringRef? kCFURLFileLastModificationTime;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLFilePOSIXMode;
+public extern "C" CFStringRef? kCFURLFilePOSIXMode;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLFileOwnerID;
+public extern "C" CFStringRef? kCFURLFileOwnerID;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLHTTPStatusCode;
+public extern "C" CFStringRef? kCFURLHTTPStatusCode;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kCFURLHTTPStatusLine;
+public extern "C" CFStringRef? kCFURLHTTPStatusLine;
 
 #endif

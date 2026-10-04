@@ -24,10 +24,16 @@
 module MacOS.Hypervisor;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Hypervisor")
+
+#if ARM64
+/// macOS 15.0 and later.
+public extern "C" hv_return_t hv_gic_create(hv_gic_config_t gic_config);
+#endif
 
 #if ARM64
 /// macOS 15.0 and later.

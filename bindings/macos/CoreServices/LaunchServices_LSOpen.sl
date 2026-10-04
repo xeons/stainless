@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -47,15 +48,15 @@ public enum LSLaunchFlags : uint
 [Pack(2)]
 public struct LSLaunchURLSpec
 {
-    public CFURLRef appURL;
-    public CFArrayRef itemURLs;
+    public __CFURL* appURL;
+    public __CFArray* itemURLs;
     public AEDesc* passThruParams;
     public LSLaunchFlags launchFlags;
     public void* asyncRefCon;
 }
 
-public extern "C" OSStatus LSOpenCFURLRef(CFURLRef inURL, CFURLRef* outLaunchedURL);
+public extern "C" OSStatus LSOpenCFURLRef(CFURLRef inURL, __CFURL** outLaunchedURL);
 
-public extern "C" OSStatus LSOpenFromURLSpec(LSLaunchURLSpec* inLaunchSpec, CFURLRef* outLaunchedURL);
+public extern "C" OSStatus LSOpenFromURLSpec(LSLaunchURLSpec* inLaunchSpec, __CFURL** outLaunchedURL);
 
 #endif

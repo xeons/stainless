@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,7 @@ import MacOS.CoreFoundation;
 public struct CGColorDataFormat
 {
     public uint version;
-    public CFTypeRef colorspace_info;
+    public void* colorspace_info;
     public CGBitmapInfo bitmap_info;
     public nuint bits_per_component;
     public nuint bytes_per_row;
@@ -40,6 +41,6 @@ public struct CGColorDataFormat
     public CGFloat* decode;
 }
 
-public extern "C" bool CGConvertColorDataWithFormat(nuint width, nuint height, void* dst_data, CGColorDataFormat dst_format, void* src_data, CGColorDataFormat src_format, CFDictionaryRef options);
+public extern "C" bool CGConvertColorDataWithFormat(nuint width, nuint height, void* dst_data, CGColorDataFormat dst_format, void* src_data, CGColorDataFormat src_format, CFDictionaryRef? options);
 
 #endif

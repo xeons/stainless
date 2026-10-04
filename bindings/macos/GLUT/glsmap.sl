@@ -29,6 +29,7 @@ import MacOS.OpenGL;
 
 #pragma comment(framework, "GLUT")
 
+/// Deprecated in macOS 10.9.
 public enum SphereMapFlags : int
 {
     CLEAR_SMAP_TEXTURE = 1,

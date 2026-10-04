@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,15 +33,16 @@ import MacOS.System;
 
 public struct OpaquePolicySearchRef;
 
-public using SecPolicySearchRef = OpaquePolicySearchRef*;
+[CFType("SecPolicySearchGetTypeID")]
+public extern objc class SecPolicySearchRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.7.
 public extern "C" CFTypeID SecPolicySearchGetTypeID();
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecPolicySearchCreate(CSSM_CERT_TYPE certType, SecAsn1Oid* policyOID, SecAsn1Item* value, SecPolicySearchRef* searchRef);
+public extern "C" OSStatus SecPolicySearchCreate(CSSM_CERT_TYPE certType, SecAsn1Oid* policyOID, SecAsn1Item* value, OpaquePolicySearchRef** searchRef);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecPolicySearchCopyNext(SecPolicySearchRef searchRef, SecPolicyRef* policyRef);
+public extern "C" OSStatus SecPolicySearchCopyNext(SecPolicySearchRef searchRef, __SecPolicy** policyRef);
 
 #endif

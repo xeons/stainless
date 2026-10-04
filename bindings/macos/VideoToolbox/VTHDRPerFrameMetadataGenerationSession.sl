@@ -26,6 +26,7 @@ module MacOS.VideoToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -35,21 +36,22 @@ import MacOS.System;
 public using VTHDRPerFrameMetadataGenerationHDRFormatType = CFStringRef;
 
 /// macOS 15.0 and later.
-public extern "C" VTHDRPerFrameMetadataGenerationHDRFormatType kVTHDRPerFrameMetadataGenerationHDRFormatType_DolbyVision;
+public extern "C" VTHDRPerFrameMetadataGenerationHDRFormatType? kVTHDRPerFrameMetadataGenerationHDRFormatType_DolbyVision;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTHDRPerFrameMetadataGenerationOptionsKey_HDRFormats;
+public extern "C" CFStringRef? kVTHDRPerFrameMetadataGenerationOptionsKey_HDRFormats;
 
 public struct OpaqueVTHDRPerFrameMetadataGenerationSession;
 
 /// macOS 15.0 and later.
-public using VTHDRPerFrameMetadataGenerationSessionRef = OpaqueVTHDRPerFrameMetadataGenerationSession*;
+[CFType("VTHDRPerFrameMetadataGenerationSessionGetTypeID")]
+public extern objc class VTHDRPerFrameMetadataGenerationSessionRef : CFTypeRef { }
 
 /// macOS 15.0 and later.
 public extern "C" CFTypeID VTHDRPerFrameMetadataGenerationSessionGetTypeID();
 
 /// macOS 15.0 and later.
-public extern "C" OSStatus VTHDRPerFrameMetadataGenerationSessionCreate(CFAllocatorRef allocator, float framesPerSecond, CFDictionaryRef options, VTHDRPerFrameMetadataGenerationSessionRef* hdrPerFrameMetadataGenerationSessionOut);
+public extern "C" OSStatus VTHDRPerFrameMetadataGenerationSessionCreate(CFAllocatorRef? allocator, float framesPerSecond, CFDictionaryRef? options, OpaqueVTHDRPerFrameMetadataGenerationSession** hdrPerFrameMetadataGenerationSessionOut);
 
 /// macOS 15.0 and later.
 public extern "C" OSStatus VTHDRPerFrameMetadataGenerationSessionAttachMetadata(VTHDRPerFrameMetadataGenerationSessionRef hdrPerFrameMetadataGenerationSession, CVPixelBufferRef pixelBuffer, Boolean sceneChange);

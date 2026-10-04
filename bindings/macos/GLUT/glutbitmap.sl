@@ -29,6 +29,7 @@ import MacOS.OpenGL;
 
 #pragma comment(framework, "GLUT")
 
+/// Deprecated in macOS 10.9.
 public struct BitmapCharRec
 {
     public GLsizei width;
@@ -42,6 +43,7 @@ public struct BitmapCharRec
 /// Deprecated in macOS 10.9.
 public using BitmapCharPtr = BitmapCharRec*;
 
+/// Deprecated in macOS 10.9.
 public struct BitmapFontRec
 {
     public byte* name;

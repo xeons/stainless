@@ -23,6 +23,10 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreAudio;
 
+import MacOS.Foundation;
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "CoreAudio")
@@ -32,6 +36,31 @@ public enum CATapMuteBehavior : long
     Unmuted = 0,
     Muted = 1,
     MutedWhenTapped = 2,
+}
+
+public extern objc class CATapDescription : NSObject
+{
+    [Selector("name", "setName:")] public NSString Name { get; set; }
+    [Selector("UUID", "setUUID:")] public NSUUID UUID { get; set; }
+    [Selector("processes", "setProcesses:")] public NSArray? Processes { get; set; }
+    /// macOS 26.0 and later.
+    [Selector("bundleIDs", "setBundleIDs:")] public NSArray? BundleIDs { get; set; }
+    [Selector("isMono", "setMono:")] public bool Mono { get; set; }
+    [Selector("isExclusive", "setExclusive:")] public bool Exclusive { get; set; }
+    [Selector("isMixdown", "setMixdown:")] public bool Mixdown { get; set; }
+    [Selector("isPrivate", "setPrivate:")] public bool PrivateTap { get; set; }
+    /// macOS 26.0 and later.
+    [Selector("isProcessRestoreEnabled", "setProcessRestoreEnabled:")] public bool ProcessRestoreEnabled { get; set; }
+    [Selector("isMuted", "setMuteBehavior:")] public CATapMuteBehavior MuteBehavior { get; set; }
+    [Selector("deviceUID", "setDeviceUID:")] public NSString? DeviceUID { get; set; }
+    [Selector("stream", "setStream:")] public NSNumber? Stream { get; set; }
+    [Selector("init")] public Self Init();
+    [Selector("initStereoMixdownOfProcesses:")] public Self InitStereoMixdownOfProcesses(NSArray processesObjectIDsToIncludeInTap);
+    [Selector("initStereoGlobalTapButExcludeProcesses:")] public Self InitStereoGlobalTapButExcludeProcesses(NSArray processesObjectIDsToExcludeFromTap);
+    [Selector("initMonoMixdownOfProcesses:")] public Self InitMonoMixdownOfProcesses(NSArray processesObjectIDsToIncludeInTap);
+    [Selector("initMonoGlobalTapButExcludeProcesses:")] public Self InitMonoGlobalTapButExcludeProcesses(NSArray processesObjectIDsToExcludeFromTap);
+    [Selector("initWithProcesses:andDeviceUID:withStream:")] public Self InitWithProcessesAndDeviceUIDWithStream(NSArray processesObjectIDsToIncludeInTap, NSString deviceUID, NSInteger stream);
+    [Selector("initExcludingProcesses:andDeviceUID:withStream:")] public Self InitExcludingProcessesAndDeviceUIDWithStream(NSArray processesObjectIDsToExcludeFromTap, NSString deviceUID, NSInteger stream);
 }
 
 #endif

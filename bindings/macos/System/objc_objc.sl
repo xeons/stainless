@@ -25,6 +25,8 @@ module MacOS.System;
 
 #if MACOS
 
+public delegate void IMP();
+
 #if ARM64
 public using BOOL = bool;
 #else

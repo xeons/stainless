@@ -25,6 +25,7 @@ module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -38,7 +39,8 @@ public using CGRefreshRate = double;
 
 public struct CGDisplayMode;
 
-public using CGDisplayModeRef = CGDisplayMode*;
+[CFType("CGDisplayModeGetTypeID")]
+public extern objc class CGDisplayModeRef : CFTypeRef { }
 
 public extern "C" CGDirectDisplayID CGMainDisplayID();
 
@@ -62,38 +64,34 @@ public extern "C" nuint CGDisplayPixelsWide(CGDirectDisplayID display);
 
 public extern "C" nuint CGDisplayPixelsHigh(CGDirectDisplayID display);
 
-public extern "C" CFArrayRef CGDisplayCopyAllDisplayModes(CGDirectDisplayID display, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CFArrayRef? CGDisplayCopyAllDisplayModes(CGDirectDisplayID display, CFDictionaryRef? options);
 
-public extern "C" CFStringRef kCGDisplayShowDuplicateLowResolutionModes;
+public extern "C" CFStringRef? kCGDisplayShowDuplicateLowResolutionModes;
 
-public extern "C" CGDisplayModeRef CGDisplayCopyDisplayMode(CGDirectDisplayID display);
+[ReturnsRetained] public extern "C" CGDisplayModeRef? CGDisplayCopyDisplayMode(CGDirectDisplayID display);
 
-public extern "C" CGError CGDisplaySetDisplayMode(CGDirectDisplayID display, CGDisplayModeRef mode, CFDictionaryRef options);
+public extern "C" CGError CGDisplaySetDisplayMode(CGDirectDisplayID display, CGDisplayModeRef? mode, CFDictionaryRef? options);
 
-public extern "C" nuint CGDisplayModeGetWidth(CGDisplayModeRef mode);
+public extern "C" nuint CGDisplayModeGetWidth(CGDisplayModeRef? mode);
 
-public extern "C" nuint CGDisplayModeGetHeight(CGDisplayModeRef mode);
+public extern "C" nuint CGDisplayModeGetHeight(CGDisplayModeRef? mode);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef CGDisplayModeCopyPixelEncoding(CGDisplayModeRef mode);
+[ReturnsRetained] public extern "C" CFStringRef? CGDisplayModeCopyPixelEncoding(CGDisplayModeRef? mode);
 
-public extern "C" double CGDisplayModeGetRefreshRate(CGDisplayModeRef mode);
+public extern "C" double CGDisplayModeGetRefreshRate(CGDisplayModeRef? mode);
 
-public extern "C" uint CGDisplayModeGetIOFlags(CGDisplayModeRef mode);
+public extern "C" uint CGDisplayModeGetIOFlags(CGDisplayModeRef? mode);
 
-public extern "C" int CGDisplayModeGetIODisplayModeID(CGDisplayModeRef mode);
+public extern "C" int CGDisplayModeGetIODisplayModeID(CGDisplayModeRef? mode);
 
-public extern "C" bool CGDisplayModeIsUsableForDesktopGUI(CGDisplayModeRef mode);
+public extern "C" bool CGDisplayModeIsUsableForDesktopGUI(CGDisplayModeRef? mode);
 
 public extern "C" CFTypeID CGDisplayModeGetTypeID();
 
-public extern "C" CGDisplayModeRef CGDisplayModeRetain(CGDisplayModeRef mode);
+public extern "C" nuint CGDisplayModeGetPixelWidth(CGDisplayModeRef? mode);
 
-public extern "C" void CGDisplayModeRelease(CGDisplayModeRef mode);
-
-public extern "C" nuint CGDisplayModeGetPixelWidth(CGDisplayModeRef mode);
-
-public extern "C" nuint CGDisplayModeGetPixelHeight(CGDisplayModeRef mode);
+public extern "C" nuint CGDisplayModeGetPixelHeight(CGDisplayModeRef? mode);
 
 public using CGGammaValue = float;
 
@@ -145,26 +143,26 @@ public extern "C" CGError CGDisplayMoveCursorToPoint(CGDirectDisplayID display, 
 
 public extern "C" void CGGetLastMouseDelta(int* deltaX, int* deltaY);
 
-public extern "C" CGContextRef CGDisplayGetDrawingContext(CGDirectDisplayID display);
+public extern "C" CGContextRef? CGDisplayGetDrawingContext(CGDirectDisplayID display);
 
 public using CGDisplayCount = uint;
 
 public using CGDisplayErr = CGError;
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFArrayRef CGDisplayAvailableModes(CGDirectDisplayID dsp);
+public extern "C" CFArrayRef? CGDisplayAvailableModes(CGDirectDisplayID dsp);
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFDictionaryRef CGDisplayBestModeForParameters(CGDirectDisplayID display, nuint bitsPerPixel, nuint width, nuint height, boolean_t* exactMatch);
+public extern "C" CFDictionaryRef? CGDisplayBestModeForParameters(CGDirectDisplayID display, nuint bitsPerPixel, nuint width, nuint height, boolean_t* exactMatch);
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFDictionaryRef CGDisplayBestModeForParametersAndRefreshRate(CGDirectDisplayID display, nuint bitsPerPixel, nuint width, nuint height, CGRefreshRate refreshRate, boolean_t* exactMatch);
+public extern "C" CFDictionaryRef? CGDisplayBestModeForParametersAndRefreshRate(CGDirectDisplayID display, nuint bitsPerPixel, nuint width, nuint height, CGRefreshRate refreshRate, boolean_t* exactMatch);
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFDictionaryRef CGDisplayCurrentMode(CGDirectDisplayID display);
+public extern "C" CFDictionaryRef? CGDisplayCurrentMode(CGDirectDisplayID display);
 
 /// Deprecated in macOS 10.6.
-public extern "C" CGError CGDisplaySwitchToMode(CGDirectDisplayID display, CFDictionaryRef mode);
+public extern "C" CGError CGDisplaySwitchToMode(CGDirectDisplayID display, CFDictionaryRef? mode);
 
 public const uint kCGNullDirectDisplay = 0;
 

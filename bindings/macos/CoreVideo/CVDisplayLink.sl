@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.OpenGL;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,9 +35,10 @@ import MacOS.System;
 
 public struct __CVDisplayLink;
 
-public using CVDisplayLinkRef = __CVDisplayLink*;
+[CFType("CVDisplayLinkGetTypeID")]
+public extern objc class CVDisplayLinkRef : CFTypeRef { }
 
-public delegate CVReturn CVDisplayLinkOutputCallback(CVDisplayLinkRef arg0, CVTimeStamp* arg1, CVTimeStamp* arg2, CVOptionFlags arg3, CVOptionFlags* arg4, void* arg5);
+public delegate CVReturn CVDisplayLinkOutputCallback(__CVDisplayLink* arg0, CVTimeStamp* arg1, CVTimeStamp* arg2, CVOptionFlags arg3, CVOptionFlags* arg4, void* arg5);
 
 public objc closure CVReturn CVDisplayLinkOutputHandler(CVDisplayLinkRef arg0, CVTimeStamp* arg1, CVTimeStamp* arg2, CVOptionFlags arg3, CVOptionFlags* arg4);
 
@@ -44,16 +46,16 @@ public objc closure CVReturn CVDisplayLinkOutputHandler(CVDisplayLinkRef arg0, C
 public extern "C" CFTypeID CVDisplayLinkGetTypeID();
 
 /// Deprecated in macOS 15.0.
-public extern "C" CVReturn CVDisplayLinkCreateWithCGDisplays(CGDirectDisplayID* displayArray, CFIndex count, CVDisplayLinkRef* displayLinkOut);
+public extern "C" CVReturn CVDisplayLinkCreateWithCGDisplays(CGDirectDisplayID* displayArray, CFIndex count, __CVDisplayLink** displayLinkOut);
 
 /// Deprecated in macOS 15.0.
-public extern "C" CVReturn CVDisplayLinkCreateWithOpenGLDisplayMask(CGOpenGLDisplayMask mask, CVDisplayLinkRef* displayLinkOut);
+public extern "C" CVReturn CVDisplayLinkCreateWithOpenGLDisplayMask(CGOpenGLDisplayMask mask, __CVDisplayLink** displayLinkOut);
 
 /// Deprecated in macOS 15.0.
-public extern "C" CVReturn CVDisplayLinkCreateWithCGDisplay(CGDirectDisplayID displayID, CVDisplayLinkRef* displayLinkOut);
+public extern "C" CVReturn CVDisplayLinkCreateWithCGDisplay(CGDirectDisplayID displayID, __CVDisplayLink** displayLinkOut);
 
 /// Deprecated in macOS 15.0.
-public extern "C" CVReturn CVDisplayLinkCreateWithActiveCGDisplays(CVDisplayLinkRef* displayLinkOut);
+public extern "C" CVReturn CVDisplayLinkCreateWithActiveCGDisplays(__CVDisplayLink** displayLinkOut);
 
 /// Deprecated in macOS 15.0.
 public extern "C" CVReturn CVDisplayLinkSetCurrentCGDisplay(CVDisplayLinkRef displayLink, CGDirectDisplayID displayID);
@@ -93,11 +95,5 @@ public extern "C" CVReturn CVDisplayLinkGetCurrentTime(CVDisplayLinkRef displayL
 
 /// Deprecated in macOS 15.0.
 public extern "C" CVReturn CVDisplayLinkTranslateTime(CVDisplayLinkRef displayLink, CVTimeStamp* inTime, CVTimeStamp* outTime);
-
-/// Deprecated in macOS 15.0.
-public extern "C" CVDisplayLinkRef CVDisplayLinkRetain(CVDisplayLinkRef displayLink);
-
-/// Deprecated in macOS 15.0.
-public extern "C" void CVDisplayLinkRelease(CVDisplayLinkRef displayLink);
 
 #endif

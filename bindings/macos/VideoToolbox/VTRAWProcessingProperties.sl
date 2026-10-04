@@ -24,18 +24,19 @@
 module MacOS.VideoToolbox;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTRAWProcessingPropertyKey_MetalDeviceRegistryID;
+public extern "C" CFStringRef? kVTRAWProcessingPropertyKey_MetalDeviceRegistryID;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTRAWProcessingPropertyKey_OutputColorAttachments;
+public extern "C" CFStringRef? kVTRAWProcessingPropertyKey_OutputColorAttachments;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kVTRAWProcessingPropertyKey_MetadataForSidecarFile;
+public extern "C" CFStringRef? kVTRAWProcessingPropertyKey_MetadataForSidecarFile;
 
 #endif

@@ -24,15 +24,16 @@
 module MacOS.IOKit;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "IOKit")
 
-public extern "C" CFTypeRef IOCFUnserialize(byte* buffer, CFAllocatorRef allocator, CFOptionFlags options, CFStringRef* errorString);
+[ReturnsRetained] public extern "C" CFTypeRef? IOCFUnserialize(byte* buffer, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
 
-public extern "C" CFTypeRef IOCFUnserializeBinary(byte* buffer, nuint bufferSize, CFAllocatorRef allocator, CFOptionFlags options, CFStringRef* errorString);
+[ReturnsRetained] public extern "C" CFTypeRef? IOCFUnserializeBinary(byte* buffer, nuint bufferSize, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
 
-public extern "C" CFTypeRef IOCFUnserializeWithSize(byte* buffer, nuint bufferSize, CFAllocatorRef allocator, CFOptionFlags options, CFStringRef* errorString);
+[ReturnsRetained] public extern "C" CFTypeRef? IOCFUnserializeWithSize(byte* buffer, nuint bufferSize, CFAllocatorRef? allocator, CFOptionFlags options, __CFString** errorString);
 
 #endif

@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreMedia;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,27 +35,28 @@ import MacOS.System;
 
 public struct OpaqueVTCompressionSession;
 
-public using VTCompressionSessionRef = OpaqueVTCompressionSession*;
+[CFType("VTCompressionSessionGetTypeID")]
+public extern objc class VTCompressionSessionRef : CFTypeRef { }
 
-public delegate void VTCompressionOutputCallback(void* arg0, void* arg1, OSStatus arg2, VTEncodeInfoFlags arg3, CMSampleBufferRef arg4);
+public delegate void VTCompressionOutputCallback(void* arg0, void* arg1, OSStatus arg2, VTEncodeInfoFlags arg3, opaqueCMSampleBuffer* arg4);
 
-public extern "C" CFStringRef kVTVideoEncoderSpecification_EncoderID;
+public extern "C" CFStringRef? kVTVideoEncoderSpecification_EncoderID;
 
-public extern "C" OSStatus VTCompressionSessionCreate(CFAllocatorRef allocator, int width, int height, CMVideoCodecType codecType, CFDictionaryRef encoderSpecification, CFDictionaryRef sourceImageBufferAttributes, CFAllocatorRef compressedDataAllocator, VTCompressionOutputCallback outputCallback, void* outputCallbackRefCon, VTCompressionSessionRef* compressionSessionOut);
+public extern "C" OSStatus VTCompressionSessionCreate(CFAllocatorRef? allocator, int width, int height, CMVideoCodecType codecType, CFDictionaryRef? encoderSpecification, CFDictionaryRef? sourceImageBufferAttributes, CFAllocatorRef? compressedDataAllocator, VTCompressionOutputCallback outputCallback, void* outputCallbackRefCon, OpaqueVTCompressionSession** compressionSessionOut);
 
 public extern "C" void VTCompressionSessionInvalidate(VTCompressionSessionRef session);
 
 public extern "C" CFTypeID VTCompressionSessionGetTypeID();
 
-public extern "C" CVPixelBufferPoolRef VTCompressionSessionGetPixelBufferPool(VTCompressionSessionRef session);
+public extern "C" CVPixelBufferPoolRef? VTCompressionSessionGetPixelBufferPool(VTCompressionSessionRef session);
 
 public extern "C" OSStatus VTCompressionSessionPrepareToEncodeFrames(VTCompressionSessionRef session);
 
-public extern "C" OSStatus VTCompressionSessionEncodeFrame(VTCompressionSessionRef session, CVImageBufferRef imageBuffer, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef frameProperties, void* sourceFrameRefcon, VTEncodeInfoFlags* infoFlagsOut);
+public extern "C" OSStatus VTCompressionSessionEncodeFrame(VTCompressionSessionRef session, CVImageBufferRef imageBuffer, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef? frameProperties, void* sourceFrameRefcon, VTEncodeInfoFlags* infoFlagsOut);
 
-public objc closure void VTCompressionOutputHandler(OSStatus arg0, VTEncodeInfoFlags arg1, CMSampleBufferRef arg2);
+public objc closure void VTCompressionOutputHandler(OSStatus arg0, VTEncodeInfoFlags arg1, CMSampleBufferRef? arg2);
 
-public extern "C" OSStatus VTCompressionSessionEncodeFrameWithOutputHandler(VTCompressionSessionRef session, CVImageBufferRef imageBuffer, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef frameProperties, VTEncodeInfoFlags* infoFlagsOut, VTCompressionOutputHandler outputHandler);
+public extern "C" OSStatus VTCompressionSessionEncodeFrameWithOutputHandler(VTCompressionSessionRef session, CVImageBufferRef imageBuffer, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef? frameProperties, VTEncodeInfoFlags* infoFlagsOut, VTCompressionOutputHandler outputHandler);
 
 public extern "C" OSStatus VTCompressionSessionCompleteFrames(VTCompressionSessionRef session, CMTime completeUntilPresentationTimeStamp);
 
@@ -62,10 +64,10 @@ public extern "C" OSStatus VTCompressionSessionCompleteFrames(VTCompressionSessi
 public extern "C" Boolean VTIsStereoMVHEVCEncodeSupported();
 
 /// macOS 14.0 and later.
-public extern "C" OSStatus VTCompressionSessionEncodeMultiImageFrame(VTCompressionSessionRef session, CMTaggedBufferGroupRef taggedBufferGroup, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef frameProperties, void* sourceFrameRefcon, VTEncodeInfoFlags* infoFlagsOut);
+public extern "C" OSStatus VTCompressionSessionEncodeMultiImageFrame(VTCompressionSessionRef session, CMTaggedBufferGroupRef taggedBufferGroup, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef? frameProperties, void* sourceFrameRefcon, VTEncodeInfoFlags* infoFlagsOut);
 
 /// macOS 14.0 and later.
-public extern "C" OSStatus VTCompressionSessionEncodeMultiImageFrameWithOutputHandler(VTCompressionSessionRef session, CMTaggedBufferGroupRef taggedBufferGroup, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef frameProperties, VTEncodeInfoFlags* infoFlagsOut, VTCompressionOutputHandler outputHandler);
+public extern "C" OSStatus VTCompressionSessionEncodeMultiImageFrameWithOutputHandler(VTCompressionSessionRef session, CMTaggedBufferGroupRef taggedBufferGroup, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef? frameProperties, VTEncodeInfoFlags* infoFlagsOut, VTCompressionOutputHandler outputHandler);
 
 [Flags]
 public enum VTCompressionSessionOptionFlags : uint

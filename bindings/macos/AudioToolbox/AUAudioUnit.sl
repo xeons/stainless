@@ -23,8 +23,12 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AudioToolbox;
 
+import MacOS.AVFAudio;
 import MacOS.CoreAudioTypes;
+import MacOS.CoreMIDI;
+import MacOS.Foundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -50,7 +54,7 @@ public enum AUAudioUnitBusType : long
 
 public objc closure AUAudioUnitStatus AURenderPullInputBlock(AudioUnitRenderActionFlags* arg0, AudioTimeStamp* arg1, AUAudioFrameCount arg2, NSInteger arg3, AudioBufferList* arg4);
 
-public objc closure AUAudioUnitStatus AURenderBlock(AudioUnitRenderActionFlags* arg0, AudioTimeStamp* arg1, AUAudioFrameCount arg2, NSInteger arg3, AudioBufferList* arg4, AURenderPullInputBlock arg5);
+public objc closure AUAudioUnitStatus AURenderBlock(AudioUnitRenderActionFlags* arg0, AudioTimeStamp* arg1, AUAudioFrameCount arg2, NSInteger arg3, AudioBufferList* arg4, AURenderPullInputBlock? arg5);
 
 public objc closure void AURenderObserver(AudioUnitRenderActionFlags arg0, AudioTimeStamp* arg1, AUAudioFrameCount arg2, NSInteger arg3);
 
@@ -60,7 +64,9 @@ public objc closure void AUScheduleMIDIEventBlock(AUEventSampleTime arg0, byte a
 
 public objc closure OSStatus AUMIDIOutputEventBlock(AUEventSampleTime arg0, byte arg1, NSInteger arg2, byte* arg3);
 
-public objc closure BOOL AUHostMusicalContextBlock(double* arg0, double* arg1, NSInteger* arg2, double* arg3, NSInteger* arg4, double* arg5);
+public objc closure bool AUHostMusicalContextBlock(double* arg0, double* arg1, NSInteger* arg2, double* arg3, NSInteger* arg4, double* arg5);
+
+public objc closure void AUMIDICIProfileChangedBlock(byte arg0, MIDIChannelNumber arg1, MIDICIProfile arg2, bool arg3);
 
 [Flags]
 public enum AUHostTransportStateFlags : ulong
@@ -71,8 +77,137 @@ public enum AUHostTransportStateFlags : ulong
     Cycling = 8,
 }
 
-public objc closure BOOL AUHostTransportStateBlock(AUHostTransportStateFlags* arg0, double* arg1, double* arg2, double* arg3);
+public objc closure bool AUHostTransportStateBlock(AUHostTransportStateFlags* arg0, double* arg1, double* arg2, double* arg3);
+
+public objc closure void AUAudioUnitInstantiateWithComponentDescriptionOptionsCompletionHandlerCompletionHandlerBlock(AUAudioUnit? arg0, NSError? arg1);
+
+public extern objc class AUAudioUnit : NSObject
+{
+    [Selector("componentDescription")] public AudioComponentDescription ComponentDescription { get; }
+    [Selector("component")] public AudioComponent Component { get; }
+    [Selector("componentName")] public NSString? ComponentName { get; }
+    [Selector("audioUnitName")] public NSString? AudioUnitName { get; }
+    [Selector("manufacturerName")] public NSString? ManufacturerName { get; }
+    [Selector("audioUnitShortName")] public NSString? AudioUnitShortName { get; }
+    [Selector("componentVersion")] public uint ComponentVersion { get; }
+    [Selector("renderResourcesAllocated")] public bool RenderResourcesAllocated { get; }
+    [Selector("inputBusses")] public AUAudioUnitBusArray InputBusses { get; }
+    [Selector("outputBusses")] public AUAudioUnitBusArray OutputBusses { get; }
+    [Selector("renderBlock")] public AURenderBlock RenderBlock { get; }
+    [Selector("scheduleParameterBlock")] public AUScheduleParameterBlock ScheduleParameterBlock { get; }
+    [Selector("maximumFramesToRender", "setMaximumFramesToRender:")] public AUAudioFrameCount MaximumFramesToRender { get; set; }
+    [Selector("parameterTree", "setParameterTree:")] public AUParameterTree? ParameterTree { get; set; }
+    [Selector("allParameterValues")] public bool AllParameterValues { get; }
+    [Selector("isMusicDeviceOrEffect")] public bool MusicDeviceOrEffect { get; }
+    [Selector("virtualMIDICableCount")] public NSInteger VirtualMIDICableCount { get; }
+    [Selector("scheduleMIDIEventBlock")] public AUScheduleMIDIEventBlock? ScheduleMIDIEventBlock { get; }
+    [Selector("scheduleMIDIEventListBlock")] public AUMIDIEventListBlock? ScheduleMIDIEventListBlock { get; }
+    [Selector("MIDIOutputNames")] public NSArray MIDIOutputNames { get; }
+    [Selector("providesUserInterface")] public bool ProvidesUserInterface { get; }
+    [Selector("MIDIOutputEventBlock", "setMIDIOutputEventBlock:")] public AUMIDIOutputEventBlock? MIDIOutputEventBlock { get; set; }
+    [Selector("MIDIOutputEventListBlock", "setMIDIOutputEventListBlock:")] public AUMIDIEventListBlock? MIDIOutputEventListBlock { get; set; }
+    [Selector("AudioUnitMIDIProtocol")] public MIDIProtocolID AudioUnitMIDIProtocol { get; }
+    [Selector("hostMIDIProtocol", "setHostMIDIProtocol:")] public MIDIProtocolID HostMIDIProtocol { get; set; }
+    [Selector("fullState", "setFullState:")] public NSDictionary? FullState { get; set; }
+    [Selector("fullStateForDocument", "setFullStateForDocument:")] public NSDictionary? FullStateForDocument { get; set; }
+    [Selector("factoryPresets")] public NSArray? FactoryPresets { get; }
+    [Selector("userPresets")] public NSArray UserPresets { get; }
+    [Selector("supportsUserPresets")] public bool SupportsUserPresets { get; }
+    [Selector("isLoadedInProcess")] public bool IsLoadedInProcess { get; }
+    [Selector("currentPreset", "setCurrentPreset:")] public AUAudioUnitPreset? CurrentPreset { get; set; }
+    [Selector("latency")] public NSTimeInterval Latency { get; }
+    [Selector("tailTime")] public NSTimeInterval TailTime { get; }
+    [Selector("renderQuality", "setRenderQuality:")] public NSInteger RenderQuality { get; set; }
+    [Selector("shouldBypassEffect", "setShouldBypassEffect:")] public bool ShouldBypassEffect { get; set; }
+    [Selector("canProcessInPlace")] public bool CanProcessInPlace { get; }
+    [Selector("isRenderingOffline", "setRenderingOffline:")] public bool RenderingOffline { get; set; }
+    [Selector("channelCapabilities")] public NSArray? ChannelCapabilities { get; }
+    [Selector("musicalContextBlock", "setMusicalContextBlock:")] public AUHostMusicalContextBlock? MusicalContextBlock { get; set; }
+    [Selector("transportStateBlock", "setTransportStateBlock:")] public AUHostTransportStateBlock? TransportStateBlock { get; set; }
+    [Selector("contextName", "setContextName:")] public NSString? ContextName { get; set; }
+    [Selector("migrateFromPlugin")] public NSArray MigrateFromPlugin { get; }
+    [Selector("supportsMPE")] public bool SupportsMPE { get; }
+    [Selector("channelMap", "setChannelMap:")] public NSArray? ChannelMap { get; set; }
+    [Selector("profileChangedBlock", "setProfileChangedBlock:")] public AUMIDICIProfileChangedBlock? ProfileChangedBlock { get; set; }
+    [Selector("initWithComponentDescription:options:error:")] public Self? InitWithComponentDescriptionOptionsError(AudioComponentDescription componentDescription, AudioComponentInstantiationOptions options, out NSError? outError);
+    [Selector("initWithComponentDescription:error:")] public Self? InitWithComponentDescriptionError(AudioComponentDescription componentDescription, out NSError? outError);
+    [Selector("instantiateWithComponentDescription:options:completionHandler:")] public static void InstantiateWithComponentDescriptionOptionsCompletionHandler(AudioComponentDescription componentDescription, AudioComponentInstantiationOptions options, AUAudioUnitInstantiateWithComponentDescriptionOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("allocateRenderResourcesAndReturnError:")] public bool AllocateRenderResourcesAndReturnError(out NSError? outError);
+    [Selector("deallocateRenderResources")] public void DeallocateRenderResources();
+    [Selector("reset")] public void Reset();
+    [Selector("tokenByAddingRenderObserver:")] public NSInteger TokenByAddingRenderObserver(AURenderObserver observer);
+    [Selector("removeRenderObserver:")] public void RemoveRenderObserver(NSInteger token);
+    [Selector("parametersForOverviewWithCount:")] public NSArray ParametersForOverviewWithCount(NSInteger count);
+    [Selector("saveUserPreset:error:")] public bool SaveUserPresetError(AUAudioUnitPreset userPreset, out NSError? outError);
+    [Selector("deleteUserPreset:error:")] public bool DeleteUserPresetError(AUAudioUnitPreset userPreset, out NSError? outError);
+    [Selector("presetStateFor:error:")] public NSDictionary? PresetStateForError(AUAudioUnitPreset userPreset, out NSError? outError);
+    [Selector("profileStateForCable:channel:")] public MIDICIProfileState ProfileStateForCableChannel(byte cable, MIDIChannelNumber channel);
+    [Selector("enableProfile:cable:onChannel:error:")] public bool EnableProfileCableOnChannelError(MIDICIProfile profile, byte cable, MIDIChannelNumber channel, out NSError? outError);
+    [Selector("disableProfile:cable:onChannel:error:")] public bool DisableProfileCableOnChannelError(MIDICIProfile profile, byte cable, MIDIChannelNumber channel, out NSError? outError);
+    [Selector("messageChannelFor:")] public AUMessageChannel MessageChannelFor(NSString channelName);
+}
 
 public objc closure void AUInputHandler(AudioUnitRenderActionFlags* arg0, AudioTimeStamp* arg1, AUAudioFrameCount arg2, NSInteger arg3);
+
+/// AUAudioInputOutputUnit, a category of AUAudioUnit.
+public extern objc class AUAudioUnit
+{
+    [Selector("canPerformInput")] public bool CanPerformInput { get; }
+    [Selector("canPerformOutput")] public bool CanPerformOutput { get; }
+    [Selector("isInputEnabled", "setInputEnabled:")] public bool InputEnabled { get; set; }
+    [Selector("isOutputEnabled", "setOutputEnabled:")] public bool OutputEnabled { get; set; }
+    [Selector("outputProvider", "setOutputProvider:")] public AURenderPullInputBlock? OutputProvider { get; set; }
+    [Selector("inputHandler", "setInputHandler:")] public AUInputHandler? InputHandler { get; set; }
+    [Selector("deviceID")] public AUAudioObjectID DeviceID { get; }
+    [Selector("deviceInputLatency")] public NSTimeInterval DeviceInputLatency { get; }
+    [Selector("deviceOutputLatency")] public NSTimeInterval DeviceOutputLatency { get; }
+    [Selector("isRunning")] public bool Running { get; }
+    [Selector("osWorkgroup")] public os_workgroup_t? OsWorkgroup { get; }
+    [Selector("setDeviceID:error:")] public bool SetDeviceIDError(AUAudioObjectID deviceID, out NSError? outError);
+    [Selector("startHardwareAndReturnError:")] public bool StartHardwareAndReturnError(out NSError? outError);
+    [Selector("stopHardware")] public void StopHardware();
+}
+
+public extern objc class AUAudioUnitBusArray : NSObject, NSFastEnumeration
+{
+    [Selector("count")] public NSUInteger Count { get; }
+    [Selector("isCountChangeable")] public bool CountChangeable { get; }
+    [Selector("ownerAudioUnit")] public AUAudioUnit OwnerAudioUnit { get; }
+    [Selector("busType")] public AUAudioUnitBusType BusType { get; }
+    [Selector("initWithAudioUnit:busType:busses:")] public Self InitWithAudioUnitBusTypeBusses(AUAudioUnit owner, AUAudioUnitBusType busType, NSArray busArray);
+    [Selector("initWithAudioUnit:busType:")] public Self InitWithAudioUnitBusType(AUAudioUnit owner, AUAudioUnitBusType busType);
+    [Selector("objectAtIndexedSubscript:")] public AUAudioUnitBus ObjectAtIndexedSubscript(NSUInteger index);
+    [Selector("setBusCount:error:")] public bool SetBusCountError(NSUInteger count, out NSError? outError);
+    [Selector("addObserverToAllBusses:forKeyPath:options:context:")] public void AddObserverToAllBussesForKeyPathOptionsContext(NSObject observer, NSString keyPath, NSKeyValueObservingOptions options, void* context);
+    [Selector("removeObserverFromAllBusses:forKeyPath:context:")] public void RemoveObserverFromAllBussesForKeyPathContext(NSObject observer, NSString keyPath, void* context);
+}
+
+public extern objc class AUAudioUnitBus : NSObject
+{
+    [Selector("format")] public AVAudioFormat Format { get; }
+    [Selector("shouldAllocateBuffer", "setShouldAllocateBuffer:")] public bool ShouldAllocateBuffer { get; set; }
+    [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
+    [Selector("name", "setName:")] public NSString? Name { get; set; }
+    [Selector("index")] public NSUInteger Index { get; }
+    [Selector("busType")] public AUAudioUnitBusType BusType { get; }
+    [Selector("ownerAudioUnit")] public AUAudioUnit OwnerAudioUnit { get; }
+    [Selector("supportedChannelLayoutTags")] public NSArray? SupportedChannelLayoutTags { get; }
+    [Selector("contextPresentationLatency", "setContextPresentationLatency:")] public NSTimeInterval ContextPresentationLatency { get; set; }
+    [Selector("setFormat:error:")] public bool SetFormatError(AVAudioFormat format, out NSError? outError);
+}
+
+public extern objc class AUAudioUnitPreset : NSObject, NSSecureCoding
+{
+    [Selector("number", "setNumber:")] public NSInteger Number { get; set; }
+    [Selector("name", "setName:")] public NSString Name { get; set; }
+}
+
+public objc closure NSDictionary CallHostBlock(NSDictionary arg0);
+
+public objc interface AUMessageChannel
+{
+    [Optional] [Selector("callHostBlock", "setCallHostBlock:")] CallHostBlock? CallHostBlock { get; set; }
+    [Optional] [Selector("callAudioUnit:")] NSDictionary CallAudioUnit(NSDictionary message);
+}
 
 #endif

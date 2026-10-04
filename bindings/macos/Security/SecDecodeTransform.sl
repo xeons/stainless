@@ -24,6 +24,7 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,6 +33,6 @@ import MacOS.CoreFoundation;
 public extern "C" CFStringRef kSecDecodeTypeAttribute;
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecDecodeTransformCreate(CFTypeRef DecodeType, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef? SecDecodeTransformCreate(CFTypeRef DecodeType, __CFError** error);
 
 #endif

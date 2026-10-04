@@ -25,6 +25,7 @@ module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,15 +33,18 @@ import MacOS.System;
 
 public struct __CFNetService;
 
-public using CFNetServiceRef = __CFNetService*;
+[CFType("CFNetServiceGetTypeID")]
+public extern objc class CFNetServiceRef : CFTypeRef { }
 
 public struct __CFNetServiceMonitor;
 
-public using CFNetServiceMonitorRef = __CFNetServiceMonitor*;
+[CFType("CFNetServiceMonitorGetTypeID")]
+public extern objc class CFNetServiceMonitorRef : CFTypeRef { }
 
 public struct __CFNetServiceBrowser;
 
-public using CFNetServiceBrowserRef = __CFNetServiceBrowser*;
+[CFType("CFNetServiceBrowserGetTypeID")]
+public extern objc class CFNetServiceBrowserRef : CFTypeRef { }
 
 public extern "C" SInt32 kCFStreamErrorDomainMach;
 
@@ -90,11 +94,11 @@ public struct CFNetServiceClientContext
     public CFAllocatorCopyDescriptionCallBack copyDescription;
 }
 
-public delegate void CFNetServiceClientCallBack(CFNetServiceRef arg0, CFStreamError* arg1, void* arg2);
+public delegate void CFNetServiceClientCallBack(__CFNetService* arg0, CFStreamError* arg1, void* arg2);
 
-public delegate void CFNetServiceMonitorClientCallBack(CFNetServiceMonitorRef arg0, CFNetServiceRef arg1, CFNetServiceMonitorType arg2, CFDataRef arg3, CFStreamError* arg4, void* arg5);
+public delegate void CFNetServiceMonitorClientCallBack(__CFNetServiceMonitor* arg0, __CFNetService* arg1, CFNetServiceMonitorType arg2, __CFData* arg3, CFStreamError* arg4, void* arg5);
 
-public delegate void CFNetServiceBrowserClientCallBack(CFNetServiceBrowserRef arg0, CFOptionFlags arg1, CFTypeRef arg2, CFStreamError* arg3, void* arg4);
+public delegate void CFNetServiceBrowserClientCallBack(__CFNetServiceBrowser* arg0, CFOptionFlags arg1, void* arg2, CFStreamError* arg3, void* arg4);
 
 /// Deprecated in macOS 100000.
 public extern "C" CFTypeID CFNetServiceGetTypeID();
@@ -106,10 +110,10 @@ public extern "C" CFTypeID CFNetServiceMonitorGetTypeID();
 public extern "C" CFTypeID CFNetServiceBrowserGetTypeID();
 
 /// Deprecated in macOS 100000.
-public extern "C" CFNetServiceRef CFNetServiceCreate(CFAllocatorRef alloc, CFStringRef domain, CFStringRef serviceType, CFStringRef name, SInt32 port);
+[ReturnsRetained] public extern "C" CFNetServiceRef CFNetServiceCreate(CFAllocatorRef? alloc, CFStringRef domain, CFStringRef serviceType, CFStringRef name, SInt32 port);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFNetServiceRef CFNetServiceCreateCopy(CFAllocatorRef alloc, CFNetServiceRef service);
+[ReturnsRetained] public extern "C" CFNetServiceRef CFNetServiceCreateCopy(CFAllocatorRef? alloc, CFNetServiceRef service);
 
 /// Deprecated in macOS 100000.
 public extern "C" CFStringRef CFNetServiceGetDomain(CFNetServiceRef theService);
@@ -130,25 +134,25 @@ public extern "C" Boolean CFNetServiceResolveWithTimeout(CFNetServiceRef theServ
 public extern "C" void CFNetServiceCancel(CFNetServiceRef theService);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFStringRef CFNetServiceGetTargetHost(CFNetServiceRef theService);
+public extern "C" CFStringRef? CFNetServiceGetTargetHost(CFNetServiceRef theService);
 
 /// Deprecated in macOS 100000.
 public extern "C" SInt32 CFNetServiceGetPortNumber(CFNetServiceRef theService);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFArrayRef CFNetServiceGetAddressing(CFNetServiceRef theService);
+public extern "C" CFArrayRef? CFNetServiceGetAddressing(CFNetServiceRef theService);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFDataRef CFNetServiceGetTXTData(CFNetServiceRef theService);
+public extern "C" CFDataRef? CFNetServiceGetTXTData(CFNetServiceRef theService);
 
 /// Deprecated in macOS 100000.
 public extern "C" Boolean CFNetServiceSetTXTData(CFNetServiceRef theService, CFDataRef txtRecord);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFDictionaryRef CFNetServiceCreateDictionaryWithTXTData(CFAllocatorRef alloc, CFDataRef txtRecord);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFNetServiceCreateDictionaryWithTXTData(CFAllocatorRef? alloc, CFDataRef txtRecord);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFDataRef CFNetServiceCreateTXTDataWithDictionary(CFAllocatorRef alloc, CFDictionaryRef keyValuePairs);
+[ReturnsRetained] public extern "C" CFDataRef? CFNetServiceCreateTXTDataWithDictionary(CFAllocatorRef? alloc, CFDictionaryRef keyValuePairs);
 
 /// Deprecated in macOS 100000.
 public extern "C" Boolean CFNetServiceSetClient(CFNetServiceRef theService, CFNetServiceClientCallBack clientCB, CFNetServiceClientContext* clientContext);
@@ -160,7 +164,7 @@ public extern "C" void CFNetServiceScheduleWithRunLoop(CFNetServiceRef theServic
 public extern "C" void CFNetServiceUnscheduleFromRunLoop(CFNetServiceRef theService, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFNetServiceMonitorRef CFNetServiceMonitorCreate(CFAllocatorRef alloc, CFNetServiceRef theService, CFNetServiceMonitorClientCallBack clientCB, CFNetServiceClientContext* clientContext);
+[ReturnsRetained] public extern "C" CFNetServiceMonitorRef CFNetServiceMonitorCreate(CFAllocatorRef? alloc, CFNetServiceRef theService, CFNetServiceMonitorClientCallBack clientCB, CFNetServiceClientContext* clientContext);
 
 /// Deprecated in macOS 100000.
 public extern "C" void CFNetServiceMonitorInvalidate(CFNetServiceMonitorRef monitor);
@@ -178,7 +182,7 @@ public extern "C" void CFNetServiceMonitorScheduleWithRunLoop(CFNetServiceMonito
 public extern "C" void CFNetServiceMonitorUnscheduleFromRunLoop(CFNetServiceMonitorRef monitor, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFNetServiceBrowserRef CFNetServiceBrowserCreate(CFAllocatorRef alloc, CFNetServiceBrowserClientCallBack clientCB, CFNetServiceClientContext* clientContext);
+[ReturnsRetained] public extern "C" CFNetServiceBrowserRef CFNetServiceBrowserCreate(CFAllocatorRef? alloc, CFNetServiceBrowserClientCallBack clientCB, CFNetServiceClientContext* clientContext);
 
 /// Deprecated in macOS 100000.
 public extern "C" void CFNetServiceBrowserInvalidate(CFNetServiceBrowserRef browser);

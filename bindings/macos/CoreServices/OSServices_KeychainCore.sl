@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.Security;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -80,10 +81,10 @@ public using KCPublicKeyHash = UInt8[20];
 public struct KCCallbackInfo
 {
     public UInt32 version;
-    public KCItemRef item;
+    public void* item;
     public SInt32[2] processID;
     public SInt32[4] event;
-    public KCRef keychain;
+    public void* keychain;
 }
 
 public const int kUnlockStateKCStatus = 1;
@@ -236,37 +237,37 @@ public extern "C" OSStatus KCSetInteractionAllowed(Boolean state);
 public extern "C" Boolean KCIsInteractionAllowed();
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCMakeKCRefFromFSRef(FSRef* keychainFSRef, KCRef* keychain);
+public extern "C" OSStatus KCMakeKCRefFromFSRef(FSRef* keychainFSRef, void** keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCMakeKCRefFromAlias(AliasHandle keychainAlias, KCRef* keychain);
+public extern "C" OSStatus KCMakeKCRefFromAlias(AliasHandle keychainAlias, void** keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCMakeAliasFromKCRef(KCRef keychain, AliasHandle* keychainAlias);
+public extern "C" OSStatus KCMakeAliasFromKCRef(KCRef? keychain, AliasHandle* keychainAlias);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCReleaseKeychain(KCRef* keychain);
+public extern "C" OSStatus KCReleaseKeychain(void** keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCGetDefaultKeychain(KCRef* keychain);
+public extern "C" OSStatus KCGetDefaultKeychain(void** keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCSetDefaultKeychain(KCRef keychain);
+public extern "C" OSStatus KCSetDefaultKeychain(KCRef? keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCGetStatus(KCRef keychain, UInt32* keychainStatus);
+public extern "C" OSStatus KCGetStatus(KCRef? keychain, UInt32* keychainStatus);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCGetKeychain(KCItemRef item, KCRef* keychain);
+public extern "C" OSStatus KCGetKeychain(KCItemRef? item, void** keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCGetKeychainName(KCRef keychain, StringPtr keychainName);
+public extern "C" OSStatus KCGetKeychainName(KCRef? keychain, StringPtr keychainName);
 
 /// Deprecated in macOS 10.6.
 public extern "C" UInt16 KCCountKeychains();
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCGetIndKeychain(UInt16 index, KCRef* keychain);
+public extern "C" OSStatus KCGetIndKeychain(UInt16 index, void** keychain);
 
 public delegate OSStatus KCCallbackProcPtr(KCEvent arg0, KCCallbackInfo* arg1, void* arg2);
 
@@ -282,16 +283,16 @@ public extern "C" void DisposeKCCallbackUPP(KCCallbackUPP userUPP);
 public extern "C" OSStatus InvokeKCCallbackUPP(KCEvent keychainEvent, KCCallbackInfo* info, void* userContext, KCCallbackUPP userUPP);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCFindAppleSharePassword(AFPServerSignature* serverSignature, ConstStringPtr serverAddress, ConstStringPtr serverName, ConstStringPtr volumeName, ConstStringPtr accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus KCFindAppleSharePassword(AFPServerSignature* serverSignature, ConstStringPtr serverAddress, ConstStringPtr serverName, ConstStringPtr volumeName, ConstStringPtr accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCFindInternetPassword(ConstStringPtr serverName, ConstStringPtr securityDomain, ConstStringPtr accountName, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus KCFindInternetPassword(ConstStringPtr serverName, ConstStringPtr securityDomain, ConstStringPtr accountName, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCFindInternetPasswordWithPath(ConstStringPtr serverName, ConstStringPtr securityDomain, ConstStringPtr accountName, ConstStringPtr path, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus KCFindInternetPasswordWithPath(ConstStringPtr serverName, ConstStringPtr securityDomain, ConstStringPtr accountName, ConstStringPtr path, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCFindGenericPassword(ConstStringPtr serviceName, ConstStringPtr accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus KCFindGenericPassword(ConstStringPtr serviceName, ConstStringPtr accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus KCAddCallback(KCCallbackUPP callbackProc, KCEventMask eventMask, void* userContext);
@@ -300,57 +301,57 @@ public extern "C" OSStatus KCAddCallback(KCCallbackUPP callbackProc, KCEventMask
 public extern "C" OSStatus KCRemoveCallback(KCCallbackUPP callbackProc);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCNewItem(KCItemClass itemClass, OSType itemCreator, UInt32 length, void* data, KCItemRef* item);
+public extern "C" OSStatus KCNewItem(KCItemClass itemClass, OSType itemCreator, UInt32 length, void* data, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCSetAttribute(KCItemRef item, KCAttribute* attr);
+public extern "C" OSStatus KCSetAttribute(KCItemRef? item, KCAttribute* attr);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCGetAttribute(KCItemRef item, KCAttribute* attr, UInt32* actualLength);
+public extern "C" OSStatus KCGetAttribute(KCItemRef? item, KCAttribute* attr, UInt32* actualLength);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCSetData(KCItemRef item, UInt32 length, void* data);
+public extern "C" OSStatus KCSetData(KCItemRef? item, UInt32 length, void* data);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCUpdateItem(KCItemRef item);
+public extern "C" OSStatus KCUpdateItem(KCItemRef? item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCReleaseItem(KCItemRef* item);
+public extern "C" OSStatus KCReleaseItem(void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCCopyItem(KCItemRef item, KCRef destKeychain, KCItemRef* copy);
+public extern "C" OSStatus KCCopyItem(KCItemRef? item, KCRef? destKeychain, void** copy);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCFindFirstItem(KCRef keychain, KCAttributeList* attrList, KCSearchRef* search, KCItemRef* item);
+public extern "C" OSStatus KCFindFirstItem(KCRef? keychain, KCAttributeList* attrList, void** search, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCFindNextItem(KCSearchRef search, KCItemRef* item);
+public extern "C" OSStatus KCFindNextItem(KCSearchRef? search, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCReleaseSearch(KCSearchRef* search);
+public extern "C" OSStatus KCReleaseSearch(void** search);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCDeleteItem(KCItemRef item);
+public extern "C" OSStatus KCDeleteItem(KCItemRef? item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCGetData(KCItemRef item, UInt32 maxLength, void* data, UInt32* actualLength);
+public extern "C" OSStatus KCGetData(KCItemRef? item, UInt32 maxLength, void* data, UInt32* actualLength);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus KCLock(KCRef keychain);
+public extern "C" OSStatus KCLock(KCRef? keychain);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcgetkeychainname(KCRef keychain, byte* keychainName);
+public extern "C" OSStatus kcgetkeychainname(KCRef? keychain, byte* keychainName);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcfindapplesharepassword(AFPServerSignature* serverSignature, byte* serverAddress, byte* serverName, byte* volumeName, byte* accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus kcfindapplesharepassword(AFPServerSignature* serverSignature, byte* serverAddress, byte* serverName, byte* volumeName, byte* accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcfindinternetpassword(byte* serverName, byte* securityDomain, byte* accountName, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus kcfindinternetpassword(byte* serverName, byte* securityDomain, byte* accountName, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcfindinternetpasswordwithpath(byte* serverName, byte* securityDomain, byte* accountName, byte* path, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus kcfindinternetpasswordwithpath(byte* serverName, byte* securityDomain, byte* accountName, byte* path, UInt16 port, OSType protocol, OSType authType, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus kcfindgenericpassword(byte* serviceName, byte* accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, KCItemRef* item);
+public extern "C" OSStatus kcfindgenericpassword(byte* serviceName, byte* accountName, UInt32 maxLength, void* passwordData, UInt32* actualLength, void** item);
 
 #endif

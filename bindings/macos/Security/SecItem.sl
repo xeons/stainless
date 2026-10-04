@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -333,7 +334,7 @@ public extern "C" CFStringRef kSecValueRef;
 
 public extern "C" CFStringRef kSecValuePersistentRef;
 
-public extern "C" CFStringRef kSecUseItemList;
+public extern "C" CFStringRef? kSecUseItemList;
 
 public extern "C" CFStringRef kSecUseKeychain;
 
@@ -361,9 +362,9 @@ public extern "C" CFStringRef kSecAttrTokenIDSecureEnclave;
 
 public extern "C" CFStringRef kSecAttrAccessGroupToken;
 
-public extern "C" OSStatus SecItemCopyMatching(CFDictionaryRef query, CFTypeRef* result);
+public extern "C" OSStatus SecItemCopyMatching(CFDictionaryRef query, void** result);
 
-public extern "C" OSStatus SecItemAdd(CFDictionaryRef attributes, CFTypeRef* result);
+public extern "C" OSStatus SecItemAdd(CFDictionaryRef attributes, void** result);
 
 public extern "C" OSStatus SecItemUpdate(CFDictionaryRef query, CFDictionaryRef attributesToUpdate);
 

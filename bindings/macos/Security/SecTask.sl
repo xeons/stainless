@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,18 +33,19 @@ import MacOS.System;
 
 public struct __SecTask;
 
-public using SecTaskRef = __SecTask*;
+[CFType("SecTaskGetTypeID")]
+public extern objc class SecTaskRef : CFTypeRef { }
 
 public extern "C" CFTypeID SecTaskGetTypeID();
 
-public extern "C" SecTaskRef SecTaskCreateWithAuditToken(CFAllocatorRef allocator, audit_token_t token);
+[ReturnsRetained] public extern "C" SecTaskRef? SecTaskCreateWithAuditToken(CFAllocatorRef? allocator, audit_token_t token);
 
-public extern "C" SecTaskRef SecTaskCreateFromSelf(CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" SecTaskRef? SecTaskCreateFromSelf(CFAllocatorRef? allocator);
 
-public extern "C" CFTypeRef SecTaskCopyValueForEntitlement(SecTaskRef task, CFStringRef entitlement, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFTypeRef? SecTaskCopyValueForEntitlement(SecTaskRef task, CFStringRef entitlement, __CFError** error);
 
-public extern "C" CFDictionaryRef SecTaskCopyValuesForEntitlements(SecTaskRef task, CFArrayRef entitlements, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SecTaskCopyValuesForEntitlements(SecTaskRef task, CFArrayRef entitlements, __CFError** error);
 
-public extern "C" CFStringRef SecTaskCopySigningIdentifier(SecTaskRef task, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CFStringRef? SecTaskCopySigningIdentifier(SecTaskRef task, __CFError** error);
 
 #endif

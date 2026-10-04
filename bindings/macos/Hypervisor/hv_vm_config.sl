@@ -24,10 +24,15 @@
 module MacOS.Hypervisor;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Hypervisor")
+
+#if ARM64
+public extern "C" hv_vm_config_t hv_vm_config_create();
+#endif
 
 #if ARM64
 public extern "C" hv_return_t hv_vm_config_get_max_ipa_size(uint* ipa_bit_length);
@@ -38,11 +43,30 @@ public extern "C" hv_return_t hv_vm_config_get_default_ipa_size(uint* ipa_bit_le
 #endif
 
 #if ARM64
+public extern "C" hv_return_t hv_vm_config_set_ipa_size(hv_vm_config_t config, uint ipa_bit_length);
+#endif
+
+#if ARM64
+public extern "C" hv_return_t hv_vm_config_get_ipa_size(hv_vm_config_t config, uint* ipa_bit_length);
+#endif
+
+#if ARM64
 /// macOS 15.0 and later.
 public extern "C" hv_return_t hv_vm_config_get_el2_supported(bool* el2_supported);
 #endif
 
 #if ARM64
+/// macOS 15.0 and later.
+public extern "C" hv_return_t hv_vm_config_get_el2_enabled(hv_vm_config_t config, bool* el2_enabled);
+#endif
+
+#if ARM64
+/// macOS 15.0 and later.
+public extern "C" hv_return_t hv_vm_config_set_el2_enabled(hv_vm_config_t config, bool el2_enabled);
+#endif
+
+#if ARM64
+/// macOS 26.0 and later.
 public enum hv_ipa_granule_t : uint
 {
     HV_IPA_GRANULE_4KB = 0,
@@ -53,6 +77,16 @@ public enum hv_ipa_granule_t : uint
 #if ARM64
 /// macOS 26.0 and later.
 public extern "C" hv_return_t hv_vm_config_get_default_ipa_granule(hv_ipa_granule_t* granule);
+#endif
+
+#if ARM64
+/// macOS 26.0 and later.
+public extern "C" hv_return_t hv_vm_config_get_ipa_granule(hv_vm_config_t config, hv_ipa_granule_t* granule);
+#endif
+
+#if ARM64
+/// macOS 26.0 and later.
+public extern "C" hv_return_t hv_vm_config_set_ipa_granule(hv_vm_config_t config, hv_ipa_granule_t granule);
 #endif
 
 #endif

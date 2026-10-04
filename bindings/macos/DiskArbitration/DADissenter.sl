@@ -25,6 +25,7 @@ module MacOS.DiskArbitration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -48,13 +49,14 @@ public using DAReturn = mach_error_t;
 
 public struct __DADissenter;
 
-public using DADissenterRef = __DADissenter*;
+[CFType]
+public extern objc class DADissenterRef : CFTypeRef { }
 
-public extern "C" DADissenterRef DADissenterCreate(CFAllocatorRef allocator, DAReturn status, CFStringRef string);
+[ReturnsRetained] public extern "C" DADissenterRef DADissenterCreate(CFAllocatorRef? allocator, DAReturn status, CFStringRef? string);
 
 public extern "C" DAReturn DADissenterGetStatus(DADissenterRef dissenter);
 
-public extern "C" CFStringRef DADissenterGetStatusString(DADissenterRef dissenter);
+public extern "C" CFStringRef? DADissenterGetStatusString(DADissenterRef dissenter);
 
 public const int err_local_diskarbitration = 14286848;
 

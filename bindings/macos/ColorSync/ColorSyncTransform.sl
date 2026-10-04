@@ -24,6 +24,7 @@
 module MacOS.ColorSync;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,17 +32,18 @@ import MacOS.CoreFoundation;
 
 public struct ColorSyncTransform;
 
-public using ColorSyncTransformRef = ColorSyncTransform*;
+[CFType("ColorSyncTransformGetTypeID")]
+public extern objc class ColorSyncTransformRef : CFTypeRef { }
 
 public extern "C" CFTypeID ColorSyncTransformGetTypeID();
 
-public extern "C" ColorSyncTransformRef ColorSyncTransformCreate(CFArrayRef profileSequence, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" ColorSyncTransformRef? ColorSyncTransformCreate(CFArrayRef? profileSequence, CFDictionaryRef? options);
 
-public extern "C" CFTypeRef ColorSyncTransformCopyProperty(ColorSyncTransformRef transform, CFTypeRef key, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CFTypeRef? ColorSyncTransformCopyProperty(ColorSyncTransformRef transform, CFTypeRef key, CFDictionaryRef? options);
 
-public extern "C" void ColorSyncTransformSetProperty(ColorSyncTransformRef transform, CFTypeRef key, CFTypeRef property);
+public extern "C" void ColorSyncTransformSetProperty(ColorSyncTransformRef transform, CFTypeRef key, CFTypeRef? property);
 
-public extern "C" CFArrayRef ColorSyncTransformGetProfileSequence(ColorSyncTransformRef transform);
+public extern "C" CFArrayRef? ColorSyncTransformGetProfileSequence(ColorSyncTransformRef transform);
 
 public enum ColorSyncDataDepth : int
 {
@@ -76,7 +78,7 @@ public const int kColorSyncByteOrder32Big = 16384;
 
 public using ColorSyncDataLayout = uint;
 
-public extern "C" bool ColorSyncTransformConvert(ColorSyncTransformRef transform, nuint width, nuint height, void* dst, ColorSyncDataDepth dstDepth, ColorSyncDataLayout dstLayout, nuint dstBytesPerRow, void* src, ColorSyncDataDepth srcDepth, ColorSyncDataLayout srcLayout, nuint srcBytesPerRow, CFDictionaryRef options);
+public extern "C" bool ColorSyncTransformConvert(ColorSyncTransformRef transform, nuint width, nuint height, void* dst, ColorSyncDataDepth dstDepth, ColorSyncDataLayout dstLayout, nuint dstBytesPerRow, void* src, ColorSyncDataDepth srcDepth, ColorSyncDataLayout srcLayout, nuint srcBytesPerRow, CFDictionaryRef? options);
 
 public extern "C" CFStringRef kColorSyncProfile;
 
@@ -117,7 +119,7 @@ public extern "C" CFStringRef kColorSyncPQDerivative;
 /// macOS 14.0 and later.
 public extern "C" CFStringRef kColorSyncHLGDerivative;
 
-public extern "C" CFStringRef kColorSyncPreferredCMM;
+public extern "C" CFStringRef? kColorSyncPreferredCMM;
 
 public extern "C" CFStringRef kColorSyncConvertQuality;
 
@@ -182,6 +184,6 @@ public extern "C" CFStringRef kColorSyncConversionBPC;
 
 public extern "C" CFStringRef kColorSyncFixedPointRange;
 
-public extern "C" CFTypeRef ColorSyncCreateCodeFragment(CFArrayRef profileSequence, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CFTypeRef ColorSyncCreateCodeFragment(CFArrayRef profileSequence, CFDictionaryRef options);
 
 #endif

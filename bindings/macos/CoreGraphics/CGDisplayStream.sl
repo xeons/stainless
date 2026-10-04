@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,11 +32,13 @@ import MacOS.CoreFoundation;
 
 public struct CGDisplayStream;
 
-public using CGDisplayStreamRef = CGDisplayStream*;
+[CFType("CGDisplayStreamGetTypeID")]
+public extern objc class CGDisplayStreamRef : CFTypeRef { }
 
 public struct CGDisplayStreamUpdate;
 
-public using CGDisplayStreamUpdateRef = CGDisplayStreamUpdate*;
+[CFType("CGDisplayStreamUpdateGetTypeID")]
+public extern objc class CGDisplayStreamUpdateRef : CFTypeRef { }
 
 public enum CGDisplayStreamUpdateRectType : int
 {
@@ -53,7 +56,7 @@ public enum CGDisplayStreamFrameStatus : int
     Stopped = 3,
 }
 
-public objc closure void CGDisplayStreamFrameAvailableHandler(CGDisplayStreamFrameStatus arg0, ulong arg1, IOSurfaceRef arg2, CGDisplayStreamUpdateRef arg3);
+public objc closure void CGDisplayStreamFrameAvailableHandler(CGDisplayStreamFrameStatus arg0, ulong arg1, IOSurfaceRef? arg2, CGDisplayStreamUpdateRef? arg3);
 
 public extern "C" CFStringRef kCGDisplayStreamYCbCrMatrix_ITU_R_709_2;
 

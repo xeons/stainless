@@ -28,12 +28,26 @@ public abstract record CDecl(string Name, string File)
     public Availability Availability { get; init; } = Availability.Always;
 }
 
-public sealed record CParameter(string? Name, CType Type);
+public sealed record CParameter(string? Name, CType Type)
+{
+    public Nullability Nullability { get; init; }
+
+    /// <summary>Spelled <c>__autoreleasing</c>: an object the callee stores for the caller, as an <c>NSError **</c> is.</summary>
+    public bool IsAutoreleasing { get; init; }
+
+    /// <summary><c>ns_consumed</c> or <c>cf_consumed</c>: the callee takes a reference it was given.</summary>
+    public bool IsConsumed { get; init; }
+}
 
 public sealed record CFunctionDecl(
     string Name, string File, CType Result, IReadOnlyList<CParameter> Parameters, bool Variadic)
     : CDecl(Name, File)
 {
+    public Nullability ResultNullability { get; init; }
+
+    /// <summary>True for <c>ns_returns_retained</c> or <c>cf_returns_retained</c>, false for their opposites, null for neither.</summary>
+    public bool? ReturnsRetained { get; init; }
+
     /// <summary><c>static inline</c>: its body is in the header and nothing exports it.</summary>
     public bool IsInline { get; init; }
 
@@ -56,6 +70,9 @@ public sealed record CRecordDecl(string Name, string File, CTagKind Kind) : CDec
     public bool IsComplete { get; init; }
 
     public bool IsPacked { get; init; }
+
+    /// <summary>Bridged to an Objective-C class, as every toll-free Core Foundation type is.</summary>
+    public bool IsBridged { get; init; }
 
     public int? Alignment { get; init; }
 
@@ -95,9 +112,82 @@ public sealed record CEnumDecl(string Name, string File) : CDecl(Name, File)
     public string? AnonymousAt { get; init; }
 }
 
-public sealed record CTypedefDecl(string Name, string File, CType Type) : CDecl(Name, File);
+public sealed record CTypedefDecl(string Name, string File, CType Type) : CDecl(Name, File)
+{
+    /// <summary><c>const struct __CFString *</c>: what a Core Foundation type's immutable typedef points at.</summary>
+    public bool PointsToConst { get; init; }
+}
 
-public sealed record CVariableDecl(string Name, string File, CType Type) : CDecl(Name, File);
+public sealed record CVariableDecl(string Name, string File, CType Type) : CDecl(Name, File)
+{
+    public Nullability Nullability { get; init; }
+}
+
+/// <summary>An Objective-C method, named by its selector.</summary>
+public sealed record CObjCMethod(string Selector, bool IsInstance, CType Result, IReadOnlyList<CParameter> Parameters)
+{
+    public Nullability ResultNullability { get; init; }
+
+    public bool IsVariadic { get; init; }
+
+    /// <summary>A protocol member under <c>@optional</c>.</summary>
+    public bool IsOptional { get; init; }
+
+    /// <summary>As on a function: what a returns-retained attribute said, or null.</summary>
+    public bool? ReturnsRetained { get; init; }
+
+    public Availability Availability { get; init; } = Availability.Always;
+
+    public int Line { get; init; }
+}
+
+/// <summary>An Objective-C property: a getter, and a setter unless it is read-only.</summary>
+public sealed record CObjCProperty(string Name, CType Type)
+{
+    public Nullability Nullability { get; init; }
+
+    public bool IsClass { get; init; }
+
+    public bool IsReadOnly { get; init; }
+
+    public string? Getter { get; init; }
+
+    public string? Setter { get; init; }
+
+    public bool IsOptional { get; init; }
+
+    public Availability Availability { get; init; } = Availability.Always;
+
+    public string GetterSelector => Getter ?? Name;
+
+    public string SetterSelector => Setter ?? $"set{char.ToUpperInvariant(Name[0])}{Name[1..]}:";
+}
+
+/// <summary>What a class, a category and a protocol all hold.</summary>
+public abstract record CObjCContainer(string Name, string File) : CDecl(Name, File)
+{
+    public List<string> Protocols { get; } = [];
+
+    public List<CObjCMethod> Methods { get; } = [];
+
+    public List<CObjCProperty> Properties { get; } = [];
+
+    /// <summary>A generic's parameters, <c>ObjectType</c>, which a binding erases to <c>id</c>.</summary>
+    public List<string> TypeParameters { get; } = [];
+
+    /// <summary>False for <c>@class X;</c> or <c>@protocol X;</c>, which say only that it exists.</summary>
+    public bool IsDefinition { get; init; } = true;
+}
+
+public sealed record CObjCInterface(string Name, string File) : CObjCContainer(Name, File)
+{
+    public string? Super { get; init; }
+}
+
+public sealed record CObjCProtocol(string Name, string File) : CObjCContainer(Name, File);
+
+/// <summary>A category: more of <see cref="Class"/>, from wherever it was written.</summary>
+public sealed record CObjCCategory(string Name, string File, string Class) : CObjCContainer(Name, File);
 
 /// <summary>Everything one translation unit declared at file scope, in order.</summary>
 public sealed class Translation
@@ -111,6 +201,17 @@ public sealed class Translation
     public Dictionary<(CTagKind, string), CRecordDecl> Records { get; } = [];
 
     public Dictionary<string, CEnumDecl> Enums { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Every Objective-C class and protocol by name: the definition, where there is one.</summary>
+    public Dictionary<string, CObjCInterface> Interfaces { get; } = new(StringComparer.Ordinal);
+
+    public Dictionary<string, CObjCProtocol> Protocols { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Struct tags bridged to an Objective-C class somewhere, which makes them Core Foundation types.</summary>
+    public HashSet<string> BridgedRecords { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Every <c>XGetTypeID</c> taking nothing: a Core Foundation type's, by the name of the type.</summary>
+    public HashSet<string> TypeIDFunctions { get; } = new(StringComparer.Ordinal);
 
     /// <summary>A record or enum with no tag, by where clang placed it.</summary>
     public Dictionary<string, CDecl> Anonymous { get; } = new(StringComparer.Ordinal);

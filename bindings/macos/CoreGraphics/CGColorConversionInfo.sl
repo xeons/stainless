@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGColorConversionInfo;
 
-public using CGColorConversionInfoRef = CGColorConversionInfo*;
+[CFType("CGColorConversionInfoGetTypeID")]
+public extern objc class CGColorConversionInfoRef : CFTypeRef { }
 
 public extern "C" CFTypeID CGColorConversionInfoGetTypeID();
 
@@ -42,14 +44,14 @@ public enum CGColorConversionInfoTransformType : uint
     ApplySpace = 2,
 }
 
-public extern "C" CGColorConversionInfoRef CGColorConversionInfoCreate(CGColorSpaceRef src, CGColorSpaceRef dst);
+[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreate(CGColorSpaceRef? src, CGColorSpaceRef? dst);
 
-public extern "C" CGColorConversionInfoRef CGColorConversionInfoCreateWithOptions(CGColorSpaceRef src, CGColorSpaceRef dst, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateWithOptions(CGColorSpaceRef src, CGColorSpaceRef dst, CFDictionaryRef? options);
 
-public extern "C" CGColorConversionInfoRef CGColorConversionInfoCreateFromList(CFDictionaryRef options, CGColorSpaceRef arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, ...);
+[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromList(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, ...);
 
 /// macOS 15.0 and later.
-public extern "C" CGColorConversionInfoRef CGColorConversionInfoCreateForToneMapping(CGColorSpaceRef from, float source_headroom, CGColorSpaceRef to, float target_headroom, CGToneMapping method, CFDictionaryRef options, CFErrorRef* error);
+[ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateForToneMapping(CGColorSpaceRef from, float source_headroom, CGColorSpaceRef to, float target_headroom, CGToneMapping method, CFDictionaryRef? options, __CFError** error);
 
 public struct CGColorBufferFormat
 {
@@ -61,7 +63,7 @@ public struct CGColorBufferFormat
 }
 
 /// macOS 15.0 and later.
-public extern "C" bool CGColorConversionInfoConvertData(CGColorConversionInfoRef info, nuint width, nuint height, void* dst_data, CGColorBufferFormat dst_format, void* src_data, CGColorBufferFormat src_format, CFDictionaryRef options);
+public extern "C" bool CGColorConversionInfoConvertData(CGColorConversionInfoRef info, nuint width, nuint height, void* dst_data, CGColorBufferFormat dst_format, void* src_data, CGColorBufferFormat src_format, CFDictionaryRef? options);
 
 public extern "C" CFStringRef kCGColorConversionBlackPointCompensation;
 

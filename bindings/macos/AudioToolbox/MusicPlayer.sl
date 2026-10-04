@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreMIDI;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -139,7 +140,7 @@ public struct AUPresetEvent
 {
     public AudioUnitScope scope;
     public AudioUnitElement element;
-    public CFPropertyListRef preset;
+    public void* preset;
 }
 
 public struct CABarBeatTime
@@ -255,7 +256,7 @@ public extern "C" OSStatus MusicSequenceFileLoadData(MusicSequence inSequence, C
 
 public extern "C" OSStatus MusicSequenceFileCreate(MusicSequence inSequence, CFURLRef inFileRef, MusicSequenceFileTypeID inFileType, MusicSequenceFileFlags inFlags, SInt16 inResolution);
 
-public extern "C" OSStatus MusicSequenceFileCreateData(MusicSequence inSequence, MusicSequenceFileTypeID inFileType, MusicSequenceFileFlags inFlags, SInt16 inResolution, CFDataRef* outData);
+public extern "C" OSStatus MusicSequenceFileCreateData(MusicSequence inSequence, MusicSequenceFileTypeID inFileType, MusicSequenceFileFlags inFlags, SInt16 inResolution, __CFData** outData);
 
 public extern "C" OSStatus MusicSequenceReverse(MusicSequence inSequence);
 
@@ -347,7 +348,7 @@ public extern "C" OSStatus MusicSequenceLoadSMFDataWithFlags(MusicSequence inSeq
 public extern "C" OSStatus MusicSequenceSaveMIDIFile(MusicSequence inSequence, FSRef* inParentDirectory, CFStringRef inFileName, UInt16 inResolution, UInt32 inFlags);
 
 /// Deprecated in macOS 10.5.
-public extern "C" OSStatus MusicSequenceSaveSMFData(MusicSequence inSequence, CFDataRef* outData, UInt16 inResolution);
+public extern "C" OSStatus MusicSequenceSaveSMFData(MusicSequence inSequence, __CFData** outData, UInt16 inResolution);
 
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus NewMusicTrackFrom(MusicTrack inSourceTrack, MusicTimeStamp inSourceStartTime, MusicTimeStamp inSourceEndTime, MusicTrack* outNewTrack);

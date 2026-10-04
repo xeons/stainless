@@ -24,6 +24,7 @@
 module MacOS.DirectoryService;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -143,7 +144,7 @@ public extern "C" tDirStatus dsAppendAuthBufferWithAuthorityAttribute(tDirNodeRe
 public extern "C" tDirStatus dsAppendAuthBufferWithAuthorityStrings(byte* inUserName, byte** inAuthAuthority, tDataBufferPtr inOutAuthBuffer);
 
 /// Deprecated in macOS 10.6.
-public extern "C" tDirStatus dsServiceInformationAllocate(CFDictionaryRef inServiceInfo, UInt32 inBufferSize, tDataBufferPtr* outPackedServiceInfo);
+public extern "C" tDirStatus dsServiceInformationAllocate(CFDictionaryRef? inServiceInfo, UInt32 inBufferSize, tDataBufferPtr* outPackedServiceInfo);
 
 /// Deprecated in macOS 10.6.
 public extern "C" tDataListPtr dsBuildListFromNodes(tDirReference inDirReferences, tDataNodePtr in1stDataNodePtr, ...);

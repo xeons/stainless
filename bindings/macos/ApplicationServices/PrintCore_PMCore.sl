@@ -26,6 +26,7 @@ module MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -49,27 +50,27 @@ public extern "C" OSStatus PMSessionBeginPageNoDialog(PMPrintSession printSessio
 
 public extern "C" OSStatus PMSessionEndPageNoDialog(PMPrintSession printSession);
 
-public extern "C" OSStatus PMSessionGetCGGraphicsContext(PMPrintSession printSession, CGContextRef* context);
+public extern "C" OSStatus PMSessionGetCGGraphicsContext(PMPrintSession printSession, CGContext** context);
 
 public extern "C" OSStatus PMSessionGetDestinationType(PMPrintSession printSession, PMPrintSettings printSettings, PMDestinationType* destTypeP);
 
-public extern "C" OSStatus PMSessionCopyDestinationFormat(PMPrintSession printSession, PMPrintSettings printSettings, CFStringRef* destFormatP);
+public extern "C" OSStatus PMSessionCopyDestinationFormat(PMPrintSession printSession, PMPrintSettings printSettings, __CFString** destFormatP);
 
-public extern "C" OSStatus PMSessionCopyDestinationLocation(PMPrintSession printSession, PMPrintSettings printSettings, CFURLRef* destLocationP);
+public extern "C" OSStatus PMSessionCopyDestinationLocation(PMPrintSession printSession, PMPrintSettings printSettings, __CFURL** destLocationP);
 
-public extern "C" OSStatus PMSessionSetDestination(PMPrintSession printSession, PMPrintSettings printSettings, PMDestinationType destType, CFStringRef destFormat, CFURLRef destLocation);
+public extern "C" OSStatus PMSessionSetDestination(PMPrintSession printSession, PMPrintSettings printSettings, PMDestinationType destType, CFStringRef? destFormat, CFURLRef? destLocation);
 
-public extern "C" OSStatus PMSessionCopyOutputFormatList(PMPrintSession printSession, PMDestinationType destType, CFArrayRef* documentFormatP);
+public extern "C" OSStatus PMSessionCopyOutputFormatList(PMPrintSession printSession, PMDestinationType destType, __CFArray** documentFormatP);
 
-public extern "C" OSStatus PMSessionCreatePageFormatList(PMPrintSession printSession, PMPrinter printer, CFArrayRef* pageFormatList);
+public extern "C" OSStatus PMSessionCreatePageFormatList(PMPrintSession printSession, PMPrinter printer, __CFArray** pageFormatList);
 
-public extern "C" OSStatus PMSessionCreatePrinterList(PMPrintSession printSession, CFArrayRef* printerList, CFIndex* currentIndex, PMPrinter* currentPrinter);
+public extern "C" OSStatus PMSessionCreatePrinterList(PMPrintSession printSession, __CFArray** printerList, CFIndex* currentIndex, PMPrinter* currentPrinter);
 
 public extern "C" OSStatus PMSessionGetCurrentPrinter(PMPrintSession printSession, PMPrinter* currentPrinter);
 
 public extern "C" OSStatus PMSessionSetCurrentPMPrinter(PMPrintSession session, PMPrinter printer);
 
-public extern "C" OSStatus PMSessionGetDataFromSession(PMPrintSession printSession, CFStringRef key, CFTypeRef* data);
+public extern "C" OSStatus PMSessionGetDataFromSession(PMPrintSession printSession, CFStringRef key, void** data);
 
 public extern "C" OSStatus PMSessionSetDataInSession(PMPrintSession printSession, CFStringRef key, CFTypeRef data);
 
@@ -83,7 +84,7 @@ public extern "C" OSStatus PMCopyPageFormat(PMPageFormat formatSrc, PMPageFormat
 
 public extern "C" OSStatus PMCreatePageFormatWithPMPaper(PMPageFormat* pageFormat, PMPaper paper);
 
-public extern "C" OSStatus PMPageFormatCreateDataRepresentation(PMPageFormat pageFormat, CFDataRef* data, PMDataFormat format);
+public extern "C" OSStatus PMPageFormatCreateDataRepresentation(PMPageFormat pageFormat, __CFData** data, PMDataFormat format);
 
 public extern "C" OSStatus PMPageFormatCreateWithDataRepresentation(CFDataRef data, PMPageFormat* pageFormat);
 
@@ -95,7 +96,7 @@ public extern "C" OSStatus PMGetOrientation(PMPageFormat pageFormat, PMOrientati
 
 public extern "C" OSStatus PMGetPageFormatExtendedData(PMPageFormat pageFormat, OSType dataID, UInt32* size, void* extendedData);
 
-public extern "C" OSStatus PMPageFormatGetPrinterID(PMPageFormat pageFormat, CFStringRef* printerID);
+public extern "C" OSStatus PMPageFormatGetPrinterID(PMPageFormat pageFormat, __CFString** printerID);
 
 public extern "C" OSStatus PMGetScale(PMPageFormat pageFormat, double* scale);
 
@@ -117,7 +118,7 @@ public extern "C" OSStatus PMSessionValidatePrintSettings(PMPrintSession printSe
 
 public extern "C" OSStatus PMCopyPrintSettings(PMPrintSettings settingSrc, PMPrintSettings settingDest);
 
-public extern "C" OSStatus PMPrintSettingsCreateDataRepresentation(PMPrintSettings printSettings, CFDataRef* data, PMDataFormat format);
+public extern "C" OSStatus PMPrintSettingsCreateDataRepresentation(PMPrintSettings printSettings, __CFData** data, PMDataFormat format);
 
 public extern "C" OSStatus PMPrintSettingsCreateWithDataRepresentation(CFDataRef data, PMPrintSettings* printSettings);
 
@@ -133,9 +134,9 @@ public extern "C" OSStatus PMGetLastPage(PMPrintSettings printSettings, UInt32* 
 
 public extern "C" OSStatus PMGetPageRange(PMPrintSettings printSettings, UInt32* minPage, UInt32* maxPage);
 
-public extern "C" OSStatus PMPrintSettingsGetJobName(PMPrintSettings printSettings, CFStringRef* name);
+public extern "C" OSStatus PMPrintSettingsGetJobName(PMPrintSettings printSettings, __CFString** name);
 
-public extern "C" OSStatus PMPrintSettingsGetValue(PMPrintSettings printSettings, CFStringRef key, CFTypeRef* value);
+public extern "C" OSStatus PMPrintSettingsGetValue(PMPrintSettings printSettings, CFStringRef key, void** value);
 
 public extern "C" OSStatus PMSetCollate(PMPrintSettings printSettings, Boolean collate);
 
@@ -151,33 +152,33 @@ public extern "C" OSStatus PMSetPageRange(PMPrintSettings printSettings, UInt32 
 
 public extern "C" OSStatus PMPrintSettingsSetJobName(PMPrintSettings printSettings, CFStringRef name);
 
-public extern "C" OSStatus PMPrintSettingsSetValue(PMPrintSettings printSettings, CFStringRef key, CFTypeRef value, Boolean locked);
+public extern "C" OSStatus PMPrintSettingsSetValue(PMPrintSettings printSettings, CFStringRef key, CFTypeRef? value, Boolean locked);
 
-public extern "C" OSStatus PMPrintSettingsCopyAsDictionary(PMPrintSettings printSettings, CFDictionaryRef* settingsDictionary);
+public extern "C" OSStatus PMPrintSettingsCopyAsDictionary(PMPrintSettings printSettings, __CFDictionary** settingsDictionary);
 
-public extern "C" OSStatus PMPrintSettingsCopyKeys(PMPrintSettings printSettings, CFArrayRef* settingsKeys);
+public extern "C" OSStatus PMPrintSettingsCopyKeys(PMPrintSettings printSettings, __CFArray** settingsKeys);
 
 public extern "C" OSStatus PMCreateGenericPrinter(PMPrinter* printer);
 
-public extern "C" OSStatus PMServerCreatePrinterList(PMServer server, CFArrayRef* printerList);
+public extern "C" OSStatus PMServerCreatePrinterList(PMServer server, __CFArray** printerList);
 
-public extern "C" OSStatus PMServerLaunchPrinterBrowser(PMServer server, CFDictionaryRef options);
+public extern "C" OSStatus PMServerLaunchPrinterBrowser(PMServer server, CFDictionaryRef? options);
 
 public extern "C" PMPrinter PMPrinterCreateFromPrinterID(CFStringRef printerID);
 
-public extern "C" OSStatus PMPrinterCopyDescriptionURL(PMPrinter printer, CFStringRef descriptionType, CFURLRef* fileURL);
+public extern "C" OSStatus PMPrinterCopyDescriptionURL(PMPrinter printer, CFStringRef descriptionType, __CFURL** fileURL);
 
-public extern "C" OSStatus PMPrinterCopyDeviceURI(PMPrinter printer, CFURLRef* deviceURI);
+public extern "C" OSStatus PMPrinterCopyDeviceURI(PMPrinter printer, __CFURL** deviceURI);
 
-public extern "C" OSStatus PMPrinterCopyHostName(PMPrinter printer, CFStringRef* hostNameP);
+public extern "C" OSStatus PMPrinterCopyHostName(PMPrinter printer, __CFString** hostNameP);
 
-public extern "C" OSStatus PMPrinterCopyPresets(PMPrinter printer, CFArrayRef* presetList);
+public extern "C" OSStatus PMPrinterCopyPresets(PMPrinter printer, __CFArray** presetList);
 
 public extern "C" OSStatus PMPrinterGetCommInfo(PMPrinter printer, Boolean* supportsControlCharRangeP, Boolean* supportsEightBitP);
 
-public extern "C" CFStringRef PMPrinterGetID(PMPrinter printer);
+public extern "C" CFStringRef? PMPrinterGetID(PMPrinter printer);
 
-public extern "C" CFStringRef PMPrinterGetLocation(PMPrinter printer);
+public extern "C" CFStringRef? PMPrinterGetLocation(PMPrinter printer);
 
 public extern "C" OSStatus PMPrinterGetDriverCreator(PMPrinter printer, OSType* creator);
 
@@ -193,13 +194,13 @@ public extern "C" OSStatus PMPrinterSetOutputResolution(PMPrinter printer, PMPri
 
 public extern "C" OSStatus PMPrinterGetLanguageInfo(PMPrinter printer, PMLanguageInfo* info);
 
-public extern "C" OSStatus PMPrinterGetMakeAndModelName(PMPrinter printer, CFStringRef* makeAndModel);
+public extern "C" OSStatus PMPrinterGetMakeAndModelName(PMPrinter printer, __CFString** makeAndModel);
 
-public extern "C" OSStatus PMPrinterGetMimeTypes(PMPrinter printer, PMPrintSettings settings, CFArrayRef* mimeTypes);
+public extern "C" OSStatus PMPrinterGetMimeTypes(PMPrinter printer, PMPrintSettings settings, __CFArray** mimeTypes);
 
-public extern "C" CFStringRef PMPrinterGetName(PMPrinter printer);
+public extern "C" CFStringRef? PMPrinterGetName(PMPrinter printer);
 
-public extern "C" OSStatus PMPrinterGetPaperList(PMPrinter printer, CFArrayRef* paperList);
+public extern "C" OSStatus PMPrinterGetPaperList(PMPrinter printer, __CFArray** paperList);
 
 public extern "C" OSStatus PMPrinterGetState(PMPrinter printer, PMPrinterState* state);
 
@@ -215,15 +216,15 @@ public extern "C" OSStatus PMPrinterIsRemote(PMPrinter printer, Boolean* isRemot
 
 public extern "C" OSStatus PMPrinterSetDefault(PMPrinter printer);
 
-public extern "C" OSStatus PMPresetCopyName(PMPreset preset, CFStringRef* name);
+public extern "C" OSStatus PMPresetCopyName(PMPreset preset, __CFString** name);
 
 public extern "C" OSStatus PMPresetCreatePrintSettings(PMPreset preset, PMPrintSession session, PMPrintSettings* printSettings);
 
-public extern "C" OSStatus PMPresetGetAttributes(PMPreset preset, CFDictionaryRef* attributes);
+public extern "C" OSStatus PMPresetGetAttributes(PMPreset preset, __CFDictionary** attributes);
 
 public extern "C" OSStatus PMGetPageFormatPaper(PMPageFormat format, PMPaper* paper);
 
-public extern "C" OSStatus PMPaperCreateCustom(PMPrinter printer, CFStringRef id, CFStringRef name, double width, double height, PMPaperMargins* margins, PMPaper* paperP);
+public extern "C" OSStatus PMPaperCreateCustom(PMPrinter printer, CFStringRef? id, CFStringRef? name, double width, double height, PMPaperMargins* margins, PMPaper* paperP);
 
 public extern "C" OSStatus PMPaperGetWidth(PMPaper paper, double* paperWidth);
 
@@ -231,42 +232,42 @@ public extern "C" OSStatus PMPaperGetHeight(PMPaper paper, double* paperHeight);
 
 public extern "C" OSStatus PMPaperGetMargins(PMPaper paper, PMPaperMargins* paperMargins);
 
-public extern "C" OSStatus PMPaperGetID(PMPaper paper, CFStringRef* paperID);
+public extern "C" OSStatus PMPaperGetID(PMPaper paper, __CFString** paperID);
 
-public extern "C" OSStatus PMPaperGetPPDPaperName(PMPaper paper, CFStringRef* paperName);
+public extern "C" OSStatus PMPaperGetPPDPaperName(PMPaper paper, __CFString** paperName);
 
-public extern "C" OSStatus PMPaperCreateLocalizedName(PMPaper paper, PMPrinter printer, CFStringRef* paperName);
+public extern "C" OSStatus PMPaperCreateLocalizedName(PMPaper paper, PMPrinter printer, __CFString** paperName);
 
-public extern "C" OSStatus PMPaperGetPrinterID(PMPaper paper, CFStringRef* printerID);
+public extern "C" OSStatus PMPaperGetPrinterID(PMPaper paper, __CFString** printerID);
 
 public extern "C" Boolean PMPaperIsCustom(PMPaper paper);
 
-public extern "C" OSStatus PMWorkflowCopyItems(CFArrayRef* workflowItems);
+public extern "C" OSStatus PMWorkflowCopyItems(__CFArray** workflowItems);
 
-public extern "C" OSStatus PMWorkflowSubmitPDFWithOptions(CFURLRef workflowItem, CFStringRef title, byte* options, CFURLRef pdfFile);
+public extern "C" OSStatus PMWorkflowSubmitPDFWithOptions(CFURLRef workflowItem, CFStringRef? title, byte* options, CFURLRef pdfFile);
 
 public extern "C" OSStatus PMWorkflowSubmitPDFWithSettings(CFURLRef workflowItem, PMPrintSettings settings, CFURLRef pdfFile);
 
 public extern "C" OSStatus PMPrinterPrintWithProvider(PMPrinter printer, PMPrintSettings settings, PMPageFormat format, CFStringRef mimeType, CGDataProviderRef provider);
 
-public extern "C" OSStatus PMPrinterPrintWithFile(PMPrinter printer, PMPrintSettings settings, PMPageFormat format, CFStringRef mimeType, CFURLRef fileURL);
+public extern "C" OSStatus PMPrinterPrintWithFile(PMPrinter printer, PMPrintSettings settings, PMPageFormat format, CFStringRef? mimeType, CFURLRef fileURL);
 
-public extern "C" OSStatus PMPrinterWritePostScriptToURL(PMPrinter printer, PMPrintSettings settings, PMPageFormat format, CFStringRef mimeType, CFURLRef sourceFileURL, CFURLRef destinationFileURL);
+public extern "C" OSStatus PMPrinterWritePostScriptToURL(PMPrinter printer, PMPrintSettings settings, PMPageFormat format, CFStringRef? mimeType, CFURLRef sourceFileURL, CFURLRef destinationFileURL);
 
 public extern "C" OSStatus PMPrintSettingsToOptions(PMPrintSettings settings, byte** options);
 
 public extern "C" OSStatus PMPrintSettingsToOptionsWithPrinterAndPageFormat(PMPrintSettings settings, PMPrinter printer, PMPageFormat pageFormat, byte** options);
 
-public extern "C" OSStatus PMPrinterSendCommand(PMPrinter printer, CFStringRef commandString, CFStringRef jobTitle, CFDictionaryRef options);
+public extern "C" OSStatus PMPrinterSendCommand(PMPrinter printer, CFStringRef commandString, CFStringRef? jobTitle, CFDictionaryRef? options);
 
-public extern "C" OSStatus PMPrinterCopyState(PMPrinter printer, CFDictionaryRef* stateDict);
+public extern "C" OSStatus PMPrinterCopyState(PMPrinter printer, __CFDictionary** stateDict);
 
-public extern "C" OSStatus PMCopyAvailablePPDs(PMPPDDomain domain, CFArrayRef* ppds);
+public extern "C" OSStatus PMCopyAvailablePPDs(PMPPDDomain domain, __CFArray** ppds);
 
-public extern "C" OSStatus PMCopyLocalizedPPD(CFURLRef ppd, CFURLRef* localizedPPD);
+public extern "C" OSStatus PMCopyLocalizedPPD(CFURLRef ppd, __CFURL** localizedPPD);
 
-public extern "C" OSStatus PMCopyPPDData(CFURLRef ppd, CFDataRef* data);
+public extern "C" OSStatus PMCopyPPDData(CFURLRef ppd, __CFData** data);
 
-public extern "C" CGImageRef PMCGImageCreateWithEPSDataProvider(CGDataProviderRef epsDataProvider, CGImageRef epsPreview);
+[ReturnsRetained] public extern "C" CGImageRef? PMCGImageCreateWithEPSDataProvider(CGDataProviderRef? epsDataProvider, CGImageRef epsPreview);
 
 #endif

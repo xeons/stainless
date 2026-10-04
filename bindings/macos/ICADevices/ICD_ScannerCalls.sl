@@ -26,6 +26,7 @@ module MacOS.ICADevices;
 import MacOS.CoreFoundation;
 import MacOS.DiskArbitration;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -107,7 +108,7 @@ public struct ICD_ScannerGetParametersPB
     public ICAObjectInfo objectInfo;
     public ICAConnectionID connectionID;
     public ICAScannerSessionID sessionID;
-    public CFMutableDictionaryRef theDict;
+    public __CFDictionary* theDict;
 }
 
 [Pack(2)]
@@ -118,7 +119,7 @@ public struct ICD_ScannerSetParametersPB
     public ICAObjectInfo objectInfo;
     public ICAConnectionID connectionID;
     public ICAScannerSessionID sessionID;
-    public CFMutableDictionaryRef theDict;
+    public __CFDictionary* theDict;
 }
 
 [Pack(2)]
@@ -164,7 +165,7 @@ public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerWrite
 
 public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerSendMessageFunction(ScannerObjectInfo* arg0, ICD_ScannerObjectSendMessagePB* arg1, ICDCompletion arg2);
 
-public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerAddPropertiesToCFDictionaryFunction(ScannerObjectInfo* arg0, CFMutableDictionaryRef arg1);
+public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerAddPropertiesToCFDictionaryFunction(ScannerObjectInfo* arg0, __CFDictionary* arg1);
 
 public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerOpenFireWireDeviceFunction(UInt64 arg0, ScannerObjectInfo* arg1);
 
@@ -184,13 +185,13 @@ public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerStatu
 
 public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerStartFunction(ScannerObjectInfo* arg0, ICD_ScannerStartPB* arg1);
 
-public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerOpenBluetoothDeviceFunction(CFDictionaryRef arg0, ScannerObjectInfo* arg1);
+public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerOpenBluetoothDeviceFunction(__CFDictionary* arg0, ScannerObjectInfo* arg1);
 
-public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerOpenTCPIPDeviceFunction(CFDictionaryRef arg0, ScannerObjectInfo* arg1);
+public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerOpenTCPIPDeviceFunction(__CFDictionary* arg0, ScannerObjectInfo* arg1);
 
 public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerWriteDataToFileFunction(ScannerObjectInfo* arg0, FILE* arg1, UInt32 arg2, long* arg3);
 
-public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerOpenMassStorageDeviceFunction(CFStringRef arg0, DASessionRef arg1, ScannerObjectInfo* arg2);
+public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerOpenMassStorageDeviceFunction(__CFString* arg0, __DASession* arg1, ScannerObjectInfo* arg2);
 
 public delegate ICAError ICD_Scannerscanner_callback_functionsF_ICD_ScannerWriteDataToFileDescriptorFunction(ScannerObjectInfo* arg0, int arg1, UInt32 arg2, long* arg3);
 
@@ -238,7 +239,7 @@ public extern "C" ICAError ICDScannerGetStandardPropertyData(ScannerObjectInfo* 
 
 public extern "C" ICAError ICDScannerNewObjectInfoCreated(ScannerObjectInfo* parentInfo, UInt32 index, ICAObject* newICAObject);
 
-public extern "C" ICAError ICDScannerCopyDeviceInfoDictionary(byte* deviceName, CFDictionaryRef* theDict);
+public extern "C" ICAError ICDScannerCopyDeviceInfoDictionary(byte* deviceName, __CFDictionary** theDict);
 
 /// Deprecated in macOS 10.7.
 public extern "C" ICAError ICDScannerCreateICAThumbnailFromICNS(byte* fileName, void* thumbnail);
@@ -264,12 +265,12 @@ public extern "C" ICAError ICDScannerDisconnectFWDevice(UInt64 guid);
 
 public extern "C" ICAError ICDScannerDisconnectFWDeviceWithIORegPath(UInt64 guid, byte* ioregPath);
 
-public extern "C" ICAError ICDScannerConnectBluetoothDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDScannerConnectBluetoothDevice(CFDictionaryRef? params);
 
-public extern "C" ICAError ICDScannerDisconnectBluetoothDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDScannerDisconnectBluetoothDevice(CFDictionaryRef? params);
 
-public extern "C" ICAError ICDScannerConnectTCPIPDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDScannerConnectTCPIPDevice(CFDictionaryRef? params);
 
-public extern "C" ICAError ICDScannerDisconnectTCPIPDevice(CFDictionaryRef params);
+public extern "C" ICAError ICDScannerDisconnectTCPIPDevice(CFDictionaryRef? params);
 
 #endif

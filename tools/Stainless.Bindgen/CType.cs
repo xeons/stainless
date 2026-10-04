@@ -48,12 +48,34 @@ public sealed record CArray(CType Element, long? Length) : CType;
 
 public sealed record CFunction(CType Result, IReadOnlyList<CType> Parameters, bool Variadic) : CType
 {
+    /// <summary>What each parameter's outermost type says about nil; empty when nothing was read.</summary>
+    public IReadOnlyList<Nullability> ParameterNullability { get; init; } = [];
+
+    public Nullability ResultNullability { get; init; }
+
     public bool Equals(CFunction? other) =>
         other is not null && Result.Equals(other.Result) && Variadic == other.Variadic &&
         Parameters.SequenceEqual(other.Parameters);
 
     public override int GetHashCode() => HashCode.Combine(Result, Parameters.Count, Variadic);
 }
+
+/// <summary>
+/// <c>NSArray&lt;NSString *&gt;</c> or <c>id&lt;NSCopying&gt;</c>: a type with a list
+/// in angle brackets, which is a class's type arguments or the protocols an
+/// object adopts; which of the two depends on the type, and is decided by
+/// whoever knows it.
+/// </summary>
+public sealed record CObjCQualified(CType Base, IReadOnlyList<CType> Arguments) : CType
+{
+    public bool Equals(CObjCQualified? other) =>
+        other is not null && Base.Equals(other.Base) && Arguments.SequenceEqual(other.Arguments);
+
+    public override int GetHashCode() => HashCode.Combine(Base, Arguments.Count);
+}
+
+/// <summary>What <c>_Nonnull</c>, <c>_Nullable</c> or nothing said about a pointer.</summary>
+public enum Nullability { Unspecified, Nullable, NonNull }
 
 /// <summary>What a binding cannot spell: a vector, an atomic, <c>long double</c>.</summary>
 public sealed record CUnsupported(string Why) : CType;
@@ -97,14 +119,29 @@ public sealed partial class CTypeParser
     private static partial System.Text.RegularExpressions.Regex QualifiedAnonymous();
 
     /// <summary>The type <paramref name="spelling"/> names.</summary>
-    public static CType Parse(string spelling)
+    public static CType Parse(string spelling) => ParseAnnotated(spelling).Type;
+
+    /// <summary>
+    /// The type <paramref name="spelling"/> names, and what its outermost
+    /// level says about nil: the qualifier after the last <c>*</c> or
+    /// <c>^</c>, or beside the type's name when there is no pointer.
+    /// </summary>
+    public static (CType Type, Nullability Nullability) ParseAnnotated(string spelling)
     {
         var parser = new CTypeParser(spelling);
-        var type = parser.ParseType();
+        var (type, nullability) = parser.ParseType();
         return parser._at == parser._tokens.Count
-            ? type
-            : new CUnsupported($"'{spelling}' has more after the type");
+            ? (type, nullability)
+            : (new CUnsupported($"'{spelling}' has more after the type"), Nullability.Unspecified);
     }
+
+    private static Nullability? NullabilityOf(string token) => token switch
+    {
+        "_Nonnull" => Nullability.NonNull,
+        "_Nullable" or "_Nullable_result" => Nullability.Nullable,
+        "_Null_unspecified" => Nullability.Unspecified,
+        _ => null,
+    };
 
     private string? Current => _at < _tokens.Count ? _tokens[_at] : null;
 
@@ -123,22 +160,25 @@ public sealed partial class CTypeParser
             throw new FormatException($"expected '{token}' at token {_at} of '{string.Join(" ", _tokens)}'");
     }
 
-    private CType ParseType()
+    private (CType Type, Nullability Nullability) ParseType()
     {
-        var baseType = ParseSpecifiers();
-        return ParseDeclarator()(baseType);
+        var (baseType, nullability) = ParseSpecifiers();
+        var (apply, outermost) = ParseDeclarator(nullability);
+        return (apply(baseType), outermost ?? nullability);
     }
 
-    /// <summary>The words before the declarator, which name the base type.</summary>
-    private CType ParseSpecifiers()
+    /// <summary>The words before the declarator, which name the base type, and what they say about nil.</summary>
+    private (CType Type, Nullability Nullability) ParseSpecifiers()
     {
         var builtin = new List<string>();
         CType? named = null;
+        var nullability = Nullability.Unspecified;
 
         while (Current is { } token)
         {
             if (Qualifiers.Contains(token))
             {
+                if (NullabilityOf(token) is { } said) nullability = said;
                 _at++;
                 // A pointer-authentication or bounds qualifier takes arguments;
                 // after any other, a parenthesis begins the declarator.
@@ -197,12 +237,18 @@ public sealed partial class CTypeParser
                 continue;
             }
 
-            // `id<NSCopying>` and `NSObject<NSCopying> *`: an Objective-C object
-            // that adopts protocols.
+            // `id<NSCopying>`, `NSObject<NSCopying> *` and `NSArray<NSString *> *`:
+            // protocols an object adopts, or a class's type arguments.
             if (token == "<" && named is not null)
             {
-                while (Current is not null && Take() != ">") { }
-                named = new CUnsupported("an Objective-C object qualified by protocols");
+                _at++;
+                var arguments = new List<CType>();
+                while (Current is not null && !Accept(">"))
+                {
+                    arguments.Add(ParseType().Type);
+                    Accept(",");
+                }
+                named = named is CUnsupported ? named : new CObjCQualified(named, arguments);
                 continue;
             }
 
@@ -215,9 +261,9 @@ public sealed partial class CTypeParser
             break;
         }
 
-        if (named is not null) return named;
+        if (named is not null) return (named, nullability);
         if (builtin.Count == 0) throw new FormatException($"no type at token {_at}");
-        return Builtin(builtin);
+        return (Builtin(builtin), nullability);
     }
 
     /// <summary>The builtin <paramref name="words"/> spell, in a canonical order.</summary>
@@ -259,23 +305,35 @@ public sealed partial class CTypeParser
     /// <summary>
     /// An abstract declarator, returned as what it does to the type before
     /// it: pointers bind looser than the arrays and parameter lists after
-    /// them, and a parenthesised declarator applies last.
+    /// them, and a parenthesised declarator applies last. With it, what the
+    /// outermost level says about nil, or null when that is the base type's.
     /// </summary>
-    private Func<CType, CType> ParseDeclarator()
+    private (Func<CType, CType> Apply, Nullability? Outermost) ParseDeclarator(Nullability baseNullability)
     {
         var pointers = new List<string>();
+        Nullability? pointerNullability = null;
         while (Current is "*" or "^" || (Current is { } q && Qualifiers.Contains(q)))
         {
             string token = Take();
-            if (token is "*" or "^") pointers.Add(token);
+            if (token is "*" or "^")
+            {
+                pointers.Add(token);
+                pointerNullability = Nullability.Unspecified;
+            }
+            else if (pointers.Count > 0 && NullabilityOf(token) is { } said)
+                pointerNullability = said;
             else if (Current == "(" && token is "__ptrauth" or "__counted_by") SkipBalanced();
         }
 
+        // What a function returns is what the pointers say, or the base type.
+        var resultNullability = pointerNullability ?? baseNullability;
+
         Func<CType, CType>? inner = null;
+        Nullability? innerOutermost = null;
         if (Current == "(" && Peek(1) is "*" or "^" or "(")
         {
             Expect("(");
-            inner = ParseDeclarator();
+            (inner, innerOutermost) = ParseDeclarator(Nullability.Unspecified);
             Expect(")");
         }
 
@@ -299,8 +357,13 @@ public sealed partial class CTypeParser
 
             if (Current == "(")
             {
-                var (parameters, variadic) = ParseParameters();
-                suffixes.Add(t => new CFunction(t, parameters, variadic));
+                var (parameters, nullabilities, variadic) = ParseParameters();
+                bool first = suffixes.Count == 0;
+                suffixes.Add(t => new CFunction(t, parameters, variadic)
+                {
+                    ParameterNullability = nullabilities,
+                    ResultNullability = first ? resultNullability : Nullability.Unspecified,
+                });
                 continue;
             }
 
@@ -315,7 +378,11 @@ public sealed partial class CTypeParser
             break;
         }
 
-        return type =>
+        Nullability? outermost = inner is not null ? innerOutermost
+            : suffixes.Count > 0 ? Nullability.Unspecified
+            : pointerNullability;
+
+        return (type =>
         {
             foreach (string pointer in pointers)
                 type = pointer == "^"
@@ -332,16 +399,17 @@ public sealed partial class CTypeParser
             }
 
             return type;
-        };
+        }, outermost);
     }
 
-    private (IReadOnlyList<CType> Parameters, bool Variadic) ParseParameters()
+    private (IReadOnlyList<CType> Parameters, IReadOnlyList<Nullability> Nullabilities, bool Variadic) ParseParameters()
     {
         Expect("(");
         var parameters = new List<CType>();
+        var nullabilities = new List<Nullability>();
         bool variadic = false;
 
-        if (Accept(")")) return (parameters, false);
+        if (Accept(")")) return (parameters, nullabilities, false);
 
         while (true)
         {
@@ -352,14 +420,20 @@ public sealed partial class CTypeParser
                 break;
             }
 
-            parameters.Add(ParseType());
+            var (parameter, nullability) = ParseType();
+            parameters.Add(parameter);
+            nullabilities.Add(nullability);
             if (Accept(")")) break;
             Expect(",");
         }
 
         // `(void)` is no parameters.
-        if (parameters is [CBuiltin { Name: "void" }]) parameters.Clear();
-        return (parameters, variadic);
+        if (parameters is [CBuiltin { Name: "void" }])
+        {
+            parameters.Clear();
+            nullabilities.Clear();
+        }
+        return (parameters, nullabilities, variadic);
     }
 
     private string? Peek(int ahead) => _at + ahead < _tokens.Count ? _tokens[_at + ahead] : null;

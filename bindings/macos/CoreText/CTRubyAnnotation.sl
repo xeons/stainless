@@ -24,6 +24,7 @@
 module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct __CTRubyAnnotation;
 
-public using CTRubyAnnotationRef = __CTRubyAnnotation*;
+[CFType("CTRubyAnnotationGetTypeID")]
+public extern objc class CTRubyAnnotationRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTRubyAnnotationGetTypeID();
 
@@ -65,15 +67,15 @@ public enum CTRubyPosition : byte
     Count = 4,
 }
 
-public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreate(CTRubyAlignment alignment, CTRubyOverhang overhang, CGFloat sizeFactor, CFStringRef* text);
+[ReturnsRetained] public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreate(CTRubyAlignment alignment, CTRubyOverhang overhang, CGFloat sizeFactor, __CFString** text);
 
 public extern "C" CFStringRef kCTRubyAnnotationSizeFactorAttributeName;
 
 public extern "C" CFStringRef kCTRubyAnnotationScaleToFitAttributeName;
 
-public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateWithAttributes(CTRubyAlignment alignment, CTRubyOverhang overhang, CTRubyPosition position, CFStringRef string, CFDictionaryRef attributes);
+[ReturnsRetained] public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateWithAttributes(CTRubyAlignment alignment, CTRubyOverhang overhang, CTRubyPosition position, CFStringRef string, CFDictionaryRef attributes);
 
-public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateCopy(CTRubyAnnotationRef rubyAnnotation);
+[ReturnsRetained] public extern "C" CTRubyAnnotationRef CTRubyAnnotationCreateCopy(CTRubyAnnotationRef rubyAnnotation);
 
 public extern "C" CTRubyAlignment CTRubyAnnotationGetAlignment(CTRubyAnnotationRef rubyAnnotation);
 
@@ -81,6 +83,6 @@ public extern "C" CTRubyOverhang CTRubyAnnotationGetOverhang(CTRubyAnnotationRef
 
 public extern "C" CGFloat CTRubyAnnotationGetSizeFactor(CTRubyAnnotationRef rubyAnnotation);
 
-public extern "C" CFStringRef CTRubyAnnotationGetTextForPosition(CTRubyAnnotationRef rubyAnnotation, CTRubyPosition position);
+public extern "C" CFStringRef? CTRubyAnnotationGetTextForPosition(CTRubyAnnotationRef rubyAnnotation, CTRubyPosition position);
 
 #endif

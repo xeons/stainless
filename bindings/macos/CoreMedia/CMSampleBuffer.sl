@@ -27,6 +27,7 @@ import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -54,7 +55,8 @@ public const uint kCMSampleBufferFlag_AudioBufferList_Assure16ByteAlignment = 1;
 
 public struct opaqueCMSampleBuffer;
 
-public using CMSampleBufferRef = opaqueCMSampleBuffer*;
+[CFType("CMSampleBufferGetTypeID")]
+public extern objc class CMSampleBufferRef : CFTypeRef { }
 
 [Pack(4)]
 public struct CMSampleTimingInfo
@@ -66,45 +68,45 @@ public struct CMSampleTimingInfo
 
 public extern "C" CMSampleTimingInfo kCMTimingInfoInvalid;
 
-public delegate OSStatus CMSampleBufferMakeDataReadyCallback(CMSampleBufferRef arg0, void* arg1);
+public delegate OSStatus CMSampleBufferMakeDataReadyCallback(opaqueCMSampleBuffer* arg0, void* arg1);
 
 public objc closure OSStatus CMSampleBufferMakeDataReadyHandler(CMSampleBufferRef arg0);
 
-public extern "C" OSStatus CMSampleBufferCreate(CFAllocatorRef allocator, CMBlockBufferRef dataBuffer, Boolean dataReady, CMSampleBufferMakeDataReadyCallback makeDataReadyCallback, void* makeDataReadyRefcon, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, CMItemCount numSampleSizeEntries, nuint* sampleSizeArray, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMSampleBufferCreate(CFAllocatorRef? allocator, CMBlockBufferRef? dataBuffer, Boolean dataReady, CMSampleBufferMakeDataReadyCallback makeDataReadyCallback, void* makeDataReadyRefcon, CMFormatDescriptionRef? formatDescription, CMItemCount numSamples, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, CMItemCount numSampleSizeEntries, nuint* sampleSizeArray, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMSampleBufferCreateWithMakeDataReadyHandler(CFAllocatorRef allocator, CMBlockBufferRef dataBuffer, Boolean dataReady, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, CMItemCount numSampleSizeEntries, nuint* sampleSizeArray, CMSampleBufferRef* sampleBufferOut, CMSampleBufferMakeDataReadyHandler makeDataReadyHandler);
+public extern "C" OSStatus CMSampleBufferCreateWithMakeDataReadyHandler(CFAllocatorRef? allocator, CMBlockBufferRef? dataBuffer, Boolean dataReady, CMFormatDescriptionRef? formatDescription, CMItemCount numSamples, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, CMItemCount numSampleSizeEntries, nuint* sampleSizeArray, opaqueCMSampleBuffer** sampleBufferOut, CMSampleBufferMakeDataReadyHandler? makeDataReadyHandler);
 
-public extern "C" OSStatus CMSampleBufferCreateReady(CFAllocatorRef allocator, CMBlockBufferRef dataBuffer, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, CMItemCount numSampleSizeEntries, nuint* sampleSizeArray, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMSampleBufferCreateReady(CFAllocatorRef? allocator, CMBlockBufferRef? dataBuffer, CMFormatDescriptionRef? formatDescription, CMItemCount numSamples, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, CMItemCount numSampleSizeEntries, nuint* sampleSizeArray, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMAudioSampleBufferCreateWithPacketDescriptions(CFAllocatorRef allocator, CMBlockBufferRef dataBuffer, Boolean dataReady, CMSampleBufferMakeDataReadyCallback makeDataReadyCallback, void* makeDataReadyRefcon, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMTime presentationTimeStamp, AudioStreamPacketDescription* packetDescriptions, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMAudioSampleBufferCreateWithPacketDescriptions(CFAllocatorRef? allocator, CMBlockBufferRef? dataBuffer, Boolean dataReady, CMSampleBufferMakeDataReadyCallback makeDataReadyCallback, void* makeDataReadyRefcon, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMTime presentationTimeStamp, AudioStreamPacketDescription* packetDescriptions, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMAudioSampleBufferCreateWithPacketDescriptionsAndMakeDataReadyHandler(CFAllocatorRef allocator, CMBlockBufferRef dataBuffer, Boolean dataReady, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMTime presentationTimeStamp, AudioStreamPacketDescription* packetDescriptions, CMSampleBufferRef* sampleBufferOut, CMSampleBufferMakeDataReadyHandler makeDataReadyHandler);
+public extern "C" OSStatus CMAudioSampleBufferCreateWithPacketDescriptionsAndMakeDataReadyHandler(CFAllocatorRef? allocator, CMBlockBufferRef? dataBuffer, Boolean dataReady, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMTime presentationTimeStamp, AudioStreamPacketDescription* packetDescriptions, opaqueCMSampleBuffer** sampleBufferOut, CMSampleBufferMakeDataReadyHandler? makeDataReadyHandler);
 
-public extern "C" OSStatus CMAudioSampleBufferCreateReadyWithPacketDescriptions(CFAllocatorRef allocator, CMBlockBufferRef dataBuffer, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMTime presentationTimeStamp, AudioStreamPacketDescription* packetDescriptions, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMAudioSampleBufferCreateReadyWithPacketDescriptions(CFAllocatorRef? allocator, CMBlockBufferRef dataBuffer, CMFormatDescriptionRef formatDescription, CMItemCount numSamples, CMTime presentationTimeStamp, AudioStreamPacketDescription* packetDescriptions, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMSampleBufferCreateForImageBuffer(CFAllocatorRef allocator, CVImageBufferRef imageBuffer, Boolean dataReady, CMSampleBufferMakeDataReadyCallback makeDataReadyCallback, void* makeDataReadyRefcon, CMVideoFormatDescriptionRef formatDescription, CMSampleTimingInfo* sampleTiming, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMSampleBufferCreateForImageBuffer(CFAllocatorRef? allocator, CVImageBufferRef imageBuffer, Boolean dataReady, CMSampleBufferMakeDataReadyCallback makeDataReadyCallback, void* makeDataReadyRefcon, CMVideoFormatDescriptionRef formatDescription, CMSampleTimingInfo* sampleTiming, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMSampleBufferCreateForImageBufferWithMakeDataReadyHandler(CFAllocatorRef allocator, CVImageBufferRef imageBuffer, Boolean dataReady, CMVideoFormatDescriptionRef formatDescription, CMSampleTimingInfo* sampleTiming, CMSampleBufferRef* sampleBufferOut, CMSampleBufferMakeDataReadyHandler makeDataReadyHandler);
+public extern "C" OSStatus CMSampleBufferCreateForImageBufferWithMakeDataReadyHandler(CFAllocatorRef? allocator, CVImageBufferRef imageBuffer, Boolean dataReady, CMVideoFormatDescriptionRef formatDescription, CMSampleTimingInfo* sampleTiming, opaqueCMSampleBuffer** sampleBufferOut, CMSampleBufferMakeDataReadyHandler? makeDataReadyHandler);
 
-public extern "C" OSStatus CMSampleBufferCreateReadyWithImageBuffer(CFAllocatorRef allocator, CVImageBufferRef imageBuffer, CMVideoFormatDescriptionRef formatDescription, CMSampleTimingInfo* sampleTiming, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMSampleBufferCreateReadyWithImageBuffer(CFAllocatorRef? allocator, CVImageBufferRef imageBuffer, CMVideoFormatDescriptionRef formatDescription, CMSampleTimingInfo* sampleTiming, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMSampleBufferCreateCopy(CFAllocatorRef allocator, CMSampleBufferRef sbuf, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMSampleBufferCreateCopy(CFAllocatorRef? allocator, CMSampleBufferRef sbuf, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMSampleBufferCreateCopyWithNewTiming(CFAllocatorRef allocator, CMSampleBufferRef originalSBuf, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMSampleBufferCreateCopyWithNewTiming(CFAllocatorRef? allocator, CMSampleBufferRef originalSBuf, CMItemCount numSampleTimingEntries, CMSampleTimingInfo* sampleTimingArray, opaqueCMSampleBuffer** sampleBufferOut);
 
-public extern "C" OSStatus CMSampleBufferCopySampleBufferForRange(CFAllocatorRef allocator, CMSampleBufferRef sbuf, CFRange sampleRange, CMSampleBufferRef* sampleBufferOut);
+public extern "C" OSStatus CMSampleBufferCopySampleBufferForRange(CFAllocatorRef? allocator, CMSampleBufferRef sbuf, CFRange sampleRange, opaqueCMSampleBuffer** sampleBufferOut);
 
 public extern "C" CFTypeID CMSampleBufferGetTypeID();
 
 public extern "C" OSStatus CMSampleBufferSetDataBuffer(CMSampleBufferRef sbuf, CMBlockBufferRef dataBuffer);
 
-public extern "C" CMBlockBufferRef CMSampleBufferGetDataBuffer(CMSampleBufferRef sbuf);
+public extern "C" CMBlockBufferRef? CMSampleBufferGetDataBuffer(CMSampleBufferRef sbuf);
 
-public extern "C" CVImageBufferRef CMSampleBufferGetImageBuffer(CMSampleBufferRef sbuf);
+public extern "C" CVImageBufferRef? CMSampleBufferGetImageBuffer(CMSampleBufferRef sbuf);
 
-public extern "C" OSStatus CMSampleBufferSetDataBufferFromAudioBufferList(CMSampleBufferRef sbuf, CFAllocatorRef blockBufferStructureAllocator, CFAllocatorRef blockBufferBlockAllocator, uint flags, AudioBufferList* bufferList);
+public extern "C" OSStatus CMSampleBufferSetDataBufferFromAudioBufferList(CMSampleBufferRef sbuf, CFAllocatorRef? blockBufferStructureAllocator, CFAllocatorRef? blockBufferBlockAllocator, uint flags, AudioBufferList* bufferList);
 
-public extern "C" OSStatus CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(CMSampleBufferRef sbuf, nuint* bufferListSizeNeededOut, AudioBufferList* bufferListOut, nuint bufferListSize, CFAllocatorRef blockBufferStructureAllocator, CFAllocatorRef blockBufferBlockAllocator, uint flags, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(CMSampleBufferRef sbuf, nuint* bufferListSizeNeededOut, AudioBufferList* bufferListOut, nuint bufferListSize, CFAllocatorRef? blockBufferStructureAllocator, CFAllocatorRef? blockBufferBlockAllocator, uint flags, OpaqueCMBlockBuffer** blockBufferOut);
 
 public extern "C" OSStatus CMSampleBufferGetAudioStreamPacketDescriptions(CMSampleBufferRef sbuf, nuint packetDescriptionsSize, AudioStreamPacketDescription* packetDescriptionsOut, nuint* packetDescriptionsSizeNeededOut);
 
@@ -126,7 +128,7 @@ public extern "C" OSStatus CMSampleBufferTrackDataReadiness(CMSampleBufferRef sb
 
 public extern "C" OSStatus CMSampleBufferInvalidate(CMSampleBufferRef sbuf);
 
-public delegate void CMSampleBufferInvalidateCallback(CMSampleBufferRef arg0, ulong arg1);
+public delegate void CMSampleBufferInvalidateCallback(opaqueCMSampleBuffer* arg0, ulong arg1);
 
 public extern "C" OSStatus CMSampleBufferSetInvalidateCallback(CMSampleBufferRef sbuf, CMSampleBufferInvalidateCallback invalidateCallback, ulong invalidateRefCon);
 
@@ -186,9 +188,9 @@ public extern "C" nuint CMSampleBufferGetSampleSize(CMSampleBufferRef sbuf, CMIt
 
 public extern "C" nuint CMSampleBufferGetTotalSampleSize(CMSampleBufferRef sbuf);
 
-public extern "C" CMFormatDescriptionRef CMSampleBufferGetFormatDescription(CMSampleBufferRef sbuf);
+public extern "C" CMFormatDescriptionRef? CMSampleBufferGetFormatDescription(CMSampleBufferRef sbuf);
 
-public extern "C" CFArrayRef CMSampleBufferGetSampleAttachmentsArray(CMSampleBufferRef sbuf, Boolean createIfNecessary);
+public extern "C" CFArrayRef? CMSampleBufferGetSampleAttachmentsArray(CMSampleBufferRef sbuf, Boolean createIfNecessary);
 
 public extern "C" CFStringRef kCMSampleAttachmentKey_NotSync;
 
@@ -295,14 +297,14 @@ public extern "C" CFStringRef kCMSampleAttachmentKey_CryptorSubsampleAuxiliaryDa
 public extern "C" CFStringRef kCMSampleAttachmentKey_HDR10PlusPerFrameData;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kCMSampleAttachmentKey_PostDecodeProcessingMetadata;
+public extern "C" CFStringRef? kCMSampleAttachmentKey_PostDecodeProcessingMetadata;
 
-public delegate OSStatus CMSampleBufferCallForEachSampleCallbackFunction(CMSampleBufferRef arg0, CMItemCount arg1, void* arg2);
+public delegate OSStatus CMSampleBufferCallForEachSampleCallbackFunction(opaqueCMSampleBuffer* arg0, CMItemCount arg1, void* arg2);
 
 public extern "C" OSStatus CMSampleBufferCallForEachSample(CMSampleBufferRef sbuf, CMSampleBufferCallForEachSampleCallbackFunction callback, void* refcon);
 
 public objc closure OSStatus CMSampleBufferCallBlockForEachSampleHandlerBlock(CMSampleBufferRef arg0, CMItemCount arg1);
 
-public extern "C" OSStatus CMSampleBufferCallBlockForEachSample(CMSampleBufferRef sbuf, CMSampleBufferCallBlockForEachSampleHandlerBlock handler);
+public extern "C" OSStatus CMSampleBufferCallBlockForEachSample(CMSampleBufferRef sbuf, CMSampleBufferCallBlockForEachSampleHandlerBlock? handler);
 
 #endif

@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -40,28 +41,29 @@ public enum CGToneMapping : uint
     None = 5,
 }
 
+/// macOS 26.0 and later.
 public struct CGContentToneMappingInfo
 {
     public CGToneMapping method;
-    public CFDictionaryRef options;
+    public __CFDictionary* options;
 }
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCGPreferredDynamicRange;
+public extern "C" CFStringRef? kCGPreferredDynamicRange;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCGDynamicRangeHigh;
+public extern "C" CFStringRef? kCGDynamicRangeHigh;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCGDynamicRangeConstrained;
+public extern "C" CFStringRef? kCGDynamicRangeConstrained;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCGDynamicRangeStandard;
+public extern "C" CFStringRef? kCGDynamicRangeStandard;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCGContentAverageLightLevel;
+public extern "C" CFStringRef? kCGContentAverageLightLevel;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kCGContentAverageLightLevelNits;
+public extern "C" CFStringRef? kCGContentAverageLightLevelNits;
 
 #endif

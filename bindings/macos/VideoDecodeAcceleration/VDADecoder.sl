@@ -24,8 +24,8 @@
 module MacOS.VideoDecodeAcceleration;
 
 import MacOS.CoreFoundation;
-import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -43,23 +43,23 @@ public struct OpaqueVDADecoder;
 
 public using VDADecoder = OpaqueVDADecoder*;
 
-public delegate void VDADecoderOutputCallback(void* arg0, CFDictionaryRef arg1, OSStatus arg2, uint arg3, CVImageBufferRef arg4);
+public delegate void VDADecoderOutputCallback(void* arg0, __CFDictionary* arg1, OSStatus arg2, uint arg3, void* arg4);
 
-public extern "C" CFStringRef kVDADecoderConfiguration_Height;
+public extern "C" CFStringRef? kVDADecoderConfiguration_Height;
 
-public extern "C" CFStringRef kVDADecoderConfiguration_Width;
+public extern "C" CFStringRef? kVDADecoderConfiguration_Width;
 
-public extern "C" CFStringRef kVDADecoderConfiguration_SourceFormat;
+public extern "C" CFStringRef? kVDADecoderConfiguration_SourceFormat;
 
-public extern "C" CFStringRef kVDADecoderConfiguration_avcCData;
+public extern "C" CFStringRef? kVDADecoderConfiguration_avcCData;
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus VDADecoderCreate(CFDictionaryRef decoderConfiguration, CFDictionaryRef destinationImageBufferAttributes, VDADecoderOutputCallback* outputCallback, void* decoderOutputCallbackRefcon, VDADecoder* decoderOut);
+public extern "C" OSStatus VDADecoderCreate(CFDictionaryRef? decoderConfiguration, CFDictionaryRef? destinationImageBufferAttributes, VDADecoderOutputCallback* outputCallback, void* decoderOutputCallbackRefcon, VDADecoder* decoderOut);
 
 public const int kVDADecoderDecodeFlags_DontEmitFrame = 1;
 
 /// Deprecated in macOS 10.11.
-public extern "C" OSStatus VDADecoderDecode(VDADecoder decoder, uint decodeFlags, CFTypeRef compressedBuffer, CFDictionaryRef frameInfo);
+public extern "C" OSStatus VDADecoderDecode(VDADecoder decoder, uint decodeFlags, CFTypeRef? compressedBuffer, CFDictionaryRef? frameInfo);
 
 public const int kVDADecoderFlush_EmitFrames = 1;
 

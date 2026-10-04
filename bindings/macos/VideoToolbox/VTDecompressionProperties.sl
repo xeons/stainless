@@ -24,114 +24,115 @@
 module MacOS.VideoToolbox;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_PixelBufferPool;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_PixelBufferPool;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_PixelBufferPoolIsShared;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_PixelBufferPoolIsShared;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_OutputPoolRequestedMinimumBufferCount;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_OutputPoolRequestedMinimumBufferCount;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_NumberOfFramesBeingDecoded;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_NumberOfFramesBeingDecoded;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_MinOutputPresentationTimeStampOfFramesBeingDecoded;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_MinOutputPresentationTimeStampOfFramesBeingDecoded;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_MaxOutputPresentationTimeStampOfFramesBeingDecoded;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_MaxOutputPresentationTimeStampOfFramesBeingDecoded;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_ContentHasInterframeDependencies;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_ContentHasInterframeDependencies;
 
-public extern "C" CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder;
+public extern "C" CFStringRef? kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder;
 
-public extern "C" CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder;
+public extern "C" CFStringRef? kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_UsingHardwareAcceleratedVideoDecoder;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_UsingHardwareAcceleratedVideoDecoder;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_RealTime;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_RealTime;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_MaximizePowerEfficiency;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_MaximizePowerEfficiency;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_ThreadCount;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_ThreadCount;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_FieldMode;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_FieldMode;
 
-public extern "C" CFStringRef kVTDecompressionProperty_FieldMode_BothFields;
+public extern "C" CFStringRef? kVTDecompressionProperty_FieldMode_BothFields;
 
-public extern "C" CFStringRef kVTDecompressionProperty_FieldMode_TopFieldOnly;
+public extern "C" CFStringRef? kVTDecompressionProperty_FieldMode_TopFieldOnly;
 
-public extern "C" CFStringRef kVTDecompressionProperty_FieldMode_BottomFieldOnly;
+public extern "C" CFStringRef? kVTDecompressionProperty_FieldMode_BottomFieldOnly;
 
-public extern "C" CFStringRef kVTDecompressionProperty_FieldMode_SingleField;
+public extern "C" CFStringRef? kVTDecompressionProperty_FieldMode_SingleField;
 
-public extern "C" CFStringRef kVTDecompressionProperty_FieldMode_DeinterlaceFields;
+public extern "C" CFStringRef? kVTDecompressionProperty_FieldMode_DeinterlaceFields;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_DeinterlaceMode;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_DeinterlaceMode;
 
-public extern "C" CFStringRef kVTDecompressionProperty_DeinterlaceMode_VerticalFilter;
+public extern "C" CFStringRef? kVTDecompressionProperty_DeinterlaceMode_VerticalFilter;
 
-public extern "C" CFStringRef kVTDecompressionProperty_DeinterlaceMode_Temporal;
+public extern "C" CFStringRef? kVTDecompressionProperty_DeinterlaceMode_Temporal;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_ReducedResolutionDecode;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_ReducedResolutionDecode;
 
-public extern "C" CFStringRef kVTDecompressionResolutionKey_Width;
+public extern "C" CFStringRef? kVTDecompressionResolutionKey_Width;
 
-public extern "C" CFStringRef kVTDecompressionResolutionKey_Height;
+public extern "C" CFStringRef? kVTDecompressionResolutionKey_Height;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_ReducedCoefficientDecode;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_ReducedCoefficientDecode;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_ReducedFrameDelivery;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_ReducedFrameDelivery;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_OnlyTheseFrames;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_OnlyTheseFrames;
 
-public extern "C" CFStringRef kVTDecompressionProperty_OnlyTheseFrames_AllFrames;
+public extern "C" CFStringRef? kVTDecompressionProperty_OnlyTheseFrames_AllFrames;
 
-public extern "C" CFStringRef kVTDecompressionProperty_OnlyTheseFrames_NonDroppableFrames;
+public extern "C" CFStringRef? kVTDecompressionProperty_OnlyTheseFrames_NonDroppableFrames;
 
-public extern "C" CFStringRef kVTDecompressionProperty_OnlyTheseFrames_IFrames;
+public extern "C" CFStringRef? kVTDecompressionProperty_OnlyTheseFrames_IFrames;
 
-public extern "C" CFStringRef kVTDecompressionProperty_OnlyTheseFrames_KeyFrames;
+public extern "C" CFStringRef? kVTDecompressionProperty_OnlyTheseFrames_KeyFrames;
 
-public extern "C" CFStringRef kVTDecompressionProperty_TemporalLevelLimit;
+public extern "C" CFStringRef? kVTDecompressionProperty_TemporalLevelLimit;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_SuggestedQualityOfServiceTiers;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_SuggestedQualityOfServiceTiers;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_SupportedPixelFormatsOrderedByQuality;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_SupportedPixelFormatsOrderedByQuality;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_SupportedPixelFormatsOrderedByPerformance;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_SupportedPixelFormatsOrderedByPerformance;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_PixelFormatsWithReducedResolutionSupport;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_PixelFormatsWithReducedResolutionSupport;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTDecompressionPropertyKey_AllowBitstreamToChangeFrameDimensions;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_AllowBitstreamToChangeFrameDimensions;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_PixelTransferProperties;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_PixelTransferProperties;
 
-public extern "C" CFStringRef kVTVideoDecoderSpecification_RequiredDecoderGPURegistryID;
+public extern "C" CFStringRef? kVTVideoDecoderSpecification_RequiredDecoderGPURegistryID;
 
-public extern "C" CFStringRef kVTVideoDecoderSpecification_PreferredDecoderGPURegistryID;
+public extern "C" CFStringRef? kVTVideoDecoderSpecification_PreferredDecoderGPURegistryID;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_UsingGPURegistryID;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_UsingGPURegistryID;
 
-public extern "C" CFStringRef kVTDecompressionPropertyKey_PropagatePerFrameHDRDisplayMetadata;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_PropagatePerFrameHDRDisplayMetadata;
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kVTDecompressionPropertyKey_GeneratePerFrameHDRDisplayMetadata;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_GeneratePerFrameHDRDisplayMetadata;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTDecompressionPropertyKey_DecoderProducesRAWOutput;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_DecoderProducesRAWOutput;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTDecompressionPropertyKey_RequestRAWOutput;
+public extern "C" CFStringRef? kVTDecompressionPropertyKey_RequestRAWOutput;
 
 /// macOS 14.0 and later.
 public extern "C" CFStringRef kVTDecompressionPropertyKey_RequestedMVHEVCVideoLayerIDs;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kVTDecodeFrameOptionKey_ContentAnalyzerRotation;
+public extern "C" CFStringRef? kVTDecodeFrameOptionKey_ContentAnalyzerRotation;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kVTDecodeFrameOptionKey_ContentAnalyzerCropRectangle;
+public extern "C" CFStringRef? kVTDecodeFrameOptionKey_ContentAnalyzerCropRectangle;
 
 #endif

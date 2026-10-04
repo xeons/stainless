@@ -25,6 +25,7 @@ module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.CoreGraphics;
 
 public struct __CTLine;
 
-public using CTLineRef = __CTLine*;
+[CFType("CTLineGetTypeID")]
+public extern objc class CTLineRef : CFTypeRef { }
 
 [Flags]
 public enum CTLineBoundsOptions : ulong
@@ -54,11 +56,11 @@ public enum CTLineTruncationType : uint
 
 public extern "C" CFTypeID CTLineGetTypeID();
 
-public extern "C" CTLineRef CTLineCreateWithAttributedString(CFAttributedStringRef attrString);
+[ReturnsRetained] public extern "C" CTLineRef CTLineCreateWithAttributedString(CFAttributedStringRef attrString);
 
-public extern "C" CTLineRef CTLineCreateTruncatedLine(CTLineRef line, double width, CTLineTruncationType truncationType, CTLineRef truncationToken);
+[ReturnsRetained] public extern "C" CTLineRef? CTLineCreateTruncatedLine(CTLineRef line, double width, CTLineTruncationType truncationType, CTLineRef? truncationToken);
 
-public extern "C" CTLineRef CTLineCreateJustifiedLine(CTLineRef line, CGFloat justificationFactor, double justificationWidth);
+[ReturnsRetained] public extern "C" CTLineRef? CTLineCreateJustifiedLine(CTLineRef line, CGFloat justificationFactor, double justificationWidth);
 
 public extern "C" CFIndex CTLineGetGlyphCount(CTLineRef line);
 
@@ -76,7 +78,7 @@ public extern "C" CGRect CTLineGetBoundsWithOptions(CTLineRef line, CTLineBounds
 
 public extern "C" double CTLineGetTrailingWhitespaceWidth(CTLineRef line);
 
-public extern "C" CGRect CTLineGetImageBounds(CTLineRef line, CGContextRef context);
+public extern "C" CGRect CTLineGetImageBounds(CTLineRef line, CGContextRef? context);
 
 public extern "C" CFIndex CTLineGetStringIndexForPosition(CTLineRef line, CGPoint position);
 

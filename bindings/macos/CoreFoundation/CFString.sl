@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -51,71 +52,71 @@ public enum CFStringBuiltInEncodings : uint
 
 public extern "C" CFTypeID CFStringGetTypeID();
 
-public extern "C" CFStringRef CFStringCreateWithPascalString(CFAllocatorRef alloc, ConstStr255Param pStr, CFStringEncoding encoding);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithPascalString(CFAllocatorRef? alloc, ConstStr255Param pStr, CFStringEncoding encoding);
 
-public extern "C" CFStringRef CFStringCreateWithCString(CFAllocatorRef alloc, byte* cStr, CFStringEncoding encoding);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithCString(CFAllocatorRef? alloc, byte* cStr, CFStringEncoding encoding);
 
-public extern "C" CFStringRef CFStringCreateWithBytes(CFAllocatorRef alloc, UInt8* bytes, CFIndex numBytes, CFStringEncoding encoding, Boolean isExternalRepresentation);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithBytes(CFAllocatorRef? alloc, UInt8* bytes, CFIndex numBytes, CFStringEncoding encoding, Boolean isExternalRepresentation);
 
-public extern "C" CFStringRef CFStringCreateWithCharacters(CFAllocatorRef alloc, UniChar* chars, CFIndex numChars);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithCharacters(CFAllocatorRef? alloc, UniChar* chars, CFIndex numChars);
 
-public extern "C" CFStringRef CFStringCreateWithPascalStringNoCopy(CFAllocatorRef alloc, ConstStr255Param pStr, CFStringEncoding encoding, CFAllocatorRef contentsDeallocator);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithPascalStringNoCopy(CFAllocatorRef? alloc, ConstStr255Param pStr, CFStringEncoding encoding, CFAllocatorRef? contentsDeallocator);
 
-public extern "C" CFStringRef CFStringCreateWithCStringNoCopy(CFAllocatorRef alloc, byte* cStr, CFStringEncoding encoding, CFAllocatorRef contentsDeallocator);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithCStringNoCopy(CFAllocatorRef? alloc, byte* cStr, CFStringEncoding encoding, CFAllocatorRef? contentsDeallocator);
 
-public extern "C" CFStringRef CFStringCreateWithBytesNoCopy(CFAllocatorRef alloc, UInt8* bytes, CFIndex numBytes, CFStringEncoding encoding, Boolean isExternalRepresentation, CFAllocatorRef contentsDeallocator);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithBytesNoCopy(CFAllocatorRef? alloc, UInt8* bytes, CFIndex numBytes, CFStringEncoding encoding, Boolean isExternalRepresentation, CFAllocatorRef? contentsDeallocator);
 
-public extern "C" CFStringRef CFStringCreateWithCharactersNoCopy(CFAllocatorRef alloc, UniChar* chars, CFIndex numChars, CFAllocatorRef contentsDeallocator);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithCharactersNoCopy(CFAllocatorRef? alloc, UniChar* chars, CFIndex numChars, CFAllocatorRef? contentsDeallocator);
 
-public extern "C" CFStringRef CFStringCreateWithSubstring(CFAllocatorRef alloc, CFStringRef str, CFRange range);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithSubstring(CFAllocatorRef? alloc, CFStringRef? str, CFRange range);
 
-public extern "C" CFStringRef CFStringCreateCopy(CFAllocatorRef alloc, CFStringRef theString);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateCopy(CFAllocatorRef? alloc, CFStringRef? theString);
 
-public extern "C" CFStringRef CFStringCreateWithFormat(CFAllocatorRef alloc, CFDictionaryRef formatOptions, CFStringRef format, ...);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithFormat(CFAllocatorRef? alloc, CFDictionaryRef? formatOptions, CFStringRef? format, ...);
 
-public extern "C" CFStringRef CFStringCreateStringWithValidatedFormat(CFAllocatorRef alloc, CFDictionaryRef formatOptions, CFStringRef validFormatSpecifiers, CFStringRef format, CFErrorRef* errorPtr, ...);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateStringWithValidatedFormat(CFAllocatorRef? alloc, CFDictionaryRef? formatOptions, CFStringRef? validFormatSpecifiers, CFStringRef? format, __CFError** errorPtr, ...);
 
-public extern "C" CFMutableStringRef CFStringCreateMutable(CFAllocatorRef alloc, CFIndex maxLength);
+[ReturnsRetained] public extern "C" CFMutableStringRef? CFStringCreateMutable(CFAllocatorRef? alloc, CFIndex maxLength);
 
-public extern "C" CFMutableStringRef CFStringCreateMutableCopy(CFAllocatorRef alloc, CFIndex maxLength, CFStringRef theString);
+[ReturnsRetained] public extern "C" CFMutableStringRef? CFStringCreateMutableCopy(CFAllocatorRef? alloc, CFIndex maxLength, CFStringRef? theString);
 
-public extern "C" CFMutableStringRef CFStringCreateMutableWithExternalCharactersNoCopy(CFAllocatorRef alloc, UniChar* chars, CFIndex numChars, CFIndex capacity, CFAllocatorRef externalCharactersAllocator);
+[ReturnsRetained] public extern "C" CFMutableStringRef? CFStringCreateMutableWithExternalCharactersNoCopy(CFAllocatorRef? alloc, UniChar* chars, CFIndex numChars, CFIndex capacity, CFAllocatorRef? externalCharactersAllocator);
 
-public extern "C" CFIndex CFStringGetLength(CFStringRef theString);
+public extern "C" CFIndex CFStringGetLength(CFStringRef? theString);
 
-public extern "C" UniChar CFStringGetCharacterAtIndex(CFStringRef theString, CFIndex idx);
+public extern "C" UniChar CFStringGetCharacterAtIndex(CFStringRef? theString, CFIndex idx);
 
-public extern "C" void CFStringGetCharacters(CFStringRef theString, CFRange range, UniChar* buffer);
+public extern "C" void CFStringGetCharacters(CFStringRef? theString, CFRange range, UniChar* buffer);
 
-public extern "C" Boolean CFStringGetPascalString(CFStringRef theString, StringPtr buffer, CFIndex bufferSize, CFStringEncoding encoding);
+public extern "C" Boolean CFStringGetPascalString(CFStringRef? theString, StringPtr buffer, CFIndex bufferSize, CFStringEncoding encoding);
 
-public extern "C" Boolean CFStringGetCString(CFStringRef theString, byte* buffer, CFIndex bufferSize, CFStringEncoding encoding);
+public extern "C" Boolean CFStringGetCString(CFStringRef? theString, byte* buffer, CFIndex bufferSize, CFStringEncoding encoding);
 
-public extern "C" ConstStringPtr CFStringGetPascalStringPtr(CFStringRef theString, CFStringEncoding encoding);
+public extern "C" ConstStringPtr CFStringGetPascalStringPtr(CFStringRef? theString, CFStringEncoding encoding);
 
-public extern "C" byte* CFStringGetCStringPtr(CFStringRef theString, CFStringEncoding encoding);
+public extern "C" byte* CFStringGetCStringPtr(CFStringRef? theString, CFStringEncoding encoding);
 
-public extern "C" UniChar* CFStringGetCharactersPtr(CFStringRef theString);
+public extern "C" UniChar* CFStringGetCharactersPtr(CFStringRef? theString);
 
-public extern "C" CFIndex CFStringGetBytes(CFStringRef theString, CFRange range, CFStringEncoding encoding, UInt8 lossByte, Boolean isExternalRepresentation, UInt8* buffer, CFIndex maxBufLen, CFIndex* usedBufLen);
+public extern "C" CFIndex CFStringGetBytes(CFStringRef? theString, CFRange range, CFStringEncoding encoding, UInt8 lossByte, Boolean isExternalRepresentation, UInt8* buffer, CFIndex maxBufLen, CFIndex* usedBufLen);
 
-public extern "C" CFStringRef CFStringCreateFromExternalRepresentation(CFAllocatorRef alloc, CFDataRef data, CFStringEncoding encoding);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateFromExternalRepresentation(CFAllocatorRef? alloc, CFDataRef? data, CFStringEncoding encoding);
 
-public extern "C" CFDataRef CFStringCreateExternalRepresentation(CFAllocatorRef alloc, CFStringRef theString, CFStringEncoding encoding, UInt8 lossByte);
+[ReturnsRetained] public extern "C" CFDataRef? CFStringCreateExternalRepresentation(CFAllocatorRef? alloc, CFStringRef? theString, CFStringEncoding encoding, UInt8 lossByte);
 
-public extern "C" CFStringEncoding CFStringGetSmallestEncoding(CFStringRef theString);
+public extern "C" CFStringEncoding CFStringGetSmallestEncoding(CFStringRef? theString);
 
-public extern "C" CFStringEncoding CFStringGetFastestEncoding(CFStringRef theString);
+public extern "C" CFStringEncoding CFStringGetFastestEncoding(CFStringRef? theString);
 
 public extern "C" CFStringEncoding CFStringGetSystemEncoding();
 
 public extern "C" CFIndex CFStringGetMaximumSizeForEncoding(CFIndex length, CFStringEncoding encoding);
 
-public extern "C" Boolean CFStringGetFileSystemRepresentation(CFStringRef string, byte* buffer, CFIndex maxBufLen);
+public extern "C" Boolean CFStringGetFileSystemRepresentation(CFStringRef? string, byte* buffer, CFIndex maxBufLen);
 
-public extern "C" CFIndex CFStringGetMaximumSizeOfFileSystemRepresentation(CFStringRef string);
+public extern "C" CFIndex CFStringGetMaximumSizeOfFileSystemRepresentation(CFStringRef? string);
 
-public extern "C" CFStringRef CFStringCreateWithFileSystemRepresentation(CFAllocatorRef alloc, byte* buffer);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateWithFileSystemRepresentation(CFAllocatorRef? alloc, byte* buffer);
 
 [Flags]
 public enum CFStringCompareFlags : ulong
@@ -131,77 +132,77 @@ public enum CFStringCompareFlags : ulong
     ForcedOrdering = 512,
 }
 
-public extern "C" CFComparisonResult CFStringCompareWithOptionsAndLocale(CFStringRef theString1, CFStringRef theString2, CFRange rangeToCompare, CFStringCompareFlags compareOptions, CFLocaleRef locale);
+public extern "C" CFComparisonResult CFStringCompareWithOptionsAndLocale(CFStringRef? theString1, CFStringRef? theString2, CFRange rangeToCompare, CFStringCompareFlags compareOptions, CFLocaleRef? locale);
 
-public extern "C" CFComparisonResult CFStringCompareWithOptions(CFStringRef theString1, CFStringRef theString2, CFRange rangeToCompare, CFStringCompareFlags compareOptions);
+public extern "C" CFComparisonResult CFStringCompareWithOptions(CFStringRef? theString1, CFStringRef? theString2, CFRange rangeToCompare, CFStringCompareFlags compareOptions);
 
-public extern "C" CFComparisonResult CFStringCompare(CFStringRef theString1, CFStringRef theString2, CFStringCompareFlags compareOptions);
+public extern "C" CFComparisonResult CFStringCompare(CFStringRef? theString1, CFStringRef? theString2, CFStringCompareFlags compareOptions);
 
-public extern "C" Boolean CFStringFindWithOptionsAndLocale(CFStringRef theString, CFStringRef stringToFind, CFRange rangeToSearch, CFStringCompareFlags searchOptions, CFLocaleRef locale, CFRange* result);
+public extern "C" Boolean CFStringFindWithOptionsAndLocale(CFStringRef? theString, CFStringRef? stringToFind, CFRange rangeToSearch, CFStringCompareFlags searchOptions, CFLocaleRef? locale, CFRange* result);
 
-public extern "C" Boolean CFStringFindWithOptions(CFStringRef theString, CFStringRef stringToFind, CFRange rangeToSearch, CFStringCompareFlags searchOptions, CFRange* result);
+public extern "C" Boolean CFStringFindWithOptions(CFStringRef? theString, CFStringRef? stringToFind, CFRange rangeToSearch, CFStringCompareFlags searchOptions, CFRange* result);
 
-public extern "C" CFArrayRef CFStringCreateArrayWithFindResults(CFAllocatorRef alloc, CFStringRef theString, CFStringRef stringToFind, CFRange rangeToSearch, CFStringCompareFlags compareOptions);
+[ReturnsRetained] public extern "C" CFArrayRef? CFStringCreateArrayWithFindResults(CFAllocatorRef? alloc, CFStringRef? theString, CFStringRef? stringToFind, CFRange rangeToSearch, CFStringCompareFlags compareOptions);
 
-public extern "C" CFRange CFStringFind(CFStringRef theString, CFStringRef stringToFind, CFStringCompareFlags compareOptions);
+public extern "C" CFRange CFStringFind(CFStringRef? theString, CFStringRef? stringToFind, CFStringCompareFlags compareOptions);
 
-public extern "C" Boolean CFStringHasPrefix(CFStringRef theString, CFStringRef prefix);
+public extern "C" Boolean CFStringHasPrefix(CFStringRef? theString, CFStringRef? prefix);
 
-public extern "C" Boolean CFStringHasSuffix(CFStringRef theString, CFStringRef suffix);
+public extern "C" Boolean CFStringHasSuffix(CFStringRef? theString, CFStringRef? suffix);
 
-public extern "C" CFRange CFStringGetRangeOfComposedCharactersAtIndex(CFStringRef theString, CFIndex theIndex);
+public extern "C" CFRange CFStringGetRangeOfComposedCharactersAtIndex(CFStringRef? theString, CFIndex theIndex);
 
-public extern "C" Boolean CFStringFindCharacterFromSet(CFStringRef theString, CFCharacterSetRef theSet, CFRange rangeToSearch, CFStringCompareFlags searchOptions, CFRange* result);
+public extern "C" Boolean CFStringFindCharacterFromSet(CFStringRef? theString, CFCharacterSetRef? theSet, CFRange rangeToSearch, CFStringCompareFlags searchOptions, CFRange* result);
 
-public extern "C" void CFStringGetLineBounds(CFStringRef theString, CFRange range, CFIndex* lineBeginIndex, CFIndex* lineEndIndex, CFIndex* contentsEndIndex);
+public extern "C" void CFStringGetLineBounds(CFStringRef? theString, CFRange range, CFIndex* lineBeginIndex, CFIndex* lineEndIndex, CFIndex* contentsEndIndex);
 
-public extern "C" void CFStringGetParagraphBounds(CFStringRef string, CFRange range, CFIndex* parBeginIndex, CFIndex* parEndIndex, CFIndex* contentsEndIndex);
+public extern "C" void CFStringGetParagraphBounds(CFStringRef? string, CFRange range, CFIndex* parBeginIndex, CFIndex* parEndIndex, CFIndex* contentsEndIndex);
 
-public extern "C" CFIndex CFStringGetHyphenationLocationBeforeIndex(CFStringRef string, CFIndex location, CFRange limitRange, CFOptionFlags options, CFLocaleRef locale, UTF32Char* character);
+public extern "C" CFIndex CFStringGetHyphenationLocationBeforeIndex(CFStringRef? string, CFIndex location, CFRange limitRange, CFOptionFlags options, CFLocaleRef? locale, UTF32Char* character);
 
-public extern "C" Boolean CFStringIsHyphenationAvailableForLocale(CFLocaleRef locale);
+public extern "C" Boolean CFStringIsHyphenationAvailableForLocale(CFLocaleRef? locale);
 
-public extern "C" CFStringRef CFStringCreateByCombiningStrings(CFAllocatorRef alloc, CFArrayRef theArray, CFStringRef separatorString);
+[ReturnsRetained] public extern "C" CFStringRef? CFStringCreateByCombiningStrings(CFAllocatorRef? alloc, CFArrayRef? theArray, CFStringRef? separatorString);
 
-public extern "C" CFArrayRef CFStringCreateArrayBySeparatingStrings(CFAllocatorRef alloc, CFStringRef theString, CFStringRef separatorString);
+[ReturnsRetained] public extern "C" CFArrayRef? CFStringCreateArrayBySeparatingStrings(CFAllocatorRef? alloc, CFStringRef? theString, CFStringRef? separatorString);
 
-public extern "C" SInt32 CFStringGetIntValue(CFStringRef str);
+public extern "C" SInt32 CFStringGetIntValue(CFStringRef? str);
 
-public extern "C" double CFStringGetDoubleValue(CFStringRef str);
+public extern "C" double CFStringGetDoubleValue(CFStringRef? str);
 
-public extern "C" void CFStringAppend(CFMutableStringRef theString, CFStringRef appendedString);
+public extern "C" void CFStringAppend(CFMutableStringRef? theString, CFStringRef? appendedString);
 
-public extern "C" void CFStringAppendCharacters(CFMutableStringRef theString, UniChar* chars, CFIndex numChars);
+public extern "C" void CFStringAppendCharacters(CFMutableStringRef? theString, UniChar* chars, CFIndex numChars);
 
-public extern "C" void CFStringAppendPascalString(CFMutableStringRef theString, ConstStr255Param pStr, CFStringEncoding encoding);
+public extern "C" void CFStringAppendPascalString(CFMutableStringRef? theString, ConstStr255Param pStr, CFStringEncoding encoding);
 
-public extern "C" void CFStringAppendCString(CFMutableStringRef theString, byte* cStr, CFStringEncoding encoding);
+public extern "C" void CFStringAppendCString(CFMutableStringRef? theString, byte* cStr, CFStringEncoding encoding);
 
-public extern "C" void CFStringAppendFormat(CFMutableStringRef theString, CFDictionaryRef formatOptions, CFStringRef format, ...);
+public extern "C" void CFStringAppendFormat(CFMutableStringRef? theString, CFDictionaryRef? formatOptions, CFStringRef? format, ...);
 
-public extern "C" void CFStringInsert(CFMutableStringRef str, CFIndex idx, CFStringRef insertedStr);
+public extern "C" void CFStringInsert(CFMutableStringRef? str, CFIndex idx, CFStringRef? insertedStr);
 
-public extern "C" void CFStringDelete(CFMutableStringRef theString, CFRange range);
+public extern "C" void CFStringDelete(CFMutableStringRef? theString, CFRange range);
 
-public extern "C" void CFStringReplace(CFMutableStringRef theString, CFRange range, CFStringRef replacement);
+public extern "C" void CFStringReplace(CFMutableStringRef? theString, CFRange range, CFStringRef? replacement);
 
-public extern "C" void CFStringReplaceAll(CFMutableStringRef theString, CFStringRef replacement);
+public extern "C" void CFStringReplaceAll(CFMutableStringRef? theString, CFStringRef? replacement);
 
-public extern "C" CFIndex CFStringFindAndReplace(CFMutableStringRef theString, CFStringRef stringToFind, CFStringRef replacementString, CFRange rangeToSearch, CFStringCompareFlags compareOptions);
+public extern "C" CFIndex CFStringFindAndReplace(CFMutableStringRef? theString, CFStringRef? stringToFind, CFStringRef? replacementString, CFRange rangeToSearch, CFStringCompareFlags compareOptions);
 
-public extern "C" void CFStringSetExternalCharactersNoCopy(CFMutableStringRef theString, UniChar* chars, CFIndex length, CFIndex capacity);
+public extern "C" void CFStringSetExternalCharactersNoCopy(CFMutableStringRef? theString, UniChar* chars, CFIndex length, CFIndex capacity);
 
-public extern "C" void CFStringPad(CFMutableStringRef theString, CFStringRef padString, CFIndex length, CFIndex indexIntoPad);
+public extern "C" void CFStringPad(CFMutableStringRef? theString, CFStringRef? padString, CFIndex length, CFIndex indexIntoPad);
 
-public extern "C" void CFStringTrim(CFMutableStringRef theString, CFStringRef trimString);
+public extern "C" void CFStringTrim(CFMutableStringRef? theString, CFStringRef? trimString);
 
-public extern "C" void CFStringTrimWhitespace(CFMutableStringRef theString);
+public extern "C" void CFStringTrimWhitespace(CFMutableStringRef? theString);
 
-public extern "C" void CFStringLowercase(CFMutableStringRef theString, CFLocaleRef locale);
+public extern "C" void CFStringLowercase(CFMutableStringRef? theString, CFLocaleRef? locale);
 
-public extern "C" void CFStringUppercase(CFMutableStringRef theString, CFLocaleRef locale);
+public extern "C" void CFStringUppercase(CFMutableStringRef? theString, CFLocaleRef? locale);
 
-public extern "C" void CFStringCapitalize(CFMutableStringRef theString, CFLocaleRef locale);
+public extern "C" void CFStringCapitalize(CFMutableStringRef? theString, CFLocaleRef? locale);
 
 public enum CFStringNormalizationForm : long
 {
@@ -211,49 +212,49 @@ public enum CFStringNormalizationForm : long
     KC = 3,
 }
 
-public extern "C" void CFStringNormalize(CFMutableStringRef theString, CFStringNormalizationForm theForm);
+public extern "C" void CFStringNormalize(CFMutableStringRef? theString, CFStringNormalizationForm theForm);
 
-public extern "C" void CFStringFold(CFMutableStringRef theString, CFStringCompareFlags theFlags, CFLocaleRef theLocale);
+public extern "C" void CFStringFold(CFMutableStringRef? theString, CFStringCompareFlags theFlags, CFLocaleRef? theLocale);
 
-public extern "C" Boolean CFStringTransform(CFMutableStringRef string, CFRange* range, CFStringRef transform, Boolean reverse);
+public extern "C" Boolean CFStringTransform(CFMutableStringRef? string, CFRange* range, CFStringRef? transform, Boolean reverse);
 
-public extern "C" CFStringRef kCFStringTransformStripCombiningMarks;
+public extern "C" CFStringRef? kCFStringTransformStripCombiningMarks;
 
-public extern "C" CFStringRef kCFStringTransformToLatin;
+public extern "C" CFStringRef? kCFStringTransformToLatin;
 
-public extern "C" CFStringRef kCFStringTransformFullwidthHalfwidth;
+public extern "C" CFStringRef? kCFStringTransformFullwidthHalfwidth;
 
-public extern "C" CFStringRef kCFStringTransformLatinKatakana;
+public extern "C" CFStringRef? kCFStringTransformLatinKatakana;
 
-public extern "C" CFStringRef kCFStringTransformLatinHiragana;
+public extern "C" CFStringRef? kCFStringTransformLatinHiragana;
 
-public extern "C" CFStringRef kCFStringTransformHiraganaKatakana;
+public extern "C" CFStringRef? kCFStringTransformHiraganaKatakana;
 
-public extern "C" CFStringRef kCFStringTransformMandarinLatin;
+public extern "C" CFStringRef? kCFStringTransformMandarinLatin;
 
-public extern "C" CFStringRef kCFStringTransformLatinHangul;
+public extern "C" CFStringRef? kCFStringTransformLatinHangul;
 
-public extern "C" CFStringRef kCFStringTransformLatinArabic;
+public extern "C" CFStringRef? kCFStringTransformLatinArabic;
 
-public extern "C" CFStringRef kCFStringTransformLatinHebrew;
+public extern "C" CFStringRef? kCFStringTransformLatinHebrew;
 
-public extern "C" CFStringRef kCFStringTransformLatinThai;
+public extern "C" CFStringRef? kCFStringTransformLatinThai;
 
-public extern "C" CFStringRef kCFStringTransformLatinCyrillic;
+public extern "C" CFStringRef? kCFStringTransformLatinCyrillic;
 
-public extern "C" CFStringRef kCFStringTransformLatinGreek;
+public extern "C" CFStringRef? kCFStringTransformLatinGreek;
 
-public extern "C" CFStringRef kCFStringTransformToXMLHex;
+public extern "C" CFStringRef? kCFStringTransformToXMLHex;
 
-public extern "C" CFStringRef kCFStringTransformToUnicodeName;
+public extern "C" CFStringRef? kCFStringTransformToUnicodeName;
 
-public extern "C" CFStringRef kCFStringTransformStripDiacritics;
+public extern "C" CFStringRef? kCFStringTransformStripDiacritics;
 
 public extern "C" Boolean CFStringIsEncodingAvailable(CFStringEncoding encoding);
 
 public extern "C" CFStringEncoding* CFStringGetListOfAvailableEncodings();
 
-public extern "C" CFStringRef CFStringGetNameOfEncoding(CFStringEncoding encoding);
+public extern "C" CFStringRef? CFStringGetNameOfEncoding(CFStringEncoding encoding);
 
 public extern "C" ulong CFStringConvertEncodingToNSStringEncoding(CFStringEncoding encoding);
 
@@ -263,16 +264,16 @@ public extern "C" UInt32 CFStringConvertEncodingToWindowsCodepage(CFStringEncodi
 
 public extern "C" CFStringEncoding CFStringConvertWindowsCodepageToEncoding(UInt32 codepage);
 
-public extern "C" CFStringEncoding CFStringConvertIANACharSetNameToEncoding(CFStringRef theString);
+public extern "C" CFStringEncoding CFStringConvertIANACharSetNameToEncoding(CFStringRef? theString);
 
-public extern "C" CFStringRef CFStringConvertEncodingToIANACharSetName(CFStringEncoding encoding);
+public extern "C" CFStringRef? CFStringConvertEncodingToIANACharSetName(CFStringEncoding encoding);
 
 public extern "C" CFStringEncoding CFStringGetMostCompatibleMacStringEncoding(CFStringEncoding encoding);
 
 public struct CFStringInlineBuffer
 {
     public UniChar[64] buffer;
-    public CFStringRef theString;
+    public __CFString* theString;
     public UniChar* directUniCharBuffer;
     public byte* directCStringBuffer;
     public CFRange rangeToBuffer;
@@ -280,11 +281,11 @@ public struct CFStringInlineBuffer
     public CFIndex bufferedRangeEnd;
 }
 
-public extern "C" void CFShow(CFTypeRef obj);
+public extern "C" void CFShow(CFTypeRef? obj);
 
-public extern "C" void CFShowStr(CFStringRef str);
+public extern "C" void CFShowStr(CFStringRef? str);
 
-public extern "C" CFStringRef __CFStringMakeConstantString(byte* cStr);
+public extern "C" CFStringRef? __CFStringMakeConstantString(byte* cStr);
 
 public const uint kCFStringEncodingInvalidId = 4294967295u;
 

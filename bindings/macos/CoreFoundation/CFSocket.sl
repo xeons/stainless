@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.System;
 
 public struct __CFSocket;
 
-public using CFSocketRef = __CFSocket*;
+[CFType("CFSocketGetTypeID")]
+public extern objc class CFSocketRef : CFTypeRef { }
 
 public enum CFSocketError : long
 {
@@ -45,7 +47,7 @@ public struct CFSocketSignature
     public SInt32 protocolFamily;
     public SInt32 socketType;
     public SInt32 protocol;
-    public CFDataRef address;
+    public __CFData* address;
 }
 
 [Flags]
@@ -66,13 +68,13 @@ public const ulong kCFSocketAutomaticallyReenableWriteCallBack = 8;
 public const ulong kCFSocketLeaveErrors = 64;
 public const ulong kCFSocketCloseOnInvalidate = 128;
 
-public delegate void CFSocketCallBack(CFSocketRef arg0, CFSocketCallBackType arg1, CFDataRef arg2, void* arg3, void* arg4);
+public delegate void CFSocketCallBack(__CFSocket* arg0, CFSocketCallBackType arg1, __CFData* arg2, void* arg3, void* arg4);
 
 public delegate void* CFSocketContextRetainFunction(void* arg0);
 
 public delegate void CFSocketContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef CFSocketContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* CFSocketContextCopyDescriptionFunction(void* arg0);
 
 public struct CFSocketContext
 {
@@ -87,68 +89,68 @@ public using CFSocketNativeHandle = int;
 
 public extern "C" CFTypeID CFSocketGetTypeID();
 
-public extern "C" CFSocketRef CFSocketCreate(CFAllocatorRef allocator, SInt32 protocolFamily, SInt32 socketType, SInt32 protocol, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
+[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreate(CFAllocatorRef? allocator, SInt32 protocolFamily, SInt32 socketType, SInt32 protocol, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
 
-public extern "C" CFSocketRef CFSocketCreateWithNative(CFAllocatorRef allocator, CFSocketNativeHandle sock, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
+[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreateWithNative(CFAllocatorRef? allocator, CFSocketNativeHandle sock, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
 
-public extern "C" CFSocketRef CFSocketCreateWithSocketSignature(CFAllocatorRef allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
+[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreateWithSocketSignature(CFAllocatorRef? allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context);
 
-public extern "C" CFSocketRef CFSocketCreateConnectedToSocketSignature(CFAllocatorRef allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context, CFTimeInterval timeout);
+[ReturnsRetained] public extern "C" CFSocketRef? CFSocketCreateConnectedToSocketSignature(CFAllocatorRef? allocator, CFSocketSignature* signature, CFOptionFlags callBackTypes, CFSocketCallBack callout, CFSocketContext* context, CFTimeInterval timeout);
 
-public extern "C" CFSocketError CFSocketSetAddress(CFSocketRef s, CFDataRef address);
+public extern "C" CFSocketError CFSocketSetAddress(CFSocketRef? s, CFDataRef? address);
 
-public extern "C" CFSocketError CFSocketConnectToAddress(CFSocketRef s, CFDataRef address, CFTimeInterval timeout);
+public extern "C" CFSocketError CFSocketConnectToAddress(CFSocketRef? s, CFDataRef? address, CFTimeInterval timeout);
 
-public extern "C" void CFSocketInvalidate(CFSocketRef s);
+public extern "C" void CFSocketInvalidate(CFSocketRef? s);
 
-public extern "C" Boolean CFSocketIsValid(CFSocketRef s);
+public extern "C" Boolean CFSocketIsValid(CFSocketRef? s);
 
-public extern "C" CFDataRef CFSocketCopyAddress(CFSocketRef s);
+[ReturnsRetained] public extern "C" CFDataRef? CFSocketCopyAddress(CFSocketRef? s);
 
-public extern "C" CFDataRef CFSocketCopyPeerAddress(CFSocketRef s);
+[ReturnsRetained] public extern "C" CFDataRef? CFSocketCopyPeerAddress(CFSocketRef? s);
 
-public extern "C" void CFSocketGetContext(CFSocketRef s, CFSocketContext* context);
+public extern "C" void CFSocketGetContext(CFSocketRef? s, CFSocketContext* context);
 
-public extern "C" CFSocketNativeHandle CFSocketGetNative(CFSocketRef s);
+public extern "C" CFSocketNativeHandle CFSocketGetNative(CFSocketRef? s);
 
-public extern "C" CFRunLoopSourceRef CFSocketCreateRunLoopSource(CFAllocatorRef allocator, CFSocketRef s, CFIndex order);
+[ReturnsRetained] public extern "C" CFRunLoopSourceRef? CFSocketCreateRunLoopSource(CFAllocatorRef? allocator, CFSocketRef? s, CFIndex order);
 
-public extern "C" CFOptionFlags CFSocketGetSocketFlags(CFSocketRef s);
+public extern "C" CFOptionFlags CFSocketGetSocketFlags(CFSocketRef? s);
 
-public extern "C" void CFSocketSetSocketFlags(CFSocketRef s, CFOptionFlags flags);
+public extern "C" void CFSocketSetSocketFlags(CFSocketRef? s, CFOptionFlags flags);
 
-public extern "C" void CFSocketDisableCallBacks(CFSocketRef s, CFOptionFlags callBackTypes);
+public extern "C" void CFSocketDisableCallBacks(CFSocketRef? s, CFOptionFlags callBackTypes);
 
-public extern "C" void CFSocketEnableCallBacks(CFSocketRef s, CFOptionFlags callBackTypes);
+public extern "C" void CFSocketEnableCallBacks(CFSocketRef? s, CFOptionFlags callBackTypes);
 
-public extern "C" CFSocketError CFSocketSendData(CFSocketRef s, CFDataRef address, CFDataRef data, CFTimeInterval timeout);
+public extern "C" CFSocketError CFSocketSendData(CFSocketRef? s, CFDataRef? address, CFDataRef? data, CFTimeInterval timeout);
 
-public extern "C" CFSocketError CFSocketRegisterValue(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef name, CFPropertyListRef value);
+public extern "C" CFSocketError CFSocketRegisterValue(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef? name, CFPropertyListRef? value);
 
-public extern "C" CFSocketError CFSocketCopyRegisteredValue(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef name, CFPropertyListRef* value, CFDataRef* nameServerAddress);
+public extern "C" CFSocketError CFSocketCopyRegisteredValue(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef? name, void** value, __CFData** nameServerAddress);
 
-public extern "C" CFSocketError CFSocketRegisterSocketSignature(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef name, CFSocketSignature* signature);
+public extern "C" CFSocketError CFSocketRegisterSocketSignature(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef? name, CFSocketSignature* signature);
 
-public extern "C" CFSocketError CFSocketCopyRegisteredSocketSignature(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef name, CFSocketSignature* signature, CFDataRef* nameServerAddress);
+public extern "C" CFSocketError CFSocketCopyRegisteredSocketSignature(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef? name, CFSocketSignature* signature, __CFData** nameServerAddress);
 
-public extern "C" CFSocketError CFSocketUnregister(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef name);
+public extern "C" CFSocketError CFSocketUnregister(CFSocketSignature* nameServerSignature, CFTimeInterval timeout, CFStringRef? name);
 
 public extern "C" void CFSocketSetDefaultNameRegistryPortNumber(UInt16 port);
 
 public extern "C" UInt16 CFSocketGetDefaultNameRegistryPortNumber();
 
-public extern "C" CFStringRef kCFSocketCommandKey;
+public extern "C" CFStringRef? kCFSocketCommandKey;
 
-public extern "C" CFStringRef kCFSocketNameKey;
+public extern "C" CFStringRef? kCFSocketNameKey;
 
-public extern "C" CFStringRef kCFSocketValueKey;
+public extern "C" CFStringRef? kCFSocketValueKey;
 
-public extern "C" CFStringRef kCFSocketResultKey;
+public extern "C" CFStringRef? kCFSocketResultKey;
 
-public extern "C" CFStringRef kCFSocketErrorKey;
+public extern "C" CFStringRef? kCFSocketErrorKey;
 
-public extern "C" CFStringRef kCFSocketRegisterCommand;
+public extern "C" CFStringRef? kCFSocketRegisterCommand;
 
-public extern "C" CFStringRef kCFSocketRetrieveCommand;
+public extern "C" CFStringRef? kCFSocketRetrieveCommand;
 
 #endif

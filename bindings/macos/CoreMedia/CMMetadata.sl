@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -94,13 +95,13 @@ public extern "C" CFStringRef kCMMetadataIdentifier_QuickTimeMetadataDisplayMask
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kCMMetadataIdentifier_QuickTimeMetadataPresentationImmersiveMedia;
 
-public extern "C" OSStatus CMMetadataCreateIdentifierForKeyAndKeySpace(CFAllocatorRef allocator, CFTypeRef key, CFStringRef keySpace, CFStringRef* identifierOut);
+public extern "C" OSStatus CMMetadataCreateIdentifierForKeyAndKeySpace(CFAllocatorRef? allocator, CFTypeRef key, CFStringRef keySpace, __CFString** identifierOut);
 
-public extern "C" OSStatus CMMetadataCreateKeyFromIdentifier(CFAllocatorRef allocator, CFStringRef identifier, CFTypeRef* keyOut);
+public extern "C" OSStatus CMMetadataCreateKeyFromIdentifier(CFAllocatorRef? allocator, CFStringRef identifier, void** keyOut);
 
-public extern "C" OSStatus CMMetadataCreateKeyFromIdentifierAsCFData(CFAllocatorRef allocator, CFStringRef identifier, CFDataRef* keyOut);
+public extern "C" OSStatus CMMetadataCreateKeyFromIdentifierAsCFData(CFAllocatorRef? allocator, CFStringRef identifier, __CFData** keyOut);
 
-public extern "C" OSStatus CMMetadataCreateKeySpaceFromIdentifier(CFAllocatorRef allocator, CFStringRef identifier, CFStringRef* keySpaceOut);
+public extern "C" OSStatus CMMetadataCreateKeySpaceFromIdentifier(CFAllocatorRef? allocator, CFStringRef identifier, __CFString** keySpaceOut);
 
 public extern "C" CFStringRef kCMMetadataBaseDataType_RawData;
 
@@ -178,7 +179,7 @@ public extern "C" CFArrayRef CMMetadataDataTypeRegistryGetConformingDataTypes(CF
 
 public extern "C" Boolean CMMetadataDataTypeRegistryDataTypeConformsToDataType(CFStringRef dataType, CFStringRef conformsToDataType);
 
-public extern "C" CFArrayRef CMMetadataDataTypeRegistryGetBaseDataTypes();
+public extern "C" CFArrayRef? CMMetadataDataTypeRegistryGetBaseDataTypes();
 
 public extern "C" Boolean CMMetadataDataTypeRegistryDataTypeIsBaseDataType(CFStringRef dataType);
 

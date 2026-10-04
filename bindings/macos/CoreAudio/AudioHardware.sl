@@ -26,6 +26,7 @@ module MacOS.CoreAudio;
 import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -56,6 +57,10 @@ public extern "C" OSStatus AudioObjectSetPropertyData(AudioObjectID inObjectID, 
 public extern "C" OSStatus AudioObjectAddPropertyListener(AudioObjectID inObjectID, AudioObjectPropertyAddress* inAddress, AudioObjectPropertyListenerProc inListener, void* inClientData);
 
 public extern "C" OSStatus AudioObjectRemovePropertyListener(AudioObjectID inObjectID, AudioObjectPropertyAddress* inAddress, AudioObjectPropertyListenerProc inListener, void* inClientData);
+
+public extern "C" OSStatus AudioObjectAddPropertyListenerBlock(AudioObjectID inObjectID, AudioObjectPropertyAddress* inAddress, dispatch_queue_t? inDispatchQueue, AudioObjectPropertyListenerBlock inListener);
+
+public extern "C" OSStatus AudioObjectRemovePropertyListenerBlock(AudioObjectID inObjectID, AudioObjectPropertyAddress* inAddress, dispatch_queue_t? inDispatchQueue, AudioObjectPropertyListenerBlock inListener);
 
 public const uint kAudioSystemObjectClassID = 1634957683;
 
@@ -194,6 +199,8 @@ public const uint kAudioDevicePropertyWantsControlsRestored = 1919251299;
 public const uint kAudioDevicePropertyWantsStreamFormatsRestored = 1919251302;
 
 public extern "C" OSStatus AudioDeviceCreateIOProcID(AudioObjectID inDevice, AudioDeviceIOProc inProc, void* inClientData, AudioDeviceIOProcID* outIOProcID);
+
+public extern "C" OSStatus AudioDeviceCreateIOProcIDWithBlock(AudioDeviceIOProcID* outIOProcID, AudioObjectID inDevice, dispatch_queue_t? inDispatchQueue, AudioDeviceIOBlock inIOBlock);
 
 public extern "C" OSStatus AudioDeviceDestroyIOProcID(AudioObjectID inDevice, AudioDeviceIOProcID inIOProcID);
 

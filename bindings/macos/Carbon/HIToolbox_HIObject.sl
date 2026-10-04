@@ -25,6 +25,7 @@ module MacOS.Carbon;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -58,13 +59,13 @@ public const int kEventParamDecodingForEditor = 1684366949;
 public const int kEventParamInitParameters = 1885434465;
 public const int typeHIObjectRef = 1751740258;
 
-public extern "C" CFStringRef kHIObjectInitParamUserName;
+public extern "C" CFStringRef? kHIObjectInitParamUserName;
 
-public extern "C" CFStringRef kHIObjectInitParamDescription;
+public extern "C" CFStringRef? kHIObjectInitParamDescription;
 
-public extern "C" CFStringRef kHIObjectInitParamEventName;
+public extern "C" CFStringRef? kHIObjectInitParamEventName;
 
-public extern "C" CFStringRef kHIObjectInitParamEventType;
+public extern "C" CFStringRef? kHIObjectInitParamEventType;
 
 public const int kEventHIObjectConstruct = 1;
 
@@ -98,41 +99,41 @@ public const int kEventDelegateIsGroup = 4;
 
 public const int kEventDelegateGetGroupClasses = 5;
 
-public extern "C" OSStatus HIObjectRegisterSubclass(CFStringRef inClassID, CFStringRef inBaseClassID, OptionBits inOptions, EventHandlerUPP inConstructProc, ItemCount inNumEvents, EventTypeSpec* inEventList, void* inConstructData, HIObjectClassRef* outClassRef);
+public extern "C" OSStatus HIObjectRegisterSubclass(CFStringRef? inClassID, CFStringRef? inBaseClassID, OptionBits inOptions, EventHandlerUPP inConstructProc, ItemCount inNumEvents, EventTypeSpec* inEventList, void* inConstructData, HIObjectClassRef* outClassRef);
 
 public extern "C" OSStatus HIObjectUnregisterClass(HIObjectClassRef inClassRef);
 
-public extern "C" OSStatus HIObjectCreate(CFStringRef inClassID, EventRef inConstructData, HIObjectRef* outObject);
+public extern "C" OSStatus HIObjectCreate(CFStringRef? inClassID, EventRef inConstructData, HIObjectRef* outObject);
 
 public extern "C" EventTargetRef HIObjectGetEventTarget(HIObjectRef inObject);
 
 public extern "C" void HIObjectPrintDebugInfo(HIObjectRef inObject);
 
-public extern "C" CFStringRef HIObjectCopyClassID(HIObjectRef inObject);
+[ReturnsRetained] public extern "C" CFStringRef? HIObjectCopyClassID(HIObjectRef inObject);
 
-public extern "C" Boolean HIObjectIsOfClass(HIObjectRef inObject, CFStringRef inObjectClassID);
+public extern "C" Boolean HIObjectIsOfClass(HIObjectRef inObject, CFStringRef? inObjectClassID);
 
-public extern "C" void* HIObjectDynamicCast(HIObjectRef inObject, CFStringRef inClassID);
+public extern "C" void* HIObjectDynamicCast(HIObjectRef inObject, CFStringRef? inClassID);
 
-public extern "C" OSStatus HIObjectCreateFromBundle(CFBundleRef inBundle, HIObjectRef* outObject);
+public extern "C" OSStatus HIObjectCreateFromBundle(CFBundleRef? inBundle, HIObjectRef* outObject);
 
 public extern "C" HIObjectRef HIObjectFromEventTarget(EventTargetRef inTarget);
 
 public extern "C" Boolean HIObjectIsArchivingIgnored(HIObjectRef inObject);
 
-public extern "C" CFStringRef kHIObjectCustomDataParameterNamesKey;
+public extern "C" CFStringRef? kHIObjectCustomDataParameterNamesKey;
 
-public extern "C" CFStringRef kHIObjectCustomDataParameterTypesKey;
+public extern "C" CFStringRef? kHIObjectCustomDataParameterTypesKey;
 
-public extern "C" CFStringRef kHIObjectCustomDataParameterValuesKey;
+public extern "C" CFStringRef? kHIObjectCustomDataParameterValuesKey;
 
-public extern "C" CFStringRef kHIObjectCustomDataClassIDKey;
+public extern "C" CFStringRef? kHIObjectCustomDataClassIDKey;
 
-public extern "C" CFStringRef kHIObjectCustomDataSuperClassIDKey;
+public extern "C" CFStringRef? kHIObjectCustomDataSuperClassIDKey;
 
-public extern "C" CFStringRef kHIObjectCustomDataCDEFProcIDKey;
+public extern "C" CFStringRef? kHIObjectCustomDataCDEFProcIDKey;
 
-public extern "C" CFStringRef kHIObjectCustomDataDelegateGroupParametersKey;
+public extern "C" CFStringRef? kHIObjectCustomDataDelegateGroupParametersKey;
 
 public using HIDelegatePosition = UInt32;
 
@@ -140,15 +141,15 @@ public const int kHIDelegateAll = 0;
 public const int kHIDelegateBefore = 1;
 public const int kHIDelegateAfter = 2;
 
-public extern "C" CFStringRef kHIDelegateBeforeKey;
+public extern "C" CFStringRef? kHIDelegateBeforeKey;
 
-public extern "C" CFStringRef kHIDelegateAfterKey;
+public extern "C" CFStringRef? kHIDelegateAfterKey;
 
 public extern "C" OSStatus HIObjectAddDelegate(HIObjectRef inObject, HIObjectRef inDelegate, HIDelegatePosition inPosition);
 
 public extern "C" OSStatus HIObjectRemoveDelegate(HIObjectRef inObject, HIObjectRef inDelegate, HIDelegatePosition inPosition);
 
-public extern "C" OSStatus HIObjectCopyDelegates(HIObjectRef inObject, CFDictionaryRef* outDelegates);
+public extern "C" OSStatus HIObjectCopyDelegates(HIObjectRef inObject, __CFDictionary** outDelegates);
 
 public extern "C" HIObjectRef HIObjectGetEventHandlerObject(EventHandlerCallRef inRef);
 

@@ -25,111 +25,113 @@ module MacOS.DiskArbitration;
 
 import MacOS.CoreFoundation;
 import MacOS.IOKit;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "DiskArbitration")
 
-public extern "C" CFStringRef kDADiskDescriptionVolumeKindKey;
+public extern "C" CFStringRef? kDADiskDescriptionVolumeKindKey;
 
-public extern "C" CFStringRef kDADiskDescriptionVolumeMountableKey;
+public extern "C" CFStringRef? kDADiskDescriptionVolumeMountableKey;
 
-public extern "C" CFStringRef kDADiskDescriptionVolumeNameKey;
+public extern "C" CFStringRef? kDADiskDescriptionVolumeNameKey;
 
-public extern "C" CFStringRef kDADiskDescriptionVolumeNetworkKey;
+public extern "C" CFStringRef? kDADiskDescriptionVolumeNetworkKey;
 
-public extern "C" CFStringRef kDADiskDescriptionVolumePathKey;
+public extern "C" CFStringRef? kDADiskDescriptionVolumePathKey;
 
-public extern "C" CFStringRef kDADiskDescriptionVolumeTypeKey;
+public extern "C" CFStringRef? kDADiskDescriptionVolumeTypeKey;
 
-public extern "C" CFStringRef kDADiskDescriptionVolumeUUIDKey;
+public extern "C" CFStringRef? kDADiskDescriptionVolumeUUIDKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaBlockSizeKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaBlockSizeKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaBSDMajorKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaBSDMajorKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaBSDMinorKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaBSDMinorKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaBSDNameKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaBSDNameKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaBSDUnitKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaBSDUnitKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaContentKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaContentKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaEjectableKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaEjectableKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaIconKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaIconKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaKindKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaKindKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaLeafKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaLeafKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaNameKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaNameKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaPathKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaPathKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaRemovableKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaRemovableKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaSizeKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaSizeKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaTypeKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaTypeKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaUUIDKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaUUIDKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaWholeKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaWholeKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaWritableKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaWritableKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaEncryptedKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaEncryptedKey;
 
-public extern "C" CFStringRef kDADiskDescriptionMediaEncryptionDetailKey;
+public extern "C" CFStringRef? kDADiskDescriptionMediaEncryptionDetailKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceGUIDKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceGUIDKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceInternalKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceInternalKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceModelKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceModelKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDevicePathKey;
+public extern "C" CFStringRef? kDADiskDescriptionDevicePathKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceProtocolKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceProtocolKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceRevisionKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceRevisionKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceUnitKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceUnitKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceVendorKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceVendorKey;
 
-public extern "C" CFStringRef kDADiskDescriptionDeviceTDMLockedKey;
+public extern "C" CFStringRef? kDADiskDescriptionDeviceTDMLockedKey;
 
-public extern "C" CFStringRef kDADiskDescriptionBusNameKey;
+public extern "C" CFStringRef? kDADiskDescriptionBusNameKey;
 
-public extern "C" CFStringRef kDADiskDescriptionBusPathKey;
+public extern "C" CFStringRef? kDADiskDescriptionBusPathKey;
 
 /// macOS 14.4 and later.
-public extern "C" CFStringRef kDADiskDescriptionFSKitPrefix;
+public extern "C" CFStringRef? kDADiskDescriptionFSKitPrefix;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kDADiskDescriptionRepairRunningKey;
+public extern "C" CFStringRef? kDADiskDescriptionRepairRunningKey;
 
 public struct __DADisk;
 
-public using DADiskRef = __DADisk*;
+[CFType("DADiskGetTypeID")]
+public extern objc class DADiskRef : CFTypeRef { }
 
 public extern "C" CFTypeID DADiskGetTypeID();
 
-public extern "C" DADiskRef DADiskCreateFromBSDName(CFAllocatorRef allocator, DASessionRef session, byte* name);
+[ReturnsRetained] public extern "C" DADiskRef? DADiskCreateFromBSDName(CFAllocatorRef? allocator, DASessionRef session, byte* name);
 
-public extern "C" DADiskRef DADiskCreateFromIOMedia(CFAllocatorRef allocator, DASessionRef session, io_service_t media);
+[ReturnsRetained] public extern "C" DADiskRef? DADiskCreateFromIOMedia(CFAllocatorRef? allocator, DASessionRef session, io_service_t media);
 
-public extern "C" DADiskRef DADiskCreateFromVolumePath(CFAllocatorRef allocator, DASessionRef session, CFURLRef path);
+[ReturnsRetained] public extern "C" DADiskRef? DADiskCreateFromVolumePath(CFAllocatorRef? allocator, DASessionRef session, CFURLRef path);
 
 public extern "C" byte* DADiskGetBSDName(DADiskRef disk);
 
 public extern "C" io_service_t DADiskCopyIOMedia(DADiskRef disk);
 
-public extern "C" CFDictionaryRef DADiskCopyDescription(DADiskRef disk);
+[ReturnsRetained] public extern "C" CFDictionaryRef? DADiskCopyDescription(DADiskRef disk);
 
-public extern "C" DADiskRef DADiskCopyWholeDisk(DADiskRef disk);
+[ReturnsRetained] public extern "C" DADiskRef? DADiskCopyWholeDisk(DADiskRef disk);
 
 #endif

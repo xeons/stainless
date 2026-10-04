@@ -27,6 +27,7 @@ import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.CoreMedia;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,7 +35,8 @@ import MacOS.System;
 
 public struct opaqueMTAudioProcessingTap;
 
-public using MTAudioProcessingTapRef = opaqueMTAudioProcessingTap*;
+[CFType("MTAudioProcessingTapGetTypeID")]
+public extern objc class MTAudioProcessingTapRef : CFTypeRef { }
 
 public extern "C" CFTypeID MTAudioProcessingTapGetTypeID();
 
@@ -48,15 +50,15 @@ public using MTAudioProcessingTapFlags = uint;
 public const uint kMTAudioProcessingTapFlag_StartOfStream = 256;
 public const uint kMTAudioProcessingTapFlag_EndOfStream = 512;
 
-public delegate void MTAudioProcessingTapInitCallback(MTAudioProcessingTapRef arg0, void* arg1, void** arg2);
+public delegate void MTAudioProcessingTapInitCallback(opaqueMTAudioProcessingTap* arg0, void* arg1, void** arg2);
 
-public delegate void MTAudioProcessingTapFinalizeCallback(MTAudioProcessingTapRef arg0);
+public delegate void MTAudioProcessingTapFinalizeCallback(opaqueMTAudioProcessingTap* arg0);
 
-public delegate void MTAudioProcessingTapPrepareCallback(MTAudioProcessingTapRef arg0, CMItemCount arg1, AudioStreamBasicDescription* arg2);
+public delegate void MTAudioProcessingTapPrepareCallback(opaqueMTAudioProcessingTap* arg0, CMItemCount arg1, AudioStreamBasicDescription* arg2);
 
-public delegate void MTAudioProcessingTapUnprepareCallback(MTAudioProcessingTapRef arg0);
+public delegate void MTAudioProcessingTapUnprepareCallback(opaqueMTAudioProcessingTap* arg0);
 
-public delegate void MTAudioProcessingTapProcessCallback(MTAudioProcessingTapRef arg0, CMItemCount arg1, MTAudioProcessingTapFlags arg2, AudioBufferList* arg3, CMItemCount* arg4, MTAudioProcessingTapFlags* arg5);
+public delegate void MTAudioProcessingTapProcessCallback(opaqueMTAudioProcessingTap* arg0, CMItemCount arg1, MTAudioProcessingTapFlags arg2, AudioBufferList* arg3, CMItemCount* arg4, MTAudioProcessingTapFlags* arg5);
 
 public const int kMTAudioProcessingTapCallbacksVersion_0 = 0;
 
@@ -72,7 +74,7 @@ public struct MTAudioProcessingTapCallbacks
     public MTAudioProcessingTapProcessCallback process;
 }
 
-public extern "C" OSStatus MTAudioProcessingTapCreate(CFAllocatorRef allocator, MTAudioProcessingTapCallbacks* callbacks, MTAudioProcessingTapCreationFlags flags, MTAudioProcessingTapRef* tapOut);
+public extern "C" OSStatus MTAudioProcessingTapCreate(CFAllocatorRef? allocator, MTAudioProcessingTapCallbacks* callbacks, MTAudioProcessingTapCreationFlags flags, opaqueMTAudioProcessingTap** tapOut);
 
 public extern "C" void* MTAudioProcessingTapGetStorage(MTAudioProcessingTapRef tap);
 

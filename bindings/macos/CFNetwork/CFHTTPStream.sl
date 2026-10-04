@@ -25,6 +25,7 @@ module MacOS.CFNetwork;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -40,42 +41,42 @@ public enum CFStreamErrorHTTP : int
 }
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPResponseHeader;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPResponseHeader;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPFinalURL;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPFinalURL;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPFinalRequest;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPFinalRequest;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPProxy;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPProxy;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPProxyHost;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPProxyHost;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPProxyPort;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPProxyPort;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPSProxyHost;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPSProxyHost;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPSProxyPort;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPSProxyPort;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPShouldAutoredirect;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPShouldAutoredirect;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPAttemptPersistentConnection;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPAttemptPersistentConnection;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFStringRef kCFStreamPropertyHTTPRequestBytesWrittenCount;
+public extern "C" CFStringRef? kCFStreamPropertyHTTPRequestBytesWrittenCount;
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFReadStreamRef CFReadStreamCreateForHTTPRequest(CFAllocatorRef alloc, CFHTTPMessageRef request);
+[ReturnsRetained] public extern "C" CFReadStreamRef CFReadStreamCreateForHTTPRequest(CFAllocatorRef? alloc, CFHTTPMessageRef request);
 
 /// Deprecated in macOS 10.11.
-public extern "C" CFReadStreamRef CFReadStreamCreateForStreamedHTTPRequest(CFAllocatorRef alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody);
+[ReturnsRetained] public extern "C" CFReadStreamRef CFReadStreamCreateForStreamedHTTPRequest(CFAllocatorRef? alloc, CFHTTPMessageRef requestHeaders, CFReadStreamRef requestBody);
 
 #endif

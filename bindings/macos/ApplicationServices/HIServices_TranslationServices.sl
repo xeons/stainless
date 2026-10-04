@@ -26,6 +26,7 @@ module MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,7 +34,8 @@ import MacOS.System;
 
 public struct OpaqueTranslationRef;
 
-public using TranslationRef = OpaqueTranslationRef*;
+[CFType("TranslationGetTypeID")]
+public extern objc class TranslationRef : CFTypeRef { }
 
 public const int badTranslationRefErr = -3031;
 
@@ -44,20 +46,20 @@ public const int kTranslationFileTranslation = 2;
 
 public extern "C" CFTypeID TranslationGetTypeID();
 
-public extern "C" OSStatus TranslationCreate(CFStringRef inSourceType, CFStringRef inDestinationType, TranslationFlags inTranslationFlags, TranslationRef* outTranslation);
+public extern "C" OSStatus TranslationCreate(CFStringRef? inSourceType, CFStringRef? inDestinationType, TranslationFlags inTranslationFlags, OpaqueTranslationRef** outTranslation);
 
-public extern "C" OSStatus TranslationCreateWithSourceArray(CFArrayRef inSourceTypes, TranslationFlags inTranslationFlags, CFArrayRef* outDestinationTypes, CFDictionaryRef* outTranslations);
+public extern "C" OSStatus TranslationCreateWithSourceArray(CFArrayRef? inSourceTypes, TranslationFlags inTranslationFlags, __CFArray** outDestinationTypes, __CFDictionary** outTranslations);
 
-public extern "C" OSStatus TranslationPerformForData(TranslationRef inTranslation, CFDataRef inSourceData, CFDataRef* outDestinationData);
+public extern "C" OSStatus TranslationPerformForData(TranslationRef? inTranslation, CFDataRef? inSourceData, __CFData** outDestinationData);
 
-public extern "C" OSStatus TranslationPerformForFile(TranslationRef inTranslation, FSRef* inSourceFile, FSRef* inDestinationDirectory, CFStringRef inDestinationName, FSRef* outTranslatedFile);
+public extern "C" OSStatus TranslationPerformForFile(TranslationRef? inTranslation, FSRef* inSourceFile, FSRef* inDestinationDirectory, CFStringRef? inDestinationName, FSRef* outTranslatedFile);
 
-public extern "C" OSStatus TranslationPerformForURL(TranslationRef inTranslation, CFURLRef inSourceURL, CFURLRef inDestinationURL, CFURLRef* outTranslatedURL);
+public extern "C" OSStatus TranslationPerformForURL(TranslationRef? inTranslation, CFURLRef? inSourceURL, CFURLRef? inDestinationURL, __CFURL** outTranslatedURL);
 
-public extern "C" OSStatus TranslationCopySourceType(TranslationRef inTranslation, CFStringRef* outSourceType);
+public extern "C" OSStatus TranslationCopySourceType(TranslationRef? inTranslation, __CFString** outSourceType);
 
-public extern "C" OSStatus TranslationCopyDestinationType(TranslationRef inTranslation, CFStringRef* outDestinationType);
+public extern "C" OSStatus TranslationCopyDestinationType(TranslationRef? inTranslation, __CFString** outDestinationType);
 
-public extern "C" OSStatus TranslationGetTranslationFlags(TranslationRef inTranslation, TranslationFlags* outTranslationFlags);
+public extern "C" OSStatus TranslationGetTranslationFlags(TranslationRef? inTranslation, TranslationFlags* outTranslationFlags);
 
 #endif

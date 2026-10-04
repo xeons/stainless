@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -50,7 +51,8 @@ public const uint kCMBlockBufferPermitEmptyReferenceFlag = 8;
 
 public struct OpaqueCMBlockBuffer;
 
-public using CMBlockBufferRef = OpaqueCMBlockBuffer*;
+[CFType("CMBlockBufferGetTypeID")]
+public extern objc class CMBlockBufferRef : CFTypeRef { }
 
 public delegate void* CMBlockBufferCustomBlockSourceAllocateBlockFunction(void* arg0, nuint arg1);
 
@@ -67,17 +69,17 @@ public struct CMBlockBufferCustomBlockSource
 
 public const uint kCMBlockBufferCustomBlockSourceVersion = 0;
 
-public extern "C" OSStatus CMBlockBufferCreateEmpty(CFAllocatorRef structureAllocator, uint subBlockCapacity, CMBlockBufferFlags flags, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMBlockBufferCreateEmpty(CFAllocatorRef? structureAllocator, uint subBlockCapacity, CMBlockBufferFlags flags, OpaqueCMBlockBuffer** blockBufferOut);
 
-public extern "C" OSStatus CMBlockBufferCreateWithMemoryBlock(CFAllocatorRef structureAllocator, void* memoryBlock, nuint blockLength, CFAllocatorRef blockAllocator, CMBlockBufferCustomBlockSource* customBlockSource, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMBlockBufferCreateWithMemoryBlock(CFAllocatorRef? structureAllocator, void* memoryBlock, nuint blockLength, CFAllocatorRef? blockAllocator, CMBlockBufferCustomBlockSource* customBlockSource, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags, OpaqueCMBlockBuffer** blockBufferOut);
 
-public extern "C" OSStatus CMBlockBufferCreateWithBufferReference(CFAllocatorRef structureAllocator, CMBlockBufferRef bufferReference, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMBlockBufferCreateWithBufferReference(CFAllocatorRef? structureAllocator, CMBlockBufferRef bufferReference, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags, OpaqueCMBlockBuffer** blockBufferOut);
 
-public extern "C" OSStatus CMBlockBufferCreateContiguous(CFAllocatorRef structureAllocator, CMBlockBufferRef sourceBuffer, CFAllocatorRef blockAllocator, CMBlockBufferCustomBlockSource* customBlockSource, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags, CMBlockBufferRef* blockBufferOut);
+public extern "C" OSStatus CMBlockBufferCreateContiguous(CFAllocatorRef? structureAllocator, CMBlockBufferRef sourceBuffer, CFAllocatorRef? blockAllocator, CMBlockBufferCustomBlockSource* customBlockSource, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags, OpaqueCMBlockBuffer** blockBufferOut);
 
 public extern "C" CFTypeID CMBlockBufferGetTypeID();
 
-public extern "C" OSStatus CMBlockBufferAppendMemoryBlock(CMBlockBufferRef theBuffer, void* memoryBlock, nuint blockLength, CFAllocatorRef blockAllocator, CMBlockBufferCustomBlockSource* customBlockSource, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags);
+public extern "C" OSStatus CMBlockBufferAppendMemoryBlock(CMBlockBufferRef theBuffer, void* memoryBlock, nuint blockLength, CFAllocatorRef? blockAllocator, CMBlockBufferCustomBlockSource* customBlockSource, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags);
 
 public extern "C" OSStatus CMBlockBufferAppendBufferReference(CMBlockBufferRef theBuffer, CMBlockBufferRef targetBBuf, nuint offsetToData, nuint dataLength, CMBlockBufferFlags flags);
 

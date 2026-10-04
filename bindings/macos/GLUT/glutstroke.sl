@@ -27,6 +27,7 @@ module MacOS.GLUT;
 
 #pragma comment(framework, "GLUT")
 
+/// Deprecated in macOS 10.9.
 public struct CoordRec
 {
     public float x;
@@ -36,6 +37,7 @@ public struct CoordRec
 /// Deprecated in macOS 10.9.
 public using CoordPtr = CoordRec*;
 
+/// Deprecated in macOS 10.9.
 public struct StrokeRec
 {
     public int num_coords;
@@ -45,6 +47,7 @@ public struct StrokeRec
 /// Deprecated in macOS 10.9.
 public using StrokePtr = StrokeRec*;
 
+/// Deprecated in macOS 10.9.
 public struct StrokeCharRec
 {
     public int num_strokes;
@@ -56,6 +59,7 @@ public struct StrokeCharRec
 /// Deprecated in macOS 10.9.
 public using StrokeCharPtr = StrokeCharRec*;
 
+/// Deprecated in macOS 10.9.
 public struct StrokeFontRec
 {
     public byte* name;

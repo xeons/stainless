@@ -24,583 +24,584 @@
 module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "SystemConfiguration")
 
-public extern "C" CFStringRef kSCResvLink;
+public extern "C" CFStringRef? kSCResvLink;
 
-public extern "C" CFStringRef kSCResvInactive;
+public extern "C" CFStringRef? kSCResvInactive;
 
-public extern "C" CFStringRef kSCPropInterfaceName;
+public extern "C" CFStringRef? kSCPropInterfaceName;
 
-public extern "C" CFStringRef kSCPropMACAddress;
+public extern "C" CFStringRef? kSCPropMACAddress;
 
-public extern "C" CFStringRef kSCPropUserDefinedName;
+public extern "C" CFStringRef? kSCPropUserDefinedName;
 
-public extern "C" CFStringRef kSCPropVersion;
+public extern "C" CFStringRef? kSCPropVersion;
 
-public extern "C" CFStringRef kSCPrefCurrentSet;
+public extern "C" CFStringRef? kSCPrefCurrentSet;
 
-public extern "C" CFStringRef kSCPrefNetworkServices;
+public extern "C" CFStringRef? kSCPrefNetworkServices;
 
-public extern "C" CFStringRef kSCPrefSets;
+public extern "C" CFStringRef? kSCPrefSets;
 
-public extern "C" CFStringRef kSCPrefSystem;
+public extern "C" CFStringRef? kSCPrefSystem;
 
-public extern "C" CFStringRef kSCCompNetwork;
+public extern "C" CFStringRef? kSCCompNetwork;
 
-public extern "C" CFStringRef kSCCompService;
+public extern "C" CFStringRef? kSCCompService;
 
-public extern "C" CFStringRef kSCCompGlobal;
+public extern "C" CFStringRef? kSCCompGlobal;
 
-public extern "C" CFStringRef kSCCompHostNames;
+public extern "C" CFStringRef? kSCCompHostNames;
 
-public extern "C" CFStringRef kSCCompInterface;
+public extern "C" CFStringRef? kSCCompInterface;
 
-public extern "C" CFStringRef kSCCompSystem;
+public extern "C" CFStringRef? kSCCompSystem;
 
-public extern "C" CFStringRef kSCCompUsers;
+public extern "C" CFStringRef? kSCCompUsers;
 
-public extern "C" CFStringRef kSCCompAnyRegex;
+public extern "C" CFStringRef? kSCCompAnyRegex;
 
-public extern "C" CFStringRef kSCEntNetAirPort;
+public extern "C" CFStringRef? kSCEntNetAirPort;
 
-public extern "C" CFStringRef kSCEntNetDHCP;
+public extern "C" CFStringRef? kSCEntNetDHCP;
 
-public extern "C" CFStringRef kSCEntNetDNS;
+public extern "C" CFStringRef? kSCEntNetDNS;
 
-public extern "C" CFStringRef kSCEntNetEthernet;
+public extern "C" CFStringRef? kSCEntNetEthernet;
 
-public extern "C" CFStringRef kSCEntNetFireWire;
+public extern "C" CFStringRef? kSCEntNetFireWire;
 
-public extern "C" CFStringRef kSCEntNetInterface;
+public extern "C" CFStringRef? kSCEntNetInterface;
 
-public extern "C" CFStringRef kSCEntNetIPSec;
+public extern "C" CFStringRef? kSCEntNetIPSec;
 
-public extern "C" CFStringRef kSCEntNetIPv4;
+public extern "C" CFStringRef? kSCEntNetIPv4;
 
-public extern "C" CFStringRef kSCEntNetIPv6;
+public extern "C" CFStringRef? kSCEntNetIPv6;
 
-public extern "C" CFStringRef kSCEntNetL2TP;
+public extern "C" CFStringRef? kSCEntNetL2TP;
 
-public extern "C" CFStringRef kSCEntNetLink;
+public extern "C" CFStringRef? kSCEntNetLink;
 
-public extern "C" CFStringRef kSCEntNetModem;
+public extern "C" CFStringRef? kSCEntNetModem;
 
-public extern "C" CFStringRef kSCEntNetPPP;
+public extern "C" CFStringRef? kSCEntNetPPP;
 
-public extern "C" CFStringRef kSCEntNetPPPoE;
+public extern "C" CFStringRef? kSCEntNetPPPoE;
 
-public extern "C" CFStringRef kSCEntNetPPPSerial;
+public extern "C" CFStringRef? kSCEntNetPPPSerial;
 
 /// Deprecated in macOS 10.12.
-public extern "C" CFStringRef kSCEntNetPPTP;
+public extern "C" CFStringRef? kSCEntNetPPTP;
 
-public extern "C" CFStringRef kSCEntNetProxies;
+public extern "C" CFStringRef? kSCEntNetProxies;
 
-public extern "C" CFStringRef kSCEntNetSMB;
+public extern "C" CFStringRef? kSCEntNetSMB;
 
-public extern "C" CFStringRef kSCEntNet6to4;
+public extern "C" CFStringRef? kSCEntNet6to4;
 
-public extern "C" CFStringRef kSCPropNetOverridePrimary;
+public extern "C" CFStringRef? kSCPropNetOverridePrimary;
 
-public extern "C" CFStringRef kSCPropNetServiceOrder;
+public extern "C" CFStringRef? kSCPropNetServiceOrder;
 
-public extern "C" CFStringRef kSCPropNetPPPOverridePrimary;
+public extern "C" CFStringRef? kSCPropNetPPPOverridePrimary;
 
-public extern "C" CFStringRef kSCPropNetInterfaces;
+public extern "C" CFStringRef? kSCPropNetInterfaces;
 
-public extern "C" CFStringRef kSCPropNetLocalHostName;
-
-/// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCPropNetAirPortAllowNetCreation;
+public extern "C" CFStringRef? kSCPropNetLocalHostName;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCPropNetAirPortAuthPassword;
+public extern "C" CFStringRef? kSCPropNetAirPortAllowNetCreation;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCPropNetAirPortAuthPasswordEncryption;
+public extern "C" CFStringRef? kSCPropNetAirPortAuthPassword;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCPropNetAirPortJoinMode;
+public extern "C" CFStringRef? kSCPropNetAirPortAuthPasswordEncryption;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCPropNetAirPortPowerEnabled;
+public extern "C" CFStringRef? kSCPropNetAirPortJoinMode;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCPropNetAirPortPreferredNetwork;
+public extern "C" CFStringRef? kSCPropNetAirPortPowerEnabled;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCPropNetAirPortSavePasswords;
+public extern "C" CFStringRef? kSCPropNetAirPortPreferredNetwork;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCValNetAirPortJoinModeAutomatic;
+public extern "C" CFStringRef? kSCPropNetAirPortSavePasswords;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCValNetAirPortJoinModePreferred;
+public extern "C" CFStringRef? kSCValNetAirPortJoinModeAutomatic;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCValNetAirPortJoinModeRanked;
+public extern "C" CFStringRef? kSCValNetAirPortJoinModePreferred;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCValNetAirPortJoinModeRecent;
+public extern "C" CFStringRef? kSCValNetAirPortJoinModeRanked;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCValNetAirPortJoinModeStrongest;
+public extern "C" CFStringRef? kSCValNetAirPortJoinModeRecent;
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFStringRef kSCValNetAirPortAuthPasswordEncryptionKeychain;
+public extern "C" CFStringRef? kSCValNetAirPortJoinModeStrongest;
 
-public extern "C" CFStringRef kSCPropNetDNSDomainName;
+/// Deprecated in macOS 10.9.
+public extern "C" CFStringRef? kSCValNetAirPortAuthPasswordEncryptionKeychain;
 
-public extern "C" CFStringRef kSCPropNetDNSOptions;
+public extern "C" CFStringRef? kSCPropNetDNSDomainName;
 
-public extern "C" CFStringRef kSCPropNetDNSSearchDomains;
+public extern "C" CFStringRef? kSCPropNetDNSOptions;
 
-public extern "C" CFStringRef kSCPropNetDNSSearchOrder;
+public extern "C" CFStringRef? kSCPropNetDNSSearchDomains;
 
-public extern "C" CFStringRef kSCPropNetDNSServerAddresses;
+public extern "C" CFStringRef? kSCPropNetDNSSearchOrder;
 
-public extern "C" CFStringRef kSCPropNetDNSServerPort;
+public extern "C" CFStringRef? kSCPropNetDNSServerAddresses;
 
-public extern "C" CFStringRef kSCPropNetDNSServerTimeout;
+public extern "C" CFStringRef? kSCPropNetDNSServerPort;
 
-public extern "C" CFStringRef kSCPropNetDNSSortList;
+public extern "C" CFStringRef? kSCPropNetDNSServerTimeout;
 
-public extern "C" CFStringRef kSCPropNetDNSSupplementalMatchDomains;
+public extern "C" CFStringRef? kSCPropNetDNSSortList;
 
-public extern "C" CFStringRef kSCPropNetDNSSupplementalMatchOrders;
+public extern "C" CFStringRef? kSCPropNetDNSSupplementalMatchDomains;
 
-public extern "C" CFStringRef kSCPropNetEthernetMediaSubType;
+public extern "C" CFStringRef? kSCPropNetDNSSupplementalMatchOrders;
 
-public extern "C" CFStringRef kSCPropNetEthernetMediaOptions;
+public extern "C" CFStringRef? kSCPropNetEthernetMediaSubType;
 
-public extern "C" CFStringRef kSCPropNetEthernetMTU;
+public extern "C" CFStringRef? kSCPropNetEthernetMediaOptions;
 
-public extern "C" CFStringRef kSCPropNetInterfaceDeviceName;
+public extern "C" CFStringRef? kSCPropNetEthernetMTU;
 
-public extern "C" CFStringRef kSCPropNetInterfaceHardware;
+public extern "C" CFStringRef? kSCPropNetInterfaceDeviceName;
 
-public extern "C" CFStringRef kSCPropNetInterfaceType;
+public extern "C" CFStringRef? kSCPropNetInterfaceHardware;
 
-public extern "C" CFStringRef kSCPropNetInterfaceSubType;
+public extern "C" CFStringRef? kSCPropNetInterfaceType;
+
+public extern "C" CFStringRef? kSCPropNetInterfaceSubType;
 
 /// Deprecated in macOS 10.13.
-public extern "C" CFStringRef kSCPropNetInterfaceSupportsModemOnHold;
+public extern "C" CFStringRef? kSCPropNetInterfaceSupportsModemOnHold;
 
-public extern "C" CFStringRef kSCValNetInterfaceTypeEthernet;
+public extern "C" CFStringRef? kSCValNetInterfaceTypeEthernet;
 
-public extern "C" CFStringRef kSCValNetInterfaceTypeFireWire;
+public extern "C" CFStringRef? kSCValNetInterfaceTypeFireWire;
 
-public extern "C" CFStringRef kSCValNetInterfaceTypePPP;
+public extern "C" CFStringRef? kSCValNetInterfaceTypePPP;
 
-public extern "C" CFStringRef kSCValNetInterfaceType6to4;
+public extern "C" CFStringRef? kSCValNetInterfaceType6to4;
 
-public extern "C" CFStringRef kSCValNetInterfaceTypeIPSec;
+public extern "C" CFStringRef? kSCValNetInterfaceTypeIPSec;
 
-public extern "C" CFStringRef kSCValNetInterfaceSubTypePPPoE;
+public extern "C" CFStringRef? kSCValNetInterfaceSubTypePPPoE;
 
-public extern "C" CFStringRef kSCValNetInterfaceSubTypePPPSerial;
+public extern "C" CFStringRef? kSCValNetInterfaceSubTypePPPSerial;
 
 /// Deprecated in macOS 10.12.
-public extern "C" CFStringRef kSCValNetInterfaceSubTypePPTP;
+public extern "C" CFStringRef? kSCValNetInterfaceSubTypePPTP;
 
-public extern "C" CFStringRef kSCValNetInterfaceSubTypeL2TP;
+public extern "C" CFStringRef? kSCValNetInterfaceSubTypeL2TP;
 
-public extern "C" CFStringRef kSCPropNetIPSecAuthenticationMethod;
+public extern "C" CFStringRef? kSCPropNetIPSecAuthenticationMethod;
 
-public extern "C" CFStringRef kSCPropNetIPSecLocalCertificate;
+public extern "C" CFStringRef? kSCPropNetIPSecLocalCertificate;
 
-public extern "C" CFStringRef kSCPropNetIPSecLocalIdentifier;
+public extern "C" CFStringRef? kSCPropNetIPSecLocalIdentifier;
 
-public extern "C" CFStringRef kSCPropNetIPSecLocalIdentifierType;
+public extern "C" CFStringRef? kSCPropNetIPSecLocalIdentifierType;
 
-public extern "C" CFStringRef kSCPropNetIPSecSharedSecret;
+public extern "C" CFStringRef? kSCPropNetIPSecSharedSecret;
 
-public extern "C" CFStringRef kSCPropNetIPSecSharedSecretEncryption;
+public extern "C" CFStringRef? kSCPropNetIPSecSharedSecretEncryption;
 
-public extern "C" CFStringRef kSCPropNetIPSecConnectTime;
+public extern "C" CFStringRef? kSCPropNetIPSecConnectTime;
 
-public extern "C" CFStringRef kSCPropNetIPSecRemoteAddress;
+public extern "C" CFStringRef? kSCPropNetIPSecRemoteAddress;
 
-public extern "C" CFStringRef kSCPropNetIPSecStatus;
+public extern "C" CFStringRef? kSCPropNetIPSecStatus;
 
-public extern "C" CFStringRef kSCPropNetIPSecXAuthEnabled;
+public extern "C" CFStringRef? kSCPropNetIPSecXAuthEnabled;
 
-public extern "C" CFStringRef kSCPropNetIPSecXAuthName;
+public extern "C" CFStringRef? kSCPropNetIPSecXAuthName;
 
-public extern "C" CFStringRef kSCPropNetIPSecXAuthPassword;
+public extern "C" CFStringRef? kSCPropNetIPSecXAuthPassword;
 
-public extern "C" CFStringRef kSCPropNetIPSecXAuthPasswordEncryption;
+public extern "C" CFStringRef? kSCPropNetIPSecXAuthPasswordEncryption;
 
-public extern "C" CFStringRef kSCValNetIPSecAuthenticationMethodSharedSecret;
+public extern "C" CFStringRef? kSCValNetIPSecAuthenticationMethodSharedSecret;
 
-public extern "C" CFStringRef kSCValNetIPSecAuthenticationMethodCertificate;
+public extern "C" CFStringRef? kSCValNetIPSecAuthenticationMethodCertificate;
 
-public extern "C" CFStringRef kSCValNetIPSecAuthenticationMethodHybrid;
+public extern "C" CFStringRef? kSCValNetIPSecAuthenticationMethodHybrid;
 
-public extern "C" CFStringRef kSCValNetIPSecLocalIdentifierTypeKeyID;
+public extern "C" CFStringRef? kSCValNetIPSecLocalIdentifierTypeKeyID;
 
-public extern "C" CFStringRef kSCValNetIPSecSharedSecretEncryptionKeychain;
+public extern "C" CFStringRef? kSCValNetIPSecSharedSecretEncryptionKeychain;
 
-public extern "C" CFStringRef kSCValNetIPSecXAuthPasswordEncryptionKeychain;
+public extern "C" CFStringRef? kSCValNetIPSecXAuthPasswordEncryptionKeychain;
 
-public extern "C" CFStringRef kSCValNetIPSecXAuthPasswordEncryptionPrompt;
+public extern "C" CFStringRef? kSCValNetIPSecXAuthPasswordEncryptionPrompt;
 
-public extern "C" CFStringRef kSCPropNetIPv4Addresses;
+public extern "C" CFStringRef? kSCPropNetIPv4Addresses;
 
-public extern "C" CFStringRef kSCPropNetIPv4ConfigMethod;
+public extern "C" CFStringRef? kSCPropNetIPv4ConfigMethod;
 
-public extern "C" CFStringRef kSCPropNetIPv4DHCPClientID;
+public extern "C" CFStringRef? kSCPropNetIPv4DHCPClientID;
 
-public extern "C" CFStringRef kSCPropNetIPv4Router;
+public extern "C" CFStringRef? kSCPropNetIPv4Router;
 
-public extern "C" CFStringRef kSCPropNetIPv4SubnetMasks;
+public extern "C" CFStringRef? kSCPropNetIPv4SubnetMasks;
 
-public extern "C" CFStringRef kSCPropNetIPv4DestAddresses;
+public extern "C" CFStringRef? kSCPropNetIPv4DestAddresses;
 
-public extern "C" CFStringRef kSCPropNetIPv4BroadcastAddresses;
+public extern "C" CFStringRef? kSCPropNetIPv4BroadcastAddresses;
 
-public extern "C" CFStringRef kSCValNetIPv4ConfigMethodAutomatic;
+public extern "C" CFStringRef? kSCValNetIPv4ConfigMethodAutomatic;
 
-public extern "C" CFStringRef kSCValNetIPv4ConfigMethodBOOTP;
+public extern "C" CFStringRef? kSCValNetIPv4ConfigMethodBOOTP;
 
-public extern "C" CFStringRef kSCValNetIPv4ConfigMethodDHCP;
+public extern "C" CFStringRef? kSCValNetIPv4ConfigMethodDHCP;
 
-public extern "C" CFStringRef kSCValNetIPv4ConfigMethodINFORM;
+public extern "C" CFStringRef? kSCValNetIPv4ConfigMethodINFORM;
 
-public extern "C" CFStringRef kSCValNetIPv4ConfigMethodLinkLocal;
+public extern "C" CFStringRef? kSCValNetIPv4ConfigMethodLinkLocal;
 
-public extern "C" CFStringRef kSCValNetIPv4ConfigMethodManual;
+public extern "C" CFStringRef? kSCValNetIPv4ConfigMethodManual;
 
-public extern "C" CFStringRef kSCValNetIPv4ConfigMethodPPP;
+public extern "C" CFStringRef? kSCValNetIPv4ConfigMethodPPP;
 
-public extern "C" CFStringRef kSCPropNetIPv6Addresses;
+public extern "C" CFStringRef? kSCPropNetIPv6Addresses;
 
-public extern "C" CFStringRef kSCPropNetIPv6ConfigMethod;
+public extern "C" CFStringRef? kSCPropNetIPv6ConfigMethod;
 
-public extern "C" CFStringRef kSCPropNetIPv6DestAddresses;
+public extern "C" CFStringRef? kSCPropNetIPv6DestAddresses;
 
-public extern "C" CFStringRef kSCPropNetIPv6Flags;
+public extern "C" CFStringRef? kSCPropNetIPv6Flags;
 
-public extern "C" CFStringRef kSCPropNetIPv6PrefixLength;
+public extern "C" CFStringRef? kSCPropNetIPv6PrefixLength;
 
-public extern "C" CFStringRef kSCPropNetIPv6Router;
+public extern "C" CFStringRef? kSCPropNetIPv6Router;
 
-public extern "C" CFStringRef kSCValNetIPv6ConfigMethodAutomatic;
+public extern "C" CFStringRef? kSCValNetIPv6ConfigMethodAutomatic;
 
-public extern "C" CFStringRef kSCValNetIPv6ConfigMethodLinkLocal;
+public extern "C" CFStringRef? kSCValNetIPv6ConfigMethodLinkLocal;
 
-public extern "C" CFStringRef kSCValNetIPv6ConfigMethodManual;
+public extern "C" CFStringRef? kSCValNetIPv6ConfigMethodManual;
 
-public extern "C" CFStringRef kSCValNetIPv6ConfigMethodRouterAdvertisement;
+public extern "C" CFStringRef? kSCValNetIPv6ConfigMethodRouterAdvertisement;
 
-public extern "C" CFStringRef kSCValNetIPv6ConfigMethod6to4;
+public extern "C" CFStringRef? kSCValNetIPv6ConfigMethod6to4;
 
-public extern "C" CFStringRef kSCPropNet6to4Relay;
+public extern "C" CFStringRef? kSCPropNet6to4Relay;
 
-public extern "C" CFStringRef kSCPropNetLinkActive;
+public extern "C" CFStringRef? kSCPropNetLinkActive;
 
-public extern "C" CFStringRef kSCPropNetLinkDetaching;
+public extern "C" CFStringRef? kSCPropNetLinkDetaching;
 
-public extern "C" CFStringRef kSCPropNetModemAccessPointName;
+public extern "C" CFStringRef? kSCPropNetModemAccessPointName;
 
-public extern "C" CFStringRef kSCPropNetModemConnectionPersonality;
+public extern "C" CFStringRef? kSCPropNetModemConnectionPersonality;
 
-public extern "C" CFStringRef kSCPropNetModemConnectionScript;
+public extern "C" CFStringRef? kSCPropNetModemConnectionScript;
 
-public extern "C" CFStringRef kSCPropNetModemConnectSpeed;
+public extern "C" CFStringRef? kSCPropNetModemConnectSpeed;
 
-public extern "C" CFStringRef kSCPropNetModemDataCompression;
+public extern "C" CFStringRef? kSCPropNetModemDataCompression;
 
-public extern "C" CFStringRef kSCPropNetModemDeviceContextID;
+public extern "C" CFStringRef? kSCPropNetModemDeviceContextID;
 
-public extern "C" CFStringRef kSCPropNetModemDeviceModel;
+public extern "C" CFStringRef? kSCPropNetModemDeviceModel;
 
-public extern "C" CFStringRef kSCPropNetModemDeviceVendor;
+public extern "C" CFStringRef? kSCPropNetModemDeviceVendor;
 
-public extern "C" CFStringRef kSCPropNetModemDialMode;
+public extern "C" CFStringRef? kSCPropNetModemDialMode;
 
-public extern "C" CFStringRef kSCPropNetModemErrorCorrection;
+public extern "C" CFStringRef? kSCPropNetModemErrorCorrection;
 
-public extern "C" CFStringRef kSCPropNetModemHoldCallWaitingAudibleAlert;
+public extern "C" CFStringRef? kSCPropNetModemHoldCallWaitingAudibleAlert;
 
-public extern "C" CFStringRef kSCPropNetModemHoldDisconnectOnAnswer;
+public extern "C" CFStringRef? kSCPropNetModemHoldDisconnectOnAnswer;
 
-public extern "C" CFStringRef kSCPropNetModemHoldEnabled;
+public extern "C" CFStringRef? kSCPropNetModemHoldEnabled;
 
-public extern "C" CFStringRef kSCPropNetModemHoldReminder;
+public extern "C" CFStringRef? kSCPropNetModemHoldReminder;
 
-public extern "C" CFStringRef kSCPropNetModemHoldReminderTime;
+public extern "C" CFStringRef? kSCPropNetModemHoldReminderTime;
 
-public extern "C" CFStringRef kSCPropNetModemNote;
+public extern "C" CFStringRef? kSCPropNetModemNote;
 
-public extern "C" CFStringRef kSCPropNetModemPulseDial;
+public extern "C" CFStringRef? kSCPropNetModemPulseDial;
 
-public extern "C" CFStringRef kSCPropNetModemSpeaker;
+public extern "C" CFStringRef? kSCPropNetModemSpeaker;
 
-public extern "C" CFStringRef kSCPropNetModemSpeed;
+public extern "C" CFStringRef? kSCPropNetModemSpeed;
 
-public extern "C" CFStringRef kSCValNetModemDialModeIgnoreDialTone;
+public extern "C" CFStringRef? kSCValNetModemDialModeIgnoreDialTone;
 
-public extern "C" CFStringRef kSCValNetModemDialModeManual;
+public extern "C" CFStringRef? kSCValNetModemDialModeManual;
 
-public extern "C" CFStringRef kSCValNetModemDialModeWaitForDialTone;
+public extern "C" CFStringRef? kSCValNetModemDialModeWaitForDialTone;
 
-public extern "C" CFStringRef kSCPropNetPPPACSPEnabled;
+public extern "C" CFStringRef? kSCPropNetPPPACSPEnabled;
 
-public extern "C" CFStringRef kSCPropNetPPPConnectTime;
+public extern "C" CFStringRef? kSCPropNetPPPConnectTime;
 
-public extern "C" CFStringRef kSCPropNetPPPDeviceLastCause;
+public extern "C" CFStringRef? kSCPropNetPPPDeviceLastCause;
 
-public extern "C" CFStringRef kSCPropNetPPPDialOnDemand;
+public extern "C" CFStringRef? kSCPropNetPPPDialOnDemand;
 
-public extern "C" CFStringRef kSCPropNetPPPDisconnectOnFastUserSwitch;
+public extern "C" CFStringRef? kSCPropNetPPPDisconnectOnFastUserSwitch;
 
-public extern "C" CFStringRef kSCPropNetPPPDisconnectOnIdle;
+public extern "C" CFStringRef? kSCPropNetPPPDisconnectOnIdle;
 
-public extern "C" CFStringRef kSCPropNetPPPDisconnectOnIdleTimer;
+public extern "C" CFStringRef? kSCPropNetPPPDisconnectOnIdleTimer;
 
-public extern "C" CFStringRef kSCPropNetPPPDisconnectOnLogout;
+public extern "C" CFStringRef? kSCPropNetPPPDisconnectOnLogout;
 
-public extern "C" CFStringRef kSCPropNetPPPDisconnectOnSleep;
+public extern "C" CFStringRef? kSCPropNetPPPDisconnectOnSleep;
 
-public extern "C" CFStringRef kSCPropNetPPPDisconnectTime;
+public extern "C" CFStringRef? kSCPropNetPPPDisconnectTime;
 
-public extern "C" CFStringRef kSCPropNetPPPIdleReminder;
+public extern "C" CFStringRef? kSCPropNetPPPIdleReminder;
 
-public extern "C" CFStringRef kSCPropNetPPPIdleReminderTimer;
+public extern "C" CFStringRef? kSCPropNetPPPIdleReminderTimer;
 
-public extern "C" CFStringRef kSCPropNetPPPLastCause;
+public extern "C" CFStringRef? kSCPropNetPPPLastCause;
 
-public extern "C" CFStringRef kSCPropNetPPPLogfile;
+public extern "C" CFStringRef? kSCPropNetPPPLogfile;
 
 /// Deprecated in macOS 10.15.
-public extern "C" CFStringRef kSCPropNetPPPPlugins;
+public extern "C" CFStringRef? kSCPropNetPPPPlugins;
 
-public extern "C" CFStringRef kSCPropNetPPPRetryConnectTime;
+public extern "C" CFStringRef? kSCPropNetPPPRetryConnectTime;
 
-public extern "C" CFStringRef kSCPropNetPPPSessionTimer;
+public extern "C" CFStringRef? kSCPropNetPPPSessionTimer;
 
-public extern "C" CFStringRef kSCPropNetPPPStatus;
+public extern "C" CFStringRef? kSCPropNetPPPStatus;
 
-public extern "C" CFStringRef kSCPropNetPPPUseSessionTimer;
+public extern "C" CFStringRef? kSCPropNetPPPUseSessionTimer;
 
-public extern "C" CFStringRef kSCPropNetPPPVerboseLogging;
+public extern "C" CFStringRef? kSCPropNetPPPVerboseLogging;
 
 /// Deprecated in macOS 10.15.
-public extern "C" CFStringRef kSCPropNetPPPAuthEAPPlugins;
+public extern "C" CFStringRef? kSCPropNetPPPAuthEAPPlugins;
 
-public extern "C" CFStringRef kSCPropNetPPPAuthName;
+public extern "C" CFStringRef? kSCPropNetPPPAuthName;
 
-public extern "C" CFStringRef kSCPropNetPPPAuthPassword;
+public extern "C" CFStringRef? kSCPropNetPPPAuthPassword;
 
-public extern "C" CFStringRef kSCPropNetPPPAuthPasswordEncryption;
+public extern "C" CFStringRef? kSCPropNetPPPAuthPasswordEncryption;
 
-public extern "C" CFStringRef kSCPropNetPPPAuthPrompt;
+public extern "C" CFStringRef? kSCPropNetPPPAuthPrompt;
 
-public extern "C" CFStringRef kSCPropNetPPPAuthProtocol;
+public extern "C" CFStringRef? kSCPropNetPPPAuthProtocol;
 
-public extern "C" CFStringRef kSCValNetPPPAuthPasswordEncryptionKeychain;
+public extern "C" CFStringRef? kSCValNetPPPAuthPasswordEncryptionKeychain;
 
-public extern "C" CFStringRef kSCValNetPPPAuthPasswordEncryptionToken;
+public extern "C" CFStringRef? kSCValNetPPPAuthPasswordEncryptionToken;
 
-public extern "C" CFStringRef kSCValNetPPPAuthPromptBefore;
+public extern "C" CFStringRef? kSCValNetPPPAuthPromptBefore;
 
-public extern "C" CFStringRef kSCValNetPPPAuthPromptAfter;
+public extern "C" CFStringRef? kSCValNetPPPAuthPromptAfter;
 
-public extern "C" CFStringRef kSCValNetPPPAuthProtocolCHAP;
+public extern "C" CFStringRef? kSCValNetPPPAuthProtocolCHAP;
 
-public extern "C" CFStringRef kSCValNetPPPAuthProtocolEAP;
+public extern "C" CFStringRef? kSCValNetPPPAuthProtocolEAP;
 
-public extern "C" CFStringRef kSCValNetPPPAuthProtocolMSCHAP1;
+public extern "C" CFStringRef? kSCValNetPPPAuthProtocolMSCHAP1;
 
-public extern "C" CFStringRef kSCValNetPPPAuthProtocolMSCHAP2;
+public extern "C" CFStringRef? kSCValNetPPPAuthProtocolMSCHAP2;
 
-public extern "C" CFStringRef kSCValNetPPPAuthProtocolPAP;
+public extern "C" CFStringRef? kSCValNetPPPAuthProtocolPAP;
 
-public extern "C" CFStringRef kSCPropNetPPPCommAlternateRemoteAddress;
+public extern "C" CFStringRef? kSCPropNetPPPCommAlternateRemoteAddress;
 
-public extern "C" CFStringRef kSCPropNetPPPCommConnectDelay;
+public extern "C" CFStringRef? kSCPropNetPPPCommConnectDelay;
 
-public extern "C" CFStringRef kSCPropNetPPPCommDisplayTerminalWindow;
+public extern "C" CFStringRef? kSCPropNetPPPCommDisplayTerminalWindow;
 
-public extern "C" CFStringRef kSCPropNetPPPCommRedialCount;
+public extern "C" CFStringRef? kSCPropNetPPPCommRedialCount;
 
-public extern "C" CFStringRef kSCPropNetPPPCommRedialEnabled;
+public extern "C" CFStringRef? kSCPropNetPPPCommRedialEnabled;
 
-public extern "C" CFStringRef kSCPropNetPPPCommRedialInterval;
+public extern "C" CFStringRef? kSCPropNetPPPCommRedialInterval;
 
-public extern "C" CFStringRef kSCPropNetPPPCommRemoteAddress;
+public extern "C" CFStringRef? kSCPropNetPPPCommRemoteAddress;
 
-public extern "C" CFStringRef kSCPropNetPPPCommTerminalScript;
+public extern "C" CFStringRef? kSCPropNetPPPCommTerminalScript;
 
-public extern "C" CFStringRef kSCPropNetPPPCommUseTerminalScript;
+public extern "C" CFStringRef? kSCPropNetPPPCommUseTerminalScript;
 
-public extern "C" CFStringRef kSCPropNetPPPCCPEnabled;
+public extern "C" CFStringRef? kSCPropNetPPPCCPEnabled;
 
-public extern "C" CFStringRef kSCPropNetPPPCCPMPPE40Enabled;
+public extern "C" CFStringRef? kSCPropNetPPPCCPMPPE40Enabled;
 
-public extern "C" CFStringRef kSCPropNetPPPCCPMPPE128Enabled;
+public extern "C" CFStringRef? kSCPropNetPPPCCPMPPE128Enabled;
 
-public extern "C" CFStringRef kSCPropNetPPPIPCPCompressionVJ;
+public extern "C" CFStringRef? kSCPropNetPPPIPCPCompressionVJ;
 
-public extern "C" CFStringRef kSCPropNetPPPIPCPUsePeerDNS;
+public extern "C" CFStringRef? kSCPropNetPPPIPCPUsePeerDNS;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPEchoEnabled;
+public extern "C" CFStringRef? kSCPropNetPPPLCPEchoEnabled;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPEchoFailure;
+public extern "C" CFStringRef? kSCPropNetPPPLCPEchoFailure;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPEchoInterval;
+public extern "C" CFStringRef? kSCPropNetPPPLCPEchoInterval;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPCompressionACField;
+public extern "C" CFStringRef? kSCPropNetPPPLCPCompressionACField;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPCompressionPField;
+public extern "C" CFStringRef? kSCPropNetPPPLCPCompressionPField;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPMRU;
+public extern "C" CFStringRef? kSCPropNetPPPLCPMRU;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPMTU;
+public extern "C" CFStringRef? kSCPropNetPPPLCPMTU;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPReceiveACCM;
+public extern "C" CFStringRef? kSCPropNetPPPLCPReceiveACCM;
 
-public extern "C" CFStringRef kSCPropNetPPPLCPTransmitACCM;
+public extern "C" CFStringRef? kSCPropNetPPPLCPTransmitACCM;
 
-public extern "C" CFStringRef kSCPropNetL2TPIPSecSharedSecret;
+public extern "C" CFStringRef? kSCPropNetL2TPIPSecSharedSecret;
 
-public extern "C" CFStringRef kSCPropNetL2TPIPSecSharedSecretEncryption;
+public extern "C" CFStringRef? kSCPropNetL2TPIPSecSharedSecretEncryption;
 
-public extern "C" CFStringRef kSCPropNetL2TPTransport;
+public extern "C" CFStringRef? kSCPropNetL2TPTransport;
 
-public extern "C" CFStringRef kSCValNetL2TPIPSecSharedSecretEncryptionKeychain;
+public extern "C" CFStringRef? kSCValNetL2TPIPSecSharedSecretEncryptionKeychain;
 
-public extern "C" CFStringRef kSCValNetL2TPTransportIP;
+public extern "C" CFStringRef? kSCValNetL2TPTransportIP;
 
-public extern "C" CFStringRef kSCValNetL2TPTransportIPSec;
+public extern "C" CFStringRef? kSCValNetL2TPTransportIPSec;
 
-public extern "C" CFStringRef kSCPropNetProxiesExceptionsList;
+public extern "C" CFStringRef? kSCPropNetProxiesExceptionsList;
 
-public extern "C" CFStringRef kSCPropNetProxiesExcludeSimpleHostnames;
+public extern "C" CFStringRef? kSCPropNetProxiesExcludeSimpleHostnames;
 
-public extern "C" CFStringRef kSCPropNetProxiesFTPEnable;
+public extern "C" CFStringRef? kSCPropNetProxiesFTPEnable;
 
-public extern "C" CFStringRef kSCPropNetProxiesFTPPassive;
+public extern "C" CFStringRef? kSCPropNetProxiesFTPPassive;
 
-public extern "C" CFStringRef kSCPropNetProxiesFTPPort;
+public extern "C" CFStringRef? kSCPropNetProxiesFTPPort;
 
-public extern "C" CFStringRef kSCPropNetProxiesFTPProxy;
-
-/// macOS 15.0 and later.
-public extern "C" CFStringRef kSCPropNetProxiesFTPUser;
-
-public extern "C" CFStringRef kSCPropNetProxiesGopherEnable;
-
-public extern "C" CFStringRef kSCPropNetProxiesGopherPort;
-
-public extern "C" CFStringRef kSCPropNetProxiesGopherProxy;
+public extern "C" CFStringRef? kSCPropNetProxiesFTPProxy;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kSCPropNetProxiesGopherUser;
+public extern "C" CFStringRef? kSCPropNetProxiesFTPUser;
 
-public extern "C" CFStringRef kSCPropNetProxiesHTTPEnable;
+public extern "C" CFStringRef? kSCPropNetProxiesGopherEnable;
 
-public extern "C" CFStringRef kSCPropNetProxiesHTTPPort;
+public extern "C" CFStringRef? kSCPropNetProxiesGopherPort;
 
-public extern "C" CFStringRef kSCPropNetProxiesHTTPProxy;
-
-/// macOS 15.0 and later.
-public extern "C" CFStringRef kSCPropNetProxiesHTTPUser;
-
-public extern "C" CFStringRef kSCPropNetProxiesHTTPSEnable;
-
-public extern "C" CFStringRef kSCPropNetProxiesHTTPSPort;
-
-public extern "C" CFStringRef kSCPropNetProxiesHTTPSProxy;
+public extern "C" CFStringRef? kSCPropNetProxiesGopherProxy;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kSCPropNetProxiesHTTPSUser;
+public extern "C" CFStringRef? kSCPropNetProxiesGopherUser;
 
-public extern "C" CFStringRef kSCPropNetProxiesRTSPEnable;
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPEnable;
 
-public extern "C" CFStringRef kSCPropNetProxiesRTSPPort;
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPPort;
 
-public extern "C" CFStringRef kSCPropNetProxiesRTSPProxy;
-
-/// macOS 15.0 and later.
-public extern "C" CFStringRef kSCPropNetProxiesRTSPUser;
-
-public extern "C" CFStringRef kSCPropNetProxiesSOCKSEnable;
-
-public extern "C" CFStringRef kSCPropNetProxiesSOCKSPort;
-
-public extern "C" CFStringRef kSCPropNetProxiesSOCKSProxy;
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPProxy;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kSCPropNetProxiesSOCKSUser;
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPUser;
 
-public extern "C" CFStringRef kSCPropNetProxiesProxyAutoConfigEnable;
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPSEnable;
 
-public extern "C" CFStringRef kSCPropNetProxiesProxyAutoConfigJavaScript;
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPSPort;
 
-public extern "C" CFStringRef kSCPropNetProxiesProxyAutoConfigURLString;
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPSProxy;
 
-public extern "C" CFStringRef kSCPropNetProxiesProxyAutoDiscoveryEnable;
+/// macOS 15.0 and later.
+public extern "C" CFStringRef? kSCPropNetProxiesHTTPSUser;
 
-public extern "C" CFStringRef kSCPropNetSMBNetBIOSName;
+public extern "C" CFStringRef? kSCPropNetProxiesRTSPEnable;
 
-public extern "C" CFStringRef kSCPropNetSMBNetBIOSNodeType;
+public extern "C" CFStringRef? kSCPropNetProxiesRTSPPort;
+
+public extern "C" CFStringRef? kSCPropNetProxiesRTSPProxy;
+
+/// macOS 15.0 and later.
+public extern "C" CFStringRef? kSCPropNetProxiesRTSPUser;
+
+public extern "C" CFStringRef? kSCPropNetProxiesSOCKSEnable;
+
+public extern "C" CFStringRef? kSCPropNetProxiesSOCKSPort;
+
+public extern "C" CFStringRef? kSCPropNetProxiesSOCKSProxy;
+
+/// macOS 15.0 and later.
+public extern "C" CFStringRef? kSCPropNetProxiesSOCKSUser;
+
+public extern "C" CFStringRef? kSCPropNetProxiesProxyAutoConfigEnable;
+
+public extern "C" CFStringRef? kSCPropNetProxiesProxyAutoConfigJavaScript;
+
+public extern "C" CFStringRef? kSCPropNetProxiesProxyAutoConfigURLString;
+
+public extern "C" CFStringRef? kSCPropNetProxiesProxyAutoDiscoveryEnable;
+
+public extern "C" CFStringRef? kSCPropNetSMBNetBIOSName;
+
+public extern "C" CFStringRef? kSCPropNetSMBNetBIOSNodeType;
 
 /// Deprecated in macOS 10.7.
-public extern "C" CFStringRef kSCPropNetSMBNetBIOSScope;
+public extern "C" CFStringRef? kSCPropNetSMBNetBIOSScope;
 
-public extern "C" CFStringRef kSCPropNetSMBWINSAddresses;
+public extern "C" CFStringRef? kSCPropNetSMBWINSAddresses;
 
-public extern "C" CFStringRef kSCPropNetSMBWorkgroup;
+public extern "C" CFStringRef? kSCPropNetSMBWorkgroup;
 
-public extern "C" CFStringRef kSCValNetSMBNetBIOSNodeTypeBroadcast;
+public extern "C" CFStringRef? kSCValNetSMBNetBIOSNodeTypeBroadcast;
 
-public extern "C" CFStringRef kSCValNetSMBNetBIOSNodeTypePeer;
+public extern "C" CFStringRef? kSCValNetSMBNetBIOSNodeTypePeer;
 
-public extern "C" CFStringRef kSCValNetSMBNetBIOSNodeTypeMixed;
+public extern "C" CFStringRef? kSCValNetSMBNetBIOSNodeTypeMixed;
 
-public extern "C" CFStringRef kSCValNetSMBNetBIOSNodeTypeHybrid;
+public extern "C" CFStringRef? kSCValNetSMBNetBIOSNodeTypeHybrid;
 
-public extern "C" CFStringRef kSCEntUsersConsoleUser;
+public extern "C" CFStringRef? kSCEntUsersConsoleUser;
 
-public extern "C" CFStringRef kSCPropSystemComputerName;
+public extern "C" CFStringRef? kSCPropSystemComputerName;
 
-public extern "C" CFStringRef kSCPropSystemComputerNameEncoding;
+public extern "C" CFStringRef? kSCPropSystemComputerNameEncoding;
 
-public extern "C" CFStringRef kSCDynamicStoreDomainFile;
+public extern "C" CFStringRef? kSCDynamicStoreDomainFile;
 
-public extern "C" CFStringRef kSCDynamicStoreDomainPlugin;
+public extern "C" CFStringRef? kSCDynamicStoreDomainPlugin;
 
-public extern "C" CFStringRef kSCDynamicStoreDomainSetup;
+public extern "C" CFStringRef? kSCDynamicStoreDomainSetup;
 
-public extern "C" CFStringRef kSCDynamicStoreDomainState;
+public extern "C" CFStringRef? kSCDynamicStoreDomainState;
 
-public extern "C" CFStringRef kSCDynamicStoreDomainPrefs;
+public extern "C" CFStringRef? kSCDynamicStoreDomainPrefs;
 
-public extern "C" CFStringRef kSCDynamicStorePropSetupCurrentSet;
+public extern "C" CFStringRef? kSCDynamicStorePropSetupCurrentSet;
 
-public extern "C" CFStringRef kSCDynamicStorePropSetupLastUpdated;
+public extern "C" CFStringRef? kSCDynamicStorePropSetupLastUpdated;
 
-public extern "C" CFStringRef kSCDynamicStorePropNetInterfaces;
+public extern "C" CFStringRef? kSCDynamicStorePropNetInterfaces;
 
-public extern "C" CFStringRef kSCDynamicStorePropNetPrimaryInterface;
+public extern "C" CFStringRef? kSCDynamicStorePropNetPrimaryInterface;
 
-public extern "C" CFStringRef kSCDynamicStorePropNetPrimaryService;
+public extern "C" CFStringRef? kSCDynamicStorePropNetPrimaryService;
 
-public extern "C" CFStringRef kSCDynamicStorePropNetServiceIDs;
-
-/// Deprecated in macOS 10.4.
-public extern "C" CFStringRef kSCPropUsersConsoleUserName;
+public extern "C" CFStringRef? kSCDynamicStorePropNetServiceIDs;
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFStringRef kSCPropUsersConsoleUserUID;
+public extern "C" CFStringRef? kSCPropUsersConsoleUserName;
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFStringRef kSCPropUsersConsoleUserGID;
+public extern "C" CFStringRef? kSCPropUsersConsoleUserUID;
+
+/// Deprecated in macOS 10.4.
+public extern "C" CFStringRef? kSCPropUsersConsoleUserGID;
 
 #endif

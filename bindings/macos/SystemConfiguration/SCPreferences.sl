@@ -26,6 +26,7 @@ module MacOS.SystemConfiguration;
 import MacOS.CoreFoundation;
 import MacOS.Security;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,7 +34,8 @@ import MacOS.System;
 
 public struct __SCPreferences;
 
-public using SCPreferencesRef = __SCPreferences*;
+[CFType("SCPreferencesGetTypeID")]
+public extern objc class SCPreferencesRef : CFTypeRef { }
 
 [Flags]
 public enum SCPreferencesNotification : uint
@@ -46,7 +48,7 @@ public delegate void* SCPreferencesContextRetainFunction(void* arg0);
 
 public delegate void SCPreferencesContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef SCPreferencesContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* SCPreferencesContextCopyDescriptionFunction(void* arg0);
 
 public struct SCPreferencesContext
 {
@@ -57,13 +59,13 @@ public struct SCPreferencesContext
     public SCPreferencesContextCopyDescriptionFunction copyDescription;
 }
 
-public delegate void SCPreferencesCallBack(SCPreferencesRef arg0, SCPreferencesNotification arg1, void* arg2);
+public delegate void SCPreferencesCallBack(__SCPreferences* arg0, SCPreferencesNotification arg1, void* arg2);
 
 public extern "C" CFTypeID SCPreferencesGetTypeID();
 
-public extern "C" SCPreferencesRef SCPreferencesCreate(CFAllocatorRef allocator, CFStringRef name, CFStringRef prefsID);
+[ReturnsRetained] public extern "C" SCPreferencesRef? SCPreferencesCreate(CFAllocatorRef? allocator, CFStringRef name, CFStringRef? prefsID);
 
-public extern "C" SCPreferencesRef SCPreferencesCreateWithAuthorization(CFAllocatorRef allocator, CFStringRef name, CFStringRef prefsID, AuthorizationRef authorization);
+[ReturnsRetained] public extern "C" SCPreferencesRef? SCPreferencesCreateWithAuthorization(CFAllocatorRef? allocator, CFStringRef name, CFStringRef? prefsID, AuthorizationRef authorization);
 
 public extern "C" Boolean SCPreferencesLock(SCPreferencesRef prefs, Boolean wait);
 
@@ -73,11 +75,11 @@ public extern "C" Boolean SCPreferencesApplyChanges(SCPreferencesRef prefs);
 
 public extern "C" Boolean SCPreferencesUnlock(SCPreferencesRef prefs);
 
-public extern "C" CFDataRef SCPreferencesGetSignature(SCPreferencesRef prefs);
+public extern "C" CFDataRef? SCPreferencesGetSignature(SCPreferencesRef prefs);
 
-public extern "C" CFArrayRef SCPreferencesCopyKeyList(SCPreferencesRef prefs);
+[ReturnsRetained] public extern "C" CFArrayRef? SCPreferencesCopyKeyList(SCPreferencesRef prefs);
 
-public extern "C" CFPropertyListRef SCPreferencesGetValue(SCPreferencesRef prefs, CFStringRef key);
+public extern "C" CFPropertyListRef? SCPreferencesGetValue(SCPreferencesRef prefs, CFStringRef key);
 
 public extern "C" Boolean SCPreferencesAddValue(SCPreferencesRef prefs, CFStringRef key, CFPropertyListRef value);
 
@@ -90,6 +92,8 @@ public extern "C" Boolean SCPreferencesSetCallback(SCPreferencesRef prefs, SCPre
 public extern "C" Boolean SCPreferencesScheduleWithRunLoop(SCPreferencesRef prefs, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
 public extern "C" Boolean SCPreferencesUnscheduleFromRunLoop(SCPreferencesRef prefs, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+
+public extern "C" Boolean SCPreferencesSetDispatchQueue(SCPreferencesRef prefs, dispatch_queue_t? queue);
 
 public extern "C" void SCPreferencesSynchronize(SCPreferencesRef prefs);
 

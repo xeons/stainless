@@ -25,65 +25,66 @@ module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreVideo")
 
-public extern "C" CFStringRef kCVPixelFormatName;
+public extern "C" CFStringRef? kCVPixelFormatName;
 
-public extern "C" CFStringRef kCVPixelFormatConstant;
+public extern "C" CFStringRef? kCVPixelFormatConstant;
 
-public extern "C" CFStringRef kCVPixelFormatCodecType;
+public extern "C" CFStringRef? kCVPixelFormatCodecType;
 
-public extern "C" CFStringRef kCVPixelFormatFourCC;
+public extern "C" CFStringRef? kCVPixelFormatFourCC;
 
-public extern "C" CFStringRef kCVPixelFormatContainsAlpha;
+public extern "C" CFStringRef? kCVPixelFormatContainsAlpha;
 
-public extern "C" CFStringRef kCVPixelFormatContainsYCbCr;
+public extern "C" CFStringRef? kCVPixelFormatContainsYCbCr;
 
-public extern "C" CFStringRef kCVPixelFormatContainsRGB;
+public extern "C" CFStringRef? kCVPixelFormatContainsRGB;
 
-public extern "C" CFStringRef kCVPixelFormatContainsGrayscale;
+public extern "C" CFStringRef? kCVPixelFormatContainsGrayscale;
 
 public extern "C" CFStringRef kCVPixelFormatContainsSenselArray;
 
-public extern "C" CFStringRef kCVPixelFormatComponentRange;
+public extern "C" CFStringRef? kCVPixelFormatComponentRange;
 
-public extern "C" CFStringRef kCVPixelFormatComponentRange_VideoRange;
+public extern "C" CFStringRef? kCVPixelFormatComponentRange_VideoRange;
 
-public extern "C" CFStringRef kCVPixelFormatComponentRange_FullRange;
+public extern "C" CFStringRef? kCVPixelFormatComponentRange_FullRange;
 
-public extern "C" CFStringRef kCVPixelFormatComponentRange_WideRange;
+public extern "C" CFStringRef? kCVPixelFormatComponentRange_WideRange;
 
-public extern "C" CFStringRef kCVPixelFormatPlanes;
+public extern "C" CFStringRef? kCVPixelFormatPlanes;
 
-public extern "C" CFStringRef kCVPixelFormatBlockWidth;
+public extern "C" CFStringRef? kCVPixelFormatBlockWidth;
 
-public extern "C" CFStringRef kCVPixelFormatBlockHeight;
+public extern "C" CFStringRef? kCVPixelFormatBlockHeight;
 
-public extern "C" CFStringRef kCVPixelFormatBitsPerBlock;
+public extern "C" CFStringRef? kCVPixelFormatBitsPerBlock;
 
 /// macOS 15.0 and later.
 public extern "C" CFStringRef kCVPixelFormatBitsPerComponent;
 
-public extern "C" CFStringRef kCVPixelFormatBlockHorizontalAlignment;
+public extern "C" CFStringRef? kCVPixelFormatBlockHorizontalAlignment;
 
-public extern "C" CFStringRef kCVPixelFormatBlockVerticalAlignment;
+public extern "C" CFStringRef? kCVPixelFormatBlockVerticalAlignment;
 
-public extern "C" CFStringRef kCVPixelFormatBlackBlock;
+public extern "C" CFStringRef? kCVPixelFormatBlackBlock;
 
-public extern "C" CFStringRef kCVPixelFormatHorizontalSubsampling;
+public extern "C" CFStringRef? kCVPixelFormatHorizontalSubsampling;
 
-public extern "C" CFStringRef kCVPixelFormatVerticalSubsampling;
+public extern "C" CFStringRef? kCVPixelFormatVerticalSubsampling;
 
-public extern "C" CFStringRef kCVPixelFormatOpenGLFormat;
+public extern "C" CFStringRef? kCVPixelFormatOpenGLFormat;
 
-public extern "C" CFStringRef kCVPixelFormatOpenGLType;
+public extern "C" CFStringRef? kCVPixelFormatOpenGLType;
 
-public extern "C" CFStringRef kCVPixelFormatOpenGLInternalFormat;
+public extern "C" CFStringRef? kCVPixelFormatOpenGLInternalFormat;
 
-public extern "C" CFStringRef kCVPixelFormatCGBitmapInfo;
+public extern "C" CFStringRef? kCVPixelFormatCGBitmapInfo;
 
 public extern "C" CFStringRef kCVPixelFormatQDCompatibility;
 
@@ -93,7 +94,7 @@ public extern "C" CFStringRef kCVPixelFormatCGImageCompatibility;
 
 public extern "C" CFStringRef kCVPixelFormatOpenGLCompatibility;
 
-public delegate Boolean CVFillExtendedPixelsCallBack(CVPixelBufferRef arg0, void* arg1);
+public delegate Boolean CVFillExtendedPixelsCallBack(void* arg0, void* arg1);
 
 public struct CVFillExtendedPixelsCallBackData
 {
@@ -102,16 +103,16 @@ public struct CVFillExtendedPixelsCallBackData
     public void* refCon;
 }
 
-public extern "C" CFStringRef kCVPixelFormatFillExtendedPixelsCallback;
+public extern "C" CFStringRef? kCVPixelFormatFillExtendedPixelsCallback;
 
-public extern "C" CFDictionaryRef CVPixelFormatDescriptionCreateWithPixelFormatType(CFAllocatorRef allocator, OSType pixelFormat);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CVPixelFormatDescriptionCreateWithPixelFormatType(CFAllocatorRef? allocator, OSType pixelFormat);
 
-public extern "C" CFArrayRef CVPixelFormatDescriptionArrayCreateWithAllPixelFormatTypes(CFAllocatorRef allocator);
+[ReturnsRetained] public extern "C" CFArrayRef? CVPixelFormatDescriptionArrayCreateWithAllPixelFormatTypes(CFAllocatorRef? allocator);
 
 public extern "C" void CVPixelFormatDescriptionRegisterDescriptionWithPixelFormatType(CFDictionaryRef description, OSType pixelFormat);
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef CVPixelFormatTypeCopyFourCharCodeString(OSType pixelFormat);
+[ReturnsRetained] public extern "C" CFStringRef CVPixelFormatTypeCopyFourCharCodeString(OSType pixelFormat);
 
 public extern "C" Boolean CVIsCompressedPixelFormatAvailable(OSType pixelFormatType);
 

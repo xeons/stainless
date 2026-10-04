@@ -25,6 +25,7 @@ module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.CoreGraphics;
 
 public struct __CTGlyphInfo;
 
-public using CTGlyphInfoRef = __CTGlyphInfo*;
+[CFType("CTGlyphInfoGetTypeID")]
+public extern objc class CTGlyphInfoRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTGlyphInfoGetTypeID();
 
@@ -52,13 +54,13 @@ public enum CTCharacterCollection : ushort
     AdobeKorea1CharacterCollection = 5,
 }
 
-public extern "C" CTGlyphInfoRef CTGlyphInfoCreateWithGlyphName(CFStringRef glyphName, CTFontRef font, CFStringRef baseString);
+[ReturnsRetained] public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithGlyphName(CFStringRef glyphName, CTFontRef font, CFStringRef baseString);
 
-public extern "C" CTGlyphInfoRef CTGlyphInfoCreateWithGlyph(CGGlyph glyph, CTFontRef font, CFStringRef baseString);
+[ReturnsRetained] public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithGlyph(CGGlyph glyph, CTFontRef font, CFStringRef baseString);
 
-public extern "C" CTGlyphInfoRef CTGlyphInfoCreateWithCharacterIdentifier(CGFontIndex cid, CTCharacterCollection collection, CFStringRef baseString);
+[ReturnsRetained] public extern "C" CTGlyphInfoRef? CTGlyphInfoCreateWithCharacterIdentifier(CGFontIndex cid, CTCharacterCollection collection, CFStringRef baseString);
 
-public extern "C" CFStringRef CTGlyphInfoGetGlyphName(CTGlyphInfoRef glyphInfo);
+public extern "C" CFStringRef? CTGlyphInfoGetGlyphName(CTGlyphInfoRef glyphInfo);
 
 public extern "C" CGGlyph CTGlyphInfoGetGlyph(CTGlyphInfoRef glyphInfo);
 

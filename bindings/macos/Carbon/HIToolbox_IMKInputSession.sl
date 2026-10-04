@@ -23,7 +23,10 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Carbon;
 
+import MacOS.CoreGraphics;
+import MacOS.Foundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,5 +36,34 @@ public const int kIMKMouseTrackingMode = 1;
 public const int kIMKNearestBoundaryMode = 2;
 
 public using IMKLocationToOffsetMappingMode = NSInteger;
+
+public extern "C" NSString? IMKTextOrientationName;
+
+public objc interface IMKTextInput
+{
+    [Selector("insertText:replacementRange:")] void InsertTextReplacementRange(AnyObject? string, NSRange replacementRange);
+    [Selector("setMarkedText:selectionRange:replacementRange:")] void SetMarkedTextSelectionRangeReplacementRange(AnyObject? string, NSRange selectionRange, NSRange replacementRange);
+    [Selector("selectedRange")] NSRange SelectedRange();
+    [Selector("markedRange")] NSRange MarkedRange();
+    [Selector("attributedSubstringFromRange:")] NSAttributedString? AttributedSubstringFromRange(NSRange range);
+    [Selector("length")] NSInteger Length();
+    [Selector("characterIndexForPoint:tracking:inMarkedRange:")] NSInteger CharacterIndexForPointTrackingInMarkedRange(NSPoint point, IMKLocationToOffsetMappingMode mappingMode, bool* inMarkedRange);
+    [Selector("attributesForCharacterIndex:lineHeightRectangle:")] NSDictionary? AttributesForCharacterIndexLineHeightRectangle(NSUInteger index, NSRect* lineRect);
+    [Selector("validAttributesForMarkedText")] NSArray? ValidAttributesForMarkedText();
+    [Selector("overrideKeyboardWithKeyboardNamed:")] void OverrideKeyboardWithKeyboardNamed(NSString? keyboardUniqueName);
+    [Selector("selectInputMode:")] void SelectInputMode(NSString? modeIdentifier);
+    [Selector("supportsUnicode")] bool SupportsUnicode();
+    [Selector("bundleIdentifier")] NSString? BundleIdentifier();
+    [Selector("windowLevel")] CGWindowLevel WindowLevel();
+    [Selector("supportsProperty:")] bool SupportsProperty(TSMDocumentPropertyTag property);
+    [Selector("uniqueClientIdentifierString")] NSString? UniqueClientIdentifierString();
+    [Selector("stringFromRange:actualRange:")] NSString? StringFromRangeActualRange(NSRange range, NSRangePointer actualRange);
+    [Selector("firstRectForCharacterRange:actualRange:")] NSRect FirstRectForCharacterRangeActualRange(NSRange aRange, NSRangePointer actualRange);
+}
+
+public objc interface IMKUnicodeTextInput
+{
+    [Selector("insertText:")] void InsertText(AnyObject? string);
+}
 
 #endif

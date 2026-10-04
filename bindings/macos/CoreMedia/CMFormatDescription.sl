@@ -27,6 +27,7 @@ import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -38,7 +39,8 @@ public const int kCMFormatDescriptionError_ValueNotAvailable = -12718;
 
 public struct opaqueCMFormatDescription;
 
-public using CMFormatDescriptionRef = opaqueCMFormatDescription*;
+[CFType("CMFormatDescriptionGetTypeID")]
+public extern objc class CMFormatDescriptionRef : CFTypeRef { }
 
 public using CMMediaType = FourCharCode;
 
@@ -54,19 +56,19 @@ public const uint kCMMediaType_TaggedBufferGroup = 1952606066;
 
 public const uint kCMMediaType_AuxiliaryPicture = 1635088502;
 
-public extern "C" OSStatus CMFormatDescriptionCreate(CFAllocatorRef allocator, CMMediaType mediaType, FourCharCode mediaSubType, CFDictionaryRef extensions, CMFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMFormatDescriptionCreate(CFAllocatorRef? allocator, CMMediaType mediaType, FourCharCode mediaSubType, CFDictionaryRef? extensions, opaqueCMFormatDescription** formatDescriptionOut);
 
 public extern "C" CFTypeID CMFormatDescriptionGetTypeID();
 
-public extern "C" Boolean CMFormatDescriptionEqual(CMFormatDescriptionRef formatDescription, CMFormatDescriptionRef otherFormatDescription);
+public extern "C" Boolean CMFormatDescriptionEqual(CMFormatDescriptionRef? formatDescription, CMFormatDescriptionRef? otherFormatDescription);
 
-public extern "C" Boolean CMFormatDescriptionEqualIgnoringExtensionKeys(CMFormatDescriptionRef formatDescription, CMFormatDescriptionRef otherFormatDescription, CFTypeRef formatDescriptionExtensionKeysToIgnore, CFTypeRef sampleDescriptionExtensionAtomKeysToIgnore);
+public extern "C" Boolean CMFormatDescriptionEqualIgnoringExtensionKeys(CMFormatDescriptionRef? formatDescription, CMFormatDescriptionRef? otherFormatDescription, CFTypeRef? formatDescriptionExtensionKeysToIgnore, CFTypeRef? sampleDescriptionExtensionAtomKeysToIgnore);
 
 public extern "C" CMMediaType CMFormatDescriptionGetMediaType(CMFormatDescriptionRef desc);
 
 public extern "C" FourCharCode CMFormatDescriptionGetMediaSubType(CMFormatDescriptionRef desc);
 
-public extern "C" CFDictionaryRef CMFormatDescriptionGetExtensions(CMFormatDescriptionRef desc);
+public extern "C" CFDictionaryRef? CMFormatDescriptionGetExtensions(CMFormatDescriptionRef desc);
 
 public extern "C" CFStringRef kCMFormatDescriptionExtension_OriginalCompressionSettings;
 
@@ -76,7 +78,7 @@ public extern "C" CFStringRef kCMFormatDescriptionExtension_VerbatimSampleDescri
 
 public extern "C" CFStringRef kCMFormatDescriptionExtension_VerbatimISOSampleEntry;
 
-public extern "C" CFPropertyListRef CMFormatDescriptionGetExtension(CMFormatDescriptionRef desc, CFStringRef extensionKey);
+public extern "C" CFPropertyListRef? CMFormatDescriptionGetExtension(CMFormatDescriptionRef desc, CFStringRef extensionKey);
 
 public using CMAudioCodecType = FourCharCode;
 
@@ -85,7 +87,7 @@ public const uint kCMAudioCodecType_AAC_AudibleProtected = 1633771875;
 
 public using CMAudioFormatDescriptionRef = CMFormatDescriptionRef;
 
-public extern "C" OSStatus CMAudioFormatDescriptionCreate(CFAllocatorRef allocator, AudioStreamBasicDescription* asbd, nuint layoutSize, AudioChannelLayout* layout, nuint magicCookieSize, void* magicCookie, CFDictionaryRef extensions, CMAudioFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMAudioFormatDescriptionCreate(CFAllocatorRef? allocator, AudioStreamBasicDescription* asbd, nuint layoutSize, AudioChannelLayout* layout, nuint magicCookieSize, void* magicCookie, CFDictionaryRef? extensions, void** formatDescriptionOut);
 
 public extern "C" AudioStreamBasicDescription* CMAudioFormatDescriptionGetStreamBasicDescription(CMAudioFormatDescriptionRef desc);
 
@@ -99,7 +101,7 @@ public extern "C" AudioFormatListItem* CMAudioFormatDescriptionGetRichestDecodab
 
 public extern "C" AudioFormatListItem* CMAudioFormatDescriptionGetMostCompatibleFormat(CMAudioFormatDescriptionRef desc);
 
-public extern "C" OSStatus CMAudioFormatDescriptionCreateSummary(CFAllocatorRef allocator, CFArrayRef formatDescriptionArray, uint flags, CMAudioFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMAudioFormatDescriptionCreateSummary(CFAllocatorRef? allocator, CFArrayRef formatDescriptionArray, uint flags, void** formatDescriptionOut);
 
 public using CMAudioFormatDescriptionMask = uint;
 
@@ -493,13 +495,13 @@ public extern "C" CFStringRef kCMFormatDescriptionCameraCalibration_ExtrinsicOri
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_ConvertedFromExternalSphericalTags;
 
-public extern "C" OSStatus CMVideoFormatDescriptionCreate(CFAllocatorRef allocator, CMVideoCodecType codecType, int width, int height, CFDictionaryRef extensions, CMVideoFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCreate(CFAllocatorRef? allocator, CMVideoCodecType codecType, int width, int height, CFDictionaryRef? extensions, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMVideoFormatDescriptionCreateForImageBuffer(CFAllocatorRef allocator, CVImageBufferRef imageBuffer, CMVideoFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCreateForImageBuffer(CFAllocatorRef? allocator, CVImageBufferRef imageBuffer, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMVideoFormatDescriptionCreateFromH264ParameterSets(CFAllocatorRef allocator, nuint parameterSetCount, byte** parameterSetPointers, nuint* parameterSetSizes, int NALUnitHeaderLength, CMFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCreateFromH264ParameterSets(CFAllocatorRef? allocator, nuint parameterSetCount, byte** parameterSetPointers, nuint* parameterSetSizes, int NALUnitHeaderLength, opaqueCMFormatDescription** formatDescriptionOut);
 
-public extern "C" OSStatus CMVideoFormatDescriptionCreateFromHEVCParameterSets(CFAllocatorRef allocator, nuint parameterSetCount, byte** parameterSetPointers, nuint* parameterSetSizes, int NALUnitHeaderLength, CFDictionaryRef extensions, CMFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCreateFromHEVCParameterSets(CFAllocatorRef? allocator, nuint parameterSetCount, byte** parameterSetPointers, nuint* parameterSetSizes, int NALUnitHeaderLength, CFDictionaryRef? extensions, opaqueCMFormatDescription** formatDescriptionOut);
 
 public extern "C" OSStatus CMVideoFormatDescriptionGetH264ParameterSetAtIndex(CMFormatDescriptionRef videoDesc, nuint parameterSetIndex, byte** parameterSetPointerOut, nuint* parameterSetSizeOut, nuint* parameterSetCountOut, int* NALUnitHeaderLengthOut);
 
@@ -516,7 +518,7 @@ public extern "C" CFArrayRef CMVideoFormatDescriptionGetExtensionKeysCommonWithI
 public extern "C" Boolean CMVideoFormatDescriptionMatchesImageBuffer(CMVideoFormatDescriptionRef desc, CVImageBufferRef imageBuffer);
 
 /// macOS 14.0 and later.
-public extern "C" OSStatus CMVideoFormatDescriptionCopyTagCollectionArray(CMVideoFormatDescriptionRef formatDescription, CFArrayRef* tagCollectionsOut);
+public extern "C" OSStatus CMVideoFormatDescriptionCopyTagCollectionArray(CMVideoFormatDescriptionRef formatDescription, __CFArray** tagCollectionsOut);
 
 public using CMTaggedBufferGroupFormatDescriptionRef = CMFormatDescriptionRef;
 
@@ -535,7 +537,7 @@ public const uint kCMMuxedStreamType_MPEG2Program = 1836069488;
 public const uint kCMMuxedStreamType_DV = 1685463072;
 public const uint kCMMuxedStreamType_EmbeddedDeviceScreenRecording = 1769173536;
 
-public extern "C" OSStatus CMMuxedFormatDescriptionCreate(CFAllocatorRef allocator, CMMuxedStreamType muxType, CFDictionaryRef extensions, CMMuxedFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMMuxedFormatDescriptionCreate(CFAllocatorRef? allocator, CMMuxedStreamType muxType, CFDictionaryRef? extensions, void** formatDescriptionOut);
 
 public using CMClosedCaptionFormatDescriptionRef = CMFormatDescriptionRef;
 
@@ -634,7 +636,7 @@ public extern "C" OSStatus CMTextFormatDescriptionGetDefaultTextBox(CMFormatDesc
 
 public extern "C" OSStatus CMTextFormatDescriptionGetDefaultStyle(CMFormatDescriptionRef desc, ushort* localFontIDOut, Boolean* boldOut, Boolean* italicOut, Boolean* underlineOut, CGFloat* fontSizeOut, CGFloat* colorComponentsOut);
 
-public extern "C" OSStatus CMTextFormatDescriptionGetFontName(CMFormatDescriptionRef desc, ushort localFontID, CFStringRef* fontNameOut);
+public extern "C" OSStatus CMTextFormatDescriptionGetFontName(CMFormatDescriptionRef desc, ushort localFontID, __CFString** fontNameOut);
 
 public using CMSubtitleFormatType = FourCharCode;
 
@@ -654,7 +656,7 @@ public const uint kCMTimeCodeFlag_DropFrame = 1;
 public const uint kCMTimeCodeFlag_24HourMax = 2;
 public const uint kCMTimeCodeFlag_NegTimesOK = 4;
 
-public extern "C" OSStatus CMTimeCodeFormatDescriptionCreate(CFAllocatorRef allocator, CMTimeCodeFormatType timeCodeFormatType, CMTime frameDuration, uint frameQuanta, uint flags, CFDictionaryRef extensions, CMTimeCodeFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMTimeCodeFormatDescriptionCreate(CFAllocatorRef? allocator, CMTimeCodeFormatType timeCodeFormatType, CMTime frameDuration, uint frameQuanta, uint flags, CFDictionaryRef? extensions, void** formatDescriptionOut);
 
 public extern "C" CMTime CMTimeCodeFormatDescriptionGetFrameDuration(CMTimeCodeFormatDescriptionRef timeCodeFormatDescription);
 
@@ -709,16 +711,16 @@ public extern "C" CFStringRef kCMMetadataFormatDescriptionMetadataSpecificationK
 
 public extern "C" CFStringRef kCMMetadataFormatDescriptionMetadataSpecificationKey_SetupData;
 
-public extern "C" OSStatus CMMetadataFormatDescriptionCreateWithKeys(CFAllocatorRef allocator, CMMetadataFormatType metadataType, CFArrayRef keys, CMMetadataFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMMetadataFormatDescriptionCreateWithKeys(CFAllocatorRef? allocator, CMMetadataFormatType metadataType, CFArrayRef? keys, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMMetadataFormatDescriptionCreateWithMetadataSpecifications(CFAllocatorRef allocator, CMMetadataFormatType metadataType, CFArrayRef metadataSpecifications, CMMetadataFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMMetadataFormatDescriptionCreateWithMetadataSpecifications(CFAllocatorRef? allocator, CMMetadataFormatType metadataType, CFArrayRef metadataSpecifications, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMMetadataFormatDescriptionCreateWithMetadataFormatDescriptionAndMetadataSpecifications(CFAllocatorRef allocator, CMMetadataFormatDescriptionRef sourceDescription, CFArrayRef metadataSpecifications, CMMetadataFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMMetadataFormatDescriptionCreateWithMetadataFormatDescriptionAndMetadataSpecifications(CFAllocatorRef? allocator, CMMetadataFormatDescriptionRef sourceDescription, CFArrayRef metadataSpecifications, void** formatDescriptionOut);
 
-public extern "C" OSStatus CMMetadataFormatDescriptionCreateByMergingMetadataFormatDescriptions(CFAllocatorRef allocator, CMMetadataFormatDescriptionRef sourceDescription, CMMetadataFormatDescriptionRef otherSourceDescription, CMMetadataFormatDescriptionRef* formatDescriptionOut);
+public extern "C" OSStatus CMMetadataFormatDescriptionCreateByMergingMetadataFormatDescriptions(CFAllocatorRef? allocator, CMMetadataFormatDescriptionRef sourceDescription, CMMetadataFormatDescriptionRef otherSourceDescription, void** formatDescriptionOut);
 
-public extern "C" CFDictionaryRef CMMetadataFormatDescriptionGetKeyWithLocalID(CMMetadataFormatDescriptionRef desc, OSType localKeyID);
+public extern "C" CFDictionaryRef? CMMetadataFormatDescriptionGetKeyWithLocalID(CMMetadataFormatDescriptionRef desc, OSType localKeyID);
 
-public extern "C" CFArrayRef CMMetadataFormatDescriptionGetIdentifiers(CMMetadataFormatDescriptionRef desc);
+public extern "C" CFArrayRef? CMMetadataFormatDescriptionGetIdentifiers(CMMetadataFormatDescriptionRef desc);
 
 #endif

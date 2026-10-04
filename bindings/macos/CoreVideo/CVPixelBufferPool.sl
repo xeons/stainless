@@ -24,6 +24,7 @@
 module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,31 +32,28 @@ import MacOS.CoreFoundation;
 
 public struct __CVPixelBufferPool;
 
-public using CVPixelBufferPoolRef = __CVPixelBufferPool*;
+[CFType("CVPixelBufferPoolGetTypeID")]
+public extern objc class CVPixelBufferPoolRef : CFTypeRef { }
 
-public extern "C" CFStringRef kCVPixelBufferPoolMinimumBufferCountKey;
+public extern "C" CFStringRef? kCVPixelBufferPoolMinimumBufferCountKey;
 
-public extern "C" CFStringRef kCVPixelBufferPoolMaximumBufferAgeKey;
+public extern "C" CFStringRef? kCVPixelBufferPoolMaximumBufferAgeKey;
 
 public extern "C" CFTypeID CVPixelBufferPoolGetTypeID();
 
-public extern "C" CVPixelBufferPoolRef CVPixelBufferPoolRetain(CVPixelBufferPoolRef pixelBufferPool);
+public extern "C" CVReturn CVPixelBufferPoolCreate(CFAllocatorRef? allocator, CFDictionaryRef? poolAttributes, CFDictionaryRef? pixelBufferAttributes, __CVPixelBufferPool** poolOut);
 
-public extern "C" void CVPixelBufferPoolRelease(CVPixelBufferPoolRef pixelBufferPool);
+public extern "C" CFDictionaryRef? CVPixelBufferPoolGetAttributes(CVPixelBufferPoolRef pool);
 
-public extern "C" CVReturn CVPixelBufferPoolCreate(CFAllocatorRef allocator, CFDictionaryRef poolAttributes, CFDictionaryRef pixelBufferAttributes, CVPixelBufferPoolRef* poolOut);
+public extern "C" CFDictionaryRef? CVPixelBufferPoolGetPixelBufferAttributes(CVPixelBufferPoolRef pool);
 
-public extern "C" CFDictionaryRef CVPixelBufferPoolGetAttributes(CVPixelBufferPoolRef pool);
+public extern "C" CVReturn CVPixelBufferPoolCreatePixelBuffer(CFAllocatorRef? allocator, CVPixelBufferPoolRef pixelBufferPool, void** pixelBufferOut);
 
-public extern "C" CFDictionaryRef CVPixelBufferPoolGetPixelBufferAttributes(CVPixelBufferPoolRef pool);
+public extern "C" CVReturn CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(CFAllocatorRef? allocator, CVPixelBufferPoolRef pixelBufferPool, CFDictionaryRef? auxAttributes, void** pixelBufferOut);
 
-public extern "C" CVReturn CVPixelBufferPoolCreatePixelBuffer(CFAllocatorRef allocator, CVPixelBufferPoolRef pixelBufferPool, CVPixelBufferRef* pixelBufferOut);
+public extern "C" CFStringRef? kCVPixelBufferPoolAllocationThresholdKey;
 
-public extern "C" CVReturn CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(CFAllocatorRef allocator, CVPixelBufferPoolRef pixelBufferPool, CFDictionaryRef auxAttributes, CVPixelBufferRef* pixelBufferOut);
-
-public extern "C" CFStringRef kCVPixelBufferPoolAllocationThresholdKey;
-
-public extern "C" CFStringRef kCVPixelBufferPoolFreeBufferNotification;
+public extern "C" CFStringRef? kCVPixelBufferPoolFreeBufferNotification;
 
 [Flags]
 public enum CVPixelBufferPoolFlushFlags : ulong

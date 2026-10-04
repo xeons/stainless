@@ -25,6 +25,7 @@ module MacOS.NetFS;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,15 +35,17 @@ public using netfsError = SInt32;
 
 public using AsyncRequestID = void*;
 
-public extern "C" int NetFSMountURLSync(CFURLRef url, CFURLRef mountpath, CFStringRef user, CFStringRef passwd, CFMutableDictionaryRef open_options, CFMutableDictionaryRef mount_options, CFArrayRef* mountpoints);
+public extern "C" int NetFSMountURLSync(CFURLRef? url, CFURLRef? mountpath, CFStringRef? user, CFStringRef? passwd, CFMutableDictionaryRef? open_options, CFMutableDictionaryRef? mount_options, __CFArray** mountpoints);
 
-public objc closure void NetFSMountURLBlock(int arg0, AsyncRequestID arg1, CFArrayRef arg2);
+public objc closure void NetFSMountURLBlock(int arg0, AsyncRequestID arg1, CFArrayRef? arg2);
+
+public extern "C" int NetFSMountURLAsync(CFURLRef? url, CFURLRef? mountpath, CFStringRef? user, CFStringRef? passwd, CFMutableDictionaryRef? open_options, CFMutableDictionaryRef? mount_options, AsyncRequestID* requestID, dispatch_queue_t? dispatchq, NetFSMountURLBlock? mount_report);
 
 public extern "C" int NetFSMountURLCancel(AsyncRequestID requestID);
 
-public extern "C" CFStringRef NetFSMountURLProbe(CFStringRef hostname);
+public extern "C" CFStringRef? NetFSMountURLProbe(CFStringRef? hostname);
 
-public extern "C" CFURLRef NetFSCopyURLForRemountingVolume(CFURLRef localPathURL);
+[ReturnsRetained] public extern "C" CFURLRef? NetFSCopyURLForRemountingVolume(CFURLRef? localPathURL);
 
 public const int ENETFSPWDNEEDSCHANGE = -5045;
 

@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,39 +32,41 @@ import MacOS.System;
 
 public struct __CFData;
 
-public using CFDataRef = __CFData*;
+[CFType("CFDataGetTypeID")]
+public extern objc class CFDataRef : CFTypeRef { }
 
-public using CFMutableDataRef = __CFData*;
+[CFType]
+public extern objc class CFMutableDataRef : CFDataRef { }
 
 public extern "C" CFTypeID CFDataGetTypeID();
 
-public extern "C" CFDataRef CFDataCreate(CFAllocatorRef allocator, UInt8* bytes, CFIndex length);
+[ReturnsRetained] public extern "C" CFDataRef? CFDataCreate(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length);
 
-public extern "C" CFDataRef CFDataCreateWithBytesNoCopy(CFAllocatorRef allocator, UInt8* bytes, CFIndex length, CFAllocatorRef bytesDeallocator);
+[ReturnsRetained] public extern "C" CFDataRef? CFDataCreateWithBytesNoCopy(CFAllocatorRef? allocator, UInt8* bytes, CFIndex length, CFAllocatorRef? bytesDeallocator);
 
-public extern "C" CFDataRef CFDataCreateCopy(CFAllocatorRef allocator, CFDataRef theData);
+[ReturnsRetained] public extern "C" CFDataRef? CFDataCreateCopy(CFAllocatorRef? allocator, CFDataRef? theData);
 
-public extern "C" CFMutableDataRef CFDataCreateMutable(CFAllocatorRef allocator, CFIndex capacity);
+[ReturnsRetained] public extern "C" CFMutableDataRef? CFDataCreateMutable(CFAllocatorRef? allocator, CFIndex capacity);
 
-public extern "C" CFMutableDataRef CFDataCreateMutableCopy(CFAllocatorRef allocator, CFIndex capacity, CFDataRef theData);
+[ReturnsRetained] public extern "C" CFMutableDataRef? CFDataCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFDataRef? theData);
 
-public extern "C" CFIndex CFDataGetLength(CFDataRef theData);
+public extern "C" CFIndex CFDataGetLength(CFDataRef? theData);
 
-public extern "C" UInt8* CFDataGetBytePtr(CFDataRef theData);
+public extern "C" UInt8* CFDataGetBytePtr(CFDataRef? theData);
 
-public extern "C" UInt8* CFDataGetMutableBytePtr(CFMutableDataRef theData);
+public extern "C" UInt8* CFDataGetMutableBytePtr(CFMutableDataRef? theData);
 
-public extern "C" void CFDataGetBytes(CFDataRef theData, CFRange range, UInt8* buffer);
+public extern "C" void CFDataGetBytes(CFDataRef? theData, CFRange range, UInt8* buffer);
 
-public extern "C" void CFDataSetLength(CFMutableDataRef theData, CFIndex length);
+public extern "C" void CFDataSetLength(CFMutableDataRef? theData, CFIndex length);
 
-public extern "C" void CFDataIncreaseLength(CFMutableDataRef theData, CFIndex extraLength);
+public extern "C" void CFDataIncreaseLength(CFMutableDataRef? theData, CFIndex extraLength);
 
-public extern "C" void CFDataAppendBytes(CFMutableDataRef theData, UInt8* bytes, CFIndex length);
+public extern "C" void CFDataAppendBytes(CFMutableDataRef? theData, UInt8* bytes, CFIndex length);
 
-public extern "C" void CFDataReplaceBytes(CFMutableDataRef theData, CFRange range, UInt8* newBytes, CFIndex newLength);
+public extern "C" void CFDataReplaceBytes(CFMutableDataRef? theData, CFRange range, UInt8* newBytes, CFIndex newLength);
 
-public extern "C" void CFDataDeleteBytes(CFMutableDataRef theData, CFRange range);
+public extern "C" void CFDataDeleteBytes(CFMutableDataRef? theData, CFRange range);
 
 [Flags]
 public enum CFDataSearchFlags : ulong
@@ -72,6 +75,6 @@ public enum CFDataSearchFlags : ulong
     Anchored = 2,
 }
 
-public extern "C" CFRange CFDataFind(CFDataRef theData, CFDataRef dataToFind, CFRange searchRange, CFDataSearchFlags compareOptions);
+public extern "C" CFRange CFDataFind(CFDataRef? theData, CFDataRef? dataToFind, CFRange searchRange, CFDataSearchFlags compareOptions);
 
 #endif

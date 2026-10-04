@@ -57,6 +57,7 @@ public delegate void gleGCSave_v3d_gen_textureFunction(double* arg0, int arg1, i
 
 public delegate void gleGCSave_end_gen_textureFunction();
 
+/// Deprecated in macOS 10.9.
 public struct gleGC
 {
     public gleGCBgn_gen_textureFunction bgn_gen_texture;

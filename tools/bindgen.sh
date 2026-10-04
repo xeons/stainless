@@ -12,8 +12,11 @@ FRAMEWORKS="CoreFoundation IOSurface ColorSync CoreGraphics CoreText CoreVideo I
 DiskArbitration SystemConfiguration ImageIO CoreAudioTypes CoreAudio CoreMIDI AudioToolbox
 CoreServices CFNetwork ApplicationServices Carbon Accelerate AudioUnit CoreMedia VideoToolbox
 MediaToolbox VideoDecodeAcceleration OpenGL GLUT OpenAL OpenCL DirectoryService DVDPlayback
-ForceFeedback GSS LDAP Hypervisor ICADevices LatentSemanticMapping NetFS PCSC TWAIN vmnet"
+ForceFeedback GSS LDAP Hypervisor ICADevices LatentSemanticMapping NetFS PCSC TWAIN vmnet
+Foundation CoreData CoreImage QuartzCore UniformTypeIdentifiers AppKit Metal MetalKit AVFAudio
+AVFoundation WebKit"
 
 # shellcheck disable=SC2086
 dotnet run --project tools/Stainless.Bindgen -c Release -- \
-    --out bindings/macos --case tests/cases/macos-bindings-layout $FRAMEWORKS
+    --out bindings/macos --case tests/cases/macos-bindings-layout \
+    --runtime-case tests/cases/macos-bindings-runtime $FRAMEWORKS

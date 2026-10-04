@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,9 +34,10 @@ public using CFNotificationName = CFStringRef;
 
 public struct __CFNotificationCenter;
 
-public using CFNotificationCenterRef = __CFNotificationCenter*;
+[CFType("CFNotificationCenterGetTypeID")]
+public extern objc class CFNotificationCenterRef : CFTypeRef { }
 
-public delegate void CFNotificationCallback(CFNotificationCenterRef arg0, void* arg1, CFNotificationName arg2, void* arg3, CFDictionaryRef arg4);
+public delegate void CFNotificationCallback(__CFNotificationCenter* arg0, void* arg1, void* arg2, void* arg3, __CFDictionary* arg4);
 
 public enum CFNotificationSuspensionBehavior : long
 {
@@ -47,23 +49,23 @@ public enum CFNotificationSuspensionBehavior : long
 
 public extern "C" CFTypeID CFNotificationCenterGetTypeID();
 
-public extern "C" CFNotificationCenterRef CFNotificationCenterGetLocalCenter();
+public extern "C" CFNotificationCenterRef? CFNotificationCenterGetLocalCenter();
 
-public extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter();
+public extern "C" CFNotificationCenterRef? CFNotificationCenterGetDistributedCenter();
 
-public extern "C" CFNotificationCenterRef CFNotificationCenterGetDarwinNotifyCenter();
+public extern "C" CFNotificationCenterRef? CFNotificationCenterGetDarwinNotifyCenter();
 
-public extern "C" void CFNotificationCenterAddObserver(CFNotificationCenterRef center, void* observer, CFNotificationCallback callBack, CFStringRef name, void* object, CFNotificationSuspensionBehavior suspensionBehavior);
+public extern "C" void CFNotificationCenterAddObserver(CFNotificationCenterRef? center, void* observer, CFNotificationCallback callBack, CFStringRef? name, void* object, CFNotificationSuspensionBehavior suspensionBehavior);
 
-public extern "C" void CFNotificationCenterRemoveObserver(CFNotificationCenterRef center, void* observer, CFNotificationName name, void* object);
+public extern "C" void CFNotificationCenterRemoveObserver(CFNotificationCenterRef? center, void* observer, CFNotificationName? name, void* object);
 
-public extern "C" void CFNotificationCenterRemoveEveryObserver(CFNotificationCenterRef center, void* observer);
+public extern "C" void CFNotificationCenterRemoveEveryObserver(CFNotificationCenterRef? center, void* observer);
 
-public extern "C" void CFNotificationCenterPostNotification(CFNotificationCenterRef center, CFNotificationName name, void* object, CFDictionaryRef userInfo, Boolean deliverImmediately);
+public extern "C" void CFNotificationCenterPostNotification(CFNotificationCenterRef? center, CFNotificationName? name, void* object, CFDictionaryRef? userInfo, Boolean deliverImmediately);
 
 public const ulong kCFNotificationDeliverImmediately = 1;
 public const ulong kCFNotificationPostToAllSessions = 2;
 
-public extern "C" void CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterRef center, CFNotificationName name, void* object, CFDictionaryRef userInfo, CFOptionFlags options);
+public extern "C" void CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterRef? center, CFNotificationName? name, void* object, CFDictionaryRef? userInfo, CFOptionFlags options);
 
 #endif

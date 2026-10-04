@@ -1091,7 +1091,7 @@ public extern "C" OSStatus RegisterEventHotKey(UInt32 inHotKeyCode, UInt32 inHot
 
 public extern "C" OSStatus UnregisterEventHotKey(EventHotKeyRef inHotKey);
 
-public extern "C" OSStatus CopySymbolicHotKeys(CFArrayRef* outHotKeyArray);
+public extern "C" OSStatus CopySymbolicHotKeys(__CFArray** outHotKeyArray);
 
 public const int kHIHotKeyModeAllEnabled = 0;
 public const int kHIHotKeyModeAllDisabled = 1;

@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,7 +35,7 @@ public const uint kSecCSDedicatedHost = 1;
 public const uint kSecCSGenerateGuestHash = 2;
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus SecHostCreateGuest(SecGuestRef host, uint status, CFURLRef path, CFDictionaryRef attributes, SecCSFlags flags, SecGuestRef* newGuest);
+public extern "C" OSStatus SecHostCreateGuest(SecGuestRef host, uint status, CFURLRef path, CFDictionaryRef? attributes, SecCSFlags flags, SecGuestRef* newGuest);
 
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus SecHostRemoveGuest(SecGuestRef host, SecGuestRef guest, SecCSFlags flags);
@@ -46,7 +47,7 @@ public extern "C" OSStatus SecHostSelectGuest(SecGuestRef guestRef, SecCSFlags f
 public extern "C" OSStatus SecHostSelectedGuest(SecCSFlags flags, SecGuestRef* guestRef);
 
 /// Deprecated in macOS 10.6.
-public extern "C" OSStatus SecHostSetGuestStatus(SecGuestRef guestRef, uint status, CFDictionaryRef attributes, SecCSFlags flags);
+public extern "C" OSStatus SecHostSetGuestStatus(SecGuestRef guestRef, uint status, CFDictionaryRef? attributes, SecCSFlags flags);
 
 /// Deprecated in macOS 10.6.
 public extern "C" OSStatus SecHostSetHostingPort(mach_port_t hostingPort, SecCSFlags flags);

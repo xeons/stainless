@@ -24,6 +24,7 @@
 module MacOS.GSS;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,20 +32,20 @@ import MacOS.CoreFoundation;
 
 public extern "C" gss_cred_id_t GSSCreateCredentialFromUUID(CFUUIDRef uuid);
 
-public extern "C" CFErrorRef GSSCreateError(gss_const_OID mech, OM_uint32 major_status, OM_uint32 minor_status);
+[ReturnsRetained] public extern "C" CFErrorRef? GSSCreateError(gss_const_OID mech, OM_uint32 major_status, OM_uint32 minor_status);
 
-public extern "C" gss_name_t GSSCreateName(CFTypeRef name, gss_const_OID name_type, CFErrorRef* error);
+public extern "C" gss_name_t GSSCreateName(CFTypeRef name, gss_const_OID name_type, __CFError** error);
 
 public extern "C" gss_name_t GSSCredentialCopyName(gss_cred_id_t cred);
 
-public extern "C" CFUUIDRef GSSCredentialCopyUUID(gss_cred_id_t credential);
+[ReturnsRetained] public extern "C" CFUUIDRef? GSSCredentialCopyUUID(gss_cred_id_t credential);
 
 public extern "C" OM_uint32 GSSCredentialGetLifetime(gss_cred_id_t cred);
 
-public extern "C" CFStringRef GSSNameCreateDisplayString(gss_name_t name);
+[ReturnsRetained] public extern "C" CFStringRef? GSSNameCreateDisplayString(gss_name_t name);
 
-public extern "C" OM_uint32 gss_aapl_change_password(gss_name_t name, gss_const_OID mech, CFDictionaryRef attributes, CFErrorRef* error);
+public extern "C" OM_uint32 gss_aapl_change_password(gss_name_t name, gss_const_OID mech, CFDictionaryRef attributes, __CFError** error);
 
-public extern "C" OM_uint32 gss_aapl_initial_cred(gss_name_t desired_name, gss_const_OID desired_mech, CFDictionaryRef attributes, gss_cred_id_t* output_cred_handle, CFErrorRef* error);
+public extern "C" OM_uint32 gss_aapl_initial_cred(gss_name_t desired_name, gss_const_OID desired_mech, CFDictionaryRef? attributes, gss_cred_id_t* output_cred_handle, __CFError** error);
 
 #endif

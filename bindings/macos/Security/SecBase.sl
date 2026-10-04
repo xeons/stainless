@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,35 +33,43 @@ import MacOS.System;
 
 public struct __SecCertificate;
 
-public using SecCertificateRef = __SecCertificate*;
+[CFType("SecCertificateGetTypeID")]
+public extern objc class SecCertificateRef : CFTypeRef { }
 
 public struct __SecIdentity;
 
-public using SecIdentityRef = __SecIdentity*;
+[CFType("SecIdentityGetTypeID")]
+public extern objc class SecIdentityRef : CFTypeRef { }
 
 public struct __SecKey;
 
-public using SecKeyRef = __SecKey*;
+[CFType("SecKeyGetTypeID")]
+public extern objc class SecKeyRef : CFTypeRef { }
 
 public struct __SecPolicy;
 
-public using SecPolicyRef = __SecPolicy*;
+[CFType("SecPolicyGetTypeID")]
+public extern objc class SecPolicyRef : CFTypeRef { }
 
 public struct __SecAccessControl;
 
-public using SecAccessControlRef = __SecAccessControl*;
+[CFType("SecAccessControlGetTypeID")]
+public extern objc class SecAccessControlRef : CFTypeRef { }
 
 public struct __SecKeychain;
 
-public using SecKeychainRef = __SecKeychain*;
+[CFType("SecKeychainGetTypeID")]
+public extern objc class SecKeychainRef : CFTypeRef { }
 
 public struct __SecKeychainItem;
 
-public using SecKeychainItemRef = __SecKeychainItem*;
+[CFType("SecKeychainItemGetTypeID")]
+public extern objc class SecKeychainItemRef : CFTypeRef { }
 
 public struct __SecKeychainSearch;
 
-public using SecKeychainSearchRef = __SecKeychainSearch*;
+[CFType("SecKeychainSearchGetTypeID")]
+public extern objc class SecKeychainSearchRef : CFTypeRef { }
 
 public using SecKeychainAttrType = OSType;
 
@@ -83,19 +92,23 @@ public using SecKeychainStatus = UInt32;
 
 public struct __SecTrustedApplication;
 
-public using SecTrustedApplicationRef = __SecTrustedApplication*;
+[CFType("SecTrustedApplicationGetTypeID")]
+public extern objc class SecTrustedApplicationRef : CFTypeRef { }
 
 public struct __SecAccess;
 
-public using SecAccessRef = __SecAccess*;
+[CFType("SecAccessGetTypeID")]
+public extern objc class SecAccessRef : CFTypeRef { }
 
 public struct __SecACL;
 
-public using SecACLRef = __SecACL*;
+[CFType("SecACLGetTypeID")]
+public extern objc class SecACLRef : CFTypeRef { }
 
 public struct __SecPassword;
 
-public using SecPasswordRef = __SecPassword*;
+[CFType]
+public extern objc class SecPasswordRef : CFTypeRef { }
 
 public struct SecKeychainAttributeInfo
 {
@@ -104,7 +117,7 @@ public struct SecKeychainAttributeInfo
     public UInt32* format;
 }
 
-public extern "C" CFStringRef SecCopyErrorMessageString(OSStatus status, void* reserved);
+[ReturnsRetained] public extern "C" CFStringRef? SecCopyErrorMessageString(OSStatus status, void* reserved);
 
 public const int errSecSuccess = 0;
 public const int errSecUnimplemented = -4;

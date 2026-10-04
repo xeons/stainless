@@ -24,6 +24,7 @@
 module MacOS.ImageIO;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 

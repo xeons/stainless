@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -39,18 +40,18 @@ public using AHTOCType = SInt16;
 public const int kAHTOCTypeUser = 0;
 public const int kAHTOCTypeDeveloper = 1;
 
-public extern "C" OSStatus AHSearch(CFStringRef bookname, CFStringRef query);
+public extern "C" OSStatus AHSearch(CFStringRef? bookname, CFStringRef? query);
 
 /// Deprecated in macOS 10.4.
 public extern "C" OSStatus AHGotoMainTOC(AHTOCType toctype);
 
-public extern "C" OSStatus AHGotoPage(CFStringRef bookname, CFStringRef path, CFStringRef anchor);
+public extern "C" OSStatus AHGotoPage(CFStringRef? bookname, CFStringRef? path, CFStringRef? anchor);
 
-public extern "C" OSStatus AHLookupAnchor(CFStringRef bookname, CFStringRef anchor);
+public extern "C" OSStatus AHLookupAnchor(CFStringRef? bookname, CFStringRef? anchor);
 
 /// Deprecated in macOS 10.4.
 public extern "C" OSStatus AHRegisterHelpBook(FSRef* appBundleRef);
 
-public extern "C" OSStatus AHRegisterHelpBookWithURL(CFURLRef applicationURL);
+public extern "C" OSStatus AHRegisterHelpBookWithURL(CFURLRef? applicationURL);
 
 #endif

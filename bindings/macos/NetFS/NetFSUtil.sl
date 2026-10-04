@@ -24,11 +24,12 @@
 module MacOS.NetFS;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "NetFS")
 
-public extern "C" byte* NetFSCFStringtoCString(CFStringRef arg0);
+public extern "C" byte* NetFSCFStringtoCString(CFStringRef? arg0);
 
 #endif

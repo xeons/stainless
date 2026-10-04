@@ -26,6 +26,7 @@ module MacOS.VideoToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreMedia;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,13 +34,14 @@ import MacOS.System;
 
 public struct OpaqueVTMultiPassStorage;
 
-public using VTMultiPassStorageRef = OpaqueVTMultiPassStorage*;
+[CFType("VTMultiPassStorageGetTypeID")]
+public extern objc class VTMultiPassStorageRef : CFTypeRef { }
 
 public extern "C" CFTypeID VTMultiPassStorageGetTypeID();
 
-public extern "C" OSStatus VTMultiPassStorageCreate(CFAllocatorRef allocator, CFURLRef fileURL, CMTimeRange timeRange, CFDictionaryRef options, VTMultiPassStorageRef* multiPassStorageOut);
+public extern "C" OSStatus VTMultiPassStorageCreate(CFAllocatorRef? allocator, CFURLRef? fileURL, CMTimeRange timeRange, CFDictionaryRef? options, OpaqueVTMultiPassStorage** multiPassStorageOut);
 
-public extern "C" CFStringRef kVTMultiPassStorageCreationOption_DoNotDelete;
+public extern "C" CFStringRef? kVTMultiPassStorageCreationOption_DoNotDelete;
 
 public extern "C" OSStatus VTMultiPassStorageClose(VTMultiPassStorageRef multiPassStorage);
 

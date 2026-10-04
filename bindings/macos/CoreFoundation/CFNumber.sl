@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,15 +32,16 @@ import MacOS.System;
 
 public struct __CFBoolean;
 
-public using CFBooleanRef = __CFBoolean*;
+[CFType("CFBooleanGetTypeID")]
+public extern objc class CFBooleanRef : CFTypeRef { }
 
-public extern "C" CFBooleanRef kCFBooleanTrue;
+public extern "C" CFBooleanRef? kCFBooleanTrue;
 
-public extern "C" CFBooleanRef kCFBooleanFalse;
+public extern "C" CFBooleanRef? kCFBooleanFalse;
 
 public extern "C" CFTypeID CFBooleanGetTypeID();
 
-public extern "C" Boolean CFBooleanGetValue(CFBooleanRef boolean);
+public extern "C" Boolean CFBooleanGetValue(CFBooleanRef? boolean);
 
 public enum CFNumberType : long
 {
@@ -64,26 +66,27 @@ public enum CFNumberType : long
 
 public struct __CFNumber;
 
-public using CFNumberRef = __CFNumber*;
+[CFType("CFNumberGetTypeID")]
+public extern objc class CFNumberRef : CFTypeRef { }
 
-public extern "C" CFNumberRef kCFNumberPositiveInfinity;
+public extern "C" CFNumberRef? kCFNumberPositiveInfinity;
 
-public extern "C" CFNumberRef kCFNumberNegativeInfinity;
+public extern "C" CFNumberRef? kCFNumberNegativeInfinity;
 
-public extern "C" CFNumberRef kCFNumberNaN;
+public extern "C" CFNumberRef? kCFNumberNaN;
 
 public extern "C" CFTypeID CFNumberGetTypeID();
 
-public extern "C" CFNumberRef CFNumberCreate(CFAllocatorRef allocator, CFNumberType theType, void* valuePtr);
+[ReturnsRetained] public extern "C" CFNumberRef? CFNumberCreate(CFAllocatorRef? allocator, CFNumberType theType, void* valuePtr);
 
-public extern "C" CFNumberType CFNumberGetType(CFNumberRef number);
+public extern "C" CFNumberType CFNumberGetType(CFNumberRef? number);
 
-public extern "C" CFIndex CFNumberGetByteSize(CFNumberRef number);
+public extern "C" CFIndex CFNumberGetByteSize(CFNumberRef? number);
 
-public extern "C" Boolean CFNumberIsFloatType(CFNumberRef number);
+public extern "C" Boolean CFNumberIsFloatType(CFNumberRef? number);
 
-public extern "C" Boolean CFNumberGetValue(CFNumberRef number, CFNumberType theType, void* valuePtr);
+public extern "C" Boolean CFNumberGetValue(CFNumberRef? number, CFNumberType theType, void* valuePtr);
 
-public extern "C" CFComparisonResult CFNumberCompare(CFNumberRef number, CFNumberRef otherNumber, void* context);
+public extern "C" CFComparisonResult CFNumberCompare(CFNumberRef? number, CFNumberRef? otherNumber, void* context);
 
 #endif

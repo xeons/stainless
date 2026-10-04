@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.System;
 
 public struct __MDQuery;
 
-public using MDQueryRef = __MDQuery*;
+[CFType("MDQueryGetTypeID")]
+public extern objc class MDQueryRef : CFTypeRef { }
 
 public enum MDQueryOptionFlags : int
 {
@@ -43,17 +45,17 @@ public enum MDQueryOptionFlags : int
 
 public extern "C" CFTypeID MDQueryGetTypeID();
 
-public extern "C" MDQueryRef MDQueryCreate(CFAllocatorRef allocator, CFStringRef queryString, CFArrayRef valueListAttrs, CFArrayRef sortingAttrs);
+[ReturnsRetained] public extern "C" MDQueryRef? MDQueryCreate(CFAllocatorRef? allocator, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs);
 
-public extern "C" MDQueryRef MDQueryCreateSubset(CFAllocatorRef allocator, MDQueryRef query, CFStringRef queryString, CFArrayRef valueListAttrs, CFArrayRef sortingAttrs);
+[ReturnsRetained] public extern "C" MDQueryRef? MDQueryCreateSubset(CFAllocatorRef? allocator, MDQueryRef? query, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs);
 
-public extern "C" MDQueryRef MDQueryCreateForItems(CFAllocatorRef allocator, CFStringRef queryString, CFArrayRef valueListAttrs, CFArrayRef sortingAttrs, CFArrayRef items);
+[ReturnsRetained] public extern "C" MDQueryRef? MDQueryCreateForItems(CFAllocatorRef? allocator, CFStringRef? queryString, CFArrayRef? valueListAttrs, CFArrayRef? sortingAttrs, CFArrayRef? items);
 
-public extern "C" CFStringRef MDQueryCopyQueryString(MDQueryRef query);
+[ReturnsRetained] public extern "C" CFStringRef? MDQueryCopyQueryString(MDQueryRef? query);
 
-public extern "C" CFArrayRef MDQueryCopyValueListAttributes(MDQueryRef query);
+[ReturnsRetained] public extern "C" CFArrayRef? MDQueryCopyValueListAttributes(MDQueryRef? query);
 
-public extern "C" CFArrayRef MDQueryCopySortingAttributes(MDQueryRef query);
+[ReturnsRetained] public extern "C" CFArrayRef? MDQueryCopySortingAttributes(MDQueryRef? query);
 
 public struct MDQueryBatchingParams
 {
@@ -65,87 +67,89 @@ public struct MDQueryBatchingParams
     public nuint update_max_ms;
 }
 
-public extern "C" MDQueryBatchingParams MDQueryGetBatchingParameters(MDQueryRef query);
+public extern "C" MDQueryBatchingParams MDQueryGetBatchingParameters(MDQueryRef? query);
 
-public extern "C" void MDQuerySetBatchingParameters(MDQueryRef query, MDQueryBatchingParams params);
+public extern "C" void MDQuerySetBatchingParameters(MDQueryRef? query, MDQueryBatchingParams params);
 
-public delegate void* MDQueryCreateResultFunction(MDQueryRef arg0, MDItemRef arg1, void* arg2);
+public delegate void* MDQueryCreateResultFunction(__MDQuery* arg0, __MDItem* arg1, void* arg2);
 
-public extern "C" void MDQuerySetCreateResultFunction(MDQueryRef query, MDQueryCreateResultFunction func, void* context, CFArrayCallBacks* cb);
+public extern "C" void MDQuerySetCreateResultFunction(MDQueryRef? query, MDQueryCreateResultFunction func, void* context, CFArrayCallBacks* cb);
 
-public delegate void* MDQueryCreateValueFunction(MDQueryRef arg0, CFStringRef arg1, CFTypeRef arg2, void* arg3);
+public delegate void* MDQueryCreateValueFunction(__MDQuery* arg0, __CFString* arg1, void* arg2, void* arg3);
 
-public extern "C" void MDQuerySetCreateValueFunction(MDQueryRef query, MDQueryCreateValueFunction func, void* context, CFArrayCallBacks* cb);
+public extern "C" void MDQuerySetCreateValueFunction(MDQueryRef? query, MDQueryCreateValueFunction func, void* context, CFArrayCallBacks* cb);
 
-public extern "C" Boolean MDQueryExecute(MDQueryRef query, CFOptionFlags optionFlags);
+public extern "C" void MDQuerySetDispatchQueue(MDQueryRef? query, dispatch_queue_t? queue);
 
-public extern "C" void MDQueryStop(MDQueryRef query);
+public extern "C" Boolean MDQueryExecute(MDQueryRef? query, CFOptionFlags optionFlags);
 
-public extern "C" void MDQueryDisableUpdates(MDQueryRef query);
+public extern "C" void MDQueryStop(MDQueryRef? query);
 
-public extern "C" void MDQueryEnableUpdates(MDQueryRef query);
+public extern "C" void MDQueryDisableUpdates(MDQueryRef? query);
 
-public extern "C" Boolean MDQueryIsGatheringComplete(MDQueryRef query);
+public extern "C" void MDQueryEnableUpdates(MDQueryRef? query);
 
-public extern "C" CFIndex MDQueryGetResultCount(MDQueryRef query);
+public extern "C" Boolean MDQueryIsGatheringComplete(MDQueryRef? query);
 
-public extern "C" void* MDQueryGetResultAtIndex(MDQueryRef query, CFIndex idx);
+public extern "C" CFIndex MDQueryGetResultCount(MDQueryRef? query);
 
-public extern "C" CFIndex MDQueryGetIndexOfResult(MDQueryRef query, void* result);
+public extern "C" void* MDQueryGetResultAtIndex(MDQueryRef? query, CFIndex idx);
 
-public extern "C" void* MDQueryGetAttributeValueOfResultAtIndex(MDQueryRef query, CFStringRef name, CFIndex idx);
+public extern "C" CFIndex MDQueryGetIndexOfResult(MDQueryRef? query, void* result);
 
-public extern "C" CFArrayRef MDQueryCopyValuesOfAttribute(MDQueryRef query, CFStringRef name);
+public extern "C" void* MDQueryGetAttributeValueOfResultAtIndex(MDQueryRef? query, CFStringRef? name, CFIndex idx);
 
-public extern "C" CFIndex MDQueryGetCountOfResultsWithAttributeValue(MDQueryRef query, CFStringRef name, CFTypeRef value);
+[ReturnsRetained] public extern "C" CFArrayRef? MDQueryCopyValuesOfAttribute(MDQueryRef? query, CFStringRef? name);
 
-public extern "C" Boolean MDQuerySetSortOrder(MDQueryRef query, CFArrayRef sortingAttrs);
+public extern "C" CFIndex MDQueryGetCountOfResultsWithAttributeValue(MDQueryRef? query, CFStringRef? name, CFTypeRef? value);
+
+public extern "C" Boolean MDQuerySetSortOrder(MDQueryRef? query, CFArrayRef? sortingAttrs);
 
 public enum MDQuerySortOptionFlags : int
 {
     kMDQueryReverseSortOrderFlag = 1,
 }
 
-public extern "C" Boolean MDQuerySetSortOptionFlagsForAttribute(MDQueryRef query, CFStringRef fieldName, uint flags);
+public extern "C" Boolean MDQuerySetSortOptionFlagsForAttribute(MDQueryRef? query, CFStringRef? fieldName, uint flags);
 
-public extern "C" uint MDQueryGetSortOptionFlagsForAttribute(MDQueryRef query, CFStringRef fieldName);
+public extern "C" uint MDQueryGetSortOptionFlagsForAttribute(MDQueryRef? query, CFStringRef? fieldName);
 
-public delegate CFComparisonResult MDQuerySortComparatorFunction(CFTypeRef* arg0, CFTypeRef* arg1, void* arg2);
+public delegate CFComparisonResult MDQuerySortComparatorFunction(void** arg0, void** arg1, void* arg2);
 
-public extern "C" void MDQuerySetSortComparator(MDQueryRef query, MDQuerySortComparatorFunction comparator, void* context);
+public extern "C" void MDQuerySetSortComparator(MDQueryRef? query, MDQuerySortComparatorFunction comparator, void* context);
 
-public objc closure CFComparisonResult MDQuerySetSortComparatorBlockComparatorBlock(CFTypeRef* arg0, CFTypeRef* arg1);
+public objc closure CFComparisonResult MDQuerySetSortComparatorBlockComparatorBlock(void** arg0, void** arg1);
 
-public extern "C" void MDQuerySetSortComparatorBlock(MDQueryRef query, MDQuerySetSortComparatorBlockComparatorBlock comparator);
+public extern "C" void MDQuerySetSortComparatorBlock(MDQueryRef? query, MDQuerySetSortComparatorBlockComparatorBlock? comparator);
 
-public extern "C" CFStringRef kMDQueryProgressNotification;
+public extern "C" CFStringRef? kMDQueryProgressNotification;
 
-public extern "C" CFStringRef kMDQueryDidFinishNotification;
+public extern "C" CFStringRef? kMDQueryDidFinishNotification;
 
-public extern "C" CFStringRef kMDQueryDidUpdateNotification;
+public extern "C" CFStringRef? kMDQueryDidUpdateNotification;
 
-public extern "C" CFStringRef kMDQueryUpdateAddedItems;
+public extern "C" CFStringRef? kMDQueryUpdateAddedItems;
 
-public extern "C" CFStringRef kMDQueryUpdateChangedItems;
+public extern "C" CFStringRef? kMDQueryUpdateChangedItems;
 
-public extern "C" CFStringRef kMDQueryUpdateRemovedItems;
+public extern "C" CFStringRef? kMDQueryUpdateRemovedItems;
 
-public extern "C" CFStringRef kMDQueryResultContentRelevance;
+public extern "C" CFStringRef? kMDQueryResultContentRelevance;
 
-public extern "C" void MDQuerySetSearchScope(MDQueryRef query, CFArrayRef scopeDirectories, OptionBits scopeOptions);
+public extern "C" void MDQuerySetSearchScope(MDQueryRef? query, CFArrayRef? scopeDirectories, OptionBits scopeOptions);
 
-public extern "C" CFStringRef kMDQueryScopeHome;
+public extern "C" CFStringRef? kMDQueryScopeHome;
 
-public extern "C" CFStringRef kMDQueryScopeComputer;
+public extern "C" CFStringRef? kMDQueryScopeComputer;
 
-public extern "C" CFStringRef kMDQueryScopeNetwork;
+public extern "C" CFStringRef? kMDQueryScopeNetwork;
 
-public extern "C" CFStringRef kMDQueryScopeAllIndexed;
+public extern "C" CFStringRef? kMDQueryScopeAllIndexed;
 
-public extern "C" CFStringRef kMDQueryScopeComputerIndexed;
+public extern "C" CFStringRef? kMDQueryScopeComputerIndexed;
 
-public extern "C" CFStringRef kMDQueryScopeNetworkIndexed;
+public extern "C" CFStringRef? kMDQueryScopeNetworkIndexed;
 
-public extern "C" void MDQuerySetMaxCount(MDQueryRef query, CFIndex size);
+public extern "C" void MDQuerySetMaxCount(MDQueryRef? query, CFIndex size);
 
 #endif

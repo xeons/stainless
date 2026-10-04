@@ -23,9 +23,20 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Hypervisor;
 
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Hypervisor")
+
+#if ARM64
+public objc interface OS_hv_vcpu_config : NSObjectProtocol { }
+#endif
+
+#if ARM64
+public using hv_vcpu_config_t = NSObject;
+#endif
 
 #if ARM64
 public using hv_vcpu_t = ulong;
@@ -148,6 +159,7 @@ public enum hv_simd_fp_reg_t : uint
 #endif
 
 #if ARM64
+/// macOS 15.2 and later.
 public struct hv_vcpu_sme_state_t
 {
     public bool streaming_sve_mode_enabled;
@@ -156,6 +168,7 @@ public struct hv_vcpu_sme_state_t
 #endif
 
 #if ARM64
+/// macOS 15.2 and later.
 public enum hv_sme_z_reg_t : uint
 {
     HV_SME_Z_REG_0 = 0,
@@ -194,6 +207,7 @@ public enum hv_sme_z_reg_t : uint
 #endif
 
 #if ARM64
+/// macOS 15.2 and later.
 public enum hv_sme_p_reg_t : uint
 {
     HV_SME_P_REG_0 = 0,

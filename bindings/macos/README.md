@@ -8,6 +8,7 @@ bindings/macos/
   CoreFoundation/ ... vmnet/   module MacOS.<Framework>;   generated, a file per header
   System/                      module MacOS.System;        what those use from usr/include
   skipped.txt                  every declaration not bound, and why
+  unanswered.txt               what the headers declare and the runtime does not answer
   api/Termios.sl               module MacOS.Termios;       hand-written, below
   api/Events.sl                module MacOS.Events;
   Terminal.sl                  module MacOS.Terminal;
@@ -21,7 +22,7 @@ the bindings compile on every host and mean something on a Mac.
 Every directory but `api/` is written by
 [tools/Stainless.Bindgen](../../tools/Stainless.Bindgen) from the SDK and MUST
 NOT be edited; [tools/bindgen.sh](../../tools/bindgen.sh) regenerates them on a
-Mac. They are the 41 frameworks whose API is C:
+Mac. They are 52 frameworks. The 41 whose API is C:
 
 > Accelerate, ApplicationServices, AudioToolbox, AudioUnit, Carbon, CFNetwork,
 > ColorSync, CoreAudio, CoreAudioTypes, CoreFoundation, CoreGraphics, CoreMedia,
@@ -30,6 +31,11 @@ Mac. They are the 41 frameworks whose API is C:
 > IOSurface, LatentSemanticMapping, LDAP, MediaToolbox, NetFS, OpenAL, OpenCL,
 > OpenGL, PCSC, Security, SystemConfiguration, TWAIN, VideoDecodeAcceleration,
 > VideoToolbox, vmnet
+
+and the 11 whose API is Objective-C:
+
+> AppKit, AVFAudio, AVFoundation, CoreData, CoreImage, Foundation, Metal,
+> MetalKit, QuartzCore, UniformTypeIdentifiers, WebKit
 
 A program names a framework's directory, and those of the modules it
 imports, as sources, and imports the module:
@@ -40,17 +46,18 @@ stainless build app.sl bindings/macos/CoreFoundation bindings/macos/System
 
 ```csharp
 import MacOS.CoreFoundation;
+import MacOS.Foundation;
 
-var text = CFStringCreateWithCString(null, "hello", (uint)CFStringBuiltInEncodings.UTF8);
-Console.WriteLine($"{CFStringGetLength(text)}");
-CFRelease(text);
+var text = CFStringCreateWithCString(null, "hello", (uint)CFStringBuiltInEncodings.UTF8)!;
+Console.WriteLine($"{CFStringGetLength(text)}");      // 5; ARC releases it
+var same = (NSString)text;                            // toll-free bridged
 ```
 
 Each module names its framework with `#pragma comment(framework, ...)`, so a
 program using it links it; one that is only headers, as CoreAudioTypes is,
-names nothing. Naming every module costs little: a CoreFoundation program
-built against all 123,000 lines takes under a second on an M4, and code is
-emitted only for what the program reaches.
+names nothing. Naming every module costs little: an AppKit program built
+against every directory takes about a second and a half on an M4, and code
+is emitted only for what the program reaches.
 
 ### What C becomes
 
@@ -72,6 +79,69 @@ emitted only for what the program reaches.
 | array in a struct | `T[N]`; a multi-dimensional one flattened, which is the same bytes |
 | flexible array member | left out, as C's `sizeof` leaves it out |
 | `uint32_t`, `size_t`, ... | `uint`, `nuint`, ... |
+| a Core Foundation type | an object ARC counts; see below |
+| an object in a struct, behind a pointer, or given to a callback | the pointer, which owns nothing |
+
+### What Objective-C becomes
+
+| Objective-C | Stainless |
+|---|---|
+| `@interface` | `extern objc class`; `[ObjCRoot]` on one with no superclass |
+| `@protocol` | `objc interface`; one named like a class gains `Protocol` and keeps its name in `[ObjCName]` |
+| `@optional` | `[Optional]` |
+| category | the class declared again, in the category's module, with its members and protocols |
+| method | a `[Selector]` method named by its whole selector: `initWithFrame:display:` is `InitWithFrameDisplay` |
+| `+` method, `class` property | `static` |
+| property | a `[Selector(getter, setter)]` property; `readonly` has the getter alone |
+| `instancetype` | `Self` |
+| `id`, `id<P>`, `Class`, `SEL` | `AnyObject`, `P`, `Class`, `Selector` |
+| `NSArray<T *> *`, `ObjectType` | `NSArray`, `AnyObject`: generics are erased |
+| `_Nonnull` | `T` |
+| `_Nullable`, or nothing said | `T?` |
+| `NSError **` | `out NSError?` |
+| block | `objc closure`, named after where it is: `NSArrayEnumerateObjectsUsingBlockBlock` |
+| `BOOL` in a message or a block | `bool` |
+| `ns_returns_retained` against the method family | `[ReturnsRetained]`, `[ReturnsNotRetained]` |
+| `extern NSString *const` | `public extern "C"`, read and never written |
+| `typedef NSString *X` (`NS_TYPED_ENUM`) | `public using X = NSString;` |
+
+What `alloc` returns is never nil, and is written so whatever the header
+says; any other result the header says nothing about is optional. A result
+declared `T` that arrives nil stops the program, naming the message, so
+trusting a header is never undefined.
+
+A member name another member of the class already has -- a class method and
+an instance method of one selector, or a property and a method -- is changed
+by a fixed rule: the class method gains `Class` before it, the property
+`Property` after it, the method `Method`. A message a property already
+answers is not declared again.
+
+### Core Foundation
+
+Every Core Foundation object is an Objective-C object on Apple's systems, so
+each CF type is a `[CFType]` class ARC counts, and nothing calls `CFRelease`:
+
+```csharp
+[CFType]                       public extern objc class CFTypeRef { }
+[CFType("CFStringGetTypeID")]  public extern objc class CFStringRef : CFTypeRef { }
+[CFType]                       public extern objc class CFMutableStringRef : CFStringRef { }
+```
+
+A typedef is a CF type when it points at a struct bridged to an Objective-C
+class, or at one with a `GetTypeID` function of its name. The mutable typedef
+of a struct derives from the immutable one and shares its `CFTypeID`.
+
+What a function returns follows the Create rule, as clang reads it: a name
+holding `Create` or `Copy` as a word hands it over, `[ReturnsRetained]`, and
+anything else hands it back at +0. `cf_returns_retained` and
+`cf_returns_not_retained` win over the name. `CFRetain`, `CFRelease`,
+`CFAutorelease` and each `...Retain` or `...Release` of one CF type are not
+bound: they are ARC's to call, and one called by hand would release what ARC
+still holds. A function that takes ownership of an argument, `cf_consumed`,
+is not bound either.
+
+In a struct, behind a pointer, and given to a callback, a CF type is its
+struct's pointer, `__CFString*`, which owns nothing.
 
 Where arm64 and x86-64 disagree about a declaration, both are written, under
 `#if ARM64` and `#else`.
@@ -102,8 +172,10 @@ binding. Most are:
 
 - **`static inline` functions**, whose bodies are in the header and which no
   library exports.
-- **Objective-C types** in a C framework's headers -- a dispatch queue, an
-  `NSString` constant. The Objective-C frameworks are the next phase.
+- **A type from a framework not generated** -- CloudKit's, Intents' -- named
+  in the reason.
+- **A variadic message**, `stringWithFormat:`, which Stainless cannot send,
+  and a class member of a protocol, which has no class to send it to.
 - **A `va_list`**, which Stainless has no way to make, and **`long double`**.
 - **A string or object `#define`**, which a `const` cannot hold.
 - **Anything that uses something above**, named in the reason.
@@ -122,20 +194,38 @@ Left out whole:
 
 [tests/cases/macos-bindings-layout](../../tests/cases/macos-bindings-layout),
 also generated, holds every bound struct's size, alignment and field offsets
-and every bound enumerator's and integer macro's value -- 38,421 checks --
-against what clang says, built for the target the suite runs as. The macOS
-lane runs it on Apple silicon and the Rosetta lane as Intel code.
+and every bound enumerator's and integer macro's value against what clang
+says, built for the target the suite runs as. The macOS lane runs it on Apple
+silicon and the Rosetta lane as Intel code.
+
+[tests/cases/macos-bindings-runtime](../../tests/cases/macos-bindings-runtime),
+generated too, asks the Objective-C runtime for every bound class and every
+message a class is declared to answer -- 23,375 checks -- skipping what
+appeared in a later macOS than the one running. A message counts as answered
+when the class or one derived from it answers it: an abstract class's `alloc`
+may make a private subclass, as Metal's descriptors' does.
+[unanswered.txt](unanswered.txt) lists what the headers declare and the
+runtime answers nowhere -- an informal protocol on `NSObject`, a method
+nothing implements -- each with why; the case does not ask those.
+
+[tests/cases/macos-bindings-objc](../../tests/cases/macos-bindings-objc) is a
+program over the bindings: Foundation, a block, AppKit's category on
+`NSString`, an `extern` string constant and Core Foundation's ownership.
 
 ### Regenerating
 
 ```
-tools/bindgen.sh          # on a Mac; about three minutes on an M4
+tools/bindgen.sh          # on a Mac; about four minutes on an M4
 ```
 
 The generator compiles each framework's headers, its subframeworks' included,
 as Objective-C for `arm64-apple-macosx13.0` and `x86_64-apple-macosx13.0`
 with `-ast-dump=json`, and keeps the declarations whose header is in the
-framework. A `#define` is asked of clang in the same translation unit, as
+framework. Every framework is read before any is written: a class one
+framework names only with `@class` is defined by another, which may name the
+first. What the dump does not say -- whether `@class X;` is a definition,
+whether a protocol's method follows `@optional` -- is read from the header's
+line. A `#define` is asked of clang in the same translation unit, as
 `enum { v = (NAME) }` for its value and `__typeof__((NAME))` for its type; a
 struct under `#pragma pack`, whose value the dump omits, is asked its
 `_Alignof`.

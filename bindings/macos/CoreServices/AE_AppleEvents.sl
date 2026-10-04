@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -85,13 +86,13 @@ public extern "C" OSErr AEGetSpecialHandler(AEKeyword functionClass, AEEventHand
 
 public extern "C" OSErr AEManagerInfo(AEKeyword keyWord, long* result);
 
-public extern "C" CFStringRef kAERemoteProcessURLKey;
+public extern "C" CFStringRef? kAERemoteProcessURLKey;
 
-public extern "C" CFStringRef kAERemoteProcessNameKey;
+public extern "C" CFStringRef? kAERemoteProcessNameKey;
 
-public extern "C" CFStringRef kAERemoteProcessUserIDKey;
+public extern "C" CFStringRef? kAERemoteProcessUserIDKey;
 
-public extern "C" CFStringRef kAERemoteProcessProcessIDKey;
+public extern "C" CFStringRef? kAERemoteProcessProcessIDKey;
 
 [Pack(2)]
 public struct AERemoteProcessResolverContext
@@ -107,15 +108,15 @@ public struct AERemoteProcessResolver;
 
 public using AERemoteProcessResolverRef = AERemoteProcessResolver*;
 
-public extern "C" AERemoteProcessResolverRef AECreateRemoteProcessResolver(CFAllocatorRef allocator, CFURLRef url);
+public extern "C" AERemoteProcessResolverRef AECreateRemoteProcessResolver(CFAllocatorRef? allocator, CFURLRef? url);
 
 public extern "C" void AEDisposeRemoteProcessResolver(AERemoteProcessResolverRef @ref);
 
-public extern "C" CFArrayRef AERemoteProcessResolverGetProcesses(AERemoteProcessResolverRef @ref, CFStreamError* outError);
+public extern "C" CFArrayRef? AERemoteProcessResolverGetProcesses(AERemoteProcessResolverRef @ref, CFStreamError* outError);
 
 public delegate void AERemoteProcessResolverCallback(AERemoteProcessResolverRef arg0, void* arg1);
 
-public extern "C" void AERemoteProcessResolverScheduleWithRunLoop(AERemoteProcessResolverRef @ref, CFRunLoopRef runLoop, CFStringRef runLoopMode, AERemoteProcessResolverCallback callback, AERemoteProcessResolverContext* ctx);
+public extern "C" void AERemoteProcessResolverScheduleWithRunLoop(AERemoteProcessResolverRef @ref, CFRunLoopRef? runLoop, CFStringRef? runLoopMode, AERemoteProcessResolverCallback callback, AERemoteProcessResolverContext* ctx);
 
 public extern "C" OSStatus AEDeterminePermissionToAutomateTarget(AEAddressDesc* target, AEEventClass theAEEventClass, AEEventID theAEEventID, Boolean askUserIfNeeded);
 

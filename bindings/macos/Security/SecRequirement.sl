@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,14 +33,14 @@ import MacOS.System;
 
 public extern "C" CFTypeID SecRequirementGetTypeID();
 
-public extern "C" OSStatus SecRequirementCreateWithData(CFDataRef data, SecCSFlags flags, SecRequirementRef* requirement);
+public extern "C" OSStatus SecRequirementCreateWithData(CFDataRef data, SecCSFlags flags, __SecRequirement** requirement);
 
-public extern "C" OSStatus SecRequirementCreateWithString(CFStringRef text, SecCSFlags flags, SecRequirementRef* requirement);
+public extern "C" OSStatus SecRequirementCreateWithString(CFStringRef text, SecCSFlags flags, __SecRequirement** requirement);
 
-public extern "C" OSStatus SecRequirementCreateWithStringAndErrors(CFStringRef text, SecCSFlags flags, CFErrorRef* errors, SecRequirementRef* requirement);
+public extern "C" OSStatus SecRequirementCreateWithStringAndErrors(CFStringRef text, SecCSFlags flags, __CFError** errors, __SecRequirement** requirement);
 
-public extern "C" OSStatus SecRequirementCopyData(SecRequirementRef requirement, SecCSFlags flags, CFDataRef* data);
+public extern "C" OSStatus SecRequirementCopyData(SecRequirementRef requirement, SecCSFlags flags, __CFData** data);
 
-public extern "C" OSStatus SecRequirementCopyString(SecRequirementRef requirement, SecCSFlags flags, CFStringRef* text);
+public extern "C" OSStatus SecRequirementCopyString(SecRequirementRef requirement, SecCSFlags flags, __CFString** text);
 
 #endif

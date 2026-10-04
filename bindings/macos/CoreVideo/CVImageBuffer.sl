@@ -26,60 +26,61 @@ module MacOS.CoreVideo;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreVideo")
 
-public extern "C" CFStringRef kCVImageBufferCGColorSpaceKey;
+public extern "C" CFStringRef? kCVImageBufferCGColorSpaceKey;
 
-public extern "C" CFStringRef kCVImageBufferCleanApertureKey;
+public extern "C" CFStringRef? kCVImageBufferCleanApertureKey;
 
-public extern "C" CFStringRef kCVImageBufferCleanApertureWidthKey;
+public extern "C" CFStringRef? kCVImageBufferCleanApertureWidthKey;
 
-public extern "C" CFStringRef kCVImageBufferCleanApertureHeightKey;
+public extern "C" CFStringRef? kCVImageBufferCleanApertureHeightKey;
 
-public extern "C" CFStringRef kCVImageBufferCleanApertureHorizontalOffsetKey;
+public extern "C" CFStringRef? kCVImageBufferCleanApertureHorizontalOffsetKey;
 
-public extern "C" CFStringRef kCVImageBufferCleanApertureVerticalOffsetKey;
+public extern "C" CFStringRef? kCVImageBufferCleanApertureVerticalOffsetKey;
 
-public extern "C" CFStringRef kCVImageBufferPreferredCleanApertureKey;
+public extern "C" CFStringRef? kCVImageBufferPreferredCleanApertureKey;
 
-public extern "C" CFStringRef kCVImageBufferFieldCountKey;
+public extern "C" CFStringRef? kCVImageBufferFieldCountKey;
 
-public extern "C" CFStringRef kCVImageBufferFieldDetailKey;
+public extern "C" CFStringRef? kCVImageBufferFieldDetailKey;
 
-public extern "C" CFStringRef kCVImageBufferFieldDetailTemporalTopFirst;
+public extern "C" CFStringRef? kCVImageBufferFieldDetailTemporalTopFirst;
 
-public extern "C" CFStringRef kCVImageBufferFieldDetailTemporalBottomFirst;
+public extern "C" CFStringRef? kCVImageBufferFieldDetailTemporalBottomFirst;
 
-public extern "C" CFStringRef kCVImageBufferFieldDetailSpatialFirstLineEarly;
+public extern "C" CFStringRef? kCVImageBufferFieldDetailSpatialFirstLineEarly;
 
-public extern "C" CFStringRef kCVImageBufferFieldDetailSpatialFirstLineLate;
+public extern "C" CFStringRef? kCVImageBufferFieldDetailSpatialFirstLineLate;
 
-public extern "C" CFStringRef kCVImageBufferPixelAspectRatioKey;
+public extern "C" CFStringRef? kCVImageBufferPixelAspectRatioKey;
 
-public extern "C" CFStringRef kCVImageBufferPixelAspectRatioHorizontalSpacingKey;
+public extern "C" CFStringRef? kCVImageBufferPixelAspectRatioHorizontalSpacingKey;
 
-public extern "C" CFStringRef kCVImageBufferPixelAspectRatioVerticalSpacingKey;
+public extern "C" CFStringRef? kCVImageBufferPixelAspectRatioVerticalSpacingKey;
 
-public extern "C" CFStringRef kCVImageBufferDisplayDimensionsKey;
+public extern "C" CFStringRef? kCVImageBufferDisplayDimensionsKey;
 
-public extern "C" CFStringRef kCVImageBufferDisplayWidthKey;
+public extern "C" CFStringRef? kCVImageBufferDisplayWidthKey;
 
-public extern "C" CFStringRef kCVImageBufferDisplayHeightKey;
+public extern "C" CFStringRef? kCVImageBufferDisplayHeightKey;
 
-public extern "C" CFStringRef kCVImageBufferGammaLevelKey;
+public extern "C" CFStringRef? kCVImageBufferGammaLevelKey;
 
-public extern "C" CFStringRef kCVImageBufferICCProfileKey;
+public extern "C" CFStringRef? kCVImageBufferICCProfileKey;
 
-public extern "C" CFStringRef kCVImageBufferYCbCrMatrixKey;
+public extern "C" CFStringRef? kCVImageBufferYCbCrMatrixKey;
 
-public extern "C" CFStringRef kCVImageBufferYCbCrMatrix_ITU_R_709_2;
+public extern "C" CFStringRef? kCVImageBufferYCbCrMatrix_ITU_R_709_2;
 
-public extern "C" CFStringRef kCVImageBufferYCbCrMatrix_ITU_R_601_4;
+public extern "C" CFStringRef? kCVImageBufferYCbCrMatrix_ITU_R_601_4;
 
-public extern "C" CFStringRef kCVImageBufferYCbCrMatrix_SMPTE_240M_1995;
+public extern "C" CFStringRef? kCVImageBufferYCbCrMatrix_SMPTE_240M_1995;
 
 /// Deprecated in macOS 11.0.
 public extern "C" CFStringRef kCVImageBufferYCbCrMatrix_DCI_P3;
@@ -87,101 +88,101 @@ public extern "C" CFStringRef kCVImageBufferYCbCrMatrix_DCI_P3;
 /// Deprecated in macOS 11.0.
 public extern "C" CFStringRef kCVImageBufferYCbCrMatrix_P3_D65;
 
-public extern "C" CFStringRef kCVImageBufferYCbCrMatrix_ITU_R_2020;
+public extern "C" CFStringRef? kCVImageBufferYCbCrMatrix_ITU_R_2020;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimariesKey;
+public extern "C" CFStringRef? kCVImageBufferColorPrimariesKey;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimaries_ITU_R_709_2;
+public extern "C" CFStringRef? kCVImageBufferColorPrimaries_ITU_R_709_2;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimaries_EBU_3213;
+public extern "C" CFStringRef? kCVImageBufferColorPrimaries_EBU_3213;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimaries_SMPTE_C;
+public extern "C" CFStringRef? kCVImageBufferColorPrimaries_SMPTE_C;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimaries_P22;
+public extern "C" CFStringRef? kCVImageBufferColorPrimaries_P22;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimaries_DCI_P3;
+public extern "C" CFStringRef? kCVImageBufferColorPrimaries_DCI_P3;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimaries_P3_D65;
+public extern "C" CFStringRef? kCVImageBufferColorPrimaries_P3_D65;
 
-public extern "C" CFStringRef kCVImageBufferColorPrimaries_ITU_R_2020;
+public extern "C" CFStringRef? kCVImageBufferColorPrimaries_ITU_R_2020;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunctionKey;
+public extern "C" CFStringRef? kCVImageBufferTransferFunctionKey;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_ITU_R_709_2;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_ITU_R_709_2;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_SMPTE_240M_1995;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_SMPTE_240M_1995;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_UseGamma;
-
-/// Deprecated in macOS 10.6.
-public extern "C" CFStringRef kCVImageBufferTransferFunction_EBU_3213;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_UseGamma;
 
 /// Deprecated in macOS 10.6.
-public extern "C" CFStringRef kCVImageBufferTransferFunction_SMPTE_C;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_EBU_3213;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_sRGB;
+/// Deprecated in macOS 10.6.
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_SMPTE_C;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_ITU_R_2020;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_sRGB;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_SMPTE_ST_428_1;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_ITU_R_2020;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_SMPTE_ST_428_1;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_ITU_R_2100_HLG;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ;
 
-public extern "C" CFStringRef kCVImageBufferTransferFunction_Linear;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_ITU_R_2100_HLG;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocationTopFieldKey;
+public extern "C" CFStringRef? kCVImageBufferTransferFunction_Linear;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocationBottomFieldKey;
+public extern "C" CFStringRef? kCVImageBufferChromaLocationTopFieldKey;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocation_Left;
+public extern "C" CFStringRef? kCVImageBufferChromaLocationBottomFieldKey;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocation_Center;
+public extern "C" CFStringRef? kCVImageBufferChromaLocation_Left;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocation_TopLeft;
+public extern "C" CFStringRef? kCVImageBufferChromaLocation_Center;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocation_Top;
+public extern "C" CFStringRef? kCVImageBufferChromaLocation_TopLeft;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocation_BottomLeft;
+public extern "C" CFStringRef? kCVImageBufferChromaLocation_Top;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocation_Bottom;
+public extern "C" CFStringRef? kCVImageBufferChromaLocation_BottomLeft;
 
-public extern "C" CFStringRef kCVImageBufferChromaLocation_DV420;
+public extern "C" CFStringRef? kCVImageBufferChromaLocation_Bottom;
 
-public extern "C" CFStringRef kCVImageBufferChromaSubsamplingKey;
+public extern "C" CFStringRef? kCVImageBufferChromaLocation_DV420;
 
-public extern "C" CFStringRef kCVImageBufferChromaSubsampling_420;
+public extern "C" CFStringRef? kCVImageBufferChromaSubsamplingKey;
 
-public extern "C" CFStringRef kCVImageBufferChromaSubsampling_422;
+public extern "C" CFStringRef? kCVImageBufferChromaSubsampling_420;
 
-public extern "C" CFStringRef kCVImageBufferChromaSubsampling_411;
+public extern "C" CFStringRef? kCVImageBufferChromaSubsampling_422;
 
-public extern "C" CFStringRef kCVImageBufferAlphaChannelIsOpaque;
+public extern "C" CFStringRef? kCVImageBufferChromaSubsampling_411;
 
-public extern "C" CFStringRef kCVImageBufferAlphaChannelModeKey;
+public extern "C" CFStringRef? kCVImageBufferAlphaChannelIsOpaque;
 
-public extern "C" CFStringRef kCVImageBufferAlphaChannelMode_StraightAlpha;
+public extern "C" CFStringRef? kCVImageBufferAlphaChannelModeKey;
 
-public extern "C" CFStringRef kCVImageBufferAlphaChannelMode_PremultipliedAlpha;
+public extern "C" CFStringRef? kCVImageBufferAlphaChannelMode_StraightAlpha;
+
+public extern "C" CFStringRef? kCVImageBufferAlphaChannelMode_PremultipliedAlpha;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kCVImageBufferPostDecodeProcessingSequenceMetadataKey;
+public extern "C" CFStringRef? kCVImageBufferPostDecodeProcessingSequenceMetadataKey;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kCVImageBufferPostDecodeProcessingFrameMetadataKey;
+public extern "C" CFStringRef? kCVImageBufferPostDecodeProcessingFrameMetadataKey;
 
-public extern "C" int CVYCbCrMatrixGetIntegerCodePointForString(CFStringRef yCbCrMatrixString);
+public extern "C" int CVYCbCrMatrixGetIntegerCodePointForString(CFStringRef? yCbCrMatrixString);
 
-public extern "C" int CVColorPrimariesGetIntegerCodePointForString(CFStringRef colorPrimariesString);
+public extern "C" int CVColorPrimariesGetIntegerCodePointForString(CFStringRef? colorPrimariesString);
 
-public extern "C" int CVTransferFunctionGetIntegerCodePointForString(CFStringRef transferFunctionString);
+public extern "C" int CVTransferFunctionGetIntegerCodePointForString(CFStringRef? transferFunctionString);
 
-public extern "C" CFStringRef CVYCbCrMatrixGetStringForIntegerCodePoint(int yCbCrMatrixCodePoint);
+public extern "C" CFStringRef? CVYCbCrMatrixGetStringForIntegerCodePoint(int yCbCrMatrixCodePoint);
 
-public extern "C" CFStringRef CVColorPrimariesGetStringForIntegerCodePoint(int colorPrimariesCodePoint);
+public extern "C" CFStringRef? CVColorPrimariesGetStringForIntegerCodePoint(int colorPrimariesCodePoint);
 
-public extern "C" CFStringRef CVTransferFunctionGetStringForIntegerCodePoint(int transferFunctionCodePoint);
+public extern "C" CFStringRef? CVTransferFunctionGetStringForIntegerCodePoint(int transferFunctionCodePoint);
 
 public using CVImageBufferRef = CVBufferRef;
 
@@ -193,13 +194,13 @@ public extern "C" CGRect CVImageBufferGetCleanRect(CVImageBufferRef imageBuffer)
 
 public extern "C" Boolean CVImageBufferIsFlipped(CVImageBufferRef imageBuffer);
 
-public extern "C" CGColorSpaceRef CVImageBufferGetColorSpace(CVImageBufferRef imageBuffer);
+public extern "C" CGColorSpaceRef? CVImageBufferGetColorSpace(CVImageBufferRef imageBuffer);
 
-public extern "C" CGColorSpaceRef CVImageBufferCreateColorSpaceFromAttachments(CFDictionaryRef attachments);
+[ReturnsRetained] public extern "C" CGColorSpaceRef? CVImageBufferCreateColorSpaceFromAttachments(CFDictionaryRef attachments);
 
-public extern "C" CFStringRef kCVImageBufferMasteringDisplayColorVolumeKey;
+public extern "C" CFStringRef? kCVImageBufferMasteringDisplayColorVolumeKey;
 
-public extern "C" CFStringRef kCVImageBufferContentLightLevelInfoKey;
+public extern "C" CFStringRef? kCVImageBufferContentLightLevelInfoKey;
 
 public extern "C" CFStringRef kCVImageBufferAmbientViewingEnvironmentKey;
 

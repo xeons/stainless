@@ -25,6 +25,7 @@ module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -37,11 +38,12 @@ public const int kCMSimpleQueueError_QueueIsFull = -12773;
 
 public struct opaqueCMSimpleQueue;
 
-public using CMSimpleQueueRef = opaqueCMSimpleQueue*;
+[CFType("CMSimpleQueueGetTypeID")]
+public extern objc class CMSimpleQueueRef : CFTypeRef { }
 
 public extern "C" CFTypeID CMSimpleQueueGetTypeID();
 
-public extern "C" OSStatus CMSimpleQueueCreate(CFAllocatorRef allocator, int capacity, CMSimpleQueueRef* queueOut);
+public extern "C" OSStatus CMSimpleQueueCreate(CFAllocatorRef? allocator, int capacity, opaqueCMSimpleQueue** queueOut);
 
 public extern "C" OSStatus CMSimpleQueueEnqueue(CMSimpleQueueRef queue, void* element);
 

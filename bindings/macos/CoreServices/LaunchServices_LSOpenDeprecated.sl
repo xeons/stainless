@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -60,8 +61,8 @@ public struct LSApplicationParameters
     public LSLaunchFlags flags;
     public FSRef* application;
     public void* asyncLaunchRefCon;
-    public CFDictionaryRef environment;
-    public CFArrayRef argv;
+    public __CFDictionary* environment;
+    public __CFArray* argv;
     public AppleEvent* initialEvent;
 }
 
@@ -72,6 +73,6 @@ public extern "C" OSStatus LSOpenApplication(LSApplicationParameters* appParams,
 public extern "C" OSStatus LSOpenItemsWithRole(FSRef* inItems, CFIndex inItemCount, LSRolesMask inRole, AEKeyDesc* inAEParam, LSApplicationParameters* inAppParams, ProcessSerialNumber* outPSNs, CFIndex inMaxPSNCount);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus LSOpenURLsWithRole(CFArrayRef inURLs, LSRolesMask inRole, AEKeyDesc* inAEParam, LSApplicationParameters* inAppParams, ProcessSerialNumber* outPSNs, CFIndex inMaxPSNCount);
+public extern "C" OSStatus LSOpenURLsWithRole(CFArrayRef? inURLs, LSRolesMask inRole, AEKeyDesc* inAEParam, LSApplicationParameters* inAppParams, ProcessSerialNumber* outPSNs, CFIndex inMaxPSNCount);
 
 #endif

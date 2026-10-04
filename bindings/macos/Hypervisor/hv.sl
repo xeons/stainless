@@ -34,10 +34,6 @@ public extern "C" hv_return_t hv_capability(hv_capability_t capability, ulong* v
 #endif
 
 #if X64
-public extern "C" hv_return_t hv_vm_create(hv_vm_options_t flags);
-#endif
-
-#if X64
 public extern "C" hv_return_t hv_vm_space_create(hv_vm_space_t* asid);
 #endif
 
@@ -67,10 +63,6 @@ public extern "C" hv_return_t hv_vm_add_pio_notifier(ushort addr, nuint size, ui
 
 #if X64
 public extern "C" hv_return_t hv_vm_remove_pio_notifier(ushort addr, nuint size, uint value, mach_port_t mach_port, hv_ion_flags_t flags);
-#endif
-
-#if X64
-public extern "C" hv_return_t hv_vcpu_create(hv_vcpuid_t* vcpu, hv_vcpu_options_t flags);
 #endif
 
 #if X64

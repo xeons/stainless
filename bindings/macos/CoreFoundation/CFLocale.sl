@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -35,35 +36,36 @@ public using CFLocaleKey = CFStringRef;
 
 public struct __CFLocale;
 
-public using CFLocaleRef = __CFLocale*;
+[CFType("CFLocaleGetTypeID")]
+public extern objc class CFLocaleRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFLocaleGetTypeID();
 
-public extern "C" CFLocaleRef CFLocaleGetSystem();
+public extern "C" CFLocaleRef? CFLocaleGetSystem();
 
-public extern "C" CFLocaleRef CFLocaleCopyCurrent();
+[ReturnsRetained] public extern "C" CFLocaleRef? CFLocaleCopyCurrent();
 
-public extern "C" CFArrayRef CFLocaleCopyAvailableLocaleIdentifiers();
+[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyAvailableLocaleIdentifiers();
 
-public extern "C" CFArrayRef CFLocaleCopyISOLanguageCodes();
+[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyISOLanguageCodes();
 
-public extern "C" CFArrayRef CFLocaleCopyISOCountryCodes();
+[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyISOCountryCodes();
 
-public extern "C" CFArrayRef CFLocaleCopyISOCurrencyCodes();
+[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyISOCurrencyCodes();
 
-public extern "C" CFArrayRef CFLocaleCopyCommonISOCurrencyCodes();
+[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyCommonISOCurrencyCodes();
 
-public extern "C" CFArrayRef CFLocaleCopyPreferredLanguages();
+[ReturnsRetained] public extern "C" CFArrayRef? CFLocaleCopyPreferredLanguages();
 
-public extern "C" CFLocaleIdentifier CFLocaleCreateCanonicalLanguageIdentifierFromString(CFAllocatorRef allocator, CFStringRef localeIdentifier);
+[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLanguageIdentifierFromString(CFAllocatorRef? allocator, CFStringRef? localeIdentifier);
 
-public extern "C" CFLocaleIdentifier CFLocaleCreateCanonicalLocaleIdentifierFromString(CFAllocatorRef allocator, CFStringRef localeIdentifier);
+[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLocaleIdentifierFromString(CFAllocatorRef? allocator, CFStringRef? localeIdentifier);
 
-public extern "C" CFLocaleIdentifier CFLocaleCreateCanonicalLocaleIdentifierFromScriptManagerCodes(CFAllocatorRef allocator, LangCode lcode, RegionCode rcode);
+[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateCanonicalLocaleIdentifierFromScriptManagerCodes(CFAllocatorRef? allocator, LangCode lcode, RegionCode rcode);
 
-public extern "C" CFLocaleIdentifier CFLocaleCreateLocaleIdentifierFromWindowsLocaleCode(CFAllocatorRef allocator, uint lcid);
+[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateLocaleIdentifierFromWindowsLocaleCode(CFAllocatorRef? allocator, uint lcid);
 
-public extern "C" uint CFLocaleGetWindowsLocaleCodeFromLocaleIdentifier(CFLocaleIdentifier localeIdentifier);
+public extern "C" uint CFLocaleGetWindowsLocaleCodeFromLocaleIdentifier(CFLocaleIdentifier? localeIdentifier);
 
 public enum CFLocaleLanguageDirection : long
 {
@@ -74,125 +76,125 @@ public enum CFLocaleLanguageDirection : long
     BottomToTop = 4,
 }
 
-public extern "C" CFLocaleLanguageDirection CFLocaleGetLanguageCharacterDirection(CFStringRef isoLangCode);
+public extern "C" CFLocaleLanguageDirection CFLocaleGetLanguageCharacterDirection(CFStringRef? isoLangCode);
 
-public extern "C" CFLocaleLanguageDirection CFLocaleGetLanguageLineDirection(CFStringRef isoLangCode);
+public extern "C" CFLocaleLanguageDirection CFLocaleGetLanguageLineDirection(CFStringRef? isoLangCode);
 
-public extern "C" CFDictionaryRef CFLocaleCreateComponentsFromLocaleIdentifier(CFAllocatorRef allocator, CFLocaleIdentifier localeID);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CFLocaleCreateComponentsFromLocaleIdentifier(CFAllocatorRef? allocator, CFLocaleIdentifier? localeID);
 
-public extern "C" CFLocaleIdentifier CFLocaleCreateLocaleIdentifierFromComponents(CFAllocatorRef allocator, CFDictionaryRef dictionary);
+[ReturnsRetained] public extern "C" CFLocaleIdentifier? CFLocaleCreateLocaleIdentifierFromComponents(CFAllocatorRef? allocator, CFDictionaryRef? dictionary);
 
-public extern "C" CFLocaleRef CFLocaleCreate(CFAllocatorRef allocator, CFLocaleIdentifier localeIdentifier);
+[ReturnsRetained] public extern "C" CFLocaleRef? CFLocaleCreate(CFAllocatorRef? allocator, CFLocaleIdentifier? localeIdentifier);
 
-public extern "C" CFLocaleRef CFLocaleCreateCopy(CFAllocatorRef allocator, CFLocaleRef locale);
+[ReturnsRetained] public extern "C" CFLocaleRef? CFLocaleCreateCopy(CFAllocatorRef? allocator, CFLocaleRef? locale);
 
-public extern "C" CFLocaleIdentifier CFLocaleGetIdentifier(CFLocaleRef locale);
+public extern "C" CFLocaleIdentifier? CFLocaleGetIdentifier(CFLocaleRef? locale);
 
-public extern "C" CFTypeRef CFLocaleGetValue(CFLocaleRef locale, CFLocaleKey key);
+public extern "C" CFTypeRef? CFLocaleGetValue(CFLocaleRef? locale, CFLocaleKey? key);
 
-public extern "C" CFStringRef CFLocaleCopyDisplayNameForPropertyValue(CFLocaleRef displayLocale, CFLocaleKey key, CFStringRef value);
+[ReturnsRetained] public extern "C" CFStringRef? CFLocaleCopyDisplayNameForPropertyValue(CFLocaleRef? displayLocale, CFLocaleKey? key, CFStringRef? value);
 
-public extern "C" CFNotificationName kCFLocaleCurrentLocaleDidChangeNotification;
+public extern "C" CFNotificationName? kCFLocaleCurrentLocaleDidChangeNotification;
 
-public extern "C" CFLocaleKey kCFLocaleIdentifier;
+public extern "C" CFLocaleKey? kCFLocaleIdentifier;
 
-public extern "C" CFLocaleKey kCFLocaleLanguageCode;
+public extern "C" CFLocaleKey? kCFLocaleLanguageCode;
 
-public extern "C" CFLocaleKey kCFLocaleCountryCode;
+public extern "C" CFLocaleKey? kCFLocaleCountryCode;
 
-public extern "C" CFLocaleKey kCFLocaleScriptCode;
+public extern "C" CFLocaleKey? kCFLocaleScriptCode;
 
-public extern "C" CFLocaleKey kCFLocaleVariantCode;
+public extern "C" CFLocaleKey? kCFLocaleVariantCode;
 
-public extern "C" CFLocaleKey kCFLocaleExemplarCharacterSet;
+public extern "C" CFLocaleKey? kCFLocaleExemplarCharacterSet;
 
-public extern "C" CFLocaleKey kCFLocaleCalendarIdentifier;
+public extern "C" CFLocaleKey? kCFLocaleCalendarIdentifier;
 
-public extern "C" CFLocaleKey kCFLocaleCalendar;
+public extern "C" CFLocaleKey? kCFLocaleCalendar;
 
-public extern "C" CFLocaleKey kCFLocaleCollationIdentifier;
+public extern "C" CFLocaleKey? kCFLocaleCollationIdentifier;
 
-public extern "C" CFLocaleKey kCFLocaleUsesMetricSystem;
+public extern "C" CFLocaleKey? kCFLocaleUsesMetricSystem;
 
-public extern "C" CFLocaleKey kCFLocaleMeasurementSystem;
+public extern "C" CFLocaleKey? kCFLocaleMeasurementSystem;
 
-public extern "C" CFLocaleKey kCFLocaleDecimalSeparator;
+public extern "C" CFLocaleKey? kCFLocaleDecimalSeparator;
 
-public extern "C" CFLocaleKey kCFLocaleGroupingSeparator;
+public extern "C" CFLocaleKey? kCFLocaleGroupingSeparator;
 
-public extern "C" CFLocaleKey kCFLocaleCurrencySymbol;
+public extern "C" CFLocaleKey? kCFLocaleCurrencySymbol;
 
-public extern "C" CFLocaleKey kCFLocaleCurrencyCode;
+public extern "C" CFLocaleKey? kCFLocaleCurrencyCode;
 
-public extern "C" CFLocaleKey kCFLocaleCollatorIdentifier;
+public extern "C" CFLocaleKey? kCFLocaleCollatorIdentifier;
 
-public extern "C" CFLocaleKey kCFLocaleQuotationBeginDelimiterKey;
+public extern "C" CFLocaleKey? kCFLocaleQuotationBeginDelimiterKey;
 
-public extern "C" CFLocaleKey kCFLocaleQuotationEndDelimiterKey;
+public extern "C" CFLocaleKey? kCFLocaleQuotationEndDelimiterKey;
 
-public extern "C" CFLocaleKey kCFLocaleAlternateQuotationBeginDelimiterKey;
+public extern "C" CFLocaleKey? kCFLocaleAlternateQuotationBeginDelimiterKey;
 
-public extern "C" CFLocaleKey kCFLocaleAlternateQuotationEndDelimiterKey;
+public extern "C" CFLocaleKey? kCFLocaleAlternateQuotationEndDelimiterKey;
 
 public using CFCalendarIdentifier = CFStringRef;
 
-public extern "C" CFCalendarIdentifier kCFGregorianCalendar;
+public extern "C" CFCalendarIdentifier? kCFGregorianCalendar;
 
-public extern "C" CFCalendarIdentifier kCFBuddhistCalendar;
+public extern "C" CFCalendarIdentifier? kCFBuddhistCalendar;
 
-public extern "C" CFCalendarIdentifier kCFChineseCalendar;
+public extern "C" CFCalendarIdentifier? kCFChineseCalendar;
 
-public extern "C" CFCalendarIdentifier kCFHebrewCalendar;
+public extern "C" CFCalendarIdentifier? kCFHebrewCalendar;
 
-public extern "C" CFCalendarIdentifier kCFIslamicCalendar;
+public extern "C" CFCalendarIdentifier? kCFIslamicCalendar;
 
-public extern "C" CFCalendarIdentifier kCFIslamicCivilCalendar;
+public extern "C" CFCalendarIdentifier? kCFIslamicCivilCalendar;
 
-public extern "C" CFCalendarIdentifier kCFJapaneseCalendar;
+public extern "C" CFCalendarIdentifier? kCFJapaneseCalendar;
 
-public extern "C" CFCalendarIdentifier kCFRepublicOfChinaCalendar;
+public extern "C" CFCalendarIdentifier? kCFRepublicOfChinaCalendar;
 
-public extern "C" CFCalendarIdentifier kCFPersianCalendar;
+public extern "C" CFCalendarIdentifier? kCFPersianCalendar;
 
-public extern "C" CFCalendarIdentifier kCFIndianCalendar;
+public extern "C" CFCalendarIdentifier? kCFIndianCalendar;
 
-public extern "C" CFCalendarIdentifier kCFISO8601Calendar;
+public extern "C" CFCalendarIdentifier? kCFISO8601Calendar;
 
-public extern "C" CFCalendarIdentifier kCFIslamicTabularCalendar;
+public extern "C" CFCalendarIdentifier? kCFIslamicTabularCalendar;
 
-public extern "C" CFCalendarIdentifier kCFIslamicUmmAlQuraCalendar;
-
-/// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFBanglaCalendar;
+public extern "C" CFCalendarIdentifier? kCFIslamicUmmAlQuraCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFGujaratiCalendar;
+public extern "C" CFCalendarIdentifier? kCFBanglaCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFKannadaCalendar;
+public extern "C" CFCalendarIdentifier? kCFGujaratiCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFMalayalamCalendar;
+public extern "C" CFCalendarIdentifier? kCFKannadaCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFMarathiCalendar;
+public extern "C" CFCalendarIdentifier? kCFMalayalamCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFOdiaCalendar;
+public extern "C" CFCalendarIdentifier? kCFMarathiCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFTamilCalendar;
+public extern "C" CFCalendarIdentifier? kCFOdiaCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFTeluguCalendar;
+public extern "C" CFCalendarIdentifier? kCFTamilCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFVikramCalendar;
+public extern "C" CFCalendarIdentifier? kCFTeluguCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFDangiCalendar;
+public extern "C" CFCalendarIdentifier? kCFVikramCalendar;
 
 /// macOS 26.0 and later.
-public extern "C" CFCalendarIdentifier kCFVietnameseCalendar;
+public extern "C" CFCalendarIdentifier? kCFDangiCalendar;
+
+/// macOS 26.0 and later.
+public extern "C" CFCalendarIdentifier? kCFVietnameseCalendar;
 
 #endif

@@ -25,6 +25,7 @@ module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -192,34 +193,34 @@ public extern "C" CFStringRef kCVPixelBufferIOSurfacePropertiesKey;
 
 public extern "C" CFStringRef kCVPixelBufferMetalCompatibilityKey;
 
-public extern "C" CFStringRef kCVPixelBufferOpenGLTextureCacheCompatibilityKey;
+public extern "C" CFStringRef? kCVPixelBufferOpenGLTextureCacheCompatibilityKey;
 
-public extern "C" CFStringRef kCVPixelBufferVersatileBayerKey_BayerPattern;
+public extern "C" CFStringRef? kCVPixelBufferVersatileBayerKey_BayerPattern;
 
 public const int kCVVersatileBayer_BayerPattern_RGGB = 0;
 public const int kCVVersatileBayer_BayerPattern_GRBG = 1;
 public const int kCVVersatileBayer_BayerPattern_GBRG = 2;
 public const int kCVVersatileBayer_BayerPattern_BGGR = 3;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_SenselSitingOffsets;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_SenselSitingOffsets;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_BlackLevel;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_BlackLevel;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_WhiteLevel;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_WhiteLevel;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_WhiteBalanceCCT;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_WhiteBalanceCCT;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_WhiteBalanceRedFactor;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_WhiteBalanceRedFactor;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_WhiteBalanceBlueFactor;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_WhiteBalanceBlueFactor;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_ColorMatrix;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_ColorMatrix;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_GainFactor;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_GainFactor;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_RecommendedCrop;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_RecommendedCrop;
 
-public extern "C" CFStringRef kCVPixelBufferProResRAWKey_MetadataExtension;
+public extern "C" CFStringRef? kCVPixelBufferProResRAWKey_MetadataExtension;
 
 public extern "C" CFStringRef kCVPixelBufferIOSurfacePurgeableKey;
 
@@ -227,21 +228,19 @@ public using CVPixelBufferRef = CVImageBufferRef;
 
 public extern "C" CFTypeID CVPixelBufferGetTypeID();
 
-public extern "C" CVPixelBufferRef CVPixelBufferRetain(CVPixelBufferRef texture);
+public extern "C" CVPixelBufferRef? CVPixelBufferRetain(CVPixelBufferRef? texture);
 
-public extern "C" void CVPixelBufferRelease(CVPixelBufferRef texture);
+public extern "C" CVReturn CVPixelBufferCreateResolvedAttributesDictionary(CFAllocatorRef? allocator, CFArrayRef? attributes, __CFDictionary** resolvedDictionaryOut);
 
-public extern "C" CVReturn CVPixelBufferCreateResolvedAttributesDictionary(CFAllocatorRef allocator, CFArrayRef attributes, CFDictionaryRef* resolvedDictionaryOut);
-
-public extern "C" CVReturn CVPixelBufferCreate(CFAllocatorRef allocator, nuint width, nuint height, OSType pixelFormatType, CFDictionaryRef pixelBufferAttributes, CVPixelBufferRef* pixelBufferOut);
+public extern "C" CVReturn CVPixelBufferCreate(CFAllocatorRef? allocator, nuint width, nuint height, OSType pixelFormatType, CFDictionaryRef? pixelBufferAttributes, void** pixelBufferOut);
 
 public delegate void CVPixelBufferReleaseBytesCallback(void* arg0, void* arg1);
 
-public extern "C" CVReturn CVPixelBufferCreateWithBytes(CFAllocatorRef allocator, nuint width, nuint height, OSType pixelFormatType, void* baseAddress, nuint bytesPerRow, CVPixelBufferReleaseBytesCallback releaseCallback, void* releaseRefCon, CFDictionaryRef pixelBufferAttributes, CVPixelBufferRef* pixelBufferOut);
+public extern "C" CVReturn CVPixelBufferCreateWithBytes(CFAllocatorRef? allocator, nuint width, nuint height, OSType pixelFormatType, void* baseAddress, nuint bytesPerRow, CVPixelBufferReleaseBytesCallback releaseCallback, void* releaseRefCon, CFDictionaryRef? pixelBufferAttributes, void** pixelBufferOut);
 
 public delegate void CVPixelBufferReleasePlanarBytesCallback(void* arg0, void* arg1, nuint arg2, nuint arg3, void** arg4);
 
-public extern "C" CVReturn CVPixelBufferCreateWithPlanarBytes(CFAllocatorRef allocator, nuint width, nuint height, OSType pixelFormatType, void* dataPtr, nuint dataSize, nuint numberOfPlanes, void** planeBaseAddress, nuint* planeWidth, nuint* planeHeight, nuint* planeBytesPerRow, CVPixelBufferReleasePlanarBytesCallback releaseCallback, void* releaseRefCon, CFDictionaryRef pixelBufferAttributes, CVPixelBufferRef* pixelBufferOut);
+public extern "C" CVReturn CVPixelBufferCreateWithPlanarBytes(CFAllocatorRef? allocator, nuint width, nuint height, OSType pixelFormatType, void* dataPtr, nuint dataSize, nuint numberOfPlanes, void** planeBaseAddress, nuint* planeWidth, nuint* planeHeight, nuint* planeBytesPerRow, CVPixelBufferReleasePlanarBytesCallback releaseCallback, void* releaseRefCon, CFDictionaryRef? pixelBufferAttributes, void** pixelBufferOut);
 
 public extern "C" CVReturn CVPixelBufferLockBaseAddress(CVPixelBufferRef pixelBuffer, CVPixelBufferLockFlags lockFlags);
 
@@ -275,8 +274,8 @@ public extern "C" void CVPixelBufferGetExtendedPixels(CVPixelBufferRef pixelBuff
 
 public extern "C" CVReturn CVPixelBufferFillExtendedPixels(CVPixelBufferRef pixelBuffer);
 
-public extern "C" CFDictionaryRef CVPixelBufferCopyCreationAttributes(CVPixelBufferRef pixelBuffer);
+[ReturnsRetained] public extern "C" CFDictionaryRef CVPixelBufferCopyCreationAttributes(CVPixelBufferRef pixelBuffer);
 
-public extern "C" Boolean CVPixelBufferIsCompatibleWithAttributes(CVPixelBufferRef pixelBuffer, CFDictionaryRef attributes);
+public extern "C" Boolean CVPixelBufferIsCompatibleWithAttributes(CVPixelBufferRef pixelBuffer, CFDictionaryRef? attributes);
 
 #endif

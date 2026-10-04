@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -38,35 +39,35 @@ public enum LSAcceptanceFlags : uint
 }
 
 /// Deprecated in macOS 100000.
-public extern "C" CFURLRef LSCopyDefaultApplicationURLForURL(CFURLRef inURL, LSRolesMask inRoleMask, CFErrorRef* outError);
+[ReturnsRetained] public extern "C" CFURLRef? LSCopyDefaultApplicationURLForURL(CFURLRef inURL, LSRolesMask inRoleMask, __CFError** outError);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFURLRef LSCopyDefaultApplicationURLForContentType(CFStringRef inContentType, LSRolesMask inRoleMask, CFErrorRef* outError);
+[ReturnsRetained] public extern "C" CFURLRef? LSCopyDefaultApplicationURLForContentType(CFStringRef inContentType, LSRolesMask inRoleMask, __CFError** outError);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFArrayRef LSCopyApplicationURLsForBundleIdentifier(CFStringRef inBundleIdentifier, CFErrorRef* outError);
+[ReturnsRetained] public extern "C" CFArrayRef? LSCopyApplicationURLsForBundleIdentifier(CFStringRef inBundleIdentifier, __CFError** outError);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFArrayRef LSCopyApplicationURLsForURL(CFURLRef inURL, LSRolesMask inRoleMask);
+[ReturnsRetained] public extern "C" CFArrayRef? LSCopyApplicationURLsForURL(CFURLRef inURL, LSRolesMask inRoleMask);
 
 public extern "C" OSStatus LSCanURLAcceptURL(CFURLRef inItemURL, CFURLRef inTargetURL, LSRolesMask inRoleMask, LSAcceptanceFlags inFlags, Boolean* outAcceptsItem);
 
 public extern "C" OSStatus LSRegisterURL(CFURLRef inURL, Boolean inUpdate);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFStringRef LSCopyDefaultRoleHandlerForContentType(CFStringRef inContentType, LSRolesMask inRole);
+[ReturnsRetained] public extern "C" CFStringRef? LSCopyDefaultRoleHandlerForContentType(CFStringRef inContentType, LSRolesMask inRole);
 
 /// Deprecated in macOS 100000.
-public extern "C" CFArrayRef LSCopyAllRoleHandlersForContentType(CFStringRef inContentType, LSRolesMask inRole);
+[ReturnsRetained] public extern "C" CFArrayRef? LSCopyAllRoleHandlersForContentType(CFStringRef inContentType, LSRolesMask inRole);
 
 /// Deprecated in macOS 100000.
 public extern "C" OSStatus LSSetDefaultRoleHandlerForContentType(CFStringRef inContentType, LSRolesMask inRole, CFStringRef inHandlerBundleID);
 
 /// Deprecated in macOS 10.15.
-public extern "C" CFStringRef LSCopyDefaultHandlerForURLScheme(CFStringRef inURLScheme);
+[ReturnsRetained] public extern "C" CFStringRef? LSCopyDefaultHandlerForURLScheme(CFStringRef inURLScheme);
 
 /// Deprecated in macOS 10.15.
-public extern "C" CFArrayRef LSCopyAllHandlersForURLScheme(CFStringRef inURLScheme);
+[ReturnsRetained] public extern "C" CFArrayRef? LSCopyAllHandlersForURLScheme(CFStringRef inURLScheme);
 
 /// Deprecated in macOS 100000.
 public extern "C" OSStatus LSSetDefaultHandlerForURLScheme(CFStringRef inURLScheme, CFStringRef inHandlerBundleID);

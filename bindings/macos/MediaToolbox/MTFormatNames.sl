@@ -26,13 +26,14 @@ module MacOS.MediaToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreMedia;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "MediaToolbox")
 
-public extern "C" CFStringRef MTCopyLocalizedNameForMediaType(CMMediaType mediaType);
+[ReturnsRetained] public extern "C" CFStringRef? MTCopyLocalizedNameForMediaType(CMMediaType mediaType);
 
-public extern "C" CFStringRef MTCopyLocalizedNameForMediaSubType(CMMediaType mediaType, FourCharCode mediaSubType);
+[ReturnsRetained] public extern "C" CFStringRef? MTCopyLocalizedNameForMediaSubType(CMMediaType mediaType, FourCharCode mediaSubType);
 
 #endif

@@ -24,6 +24,7 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,16 +34,16 @@ public using SKDocumentRef = CFTypeRef;
 
 public extern "C" CFTypeID SKDocumentGetTypeID();
 
-public extern "C" SKDocumentRef SKDocumentCreateWithURL(CFURLRef inURL);
+[ReturnsRetained] public extern "C" SKDocumentRef? SKDocumentCreateWithURL(CFURLRef? inURL);
 
-public extern "C" CFURLRef SKDocumentCopyURL(SKDocumentRef inDocument);
+[ReturnsRetained] public extern "C" CFURLRef? SKDocumentCopyURL(SKDocumentRef? inDocument);
 
-public extern "C" SKDocumentRef SKDocumentCreate(CFStringRef inScheme, SKDocumentRef inParent, CFStringRef inName);
+[ReturnsRetained] public extern "C" SKDocumentRef? SKDocumentCreate(CFStringRef? inScheme, SKDocumentRef? inParent, CFStringRef? inName);
 
-public extern "C" CFStringRef SKDocumentGetSchemeName(SKDocumentRef inDocument);
+public extern "C" CFStringRef? SKDocumentGetSchemeName(SKDocumentRef? inDocument);
 
-public extern "C" CFStringRef SKDocumentGetName(SKDocumentRef inDocument);
+public extern "C" CFStringRef? SKDocumentGetName(SKDocumentRef? inDocument);
 
-public extern "C" SKDocumentRef SKDocumentGetParent(SKDocumentRef inDocument);
+public extern "C" SKDocumentRef? SKDocumentGetParent(SKDocumentRef? inDocument);
 
 #endif

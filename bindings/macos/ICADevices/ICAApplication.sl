@@ -26,6 +26,7 @@ module MacOS.ICADevices;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -145,105 +146,105 @@ public struct ICAPTPEventDataset
     public UInt32[3] params;
 }
 
-public extern "C" CFStringRef kICADevicesArrayKey;
+public extern "C" CFStringRef? kICADevicesArrayKey;
 
-public extern "C" CFStringRef kICAObjectKey;
+public extern "C" CFStringRef? kICAObjectKey;
 
-public extern "C" CFStringRef kICAObjectNameKey;
+public extern "C" CFStringRef? kICAObjectNameKey;
 
-public extern "C" CFStringRef kICAUSBVendorIDKey;
+public extern "C" CFStringRef? kICAUSBVendorIDKey;
 
-public extern "C" CFStringRef kICAUSBProductIDKey;
+public extern "C" CFStringRef? kICAUSBProductIDKey;
 
-public extern "C" CFStringRef kICADeviceTypeKey;
+public extern "C" CFStringRef? kICADeviceTypeKey;
 
-public extern "C" CFStringRef kICAExecutableArchitectureKey;
+public extern "C" CFStringRef? kICAExecutableArchitectureKey;
 
-public extern "C" CFStringRef kICARemoteDeviceKey;
+public extern "C" CFStringRef? kICARemoteDeviceKey;
 
-public extern "C" CFStringRef kICADeviceSharedKey;
+public extern "C" CFStringRef? kICADeviceSharedKey;
 
-public extern "C" CFStringRef kICADeviceWebSharedKey;
+public extern "C" CFStringRef? kICADeviceWebSharedKey;
 
-public extern "C" CFStringRef kICADeviceUsedKey;
+public extern "C" CFStringRef? kICADeviceUsedKey;
 
-public extern "C" CFStringRef kICABonjourServiceTypeKey;
+public extern "C" CFStringRef? kICABonjourServiceTypeKey;
 
-public extern "C" CFStringRef kICABonjourServiceNameKey;
+public extern "C" CFStringRef? kICABonjourServiceNameKey;
 
-public extern "C" CFStringRef kICABonjourTXTRecordKey;
+public extern "C" CFStringRef? kICABonjourTXTRecordKey;
 
-public extern "C" CFStringRef kICADeviceCapabilitiesKey;
+public extern "C" CFStringRef? kICADeviceCapabilitiesKey;
 
-public extern "C" CFStringRef kICALockStatusKey;
+public extern "C" CFStringRef? kICALockStatusKey;
 
-public extern "C" CFStringRef kICADataPropertyKey;
+public extern "C" CFStringRef? kICADataPropertyKey;
 
-public extern "C" CFStringRef kICADataTypeKey;
+public extern "C" CFStringRef? kICADataTypeKey;
 
-public extern "C" CFStringRef kICADataSizeKey;
+public extern "C" CFStringRef? kICADataSizeKey;
 
-public extern "C" CFStringRef kICAThumbnailPropertyKey;
+public extern "C" CFStringRef? kICAThumbnailPropertyKey;
 
-public extern "C" CFStringRef kICAThumbnailSizeKey;
+public extern "C" CFStringRef? kICAThumbnailSizeKey;
 
-public extern "C" CFStringRef kICARawKey;
+public extern "C" CFStringRef? kICARawKey;
 
-public extern "C" CFStringRef kICAMediaHeightKey;
+public extern "C" CFStringRef? kICAMediaHeightKey;
 
-public extern "C" CFStringRef kICAMediaWidthKey;
+public extern "C" CFStringRef? kICAMediaWidthKey;
 
-public extern "C" CFStringRef kICACreationDateStringKey;
+public extern "C" CFStringRef? kICACreationDateStringKey;
 
-public extern "C" CFStringRef kICAModificationDateStringKey;
+public extern "C" CFStringRef? kICAModificationDateStringKey;
 
-public extern "C" CFStringRef kMetaDataDictionaryKey;
+public extern "C" CFStringRef? kMetaDataDictionaryKey;
 
-public extern "C" CFStringRef kICAMediaDurationInSecondsKey;
+public extern "C" CFStringRef? kICAMediaDurationInSecondsKey;
 
-public extern "C" CFStringRef kICADeviceTypeCamera;
+public extern "C" CFStringRef? kICADeviceTypeCamera;
 
-public extern "C" CFStringRef kICADeviceTypeScanner;
+public extern "C" CFStringRef? kICADeviceTypeScanner;
 
-public extern "C" CFStringRef kICAUSBTransportType;
+public extern "C" CFStringRef? kICAUSBTransportType;
 
-public extern "C" CFStringRef kICAFireWireTransportType;
+public extern "C" CFStringRef? kICAFireWireTransportType;
 
-public extern "C" CFStringRef kICABluetoothTransportType;
+public extern "C" CFStringRef? kICABluetoothTransportType;
 
-public extern "C" CFStringRef kICATCPIPTransportType;
+public extern "C" CFStringRef? kICATCPIPTransportType;
 
-public extern "C" CFStringRef kICASCSITransportType;
+public extern "C" CFStringRef? kICASCSITransportType;
 
-public extern "C" CFStringRef kICATWAINTransportType;
+public extern "C" CFStringRef? kICATWAINTransportType;
 
-public extern "C" CFStringRef kICADeviceBrowserDeviceRefKey;
+public extern "C" CFStringRef? kICADeviceBrowserDeviceRefKey;
 
-public extern "C" CFStringRef kICADeviceModulePathKey;
+public extern "C" CFStringRef? kICADeviceModulePathKey;
 
-public extern "C" CFStringRef kICADeviceIconPathKey;
+public extern "C" CFStringRef? kICADeviceIconPathKey;
 
-public extern "C" CFStringRef kICATransportTypeKey;
+public extern "C" CFStringRef? kICATransportTypeKey;
 
-public extern "C" CFStringRef kICABluetoothAddressKey;
+public extern "C" CFStringRef? kICABluetoothAddressKey;
 
-public extern "C" CFStringRef kICAUSBLocationIDKey;
+public extern "C" CFStringRef? kICAUSBLocationIDKey;
 
-public extern "C" CFStringRef kICAFireWireGUIDKey;
+public extern "C" CFStringRef? kICAFireWireGUIDKey;
 
-public extern "C" CFStringRef kICAIOServicePathKey;
+public extern "C" CFStringRef? kICAIOServicePathKey;
 
-public extern "C" CFStringRef kICAIPAddressKey;
+public extern "C" CFStringRef? kICAIPAddressKey;
 
-public extern "C" CFStringRef kICAIPPortKey;
+public extern "C" CFStringRef? kICAIPPortKey;
 
-public extern "C" CFStringRef kICAIPNameKey;
+public extern "C" CFStringRef? kICAIPNameKey;
 
-public extern "C" CFStringRef kICAIPGUIDKey;
+public extern "C" CFStringRef? kICAIPGUIDKey;
 
-public extern "C" CFStringRef kICATWAINDSPathKey;
+public extern "C" CFStringRef? kICATWAINDSPathKey;
 
-public extern "C" CFStringRef kICAUserAssignedDeviceNameKey;
+public extern "C" CFStringRef? kICAUserAssignedDeviceNameKey;
 
 [Pack(2)]
 public struct ICAHeader
@@ -254,9 +255,9 @@ public struct ICAHeader
 
 public delegate void ICACompletion(ICAHeader* arg0);
 
-public delegate Boolean ICAImportFilterProc(CFDictionaryRef arg0, ulong arg1);
+public delegate Boolean ICAImportFilterProc(__CFDictionary* arg0, ulong arg1);
 
-public delegate void ICANotificationProc(CFStringRef arg0, CFDictionaryRef arg1);
+public delegate void ICANotificationProc(__CFString* arg0, __CFDictionary* arg1);
 
 public using ICAObject = UInt32;
 
@@ -286,213 +287,213 @@ public struct ICAImportImagePB
     public ICAHeader header;
     public ICAObject deviceObject;
     public UInt32 flags;
-    public CFArrayRef supportedFileTypes;
+    public __CFArray* supportedFileTypes;
     public ICAImportFilterProc filterProc;
-    public CFArrayRef* importedImages;
+    public __CFArray** importedImages;
 }
 
 /// Deprecated in macOS 10.7.
 public extern "C" ICAError ICAImportImage(ICAImportImagePB* pb, ICACompletion completion);
 
 /// Deprecated in macOS 10.7.
-public extern "C" ICAError ICAShowDeviceBrowser(CFDictionaryRef options);
+public extern "C" ICAError ICAShowDeviceBrowser(CFDictionaryRef? options);
 
-public delegate void ICANotification(CFStringRef arg0, CFDictionaryRef arg1);
+public delegate void ICANotification(__CFString* arg0, __CFDictionary* arg1);
 
-public extern "C" CFStringRef kICANotificationTypeObjectAdded;
+public extern "C" CFStringRef? kICANotificationTypeObjectAdded;
 
-public extern "C" CFStringRef kICANotificationTypeObjectRemoved;
+public extern "C" CFStringRef? kICANotificationTypeObjectRemoved;
 
-public extern "C" CFStringRef kICANotificationTypeObjectInfoChanged;
+public extern "C" CFStringRef? kICANotificationTypeObjectInfoChanged;
 
-public extern "C" CFStringRef kICANotificationTypeStoreAdded;
+public extern "C" CFStringRef? kICANotificationTypeStoreAdded;
 
-public extern "C" CFStringRef kICANotificationTypeStoreRemoved;
+public extern "C" CFStringRef? kICANotificationTypeStoreRemoved;
 
-public extern "C" CFStringRef kICANotificationTypeStoreFull;
+public extern "C" CFStringRef? kICANotificationTypeStoreFull;
 
-public extern "C" CFStringRef kICANotificationTypeStoreInfoChanged;
+public extern "C" CFStringRef? kICANotificationTypeStoreInfoChanged;
 
-public extern "C" CFStringRef kICANotificationTypeDeviceAdded;
+public extern "C" CFStringRef? kICANotificationTypeDeviceAdded;
 
-public extern "C" CFStringRef kICANotificationTypeDeviceRemoved;
+public extern "C" CFStringRef? kICANotificationTypeDeviceRemoved;
 
-public extern "C" CFStringRef kICANotificationTypeDeviceInfoChanged;
+public extern "C" CFStringRef? kICANotificationTypeDeviceInfoChanged;
 
-public extern "C" CFStringRef kICANotificationTypeDevicePropertyChanged;
+public extern "C" CFStringRef? kICANotificationTypeDevicePropertyChanged;
 
-public extern "C" CFStringRef kICANotificationTypeDeviceWasReset;
+public extern "C" CFStringRef? kICANotificationTypeDeviceWasReset;
 
-public extern "C" CFStringRef kICANotificationTypeDeviceStatusInfo;
+public extern "C" CFStringRef? kICANotificationTypeDeviceStatusInfo;
 
-public extern "C" CFStringRef kICANotificationTypeDeviceStatusError;
+public extern "C" CFStringRef? kICANotificationTypeDeviceStatusError;
 
-public extern "C" CFStringRef kICANotificationTypeCaptureComplete;
+public extern "C" CFStringRef? kICANotificationTypeCaptureComplete;
 
-public extern "C" CFStringRef kICANotificationTypeRequestObjectTransfer;
+public extern "C" CFStringRef? kICANotificationTypeRequestObjectTransfer;
 
-public extern "C" CFStringRef kICANotificationTypeTransactionCanceled;
+public extern "C" CFStringRef? kICANotificationTypeTransactionCanceled;
 
-public extern "C" CFStringRef kICANotificationTypeUnreportedStatus;
+public extern "C" CFStringRef? kICANotificationTypeUnreportedStatus;
 
-public extern "C" CFStringRef kICANotificationTypeProprietary;
+public extern "C" CFStringRef? kICANotificationTypeProprietary;
 
-public extern "C" CFStringRef kICANotificationTypeDeviceConnectionProgress;
+public extern "C" CFStringRef? kICANotificationTypeDeviceConnectionProgress;
 
-public extern "C" CFStringRef kICANotificationTypeDownloadProgressStatus;
+public extern "C" CFStringRef? kICANotificationTypeDownloadProgressStatus;
 
-public extern "C" CFStringRef kICANotificationTypeScanProgressStatus;
+public extern "C" CFStringRef? kICANotificationTypeScanProgressStatus;
 
-public extern "C" CFStringRef kICANotificationTypeScannerSessionClosed;
+public extern "C" CFStringRef? kICANotificationTypeScannerSessionClosed;
 
-public extern "C" CFStringRef kICANotificationTypeScannerScanDone;
+public extern "C" CFStringRef? kICANotificationTypeScannerScanDone;
 
-public extern "C" CFStringRef kICANotificationTypeScannerPageDone;
+public extern "C" CFStringRef? kICANotificationTypeScannerPageDone;
 
-public extern "C" CFStringRef kICANotificationTypeScannerButtonPressed;
+public extern "C" CFStringRef? kICANotificationTypeScannerButtonPressed;
 
-public extern "C" CFStringRef kICANotificationTypeScannerOverviewOverlayAvailable;
+public extern "C" CFStringRef? kICANotificationTypeScannerOverviewOverlayAvailable;
 
-public extern "C" CFStringRef kICAErrorKey;
+public extern "C" CFStringRef? kICAErrorKey;
 
-public extern "C" CFStringRef kICARefconKey;
+public extern "C" CFStringRef? kICARefconKey;
 
-public extern "C" CFStringRef kICANotificationICAObjectKey;
+public extern "C" CFStringRef? kICANotificationICAObjectKey;
 
-public extern "C" CFStringRef kICANotificationDeviceICAObjectKey;
+public extern "C" CFStringRef? kICANotificationDeviceICAObjectKey;
 
-public extern "C" CFStringRef kICANotificationDeviceListICAObjectKey;
+public extern "C" CFStringRef? kICANotificationDeviceListICAObjectKey;
 
-public extern "C" CFStringRef kICANotificationClassKey;
+public extern "C" CFStringRef? kICANotificationClassKey;
 
-public extern "C" CFStringRef kICANotificationTypeKey;
+public extern "C" CFStringRef? kICANotificationTypeKey;
 
-public extern "C" CFStringRef kICANotificationRawEventKey;
+public extern "C" CFStringRef? kICANotificationRawEventKey;
 
-public extern "C" CFStringRef kICANotificationDataKey;
+public extern "C" CFStringRef? kICANotificationDataKey;
 
-public extern "C" CFStringRef kICANotificationDataSizeKey;
+public extern "C" CFStringRef? kICANotificationDataSizeKey;
 
-public extern "C" CFStringRef kICANotificationDataCookieKey;
+public extern "C" CFStringRef? kICANotificationDataCookieKey;
 
-public extern "C" CFStringRef kICANotificationImageKey;
+public extern "C" CFStringRef? kICANotificationImageKey;
 
-public extern "C" CFStringRef kICANotificationImageWidthKey;
+public extern "C" CFStringRef? kICANotificationImageWidthKey;
 
-public extern "C" CFStringRef kICANotificationImageHeightKey;
+public extern "C" CFStringRef? kICANotificationImageHeightKey;
 
-public extern "C" CFStringRef kICANotificationImageBytesPerRowKey;
+public extern "C" CFStringRef? kICANotificationImageBytesPerRowKey;
 
-public extern "C" CFStringRef kICANotificationImageStartRowKey;
+public extern "C" CFStringRef? kICANotificationImageStartRowKey;
 
-public extern "C" CFStringRef kICANotificationImageNumberOfRowsKey;
+public extern "C" CFStringRef? kICANotificationImageNumberOfRowsKey;
 
-public extern "C" CFStringRef kICANotificationImageDataKey;
+public extern "C" CFStringRef? kICANotificationImageDataKey;
 
-public extern "C" CFStringRef kICANotificationImageDataSizeKey;
+public extern "C" CFStringRef? kICANotificationImageDataSizeKey;
 
-public extern "C" CFStringRef kICANotificationDataIsBigEndianKey;
+public extern "C" CFStringRef? kICANotificationDataIsBigEndianKey;
 
-public extern "C" CFStringRef kICANotificationScannerDocumentNameKey;
+public extern "C" CFStringRef? kICANotificationScannerDocumentNameKey;
 
-public extern "C" CFStringRef kICANotificationScannerButtonTypeKey;
+public extern "C" CFStringRef? kICANotificationScannerButtonTypeKey;
 
-public extern "C" CFStringRef kICANotificationNumerOfImagesRemainingKey;
+public extern "C" CFStringRef? kICANotificationNumerOfImagesRemainingKey;
 
-public extern "C" CFStringRef kICANotificationPercentDownloadedKey;
+public extern "C" CFStringRef? kICANotificationPercentDownloadedKey;
 
-public extern "C" CFStringRef kICANotificationSubTypeKey;
+public extern "C" CFStringRef? kICANotificationSubTypeKey;
 
-public extern "C" CFStringRef kICANotificationSubTypeWarmUpStarted;
+public extern "C" CFStringRef? kICANotificationSubTypeWarmUpStarted;
 
-public extern "C" CFStringRef kICANotificationSubTypeWarmUpDone;
+public extern "C" CFStringRef? kICANotificationSubTypeWarmUpDone;
 
-public extern "C" CFStringRef kICANotificationVendorErrorCodeKey;
+public extern "C" CFStringRef? kICANotificationVendorErrorCodeKey;
 
-public extern "C" CFStringRef kICANotificationSubTypePerformOverviewScan;
+public extern "C" CFStringRef? kICANotificationSubTypePerformOverviewScan;
 
-public extern "C" CFStringRef kICANotificationSubTypeDocumentLoaded;
+public extern "C" CFStringRef? kICANotificationSubTypeDocumentLoaded;
 
-public extern "C" CFStringRef kICANotificationSubTypeDocumentNotLoaded;
+public extern "C" CFStringRef? kICANotificationSubTypeDocumentNotLoaded;
 
-public extern "C" CFStringRef kICANotificationClassPTPStandard;
+public extern "C" CFStringRef? kICANotificationClassPTPStandard;
 
-public extern "C" CFStringRef kICANotificationClassPTPVendor;
+public extern "C" CFStringRef? kICANotificationClassPTPVendor;
 
-public extern "C" CFStringRef kICANotificationClassProprietary;
+public extern "C" CFStringRef? kICANotificationClassProprietary;
 
-public extern "C" CFStringRef kICADevicePropUndefined;
+public extern "C" CFStringRef? kICADevicePropUndefined;
 
-public extern "C" CFStringRef kICADevicePropBatteryLevel;
+public extern "C" CFStringRef? kICADevicePropBatteryLevel;
 
-public extern "C" CFStringRef kICADevicePropFunctionalMode;
+public extern "C" CFStringRef? kICADevicePropFunctionalMode;
 
-public extern "C" CFStringRef kICADevicePropImageSize;
+public extern "C" CFStringRef? kICADevicePropImageSize;
 
-public extern "C" CFStringRef kICADevicePropCompressionSetting;
+public extern "C" CFStringRef? kICADevicePropCompressionSetting;
 
-public extern "C" CFStringRef kICADevicePropWhiteBalance;
+public extern "C" CFStringRef? kICADevicePropWhiteBalance;
 
-public extern "C" CFStringRef kICADevicePropRGBGain;
+public extern "C" CFStringRef? kICADevicePropRGBGain;
 
-public extern "C" CFStringRef kICADevicePropFNumber;
+public extern "C" CFStringRef? kICADevicePropFNumber;
 
-public extern "C" CFStringRef kICADevicePropFocalLength;
+public extern "C" CFStringRef? kICADevicePropFocalLength;
 
-public extern "C" CFStringRef kICADevicePropFocusDistance;
+public extern "C" CFStringRef? kICADevicePropFocusDistance;
 
-public extern "C" CFStringRef kICADevicePropFocusMode;
+public extern "C" CFStringRef? kICADevicePropFocusMode;
 
-public extern "C" CFStringRef kICADevicePropExposureMeteringMode;
+public extern "C" CFStringRef? kICADevicePropExposureMeteringMode;
 
-public extern "C" CFStringRef kICADevicePropFlashMode;
+public extern "C" CFStringRef? kICADevicePropFlashMode;
 
-public extern "C" CFStringRef kICADevicePropExposureTime;
+public extern "C" CFStringRef? kICADevicePropExposureTime;
 
-public extern "C" CFStringRef kICADevicePropExposureProgramMode;
+public extern "C" CFStringRef? kICADevicePropExposureProgramMode;
 
-public extern "C" CFStringRef kICADevicePropExposureIndex;
+public extern "C" CFStringRef? kICADevicePropExposureIndex;
 
-public extern "C" CFStringRef kICADevicePropExposureBiasCompensation;
+public extern "C" CFStringRef? kICADevicePropExposureBiasCompensation;
 
-public extern "C" CFStringRef kICADevicePropDateTime;
+public extern "C" CFStringRef? kICADevicePropDateTime;
 
-public extern "C" CFStringRef kICADevicePropCaptureDelay;
+public extern "C" CFStringRef? kICADevicePropCaptureDelay;
 
-public extern "C" CFStringRef kICADevicePropStillCaptureMode;
+public extern "C" CFStringRef? kICADevicePropStillCaptureMode;
 
-public extern "C" CFStringRef kICADevicePropContrast;
+public extern "C" CFStringRef? kICADevicePropContrast;
 
-public extern "C" CFStringRef kICADevicePropSharpness;
+public extern "C" CFStringRef? kICADevicePropSharpness;
 
-public extern "C" CFStringRef kICADevicePropDigitalZoom;
+public extern "C" CFStringRef? kICADevicePropDigitalZoom;
 
-public extern "C" CFStringRef kICADevicePropEffectMode;
+public extern "C" CFStringRef? kICADevicePropEffectMode;
 
-public extern "C" CFStringRef kICADevicePropBurstNumber;
+public extern "C" CFStringRef? kICADevicePropBurstNumber;
 
-public extern "C" CFStringRef kICADevicePropBurstInterval;
+public extern "C" CFStringRef? kICADevicePropBurstInterval;
 
-public extern "C" CFStringRef kICADevicePropTimelapseNumber;
+public extern "C" CFStringRef? kICADevicePropTimelapseNumber;
 
-public extern "C" CFStringRef kICADevicePropTimelapseInterval;
+public extern "C" CFStringRef? kICADevicePropTimelapseInterval;
 
-public extern "C" CFStringRef kICADevicePropFocusMeteringMode;
+public extern "C" CFStringRef? kICADevicePropFocusMeteringMode;
 
-public extern "C" CFStringRef kICADevicePropUploadURL;
+public extern "C" CFStringRef? kICADevicePropUploadURL;
 
-public extern "C" CFStringRef kICADevicePropArtist;
+public extern "C" CFStringRef? kICADevicePropArtist;
 
-public extern "C" CFStringRef kICADevicePropCopyrightInfo;
+public extern "C" CFStringRef? kICADevicePropCopyrightInfo;
 
 [Pack(2)]
 public struct ICARegisterForEventNotificationPB
 {
     public ICAHeader header;
     public ICAObject objectOfInterest;
-    public CFArrayRef eventsOfInterest;
+    public __CFArray* eventsOfInterest;
     public ICANotification notificationProc;
-    public CFDictionaryRef options;
+    public __CFDictionary* options;
 }
 
 /// Deprecated in macOS 10.7.
@@ -502,7 +503,7 @@ public extern "C" ICAError ICARegisterForEventNotification(ICARegisterForEventNo
 public struct ICASendNotificationPB
 {
     public ICAHeader header;
-    public CFMutableDictionaryRef notificationDictionary;
+    public __CFDictionary* notificationDictionary;
     public UInt32 replyCode;
 }
 
@@ -527,7 +528,7 @@ public struct ICACopyObjectPropertyDictionaryPB
 {
     public ICAHeader header;
     public ICAObject object;
-    public CFDictionaryRef* theDict;
+    public __CFDictionary** theDict;
 }
 
 /// Deprecated in macOS 10.7.
@@ -543,7 +544,7 @@ public struct ICACopyObjectThumbnailPB
     public ICAHeader header;
     public ICAObject object;
     public OSType thumbnailFormat;
-    public CFDataRef* thumbnailData;
+    public __CFData** thumbnailData;
 }
 
 /// Deprecated in macOS 10.7.
@@ -556,7 +557,7 @@ public struct ICACopyObjectDataPB
     public ICAObject object;
     public nuint startByte;
     public nuint requestedSize;
-    public CFDataRef* data;
+    public __CFData** data;
 }
 
 /// Deprecated in macOS 10.7.
@@ -638,7 +639,7 @@ public extern "C" ICAError ICAUploadFile(ICAUploadFilePB* pb, ICACompletion comp
 public struct ICALoadDeviceModulePB
 {
     public ICAHeader header;
-    public CFDictionaryRef paramDictionary;
+    public __CFDictionary* paramDictionary;
 }
 
 /// Deprecated in macOS 10.7.
@@ -711,7 +712,7 @@ public struct ICAScannerGetParametersPB
 {
     public ICAHeader header;
     public ICAScannerSessionID sessionID;
-    public CFMutableDictionaryRef theDict;
+    public __CFDictionary* theDict;
 }
 
 /// Deprecated in macOS 10.7.
@@ -722,7 +723,7 @@ public struct ICAScannerSetParametersPB
 {
     public ICAHeader header;
     public ICAScannerSessionID sessionID;
-    public CFMutableDictionaryRef theDict;
+    public __CFDictionary* theDict;
 }
 
 /// Deprecated in macOS 10.7.

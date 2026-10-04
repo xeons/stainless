@@ -47,7 +47,7 @@ public struct AudioServerPlugInClientInfo
     public UInt32 mClientID;
     public pid_t mProcessID;
     public Boolean mIsNativeEndian;
-    public CFStringRef mBundleID;
+    public __CFString* mBundleID;
 }
 
 public struct AudioServerPlugInIOCycleInfo
@@ -106,11 +106,11 @@ public const uint kAudioDevicePropertyClockIsStable = 1668510818;
 
 public delegate OSStatus AudioServerPlugInHostInterfacePropertiesChangedFunction(AudioServerPlugInHostRef arg0, AudioObjectID arg1, UInt32 arg2, AudioObjectPropertyAddress* arg3);
 
-public delegate OSStatus AudioServerPlugInHostInterfaceCopyFromStorageFunction(AudioServerPlugInHostRef arg0, CFStringRef arg1, CFPropertyListRef* arg2);
+public delegate OSStatus AudioServerPlugInHostInterfaceCopyFromStorageFunction(AudioServerPlugInHostRef arg0, __CFString* arg1, void** arg2);
 
-public delegate OSStatus AudioServerPlugInHostInterfaceWriteToStorageFunction(AudioServerPlugInHostRef arg0, CFStringRef arg1, CFPropertyListRef arg2);
+public delegate OSStatus AudioServerPlugInHostInterfaceWriteToStorageFunction(AudioServerPlugInHostRef arg0, __CFString* arg1, void* arg2);
 
-public delegate OSStatus AudioServerPlugInHostInterfaceDeleteFromStorageFunction(AudioServerPlugInHostRef arg0, CFStringRef arg1);
+public delegate OSStatus AudioServerPlugInHostInterfaceDeleteFromStorageFunction(AudioServerPlugInHostRef arg0, __CFString* arg1);
 
 public delegate OSStatus AudioServerPlugInHostInterfaceRequestDeviceConfigurationChangeFunction(AudioServerPlugInHostRef arg0, AudioObjectID arg1, UInt64 arg2, void* arg3);
 
@@ -131,7 +131,7 @@ public delegate ULONG AudioServerPlugInDriverInterfaceReleaseFunction(void* arg0
 
 public delegate OSStatus AudioServerPlugInDriverInterfaceInitializeFunction(AudioServerPlugInDriverRef arg0, AudioServerPlugInHostRef arg1);
 
-public delegate OSStatus AudioServerPlugInDriverInterfaceCreateDeviceFunction(AudioServerPlugInDriverRef arg0, CFDictionaryRef arg1, AudioServerPlugInClientInfo* arg2, AudioObjectID* arg3);
+public delegate OSStatus AudioServerPlugInDriverInterfaceCreateDeviceFunction(AudioServerPlugInDriverRef arg0, __CFDictionary* arg1, AudioServerPlugInClientInfo* arg2, AudioObjectID* arg3);
 
 public delegate OSStatus AudioServerPlugInDriverInterfaceDestroyDeviceFunction(AudioServerPlugInDriverRef arg0, AudioObjectID arg1);
 

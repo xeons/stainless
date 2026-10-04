@@ -24,312 +24,313 @@
 module MacOS.VideoToolbox;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "VideoToolbox")
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_NumberOfPendingFrames;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_NumberOfPendingFrames;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_PixelBufferPoolIsShared;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_PixelBufferPoolIsShared;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_VideoEncoderPixelBufferAttributes;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_VideoEncoderPixelBufferAttributes;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MaxKeyFrameInterval;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MaxKeyFrameInterval;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_AllowTemporalCompression;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_AllowTemporalCompression;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_AllowFrameReordering;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_AllowFrameReordering;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_AllowOpenGOP;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_AllowOpenGOP;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_AverageBitRate;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_AverageBitRate;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_DataRateLimits;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_DataRateLimits;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_Quality;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_Quality;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_TargetQualityForAlpha;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_TargetQualityForAlpha;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MoreFramesBeforeStart;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MoreFramesBeforeStart;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MoreFramesAfterEnd;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MoreFramesAfterEnd;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ConstantBitRate;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ConstantBitRate;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_EstimatedAverageBytesPerFrame;
-
-/// macOS 26.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_VariableBitRate;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_EstimatedAverageBytesPerFrame;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_VBVMaxBitRate;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_VariableBitRate;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_VBVBufferDuration;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_VBVMaxBitRate;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_VBVInitialDelayPercentage;
-
-public extern "C" CFStringRef kVTCompressionPropertyKey_ProfileLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_HEVC_Main_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_HEVC_Main10_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_HEVC_Main42210_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_HEVC_Monochrome_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_HEVC_Monochrome10_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_1_3;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_3_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_3_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_3_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_4_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_4_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_4_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_5_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_5_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_5_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Baseline_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_ConstrainedBaseline_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_3_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_3_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_3_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_4_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_4_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_4_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_5_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_5_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_5_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Main_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Extended_5_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_Extended_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_3_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_3_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_3_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_4_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_4_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_4_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_5_0;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_5_1;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_5_2;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_High_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_H264_ConstrainedHigh_AutoLevel;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_Simple_L0;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_Simple_L1;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_Simple_L2;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_Simple_L3;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_Main_L2;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_Main_L3;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_Main_L4;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_AdvancedSimple_L0;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_AdvancedSimple_L1;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_AdvancedSimple_L2;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_AdvancedSimple_L3;
-
-public extern "C" CFStringRef kVTProfileLevel_MP4V_AdvancedSimple_L4;
-
-public extern "C" CFStringRef kVTProfileLevel_H263_Profile0_Level10;
-
-public extern "C" CFStringRef kVTProfileLevel_H263_Profile0_Level45;
-
-public extern "C" CFStringRef kVTProfileLevel_H263_Profile3_Level45;
-
-public extern "C" CFStringRef kVTCompressionPropertyKey_OutputBitDepth;
-
-public extern "C" CFStringRef kVTCompressionPropertyKey_HDRMetadataInsertionMode;
-
-public extern "C" CFStringRef kVTHDRMetadataInsertionMode_None;
-
-public extern "C" CFStringRef kVTHDRMetadataInsertionMode_Auto;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_VBVBufferDuration;
 
 /// macOS 26.0 and later.
-public extern "C" CFStringRef kVTHDRMetadataInsertionMode_RequestSDRRangePreservation;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_VBVInitialDelayPercentage;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_H264EntropyMode;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ProfileLevel;
 
-public extern "C" CFStringRef kVTH264EntropyMode_CAVLC;
+public extern "C" CFStringRef? kVTProfileLevel_HEVC_Main_AutoLevel;
 
-public extern "C" CFStringRef kVTH264EntropyMode_CABAC;
+public extern "C" CFStringRef? kVTProfileLevel_HEVC_Main10_AutoLevel;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_Depth;
+public extern "C" CFStringRef? kVTProfileLevel_HEVC_Main42210_AutoLevel;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_PreserveAlphaChannel;
+public extern "C" CFStringRef? kVTProfileLevel_HEVC_Monochrome_AutoLevel;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MaxFrameDelayCount;
+public extern "C" CFStringRef? kVTProfileLevel_HEVC_Monochrome10_AutoLevel;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_1_3;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_3_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_3_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_3_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_4_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_4_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_4_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_5_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_5_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_5_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Baseline_AutoLevel;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_ConstrainedBaseline_AutoLevel;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_3_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_3_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_3_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_4_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_4_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_4_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_5_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_5_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_5_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Main_AutoLevel;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Extended_5_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_Extended_AutoLevel;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_3_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_3_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_3_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_4_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_4_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_4_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_5_0;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_5_1;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_5_2;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_High_AutoLevel;
+
+public extern "C" CFStringRef? kVTProfileLevel_H264_ConstrainedHigh_AutoLevel;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_Simple_L0;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_Simple_L1;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_Simple_L2;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_Simple_L3;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_Main_L2;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_Main_L3;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_Main_L4;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_AdvancedSimple_L0;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_AdvancedSimple_L1;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_AdvancedSimple_L2;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_AdvancedSimple_L3;
+
+public extern "C" CFStringRef? kVTProfileLevel_MP4V_AdvancedSimple_L4;
+
+public extern "C" CFStringRef? kVTProfileLevel_H263_Profile0_Level10;
+
+public extern "C" CFStringRef? kVTProfileLevel_H263_Profile0_Level45;
+
+public extern "C" CFStringRef? kVTProfileLevel_H263_Profile3_Level45;
+
+public extern "C" CFStringRef? kVTCompressionPropertyKey_OutputBitDepth;
+
+public extern "C" CFStringRef? kVTCompressionPropertyKey_HDRMetadataInsertionMode;
+
+public extern "C" CFStringRef? kVTHDRMetadataInsertionMode_None;
+
+public extern "C" CFStringRef? kVTHDRMetadataInsertionMode_Auto;
+
+/// macOS 26.0 and later.
+public extern "C" CFStringRef? kVTHDRMetadataInsertionMode_RequestSDRRangePreservation;
+
+public extern "C" CFStringRef? kVTCompressionPropertyKey_H264EntropyMode;
+
+public extern "C" CFStringRef? kVTH264EntropyMode_CAVLC;
+
+public extern "C" CFStringRef? kVTH264EntropyMode_CABAC;
+
+public extern "C" CFStringRef? kVTCompressionPropertyKey_Depth;
+
+public extern "C" CFStringRef? kVTCompressionPropertyKey_PreserveAlphaChannel;
+
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MaxFrameDelayCount;
 
 public const int kVTUnlimitedFrameDelayCount = -1;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MaxH264SliceBytes;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MaxH264SliceBytes;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_RealTime;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_RealTime;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MaximizePowerEfficiency;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MaximizePowerEfficiency;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_SourceFrameCount;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_SourceFrameCount;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ExpectedFrameRate;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ExpectedFrameRate;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_MaximumRealTimeFrameRate;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MaximumRealTimeFrameRate;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_BaseLayerFrameRateFraction;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_BaseLayerFrameRateFraction;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_BaseLayerBitRateFraction;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_BaseLayerBitRateFraction;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ExpectedDuration;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ExpectedDuration;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_BaseLayerFrameRate;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_BaseLayerFrameRate;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ReferenceBufferCount;
-
-/// macOS 14.4 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_CalculateMeanSquaredError;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ReferenceBufferCount;
 
 /// macOS 14.4 and later.
-public extern "C" CFStringRef kVTSampleAttachmentKey_QualityMetrics;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_CalculateMeanSquaredError;
 
 /// macOS 14.4 and later.
-public extern "C" CFStringRef kVTSampleAttachmentQualityMetricsKey_LumaMeanSquaredError;
+public extern "C" CFStringRef? kVTSampleAttachmentKey_QualityMetrics;
 
 /// macOS 14.4 and later.
-public extern "C" CFStringRef kVTSampleAttachmentQualityMetricsKey_ChromaBlueMeanSquaredError;
+public extern "C" CFStringRef? kVTSampleAttachmentQualityMetricsKey_LumaMeanSquaredError;
 
 /// macOS 14.4 and later.
-public extern "C" CFStringRef kVTSampleAttachmentQualityMetricsKey_ChromaRedMeanSquaredError;
+public extern "C" CFStringRef? kVTSampleAttachmentQualityMetricsKey_ChromaBlueMeanSquaredError;
 
-public extern "C" CFStringRef kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder;
+/// macOS 14.4 and later.
+public extern "C" CFStringRef? kVTSampleAttachmentQualityMetricsKey_ChromaRedMeanSquaredError;
 
-public extern "C" CFStringRef kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder;
+public extern "C" CFStringRef? kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_UsingHardwareAcceleratedVideoEncoder;
+public extern "C" CFStringRef? kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder;
 
-public extern "C" CFStringRef kVTVideoEncoderSpecification_RequiredEncoderGPURegistryID;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_UsingHardwareAcceleratedVideoEncoder;
 
-public extern "C" CFStringRef kVTVideoEncoderSpecification_PreferredEncoderGPURegistryID;
+public extern "C" CFStringRef? kVTVideoEncoderSpecification_RequiredEncoderGPURegistryID;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_UsingGPURegistryID;
+public extern "C" CFStringRef? kVTVideoEncoderSpecification_PreferredEncoderGPURegistryID;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_SupportsBaseFrameQP;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_UsingGPURegistryID;
 
-public extern "C" CFStringRef kVTEncodeFrameOptionKey_ForceKeyFrame;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_SupportsBaseFrameQP;
 
-public extern "C" CFStringRef kVTEncodeFrameOptionKey_BaseFrameQP;
+public extern "C" CFStringRef? kVTEncodeFrameOptionKey_ForceKeyFrame;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_CleanAperture;
+public extern "C" CFStringRef? kVTEncodeFrameOptionKey_BaseFrameQP;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_PixelAspectRatio;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_CleanAperture;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_FieldCount;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_PixelAspectRatio;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_FieldDetail;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_FieldCount;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_AspectRatio16x9;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_FieldDetail;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ProgressiveScan;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_AspectRatio16x9;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ColorPrimaries;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ProgressiveScan;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_TransferFunction;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ColorPrimaries;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_YCbCrMatrix;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_TransferFunction;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ICCProfile;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_YCbCrMatrix;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MasteringDisplayColorVolume;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ICCProfile;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_ContentLightLevelInfo;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MasteringDisplayColorVolume;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_GammaLevel;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_ContentLightLevelInfo;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_AlphaChannelMode;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_GammaLevel;
 
-public extern "C" CFStringRef kVTAlphaChannelMode_StraightAlpha;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_AlphaChannelMode;
 
-public extern "C" CFStringRef kVTAlphaChannelMode_PremultipliedAlpha;
+public extern "C" CFStringRef? kVTAlphaChannelMode_StraightAlpha;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_PixelTransferProperties;
+public extern "C" CFStringRef? kVTAlphaChannelMode_PremultipliedAlpha;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MultiPassStorage;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_PixelTransferProperties;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_EncoderID;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MultiPassStorage;
+
+public extern "C" CFStringRef? kVTCompressionPropertyKey_EncoderID;
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_RecommendedParallelizationLimit;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_RecommendedParallelizationLimit;
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_RecommendedParallelizedSubdivisionMinimumFrameCount;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_RecommendedParallelizedSubdivisionMinimumFrameCount;
 
 /// macOS 14.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_RecommendedParallelizedSubdivisionMinimumDuration;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_RecommendedParallelizedSubdivisionMinimumDuration;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_PreserveDynamicHDRMetadata;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_PreserveDynamicHDRMetadata;
 
-public extern "C" CFStringRef kVTVideoEncoderSpecification_EnableLowLatencyRateControl;
+public extern "C" CFStringRef? kVTVideoEncoderSpecification_EnableLowLatencyRateControl;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MaxAllowedFrameQP;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MaxAllowedFrameQP;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_MinAllowedFrameQP;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_MinAllowedFrameQP;
 
-public extern "C" CFStringRef kVTCompressionPropertyKey_EnableLTR;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_EnableLTR;
 
-public extern "C" CFStringRef kVTEncodeFrameOptionKey_AcknowledgedLTRTokens;
+public extern "C" CFStringRef? kVTEncodeFrameOptionKey_AcknowledgedLTRTokens;
 
-public extern "C" CFStringRef kVTEncodeFrameOptionKey_ForceLTRRefresh;
+public extern "C" CFStringRef? kVTEncodeFrameOptionKey_ForceLTRRefresh;
 
-public extern "C" CFStringRef kVTSampleAttachmentKey_RequireLTRAcknowledgementToken;
+public extern "C" CFStringRef? kVTSampleAttachmentKey_RequireLTRAcknowledgementToken;
 
 /// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_MVHEVCVideoLayerIDs;
@@ -449,10 +450,10 @@ public extern "C" CFStringRef kVTCameraCalibrationExtrinsicOriginSource_StereoCa
 public extern "C" CFStringRef kVTCompressionPropertyCameraCalibrationKey_ExtrinsicOrientationQuaternion;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_SuggestedLookAheadFrameCount;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_SuggestedLookAheadFrameCount;
 
 /// macOS 15.0 and later.
-public extern "C" CFStringRef kVTCompressionPropertyKey_SpatialAdaptiveQPLevel;
+public extern "C" CFStringRef? kVTCompressionPropertyKey_SpatialAdaptiveQPLevel;
 
 public const int kVTQPModulationLevel_Default = -1;
 public const int kVTQPModulationLevel_Disable = 0;

@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGContext;
 
-public using CGContextRef = CGContext*;
+[CFType("CGContextGetTypeID")]
+public extern objc class CGContextRef : CFTypeRef { }
 
 public enum CGPathDrawingMode : int
 {
@@ -104,143 +106,143 @@ public enum CGBlendMode : int
 
 public extern "C" CFTypeID CGContextGetTypeID();
 
-public extern "C" void CGContextSaveGState(CGContextRef c);
+public extern "C" void CGContextSaveGState(CGContextRef? c);
 
-public extern "C" void CGContextRestoreGState(CGContextRef c);
+public extern "C" void CGContextRestoreGState(CGContextRef? c);
 
-public extern "C" void CGContextScaleCTM(CGContextRef c, CGFloat sx, CGFloat sy);
+public extern "C" void CGContextScaleCTM(CGContextRef? c, CGFloat sx, CGFloat sy);
 
-public extern "C" void CGContextTranslateCTM(CGContextRef c, CGFloat tx, CGFloat ty);
+public extern "C" void CGContextTranslateCTM(CGContextRef? c, CGFloat tx, CGFloat ty);
 
-public extern "C" void CGContextRotateCTM(CGContextRef c, CGFloat angle);
+public extern "C" void CGContextRotateCTM(CGContextRef? c, CGFloat angle);
 
-public extern "C" void CGContextConcatCTM(CGContextRef c, CGAffineTransform transform);
+public extern "C" void CGContextConcatCTM(CGContextRef? c, CGAffineTransform transform);
 
-public extern "C" CGAffineTransform CGContextGetCTM(CGContextRef c);
+public extern "C" CGAffineTransform CGContextGetCTM(CGContextRef? c);
 
-public extern "C" void CGContextSetLineWidth(CGContextRef c, CGFloat width);
+public extern "C" void CGContextSetLineWidth(CGContextRef? c, CGFloat width);
 
-public extern "C" void CGContextSetLineCap(CGContextRef c, CGLineCap cap);
+public extern "C" void CGContextSetLineCap(CGContextRef? c, CGLineCap cap);
 
-public extern "C" void CGContextSetLineJoin(CGContextRef c, CGLineJoin join);
+public extern "C" void CGContextSetLineJoin(CGContextRef? c, CGLineJoin join);
 
-public extern "C" void CGContextSetMiterLimit(CGContextRef c, CGFloat limit);
+public extern "C" void CGContextSetMiterLimit(CGContextRef? c, CGFloat limit);
 
-public extern "C" void CGContextSetLineDash(CGContextRef c, CGFloat phase, CGFloat* lengths, nuint count);
+public extern "C" void CGContextSetLineDash(CGContextRef? c, CGFloat phase, CGFloat* lengths, nuint count);
 
-public extern "C" void CGContextSetFlatness(CGContextRef c, CGFloat flatness);
+public extern "C" void CGContextSetFlatness(CGContextRef? c, CGFloat flatness);
 
-public extern "C" void CGContextSetAlpha(CGContextRef c, CGFloat alpha);
+public extern "C" void CGContextSetAlpha(CGContextRef? c, CGFloat alpha);
 
-public extern "C" void CGContextSetBlendMode(CGContextRef c, CGBlendMode mode);
+public extern "C" void CGContextSetBlendMode(CGContextRef? c, CGBlendMode mode);
 
-public extern "C" void CGContextBeginPath(CGContextRef c);
+public extern "C" void CGContextBeginPath(CGContextRef? c);
 
-public extern "C" void CGContextMoveToPoint(CGContextRef c, CGFloat x, CGFloat y);
+public extern "C" void CGContextMoveToPoint(CGContextRef? c, CGFloat x, CGFloat y);
 
-public extern "C" void CGContextAddLineToPoint(CGContextRef c, CGFloat x, CGFloat y);
+public extern "C" void CGContextAddLineToPoint(CGContextRef? c, CGFloat x, CGFloat y);
 
-public extern "C" void CGContextAddCurveToPoint(CGContextRef c, CGFloat cp1x, CGFloat cp1y, CGFloat cp2x, CGFloat cp2y, CGFloat x, CGFloat y);
+public extern "C" void CGContextAddCurveToPoint(CGContextRef? c, CGFloat cp1x, CGFloat cp1y, CGFloat cp2x, CGFloat cp2y, CGFloat x, CGFloat y);
 
-public extern "C" void CGContextAddQuadCurveToPoint(CGContextRef c, CGFloat cpx, CGFloat cpy, CGFloat x, CGFloat y);
+public extern "C" void CGContextAddQuadCurveToPoint(CGContextRef? c, CGFloat cpx, CGFloat cpy, CGFloat x, CGFloat y);
 
-public extern "C" void CGContextClosePath(CGContextRef c);
+public extern "C" void CGContextClosePath(CGContextRef? c);
 
-public extern "C" void CGContextAddRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextAddRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextAddRects(CGContextRef c, CGRect* rects, nuint count);
+public extern "C" void CGContextAddRects(CGContextRef? c, CGRect* rects, nuint count);
 
-public extern "C" void CGContextAddLines(CGContextRef c, CGPoint* points, nuint count);
+public extern "C" void CGContextAddLines(CGContextRef? c, CGPoint* points, nuint count);
 
-public extern "C" void CGContextAddEllipseInRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextAddEllipseInRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextAddArc(CGContextRef c, CGFloat x, CGFloat y, CGFloat radius, CGFloat startAngle, CGFloat endAngle, int clockwise);
+public extern "C" void CGContextAddArc(CGContextRef? c, CGFloat x, CGFloat y, CGFloat radius, CGFloat startAngle, CGFloat endAngle, int clockwise);
 
-public extern "C" void CGContextAddArcToPoint(CGContextRef c, CGFloat x1, CGFloat y1, CGFloat x2, CGFloat y2, CGFloat radius);
+public extern "C" void CGContextAddArcToPoint(CGContextRef? c, CGFloat x1, CGFloat y1, CGFloat x2, CGFloat y2, CGFloat radius);
 
-public extern "C" void CGContextAddPath(CGContextRef c, CGPathRef path);
+public extern "C" void CGContextAddPath(CGContextRef? c, CGPathRef? path);
 
-public extern "C" void CGContextReplacePathWithStrokedPath(CGContextRef c);
+public extern "C" void CGContextReplacePathWithStrokedPath(CGContextRef? c);
 
-public extern "C" bool CGContextIsPathEmpty(CGContextRef c);
+public extern "C" bool CGContextIsPathEmpty(CGContextRef? c);
 
-public extern "C" CGPoint CGContextGetPathCurrentPoint(CGContextRef c);
+public extern "C" CGPoint CGContextGetPathCurrentPoint(CGContextRef? c);
 
-public extern "C" CGRect CGContextGetPathBoundingBox(CGContextRef c);
+public extern "C" CGRect CGContextGetPathBoundingBox(CGContextRef? c);
 
-public extern "C" CGPathRef CGContextCopyPath(CGContextRef c);
+[ReturnsRetained] public extern "C" CGPathRef? CGContextCopyPath(CGContextRef? c);
 
-public extern "C" bool CGContextPathContainsPoint(CGContextRef c, CGPoint point, CGPathDrawingMode mode);
+public extern "C" bool CGContextPathContainsPoint(CGContextRef? c, CGPoint point, CGPathDrawingMode mode);
 
-public extern "C" void CGContextDrawPath(CGContextRef c, CGPathDrawingMode mode);
+public extern "C" void CGContextDrawPath(CGContextRef? c, CGPathDrawingMode mode);
 
-public extern "C" void CGContextFillPath(CGContextRef c);
+public extern "C" void CGContextFillPath(CGContextRef? c);
 
-public extern "C" void CGContextEOFillPath(CGContextRef c);
+public extern "C" void CGContextEOFillPath(CGContextRef? c);
 
-public extern "C" void CGContextStrokePath(CGContextRef c);
+public extern "C" void CGContextStrokePath(CGContextRef? c);
 
-public extern "C" void CGContextFillRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextFillRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextFillRects(CGContextRef c, CGRect* rects, nuint count);
+public extern "C" void CGContextFillRects(CGContextRef? c, CGRect* rects, nuint count);
 
-public extern "C" void CGContextStrokeRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextStrokeRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextStrokeRectWithWidth(CGContextRef c, CGRect rect, CGFloat width);
+public extern "C" void CGContextStrokeRectWithWidth(CGContextRef? c, CGRect rect, CGFloat width);
 
-public extern "C" void CGContextClearRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextClearRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextFillEllipseInRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextFillEllipseInRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextStrokeEllipseInRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextStrokeEllipseInRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextStrokeLineSegments(CGContextRef c, CGPoint* points, nuint count);
+public extern "C" void CGContextStrokeLineSegments(CGContextRef? c, CGPoint* points, nuint count);
 
-public extern "C" void CGContextClip(CGContextRef c);
+public extern "C" void CGContextClip(CGContextRef? c);
 
-public extern "C" void CGContextEOClip(CGContextRef c);
+public extern "C" void CGContextEOClip(CGContextRef? c);
 
 public extern "C" void CGContextResetClip(CGContextRef c);
 
-public extern "C" void CGContextClipToMask(CGContextRef c, CGRect rect, CGImageRef mask);
+public extern "C" void CGContextClipToMask(CGContextRef? c, CGRect rect, CGImageRef? mask);
 
-public extern "C" CGRect CGContextGetClipBoundingBox(CGContextRef c);
+public extern "C" CGRect CGContextGetClipBoundingBox(CGContextRef? c);
 
-public extern "C" void CGContextClipToRect(CGContextRef c, CGRect rect);
+public extern "C" void CGContextClipToRect(CGContextRef? c, CGRect rect);
 
-public extern "C" void CGContextClipToRects(CGContextRef c, CGRect* rects, nuint count);
+public extern "C" void CGContextClipToRects(CGContextRef? c, CGRect* rects, nuint count);
 
-public extern "C" void CGContextSetFillColorWithColor(CGContextRef c, CGColorRef color);
+public extern "C" void CGContextSetFillColorWithColor(CGContextRef? c, CGColorRef? color);
 
-public extern "C" void CGContextSetStrokeColorWithColor(CGContextRef c, CGColorRef color);
+public extern "C" void CGContextSetStrokeColorWithColor(CGContextRef? c, CGColorRef? color);
 
-public extern "C" void CGContextSetFillColorSpace(CGContextRef c, CGColorSpaceRef space);
+public extern "C" void CGContextSetFillColorSpace(CGContextRef? c, CGColorSpaceRef? space);
 
-public extern "C" void CGContextSetStrokeColorSpace(CGContextRef c, CGColorSpaceRef space);
+public extern "C" void CGContextSetStrokeColorSpace(CGContextRef? c, CGColorSpaceRef? space);
 
-public extern "C" void CGContextSetFillColor(CGContextRef c, CGFloat* components);
+public extern "C" void CGContextSetFillColor(CGContextRef? c, CGFloat* components);
 
-public extern "C" void CGContextSetStrokeColor(CGContextRef c, CGFloat* components);
+public extern "C" void CGContextSetStrokeColor(CGContextRef? c, CGFloat* components);
 
-public extern "C" void CGContextSetFillPattern(CGContextRef c, CGPatternRef pattern, CGFloat* components);
+public extern "C" void CGContextSetFillPattern(CGContextRef? c, CGPatternRef? pattern, CGFloat* components);
 
-public extern "C" void CGContextSetStrokePattern(CGContextRef c, CGPatternRef pattern, CGFloat* components);
+public extern "C" void CGContextSetStrokePattern(CGContextRef? c, CGPatternRef? pattern, CGFloat* components);
 
-public extern "C" void CGContextSetPatternPhase(CGContextRef c, CGSize phase);
+public extern "C" void CGContextSetPatternPhase(CGContextRef? c, CGSize phase);
 
-public extern "C" void CGContextSetGrayFillColor(CGContextRef c, CGFloat gray, CGFloat alpha);
+public extern "C" void CGContextSetGrayFillColor(CGContextRef? c, CGFloat gray, CGFloat alpha);
 
-public extern "C" void CGContextSetGrayStrokeColor(CGContextRef c, CGFloat gray, CGFloat alpha);
+public extern "C" void CGContextSetGrayStrokeColor(CGContextRef? c, CGFloat gray, CGFloat alpha);
 
-public extern "C" void CGContextSetRGBFillColor(CGContextRef c, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+public extern "C" void CGContextSetRGBFillColor(CGContextRef? c, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
 
-public extern "C" void CGContextSetRGBStrokeColor(CGContextRef c, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+public extern "C" void CGContextSetRGBStrokeColor(CGContextRef? c, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
 
-public extern "C" void CGContextSetCMYKFillColor(CGContextRef c, CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
+public extern "C" void CGContextSetCMYKFillColor(CGContextRef? c, CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
 
-public extern "C" void CGContextSetCMYKStrokeColor(CGContextRef c, CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
+public extern "C" void CGContextSetCMYKStrokeColor(CGContextRef? c, CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
 
-public extern "C" void CGContextSetRenderingIntent(CGContextRef c, CGColorRenderingIntent intent);
+public extern "C" void CGContextSetRenderingIntent(CGContextRef? c, CGColorRenderingIntent intent);
 
 /// macOS 15.0 and later.
 public extern "C" bool CGContextSetEDRTargetHeadroom(CGContextRef c, float headroom);
@@ -248,12 +250,12 @@ public extern "C" bool CGContextSetEDRTargetHeadroom(CGContextRef c, float headr
 /// macOS 15.0 and later.
 public extern "C" float CGContextGetEDRTargetHeadroom(CGContextRef c);
 
-public extern "C" void CGContextDrawImage(CGContextRef c, CGRect rect, CGImageRef image);
+public extern "C" void CGContextDrawImage(CGContextRef? c, CGRect rect, CGImageRef? image);
 
-public extern "C" void CGContextDrawTiledImage(CGContextRef c, CGRect rect, CGImageRef image);
+public extern "C" void CGContextDrawTiledImage(CGContextRef? c, CGRect rect, CGImageRef? image);
 
 /// macOS 15.0 and later.
-public extern "C" bool CGContextDrawImageApplyingToneMapping(CGContextRef c, CGRect r, CGImageRef image, CGToneMapping method, CFDictionaryRef options);
+public extern "C" bool CGContextDrawImageApplyingToneMapping(CGContextRef c, CGRect r, CGImageRef image, CGToneMapping method, CFDictionaryRef? options);
 
 /// macOS 26.0 and later.
 public extern "C" CGContentToneMappingInfo CGContextGetContentToneMappingInfo(CGContextRef c);
@@ -261,113 +263,109 @@ public extern "C" CGContentToneMappingInfo CGContextGetContentToneMappingInfo(CG
 /// macOS 26.0 and later.
 public extern "C" void CGContextSetContentToneMappingInfo(CGContextRef c, CGContentToneMappingInfo info);
 
-public extern "C" CGInterpolationQuality CGContextGetInterpolationQuality(CGContextRef c);
+public extern "C" CGInterpolationQuality CGContextGetInterpolationQuality(CGContextRef? c);
 
-public extern "C" void CGContextSetInterpolationQuality(CGContextRef c, CGInterpolationQuality quality);
+public extern "C" void CGContextSetInterpolationQuality(CGContextRef? c, CGInterpolationQuality quality);
 
-public extern "C" void CGContextSetShadowWithColor(CGContextRef c, CGSize offset, CGFloat blur, CGColorRef color);
+public extern "C" void CGContextSetShadowWithColor(CGContextRef? c, CGSize offset, CGFloat blur, CGColorRef? color);
 
-public extern "C" void CGContextSetShadow(CGContextRef c, CGSize offset, CGFloat blur);
+public extern "C" void CGContextSetShadow(CGContextRef? c, CGSize offset, CGFloat blur);
 
-public extern "C" void CGContextDrawLinearGradient(CGContextRef c, CGGradientRef gradient, CGPoint startPoint, CGPoint endPoint, CGGradientDrawingOptions options);
+public extern "C" void CGContextDrawLinearGradient(CGContextRef? c, CGGradientRef? gradient, CGPoint startPoint, CGPoint endPoint, CGGradientDrawingOptions options);
 
-public extern "C" void CGContextDrawRadialGradient(CGContextRef c, CGGradientRef gradient, CGPoint startCenter, CGFloat startRadius, CGPoint endCenter, CGFloat endRadius, CGGradientDrawingOptions options);
+public extern "C" void CGContextDrawRadialGradient(CGContextRef? c, CGGradientRef? gradient, CGPoint startCenter, CGFloat startRadius, CGPoint endCenter, CGFloat endRadius, CGGradientDrawingOptions options);
 
 /// macOS 14.0 and later.
-public extern "C" void CGContextDrawConicGradient(CGContextRef c, CGGradientRef gradient, CGPoint center, CGFloat angle);
+public extern "C" void CGContextDrawConicGradient(CGContextRef c, CGGradientRef? gradient, CGPoint center, CGFloat angle);
 
-public extern "C" void CGContextDrawShading(CGContextRef c, CGShadingRef shading);
+public extern "C" void CGContextDrawShading(CGContextRef? c, CGShadingRef? shading);
 
-public extern "C" void CGContextSetCharacterSpacing(CGContextRef c, CGFloat spacing);
+public extern "C" void CGContextSetCharacterSpacing(CGContextRef? c, CGFloat spacing);
 
-public extern "C" void CGContextSetTextPosition(CGContextRef c, CGFloat x, CGFloat y);
+public extern "C" void CGContextSetTextPosition(CGContextRef? c, CGFloat x, CGFloat y);
 
-public extern "C" CGPoint CGContextGetTextPosition(CGContextRef c);
+public extern "C" CGPoint CGContextGetTextPosition(CGContextRef? c);
 
-public extern "C" void CGContextSetTextMatrix(CGContextRef c, CGAffineTransform t);
+public extern "C" void CGContextSetTextMatrix(CGContextRef? c, CGAffineTransform t);
 
-public extern "C" CGAffineTransform CGContextGetTextMatrix(CGContextRef c);
+public extern "C" CGAffineTransform CGContextGetTextMatrix(CGContextRef? c);
 
-public extern "C" void CGContextSetTextDrawingMode(CGContextRef c, CGTextDrawingMode mode);
+public extern "C" void CGContextSetTextDrawingMode(CGContextRef? c, CGTextDrawingMode mode);
 
-public extern "C" void CGContextSetFont(CGContextRef c, CGFontRef font);
+public extern "C" void CGContextSetFont(CGContextRef? c, CGFontRef? font);
 
-public extern "C" void CGContextSetFontSize(CGContextRef c, CGFloat size);
+public extern "C" void CGContextSetFontSize(CGContextRef? c, CGFloat size);
 
-public extern "C" void CGContextShowGlyphsAtPositions(CGContextRef c, CGGlyph* glyphs, CGPoint* Lpositions, nuint count);
+public extern "C" void CGContextShowGlyphsAtPositions(CGContextRef? c, CGGlyph* glyphs, CGPoint* Lpositions, nuint count);
 
-public extern "C" void CGContextDrawPDFPage(CGContextRef c, CGPDFPageRef page);
+public extern "C" void CGContextDrawPDFPage(CGContextRef? c, CGPDFPageRef? page);
 
-public extern "C" void CGContextBeginPage(CGContextRef c, CGRect* mediaBox);
+public extern "C" void CGContextBeginPage(CGContextRef? c, CGRect* mediaBox);
 
-public extern "C" void CGContextEndPage(CGContextRef c);
+public extern "C" void CGContextEndPage(CGContextRef? c);
 
-public extern "C" CGContextRef CGContextRetain(CGContextRef c);
+public extern "C" void CGContextFlush(CGContextRef? c);
 
-public extern "C" void CGContextRelease(CGContextRef c);
-
-public extern "C" void CGContextFlush(CGContextRef c);
-
-public extern "C" void CGContextSynchronize(CGContextRef c);
+public extern "C" void CGContextSynchronize(CGContextRef? c);
 
 /// macOS 26.0 and later.
 public extern "C" void CGContextSynchronizeAttributes(CGContextRef c);
 
-public extern "C" void CGContextSetShouldAntialias(CGContextRef c, bool shouldAntialias);
+public extern "C" void CGContextSetShouldAntialias(CGContextRef? c, bool shouldAntialias);
 
-public extern "C" void CGContextSetAllowsAntialiasing(CGContextRef c, bool allowsAntialiasing);
+public extern "C" void CGContextSetAllowsAntialiasing(CGContextRef? c, bool allowsAntialiasing);
 
-public extern "C" void CGContextSetShouldSmoothFonts(CGContextRef c, bool shouldSmoothFonts);
+public extern "C" void CGContextSetShouldSmoothFonts(CGContextRef? c, bool shouldSmoothFonts);
 
-public extern "C" void CGContextSetAllowsFontSmoothing(CGContextRef c, bool allowsFontSmoothing);
+public extern "C" void CGContextSetAllowsFontSmoothing(CGContextRef? c, bool allowsFontSmoothing);
 
-public extern "C" void CGContextSetShouldSubpixelPositionFonts(CGContextRef c, bool shouldSubpixelPositionFonts);
+public extern "C" void CGContextSetShouldSubpixelPositionFonts(CGContextRef? c, bool shouldSubpixelPositionFonts);
 
-public extern "C" void CGContextSetAllowsFontSubpixelPositioning(CGContextRef c, bool allowsFontSubpixelPositioning);
+public extern "C" void CGContextSetAllowsFontSubpixelPositioning(CGContextRef? c, bool allowsFontSubpixelPositioning);
 
-public extern "C" void CGContextSetShouldSubpixelQuantizeFonts(CGContextRef c, bool shouldSubpixelQuantizeFonts);
+public extern "C" void CGContextSetShouldSubpixelQuantizeFonts(CGContextRef? c, bool shouldSubpixelQuantizeFonts);
 
-public extern "C" void CGContextSetAllowsFontSubpixelQuantization(CGContextRef c, bool allowsFontSubpixelQuantization);
+public extern "C" void CGContextSetAllowsFontSubpixelQuantization(CGContextRef? c, bool allowsFontSubpixelQuantization);
 
-public extern "C" void CGContextBeginTransparencyLayer(CGContextRef c, CFDictionaryRef auxiliaryInfo);
+public extern "C" void CGContextBeginTransparencyLayer(CGContextRef? c, CFDictionaryRef? auxiliaryInfo);
 
-public extern "C" void CGContextBeginTransparencyLayerWithRect(CGContextRef c, CGRect rect, CFDictionaryRef auxInfo);
+public extern "C" void CGContextBeginTransparencyLayerWithRect(CGContextRef? c, CGRect rect, CFDictionaryRef? auxInfo);
 
-public extern "C" void CGContextEndTransparencyLayer(CGContextRef c);
+public extern "C" void CGContextEndTransparencyLayer(CGContextRef? c);
 
-public extern "C" CGAffineTransform CGContextGetUserSpaceToDeviceSpaceTransform(CGContextRef c);
+public extern "C" CGAffineTransform CGContextGetUserSpaceToDeviceSpaceTransform(CGContextRef? c);
 
-public extern "C" CGPoint CGContextConvertPointToDeviceSpace(CGContextRef c, CGPoint point);
+public extern "C" CGPoint CGContextConvertPointToDeviceSpace(CGContextRef? c, CGPoint point);
 
-public extern "C" CGPoint CGContextConvertPointToUserSpace(CGContextRef c, CGPoint point);
+public extern "C" CGPoint CGContextConvertPointToUserSpace(CGContextRef? c, CGPoint point);
 
-public extern "C" CGSize CGContextConvertSizeToDeviceSpace(CGContextRef c, CGSize size);
+public extern "C" CGSize CGContextConvertSizeToDeviceSpace(CGContextRef? c, CGSize size);
 
-public extern "C" CGSize CGContextConvertSizeToUserSpace(CGContextRef c, CGSize size);
+public extern "C" CGSize CGContextConvertSizeToUserSpace(CGContextRef? c, CGSize size);
 
-public extern "C" CGRect CGContextConvertRectToDeviceSpace(CGContextRef c, CGRect rect);
+public extern "C" CGRect CGContextConvertRectToDeviceSpace(CGContextRef? c, CGRect rect);
 
-public extern "C" CGRect CGContextConvertRectToUserSpace(CGContextRef c, CGRect rect);
-
-/// Deprecated in macOS 10.9.
-public extern "C" void CGContextSelectFont(CGContextRef c, byte* name, CGFloat size, CGTextEncoding textEncoding);
+public extern "C" CGRect CGContextConvertRectToUserSpace(CGContextRef? c, CGRect rect);
 
 /// Deprecated in macOS 10.9.
-public extern "C" void CGContextShowText(CGContextRef c, byte* string, nuint length);
+public extern "C" void CGContextSelectFont(CGContextRef? c, byte* name, CGFloat size, CGTextEncoding textEncoding);
 
 /// Deprecated in macOS 10.9.
-public extern "C" void CGContextShowTextAtPoint(CGContextRef c, CGFloat x, CGFloat y, byte* string, nuint length);
+public extern "C" void CGContextShowText(CGContextRef? c, byte* string, nuint length);
 
 /// Deprecated in macOS 10.9.
-public extern "C" void CGContextShowGlyphs(CGContextRef c, CGGlyph* g, nuint count);
+public extern "C" void CGContextShowTextAtPoint(CGContextRef? c, CGFloat x, CGFloat y, byte* string, nuint length);
 
 /// Deprecated in macOS 10.9.
-public extern "C" void CGContextShowGlyphsAtPoint(CGContextRef c, CGFloat x, CGFloat y, CGGlyph* glyphs, nuint count);
+public extern "C" void CGContextShowGlyphs(CGContextRef? c, CGGlyph* g, nuint count);
 
 /// Deprecated in macOS 10.9.
-public extern "C" void CGContextShowGlyphsWithAdvances(CGContextRef c, CGGlyph* glyphs, CGSize* advances, nuint count);
+public extern "C" void CGContextShowGlyphsAtPoint(CGContextRef? c, CGFloat x, CGFloat y, CGGlyph* glyphs, nuint count);
+
+/// Deprecated in macOS 10.9.
+public extern "C" void CGContextShowGlyphsWithAdvances(CGContextRef? c, CGGlyph* glyphs, CGSize* advances, nuint count);
 
 /// Deprecated in macOS 10.5.
-public extern "C" void CGContextDrawPDFDocument(CGContextRef c, CGRect rect, CGPDFDocumentRef document, int page);
+public extern "C" void CGContextDrawPDFDocument(CGContextRef? c, CGRect rect, CGPDFDocumentRef? document, int page);
 
 #endif

@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AudioToolbox;
 
+import MacOS.Foundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -63,5 +65,47 @@ public objc closure void AUParameterRecordingObserver(NSInteger arg0, AURecorded
 public objc closure void AUParameterAutomationObserver(NSInteger arg0, AUParameterAutomationEvent* arg1);
 
 public using AUParameterObserverToken = void*;
+
+public extern objc class AUParameterNode : NSObject
+{
+    [Selector("identifier")] public NSString Identifier { get; }
+    [Selector("keyPath")] public NSString KeyPath { get; }
+    [Selector("displayName")] public NSString DisplayName { get; }
+    [Selector("displayNameWithLength:")] public NSString DisplayNameWithLength(NSInteger maximumLength);
+    [Selector("tokenByAddingParameterObserver:")] public AUParameterObserverToken TokenByAddingParameterObserver(AUParameterObserver observer);
+    [Selector("tokenByAddingParameterRecordingObserver:")] public AUParameterObserverToken TokenByAddingParameterRecordingObserver(AUParameterRecordingObserver observer);
+    [Selector("tokenByAddingParameterAutomationObserver:")] public AUParameterObserverToken TokenByAddingParameterAutomationObserver(AUParameterAutomationObserver observer);
+    [Selector("removeParameterObserver:")] public void RemoveParameterObserver(AUParameterObserverToken token);
+}
+
+public extern objc class AUParameterGroup : AUParameterNode, NSSecureCoding
+{
+    [Selector("children")] public NSArray Children { get; }
+    [Selector("allParameters")] public NSArray AllParameters { get; }
+}
+
+public extern objc class AUParameterTree : AUParameterGroup, NSSecureCoding
+{
+    [Selector("parameterWithAddress:")] public AUParameter? ParameterWithAddress(AUParameterAddress address);
+    [Selector("parameterWithID:scope:element:")] public AUParameter? ParameterWithIDScopeElement(AudioUnitParameterID paramID, AudioUnitScope scope, AudioUnitElement element);
+}
+
+public extern objc class AUParameter : AUParameterNode, NSSecureCoding
+{
+    [Selector("minValue")] public AUValue MinValue { get; }
+    [Selector("maxValue")] public AUValue MaxValue { get; }
+    [Selector("unit")] public AudioUnitParameterUnit Unit { get; }
+    [Selector("unitName")] public NSString? UnitName { get; }
+    [Selector("flags")] public AudioUnitParameterOptions Flags { get; }
+    [Selector("address")] public AUParameterAddress Address { get; }
+    [Selector("valueStrings")] public NSArray? ValueStrings { get; }
+    [Selector("dependentParameters")] public NSArray? DependentParameters { get; }
+    [Selector("value", "setValue:")] public AUValue Value { get; set; }
+    [Selector("setValue:originator:")] public void SetValueOriginator(AUValue value, AUParameterObserverToken originator);
+    [Selector("setValue:originator:atHostTime:")] public void SetValueOriginatorAtHostTime(AUValue value, AUParameterObserverToken originator, ulong hostTime);
+    [Selector("setValue:originator:atHostTime:eventType:")] public void SetValueOriginatorAtHostTimeEventType(AUValue value, AUParameterObserverToken originator, ulong hostTime, AUParameterAutomationEventType eventType);
+    [Selector("stringFromValue:")] public NSString StringFromValue(AUValue* value);
+    [Selector("valueFromString:")] public AUValue ValueFromString(NSString string);
+}
 
 #endif

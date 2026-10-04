@@ -24,6 +24,7 @@
 module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -52,7 +53,7 @@ public const int kSCStatusConnectionIgnore = 5002;
 
 public extern "C" CFStringRef kCFErrorDomainSystemConfiguration;
 
-public extern "C" CFErrorRef SCCopyLastError();
+[ReturnsRetained] public extern "C" CFErrorRef SCCopyLastError();
 
 public extern "C" int SCError();
 

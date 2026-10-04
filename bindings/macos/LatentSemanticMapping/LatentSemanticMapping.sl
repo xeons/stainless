@@ -25,6 +25,7 @@ module MacOS.LatentSemanticMapping;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -39,25 +40,28 @@ public const int kLSMMapOverflow = -6645;
 
 public struct __LSMMap;
 
-public using LSMMapRef = __LSMMap*;
+[CFType("LSMMapGetTypeID")]
+public extern objc class LSMMapRef : CFTypeRef { }
 
 public extern "C" CFTypeID LSMMapGetTypeID();
 
 public struct __LSMText;
 
-public using LSMTextRef = __LSMText*;
+[CFType("LSMTextGetTypeID")]
+public extern objc class LSMTextRef : CFTypeRef { }
 
 public extern "C" CFTypeID LSMTextGetTypeID();
 
 public struct __LSMResult;
 
-public using LSMResultRef = __LSMResult*;
+[CFType("LSMResultGetTypeID")]
+public extern objc class LSMResultRef : CFTypeRef { }
 
 public extern "C" CFTypeID LSMResultGetTypeID();
 
 public using LSMCategory = uint;
 
-public extern "C" LSMMapRef LSMMapCreate(CFAllocatorRef alloc, CFOptionFlags flags);
+[ReturnsRetained] public extern "C" LSMMapRef LSMMapCreate(CFAllocatorRef? alloc, CFOptionFlags flags);
 
 public const int kLSMMapPairs = 1;
 public const int kLSMMapTriplets = 2;
@@ -81,7 +85,7 @@ public extern "C" OSStatus LSMMapAddTextWithWeight(LSMMapRef mapref, LSMTextRef 
 
 public extern "C" OSStatus LSMMapCompile(LSMMapRef mapref);
 
-public extern "C" CFArrayRef LSMMapCreateClusters(CFAllocatorRef alloc, LSMMapRef mapref, CFArrayRef subset, CFIndex numClusters, CFOptionFlags flags);
+[ReturnsRetained] public extern "C" CFArrayRef? LSMMapCreateClusters(CFAllocatorRef? alloc, LSMMapRef mapref, CFArrayRef? subset, CFIndex numClusters, CFOptionFlags flags);
 
 public const int kLSMClusterCategories = 0;
 public const int kLSMClusterWords = 1;
@@ -91,7 +95,7 @@ public const int kLSMClusterAgglomerative = 4;
 
 public extern "C" OSStatus LSMMapApplyClusters(LSMMapRef mapref, CFArrayRef clusters);
 
-public extern "C" LSMResultRef LSMResultCreate(CFAllocatorRef alloc, LSMMapRef mapref, LSMTextRef textref, CFIndex numResults, CFOptionFlags flags);
+[ReturnsRetained] public extern "C" LSMResultRef LSMResultCreate(CFAllocatorRef? alloc, LSMMapRef mapref, LSMTextRef textref, CFIndex numResults, CFOptionFlags flags);
 
 public const int kLSMResultBestWords = 1;
 
@@ -101,28 +105,28 @@ public extern "C" LSMCategory LSMResultGetCategory(LSMResultRef result, CFIndex 
 
 public extern "C" float LSMResultGetScore(LSMResultRef result, CFIndex n);
 
-public extern "C" CFStringRef LSMResultCopyWord(LSMResultRef result, CFIndex n);
+[ReturnsRetained] public extern "C" CFStringRef? LSMResultCopyWord(LSMResultRef result, CFIndex n);
 
-public extern "C" CFDataRef LSMResultCopyToken(LSMResultRef result, CFIndex n);
+[ReturnsRetained] public extern "C" CFDataRef? LSMResultCopyToken(LSMResultRef result, CFIndex n);
 
-public extern "C" CFArrayRef LSMResultCopyWordCluster(LSMResultRef result, CFIndex n);
+[ReturnsRetained] public extern "C" CFArrayRef? LSMResultCopyWordCluster(LSMResultRef result, CFIndex n);
 
-public extern "C" CFArrayRef LSMResultCopyTokenCluster(LSMResultRef result, CFIndex n);
+[ReturnsRetained] public extern "C" CFArrayRef? LSMResultCopyTokenCluster(LSMResultRef result, CFIndex n);
 
 public extern "C" OSStatus LSMMapWriteToURL(LSMMapRef mapref, CFURLRef file, CFOptionFlags flags);
 
-public extern "C" LSMMapRef LSMMapCreateFromURL(CFAllocatorRef alloc, CFURLRef file, CFOptionFlags flags);
+[ReturnsRetained] public extern "C" LSMMapRef? LSMMapCreateFromURL(CFAllocatorRef? alloc, CFURLRef file, CFOptionFlags flags);
 
 public const int kLSMMapDiscardCounts = 1;
 public const int kLSMMapLoadMutable = 2;
 
-public extern "C" OSStatus LSMMapWriteToStream(LSMMapRef mapref, LSMTextRef textref, CFWriteStreamRef stream, CFOptionFlags options);
+public extern "C" OSStatus LSMMapWriteToStream(LSMMapRef mapref, LSMTextRef? textref, CFWriteStreamRef stream, CFOptionFlags options);
 
-public extern "C" LSMTextRef LSMTextCreate(CFAllocatorRef alloc, LSMMapRef mapref);
+[ReturnsRetained] public extern "C" LSMTextRef LSMTextCreate(CFAllocatorRef? alloc, LSMMapRef mapref);
 
 public extern "C" OSStatus LSMTextAddWord(LSMTextRef textref, CFStringRef word);
 
-public extern "C" OSStatus LSMTextAddWords(LSMTextRef textref, CFStringRef words, CFLocaleRef locale, CFOptionFlags flags);
+public extern "C" OSStatus LSMTextAddWords(LSMTextRef textref, CFStringRef words, CFLocaleRef? locale, CFOptionFlags flags);
 
 public const int kLSMTextPreserveCase = 1;
 public const int kLSMTextPreserveAcronyms = 2;

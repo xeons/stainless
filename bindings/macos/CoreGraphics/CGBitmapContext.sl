@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,9 +32,9 @@ import MacOS.CoreFoundation;
 
 public delegate void CGBitmapContextReleaseDataCallback(void* arg0, void* arg1);
 
-public extern "C" CGContextRef CGBitmapContextCreateWithData(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef space, CGBitmapInfo bitmapInfo, CGBitmapContextReleaseDataCallback releaseCallback, void* releaseInfo);
+[ReturnsRetained] public extern "C" CGContextRef? CGBitmapContextCreateWithData(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGBitmapContextReleaseDataCallback releaseCallback, void* releaseInfo);
 
-public extern "C" CGContextRef CGBitmapContextCreate(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef space, CGBitmapInfo bitmapInfo);
+[ReturnsRetained] public extern "C" CGContextRef? CGBitmapContextCreate(void* data, nuint width, nuint height, nuint bitsPerComponent, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo);
 
 [Flags]
 public enum CGColorModel : uint
@@ -91,7 +92,7 @@ public struct CGBitmapParameters
     public CGComponent component;
     public CGBitmapLayout layout;
     public CGImagePixelFormatInfo format;
-    public CGColorSpaceRef colorSpace;
+    public CGColorSpace* colorSpace;
     public bool hasPremultipliedAlpha;
     public CFByteOrder byteOrder;
     public float edrTargetHeadroom;
@@ -99,35 +100,35 @@ public struct CGBitmapParameters
 
 public objc closure bool CGBitmapContextCreateAdaptiveOnResolveBlock(CGContentInfo* arg0, CGBitmapParameters* arg1);
 
-public objc closure CGRenderingBufferProviderRef CGBitmapContextCreateAdaptiveOnAllocateBlock(CGContentInfo* arg0, CGBitmapParameters* arg1);
+public objc closure CGRenderingBufferProviderRef? CGBitmapContextCreateAdaptiveOnAllocateBlock(CGContentInfo* arg0, CGBitmapParameters* arg1);
 
 public objc closure void CGBitmapContextCreateAdaptiveOnFreeBlock(CGRenderingBufferProviderRef arg0, CGContentInfo* arg1, CGBitmapParameters* arg2);
 
 public objc closure void CGBitmapContextCreateAdaptiveOnErrorBlock(CFErrorRef arg0, CGContentInfo* arg1, CGBitmapParameters* arg2);
 
 /// macOS 26.0 and later.
-public extern "C" CGContextRef CGBitmapContextCreateAdaptive(nuint width, nuint height, CFDictionaryRef auxiliaryInfo, CGBitmapContextCreateAdaptiveOnResolveBlock onResolve, CGBitmapContextCreateAdaptiveOnAllocateBlock onAllocate, CGBitmapContextCreateAdaptiveOnFreeBlock onFree, CGBitmapContextCreateAdaptiveOnErrorBlock onError);
+[ReturnsRetained] public extern "C" CGContextRef? CGBitmapContextCreateAdaptive(nuint width, nuint height, CFDictionaryRef? auxiliaryInfo, CGBitmapContextCreateAdaptiveOnResolveBlock? onResolve, CGBitmapContextCreateAdaptiveOnAllocateBlock? onAllocate, CGBitmapContextCreateAdaptiveOnFreeBlock? onFree, CGBitmapContextCreateAdaptiveOnErrorBlock? onError);
 
-public extern "C" CFStringRef kCGAdaptiveMaximumBitDepth;
+public extern "C" CFStringRef? kCGAdaptiveMaximumBitDepth;
 
-public extern "C" void* CGBitmapContextGetData(CGContextRef context);
+public extern "C" void* CGBitmapContextGetData(CGContextRef? context);
 
-public extern "C" nuint CGBitmapContextGetWidth(CGContextRef context);
+public extern "C" nuint CGBitmapContextGetWidth(CGContextRef? context);
 
-public extern "C" nuint CGBitmapContextGetHeight(CGContextRef context);
+public extern "C" nuint CGBitmapContextGetHeight(CGContextRef? context);
 
-public extern "C" nuint CGBitmapContextGetBitsPerComponent(CGContextRef context);
+public extern "C" nuint CGBitmapContextGetBitsPerComponent(CGContextRef? context);
 
-public extern "C" nuint CGBitmapContextGetBitsPerPixel(CGContextRef context);
+public extern "C" nuint CGBitmapContextGetBitsPerPixel(CGContextRef? context);
 
-public extern "C" nuint CGBitmapContextGetBytesPerRow(CGContextRef context);
+public extern "C" nuint CGBitmapContextGetBytesPerRow(CGContextRef? context);
 
-public extern "C" CGColorSpaceRef CGBitmapContextGetColorSpace(CGContextRef context);
+public extern "C" CGColorSpaceRef? CGBitmapContextGetColorSpace(CGContextRef? context);
 
-public extern "C" CGImageAlphaInfo CGBitmapContextGetAlphaInfo(CGContextRef context);
+public extern "C" CGImageAlphaInfo CGBitmapContextGetAlphaInfo(CGContextRef? context);
 
-public extern "C" CGBitmapInfo CGBitmapContextGetBitmapInfo(CGContextRef context);
+public extern "C" CGBitmapInfo CGBitmapContextGetBitmapInfo(CGContextRef? context);
 
-public extern "C" CGImageRef CGBitmapContextCreateImage(CGContextRef context);
+[ReturnsRetained] public extern "C" CGImageRef? CGBitmapContextCreateImage(CGContextRef? context);
 
 #endif

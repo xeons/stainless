@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,30 +33,30 @@ import MacOS.System;
 
 public extern "C" CFTypeID SecIdentityGetTypeID();
 
-public extern "C" SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificateRef certificate, SecKeyRef privateKey);
+[ReturnsRetained] public extern "C" SecIdentityRef? SecIdentityCreate(CFAllocatorRef? allocator, SecCertificateRef certificate, SecKeyRef privateKey);
 
-public extern "C" OSStatus SecIdentityCreateWithCertificate(CFTypeRef keychainOrArray, SecCertificateRef certificateRef, SecIdentityRef* identityRef);
+public extern "C" OSStatus SecIdentityCreateWithCertificate(CFTypeRef? keychainOrArray, SecCertificateRef certificateRef, __SecIdentity** identityRef);
 
-public extern "C" OSStatus SecIdentityCopyCertificate(SecIdentityRef identityRef, SecCertificateRef* certificateRef);
+public extern "C" OSStatus SecIdentityCopyCertificate(SecIdentityRef identityRef, __SecCertificate** certificateRef);
 
-public extern "C" OSStatus SecIdentityCopyPrivateKey(SecIdentityRef identityRef, SecKeyRef* privateKeyRef);
+public extern "C" OSStatus SecIdentityCopyPrivateKey(SecIdentityRef identityRef, __SecKey** privateKeyRef);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecIdentityCopyPreference(CFStringRef name, CSSM_KEYUSE keyUsage, CFArrayRef validIssuers, SecIdentityRef* identity);
+public extern "C" OSStatus SecIdentityCopyPreference(CFStringRef name, CSSM_KEYUSE keyUsage, CFArrayRef? validIssuers, __SecIdentity** identity);
 
-public extern "C" SecIdentityRef SecIdentityCopyPreferred(CFStringRef name, CFArrayRef keyUsage, CFArrayRef validIssuers);
+[ReturnsRetained] public extern "C" SecIdentityRef? SecIdentityCopyPreferred(CFStringRef name, CFArrayRef? keyUsage, CFArrayRef? validIssuers);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecIdentitySetPreference(SecIdentityRef identity, CFStringRef name, CSSM_KEYUSE keyUsage);
 
-public extern "C" OSStatus SecIdentitySetPreferred(SecIdentityRef identity, CFStringRef name, CFArrayRef keyUsage);
+public extern "C" OSStatus SecIdentitySetPreferred(SecIdentityRef? identity, CFStringRef name, CFArrayRef? keyUsage);
 
-public extern "C" OSStatus SecIdentityCopySystemIdentity(CFStringRef domain, SecIdentityRef* idRef, CFStringRef* actualDomain);
+public extern "C" OSStatus SecIdentityCopySystemIdentity(CFStringRef domain, __SecIdentity** idRef, __CFString** actualDomain);
 
-public extern "C" OSStatus SecIdentitySetSystemIdentity(CFStringRef domain, SecIdentityRef idRef);
+public extern "C" OSStatus SecIdentitySetSystemIdentity(CFStringRef domain, SecIdentityRef? idRef);
 
-public extern "C" CFStringRef kSecIdentityDomainDefault;
+public extern "C" CFStringRef? kSecIdentityDomainDefault;
 
-public extern "C" CFStringRef kSecIdentityDomainKerberosKDC;
+public extern "C" CFStringRef? kSecIdentityDomainKerberosKDC;
 
 #endif

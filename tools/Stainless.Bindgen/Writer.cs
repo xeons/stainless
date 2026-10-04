@@ -31,7 +31,16 @@ public sealed record Emitted(string Key, string Owner, string Header, string Tex
 
     /// <summary>What the layout probe compares it on, as C and as Stainless spell it.</summary>
     public IReadOnlyList<(string C, string Stainless)> Checks { get; init; } = [];
+
+    /// <summary>The classes and messages it binds, which the runtime probe asks the Objective-C runtime for.</summary>
+    public IReadOnlyList<RuntimeCheck> Runtime { get; init; } = [];
 }
+
+/// <summary>
+/// A class, or a message a class answers, with the macOS it first appeared
+/// in when that is later than the oldest the compiler builds for.
+/// </summary>
+public sealed record RuntimeCheck(string Class, string? Selector, bool IsInstance, string? Introduced);
 
 /// <summary>A declaration that could not be bound, and why.</summary>
 public sealed record Skipped(string Owner, string Header, string Name, string Reason);
@@ -41,7 +50,7 @@ public sealed record Skipped(string Owner, string Header, string Name, string Re
 /// at a time. The pieces that cannot be spelled are skipped with their
 /// reason, never guessed at.
 /// </summary>
-public sealed partial class Writer(Translation translation, IReadOnlySet<string> generated)
+public sealed partial class Writer(Translation translation, IReadOnlySet<string> generated, ObjCNames? names = null)
 {
     /// <summary>The module everything outside a framework goes in: libc, Mach and MacTypes.h.</summary>
     public const string SystemOwner = "System";
@@ -124,6 +133,9 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         if (declaration is CRecordDecl { AnonymousAt: not null })
             return null;
 
+        if (declaration is CObjCContainer { IsDefinition: false })
+            return null;
+
         try
         {
             string? text = declaration switch
@@ -134,6 +146,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
                 CTypedefDecl typedef => WriteTypedef(typedef, context),
                 CVariableDecl variable => WriteVariable(variable, context),
                 CMacro macro => WriteMacro(macro),
+                CObjCContainer container => WriteObjCContainer(container, context),
                 _ => null,
             };
 
@@ -146,6 +159,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             return new Emitted(Key(declaration), owner, context.Header, all.ToString(), context.Imports)
             {
                 Checks = Checks(declaration, text),
+                Runtime = context.Runtime,
                 Uses = context.Uses,
                 IsOpaque = declaration is CRecordDecl { IsComplete: false } && context.Synthesized.Count == 0,
             };
@@ -213,6 +227,9 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         // An enum with no name is its constants, known by the first of them.
         CEnumDecl { Name.Length: 0, Members: [var first, ..] } => "constants " + first.Name,
         CEnumDecl => "enum " + declaration.Name,
+        CObjCInterface => "class " + declaration.Name,
+        CObjCProtocol => "protocol " + declaration.Name,
+        CObjCCategory category => $"category {category.Class}({category.Name}) {category.File}",
         _ => "typedef " + declaration.Name,
     };
 
@@ -236,20 +253,43 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             throw new Unsupported("inline in the header, so nothing exports it");
         if (function.AsmLabel is not null)
             throw new Unsupported($"linked as '{function.AsmLabel}', and an extern cannot be renamed");
+        if (IsManualCounting(function, context))
+            throw new Unsupported("manual reference counting, which ARC does");
+        if (function.Parameters.FirstOrDefault(p => p.IsConsumed) is { } consumed)
+            throw new Unsupported($"it takes ownership of '{consumed.Name}', which a binding cannot hand over");
 
-        string result = Spell(function.Result, context, function.Name + "Result");
+        string result = Canonical(function.Result) is CBuiltin { Name: "void" }
+            ? "void"
+            : Spell(function.Result, context, function.Name + "Result", Placement.Value, function.ResultNullability);
         var parameters = new List<string>();
         for (int i = 0; i < function.Parameters.Count; i++)
         {
             var parameter = function.Parameters[i];
             string name = ParameterName(parameter.Name, i);
-            string type = SpellParameter(parameter.Type, context, function.Name + Capitalized(name));
+            string type = SpellParameter(parameter.Type, context, function.Name + Capitalized(name), parameter.Nullability);
             parameters.Add($"{type} {name}");
         }
 
         if (function.Variadic) parameters.Add("...");
-        return $"public extern \"C\" {result} {Identifier(function.Name)}({string.Join(", ", parameters)});\n";
+
+        // ARC's rule for a C function is +0; a CF function follows the
+        // Create rule unless an attribute says otherwise.
+        bool returnsObject = IsManaged(function.Result, context);
+        bool retained = returnsObject &&
+                        (function.ReturnsRetained ??
+                         (IsCFValue(function.Result) && FollowsCreateRule(function.Name)));
+        string ownership = retained ? "[ReturnsRetained] " : "";
+        return $"{ownership}public extern \"C\" {result} {Identifier(function.Name)}({string.Join(", ", parameters)});\n";
     }
+
+    /// <summary>A Core Foundation type, through any typedef naming one.</summary>
+    private bool IsCFValue(CType type) => type switch
+    {
+        CTypedef named when IsCFTypedef(named.Name) => true,
+        CTypedef named when translation.Typedefs.TryGetValue(named.Name, out var typedef) && typedef.Type != type =>
+            IsCFValue(typedef.Type),
+        _ => false,
+    };
 
     private string? WriteVariable(CVariableDecl variable, Context context)
     {
@@ -261,7 +301,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         if (variable.Type is CFunction)
             throw new Unsupported("a function declared as a variable");
 
-        string type = Spell(variable.Type, context, variable.Name + "Type", isField: true);
+        string type = Spell(variable.Type, context, variable.Name + "Type", Placement.Value, variable.Nullability);
         return $"public extern \"C\" {type} {Identifier(variable.Name)};\n";
     }
 
@@ -269,6 +309,11 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
     {
         if (IsPrivateName(typedef.Name) || Primitives.ContainsKey(typedef.Name)) return null;
         if (Canonical(typedef.Type) is CBuiltin { Name: "void" }) return null;
+
+        if (IsCFTypedef(typedef.Name))
+            return WriteCFType(typedef, context);
+        if (typedef.Type is not CBlock && IsManaged(typedef.Type, context))
+            return $"public using {Identifier(typedef.Name)} = {SpellManaged(typedef.Type, context, typedef.Name + "Type")};\n";
 
         switch (typedef.Type)
         {
@@ -298,7 +343,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             // `typedef unsigned char Str255[256]`: the array itself, which a
             // field holds whole and a parameter receives as a pointer.
             case CArray { Length: not null } array:
-                return $"public using {Identifier(typedef.Name)} = {Spell(array, context, typedef.Name + "Type", isField: true)};\n";
+                return $"public using {Identifier(typedef.Name)} = {Spell(array, context, typedef.Name + "Type", Placement.Field)};\n";
 
             default:
                 return $"public using {Identifier(typedef.Name)} = {Spell(typedef.Type, context, typedef.Name + "Type")};\n";
@@ -309,18 +354,36 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
     {
         if (function.Variadic) throw new Unsupported("a variadic function pointer, which a delegate cannot be");
 
+        // C calls it and says nothing of who owns an object it passes, so
+        // what a delegate takes is the pointer.
         var parameters = function.Parameters
-            .Select((p, i) => $"{SpellParameter(p, context, name + "Arg" + i)} arg{i}");
+            .Select((p, i) => $"{SpellParameter(p, context, name + "Arg" + i, use: Placement.Raw)} arg{i}");
         return $"public delegate {Spell(function.Result, context, name + "Result")} {Identifier(name)}({string.Join(", ", parameters)});\n";
     }
 
+    /// <summary>
+    /// A block type: what it takes and returns crosses as a message's does,
+    /// so an object is counted and a <c>BOOL</c> is <c>bool</c>.
+    /// </summary>
     private string WriteBlock(string name, CFunction function, Context context)
     {
         if (function.Variadic) throw new Unsupported("a variadic block");
 
-        var parameters = function.Parameters
-            .Select((p, i) => $"{SpellParameter(p, context, name + "Arg" + i)} arg{i}");
-        return $"public objc closure {Spell(function.Result, context, name + "Result")} {Identifier(name)}({string.Join(", ", parameters)});\n";
+        bool outer = context.InObjC;
+        context.InObjC = true;
+        try
+        {
+            var parameters = function.Parameters.Select((p, i) =>
+                $"{SpellValue(p, function.ParameterNullability.ElementAtOrDefault(i), context, name + "Arg" + i)} arg{i}");
+            string result = Canonical(function.Result) is CBuiltin { Name: "void" }
+                ? "void"
+                : SpellValue(function.Result, function.ResultNullability, context, name + "Result");
+            return $"public objc closure {result} {Identifier(name)}({string.Join(", ", parameters)});\n";
+        }
+        finally
+        {
+            context.InObjC = outer;
+        }
     }
 
     private string? WriteRecord(CRecordDecl record, string name, Context context)
@@ -418,7 +481,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
                 continue;
             }
 
-            string type = Spell(field.Type, context, owner + Capitalized(field.Name), isField: true);
+            string type = Spell(field.Type, context, owner + Capitalized(field.Name), Placement.Field);
             string width = field.BitWidth is { } bits ? $" : {bits}" : "";
             text.Append($"{indent}public {type} {Identifier(field.Name)}{width};\n");
         }
@@ -582,16 +645,42 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
     // ------------------------------------------------------------ types
 
     /// <summary>A parameter's type: an array decays to a pointer to its element, as C passes it.</summary>
-    private string SpellParameter(CType type, Context context, string hint) =>
+    private string SpellParameter(CType type, Context context, string hint,
+                                  Nullability nullability = Nullability.Unspecified, Placement use = Placement.Value) =>
         Canonical(type) is CArray array
             ? Spell(new CPointer(array.Element), context, hint)
-            : Spell(type, context, hint);
+            : Spell(type, context, hint, use, nullability);
 
-    /// <summary>A type as Stainless writes it, noting the modules and synthesized types it needs.</summary>
-    private string Spell(CType type, Context context, string hint, bool isField = false)
+    /// <summary>
+    /// A type as Stainless writes it, noting the modules and synthesized
+    /// types it needs. An object is counted where it is a value, and is a
+    /// plain pointer anywhere else; a value is optional unless C promised it
+    /// is never nil.
+    /// </summary>
+    private string Spell(CType type, Context context, string hint, Placement use = Placement.Raw,
+                         Nullability nullability = Nullability.Unspecified)
     {
+        if (IsManaged(type, context))
+        {
+            if (use != Placement.Value) return SpellUnmanaged(type, context, hint);
+            string managed = SpellManaged(type, context, hint);
+            return nullability == Nullability.NonNull ? managed : managed + "?";
+        }
+
+        bool isField = use is Placement.Field or Placement.Value;
         switch (type)
         {
+            case CTypedef { Name: "Class" } or CObjCQualified { Base: CTypedef { Name: "Class" } }:
+                context.Imports.Add(ObjCModule);
+                return "Class";
+
+            case CTypedef { Name: "SEL" }:
+                context.Imports.Add(ObjCModule);
+                return "Selector";
+
+            case CTypedef { Name: "BOOL" } when context.InObjC:
+                return "bool";
+
             case CBuiltin builtin:
                 return Builtin(builtin.Name);
 
@@ -663,6 +752,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
 
     private string SpellTypedef(string name, Context context, string hint)
     {
+        if (context.TypeParameters.Contains(name)) return "void*";
         if (Primitives.TryGetValue(name, out string? primitive)) return primitive;
         if (name is "va_list" or "__builtin_va_list" or "__darwin_va_list" or "__gnuc_va_list")
             throw new Unsupported("a va_list, which Stainless cannot make");
@@ -718,6 +808,8 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
     {
         if (owner != SystemOwner && !generated.Contains(owner))
             throw new Unsupported($"it uses '{declared.Name}' from {owner}, which is not generated");
+        if (declared.Availability.Unavailable)
+            throw new Unsupported($"it uses '{declared.Name}', which is unavailable on macOS");
         if (WhyNotWritable(declared) is { } why)
             throw new Unsupported($"it uses '{declared.Name}', which is skipped: {why}");
 
@@ -814,7 +906,10 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
                     "ushort" => "unsigned short", "int" => "int", "uint" => "unsigned int",
                     "long" or "nint" => "long", _ => "unsigned long",
                 })
-                : translation.Typedefs.TryGetValue(typedef.Name, out var declared) ? Canonical(declared.Type) : type
+                // clang's own `typedef id id` names itself.
+                : translation.Typedefs.TryGetValue(typedef.Name, out var declared) && declared.Type != type
+                    ? Canonical(declared.Type)
+                    : type
             : type;
 
     private bool IsIncomplete(CTag tag) =>
@@ -838,6 +933,17 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
     /// <summary>What one declaration being written has gathered.</summary>
     private sealed class Context(string owner, string header, string name)
     {
+        /// <summary>An Objective-C class's type parameters, which are <c>id</c>.</summary>
+        public HashSet<string> TypeParameters { get; } = new(StringComparer.Ordinal);
+
+        /// <summary>Inside a message or a block, where a <c>BOOL</c> is <c>bool</c>.</summary>
+        public bool InObjC { get; set; }
+
+        public List<RuntimeCheck> Runtime { get; } = [];
+
+        /// <summary>When the class, category or protocol being written appeared, if later than the oldest built for.</summary>
+        public string? Introduced { get; set; }
+
         public string Owner { get; } = owner;
         public string Header { get; } = header;
         public string Name { get; } = name;

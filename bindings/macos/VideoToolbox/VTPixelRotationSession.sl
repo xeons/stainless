@@ -26,6 +26,7 @@ module MacOS.VideoToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,9 +34,10 @@ import MacOS.System;
 
 public struct OpaqueVTPixelRotationSession;
 
-public using VTPixelRotationSessionRef = OpaqueVTPixelRotationSession*;
+[CFType("VTPixelRotationSessionGetTypeID")]
+public extern objc class VTPixelRotationSessionRef : CFTypeRef { }
 
-public extern "C" OSStatus VTPixelRotationSessionCreate(CFAllocatorRef allocator, VTPixelRotationSessionRef* pixelRotationSessionOut);
+public extern "C" OSStatus VTPixelRotationSessionCreate(CFAllocatorRef? allocator, OpaqueVTPixelRotationSession** pixelRotationSessionOut);
 
 public extern "C" void VTPixelRotationSessionInvalidate(VTPixelRotationSessionRef session);
 

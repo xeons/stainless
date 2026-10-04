@@ -25,6 +25,7 @@ module MacOS.AudioToolbox;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -59,11 +60,11 @@ public extern "C" OSStatus AudioServicesDisposeSystemSoundID(SystemSoundID inSys
 
 public objc closure void AudioServicesPlayAlertSoundWithCompletionInCompletionBlock();
 
-public extern "C" void AudioServicesPlayAlertSoundWithCompletion(SystemSoundID inSystemSoundID, AudioServicesPlayAlertSoundWithCompletionInCompletionBlock inCompletionBlock);
+public extern "C" void AudioServicesPlayAlertSoundWithCompletion(SystemSoundID inSystemSoundID, AudioServicesPlayAlertSoundWithCompletionInCompletionBlock? inCompletionBlock);
 
 public objc closure void AudioServicesPlaySystemSoundWithCompletionInCompletionBlock();
 
-public extern "C" void AudioServicesPlaySystemSoundWithCompletion(SystemSoundID inSystemSoundID, AudioServicesPlaySystemSoundWithCompletionInCompletionBlock inCompletionBlock);
+public extern "C" void AudioServicesPlaySystemSoundWithCompletion(SystemSoundID inSystemSoundID, AudioServicesPlaySystemSoundWithCompletionInCompletionBlock? inCompletionBlock);
 
 public extern "C" OSStatus AudioServicesGetPropertyInfo(AudioServicesPropertyID inPropertyID, UInt32 inSpecifierSize, void* inSpecifier, UInt32* outPropertyDataSize, Boolean* outWritable);
 
@@ -75,7 +76,7 @@ public extern "C" void AudioServicesPlayAlertSound(SystemSoundID inSystemSoundID
 
 public extern "C" void AudioServicesPlaySystemSound(SystemSoundID inSystemSoundID);
 
-public extern "C" OSStatus AudioServicesAddSystemSoundCompletion(SystemSoundID inSystemSoundID, CFRunLoopRef inRunLoop, CFStringRef inRunLoopMode, AudioServicesSystemSoundCompletionProc inCompletionRoutine, void* inClientData);
+public extern "C" OSStatus AudioServicesAddSystemSoundCompletion(SystemSoundID inSystemSoundID, CFRunLoopRef? inRunLoop, CFStringRef? inRunLoopMode, AudioServicesSystemSoundCompletionProc inCompletionRoutine, void* inClientData);
 
 public extern "C" void AudioServicesRemoveSystemSoundCompletion(SystemSoundID inSystemSoundID);
 

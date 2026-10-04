@@ -271,12 +271,12 @@ public struct MenuItemDataRec
     public SInt32 fontID;
     public URefCon refcon;
     public OptionBits attr;
-    public CFStringRef cfText;
+    public __CFString* cfText;
     public Collection properties;
     public UInt32 indent;
     public UInt16 cmdVirtualKey;
-    public CFAttributedStringRef attributedText;
-    public CTFontRef font;
+    public __CFAttributedString* attributedText;
+    public __CTFont* font;
 }
 
 public using MenuItemDataPtr = MenuItemDataRec*;
@@ -293,7 +293,7 @@ public using MenuDefUPP = void*;
 [Pack(2)]
 public struct MenuDefSpecUView
 {
-    public CFStringRef classID;
+    public __CFString* classID;
     public EventRef initEvent;
 }
 

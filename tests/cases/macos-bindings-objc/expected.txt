@@ -1,0 +1,9 @@
+path: /usr/local/bin
+parts: 3, the last c
+enumerated 2 before stopping
+measured: true
+CF length 29, owned 1 time(s)
+toll-free: a string Core Foundation made
+a string: true, an array: false
+a color with 4 components
+processors: true

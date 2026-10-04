@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -127,8 +128,8 @@ public enum SecKeychainEventMask : uint
 public struct SecKeychainCallbackInfo
 {
     public UInt32 version;
-    public SecKeychainItemRef item;
-    public SecKeychainRef keychain;
+    public __SecKeychainItem* item;
+    public __SecKeychain* keychain;
     public pid_t pid;
 }
 
@@ -139,37 +140,37 @@ public extern "C" CFTypeID SecKeychainGetTypeID();
 public extern "C" OSStatus SecKeychainGetVersion(UInt32* returnVers);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainOpen(byte* pathName, SecKeychainRef* keychain);
+public extern "C" OSStatus SecKeychainOpen(byte* pathName, __SecKeychain** keychain);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainCreate(byte* pathName, UInt32 passwordLength, void* password, Boolean promptUser, SecAccessRef initialAccess, SecKeychainRef* keychain);
+public extern "C" OSStatus SecKeychainCreate(byte* pathName, UInt32 passwordLength, void* password, Boolean promptUser, SecAccessRef? initialAccess, __SecKeychain** keychain);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainDelete(SecKeychainRef keychainOrArray);
+public extern "C" OSStatus SecKeychainDelete(SecKeychainRef? keychainOrArray);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainSetSettings(SecKeychainRef keychain, SecKeychainSettings* newSettings);
+public extern "C" OSStatus SecKeychainSetSettings(SecKeychainRef? keychain, SecKeychainSettings* newSettings);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainCopySettings(SecKeychainRef keychain, SecKeychainSettings* outSettings);
+public extern "C" OSStatus SecKeychainCopySettings(SecKeychainRef? keychain, SecKeychainSettings* outSettings);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainUnlock(SecKeychainRef keychain, UInt32 passwordLength, void* password, Boolean usePassword);
+public extern "C" OSStatus SecKeychainUnlock(SecKeychainRef? keychain, UInt32 passwordLength, void* password, Boolean usePassword);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainLock(SecKeychainRef keychain);
+public extern "C" OSStatus SecKeychainLock(SecKeychainRef? keychain);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecKeychainLockAll();
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainCopyDefault(SecKeychainRef* keychain);
+public extern "C" OSStatus SecKeychainCopyDefault(__SecKeychain** keychain);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainSetDefault(SecKeychainRef keychain);
+public extern "C" OSStatus SecKeychainSetDefault(SecKeychainRef? keychain);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainCopySearchList(CFArrayRef* searchList);
+public extern "C" OSStatus SecKeychainCopySearchList(__CFArray** searchList);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecKeychainSetSearchList(CFArrayRef searchList);
@@ -183,13 +184,13 @@ public enum SecPreferencesDomain : int
 }
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainCopyDomainDefault(SecPreferencesDomain domain, SecKeychainRef* keychain);
+public extern "C" OSStatus SecKeychainCopyDomainDefault(SecPreferencesDomain domain, __SecKeychain** keychain);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainSetDomainDefault(SecPreferencesDomain domain, SecKeychainRef keychain);
+public extern "C" OSStatus SecKeychainSetDomainDefault(SecPreferencesDomain domain, SecKeychainRef? keychain);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainCopyDomainSearchList(SecPreferencesDomain domain, CFArrayRef* searchList);
+public extern "C" OSStatus SecKeychainCopyDomainSearchList(SecPreferencesDomain domain, __CFArray** searchList);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecKeychainSetDomainSearchList(SecPreferencesDomain domain, CFArrayRef searchList);
@@ -201,13 +202,13 @@ public extern "C" OSStatus SecKeychainSetPreferenceDomain(SecPreferencesDomain d
 public extern "C" OSStatus SecKeychainGetPreferenceDomain(SecPreferencesDomain* domain);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainGetStatus(SecKeychainRef keychain, SecKeychainStatus* keychainStatus);
+public extern "C" OSStatus SecKeychainGetStatus(SecKeychainRef? keychain, SecKeychainStatus* keychainStatus);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainGetPath(SecKeychainRef keychain, UInt32* ioPathLength, byte* pathName);
+public extern "C" OSStatus SecKeychainGetPath(SecKeychainRef? keychain, UInt32* ioPathLength, byte* pathName);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainAttributeInfoForItemID(SecKeychainRef keychain, UInt32 itemID, SecKeychainAttributeInfo** info);
+public extern "C" OSStatus SecKeychainAttributeInfoForItemID(SecKeychainRef? keychain, UInt32 itemID, SecKeychainAttributeInfo** info);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecKeychainFreeAttributeInfo(SecKeychainAttributeInfo* info);
@@ -222,16 +223,16 @@ public extern "C" OSStatus SecKeychainAddCallback(SecKeychainCallback callbackFu
 public extern "C" OSStatus SecKeychainRemoveCallback(SecKeychainCallback callbackFunction);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainAddInternetPassword(SecKeychainRef keychain, UInt32 serverNameLength, byte* serverName, UInt32 securityDomainLength, byte* securityDomain, UInt32 accountNameLength, byte* accountName, UInt32 pathLength, byte* path, UInt16 port, SecProtocolType protocol, SecAuthenticationType authenticationType, UInt32 passwordLength, void* passwordData, SecKeychainItemRef* itemRef);
+public extern "C" OSStatus SecKeychainAddInternetPassword(SecKeychainRef? keychain, UInt32 serverNameLength, byte* serverName, UInt32 securityDomainLength, byte* securityDomain, UInt32 accountNameLength, byte* accountName, UInt32 pathLength, byte* path, UInt16 port, SecProtocolType protocol, SecAuthenticationType authenticationType, UInt32 passwordLength, void* passwordData, __SecKeychainItem** itemRef);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainFindInternetPassword(CFTypeRef keychainOrArray, UInt32 serverNameLength, byte* serverName, UInt32 securityDomainLength, byte* securityDomain, UInt32 accountNameLength, byte* accountName, UInt32 pathLength, byte* path, UInt16 port, SecProtocolType protocol, SecAuthenticationType authenticationType, UInt32* passwordLength, void** passwordData, SecKeychainItemRef* itemRef);
+public extern "C" OSStatus SecKeychainFindInternetPassword(CFTypeRef? keychainOrArray, UInt32 serverNameLength, byte* serverName, UInt32 securityDomainLength, byte* securityDomain, UInt32 accountNameLength, byte* accountName, UInt32 pathLength, byte* path, UInt16 port, SecProtocolType protocol, SecAuthenticationType authenticationType, UInt32* passwordLength, void** passwordData, __SecKeychainItem** itemRef);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainAddGenericPassword(SecKeychainRef keychain, UInt32 serviceNameLength, byte* serviceName, UInt32 accountNameLength, byte* accountName, UInt32 passwordLength, void* passwordData, SecKeychainItemRef* itemRef);
+public extern "C" OSStatus SecKeychainAddGenericPassword(SecKeychainRef? keychain, UInt32 serviceNameLength, byte* serviceName, UInt32 accountNameLength, byte* accountName, UInt32 passwordLength, void* passwordData, __SecKeychainItem** itemRef);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainFindGenericPassword(CFTypeRef keychainOrArray, UInt32 serviceNameLength, byte* serviceName, UInt32 accountNameLength, byte* accountName, UInt32* passwordLength, void** passwordData, SecKeychainItemRef* itemRef);
+public extern "C" OSStatus SecKeychainFindGenericPassword(CFTypeRef? keychainOrArray, UInt32 serviceNameLength, byte* serviceName, UInt32 accountNameLength, byte* accountName, UInt32* passwordLength, void** passwordData, __SecKeychainItem** itemRef);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecKeychainSetUserInteractionAllowed(Boolean state);
@@ -240,16 +241,16 @@ public extern "C" OSStatus SecKeychainSetUserInteractionAllowed(Boolean state);
 public extern "C" OSStatus SecKeychainGetUserInteractionAllowed(Boolean* state);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecKeychainGetCSPHandle(SecKeychainRef keychain, CSSM_CSP_HANDLE* cspHandle);
+public extern "C" OSStatus SecKeychainGetCSPHandle(SecKeychainRef? keychain, CSSM_CSP_HANDLE* cspHandle);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecKeychainGetDLDBHandle(SecKeychainRef keychain, CSSM_DL_DB_HANDLE* dldbHandle);
+public extern "C" OSStatus SecKeychainGetDLDBHandle(SecKeychainRef? keychain, CSSM_DL_DB_HANDLE* dldbHandle);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainCopyAccess(SecKeychainRef keychain, SecAccessRef* access);
+public extern "C" OSStatus SecKeychainCopyAccess(SecKeychainRef? keychain, __SecAccess** access);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecKeychainSetAccess(SecKeychainRef keychain, SecAccessRef access);
+public extern "C" OSStatus SecKeychainSetAccess(SecKeychainRef? keychain, SecAccessRef access);
 
 public const int SEC_KEYCHAIN_SETTINGS_VERS1 = 1;
 

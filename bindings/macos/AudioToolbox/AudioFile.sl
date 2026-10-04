@@ -27,6 +27,7 @@ import MacOS.CoreAudioTypes;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -112,7 +113,7 @@ public const uint kAudioFileMarkerType_Generic = 0;
 public struct AudioFileMarker
 {
     public Float64 mFramePosition;
-    public CFStringRef mName;
+    public __CFString* mName;
     public SInt32 mMarkerID;
     public AudioFile_SMPTE_Time mSMPTETime;
     public UInt32 mType;
@@ -138,7 +139,7 @@ public enum AudioFileRegionFlags : uint
 public struct AudioFileRegion
 {
     public UInt32 mRegionID;
-    public CFStringRef mName;
+    public __CFString* mName;
     public AudioFileRegionFlags mFlags;
     public UInt32 mNumberMarkers;
     public AudioFileMarker[1] mMarkers;

@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.CoreText;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -59,9 +60,9 @@ public extern "C" void GetSystemUIMode(SystemUIMode* outMode, SystemUIOptions* o
 
 public extern "C" TextEncoding GetApplicationTextEncoding();
 
-public extern "C" OSStatus HISearchWindowShow(CFStringRef inSearchString, OptionBits inFlags);
+public extern "C" OSStatus HISearchWindowShow(CFStringRef? inSearchString, OptionBits inFlags);
 
-public extern "C" void HIDictionaryWindowShow(DCSDictionaryRef dictionary, CFTypeRef textString, CFRange selectionRange, CTFontRef textFont, CGPoint textOrigin, Boolean verticalText, CGAffineTransform* viewTransform);
+public extern "C" void HIDictionaryWindowShow(DCSDictionaryRef? dictionary, CFTypeRef? textString, CFRange selectionRange, CTFontRef? textFont, CGPoint textOrigin, Boolean verticalText, CGAffineTransform* viewTransform);
 
 public const double kHIToolboxVersionNumber10_3 = 145.0;
 

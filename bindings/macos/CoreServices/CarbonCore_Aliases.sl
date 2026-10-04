@@ -139,7 +139,7 @@ public extern "C" OSStatus FSNewAliasFromPath(byte* fromFilePath, byte* targetPa
 public extern "C" OSStatus FSMatchAliasBulk(FSRef* fromFile, ulong rulesMask, AliasHandle inAlias, short* aliasCount, FSRef* aliasList, Boolean* needsUpdate, FSAliasFilterProcPtr aliasFilter, void* yourDataPtr);
 
 /// Deprecated in macOS 10.8.
-public extern "C" OSStatus FSCopyAliasInfo(AliasHandle inAlias, HFSUniStr255* targetName, HFSUniStr255* volumeName, CFStringRef* pathString, FSAliasInfoBitmap* whichInfo, FSAliasInfo* info);
+public extern "C" OSStatus FSCopyAliasInfo(AliasHandle inAlias, HFSUniStr255* targetName, HFSUniStr255* volumeName, __CFString** pathString, FSAliasInfoBitmap* whichInfo, FSAliasInfo* info);
 
 /// Deprecated in macOS 10.8.
 public extern "C" Size GetAliasSize(AliasHandle alias);

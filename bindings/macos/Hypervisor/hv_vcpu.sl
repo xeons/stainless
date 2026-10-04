@@ -24,10 +24,17 @@
 module MacOS.Hypervisor;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Hypervisor")
+
+#if ARM64
+public extern "C" hv_return_t hv_vcpu_create(hv_vcpu_t* vcpu, hv_vcpu_exit_t** exit, hv_vcpu_config_t? config);
+#else
+public extern "C" hv_return_t hv_vcpu_create(hv_vcpuid_t* vcpu, hv_vcpu_options_t flags);
+#endif
 
 #if ARM64
 public extern "C" hv_return_t hv_vcpu_destroy(hv_vcpu_t vcpu);

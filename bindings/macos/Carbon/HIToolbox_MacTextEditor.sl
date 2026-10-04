@@ -27,6 +27,7 @@ import MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -104,41 +105,41 @@ public const int kTXNTextData = 1413830740;
 public const int kTXNUnicodeTextData = 1970567284;
 public const int kTXNRichTextFormatData = 1381254688;
 
-public extern "C" CFStringRef kTXNActionTyping;
+public extern "C" CFStringRef? kTXNActionTyping;
 
-public extern "C" CFStringRef kTXNActionCut;
+public extern "C" CFStringRef? kTXNActionCut;
 
-public extern "C" CFStringRef kTXNActionPaste;
+public extern "C" CFStringRef? kTXNActionPaste;
 
-public extern "C" CFStringRef kTXNActionClear;
+public extern "C" CFStringRef? kTXNActionClear;
 
-public extern "C" CFStringRef kTXNActionChangeFont;
+public extern "C" CFStringRef? kTXNActionChangeFont;
 
-public extern "C" CFStringRef kTXNActionChangeColor;
+public extern "C" CFStringRef? kTXNActionChangeColor;
 
-public extern "C" CFStringRef kTXNActionChangeSize;
+public extern "C" CFStringRef? kTXNActionChangeSize;
 
-public extern "C" CFStringRef kTXNActionChangeStyle;
+public extern "C" CFStringRef? kTXNActionChangeStyle;
 
-public extern "C" CFStringRef kTXNActionAlignLeft;
+public extern "C" CFStringRef? kTXNActionAlignLeft;
 
-public extern "C" CFStringRef kTXNActionAlignCenter;
+public extern "C" CFStringRef? kTXNActionAlignCenter;
 
-public extern "C" CFStringRef kTXNActionAlignRight;
+public extern "C" CFStringRef? kTXNActionAlignRight;
 
-public extern "C" CFStringRef kTXNActionDrop;
+public extern "C" CFStringRef? kTXNActionDrop;
 
-public extern "C" CFStringRef kTXNActionMove;
+public extern "C" CFStringRef? kTXNActionMove;
 
-public extern "C" CFStringRef kTXNActionChangeFontFeature;
+public extern "C" CFStringRef? kTXNActionChangeFontFeature;
 
-public extern "C" CFStringRef kTXNActionChangeFontVariation;
+public extern "C" CFStringRef? kTXNActionChangeFontVariation;
 
-public extern "C" CFStringRef kTXNActionChangeGlyphVariation;
+public extern "C" CFStringRef? kTXNActionChangeGlyphVariation;
 
-public extern "C" CFStringRef kTXNActionChangeTextPosition;
+public extern "C" CFStringRef? kTXNActionChangeTextPosition;
 
-public extern "C" CFStringRef kTXNActionUndoLast;
+public extern "C" CFStringRef? kTXNActionUndoLast;
 
 public using TXNTabType = SInt8;
 
@@ -292,7 +293,7 @@ public union TXNAttributeData
     public UInt32 dataValue;
     public TXNATSUIFeatures* atsuFeatures;
     public TXNATSUIVariations* atsuVariations;
-    public CFURLRef urlReference;
+    public __CFURL* urlReference;
 }
 
 [Pack(2)]
@@ -359,11 +360,11 @@ public struct TXNBackground
     public TXNBackgroundData bg;
 }
 
-public extern "C" CFStringRef kTXNActionCountOfTextChanges;
+public extern "C" CFStringRef? kTXNActionCountOfTextChanges;
 
-public extern "C" CFStringRef kTXNActionCountOfStyleChanges;
+public extern "C" CFStringRef? kTXNActionCountOfStyleChanges;
 
-public extern "C" CFStringRef kTXNActionCountOfAllChanges;
+public extern "C" CFStringRef? kTXNActionCountOfAllChanges;
 
 public using TXNScrollUnit = UInt32;
 
@@ -406,44 +407,44 @@ public struct TXNCarbonEventInfo
     public Boolean useCarbonEvents;
     public UInt8 filler;
     public UInt16 flags;
-    public CFDictionaryRef fDictionary;
+    public __CFDictionary* fDictionary;
 }
 
-public extern "C" CFStringRef kTXNDocumentAttributeTitleKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeTitleKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeCompanyNameKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeCompanyNameKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeSubjectKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeSubjectKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeAuthorKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeAuthorKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeKeywordsKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeKeywordsKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeCommentKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeCommentKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeEditorKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeEditorKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeCreationTimeKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeCreationTimeKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeModificationTimeKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeModificationTimeKey;
 
-public extern "C" CFStringRef kTXNDocumentAttributeCopyrightKey;
+public extern "C" CFStringRef? kTXNDocumentAttributeCopyrightKey;
 
-public extern "C" CFStringRef kTXNDataOptionDocumentTypeKey;
+public extern "C" CFStringRef? kTXNDataOptionDocumentTypeKey;
 
-public extern "C" CFStringRef kTXNDataOptionCharacterEncodingKey;
+public extern "C" CFStringRef? kTXNDataOptionCharacterEncodingKey;
 
-public extern "C" CFStringRef kTXNPlainTextDocumentType;
+public extern "C" CFStringRef? kTXNPlainTextDocumentType;
 
-public extern "C" CFStringRef kTXNMLTEDocumentType;
+public extern "C" CFStringRef? kTXNMLTEDocumentType;
 
-public extern "C" CFStringRef kTXNRTFDocumentType;
+public extern "C" CFStringRef? kTXNRTFDocumentType;
 
-public extern "C" CFStringRef kTXNQuickTimeDocumentType;
+public extern "C" CFStringRef? kTXNQuickTimeDocumentType;
 
 public delegate OSStatus TXNFindProcPtr(TXNMatchTextRecord* arg0, TXNDataType arg1, TXNMatchOptions arg2, void* arg3, TextEncoding arg4, TXNOffset arg5, ByteCount arg6, TXNOffset* arg7, TXNOffset* arg8, Boolean* arg9, URefCon arg10);
 
-public delegate CFStringRef TXNActionNameMapperProcPtr(CFStringRef arg0, UInt32 arg1, void* arg2);
+public delegate __CFString* TXNActionNameMapperProcPtr(__CFString* arg0, UInt32 arg1, void* arg2);
 
 public delegate void TXNContextualMenuSetupProcPtr(MenuRef arg0, TXNObject arg1, void* arg2);
 
@@ -475,7 +476,7 @@ public extern "C" void DisposeTXNScrollInfoUPP(TXNScrollInfoUPP userUPP);
 
 public extern "C" OSStatus InvokeTXNFindUPP(TXNMatchTextRecord* matchData, TXNDataType iDataType, TXNMatchOptions iMatchOptions, void* iSearchTextPtr, TextEncoding encoding, TXNOffset absStartOffset, ByteCount searchTextLength, TXNOffset* oStartMatch, TXNOffset* oEndMatch, Boolean* ofound, URefCon refCon, TXNFindUPP userUPP);
 
-public extern "C" CFStringRef InvokeTXNActionNameMapperUPP(CFStringRef actionName, UInt32 commandID, void* inUserData, TXNActionNameMapperUPP userUPP);
+public extern "C" CFStringRef? InvokeTXNActionNameMapperUPP(CFStringRef? actionName, UInt32 commandID, void* inUserData, TXNActionNameMapperUPP userUPP);
 
 public extern "C" void InvokeTXNContextualMenuSetupUPP(MenuRef iContextualMenu, TXNObject object, void* inUserData, TXNContextualMenuSetupUPP userUPP);
 
@@ -570,7 +571,7 @@ public const int kTXNFontFeatureAction = 13;
 public const int kTXNFontVariationAction = 14;
 public const int kTXNUndoLastAction = 1024;
 
-public delegate CFStringRef TXNActionKeyMapperProcPtr(TXNActionKey arg0, UInt32 arg1);
+public delegate __CFString* TXNActionKeyMapperProcPtr(TXNActionKey arg0, UInt32 arg1);
 
 public using TXNActionKeyMapperUPP = TXNActionKeyMapperProcPtr;
 
@@ -581,7 +582,7 @@ public extern "C" TXNActionKeyMapperUPP NewTXNActionKeyMapperUPP(TXNActionKeyMap
 public extern "C" void DisposeTXNActionKeyMapperUPP(TXNActionKeyMapperUPP userUPP);
 
 /// Deprecated in macOS 10.4.
-public extern "C" CFStringRef InvokeTXNActionKeyMapperUPP(TXNActionKey actionKey, UInt32 commandID, TXNActionKeyMapperUPP userUPP);
+public extern "C" CFStringRef? InvokeTXNActionKeyMapperUPP(TXNActionKey actionKey, UInt32 commandID, TXNActionKeyMapperUPP userUPP);
 
 public const int kTXNTextInputCountBit = 0;
 public const int kTXNRunCountBit = 1;

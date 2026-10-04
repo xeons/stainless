@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -325,7 +326,7 @@ public extern "C" OSErr GetIconRefFromFolder(SInt16 vRefNum, SInt32 parentFolder
 public extern "C" OSStatus GetIconRefFromFileInfo(FSRef* inRef, UniCharCount inFileNameLength, UniChar* inFileName, FSCatalogInfoBitmap inWhichInfo, FSCatalogInfo* inCatalogInfo, IconServicesUsageFlags inUsageFlags, IconRef* outIconRef, SInt16* outLabel);
 
 /// Deprecated in macOS 10.15.
-public extern "C" OSErr GetIconRefFromTypeInfo(OSType inCreator, OSType inType, CFStringRef inExtension, CFStringRef inMIMEType, IconServicesUsageFlags inUsageFlags, IconRef* outIconRef);
+public extern "C" OSErr GetIconRefFromTypeInfo(OSType inCreator, OSType inType, CFStringRef? inExtension, CFStringRef? inMIMEType, IconServicesUsageFlags inUsageFlags, IconRef* outIconRef);
 
 /// Deprecated in macOS 10.15.
 public extern "C" OSStatus GetIconRefFromIconFamilyPtr(IconFamilyResource* inIconFamilyPtr, Size inSize, IconRef* outIconRef);

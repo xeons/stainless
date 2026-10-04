@@ -26,12 +26,13 @@ module MacOS.ICADevices;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "ICADevices")
 
-public extern "C" CFStringRef kICUTTypeRaw;
+public extern "C" CFStringRef? kICUTTypeRaw;
 
 public struct ICARawFileHeader
 {
@@ -50,11 +51,11 @@ public struct ICARawFileHeader
     public byte[64] colorSyncModeStr;
 }
 
-public extern "C" CGColorSpaceRef ICDCreateColorSpace(UInt32 bitsPerPixel, UInt32 samplesPerPixel, ICAObject icaObject, CFStringRef colorSyncMode, CFDataRef abstractProfile, byte* tmpProfilePath);
+[ReturnsRetained] public extern "C" CGColorSpaceRef? ICDCreateColorSpace(UInt32 bitsPerPixel, UInt32 samplesPerPixel, ICAObject icaObject, CFStringRef? colorSyncMode, CFDataRef? abstractProfile, byte* tmpProfilePath);
 
-public extern "C" ICAError ICDAddImageInfoToNotificationDictionary(CFMutableDictionaryRef dict, UInt32 width, UInt32 height, UInt32 bytesPerRow, UInt32 dataStartRow, UInt32 dataNumberOfRows, UInt32 dataSize, void* dataBuffer);
+public extern "C" ICAError ICDAddImageInfoToNotificationDictionary(CFMutableDictionaryRef? dict, UInt32 width, UInt32 height, UInt32 bytesPerRow, UInt32 dataStartRow, UInt32 dataNumberOfRows, UInt32 dataSize, void* dataBuffer);
 
-public extern "C" ICAError ICDAddBandInfoToNotificationDictionary(CFMutableDictionaryRef dict, UInt32 width, UInt32 height, UInt32 bitsPerPixel, UInt32 bitsPerComponent, UInt32 numComponents, UInt32 endianness, UInt32 pixelDataType, UInt32 bytesPerRow, UInt32 dataStartRow, UInt32 dataNumberOfRows, UInt32 dataSize, void* dataBuffer);
+public extern "C" ICAError ICDAddBandInfoToNotificationDictionary(CFMutableDictionaryRef? dict, UInt32 width, UInt32 height, UInt32 bitsPerPixel, UInt32 bitsPerComponent, UInt32 numComponents, UInt32 endianness, UInt32 pixelDataType, UInt32 bytesPerRow, UInt32 dataStartRow, UInt32 dataNumberOfRows, UInt32 dataSize, void* dataBuffer);
 
 public extern "C" ICAError ICDSendNotification(ICASendNotificationPB* pb);
 

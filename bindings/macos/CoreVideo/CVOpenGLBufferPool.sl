@@ -24,6 +24,7 @@
 module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,33 +32,28 @@ import MacOS.CoreFoundation;
 
 public struct __CVOpenGLBufferPool;
 
-public using CVOpenGLBufferPoolRef = __CVOpenGLBufferPool*;
+[CFType("CVOpenGLBufferPoolGetTypeID")]
+public extern objc class CVOpenGLBufferPoolRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLBufferPoolMinimumBufferCountKey;
+public extern "C" CFStringRef? kCVOpenGLBufferPoolMinimumBufferCountKey;
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFStringRef kCVOpenGLBufferPoolMaximumBufferAgeKey;
+public extern "C" CFStringRef? kCVOpenGLBufferPoolMaximumBufferAgeKey;
 
 /// Deprecated in macOS 10.14.
 public extern "C" CFTypeID CVOpenGLBufferPoolGetTypeID();
 
 /// Deprecated in macOS 10.14.
-public extern "C" CVOpenGLBufferPoolRef CVOpenGLBufferPoolRetain(CVOpenGLBufferPoolRef openGLBufferPool);
+public extern "C" CVReturn CVOpenGLBufferPoolCreate(CFAllocatorRef? allocator, CFDictionaryRef? poolAttributes, CFDictionaryRef? openGLBufferAttributes, __CVOpenGLBufferPool** poolOut);
 
 /// Deprecated in macOS 10.14.
-public extern "C" void CVOpenGLBufferPoolRelease(CVOpenGLBufferPoolRef openGLBufferPool);
+public extern "C" CFDictionaryRef? CVOpenGLBufferPoolGetAttributes(CVOpenGLBufferPoolRef pool);
 
 /// Deprecated in macOS 10.14.
-public extern "C" CVReturn CVOpenGLBufferPoolCreate(CFAllocatorRef allocator, CFDictionaryRef poolAttributes, CFDictionaryRef openGLBufferAttributes, CVOpenGLBufferPoolRef* poolOut);
+public extern "C" CFDictionaryRef? CVOpenGLBufferPoolGetOpenGLBufferAttributes(CVOpenGLBufferPoolRef pool);
 
 /// Deprecated in macOS 10.14.
-public extern "C" CFDictionaryRef CVOpenGLBufferPoolGetAttributes(CVOpenGLBufferPoolRef pool);
-
-/// Deprecated in macOS 10.14.
-public extern "C" CFDictionaryRef CVOpenGLBufferPoolGetOpenGLBufferAttributes(CVOpenGLBufferPoolRef pool);
-
-/// Deprecated in macOS 10.14.
-public extern "C" CVReturn CVOpenGLBufferPoolCreateOpenGLBuffer(CFAllocatorRef allocator, CVOpenGLBufferPoolRef openGLBufferPool, CVOpenGLBufferRef* openGLBufferOut);
+public extern "C" CVReturn CVOpenGLBufferPoolCreateOpenGLBuffer(CFAllocatorRef? allocator, CVOpenGLBufferPoolRef openGLBufferPool, void** openGLBufferOut);
 
 #endif

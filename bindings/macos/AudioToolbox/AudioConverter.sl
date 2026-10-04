@@ -25,6 +25,7 @@ module MacOS.AudioToolbox;
 
 import MacOS.CoreAudioTypes;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -117,7 +118,7 @@ public const int kAudioConverterErr_OutputSampleRateOutOfRange = 560952178;
 public objc closure void AudioConverterPrepareInCompletionBlock(OSStatus arg0);
 
 /// macOS 15.0 and later.
-public extern "C" void AudioConverterPrepare(UInt32 inFlags, void* ioReserved, AudioConverterPrepareInCompletionBlock inCompletionBlock);
+public extern "C" void AudioConverterPrepare(UInt32 inFlags, void* ioReserved, AudioConverterPrepareInCompletionBlock? inCompletionBlock);
 
 public extern "C" OSStatus AudioConverterNew(AudioStreamBasicDescription* inSourceFormat, AudioStreamBasicDescription* inDestinationFormat, AudioConverterRef* outAudioConverter);
 

@@ -25,6 +25,7 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,13 +33,14 @@ import MacOS.System;
 
 public struct __SCNetworkReachability;
 
-public using SCNetworkReachabilityRef = __SCNetworkReachability*;
+[CFType("SCNetworkReachabilityGetTypeID")]
+public extern objc class SCNetworkReachabilityRef : CFTypeRef { }
 
 public delegate void* SCNetworkReachabilityContextRetainFunction(void* arg0);
 
 public delegate void SCNetworkReachabilityContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef SCNetworkReachabilityContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* SCNetworkReachabilityContextCopyDescriptionFunction(void* arg0);
 
 public struct SCNetworkReachabilityContext
 {
@@ -63,16 +65,16 @@ public enum SCNetworkReachabilityFlags : uint
     ConnectionAutomatic = 8,
 }
 
-public delegate void SCNetworkReachabilityCallBack(SCNetworkReachabilityRef arg0, SCNetworkReachabilityFlags arg1, void* arg2);
+public delegate void SCNetworkReachabilityCallBack(__SCNetworkReachability* arg0, SCNetworkReachabilityFlags arg1, void* arg2);
 
 /// Deprecated in macOS 14.4.
-public extern "C" SCNetworkReachabilityRef SCNetworkReachabilityCreateWithAddress(CFAllocatorRef allocator, sockaddr* address);
+[ReturnsRetained] public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithAddress(CFAllocatorRef? allocator, sockaddr* address);
 
 /// Deprecated in macOS 14.4.
-public extern "C" SCNetworkReachabilityRef SCNetworkReachabilityCreateWithAddressPair(CFAllocatorRef allocator, sockaddr* localAddress, sockaddr* remoteAddress);
+[ReturnsRetained] public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithAddressPair(CFAllocatorRef? allocator, sockaddr* localAddress, sockaddr* remoteAddress);
 
 /// Deprecated in macOS 14.4.
-public extern "C" SCNetworkReachabilityRef SCNetworkReachabilityCreateWithName(CFAllocatorRef allocator, byte* nodename);
+[ReturnsRetained] public extern "C" SCNetworkReachabilityRef? SCNetworkReachabilityCreateWithName(CFAllocatorRef? allocator, byte* nodename);
 
 /// Deprecated in macOS 14.4.
 public extern "C" CFTypeID SCNetworkReachabilityGetTypeID();
@@ -88,5 +90,8 @@ public extern "C" Boolean SCNetworkReachabilityScheduleWithRunLoop(SCNetworkReac
 
 /// Deprecated in macOS 14.4.
 public extern "C" Boolean SCNetworkReachabilityUnscheduleFromRunLoop(SCNetworkReachabilityRef target, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+
+/// Deprecated in macOS 14.4.
+public extern "C" Boolean SCNetworkReachabilitySetDispatchQueue(SCNetworkReachabilityRef target, dispatch_queue_t? queue);
 
 #endif

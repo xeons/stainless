@@ -25,6 +25,7 @@ module MacOS.CoreMIDI;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -185,7 +186,7 @@ public struct MIDIObjectPropertyChangeNotification
     public UInt32 messageSize;
     public MIDIObjectRef object;
     public MIDIObjectType objectType;
-    public CFStringRef propertyName;
+    public __CFString* propertyName;
 }
 
 public struct MIDIIOErrorNotification
@@ -229,13 +230,13 @@ public extern "C" CFStringRef kMIDIPropertyPrivate;
 public extern "C" CFStringRef kMIDIPropertyDriverOwner;
 
 /// Deprecated in macOS 10.2.
-public extern "C" CFStringRef kMIDIPropertyFactoryPatchNameFile;
+public extern "C" CFStringRef? kMIDIPropertyFactoryPatchNameFile;
 
 /// Deprecated in macOS 10.2.
-public extern "C" CFStringRef kMIDIPropertyUserPatchNameFile;
+public extern "C" CFStringRef? kMIDIPropertyUserPatchNameFile;
 
 /// Deprecated in macOS 10.15.
-public extern "C" CFStringRef kMIDIPropertyNameConfiguration;
+public extern "C" CFStringRef? kMIDIPropertyNameConfiguration;
 
 public extern "C" CFStringRef kMIDIPropertyNameConfigurationDictionary;
 
@@ -306,7 +307,7 @@ public extern "C" CFStringRef kMIDIPropertyAssociatedEndpoint;
 
 public extern "C" OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void* notifyRefCon, MIDIClientRef* outClient);
 
-public extern "C" OSStatus MIDIClientCreateWithBlock(CFStringRef name, MIDIClientRef* outClient, MIDINotifyBlock notifyBlock);
+public extern "C" OSStatus MIDIClientCreateWithBlock(CFStringRef name, MIDIClientRef* outClient, MIDINotifyBlock? notifyBlock);
 
 public extern "C" OSStatus MIDIClientDispose(MIDIClientRef client);
 
@@ -377,19 +378,19 @@ public extern "C" OSStatus MIDIObjectGetIntegerProperty(MIDIObjectRef obj, CFStr
 
 public extern "C" OSStatus MIDIObjectSetIntegerProperty(MIDIObjectRef obj, CFStringRef propertyID, SInt32 value);
 
-public extern "C" OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef* str);
+public extern "C" OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, __CFString** str);
 
 public extern "C" OSStatus MIDIObjectSetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef str);
 
-public extern "C" OSStatus MIDIObjectGetDataProperty(MIDIObjectRef obj, CFStringRef propertyID, CFDataRef* outData);
+public extern "C" OSStatus MIDIObjectGetDataProperty(MIDIObjectRef obj, CFStringRef propertyID, __CFData** outData);
 
 public extern "C" OSStatus MIDIObjectSetDataProperty(MIDIObjectRef obj, CFStringRef propertyID, CFDataRef data);
 
-public extern "C" OSStatus MIDIObjectGetDictionaryProperty(MIDIObjectRef obj, CFStringRef propertyID, CFDictionaryRef* outDict);
+public extern "C" OSStatus MIDIObjectGetDictionaryProperty(MIDIObjectRef obj, CFStringRef propertyID, __CFDictionary** outDict);
 
 public extern "C" OSStatus MIDIObjectSetDictionaryProperty(MIDIObjectRef obj, CFStringRef propertyID, CFDictionaryRef dict);
 
-public extern "C" OSStatus MIDIObjectGetProperties(MIDIObjectRef obj, CFPropertyListRef* outProperties, Boolean deep);
+public extern "C" OSStatus MIDIObjectGetProperties(MIDIObjectRef obj, void** outProperties, Boolean deep);
 
 public extern "C" OSStatus MIDIObjectRemoveProperty(MIDIObjectRef obj, CFStringRef propertyID);
 
@@ -409,7 +410,7 @@ public extern "C" OSStatus MIDISendUMPSysex(MIDISysexSendRequestUMP* umpRequest)
 public extern "C" OSStatus MIDISendUMPSysex8(MIDISysexSendRequestUMP* umpRequest);
 
 /// macOS 14.0 and later.
-public extern "C" OSStatus MIDIEventPacketSysexBytesForGroup(MIDIEventPacket* pkt, UInt8 groupIndex, CFDataRef* outData);
+public extern "C" OSStatus MIDIEventPacketSysexBytesForGroup(MIDIEventPacket* pkt, UInt8 groupIndex, __CFData** outData);
 
 public extern "C" OSStatus MIDIReceivedEventList(MIDIEndpointRef src, MIDIEventList* evtlist);
 

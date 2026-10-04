@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,19 +32,20 @@ import MacOS.CoreFoundation;
 
 public struct CGPSConverter;
 
-public using CGPSConverterRef = CGPSConverter*;
+[CFType("CGPSConverterGetTypeID")]
+public extern objc class CGPSConverterRef : CFTypeRef { }
 
 public delegate void CGPSConverterBeginDocumentCallback(void* arg0);
 
 public delegate void CGPSConverterEndDocumentCallback(void* arg0, bool arg1);
 
-public delegate void CGPSConverterBeginPageCallback(void* arg0, nuint arg1, CFDictionaryRef arg2);
+public delegate void CGPSConverterBeginPageCallback(void* arg0, nuint arg1, __CFDictionary* arg2);
 
-public delegate void CGPSConverterEndPageCallback(void* arg0, nuint arg1, CFDictionaryRef arg2);
+public delegate void CGPSConverterEndPageCallback(void* arg0, nuint arg1, __CFDictionary* arg2);
 
 public delegate void CGPSConverterProgressCallback(void* arg0);
 
-public delegate void CGPSConverterMessageCallback(void* arg0, CFStringRef arg1);
+public delegate void CGPSConverterMessageCallback(void* arg0, __CFString* arg1);
 
 public delegate void CGPSConverterReleaseInfoCallback(void* arg0);
 
@@ -59,9 +61,9 @@ public struct CGPSConverterCallbacks
     public CGPSConverterReleaseInfoCallback releaseInfo;
 }
 
-public extern "C" CGPSConverterRef CGPSConverterCreate(void* info, CGPSConverterCallbacks* callbacks, CFDictionaryRef options);
+[ReturnsRetained] public extern "C" CGPSConverterRef? CGPSConverterCreate(void* info, CGPSConverterCallbacks* callbacks, CFDictionaryRef? options);
 
-public extern "C" bool CGPSConverterConvert(CGPSConverterRef converter, CGDataProviderRef provider, CGDataConsumerRef consumer, CFDictionaryRef options);
+public extern "C" bool CGPSConverterConvert(CGPSConverterRef converter, CGDataProviderRef provider, CGDataConsumerRef consumer, CFDictionaryRef? options);
 
 public extern "C" bool CGPSConverterAbort(CGPSConverterRef converter);
 

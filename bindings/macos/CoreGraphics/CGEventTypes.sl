@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreGraphics;
 
+import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +33,8 @@ import MacOS.System;
 
 public struct __CGEvent;
 
-public using CGEventRef = __CGEvent*;
+[CFType("CGEventGetTypeID")]
+public extern objc class CGEventRef : CFTypeRef { }
 
 public enum CGMouseButton : uint
 {
@@ -213,7 +216,7 @@ public struct __CGEventTapProxy;
 
 public using CGEventTapProxy = __CGEventTapProxy*;
 
-public delegate CGEventRef CGEventTapCallBack(CGEventTapProxy arg0, CGEventType arg1, CGEventRef arg2, void* arg3);
+public delegate __CGEvent* CGEventTapCallBack(CGEventTapProxy arg0, CGEventType arg1, __CGEvent* arg2, void* arg3);
 
 public struct __CGEventTapInformation
 {
@@ -233,7 +236,8 @@ public using CGEventTapInformation = __CGEventTapInformation;
 
 public struct __CGEventSource;
 
-public using CGEventSourceRef = __CGEventSource*;
+[CFType("CGEventSourceGetTypeID")]
+public extern objc class CGEventSourceRef : CFTypeRef { }
 
 public enum CGEventSourceStateID : int
 {

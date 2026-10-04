@@ -23,9 +23,16 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.IOSurface;
 
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "IOSurface")
+
+public extern "C" xpc_object_t IOSurfaceCreateXPCObject(IOSurfaceRef aSurface);
+
+[ReturnsRetained] public extern "C" IOSurfaceRef? IOSurfaceLookupFromXPCObject(xpc_object_t xobj);
 
 public const int IOSURFACE_API_H = 1;
 

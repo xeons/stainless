@@ -139,7 +139,7 @@ public enum ATSFontQueryMessageID : int
     kATSQueryActivateFontMessage = 1635021665,
 }
 
-public delegate CFPropertyListRef ATSFontQueryCallback(ATSFontQueryMessageID arg0, CFPropertyListRef arg1, void* arg2);
+public delegate void* ATSFontQueryCallback(ATSFontQueryMessageID arg0, void* arg1, void* arg2);
 
 public const int kATSFontAutoActivationDefault = 0;
 public const int kATSFontAutoActivationDisabled = 1;

@@ -18,7 +18,7 @@
 
   <!-- clang's dump of a header holding one of each shape the bindings generator reads. -->
   <ItemGroup>
-    <None Include="Bindgen/fixture.*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Bindgen/fixture.*;Bindgen/objc.*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- The end-to-end harness's case selection, so it can be asked as another host. -->

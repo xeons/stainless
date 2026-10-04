@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,15 +33,16 @@ import MacOS.System;
 
 public struct OpaqueSecIdentitySearchRef;
 
-public using SecIdentitySearchRef = OpaqueSecIdentitySearchRef*;
+[CFType("SecIdentitySearchGetTypeID")]
+public extern objc class SecIdentitySearchRef : CFTypeRef { }
 
 /// Deprecated in macOS 10.7.
 public extern "C" CFTypeID SecIdentitySearchGetTypeID();
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecIdentitySearchCreate(CFTypeRef keychainOrArray, CSSM_KEYUSE keyUsage, SecIdentitySearchRef* searchRef);
+public extern "C" OSStatus SecIdentitySearchCreate(CFTypeRef? keychainOrArray, CSSM_KEYUSE keyUsage, OpaqueSecIdentitySearchRef** searchRef);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecIdentitySearchCopyNext(SecIdentitySearchRef searchRef, SecIdentityRef* identity);
+public extern "C" OSStatus SecIdentitySearchCopyNext(SecIdentitySearchRef searchRef, __SecIdentity** identity);
 
 #endif

@@ -25,6 +25,7 @@ module MacOS.AudioToolbox;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -66,7 +67,9 @@ public delegate void AUParameterListenerProc(void* arg0, void* arg1, AudioUnitPa
 
 public delegate void AUEventListenerProc(void* arg0, void* arg1, AudioUnitEvent* arg2, UInt64 arg3, AudioUnitParameterValue arg4);
 
-public extern "C" OSStatus AUListenerCreate(AUParameterListenerProc inProc, void* inUserData, CFRunLoopRef inRunLoop, CFStringRef inRunLoopMode, Float32 inNotificationInterval, AUParameterListenerRef* outListener);
+public extern "C" OSStatus AUListenerCreateWithDispatchQueue(AUParameterListenerRef* outListener, Float32 inNotificationInterval, dispatch_queue_t inDispatchQueue, AUParameterListenerBlock inBlock);
+
+public extern "C" OSStatus AUListenerCreate(AUParameterListenerProc inProc, void* inUserData, CFRunLoopRef? inRunLoop, CFStringRef? inRunLoopMode, Float32 inNotificationInterval, AUParameterListenerRef* outListener);
 
 public extern "C" OSStatus AUListenerDispose(AUParameterListenerRef inListener);
 
@@ -78,7 +81,9 @@ public extern "C" OSStatus AUParameterSet(AUParameterListenerRef inSendingListen
 
 public extern "C" OSStatus AUParameterListenerNotify(AUParameterListenerRef inSendingListener, void* inSendingObject, AudioUnitParameter* inParameter);
 
-public extern "C" OSStatus AUEventListenerCreate(AUEventListenerProc inProc, void* inUserData, CFRunLoopRef inRunLoop, CFStringRef inRunLoopMode, Float32 inNotificationInterval, Float32 inValueChangeGranularity, AUEventListenerRef* outListener);
+public extern "C" OSStatus AUEventListenerCreateWithDispatchQueue(AUEventListenerRef* outListener, Float32 inNotificationInterval, Float32 inValueChangeGranularity, dispatch_queue_t inDispatchQueue, AUEventListenerBlock inBlock);
+
+public extern "C" OSStatus AUEventListenerCreate(AUEventListenerProc inProc, void* inUserData, CFRunLoopRef? inRunLoop, CFStringRef? inRunLoopMode, Float32 inNotificationInterval, Float32 inValueChangeGranularity, AUEventListenerRef* outListener);
 
 public extern "C" OSStatus AUEventListenerAddEventType(AUEventListenerRef inListener, void* inObject, AudioUnitEvent* inEvent);
 

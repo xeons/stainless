@@ -25,17 +25,18 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "SystemConfiguration")
 
-public extern "C" CFDictionaryRef SCDynamicStoreCopyDHCPInfo(SCDynamicStoreRef store, CFStringRef serviceID);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SCDynamicStoreCopyDHCPInfo(SCDynamicStoreRef? store, CFStringRef? serviceID);
 
-public extern "C" CFDataRef DHCPInfoGetOptionData(CFDictionaryRef info, UInt8 code);
+public extern "C" CFDataRef? DHCPInfoGetOptionData(CFDictionaryRef info, UInt8 code);
 
-public extern "C" CFDateRef DHCPInfoGetLeaseStartTime(CFDictionaryRef info);
+public extern "C" CFDateRef? DHCPInfoGetLeaseStartTime(CFDictionaryRef info);
 
-public extern "C" CFDateRef DHCPInfoGetLeaseExpirationTime(CFDictionaryRef info);
+public extern "C" CFDateRef? DHCPInfoGetLeaseExpirationTime(CFDictionaryRef info);
 
 #endif

@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,7 +34,8 @@ public using CFNumberFormatterKey = CFStringRef;
 
 public struct __CFNumberFormatter;
 
-public using CFNumberFormatterRef = __CFNumberFormatter*;
+[CFType("CFNumberFormatterGetTypeID")]
+public extern objc class CFNumberFormatterRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFNumberFormatterGetTypeID();
 
@@ -51,19 +53,19 @@ public enum CFNumberFormatterStyle : long
     CurrencyAccountingStyle = 10,
 }
 
-public extern "C" CFNumberFormatterRef CFNumberFormatterCreate(CFAllocatorRef allocator, CFLocaleRef locale, CFNumberFormatterStyle style);
+[ReturnsRetained] public extern "C" CFNumberFormatterRef? CFNumberFormatterCreate(CFAllocatorRef? allocator, CFLocaleRef? locale, CFNumberFormatterStyle style);
 
-public extern "C" CFLocaleRef CFNumberFormatterGetLocale(CFNumberFormatterRef formatter);
+public extern "C" CFLocaleRef? CFNumberFormatterGetLocale(CFNumberFormatterRef? formatter);
 
-public extern "C" CFNumberFormatterStyle CFNumberFormatterGetStyle(CFNumberFormatterRef formatter);
+public extern "C" CFNumberFormatterStyle CFNumberFormatterGetStyle(CFNumberFormatterRef? formatter);
 
-public extern "C" CFStringRef CFNumberFormatterGetFormat(CFNumberFormatterRef formatter);
+public extern "C" CFStringRef? CFNumberFormatterGetFormat(CFNumberFormatterRef? formatter);
 
-public extern "C" void CFNumberFormatterSetFormat(CFNumberFormatterRef formatter, CFStringRef formatString);
+public extern "C" void CFNumberFormatterSetFormat(CFNumberFormatterRef? formatter, CFStringRef? formatString);
 
-public extern "C" CFStringRef CFNumberFormatterCreateStringWithNumber(CFAllocatorRef allocator, CFNumberFormatterRef formatter, CFNumberRef number);
+[ReturnsRetained] public extern "C" CFStringRef? CFNumberFormatterCreateStringWithNumber(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFNumberRef? number);
 
-public extern "C" CFStringRef CFNumberFormatterCreateStringWithValue(CFAllocatorRef allocator, CFNumberFormatterRef formatter, CFNumberType numberType, void* valuePtr);
+[ReturnsRetained] public extern "C" CFStringRef? CFNumberFormatterCreateStringWithValue(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFNumberType numberType, void* valuePtr);
 
 [Flags]
 public enum CFNumberFormatterOptionFlags : ulong
@@ -71,92 +73,92 @@ public enum CFNumberFormatterOptionFlags : ulong
     kCFNumberFormatterParseIntegersOnly = 1,
 }
 
-public extern "C" CFNumberRef CFNumberFormatterCreateNumberFromString(CFAllocatorRef allocator, CFNumberFormatterRef formatter, CFStringRef string, CFRange* rangep, CFOptionFlags options);
+[ReturnsRetained] public extern "C" CFNumberRef? CFNumberFormatterCreateNumberFromString(CFAllocatorRef? allocator, CFNumberFormatterRef? formatter, CFStringRef? string, CFRange* rangep, CFOptionFlags options);
 
-public extern "C" Boolean CFNumberFormatterGetValueFromString(CFNumberFormatterRef formatter, CFStringRef string, CFRange* rangep, CFNumberType numberType, void* valuePtr);
+public extern "C" Boolean CFNumberFormatterGetValueFromString(CFNumberFormatterRef? formatter, CFStringRef? string, CFRange* rangep, CFNumberType numberType, void* valuePtr);
 
-public extern "C" void CFNumberFormatterSetProperty(CFNumberFormatterRef formatter, CFNumberFormatterKey key, CFTypeRef value);
+public extern "C" void CFNumberFormatterSetProperty(CFNumberFormatterRef? formatter, CFNumberFormatterKey? key, CFTypeRef? value);
 
-public extern "C" CFTypeRef CFNumberFormatterCopyProperty(CFNumberFormatterRef formatter, CFNumberFormatterKey key);
+[ReturnsRetained] public extern "C" CFTypeRef? CFNumberFormatterCopyProperty(CFNumberFormatterRef? formatter, CFNumberFormatterKey? key);
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterCurrencyCode;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterCurrencyCode;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterDecimalSeparator;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterDecimalSeparator;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterCurrencyDecimalSeparator;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterCurrencyDecimalSeparator;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterAlwaysShowDecimalSeparator;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterAlwaysShowDecimalSeparator;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterGroupingSeparator;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterGroupingSeparator;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterUseGroupingSeparator;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterUseGroupingSeparator;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterPercentSymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterPercentSymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterZeroSymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterZeroSymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterNaNSymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterNaNSymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterInfinitySymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterInfinitySymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMinusSign;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMinusSign;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterPlusSign;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterPlusSign;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterCurrencySymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterCurrencySymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterExponentSymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterExponentSymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMinIntegerDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMinIntegerDigits;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMaxIntegerDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMaxIntegerDigits;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMinFractionDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMinFractionDigits;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMaxFractionDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMaxFractionDigits;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterGroupingSize;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterGroupingSize;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterSecondaryGroupingSize;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterSecondaryGroupingSize;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterRoundingMode;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterRoundingMode;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterRoundingIncrement;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterRoundingIncrement;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterFormatWidth;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterFormatWidth;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterPaddingPosition;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterPaddingPosition;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterPaddingCharacter;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterPaddingCharacter;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterDefaultFormat;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterDefaultFormat;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMultiplier;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMultiplier;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterPositivePrefix;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterPositivePrefix;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterPositiveSuffix;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterPositiveSuffix;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterNegativePrefix;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterNegativePrefix;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterNegativeSuffix;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterNegativeSuffix;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterPerMillSymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterPerMillSymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterInternationalCurrencySymbol;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterInternationalCurrencySymbol;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterCurrencyGroupingSeparator;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterCurrencyGroupingSeparator;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterIsLenient;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterIsLenient;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterUseSignificantDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterUseSignificantDigits;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMinSignificantDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMinSignificantDigits;
 
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMaxSignificantDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMaxSignificantDigits;
 
 /// macOS 15.0 and later.
-public extern "C" CFNumberFormatterKey kCFNumberFormatterMinGroupingDigits;
+public extern "C" CFNumberFormatterKey? kCFNumberFormatterMinGroupingDigits;
 
 public enum CFNumberFormatterRoundingMode : long
 {
@@ -177,6 +179,6 @@ public enum CFNumberFormatterPadPosition : long
     AfterSuffix = 3,
 }
 
-public extern "C" Boolean CFNumberFormatterGetDecimalInfoForCurrencyCode(CFStringRef currencyCode, int* defaultFractionDigits, double* roundingIncrement);
+public extern "C" Boolean CFNumberFormatterGetDecimalInfoForCurrencyCode(CFStringRef? currencyCode, int* defaultFractionDigits, double* roundingIncrement);
 
 #endif

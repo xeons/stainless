@@ -23,9 +23,25 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.Security;
 
+import MacOS.CoreFoundation;
+import MacOS.System;
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "Security")
+
+public objc interface OS_sec_trust : NSObjectProtocol { }
+
+public using sec_trust_t = NSObject;
+
+public objc interface OS_sec_identity : NSObjectProtocol { }
+
+public using sec_identity_t = NSObject;
+
+public objc interface OS_sec_certificate : NSObjectProtocol { }
+
+public using sec_certificate_t = NSObject;
 
 public enum tls_protocol_version_t : ushort
 {
@@ -92,5 +108,25 @@ public enum SSLProtocol : int
     TLSProtocol1Only = 5,
     SSLProtocolAll = 6,
 }
+
+public extern "C" sec_trust_t? sec_trust_create(SecTrustRef trust);
+
+[ReturnsRetained] public extern "C" SecTrustRef sec_trust_copy_ref(sec_trust_t trust);
+
+public extern "C" sec_identity_t? sec_identity_create(SecIdentityRef identity);
+
+public extern "C" sec_identity_t? sec_identity_create_with_certificates(SecIdentityRef identity, CFArrayRef certificates);
+
+public objc closure void sec_identity_access_certificatesHandlerBlock(sec_certificate_t arg0);
+
+public extern "C" bool sec_identity_access_certificates(sec_identity_t identity, sec_identity_access_certificatesHandlerBlock handler);
+
+[ReturnsRetained] public extern "C" SecIdentityRef? sec_identity_copy_ref(sec_identity_t identity);
+
+[ReturnsRetained] public extern "C" CFArrayRef? sec_identity_copy_certificates_ref(sec_identity_t identity);
+
+public extern "C" sec_certificate_t? sec_certificate_create(SecCertificateRef certificate);
+
+[ReturnsRetained] public extern "C" SecCertificateRef sec_certificate_copy_ref(sec_certificate_t certificate);
 
 #endif

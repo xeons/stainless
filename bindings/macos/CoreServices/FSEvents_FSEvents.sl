@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -93,19 +94,19 @@ public struct FSEventStreamContext
 
 public delegate void FSEventStreamCallback(ConstFSEventStreamRef arg0, void* arg1, nuint arg2, void* arg3, FSEventStreamEventFlags* arg4, FSEventStreamEventId* arg5);
 
-public extern "C" FSEventStreamRef FSEventStreamCreate(CFAllocatorRef allocator, FSEventStreamCallback callback, FSEventStreamContext* context, CFArrayRef pathsToWatch, FSEventStreamEventId sinceWhen, CFTimeInterval latency, FSEventStreamCreateFlags flags);
+public extern "C" FSEventStreamRef FSEventStreamCreate(CFAllocatorRef? allocator, FSEventStreamCallback callback, FSEventStreamContext* context, CFArrayRef pathsToWatch, FSEventStreamEventId sinceWhen, CFTimeInterval latency, FSEventStreamCreateFlags flags);
 
-public extern "C" FSEventStreamRef FSEventStreamCreateRelativeToDevice(CFAllocatorRef allocator, FSEventStreamCallback callback, FSEventStreamContext* context, dev_t deviceToWatch, CFArrayRef pathsToWatchRelativeToDevice, FSEventStreamEventId sinceWhen, CFTimeInterval latency, FSEventStreamCreateFlags flags);
+public extern "C" FSEventStreamRef FSEventStreamCreateRelativeToDevice(CFAllocatorRef? allocator, FSEventStreamCallback callback, FSEventStreamContext* context, dev_t deviceToWatch, CFArrayRef pathsToWatchRelativeToDevice, FSEventStreamEventId sinceWhen, CFTimeInterval latency, FSEventStreamCreateFlags flags);
 
 public extern "C" FSEventStreamEventId FSEventStreamGetLatestEventId(ConstFSEventStreamRef streamRef);
 
 public extern "C" dev_t FSEventStreamGetDeviceBeingWatched(ConstFSEventStreamRef streamRef);
 
-public extern "C" CFArrayRef FSEventStreamCopyPathsBeingWatched(ConstFSEventStreamRef streamRef);
+[ReturnsRetained] public extern "C" CFArrayRef FSEventStreamCopyPathsBeingWatched(ConstFSEventStreamRef streamRef);
 
 public extern "C" FSEventStreamEventId FSEventsGetCurrentEventId();
 
-public extern "C" CFUUIDRef FSEventsCopyUUIDForDevice(dev_t dev);
+[ReturnsRetained] public extern "C" CFUUIDRef? FSEventsCopyUUIDForDevice(dev_t dev);
 
 public extern "C" FSEventStreamEventId FSEventsGetLastEventIdForDeviceBeforeTime(dev_t dev, CFAbsoluteTime time);
 
@@ -121,6 +122,8 @@ public extern "C" void FSEventStreamScheduleWithRunLoop(FSEventStreamRef streamR
 /// Deprecated in macOS 13.0.
 public extern "C" void FSEventStreamUnscheduleFromRunLoop(FSEventStreamRef streamRef, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
+public extern "C" void FSEventStreamSetDispatchQueue(FSEventStreamRef streamRef, dispatch_queue_t? q);
+
 public extern "C" void FSEventStreamInvalidate(FSEventStreamRef streamRef);
 
 public extern "C" Boolean FSEventStreamStart(FSEventStreamRef streamRef);
@@ -133,7 +136,7 @@ public extern "C" void FSEventStreamStop(FSEventStreamRef streamRef);
 
 public extern "C" void FSEventStreamShow(ConstFSEventStreamRef streamRef);
 
-public extern "C" CFStringRef FSEventStreamCopyDescription(ConstFSEventStreamRef streamRef);
+[ReturnsRetained] public extern "C" CFStringRef FSEventStreamCopyDescription(ConstFSEventStreamRef streamRef);
 
 public extern "C" Boolean FSEventStreamSetExclusionPaths(FSEventStreamRef streamRef, CFArrayRef pathsToExclude);
 

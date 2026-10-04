@@ -26,6 +26,7 @@ module MacOS.VideoToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreVideo;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -46,24 +47,25 @@ public enum VTMotionEstimationInfoFlags : uint
 public struct OpaqueVTMotionEstimationSession;
 
 /// macOS 26.0 and later.
-public using VTMotionEstimationSessionRef = OpaqueVTMotionEstimationSession*;
+[CFType("VTMotionEstimationSessionGetTypeID")]
+public extern objc class VTMotionEstimationSessionRef : CFTypeRef { }
 
 /// macOS 26.0 and later.
 public extern "C" CFTypeID VTMotionEstimationSessionGetTypeID();
 
 /// macOS 26.0 and later.
-public extern "C" OSStatus VTMotionEstimationSessionCreate(CFAllocatorRef allocator, CFDictionaryRef motionVectorProcessorSelectionOptions, uint width, uint height, VTMotionEstimationSessionRef* motionEstimationSessionOut);
+public extern "C" OSStatus VTMotionEstimationSessionCreate(CFAllocatorRef? allocator, CFDictionaryRef? motionVectorProcessorSelectionOptions, uint width, uint height, OpaqueVTMotionEstimationSession** motionEstimationSessionOut);
 
 /// macOS 26.0 and later.
-public extern "C" OSStatus VTMotionEstimationSessionCopySourcePixelBufferAttributes(VTMotionEstimationSessionRef motionEstimationSession, CFDictionaryRef* attributesOut);
+public extern "C" OSStatus VTMotionEstimationSessionCopySourcePixelBufferAttributes(VTMotionEstimationSessionRef motionEstimationSession, __CFDictionary** attributesOut);
 
 /// macOS 26.0 and later.
 public extern "C" void VTMotionEstimationSessionInvalidate(VTMotionEstimationSessionRef session);
 
-public objc closure void VTMotionEstimationOutputHandler(OSStatus arg0, VTMotionEstimationInfoFlags arg1, CFDictionaryRef arg2, CVPixelBufferRef arg3);
+public objc closure void VTMotionEstimationOutputHandler(OSStatus arg0, VTMotionEstimationInfoFlags arg1, CFDictionaryRef? arg2, CVPixelBufferRef? arg3);
 
 /// macOS 26.0 and later.
-public extern "C" OSStatus VTMotionEstimationSessionEstimateMotionVectors(VTMotionEstimationSessionRef session, CVPixelBufferRef referenceImage, CVPixelBufferRef currentImage, VTMotionEstimationFrameFlags motionEstimationFrameFlags, CFDictionaryRef additionalFrameOptions, VTMotionEstimationOutputHandler outputHandler);
+public extern "C" OSStatus VTMotionEstimationSessionEstimateMotionVectors(VTMotionEstimationSessionRef session, CVPixelBufferRef referenceImage, CVPixelBufferRef currentImage, VTMotionEstimationFrameFlags motionEstimationFrameFlags, CFDictionaryRef? additionalFrameOptions, VTMotionEstimationOutputHandler outputHandler);
 
 /// macOS 26.0 and later.
 public extern "C" OSStatus VTMotionEstimationSessionCompleteFrames(VTMotionEstimationSessionRef session);

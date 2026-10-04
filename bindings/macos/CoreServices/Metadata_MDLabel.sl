@@ -25,6 +25,7 @@ module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,15 +33,16 @@ import MacOS.System;
 
 public struct __MDLabel;
 
-public using MDLabelRef = __MDLabel*;
+[CFType("MDLabelGetTypeID")]
+public extern objc class MDLabelRef : CFTypeRef { }
 
 public extern "C" CFTypeID MDLabelGetTypeID();
 
-public extern "C" CFArrayRef MDItemCopyLabels(MDItemRef item);
+[ReturnsRetained] public extern "C" CFArrayRef? MDItemCopyLabels(MDItemRef? item);
 
-public extern "C" Boolean MDItemSetLabel(MDItemRef item, MDLabelRef label);
+public extern "C" Boolean MDItemSetLabel(MDItemRef? item, MDLabelRef? label);
 
-public extern "C" Boolean MDItemRemoveLabel(MDItemRef item, MDLabelRef label);
+public extern "C" Boolean MDItemRemoveLabel(MDItemRef? item, MDLabelRef? label);
 
 public enum MDLabelDomain : int
 {
@@ -48,56 +50,56 @@ public enum MDLabelDomain : int
     LocalDomain = 1,
 }
 
-public extern "C" MDLabelRef MDLabelCreate(CFAllocatorRef allocator, CFStringRef displayName, CFStringRef kind, MDLabelDomain domain);
+[ReturnsRetained] public extern "C" MDLabelRef? MDLabelCreate(CFAllocatorRef? allocator, CFStringRef? displayName, CFStringRef? kind, MDLabelDomain domain);
 
-public extern "C" CFTypeRef MDLabelCopyAttribute(MDLabelRef label, CFStringRef name);
+[ReturnsRetained] public extern "C" CFTypeRef? MDLabelCopyAttribute(MDLabelRef? label, CFStringRef? name);
 
-public extern "C" CFStringRef MDLabelCopyAttributeName(MDLabelRef label);
+[ReturnsRetained] public extern "C" CFStringRef? MDLabelCopyAttributeName(MDLabelRef? label);
 
-public extern "C" Boolean MDLabelDelete(MDLabelRef label);
+public extern "C" Boolean MDLabelDelete(MDLabelRef? label);
 
-public extern "C" Boolean MDLabelSetAttributes(MDLabelRef label, CFDictionaryRef attrs);
+public extern "C" Boolean MDLabelSetAttributes(MDLabelRef? label, CFDictionaryRef? attrs);
 
-public extern "C" CFArrayRef MDCopyLabelKinds();
+[ReturnsRetained] public extern "C" CFArrayRef? MDCopyLabelKinds();
 
-public extern "C" CFArrayRef MDCopyLabelsMatchingExpression(CFStringRef simpleQueryString);
+[ReturnsRetained] public extern "C" CFArrayRef? MDCopyLabelsMatchingExpression(CFStringRef? simpleQueryString);
 
-public extern "C" CFArrayRef MDCopyLabelsWithKind(CFStringRef kind);
+[ReturnsRetained] public extern "C" CFArrayRef? MDCopyLabelsWithKind(CFStringRef? kind);
 
-public extern "C" MDLabelRef MDCopyLabelWithUUID(CFUUIDRef labelUUID);
+[ReturnsRetained] public extern "C" MDLabelRef? MDCopyLabelWithUUID(CFUUIDRef? labelUUID);
 
-public extern "C" CFStringRef kMDLabelBundleURL;
+public extern "C" CFStringRef? kMDLabelBundleURL;
 
-public extern "C" CFStringRef kMDLabelContentChangeDate;
+public extern "C" CFStringRef? kMDLabelContentChangeDate;
 
-public extern "C" CFStringRef kMDLabelDisplayName;
+public extern "C" CFStringRef? kMDLabelDisplayName;
 
-public extern "C" CFStringRef kMDLabelIconData;
+public extern "C" CFStringRef? kMDLabelIconData;
 
-public extern "C" CFStringRef kMDLabelIconUUID;
+public extern "C" CFStringRef? kMDLabelIconUUID;
 
-public extern "C" CFStringRef kMDLabelIsMutuallyExclusiveSetMember;
+public extern "C" CFStringRef? kMDLabelIsMutuallyExclusiveSetMember;
 
-public extern "C" CFStringRef kMDLabelKind;
+public extern "C" CFStringRef? kMDLabelKind;
 
-public extern "C" CFStringRef kMDLabelSetsFinderColor;
+public extern "C" CFStringRef? kMDLabelSetsFinderColor;
 
-public extern "C" CFStringRef kMDLabelUUID;
+public extern "C" CFStringRef? kMDLabelUUID;
 
-public extern "C" CFStringRef kMDLabelVisibility;
+public extern "C" CFStringRef? kMDLabelVisibility;
 
-public extern "C" CFStringRef kMDLabelKindIsMutuallyExclusiveSetKey;
+public extern "C" CFStringRef? kMDLabelKindIsMutuallyExclusiveSetKey;
 
-public extern "C" CFStringRef kMDLabelKindVisibilityKey;
+public extern "C" CFStringRef? kMDLabelKindVisibilityKey;
 
-public extern "C" CFStringRef kMDPrivateVisibility;
+public extern "C" CFStringRef? kMDPrivateVisibility;
 
-public extern "C" CFStringRef kMDPublicVisibility;
+public extern "C" CFStringRef? kMDPublicVisibility;
 
-public extern "C" CFStringRef kMDLabelAddedNotification;
+public extern "C" CFStringRef? kMDLabelAddedNotification;
 
-public extern "C" CFStringRef kMDLabelChangedNotification;
+public extern "C" CFStringRef? kMDLabelChangedNotification;
 
-public extern "C" CFStringRef kMDLabelRemovedNotification;
+public extern "C" CFStringRef? kMDLabelRemovedNotification;
 
 #endif

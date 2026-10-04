@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.System;
 
 public struct __CFURLEnumerator;
 
-public using CFURLEnumeratorRef = __CFURLEnumerator*;
+[CFType("CFURLEnumeratorGetTypeID")]
+public extern objc class CFURLEnumeratorRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFURLEnumeratorGetTypeID();
 
@@ -48,9 +50,9 @@ public enum CFURLEnumeratorOptions : ulong
     GenerateRelativePathURLs = 64,
 }
 
-public extern "C" CFURLEnumeratorRef CFURLEnumeratorCreateForDirectoryURL(CFAllocatorRef alloc, CFURLRef directoryURL, CFURLEnumeratorOptions option, CFArrayRef propertyKeys);
+[ReturnsRetained] public extern "C" CFURLEnumeratorRef? CFURLEnumeratorCreateForDirectoryURL(CFAllocatorRef? alloc, CFURLRef? directoryURL, CFURLEnumeratorOptions option, CFArrayRef? propertyKeys);
 
-public extern "C" CFURLEnumeratorRef CFURLEnumeratorCreateForMountedVolumes(CFAllocatorRef alloc, CFURLEnumeratorOptions option, CFArrayRef propertyKeys);
+[ReturnsRetained] public extern "C" CFURLEnumeratorRef? CFURLEnumeratorCreateForMountedVolumes(CFAllocatorRef? alloc, CFURLEnumeratorOptions option, CFArrayRef? propertyKeys);
 
 public enum CFURLEnumeratorResult : long
 {
@@ -60,13 +62,13 @@ public enum CFURLEnumeratorResult : long
     DirectoryPostOrderSuccess = 4,
 }
 
-public extern "C" CFURLEnumeratorResult CFURLEnumeratorGetNextURL(CFURLEnumeratorRef enumerator, CFURLRef* url, CFErrorRef* error);
+public extern "C" CFURLEnumeratorResult CFURLEnumeratorGetNextURL(CFURLEnumeratorRef? enumerator, __CFURL** url, __CFError** error);
 
-public extern "C" void CFURLEnumeratorSkipDescendents(CFURLEnumeratorRef enumerator);
+public extern "C" void CFURLEnumeratorSkipDescendents(CFURLEnumeratorRef? enumerator);
 
-public extern "C" CFIndex CFURLEnumeratorGetDescendentLevel(CFURLEnumeratorRef enumerator);
+public extern "C" CFIndex CFURLEnumeratorGetDescendentLevel(CFURLEnumeratorRef? enumerator);
 
 /// Deprecated in macOS 10.7.
-public extern "C" Boolean CFURLEnumeratorGetSourceDidChange(CFURLEnumeratorRef enumerator);
+public extern "C" Boolean CFURLEnumeratorGetSourceDidChange(CFURLEnumeratorRef? enumerator);
 
 #endif

@@ -25,6 +25,7 @@ module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,18 +33,19 @@ import MacOS.CoreGraphics;
 
 public struct __CTFramesetter;
 
-public using CTFramesetterRef = __CTFramesetter*;
+[CFType("CTFramesetterGetTypeID")]
+public extern objc class CTFramesetterRef : CFTypeRef { }
 
 public extern "C" CFTypeID CTFramesetterGetTypeID();
 
-public extern "C" CTFramesetterRef CTFramesetterCreateWithTypesetter(CTTypesetterRef typesetter);
+[ReturnsRetained] public extern "C" CTFramesetterRef CTFramesetterCreateWithTypesetter(CTTypesetterRef typesetter);
 
-public extern "C" CTFramesetterRef CTFramesetterCreateWithAttributedString(CFAttributedStringRef attrString);
+[ReturnsRetained] public extern "C" CTFramesetterRef CTFramesetterCreateWithAttributedString(CFAttributedStringRef attrString);
 
-public extern "C" CTFrameRef CTFramesetterCreateFrame(CTFramesetterRef framesetter, CFRange stringRange, CGPathRef path, CFDictionaryRef frameAttributes);
+[ReturnsRetained] public extern "C" CTFrameRef CTFramesetterCreateFrame(CTFramesetterRef framesetter, CFRange stringRange, CGPathRef path, CFDictionaryRef? frameAttributes);
 
 public extern "C" CTTypesetterRef CTFramesetterGetTypesetter(CTFramesetterRef framesetter);
 
-public extern "C" CGSize CTFramesetterSuggestFrameSizeWithConstraints(CTFramesetterRef framesetter, CFRange stringRange, CFDictionaryRef frameAttributes, CGSize constraints, CFRange* fitRange);
+public extern "C" CGSize CTFramesetterSuggestFrameSizeWithConstraints(CTFramesetterRef framesetter, CFRange stringRange, CFDictionaryRef? frameAttributes, CGSize constraints, CFRange* fitRange);
 
 #endif

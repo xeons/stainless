@@ -26,6 +26,7 @@ module MacOS.ApplicationServices;
 import MacOS.CoreFoundation;
 import MacOS.CoreServices;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -192,7 +193,7 @@ public extern "C" OSErr GetNextProcess(ProcessSerialNumber* pPSN);
 public extern "C" OSErr GetProcessInformation(ProcessSerialNumber* PSN, ProcessInfoRec* info);
 
 /// Deprecated in macOS 10.9.
-public extern "C" CFDictionaryRef ProcessInformationCopyDictionary(ProcessSerialNumber* PSN, UInt32 infoToReturn);
+[ReturnsRetained] public extern "C" CFDictionaryRef? ProcessInformationCopyDictionary(ProcessSerialNumber* PSN, UInt32 infoToReturn);
 
 /// Deprecated in macOS 10.9.
 public extern "C" OSErr SetFrontProcess(ProcessSerialNumber* pPSN);
@@ -219,7 +220,7 @@ public extern "C" OSErr KillProcess(ProcessSerialNumber* inProcess);
 public extern "C" OSStatus GetProcessBundleLocation(ProcessSerialNumber* psn, FSRef* location);
 
 /// Deprecated in macOS 10.9.
-public extern "C" OSStatus CopyProcessName(ProcessSerialNumber* psn, CFStringRef* name);
+public extern "C" OSStatus CopyProcessName(ProcessSerialNumber* psn, __CFString** name);
 
 /// Deprecated in macOS 10.9.
 public extern "C" OSStatus GetProcessPID(ProcessSerialNumber* psn, pid_t* pid);

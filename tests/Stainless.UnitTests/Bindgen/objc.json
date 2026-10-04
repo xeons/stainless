@@ -1,0 +1,5859 @@
+{
+  "id": "0x12f86ae08",
+  "kind": "TranslationUnitDecl",
+  "loc": {},
+  "range": {
+    "begin": {},
+    "end": {}
+  },
+  "inner": [
+    {
+      "id": "0x12f955088",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__int128_t",
+      "type": {
+        "qualType": "__int128"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b3d0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__int128"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9550f8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__uint128_t",
+      "type": {
+        "qualType": "unsigned __int128"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b3f0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "unsigned __int128"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f955198",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "SEL",
+      "type": {
+        "qualType": "SEL *"
+      },
+      "inner": [
+        {
+          "id": "0x12f955150",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "SEL *"
+          },
+          "inner": [
+            {
+              "id": "0x12f86b590",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "SEL"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955280",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "isReferenced": true,
+      "name": "id",
+      "type": {
+        "qualType": "id"
+      },
+      "inner": [
+        {
+          "id": "0x12f955220",
+          "kind": "ObjCObjectPointerType",
+          "type": {
+            "qualType": "id"
+          },
+          "inner": [
+            {
+              "id": "0x12f9551f0",
+              "kind": "ObjCObjectType",
+              "type": {
+                "qualType": "id"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955370",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "Class",
+      "type": {
+        "qualType": "Class"
+      },
+      "inner": [
+        {
+          "id": "0x12f955310",
+          "kind": "ObjCObjectPointerType",
+          "type": {
+            "qualType": "Class"
+          },
+          "inner": [
+            {
+              "id": "0x12f9552e0",
+              "kind": "ObjCObjectType",
+              "type": {
+                "qualType": "Class"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9553c8",
+      "kind": "ObjCInterfaceDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "Protocol",
+      "mangledName": "_OBJC_CLASS_$_Protocol",
+      "super": {
+        "id": "0x0"
+      },
+      "implementation": {
+        "id": "0x0"
+      }
+    },
+    {
+      "id": "0x12f955738",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__NSConstantString",
+      "type": {
+        "qualType": "struct __NSConstantString_tag"
+      },
+      "inner": [
+        {
+          "id": "0x12f955700",
+          "kind": "RecordType",
+          "type": {
+            "qualType": "struct __NSConstantString_tag"
+          },
+          "decl": {
+            "id": "0x12f955480",
+            "kind": "RecordDecl",
+            "name": "__NSConstantString_tag"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9557d8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Int8x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(8))) signed char"
+      },
+      "inner": [
+        {
+          "id": "0x12f955790",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(8))) signed char"
+          },
+          "numElements": 8,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86aed0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "signed char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955878",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Int16x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(4))) short"
+      },
+      "inner": [
+        {
+          "id": "0x12f955830",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(4))) short"
+          },
+          "numElements": 4,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86aef0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "short"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955918",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Int32x2_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(2))) int"
+      },
+      "inner": [
+        {
+          "id": "0x12f9558d0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(2))) int"
+          },
+          "numElements": 2,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86af10",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "int"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9559b8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Uint8x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(8))) unsigned char"
+      },
+      "inner": [
+        {
+          "id": "0x12f955970",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(8))) unsigned char"
+          },
+          "numElements": 8,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86af70",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955a58",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Uint16x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(4))) unsigned short"
+      },
+      "inner": [
+        {
+          "id": "0x12f955a10",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(4))) unsigned short"
+          },
+          "numElements": 4,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86af90",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned short"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955af8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Uint32x2_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(2))) unsigned int"
+      },
+      "inner": [
+        {
+          "id": "0x12f955ab0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(2))) unsigned int"
+          },
+          "numElements": 2,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86afb0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned int"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955b98",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Float16x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(4))) __fp16"
+      },
+      "inner": [
+        {
+          "id": "0x12f955b50",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(4))) __fp16"
+          },
+          "numElements": 4,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86bd20",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "__fp16"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955c38",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Float32x2_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(2))) float"
+      },
+      "inner": [
+        {
+          "id": "0x12f955bf0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(2))) float"
+          },
+          "numElements": 2,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86b010",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "float"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955cd8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Poly8x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_polyvector_type(8))) unsigned char"
+      },
+      "inner": [
+        {
+          "id": "0x12f955c90",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_polyvector_type(8))) unsigned char"
+          },
+          "numElements": 8,
+          "vectorKind": "neon poly",
+          "inner": [
+            {
+              "id": "0x12f86af70",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955d78",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Poly16x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_polyvector_type(4))) unsigned short"
+      },
+      "inner": [
+        {
+          "id": "0x12f955d30",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_polyvector_type(4))) unsigned short"
+          },
+          "numElements": 4,
+          "vectorKind": "neon poly",
+          "inner": [
+            {
+              "id": "0x12f86af90",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned short"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955e18",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Bfloat16x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(4))) __bf16"
+      },
+      "inner": [
+        {
+          "id": "0x12f955dd0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(4))) __bf16"
+          },
+          "numElements": 4,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86bd40",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "__bf16"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955eb8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Int8x16_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(16))) signed char"
+      },
+      "inner": [
+        {
+          "id": "0x12f955e70",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(16))) signed char"
+          },
+          "numElements": 16,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86aed0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "signed char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955f58",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Int16x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(8))) short"
+      },
+      "inner": [
+        {
+          "id": "0x12f955f10",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(8))) short"
+          },
+          "numElements": 8,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86aef0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "short"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f956e00",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Int32x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(4))) int"
+      },
+      "inner": [
+        {
+          "id": "0x12f955fb0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(4))) int"
+          },
+          "numElements": 4,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86af10",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "int"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f956ea8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Int64x2_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(2))) long"
+      },
+      "inner": [
+        {
+          "id": "0x12f956e60",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(2))) long"
+          },
+          "numElements": 2,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86af30",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "long"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f956f48",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Uint8x16_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(16))) unsigned char"
+      },
+      "inner": [
+        {
+          "id": "0x12f956f00",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(16))) unsigned char"
+          },
+          "numElements": 16,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86af70",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f956fe8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Uint16x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(8))) unsigned short"
+      },
+      "inner": [
+        {
+          "id": "0x12f956fa0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(8))) unsigned short"
+          },
+          "numElements": 8,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86af90",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned short"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957088",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Uint32x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(4))) unsigned int"
+      },
+      "inner": [
+        {
+          "id": "0x12f957040",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(4))) unsigned int"
+          },
+          "numElements": 4,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86afb0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned int"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957128",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Uint64x2_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(2))) unsigned long"
+      },
+      "inner": [
+        {
+          "id": "0x12f9570e0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(2))) unsigned long"
+          },
+          "numElements": 2,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86afd0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned long"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9571c8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Float16x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(8))) __fp16"
+      },
+      "inner": [
+        {
+          "id": "0x12f957180",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(8))) __fp16"
+          },
+          "numElements": 8,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86bd20",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "__fp16"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957268",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Float32x4_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(4))) float"
+      },
+      "inner": [
+        {
+          "id": "0x12f957220",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(4))) float"
+          },
+          "numElements": 4,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86b010",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "float"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957308",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Float64x2_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(2))) double"
+      },
+      "inner": [
+        {
+          "id": "0x12f9572c0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(2))) double"
+          },
+          "numElements": 2,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86b030",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "double"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9573a8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Poly8x16_t",
+      "type": {
+        "qualType": "__attribute__((neon_polyvector_type(16))) unsigned char"
+      },
+      "inner": [
+        {
+          "id": "0x12f957360",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_polyvector_type(16))) unsigned char"
+          },
+          "numElements": 16,
+          "vectorKind": "neon poly",
+          "inner": [
+            {
+              "id": "0x12f86af70",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957448",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Poly16x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_polyvector_type(8))) unsigned short"
+      },
+      "inner": [
+        {
+          "id": "0x12f957400",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_polyvector_type(8))) unsigned short"
+          },
+          "numElements": 8,
+          "vectorKind": "neon poly",
+          "inner": [
+            {
+              "id": "0x12f86af90",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned short"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9574e8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Poly64x2_t",
+      "type": {
+        "qualType": "__attribute__((neon_polyvector_type(2))) unsigned long"
+      },
+      "inner": [
+        {
+          "id": "0x12f9574a0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_polyvector_type(2))) unsigned long"
+          },
+          "numElements": 2,
+          "vectorKind": "neon poly",
+          "inner": [
+            {
+              "id": "0x12f86afd0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned long"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957588",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Bfloat16x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(8))) __bf16"
+      },
+      "inner": [
+        {
+          "id": "0x12f957540",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(8))) __bf16"
+          },
+          "numElements": 8,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86bd40",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "__bf16"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957628",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Mfloat8x8_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(8))) __mfp8"
+      },
+      "inner": [
+        {
+          "id": "0x12f9575e0",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(8))) __mfp8"
+          },
+          "numElements": 8,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86bcb0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "__mfp8"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9576c8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__Mfloat8x16_t",
+      "type": {
+        "qualType": "__attribute__((neon_vector_type(16))) __mfp8"
+      },
+      "inner": [
+        {
+          "id": "0x12f957680",
+          "kind": "VectorType",
+          "type": {
+            "qualType": "__attribute__((neon_vector_type(16))) __mfp8"
+          },
+          "numElements": 16,
+          "vectorKind": "neon",
+          "inner": [
+            {
+              "id": "0x12f86bcb0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "__mfp8"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f957730",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVInt8_t",
+      "type": {
+        "qualType": "__SVInt8_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b5b0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVInt8_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957798",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVInt16_t",
+      "type": {
+        "qualType": "__SVInt16_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b5d0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVInt16_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957800",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVInt32_t",
+      "type": {
+        "qualType": "__SVInt32_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b5f0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVInt32_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957868",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVInt64_t",
+      "type": {
+        "qualType": "__SVInt64_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b610",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVInt64_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9578d0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVUint8_t",
+      "type": {
+        "qualType": "__SVUint8_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b630",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVUint8_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957938",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVUint16_t",
+      "type": {
+        "qualType": "__SVUint16_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b650",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVUint16_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9579a0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVUint32_t",
+      "type": {
+        "qualType": "__SVUint32_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b670",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVUint32_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957a08",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVUint64_t",
+      "type": {
+        "qualType": "__SVUint64_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b690",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVUint64_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957a70",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVFloat16_t",
+      "type": {
+        "qualType": "__SVFloat16_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b6b0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVFloat16_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957ad8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVFloat32_t",
+      "type": {
+        "qualType": "__SVFloat32_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b6d0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVFloat32_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957b40",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVFloat64_t",
+      "type": {
+        "qualType": "__SVFloat64_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b6f0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVFloat64_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957ba8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVBfloat16_t",
+      "type": {
+        "qualType": "__SVBfloat16_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b710",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVBfloat16_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957c10",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVMfloat8_t",
+      "type": {
+        "qualType": "__SVMfloat8_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b730",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVMfloat8_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957c78",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint8x2_t",
+      "type": {
+        "qualType": "__clang_svint8x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b750",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint8x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957ce0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint16x2_t",
+      "type": {
+        "qualType": "__clang_svint16x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b770",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint16x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957d48",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint32x2_t",
+      "type": {
+        "qualType": "__clang_svint32x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b790",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint32x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957e00",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint64x2_t",
+      "type": {
+        "qualType": "__clang_svint64x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b7b0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint64x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957e68",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint8x2_t",
+      "type": {
+        "qualType": "__clang_svuint8x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b7d0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint8x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957ed0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint16x2_t",
+      "type": {
+        "qualType": "__clang_svuint16x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b7f0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint16x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957f38",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint32x2_t",
+      "type": {
+        "qualType": "__clang_svuint32x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b810",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint32x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f957fa0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint64x2_t",
+      "type": {
+        "qualType": "__clang_svuint64x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b830",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint64x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958008",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat16x2_t",
+      "type": {
+        "qualType": "__clang_svfloat16x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b850",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat16x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958070",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat32x2_t",
+      "type": {
+        "qualType": "__clang_svfloat32x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b870",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat32x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9580d8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat64x2_t",
+      "type": {
+        "qualType": "__clang_svfloat64x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b890",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat64x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958140",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svbfloat16x2_t",
+      "type": {
+        "qualType": "__clang_svbfloat16x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b8b0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svbfloat16x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9581a8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svmfloat8x2_t",
+      "type": {
+        "qualType": "__clang_svmfloat8x2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b8d0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svmfloat8x2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958210",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint8x3_t",
+      "type": {
+        "qualType": "__clang_svint8x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b8f0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint8x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958278",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint16x3_t",
+      "type": {
+        "qualType": "__clang_svint16x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b910",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint16x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9582e0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint32x3_t",
+      "type": {
+        "qualType": "__clang_svint32x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b930",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint32x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958348",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint64x3_t",
+      "type": {
+        "qualType": "__clang_svint64x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b950",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint64x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9583b0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint8x3_t",
+      "type": {
+        "qualType": "__clang_svuint8x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b970",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint8x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958418",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint16x3_t",
+      "type": {
+        "qualType": "__clang_svuint16x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b990",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint16x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958480",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint32x3_t",
+      "type": {
+        "qualType": "__clang_svuint32x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b9b0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint32x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9584e8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint64x3_t",
+      "type": {
+        "qualType": "__clang_svuint64x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b9d0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint64x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958550",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat16x3_t",
+      "type": {
+        "qualType": "__clang_svfloat16x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86b9f0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat16x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9585b8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat32x3_t",
+      "type": {
+        "qualType": "__clang_svfloat32x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86ba10",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat32x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958620",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat64x3_t",
+      "type": {
+        "qualType": "__clang_svfloat64x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86ba30",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat64x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958688",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svbfloat16x3_t",
+      "type": {
+        "qualType": "__clang_svbfloat16x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86ba50",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svbfloat16x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9586f0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svmfloat8x3_t",
+      "type": {
+        "qualType": "__clang_svmfloat8x3_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86ba70",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svmfloat8x3_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958758",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint8x4_t",
+      "type": {
+        "qualType": "__clang_svint8x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86ba90",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint8x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9587c0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint16x4_t",
+      "type": {
+        "qualType": "__clang_svint16x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bab0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint16x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958828",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint32x4_t",
+      "type": {
+        "qualType": "__clang_svint32x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bad0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint32x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958890",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svint64x4_t",
+      "type": {
+        "qualType": "__clang_svint64x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86baf0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svint64x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9588f8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint8x4_t",
+      "type": {
+        "qualType": "__clang_svuint8x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bb10",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint8x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958960",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint16x4_t",
+      "type": {
+        "qualType": "__clang_svuint16x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bb30",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint16x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9589c8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint32x4_t",
+      "type": {
+        "qualType": "__clang_svuint32x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bb50",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint32x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958a30",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svuint64x4_t",
+      "type": {
+        "qualType": "__clang_svuint64x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bb70",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svuint64x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958a98",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat16x4_t",
+      "type": {
+        "qualType": "__clang_svfloat16x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bb90",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat16x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958b00",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat32x4_t",
+      "type": {
+        "qualType": "__clang_svfloat32x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bbb0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat32x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958b68",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svfloat64x4_t",
+      "type": {
+        "qualType": "__clang_svfloat64x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bbd0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svfloat64x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958bd0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svbfloat16x4_t",
+      "type": {
+        "qualType": "__clang_svbfloat16x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bbf0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svbfloat16x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958c38",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svmfloat8x4_t",
+      "type": {
+        "qualType": "__clang_svmfloat8x4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bc10",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svmfloat8x4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958ca0",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVBool_t",
+      "type": {
+        "qualType": "__SVBool_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bc30",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVBool_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958d08",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svboolx2_t",
+      "type": {
+        "qualType": "__clang_svboolx2_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bc50",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svboolx2_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f958d70",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__clang_svboolx4_t",
+      "type": {
+        "qualType": "__clang_svboolx4_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bc70",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__clang_svboolx4_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f959600",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__SVCount_t",
+      "type": {
+        "qualType": "__SVCount_t"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bc90",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__SVCount_t"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f959668",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__mfp8",
+      "type": {
+        "qualType": "__mfp8"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bcb0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "__mfp8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f86bda8",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__builtin_ms_va_list",
+      "type": {
+        "qualType": "char *"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bd60",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "char *"
+          },
+          "inner": [
+            {
+              "id": "0x12f86aeb0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f955018",
+      "kind": "TypedefDecl",
+      "loc": {},
+      "range": {
+        "begin": {},
+        "end": {}
+      },
+      "isImplicit": true,
+      "name": "__builtin_va_list",
+      "type": {
+        "qualType": "char *"
+      },
+      "inner": [
+        {
+          "id": "0x12f86bd60",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "char *"
+          },
+          "inner": [
+            {
+              "id": "0x12f86aeb0",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9596d0",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 278,
+        "file": "objc.h",
+        "line": 5,
+        "col": 15,
+        "tokLen": 4
+      },
+      "range": {
+        "begin": {
+          "offset": 264,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 278,
+          "col": 15,
+          "tokLen": 4
+        }
+      },
+      "isReferenced": true,
+      "name": "BOOL",
+      "type": {
+        "qualType": "_Bool"
+      },
+      "inner": [
+        {
+          "id": "0x12f86ae90",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "_Bool"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f959740",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 306,
+        "line": 6,
+        "col": 23,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 284,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 306,
+          "col": 23,
+          "tokLen": 8
+        }
+      },
+      "isReferenced": true,
+      "name": "CFTypeID",
+      "type": {
+        "qualType": "unsigned long"
+      },
+      "inner": [
+        {
+          "id": "0x12f86afd0",
+          "kind": "BuiltinType",
+          "type": {
+            "qualType": "unsigned long"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f9597e8",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 336,
+        "line": 7,
+        "col": 21,
+        "tokLen": 9
+      },
+      "range": {
+        "begin": {
+          "offset": 316,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 336,
+          "col": 21,
+          "tokLen": 9
+        }
+      },
+      "isReferenced": true,
+      "name": "CFTypeRef",
+      "type": {
+        "qualType": "const void *"
+      },
+      "inner": [
+        {
+          "id": "0x12f9597a0",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "const void *"
+          },
+          "inner": [
+            {
+              "id": "0x12f86ae71",
+              "kind": "QualType",
+              "type": {
+                "qualType": "const void"
+              },
+              "qualifiers": "const",
+              "inner": [
+                {
+                  "id": "0x12f86ae70",
+                  "kind": "BuiltinType",
+                  "type": {
+                    "qualType": "void"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f959850",
+      "kind": "RecordDecl",
+      "loc": {
+        "offset": 407,
+        "line": 8,
+        "col": 61,
+        "tokLen": 10
+      },
+      "range": {
+        "begin": {
+          "offset": 361,
+          "col": 15,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 407,
+          "col": 61,
+          "tokLen": 10
+        }
+      },
+      "name": "__CFString",
+      "tagUsed": "struct",
+      "inner": [
+        {
+          "id": "0x12f9598d0",
+          "kind": "ObjCBridgeAttr",
+          "range": {
+            "begin": {
+              "offset": 383,
+              "col": 37,
+              "tokLen": 11
+            },
+            "end": {
+              "offset": 403,
+              "col": 57,
+              "tokLen": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f959a00",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 419,
+        "col": 73,
+        "tokLen": 11
+      },
+      "range": {
+        "begin": {
+          "offset": 347,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 419,
+          "col": 73,
+          "tokLen": 11
+        }
+      },
+      "isReferenced": true,
+      "name": "CFStringRef",
+      "type": {
+        "qualType": "const struct __CFString *"
+      },
+      "inner": [
+        {
+          "id": "0x12f9599b0",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "const struct __CFString *"
+          },
+          "inner": [
+            {
+              "id": "0x12f959961",
+              "kind": "QualType",
+              "type": {
+                "qualType": "const struct __CFString"
+              },
+              "qualifiers": "const",
+              "inner": [
+                {
+                  "id": "0x12f959960",
+                  "kind": "RecordType",
+                  "type": {
+                    "qualType": "struct __CFString"
+                  },
+                  "decl": {
+                    "id": "0x12f959850",
+                    "kind": "RecordDecl",
+                    "name": "__CFString"
+                  },
+                  "isTagOwned": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f959a80",
+      "kind": "RecordDecl",
+      "loc": {
+        "offset": 501,
+        "line": 9,
+        "col": 70,
+        "tokLen": 10
+      },
+      "range": {
+        "begin": {
+          "offset": 440,
+          "col": 9,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 501,
+          "col": 70,
+          "tokLen": 10
+        }
+      },
+      "previousDecl": "0x12f959850",
+      "name": "__CFString",
+      "tagUsed": "struct",
+      "inner": [
+        {
+          "id": "0x12f959b60",
+          "kind": "ObjCBridgeAttr",
+          "range": {
+            "begin": {
+              "offset": 383,
+              "line": 8,
+              "col": 37,
+              "tokLen": 11
+            },
+            "end": {
+              "offset": 403,
+              "col": 57,
+              "tokLen": 1
+            }
+          },
+          "inherited": true
+        },
+        {
+          "id": "0x12f959b00",
+          "kind": "ObjCBridgeMutableAttr",
+          "range": {
+            "begin": {
+              "offset": 462,
+              "line": 9,
+              "col": 31,
+              "tokLen": 19
+            },
+            "end": {
+              "offset": 497,
+              "col": 66,
+              "tokLen": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f959c40",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 513,
+        "col": 82,
+        "tokLen": 18
+      },
+      "range": {
+        "begin": {
+          "offset": 432,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 513,
+          "col": 82,
+          "tokLen": 18
+        }
+      },
+      "name": "CFMutableStringRef",
+      "type": {
+        "qualType": "struct __CFString *"
+      },
+      "inner": [
+        {
+          "id": "0x12f959bf0",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "struct __CFString *"
+          },
+          "inner": [
+            {
+              "id": "0x12f959ba0",
+              "kind": "RecordType",
+              "type": {
+                "qualType": "struct __CFString"
+              },
+              "decl": {
+                "id": "0x12f959a80",
+                "kind": "RecordDecl",
+                "name": "__CFString"
+              },
+              "isTagOwned": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f959cb0",
+      "kind": "RecordDecl",
+      "loc": {
+        "offset": 548,
+        "line": 10,
+        "col": 16,
+        "tokLen": 6
+      },
+      "range": {
+        "begin": {
+          "offset": 541,
+          "col": 9,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 548,
+          "col": 16,
+          "tokLen": 6
+        }
+      },
+      "name": "CGPath",
+      "tagUsed": "struct"
+    },
+    {
+      "id": "0x12f959e00",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 556,
+        "col": 24,
+        "tokLen": 9
+      },
+      "range": {
+        "begin": {
+          "offset": 533,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 556,
+          "col": 24,
+          "tokLen": 9
+        }
+      },
+      "isReferenced": true,
+      "name": "CGPathRef",
+      "type": {
+        "qualType": "struct CGPath *"
+      },
+      "inner": [
+        {
+          "id": "0x12f959db0",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "struct CGPath *"
+          },
+          "inner": [
+            {
+              "id": "0x12f959d60",
+              "kind": "RecordType",
+              "type": {
+                "qualType": "struct CGPath"
+              },
+              "decl": {
+                "id": "0x12f959cb0",
+                "kind": "RecordDecl",
+                "name": "CGPath"
+              },
+              "isTagOwned": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f959e70",
+      "kind": "RecordDecl",
+      "loc": {
+        "offset": 582,
+        "line": 11,
+        "col": 16,
+        "tokLen": 11
+      },
+      "range": {
+        "begin": {
+          "offset": 575,
+          "col": 9,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 582,
+          "col": 16,
+          "tokLen": 11
+        }
+      },
+      "name": "OpaqueQueue",
+      "tagUsed": "struct"
+    },
+    {
+      "id": "0x12f959fc0",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 595,
+        "col": 29,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 567,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 595,
+          "col": 29,
+          "tokLen": 8
+        }
+      },
+      "isReferenced": true,
+      "name": "QueueRef",
+      "type": {
+        "qualType": "struct OpaqueQueue *"
+      },
+      "inner": [
+        {
+          "id": "0x12f959f70",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "struct OpaqueQueue *"
+          },
+          "inner": [
+            {
+              "id": "0x12f959f20",
+              "kind": "RecordType",
+              "type": {
+                "qualType": "struct OpaqueQueue"
+              },
+              "decl": {
+                "id": "0x12f959e70",
+                "kind": "RecordDecl",
+                "name": "OpaqueQueue"
+              },
+              "isTagOwned": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f95a030",
+      "kind": "RecordDecl",
+      "loc": {
+        "offset": 620,
+        "line": 12,
+        "col": 16,
+        "tokLen": 4
+      },
+      "range": {
+        "begin": {
+          "offset": 613,
+          "col": 9,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 662,
+          "col": 58,
+          "tokLen": 1
+        }
+      },
+      "name": "Pair",
+      "tagUsed": "struct",
+      "completeDefinition": true,
+      "inner": [
+        {
+          "id": "0x12f95a0e8",
+          "kind": "FieldDecl",
+          "loc": {
+            "offset": 639,
+            "col": 35,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 627,
+              "col": 23,
+              "tokLen": 11
+            },
+            "end": {
+              "offset": 639,
+              "col": 35,
+              "tokLen": 4
+            }
+          },
+          "name": "name",
+          "type": {
+            "desugaredQualType": "const struct __CFString *",
+            "qualType": "CFStringRef",
+            "typeAliasDeclId": "0x12f959a00"
+          }
+        },
+        {
+          "id": "0x12f95a178",
+          "kind": "FieldDecl",
+          "loc": {
+            "offset": 655,
+            "col": 51,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 645,
+              "col": 41,
+              "tokLen": 9
+            },
+            "end": {
+              "offset": 655,
+              "col": 51,
+              "tokLen": 5
+            }
+          },
+          "name": "value",
+          "type": {
+            "desugaredQualType": "const void *",
+            "qualType": "CFTypeRef",
+            "typeAliasDeclId": "0x12f9597e8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f95a238",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 664,
+        "col": 60,
+        "tokLen": 4
+      },
+      "range": {
+        "begin": {
+          "offset": 605,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 664,
+          "col": 60,
+          "tokLen": 4
+        }
+      },
+      "name": "Pair",
+      "type": {
+        "qualType": "struct Pair"
+      },
+      "inner": [
+        {
+          "id": "0x12f95a200",
+          "kind": "RecordType",
+          "type": {
+            "qualType": "struct Pair"
+          },
+          "decl": {
+            "id": "0x12f95a030",
+            "kind": "RecordDecl",
+            "name": "Pair"
+          },
+          "isTagOwned": true
+        }
+      ]
+    },
+    {
+      "id": "0x12f95a510",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 685,
+        "line": 13,
+        "col": 16,
+        "tokLen": 7
+      },
+      "range": {
+        "begin": {
+          "offset": 670,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 725,
+          "col": 56,
+          "tokLen": 1
+        }
+      },
+      "name": "Applier",
+      "type": {
+        "qualType": "void (*)(CFStringRef, void *)"
+      },
+      "inner": [
+        {
+          "id": "0x12f95a4a0",
+          "kind": "PointerType",
+          "type": {
+            "qualType": "void (*)(CFStringRef, void *)"
+          },
+          "inner": [
+            {
+              "id": "0x12f95a440",
+              "kind": "ParenType",
+              "type": {
+                "qualType": "void (CFStringRef, void *)"
+              },
+              "inner": [
+                {
+                  "id": "0x12f95a400",
+                  "kind": "FunctionProtoType",
+                  "type": {
+                    "qualType": "void (CFStringRef, void *)"
+                  },
+                  "cc": "cdecl",
+                  "inner": [
+                    {
+                      "id": "0x12f86ae70",
+                      "kind": "BuiltinType",
+                      "type": {
+                        "qualType": "void"
+                      }
+                    },
+                    {
+                      "id": "0x12f95a0b0",
+                      "kind": "TypedefType",
+                      "type": {
+                        "qualType": "CFStringRef"
+                      },
+                      "decl": {
+                        "id": "0x12f959a00",
+                        "kind": "TypedefDecl",
+                        "name": "CFStringRef"
+                      },
+                      "inner": [
+                        {
+                          "id": "0x12f9599b0",
+                          "kind": "PointerType",
+                          "type": {
+                            "qualType": "const struct __CFString *"
+                          },
+                          "inner": [
+                            {
+                              "id": "0x12f959961",
+                              "kind": "QualType",
+                              "type": {
+                                "qualType": "const struct __CFString"
+                              },
+                              "qualifiers": "const",
+                              "inner": [
+                                {
+                                  "id": "0x12f959960",
+                                  "kind": "RecordType",
+                                  "type": {
+                                    "qualType": "struct __CFString"
+                                  },
+                                  "decl": {
+                                    "id": "0x12f959850",
+                                    "kind": "RecordDecl",
+                                    "name": "__CFString"
+                                  },
+                                  "isTagOwned": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "0x12f86bcd0",
+                      "kind": "PointerType",
+                      "type": {
+                        "qualType": "void *"
+                      },
+                      "inner": [
+                        {
+                          "id": "0x12f86ae70",
+                          "kind": "BuiltinType",
+                          "type": {
+                            "qualType": "void"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f97c8f8",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 738,
+        "line": 15,
+        "col": 10,
+        "tokLen": 17
+      },
+      "range": {
+        "begin": {
+          "offset": 729,
+          "col": 1,
+          "tokLen": 8
+        },
+        "end": {
+          "offset": 760,
+          "col": 32,
+          "tokLen": 1
+        }
+      },
+      "name": "CFStringGetTypeID",
+      "mangledName": "_CFStringGetTypeID",
+      "type": {
+        "qualType": "CFTypeID (void)"
+      }
+    },
+    {
+      "id": "0x12f97ca88",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 772,
+        "line": 16,
+        "col": 10,
+        "tokLen": 15
+      },
+      "range": {
+        "begin": {
+          "offset": 763,
+          "col": 1,
+          "tokLen": 8
+        },
+        "end": {
+          "offset": 792,
+          "col": 30,
+          "tokLen": 1
+        }
+      },
+      "name": "CGPathGetTypeID",
+      "mangledName": "_CGPathGetTypeID",
+      "type": {
+        "qualType": "CFTypeID (void)"
+      }
+    },
+    {
+      "id": "0x12f97cd08",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 807,
+        "line": 17,
+        "col": 13,
+        "tokLen": 18
+      },
+      "range": {
+        "begin": {
+          "offset": 795,
+          "col": 1,
+          "tokLen": 11
+        },
+        "end": {
+          "offset": 863,
+          "col": 69,
+          "tokLen": 1
+        }
+      },
+      "name": "CFStringCreateCopy",
+      "mangledName": "_CFStringCreateCopy",
+      "type": {
+        "qualType": "CFStringRef (CFTypeRef, CFStringRef)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97cb60",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 836,
+            "col": 42,
+            "tokLen": 9
+          },
+          "range": {
+            "begin": {
+              "offset": 826,
+              "col": 32,
+              "tokLen": 9
+            },
+            "end": {
+              "offset": 836,
+              "col": 42,
+              "tokLen": 9
+            }
+          },
+          "name": "allocator",
+          "type": {
+            "desugaredQualType": "const void *",
+            "qualType": "CFTypeRef",
+            "typeAliasDeclId": "0x12f9597e8"
+          }
+        },
+        {
+          "id": "0x12f97cbe0",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 859,
+            "col": 65,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 847,
+              "col": 53,
+              "tokLen": 11
+            },
+            "end": {
+              "offset": 859,
+              "col": 65,
+              "tokLen": 4
+            }
+          },
+          "name": "text",
+          "type": {
+            "desugaredQualType": "const struct __CFString *",
+            "qualType": "CFStringRef",
+            "typeAliasDeclId": "0x12f959a00"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f97cf08",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 878,
+        "line": 18,
+        "col": 13,
+        "tokLen": 15
+      },
+      "range": {
+        "begin": {
+          "offset": 866,
+          "col": 1,
+          "tokLen": 11
+        },
+        "end": {
+          "offset": 910,
+          "col": 45,
+          "tokLen": 1
+        }
+      },
+      "name": "CFStringGetName",
+      "mangledName": "_CFStringGetName",
+      "type": {
+        "qualType": "CFStringRef (CFStringRef)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97cdf0",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 906,
+            "col": 41,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 894,
+              "col": 29,
+              "tokLen": 11
+            },
+            "end": {
+              "offset": 906,
+              "col": 41,
+              "tokLen": 4
+            }
+          },
+          "name": "text",
+          "type": {
+            "desugaredQualType": "const struct __CFString *",
+            "qualType": "CFStringRef",
+            "typeAliasDeclId": "0x12f959a00"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f97d0b8",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 925,
+        "line": 19,
+        "col": 13,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 913,
+          "col": 1,
+          "tokLen": 11
+        },
+        "end": {
+          "offset": 975,
+          "col": 63,
+          "tokLen": 1
+        }
+      },
+      "name": "MakeName",
+      "mangledName": "_MakeName",
+      "type": {
+        "qualType": "CFStringRef (void)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97d160",
+          "kind": "CFReturnsRetainedAttr",
+          "range": {
+            "begin": {
+              "offset": 955,
+              "col": 43,
+              "tokLen": 19
+            },
+            "end": {
+              "offset": 955,
+              "col": 43,
+              "tokLen": 19
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f97d258",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 990,
+        "line": 20,
+        "col": 13,
+        "tokLen": 9
+      },
+      "range": {
+        "begin": {
+          "offset": 978,
+          "col": 1,
+          "tokLen": 11
+        },
+        "end": {
+          "offset": 1045,
+          "col": 68,
+          "tokLen": 1
+        }
+      },
+      "name": "CopiedNot",
+      "mangledName": "_CopiedNot",
+      "type": {
+        "qualType": "CFStringRef (void)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97d300",
+          "kind": "CFReturnsNotRetainedAttr",
+          "range": {
+            "begin": {
+              "offset": 1021,
+              "col": 44,
+              "tokLen": 23
+            },
+            "end": {
+              "offset": 1021,
+              "col": 44,
+              "tokLen": 23
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f97d498",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 1058,
+        "line": 21,
+        "col": 11,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 1048,
+          "col": 1,
+          "tokLen": 9
+        },
+        "end": {
+          "offset": 1079,
+          "col": 32,
+          "tokLen": 1
+        }
+      },
+      "name": "CFRetain",
+      "mangledName": "_CFRetain",
+      "type": {
+        "qualType": "CFTypeRef (CFTypeRef)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97d388",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 1077,
+            "col": 30,
+            "tokLen": 2
+          },
+          "range": {
+            "begin": {
+              "offset": 1067,
+              "col": 20,
+              "tokLen": 9
+            },
+            "end": {
+              "offset": 1077,
+              "col": 30,
+              "tokLen": 2
+            }
+          },
+          "name": "cf",
+          "type": {
+            "desugaredQualType": "const void *",
+            "qualType": "CFTypeRef",
+            "typeAliasDeclId": "0x12f9597e8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f97d680",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 1087,
+        "line": 22,
+        "col": 6,
+        "tokLen": 9
+      },
+      "range": {
+        "begin": {
+          "offset": 1082,
+          "col": 1,
+          "tokLen": 4
+        },
+        "end": {
+          "offset": 1109,
+          "col": 28,
+          "tokLen": 1
+        }
+      },
+      "name": "CFRelease",
+      "mangledName": "_CFRelease",
+      "type": {
+        "qualType": "void (CFTypeRef)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97d578",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 1107,
+            "col": 26,
+            "tokLen": 2
+          },
+          "range": {
+            "begin": {
+              "offset": 1097,
+              "col": 16,
+              "tokLen": 9
+            },
+            "end": {
+              "offset": 1107,
+              "col": 26,
+              "tokLen": 2
+            }
+          },
+          "name": "cf",
+          "type": {
+            "desugaredQualType": "const void *",
+            "qualType": "CFTypeRef",
+            "typeAliasDeclId": "0x12f9597e8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f97f8a0",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 1117,
+        "line": 23,
+        "col": 6,
+        "tokLen": 13
+      },
+      "range": {
+        "begin": {
+          "offset": 1112,
+          "col": 1,
+          "tokLen": 4
+        },
+        "end": {
+          "offset": 1145,
+          "col": 34,
+          "tokLen": 1
+        }
+      },
+      "name": "CGPathRelease",
+      "mangledName": "_CGPathRelease",
+      "type": {
+        "qualType": "void (CGPathRef)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97d780",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 1141,
+            "col": 30,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 1131,
+              "col": 20,
+              "tokLen": 9
+            },
+            "end": {
+              "offset": 1141,
+              "col": 30,
+              "tokLen": 4
+            }
+          },
+          "name": "path",
+          "type": {
+            "desugaredQualType": "struct CGPath *",
+            "qualType": "CGPathRef",
+            "typeAliasDeclId": "0x12f959e00"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f97fa50",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 1153,
+        "line": 24,
+        "col": 6,
+        "tokLen": 13
+      },
+      "range": {
+        "begin": {
+          "offset": 1148,
+          "col": 1,
+          "tokLen": 4
+        },
+        "end": {
+          "offset": 1208,
+          "col": 61,
+          "tokLen": 1
+        }
+      },
+      "name": "TakeOwnership",
+      "mangledName": "_TakeOwnership",
+      "type": {
+        "qualType": "void (CFTypeRef)"
+      },
+      "inner": [
+        {
+          "id": "0x12f97f968",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 1206,
+            "col": 59,
+            "tokLen": 2
+          },
+          "range": {
+            "begin": {
+              "offset": 1167,
+              "col": 20,
+              "tokLen": 13
+            },
+            "end": {
+              "offset": 1206,
+              "col": 59,
+              "tokLen": 2
+            }
+          },
+          "name": "cf",
+          "type": {
+            "desugaredQualType": "const void *",
+            "qualType": "CFTypeRef",
+            "typeAliasDeclId": "0x12f9597e8"
+          },
+          "inner": [
+            {
+              "id": "0x12f97f9d0",
+              "kind": "CFConsumedAttr",
+              "range": {
+                "begin": {
+                  "offset": 1182,
+                  "col": 35,
+                  "tokLen": 11
+                },
+                "end": {
+                  "offset": 1182,
+                  "col": 35,
+                  "tokLen": 11
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f97fc28",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 1220,
+        "line": 25,
+        "col": 10,
+        "tokLen": 11
+      },
+      "range": {
+        "begin": {
+          "offset": 1211,
+          "col": 1,
+          "tokLen": 8
+        },
+        "end": {
+          "offset": 1236,
+          "col": 26,
+          "tokLen": 1
+        }
+      },
+      "name": "QueueCreate",
+      "mangledName": "_QueueCreate",
+      "type": {
+        "qualType": "QueueRef (void)"
+      }
+    },
+    {
+      "id": "0x12f97fd60",
+      "kind": "VarDecl",
+      "loc": {
+        "offset": 1273,
+        "line": 26,
+        "col": 35,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 1239,
+          "col": 1,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 1273,
+          "col": 35,
+          "tokLen": 8
+        }
+      },
+      "name": "kNameKey",
+      "mangledName": "_kNameKey",
+      "type": {
+        "desugaredQualType": "const struct __CFString *const",
+        "qualType": "CFStringRef  _Nonnull const",
+        "typeAliasDeclId": "0x12f959a00"
+      },
+      "storageClass": "extern"
+    },
+    {
+      "id": "0x12f97fde0",
+      "kind": "VarDecl",
+      "loc": {
+        "offset": 1308,
+        "line": 27,
+        "col": 26,
+        "tokLen": 9
+      },
+      "range": {
+        "begin": {
+          "offset": 1283,
+          "col": 1,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 1308,
+          "col": 26,
+          "tokLen": 9
+        }
+      },
+      "name": "kLooseKey",
+      "mangledName": "_kLooseKey",
+      "type": {
+        "desugaredQualType": "const struct __CFString *const",
+        "qualType": "const CFStringRef",
+        "typeAliasDeclId": "0x12f959a00"
+      },
+      "storageClass": "extern"
+    },
+    {
+      "id": "0x12f97fe48",
+      "kind": "ObjCInterfaceDecl",
+      "loc": {
+        "offset": 1363,
+        "line": 31,
+        "col": 8,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 1356,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 1363,
+          "col": 8,
+          "tokLen": 8
+        }
+      },
+      "name": "NSString",
+      "mangledName": "_OBJC_CLASS_$_NSString",
+      "super": {
+        "id": "0x12f980638",
+        "kind": "ObjCInterfaceDecl",
+        "name": "NSObject"
+      },
+      "implementation": {
+        "id": "0x0"
+      },
+      "protocols": [
+        {
+          "id": "0x12f965a30",
+          "kind": "ObjCProtocolDecl",
+          "name": "Copying"
+        }
+      ]
+    },
+    {
+      "id": "0x12f97ff00",
+      "kind": "ObjCInterfaceDecl",
+      "loc": {
+        "offset": 1380,
+        "line": 32,
+        "col": 8,
+        "tokLen": 7
+      },
+      "range": {
+        "begin": {
+          "offset": 1373,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 1380,
+          "col": 8,
+          "tokLen": 7
+        }
+      },
+      "name": "NSError",
+      "mangledName": "_OBJC_CLASS_$_NSError",
+      "super": {
+        "id": "0x12f980638",
+        "kind": "ObjCInterfaceDecl",
+        "name": "NSObject"
+      },
+      "implementation": {
+        "id": "0x0"
+      }
+    },
+    {
+      "id": "0x12f97ffb0",
+      "kind": "ObjCProtocolDecl",
+      "loc": {
+        "offset": 1400,
+        "line": 34,
+        "col": 11,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 1390,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 1479,
+          "line": 37,
+          "col": 2,
+          "tokLen": 3
+        }
+      },
+      "name": "NSObject",
+      "inner": [
+        {
+          "id": "0x12f9802a0",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1409,
+            "line": 35,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 1409,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1435,
+              "col": 27,
+              "tokLen": 1
+            }
+          },
+          "name": "isEqual:",
+          "mangledName": "-[NSObject isEqual:]",
+          "returnType": {
+            "desugaredQualType": "_Bool",
+            "qualType": "BOOL",
+            "typeAliasDeclId": "0x12f9596d0"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f9801a0",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 1429,
+                "col": 21,
+                "tokLen": 6
+              },
+              "range": {
+                "begin": {
+                  "offset": 1426,
+                  "col": 18,
+                  "tokLen": 2
+                },
+                "end": {
+                  "offset": 1429,
+                  "col": 21,
+                  "tokLen": 6
+                }
+              },
+              "name": "object",
+              "type": {
+                "desugaredQualType": "__strong id",
+                "qualType": "id  _Nonnull __strong",
+                "typeAliasDeclId": "0x12f955280"
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f980460",
+          "kind": "ObjCPropertyDecl",
+          "loc": {
+            "offset": 1472,
+            "line": 36,
+            "col": 36,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 1437,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1472,
+              "col": 36,
+              "tokLen": 4
+            }
+          },
+          "name": "hash",
+          "type": {
+            "qualType": "unsigned long"
+          },
+          "readonly": true,
+          "atomic": true
+        },
+        {
+          "id": "0x12f9804e0",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1472,
+            "col": 36,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 1472,
+              "col": 36,
+              "tokLen": 4
+            },
+            "end": {
+              "offset": 1472,
+              "col": 36,
+              "tokLen": 4
+            }
+          },
+          "isImplicit": true,
+          "name": "hash",
+          "mangledName": "-[NSObject hash]",
+          "returnType": {
+            "qualType": "unsigned long"
+          },
+          "instance": true
+        }
+      ]
+    },
+    {
+      "id": "0x12f980638",
+      "kind": "ObjCInterfaceDecl",
+      "loc": {
+        "offset": 1528,
+        "line": 40,
+        "col": 12,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 1517,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 1621,
+          "line": 44,
+          "col": 2,
+          "tokLen": 3
+        }
+      },
+      "name": "NSObject",
+      "mangledName": "_OBJC_CLASS_$_NSObject",
+      "super": {
+        "id": "0x0"
+      },
+      "implementation": {
+        "id": "0x0"
+      },
+      "protocols": [
+        {
+          "id": "0x12f97ffb0",
+          "kind": "ObjCProtocolDecl",
+          "name": "NSObject"
+        }
+      ],
+      "inner": [
+        {
+          "id": "0x12f9806f0",
+          "kind": "ObjCRootClassAttr",
+          "range": {
+            "begin": {
+              "offset": 1499,
+              "line": 39,
+              "col": 16,
+              "tokLen": 15
+            },
+            "end": {
+              "offset": 1499,
+              "col": 16,
+              "tokLen": 15
+            }
+          }
+        },
+        {
+          "id": "0x12f965260",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1548,
+            "line": 41,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 1548,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1569,
+              "col": 22,
+              "tokLen": 1
+            }
+          },
+          "name": "alloc",
+          "mangledName": "+[NSObject alloc]",
+          "returnType": {
+            "desugaredQualType": "id",
+            "qualType": "instancetype _Nonnull",
+            "typeAliasDeclId": "0x12f980220"
+          },
+          "instance": false,
+          "inner": [
+            {
+              "id": "0x12f9652e8",
+              "kind": "NSReturnsRetainedAttr",
+              "range": {
+                "begin": {},
+                "end": {}
+              },
+              "implicit": true
+            }
+          ]
+        },
+        {
+          "id": "0x12f965490",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1571,
+            "line": 42,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 1571,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1591,
+              "col": 21,
+              "tokLen": 1
+            }
+          },
+          "name": "init",
+          "mangledName": "-[NSObject init]",
+          "returnType": {
+            "desugaredQualType": "id",
+            "qualType": "instancetype _Nonnull",
+            "typeAliasDeclId": "0x12f980220"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f965518",
+              "kind": "NSConsumesSelfAttr",
+              "range": {
+                "begin": {},
+                "end": {}
+              },
+              "implicit": true
+            },
+            {
+              "id": "0x12f965570",
+              "kind": "NSReturnsRetainedAttr",
+              "range": {
+                "begin": {},
+                "end": {}
+              },
+              "implicit": true
+            }
+          ]
+        },
+        {
+          "id": "0x12f9657f0",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1593,
+            "line": 43,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 1593,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1618,
+              "col": 26,
+              "tokLen": 1
+            }
+          },
+          "name": "description",
+          "mangledName": "+[NSObject description]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nonnull"
+          },
+          "instance": false
+        }
+      ]
+    },
+    {
+      "id": "0x12f965948",
+      "kind": "ObjCInterfaceDecl",
+      "loc": {
+        "offset": 1637,
+        "line": 46,
+        "col": 12,
+        "tokLen": 7
+      },
+      "range": {
+        "begin": {
+          "offset": 1626,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 1657,
+          "line": 47,
+          "col": 2,
+          "tokLen": 3
+        }
+      },
+      "previousDecl": "0x12f97ff00",
+      "name": "NSError",
+      "mangledName": "_OBJC_CLASS_$_NSError",
+      "super": {
+        "id": "0x12f980638",
+        "kind": "ObjCInterfaceDecl",
+        "name": "NSObject"
+      },
+      "implementation": {
+        "id": "0x0"
+      }
+    },
+    {
+      "id": "0x12f965a30",
+      "kind": "ObjCProtocolDecl",
+      "loc": {
+        "offset": 1672,
+        "line": 49,
+        "col": 11,
+        "tokLen": 7
+      },
+      "range": {
+        "begin": {
+          "offset": 1662,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 1829,
+          "line": 56,
+          "col": 2,
+          "tokLen": 3
+        }
+      },
+      "name": "Copying",
+      "inner": [
+        {
+          "id": "0x12f965c18",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1680,
+            "line": 50,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 1680,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1720,
+              "col": 41,
+              "tokLen": 1
+            }
+          },
+          "name": "copyWithZone:",
+          "mangledName": "-[Copying copyWithZone:]",
+          "returnType": {
+            "desugaredQualType": "id",
+            "qualType": "id _Nonnull",
+            "typeAliasDeclId": "0x12f955280"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f965bb0",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 1716,
+                "col": 37,
+                "tokLen": 4
+              },
+              "range": {
+                "begin": {
+                  "offset": 1700,
+                  "col": 21,
+                  "tokLen": 4
+                },
+                "end": {
+                  "offset": 1716,
+                  "col": 37,
+                  "tokLen": 4
+                }
+              },
+              "name": "zone",
+              "type": {
+                "desugaredQualType": "void *",
+                "qualType": "void * _Nullable"
+              }
+            },
+            {
+              "id": "0x12f965ca8",
+              "kind": "NSReturnsRetainedAttr",
+              "range": {
+                "begin": {},
+                "end": {}
+              },
+              "implicit": true
+            }
+          ]
+        },
+        {
+          "id": "0x12f965de0",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1732,
+            "line": 52,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 1732,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1753,
+              "col": 22,
+              "tokLen": 1
+            }
+          },
+          "name": "optionalThing",
+          "mangledName": "-[Copying optionalThing]",
+          "returnType": {
+            "qualType": "void"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f965f50",
+          "kind": "ObjCPropertyDecl",
+          "loc": {
+            "offset": 1781,
+            "line": 53,
+            "col": 27,
+            "tokLen": 12
+          },
+          "range": {
+            "begin": {
+              "offset": 1755,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1781,
+              "col": 27,
+              "tokLen": 12
+            }
+          },
+          "name": "optionalFlag",
+          "type": {
+            "desugaredQualType": "_Bool",
+            "qualType": "BOOL",
+            "typeAliasDeclId": "0x12f9596d0"
+          },
+          "control": "optional",
+          "readonly": true,
+          "atomic": true
+        },
+        {
+          "id": "0x12f965fe0",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1805,
+            "line": 55,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 1805,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1826,
+              "col": 22,
+              "tokLen": 1
+            }
+          },
+          "name": "requiredThing",
+          "mangledName": "-[Copying requiredThing]",
+          "returnType": {
+            "qualType": "void"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f966138",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1781,
+            "line": 53,
+            "col": 27,
+            "tokLen": 12
+          },
+          "range": {
+            "begin": {
+              "offset": 1781,
+              "col": 27,
+              "tokLen": 12
+            },
+            "end": {
+              "offset": 1781,
+              "col": 27,
+              "tokLen": 12
+            }
+          },
+          "isImplicit": true,
+          "name": "optionalFlag",
+          "mangledName": "-[Copying optionalFlag]",
+          "returnType": {
+            "desugaredQualType": "_Bool",
+            "qualType": "BOOL",
+            "typeAliasDeclId": "0x12f9596d0"
+          },
+          "instance": true
+        }
+      ]
+    },
+    {
+      "id": "0x12f9830d0",
+      "kind": "ObjCInterfaceDecl",
+      "loc": {
+        "offset": 1845,
+        "line": 58,
+        "col": 12,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 1834,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 2560,
+          "line": 74,
+          "col": 2,
+          "tokLen": 3
+        }
+      },
+      "previousDecl": "0x12f97fe48",
+      "name": "NSString",
+      "mangledName": "_OBJC_CLASS_$_NSString",
+      "super": {
+        "id": "0x12f980638",
+        "kind": "ObjCInterfaceDecl",
+        "name": "NSObject"
+      },
+      "implementation": {
+        "id": "0x0"
+      },
+      "protocols": [
+        {
+          "id": "0x12f965a30",
+          "kind": "ObjCProtocolDecl",
+          "name": "Copying"
+        }
+      ],
+      "inner": [
+        {
+          "id": "0x12f9831e0",
+          "kind": "ObjCPropertyDecl",
+          "loc": {
+            "offset": 1910,
+            "line": 59,
+            "col": 36,
+            "tokLen": 6
+          },
+          "range": {
+            "begin": {
+              "offset": 1875,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1910,
+              "col": 36,
+              "tokLen": 6
+            }
+          },
+          "name": "length",
+          "type": {
+            "qualType": "unsigned long"
+          },
+          "readonly": true,
+          "atomic": true
+        },
+        {
+          "id": "0x12f9832a8",
+          "kind": "ObjCPropertyDecl",
+          "loc": {
+            "offset": 1962,
+            "line": 60,
+            "col": 45,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 1918,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 1962,
+              "col": 45,
+              "tokLen": 5
+            }
+          },
+          "name": "empty",
+          "type": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nonnull"
+          },
+          "readonly": true,
+          "copy": true,
+          "atomic": true,
+          "class": true
+        },
+        {
+          "id": "0x12f9833b0",
+          "kind": "ObjCPropertyDecl",
+          "loc": {
+            "offset": 2006,
+            "line": 61,
+            "col": 38,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 1969,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2006,
+              "col": 38,
+              "tokLen": 5
+            }
+          },
+          "name": "title",
+          "type": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nullable"
+          },
+          "readwrite": true,
+          "copy": true,
+          "atomic": true,
+          "nullability": true
+        },
+        {
+          "id": "0x12f983448",
+          "kind": "ObjCPropertyDecl",
+          "loc": {
+            "offset": 2044,
+            "line": 62,
+            "col": 32,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 2013,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2044,
+              "col": 32,
+              "tokLen": 4
+            }
+          },
+          "name": "open",
+          "type": {
+            "desugaredQualType": "_Bool",
+            "qualType": "BOOL",
+            "typeAliasDeclId": "0x12f9596d0"
+          },
+          "getter": {
+            "id": "0x12f986980",
+            "kind": "ObjCMethodDecl",
+            "name": "isOpen"
+          },
+          "assign": true,
+          "readwrite": true,
+          "atomic": true,
+          "unsafe_unretained": true
+        },
+        {
+          "id": "0x12f983638",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2050,
+            "line": 63,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2050,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2098,
+              "col": 49,
+              "tokLen": 1
+            }
+          },
+          "name": "initWithCoder:",
+          "mangledName": "-[NSString initWithCoder:]",
+          "returnType": {
+            "desugaredQualType": "id",
+            "qualType": "instancetype _Nullable",
+            "typeAliasDeclId": "0x12f980220"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f9835d0",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2093,
+                "col": 44,
+                "tokLen": 5
+              },
+              "range": {
+                "begin": {
+                  "offset": 2090,
+                  "col": 41,
+                  "tokLen": 2
+                },
+                "end": {
+                  "offset": 2093,
+                  "col": 44,
+                  "tokLen": 5
+                }
+              },
+              "name": "coder",
+              "type": {
+                "desugaredQualType": "__strong id",
+                "qualType": "id  _Nonnull __strong",
+                "typeAliasDeclId": "0x12f955280"
+              }
+            },
+            {
+              "id": "0x12f9836c8",
+              "kind": "NSConsumesSelfAttr",
+              "range": {
+                "begin": {},
+                "end": {}
+              },
+              "implicit": true
+            },
+            {
+              "id": "0x12f983720",
+              "kind": "NSReturnsRetainedAttr",
+              "range": {
+                "begin": {},
+                "end": {}
+              },
+              "implicit": true
+            }
+          ]
+        },
+        {
+          "id": "0x12f9839d8",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2100,
+            "line": 64,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2100,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2155,
+              "col": 56,
+              "tokLen": 1
+            }
+          },
+          "name": "stringByAppendingString:",
+          "mangledName": "-[NSString stringByAppendingString:]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nonnull"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f983970",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2150,
+                "col": 51,
+                "tokLen": 5
+              },
+              "range": {
+                "begin": {
+                  "offset": 2139,
+                  "col": 40,
+                  "tokLen": 8
+                },
+                "end": {
+                  "offset": 2150,
+                  "col": 51,
+                  "tokLen": 5
+                }
+              },
+              "name": "other",
+              "type": {
+                "desugaredQualType": "NSString *__strong",
+                "qualType": "NSString * _Nonnull __strong"
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f983e70",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2157,
+            "line": 65,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2157,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2217,
+              "col": 61,
+              "tokLen": 1
+            }
+          },
+          "name": "writeToFile:error:",
+          "mangledName": "-[NSString writeToFile:error:]",
+          "returnType": {
+            "desugaredQualType": "_Bool",
+            "qualType": "BOOL",
+            "typeAliasDeclId": "0x12f9596d0"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f983da0",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2189,
+                "col": 33,
+                "tokLen": 4
+              },
+              "range": {
+                "begin": {
+                  "offset": 2178,
+                  "col": 22,
+                  "tokLen": 8
+                },
+                "end": {
+                  "offset": 2189,
+                  "col": 33,
+                  "tokLen": 4
+                }
+              },
+              "name": "path",
+              "type": {
+                "desugaredQualType": "NSString *__strong",
+                "qualType": "NSString * _Nonnull __strong"
+              }
+            },
+            {
+              "id": "0x12f983e08",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2212,
+                "col": 56,
+                "tokLen": 5
+              },
+              "range": {
+                "begin": {
+                  "offset": 2201,
+                  "col": 45,
+                  "tokLen": 7
+                },
+                "end": {
+                  "offset": 2212,
+                  "col": 56,
+                  "tokLen": 5
+                }
+              },
+              "name": "error",
+              "type": {
+                "desugaredQualType": "NSError *__autoreleasing  _Nullable *",
+                "qualType": "NSError *__autoreleasing  _Nullable * _Nullable"
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f985488",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2219,
+            "line": 66,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2219,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2285,
+              "col": 67,
+              "tokLen": 1
+            }
+          },
+          "name": "enumerateLines:",
+          "mangledName": "-[NSString enumerateLines:]",
+          "returnType": {
+            "qualType": "void"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f985420",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2280,
+                "col": 62,
+                "tokLen": 5
+              },
+              "range": {
+                "begin": {
+                  "offset": 2243,
+                  "col": 25,
+                  "tokLen": 4
+                },
+                "end": {
+                  "offset": 2280,
+                  "col": 62,
+                  "tokLen": 5
+                }
+              },
+              "name": "block",
+              "type": {
+                "desugaredQualType": "void (^__strong)(NSString * _Nonnull __strong, BOOL * _Nonnull)",
+                "qualType": "void (^ _Nonnull __strong)(NSString * _Nonnull __strong, BOOL * _Nonnull)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f985700",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2287,
+            "line": 67,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2287,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2341,
+              "col": 55,
+              "tokLen": 1
+            }
+          },
+          "name": "stringWithFormat:",
+          "mangledName": "-[NSString stringWithFormat:]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nonnull"
+          },
+          "instance": true,
+          "variadic": true,
+          "inner": [
+            {
+              "id": "0x12f985698",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2330,
+                "col": 44,
+                "tokLen": 6
+              },
+              "range": {
+                "begin": {
+                  "offset": 2319,
+                  "col": 33,
+                  "tokLen": 8
+                },
+                "end": {
+                  "offset": 2330,
+                  "col": 44,
+                  "tokLen": 6
+                }
+              },
+              "name": "format",
+              "type": {
+                "desugaredQualType": "NSString *__strong",
+                "qualType": "NSString * _Nonnull __strong"
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f9858c0",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2343,
+            "line": 68,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2343,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2366,
+              "col": 24,
+              "tokLen": 1
+            }
+          },
+          "name": "cfString",
+          "mangledName": "-[NSString cfString]",
+          "returnType": {
+            "desugaredQualType": "const struct __CFString *",
+            "qualType": "CFStringRef _Nonnull",
+            "typeAliasDeclId": "0x12f959a00"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f985b80",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2368,
+            "line": 69,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2368,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2389,
+              "col": 22,
+              "tokLen": 1
+            }
+          },
+          "name": "copier",
+          "mangledName": "-[NSString copier]",
+          "returnType": {
+            "desugaredQualType": "id<Copying>",
+            "qualType": "id<Copying> _Nonnull"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f985d30",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2391,
+            "line": 70,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2391,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2451,
+              "col": 61,
+              "tokLen": 1
+            }
+          },
+          "name": "madeThing",
+          "mangledName": "-[NSString madeThing]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nonnull"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f985dc0",
+              "kind": "NSReturnsRetainedAttr",
+              "range": {
+                "begin": {
+                  "offset": 2430,
+                  "col": 40,
+                  "tokLen": 19
+                },
+                "end": {
+                  "offset": 2430,
+                  "col": 40,
+                  "tokLen": 19
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f985ef8",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2453,
+            "line": 71,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2453,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2494,
+              "col": 42,
+              "tokLen": 1
+            }
+          },
+          "name": "gone",
+          "mangledName": "-[NSString gone]",
+          "returnType": {
+            "qualType": "void"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f985f88",
+              "kind": "UnavailableAttr",
+              "range": {
+                "begin": {
+                  "offset": 2481,
+                  "col": 29,
+                  "tokLen": 11
+                },
+                "end": {
+                  "offset": 2481,
+                  "col": 29,
+                  "tokLen": 11
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f986170",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2496,
+            "line": 72,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2496,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2532,
+              "col": 37,
+              "tokLen": 1
+            }
+          },
+          "name": "loose",
+          "mangledName": "-[NSString loose]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Null_unspecified"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f9862e0",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2534,
+            "line": 73,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2534,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2557,
+              "col": 24,
+              "tokLen": 1
+            }
+          },
+          "name": "length",
+          "mangledName": "-[NSString length]",
+          "returnType": {
+            "qualType": "unsigned long"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f986508",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 1962,
+            "line": 60,
+            "col": 45,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 1962,
+              "col": 45,
+              "tokLen": 5
+            },
+            "end": {
+              "offset": 1962,
+              "col": 45,
+              "tokLen": 5
+            }
+          },
+          "isImplicit": true,
+          "name": "empty",
+          "mangledName": "+[NSString empty]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nonnull"
+          },
+          "instance": false
+        },
+        {
+          "id": "0x12f986660",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2006,
+            "line": 61,
+            "col": 38,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 2006,
+              "col": 38,
+              "tokLen": 5
+            },
+            "end": {
+              "offset": 2006,
+              "col": 38,
+              "tokLen": 5
+            }
+          },
+          "isImplicit": true,
+          "name": "title",
+          "mangledName": "-[NSString title]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nullable"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f9867b8",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2006,
+            "col": 38,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 2006,
+              "col": 38,
+              "tokLen": 5
+            },
+            "end": {
+              "offset": 2006,
+              "col": 38,
+              "tokLen": 5
+            }
+          },
+          "isImplicit": true,
+          "name": "setTitle:",
+          "mangledName": "-[NSString setTitle:]",
+          "returnType": {
+            "qualType": "void"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f986840",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2006,
+                "col": 38,
+                "tokLen": 5
+              },
+              "range": {
+                "begin": {
+                  "offset": 2006,
+                  "col": 38,
+                  "tokLen": 5
+                },
+                "end": {
+                  "offset": 2006,
+                  "col": 38,
+                  "tokLen": 5
+                }
+              },
+              "name": "title",
+              "type": {
+                "desugaredQualType": "NSString *",
+                "qualType": "NSString * _Nullable"
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f986980",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2044,
+            "line": 62,
+            "col": 32,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 2044,
+              "col": 32,
+              "tokLen": 4
+            },
+            "end": {
+              "offset": 2044,
+              "col": 32,
+              "tokLen": 4
+            }
+          },
+          "isImplicit": true,
+          "name": "isOpen",
+          "mangledName": "-[NSString isOpen]",
+          "returnType": {
+            "desugaredQualType": "_Bool",
+            "qualType": "BOOL",
+            "typeAliasDeclId": "0x12f9596d0"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f986ad8",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2044,
+            "col": 32,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 2044,
+              "col": 32,
+              "tokLen": 4
+            },
+            "end": {
+              "offset": 2044,
+              "col": 32,
+              "tokLen": 4
+            }
+          },
+          "isImplicit": true,
+          "name": "setOpen:",
+          "mangledName": "-[NSString setOpen:]",
+          "returnType": {
+            "qualType": "void"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f986b60",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2044,
+                "col": 32,
+                "tokLen": 4
+              },
+              "range": {
+                "begin": {
+                  "offset": 2044,
+                  "col": 32,
+                  "tokLen": 4
+                },
+                "end": {
+                  "offset": 2044,
+                  "col": 32,
+                  "tokLen": 4
+                }
+              },
+              "name": "open",
+              "type": {
+                "desugaredQualType": "_Bool",
+                "qualType": "BOOL",
+                "typeAliasDeclId": "0x12f9596d0"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f986d68",
+      "kind": "ObjCInterfaceDecl",
+      "loc": {
+        "offset": 2576,
+        "line": 76,
+        "col": 12,
+        "tokLen": 7
+      },
+      "range": {
+        "begin": {
+          "offset": 2565,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 2735,
+          "line": 79,
+          "col": 2,
+          "tokLen": 3
+        }
+      },
+      "name": "NSArray",
+      "mangledName": "_OBJC_CLASS_$_NSArray",
+      "super": {
+        "id": "0x12f980638",
+        "kind": "ObjCInterfaceDecl",
+        "name": "NSObject"
+      },
+      "implementation": {
+        "id": "0x0"
+      },
+      "inner": [
+        {
+          "id": "0x12f986cb8",
+          "kind": "ObjCTypeParamDecl",
+          "loc": {
+            "offset": 2596,
+            "line": 76,
+            "col": 32,
+            "tokLen": 10
+          },
+          "range": {
+            "begin": {
+              "offset": 2584,
+              "col": 20,
+              "tokLen": 11
+            },
+            "end": {
+              "offset": 2584,
+              "col": 20,
+              "tokLen": 11
+            }
+          },
+          "isReferenced": true,
+          "name": "ObjectType",
+          "type": {
+            "qualType": "id",
+            "typeAliasDeclId": "0x12f955280"
+          },
+          "variance": "covariant"
+        },
+        {
+          "id": "0x12f987000",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2619,
+            "line": 77,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2619,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2667,
+              "col": 49,
+              "tokLen": 1
+            }
+          },
+          "name": "objectAtIndex:",
+          "mangledName": "-[NSArray objectAtIndex:]",
+          "returnType": {
+            "desugaredQualType": "id",
+            "qualType": "ObjectType _Nonnull"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f986f30",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2662,
+                "col": 44,
+                "tokLen": 5
+              },
+              "range": {
+                "begin": {
+                  "offset": 2648,
+                  "col": 30,
+                  "tokLen": 8
+                },
+                "end": {
+                  "offset": 2662,
+                  "col": 44,
+                  "tokLen": 5
+                }
+              },
+              "name": "index",
+              "type": {
+                "qualType": "unsigned long"
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12f987478",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2669,
+            "line": 78,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2669,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2732,
+              "col": 64,
+              "tokLen": 1
+            }
+          },
+          "name": "arrayByAddingObject:",
+          "mangledName": "-[NSArray arrayByAddingObject:]",
+          "returnType": {
+            "desugaredQualType": "NSArray<ObjectType> *",
+            "qualType": "NSArray<ObjectType> * _Nonnull"
+          },
+          "instance": true,
+          "inner": [
+            {
+              "id": "0x12f987410",
+              "kind": "ParmVarDecl",
+              "loc": {
+                "offset": 2726,
+                "col": 58,
+                "tokLen": 6
+              },
+              "range": {
+                "begin": {
+                  "offset": 2715,
+                  "col": 47,
+                  "tokLen": 10
+                },
+                "end": {
+                  "offset": 2726,
+                  "col": 58,
+                  "tokLen": 6
+                }
+              },
+              "name": "object",
+              "type": {
+                "desugaredQualType": "__strong id",
+                "qualType": "ObjectType  _Nonnull __strong"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f9875d8",
+      "kind": "ObjCCategoryDecl",
+      "loc": {
+        "offset": 2751,
+        "line": 81,
+        "col": 12,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 2740,
+          "col": 1,
+          "tokLen": 1
+        },
+        "end": {
+          "offset": 2823,
+          "line": 84,
+          "col": 2,
+          "tokLen": 3
+        }
+      },
+      "name": "Drawing",
+      "interface": {
+        "id": "0x12f9830d0",
+        "kind": "ObjCInterfaceDecl",
+        "name": "NSString"
+      },
+      "implementation": {
+        "id": "0x0"
+      },
+      "protocols": [
+        {
+          "id": "0x12f97ffb0",
+          "kind": "ObjCProtocolDecl",
+          "name": "NSObject"
+        }
+      ],
+      "inner": [
+        {
+          "id": "0x12f987690",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2781,
+            "line": 82,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2781,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2793,
+              "col": 13,
+              "tokLen": 1
+            }
+          },
+          "name": "draw",
+          "mangledName": "-[NSString(Drawing) draw]",
+          "returnType": {
+            "qualType": "void"
+          },
+          "instance": true
+        },
+        {
+          "id": "0x12f987840",
+          "kind": "ObjCMethodDecl",
+          "loc": {
+            "offset": 2795,
+            "line": 83,
+            "col": 1,
+            "tokLen": 1
+          },
+          "range": {
+            "begin": {
+              "offset": 2795,
+              "col": 1,
+              "tokLen": 1
+            },
+            "end": {
+              "offset": 2820,
+              "col": 26,
+              "tokLen": 1
+            }
+          },
+          "name": "description",
+          "mangledName": "+[NSString(Drawing) description]",
+          "returnType": {
+            "desugaredQualType": "NSString *",
+            "qualType": "NSString * _Nonnull"
+          },
+          "instance": false
+        }
+      ]
+    },
+    {
+      "id": "0x12f9879b0",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 2846,
+        "line": 86,
+        "col": 19,
+        "tokLen": 4
+      },
+      "range": {
+        "begin": {
+          "offset": 2828,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 2846,
+          "col": 19,
+          "tokLen": 4
+        }
+      },
+      "isReferenced": true,
+      "name": "Mode",
+      "type": {
+        "qualType": "NSString *"
+      },
+      "inner": [
+        {
+          "id": "0x12f965730",
+          "kind": "ObjCObjectPointerType",
+          "type": {
+            "qualType": "NSString *"
+          },
+          "inner": [
+            {
+              "id": "0x12f97fed0",
+              "kind": "ObjCInterfaceType",
+              "type": {
+                "qualType": "NSString"
+              },
+              "decl": {
+                "id": "0x12f9830d0",
+                "kind": "ObjCInterfaceDecl",
+                "name": "NSString"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12f987ac0",
+      "kind": "VarDecl",
+      "loc": {
+        "offset": 2870,
+        "line": 87,
+        "col": 19,
+        "tokLen": 11
+      },
+      "range": {
+        "begin": {
+          "offset": 2852,
+          "col": 1,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 2870,
+          "col": 19,
+          "tokLen": 11
+        }
+      },
+      "name": "DefaultMode",
+      "mangledName": "_DefaultMode",
+      "type": {
+        "desugaredQualType": "NSString *const __strong",
+        "qualType": "const Mode  _Nonnull __strong",
+        "typeAliasDeclId": "0x12f9879b0"
+      },
+      "storageClass": "extern"
+    },
+    {
+      "id": "0x12f987cb0",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 2893,
+        "line": 88,
+        "col": 11,
+        "tokLen": 17
+      },
+      "range": {
+        "begin": {
+          "offset": 2883,
+          "col": 1,
+          "tokLen": 8
+        },
+        "end": {
+          "offset": 2920,
+          "col": 38,
+          "tokLen": 1
+        }
+      },
+      "name": "NSStringFromThing",
+      "mangledName": "_NSStringFromThing",
+      "type": {
+        "qualType": "NSString * _Nonnull (int)"
+      },
+      "inner": [
+        {
+          "id": "0x12f987b68",
+          "kind": "ParmVarDecl",
+          "loc": {
+            "offset": 2915,
+            "col": 33,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 2911,
+              "col": 29,
+              "tokLen": 3
+            },
+            "end": {
+              "offset": 2915,
+              "col": 33,
+              "tokLen": 5
+            }
+          },
+          "name": "value",
+          "type": {
+            "qualType": "int"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12f988600",
+      "kind": "FunctionDecl",
+      "loc": {
+        "offset": 2933,
+        "line": 89,
+        "col": 11,
+        "tokLen": 12
+      },
+      "range": {
+        "begin": {
+          "offset": 2923,
+          "col": 1,
+          "tokLen": 8
+        },
+        "end": {
+          "offset": 2987,
+          "col": 65,
+          "tokLen": 1
+        }
+      },
+      "name": "NSMadeString",
+      "mangledName": "_NSMadeString",
+      "type": {
+        "qualType": "NSString * _Nonnull (void) __attribute__((ns_returns_retained))"
+      }
+    }
+  ]
+}

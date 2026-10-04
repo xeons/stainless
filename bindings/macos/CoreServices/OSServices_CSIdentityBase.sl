@@ -24,12 +24,13 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreServices")
 
-public extern "C" CFStringRef kCSIdentityErrorDomain;
+public extern "C" CFStringRef? kCSIdentityErrorDomain;
 
 public const int kCSIdentityUnknownAuthorityErr = -1;
 public const int kCSIdentityAuthorityNotAccessibleErr = -2;

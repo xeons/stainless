@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,17 +32,17 @@ import MacOS.CoreFoundation;
 
 public extern "C" CFTypeID CGEventSourceGetTypeID();
 
-public extern "C" CGEventSourceRef CGEventSourceCreate(CGEventSourceStateID stateID);
+[ReturnsRetained] public extern "C" CGEventSourceRef? CGEventSourceCreate(CGEventSourceStateID stateID);
 
-public extern "C" CGEventSourceKeyboardType CGEventSourceGetKeyboardType(CGEventSourceRef source);
+public extern "C" CGEventSourceKeyboardType CGEventSourceGetKeyboardType(CGEventSourceRef? source);
 
-public extern "C" void CGEventSourceSetKeyboardType(CGEventSourceRef source, CGEventSourceKeyboardType keyboardType);
+public extern "C" void CGEventSourceSetKeyboardType(CGEventSourceRef? source, CGEventSourceKeyboardType keyboardType);
 
-public extern "C" double CGEventSourceGetPixelsPerLine(CGEventSourceRef source);
+public extern "C" double CGEventSourceGetPixelsPerLine(CGEventSourceRef? source);
 
-public extern "C" void CGEventSourceSetPixelsPerLine(CGEventSourceRef source, double pixelsPerLine);
+public extern "C" void CGEventSourceSetPixelsPerLine(CGEventSourceRef? source, double pixelsPerLine);
 
-public extern "C" CGEventSourceStateID CGEventSourceGetSourceStateID(CGEventSourceRef source);
+public extern "C" CGEventSourceStateID CGEventSourceGetSourceStateID(CGEventSourceRef? source);
 
 public extern "C" bool CGEventSourceButtonState(CGEventSourceStateID stateID, CGMouseButton button);
 
@@ -53,16 +54,16 @@ public extern "C" CFTimeInterval CGEventSourceSecondsSinceLastEventType(CGEventS
 
 public extern "C" uint CGEventSourceCounterForEventType(CGEventSourceStateID stateID, CGEventType eventType);
 
-public extern "C" void CGEventSourceSetUserData(CGEventSourceRef source, long userData);
+public extern "C" void CGEventSourceSetUserData(CGEventSourceRef? source, long userData);
 
-public extern "C" long CGEventSourceGetUserData(CGEventSourceRef source);
+public extern "C" long CGEventSourceGetUserData(CGEventSourceRef? source);
 
-public extern "C" void CGEventSourceSetLocalEventsFilterDuringSuppressionState(CGEventSourceRef source, CGEventFilterMask filter, CGEventSuppressionState state);
+public extern "C" void CGEventSourceSetLocalEventsFilterDuringSuppressionState(CGEventSourceRef? source, CGEventFilterMask filter, CGEventSuppressionState state);
 
-public extern "C" CGEventFilterMask CGEventSourceGetLocalEventsFilterDuringSuppressionState(CGEventSourceRef source, CGEventSuppressionState state);
+public extern "C" CGEventFilterMask CGEventSourceGetLocalEventsFilterDuringSuppressionState(CGEventSourceRef? source, CGEventSuppressionState state);
 
-public extern "C" void CGEventSourceSetLocalEventsSuppressionInterval(CGEventSourceRef source, CFTimeInterval seconds);
+public extern "C" void CGEventSourceSetLocalEventsSuppressionInterval(CGEventSourceRef? source, CFTimeInterval seconds);
 
-public extern "C" CFTimeInterval CGEventSourceGetLocalEventsSuppressionInterval(CGEventSourceRef source);
+public extern "C" CFTimeInterval CGEventSourceGetLocalEventsSuppressionInterval(CGEventSourceRef? source);
 
 #endif

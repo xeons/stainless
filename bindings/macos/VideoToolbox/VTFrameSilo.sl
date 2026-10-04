@@ -26,6 +26,7 @@ module MacOS.VideoToolbox;
 import MacOS.CoreFoundation;
 import MacOS.CoreMedia;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,11 +34,12 @@ import MacOS.System;
 
 public struct OpaqueVTFrameSilo;
 
-public using VTFrameSiloRef = OpaqueVTFrameSilo*;
+[CFType("VTFrameSiloGetTypeID")]
+public extern objc class VTFrameSiloRef : CFTypeRef { }
 
 public extern "C" CFTypeID VTFrameSiloGetTypeID();
 
-public extern "C" OSStatus VTFrameSiloCreate(CFAllocatorRef allocator, CFURLRef fileURL, CMTimeRange timeRange, CFDictionaryRef options, VTFrameSiloRef* frameSiloOut);
+public extern "C" OSStatus VTFrameSiloCreate(CFAllocatorRef? allocator, CFURLRef? fileURL, CMTimeRange timeRange, CFDictionaryRef? options, OpaqueVTFrameSilo** frameSiloOut);
 
 public extern "C" OSStatus VTFrameSiloAddSampleBuffer(VTFrameSiloRef silo, CMSampleBufferRef sampleBuffer);
 
@@ -45,12 +47,12 @@ public extern "C" OSStatus VTFrameSiloSetTimeRangesForNextPass(VTFrameSiloRef si
 
 public extern "C" OSStatus VTFrameSiloGetProgressOfCurrentPass(VTFrameSiloRef silo, Float32* progressOut);
 
-public delegate OSStatus VTFrameSiloCallFunctionForEachSampleBufferCallbackFunction(void* arg0, CMSampleBufferRef arg1);
+public delegate OSStatus VTFrameSiloCallFunctionForEachSampleBufferCallbackFunction(void* arg0, opaqueCMSampleBuffer* arg1);
 
 public extern "C" OSStatus VTFrameSiloCallFunctionForEachSampleBuffer(VTFrameSiloRef silo, CMTimeRange timeRange, void* refcon, VTFrameSiloCallFunctionForEachSampleBufferCallbackFunction callback);
 
 public objc closure OSStatus VTFrameSiloCallBlockForEachSampleBufferHandlerBlock(CMSampleBufferRef arg0);
 
-public extern "C" OSStatus VTFrameSiloCallBlockForEachSampleBuffer(VTFrameSiloRef silo, CMTimeRange timeRange, VTFrameSiloCallBlockForEachSampleBufferHandlerBlock handler);
+public extern "C" OSStatus VTFrameSiloCallBlockForEachSampleBuffer(VTFrameSiloRef silo, CMTimeRange timeRange, VTFrameSiloCallBlockForEachSampleBufferHandlerBlock? handler);
 
 #endif

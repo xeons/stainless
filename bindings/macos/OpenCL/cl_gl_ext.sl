@@ -23,8 +23,6 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.OpenCL;
 
-import MacOS.IOSurface;
-
 #if MACOS
 
 #pragma comment(framework, "OpenCL")
@@ -32,10 +30,6 @@ import MacOS.IOSurface;
 public extern "C" cl_int clGetGLContextInfoAPPLE(cl_context arg0, void* arg1, cl_gl_platform_info arg2, nuint arg3, void* arg4, nuint* arg5);
 
 public extern "C" cl_event clCreateEventFromGLsyncKHR(cl_context arg0, cl_GLsync arg1, cl_int* arg2);
-
-public using IOSurfaceRef = __IOSurface*;
-
-public extern "C" cl_mem clCreateImageFromIOSurface2DAPPLE(cl_context arg0, cl_mem_flags arg1, cl_image_format* arg2, nuint arg3, nuint arg4, IOSurfaceRef arg5, cl_int* arg6);
 
 public using cl_iosurface_properties_APPLE = nint;
 

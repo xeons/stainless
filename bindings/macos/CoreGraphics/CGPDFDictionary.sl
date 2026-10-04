@@ -23,6 +23,8 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreGraphics;
 
+import Standard.ObjC;
+
 #if MACOS
 
 #pragma comment(framework, "CoreGraphics")
@@ -57,6 +59,6 @@ public extern "C" void CGPDFDictionaryApplyFunction(CGPDFDictionaryRef dict, CGP
 
 public objc closure bool CGPDFDictionaryApplierBlock(byte* arg0, CGPDFObjectRef arg1, void* arg2);
 
-public extern "C" void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef dict, CGPDFDictionaryApplierBlock block, void* info);
+public extern "C" void CGPDFDictionaryApplyBlock(CGPDFDictionaryRef dict, CGPDFDictionaryApplierBlock? block, void* info);
 
 #endif

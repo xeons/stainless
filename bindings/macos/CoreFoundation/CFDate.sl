@@ -24,6 +24,7 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -41,22 +42,25 @@ public extern "C" CFTimeInterval kCFAbsoluteTimeIntervalSince1904;
 
 public struct __CFDate;
 
-public using CFDateRef = __CFDate*;
+[CFType("CFDateGetTypeID")]
+public extern objc class CFDateRef : CFTypeRef { }
 
 public extern "C" CFTypeID CFDateGetTypeID();
 
-public extern "C" CFDateRef CFDateCreate(CFAllocatorRef allocator, CFAbsoluteTime at);
+[ReturnsRetained] public extern "C" CFDateRef? CFDateCreate(CFAllocatorRef? allocator, CFAbsoluteTime at);
 
-public extern "C" CFAbsoluteTime CFDateGetAbsoluteTime(CFDateRef theDate);
+public extern "C" CFAbsoluteTime CFDateGetAbsoluteTime(CFDateRef? theDate);
 
-public extern "C" CFTimeInterval CFDateGetTimeIntervalSinceDate(CFDateRef theDate, CFDateRef otherDate);
+public extern "C" CFTimeInterval CFDateGetTimeIntervalSinceDate(CFDateRef? theDate, CFDateRef? otherDate);
 
-public extern "C" CFComparisonResult CFDateCompare(CFDateRef theDate, CFDateRef otherDate, void* context);
+public extern "C" CFComparisonResult CFDateCompare(CFDateRef? theDate, CFDateRef? otherDate, void* context);
 
 public struct __CFTimeZone;
 
-public using CFTimeZoneRef = __CFTimeZone*;
+[CFType("CFTimeZoneGetTypeID")]
+public extern objc class CFTimeZoneRef : CFTypeRef { }
 
+/// Deprecated in macOS 10.10.
 public struct CFGregorianDate
 {
     public SInt32 year;
@@ -67,6 +71,7 @@ public struct CFGregorianDate
     public double second;
 }
 
+/// Deprecated in macOS 10.10.
 public struct CFGregorianUnits
 {
     public SInt32 years;
@@ -93,24 +98,24 @@ public enum CFGregorianUnitFlags : ulong
 public extern "C" Boolean CFGregorianDateIsValid(CFGregorianDate gdate, CFOptionFlags unitFlags);
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFAbsoluteTime CFGregorianDateGetAbsoluteTime(CFGregorianDate gdate, CFTimeZoneRef tz);
+public extern "C" CFAbsoluteTime CFGregorianDateGetAbsoluteTime(CFGregorianDate gdate, CFTimeZoneRef? tz);
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFGregorianDate CFAbsoluteTimeGetGregorianDate(CFAbsoluteTime at, CFTimeZoneRef tz);
+public extern "C" CFGregorianDate CFAbsoluteTimeGetGregorianDate(CFAbsoluteTime at, CFTimeZoneRef? tz);
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFAbsoluteTime CFAbsoluteTimeAddGregorianUnits(CFAbsoluteTime at, CFTimeZoneRef tz, CFGregorianUnits units);
+public extern "C" CFAbsoluteTime CFAbsoluteTimeAddGregorianUnits(CFAbsoluteTime at, CFTimeZoneRef? tz, CFGregorianUnits units);
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFGregorianUnits CFAbsoluteTimeGetDifferenceAsGregorianUnits(CFAbsoluteTime at1, CFAbsoluteTime at2, CFTimeZoneRef tz, CFOptionFlags unitFlags);
+public extern "C" CFGregorianUnits CFAbsoluteTimeGetDifferenceAsGregorianUnits(CFAbsoluteTime at1, CFAbsoluteTime at2, CFTimeZoneRef? tz, CFOptionFlags unitFlags);
 
 /// Deprecated in macOS 10.10.
-public extern "C" SInt32 CFAbsoluteTimeGetDayOfWeek(CFAbsoluteTime at, CFTimeZoneRef tz);
+public extern "C" SInt32 CFAbsoluteTimeGetDayOfWeek(CFAbsoluteTime at, CFTimeZoneRef? tz);
 
 /// Deprecated in macOS 10.10.
-public extern "C" SInt32 CFAbsoluteTimeGetDayOfYear(CFAbsoluteTime at, CFTimeZoneRef tz);
+public extern "C" SInt32 CFAbsoluteTimeGetDayOfYear(CFAbsoluteTime at, CFTimeZoneRef? tz);
 
 /// Deprecated in macOS 10.10.
-public extern "C" SInt32 CFAbsoluteTimeGetWeekOfYear(CFAbsoluteTime at, CFTimeZoneRef tz);
+public extern "C" SInt32 CFAbsoluteTimeGetWeekOfYear(CFAbsoluteTime at, CFTimeZoneRef? tz);
 
 #endif

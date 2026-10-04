@@ -24,46 +24,47 @@
 module MacOS.Security;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "Security")
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestMD2;
+public extern "C" CFStringRef? kSecDigestMD2;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestMD4;
+public extern "C" CFStringRef? kSecDigestMD4;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestMD5;
+public extern "C" CFStringRef? kSecDigestMD5;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestSHA1;
+public extern "C" CFStringRef? kSecDigestSHA1;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestSHA2;
+public extern "C" CFStringRef? kSecDigestSHA2;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestHMACMD5;
+public extern "C" CFStringRef? kSecDigestHMACMD5;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestHMACSHA1;
+public extern "C" CFStringRef? kSecDigestHMACSHA1;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestHMACSHA2;
+public extern "C" CFStringRef? kSecDigestHMACSHA2;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestTypeAttribute;
+public extern "C" CFStringRef? kSecDigestTypeAttribute;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestLengthAttribute;
+public extern "C" CFStringRef? kSecDigestLengthAttribute;
 
 /// Deprecated in macOS 13.0.
-public extern "C" CFStringRef kSecDigestHMACKeyAttribute;
+public extern "C" CFStringRef? kSecDigestHMACKeyAttribute;
 
 /// Deprecated in macOS 13.0.
-public extern "C" SecTransformRef SecDigestTransformCreate(CFTypeRef digestType, CFIndex digestLength, CFErrorRef* error);
+[ReturnsRetained] public extern "C" SecTransformRef SecDigestTransformCreate(CFTypeRef? digestType, CFIndex digestLength, __CFError** error);
 
 /// Deprecated in macOS 13.0.
 public extern "C" CFTypeID SecDigestTransformGetTypeID();

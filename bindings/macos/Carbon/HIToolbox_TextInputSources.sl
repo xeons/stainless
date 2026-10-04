@@ -25,6 +25,7 @@ module MacOS.Carbon;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,92 +33,93 @@ import MacOS.System;
 
 public struct __TISInputSource;
 
-public using TISInputSourceRef = __TISInputSource*;
+[CFType("TISInputSourceGetTypeID")]
+public extern objc class TISInputSourceRef : CFTypeRef { }
 
 public extern "C" CFTypeID TISInputSourceGetTypeID();
 
-public extern "C" CFStringRef kTISPropertyInputSourceCategory;
+public extern "C" CFStringRef? kTISPropertyInputSourceCategory;
 
-public extern "C" CFStringRef kTISPropertyInputSourceType;
+public extern "C" CFStringRef? kTISPropertyInputSourceType;
 
-public extern "C" CFStringRef kTISPropertyInputSourceIsASCIICapable;
+public extern "C" CFStringRef? kTISPropertyInputSourceIsASCIICapable;
 
-public extern "C" CFStringRef kTISPropertyInputSourceIsEnableCapable;
+public extern "C" CFStringRef? kTISPropertyInputSourceIsEnableCapable;
 
-public extern "C" CFStringRef kTISPropertyInputSourceIsSelectCapable;
+public extern "C" CFStringRef? kTISPropertyInputSourceIsSelectCapable;
 
-public extern "C" CFStringRef kTISPropertyInputSourceIsEnabled;
+public extern "C" CFStringRef? kTISPropertyInputSourceIsEnabled;
 
-public extern "C" CFStringRef kTISPropertyInputSourceIsSelected;
+public extern "C" CFStringRef? kTISPropertyInputSourceIsSelected;
 
-public extern "C" CFStringRef kTISPropertyInputSourceID;
+public extern "C" CFStringRef? kTISPropertyInputSourceID;
 
-public extern "C" CFStringRef kTISPropertyBundleID;
+public extern "C" CFStringRef? kTISPropertyBundleID;
 
-public extern "C" CFStringRef kTISPropertyInputModeID;
+public extern "C" CFStringRef? kTISPropertyInputModeID;
 
-public extern "C" CFStringRef kTISPropertyLocalizedName;
+public extern "C" CFStringRef? kTISPropertyLocalizedName;
 
-public extern "C" CFStringRef kTISPropertyInputSourceLanguages;
+public extern "C" CFStringRef? kTISPropertyInputSourceLanguages;
 
-public extern "C" CFStringRef kTISPropertyUnicodeKeyLayoutData;
+public extern "C" CFStringRef? kTISPropertyUnicodeKeyLayoutData;
 
-public extern "C" CFStringRef kTISPropertyIconRef;
+public extern "C" CFStringRef? kTISPropertyIconRef;
 
-public extern "C" CFStringRef kTISPropertyIconImageURL;
+public extern "C" CFStringRef? kTISPropertyIconImageURL;
 
-public extern "C" CFStringRef kTISCategoryKeyboardInputSource;
+public extern "C" CFStringRef? kTISCategoryKeyboardInputSource;
 
-public extern "C" CFStringRef kTISCategoryPaletteInputSource;
+public extern "C" CFStringRef? kTISCategoryPaletteInputSource;
 
-public extern "C" CFStringRef kTISCategoryInkInputSource;
+public extern "C" CFStringRef? kTISCategoryInkInputSource;
 
-public extern "C" CFStringRef kTISTypeKeyboardLayout;
+public extern "C" CFStringRef? kTISTypeKeyboardLayout;
 
-public extern "C" CFStringRef kTISTypeKeyboardInputMethodWithoutModes;
+public extern "C" CFStringRef? kTISTypeKeyboardInputMethodWithoutModes;
 
-public extern "C" CFStringRef kTISTypeKeyboardInputMethodModeEnabled;
+public extern "C" CFStringRef? kTISTypeKeyboardInputMethodModeEnabled;
 
-public extern "C" CFStringRef kTISTypeKeyboardInputMode;
+public extern "C" CFStringRef? kTISTypeKeyboardInputMode;
 
-public extern "C" CFStringRef kTISTypeCharacterPalette;
+public extern "C" CFStringRef? kTISTypeCharacterPalette;
 
-public extern "C" CFStringRef kTISTypeKeyboardViewer;
+public extern "C" CFStringRef? kTISTypeKeyboardViewer;
 
-public extern "C" CFStringRef kTISTypeInk;
+public extern "C" CFStringRef? kTISTypeInk;
 
-public extern "C" void* TISGetInputSourceProperty(TISInputSourceRef inputSource, CFStringRef propertyKey);
+public extern "C" void* TISGetInputSourceProperty(TISInputSourceRef? inputSource, CFStringRef? propertyKey);
 
-public extern "C" CFArrayRef TISCreateInputSourceList(CFDictionaryRef properties, Boolean includeAllInstalled);
+[ReturnsRetained] public extern "C" CFArrayRef? TISCreateInputSourceList(CFDictionaryRef? properties, Boolean includeAllInstalled);
 
-public extern "C" TISInputSourceRef TISCopyCurrentKeyboardInputSource();
+[ReturnsRetained] public extern "C" TISInputSourceRef? TISCopyCurrentKeyboardInputSource();
 
-public extern "C" TISInputSourceRef TISCopyCurrentKeyboardLayoutInputSource();
+[ReturnsRetained] public extern "C" TISInputSourceRef? TISCopyCurrentKeyboardLayoutInputSource();
 
-public extern "C" TISInputSourceRef TISCopyCurrentASCIICapableKeyboardInputSource();
+[ReturnsRetained] public extern "C" TISInputSourceRef? TISCopyCurrentASCIICapableKeyboardInputSource();
 
-public extern "C" TISInputSourceRef TISCopyCurrentASCIICapableKeyboardLayoutInputSource();
+[ReturnsRetained] public extern "C" TISInputSourceRef? TISCopyCurrentASCIICapableKeyboardLayoutInputSource();
 
-public extern "C" TISInputSourceRef TISCopyInputSourceForLanguage(CFStringRef language);
+[ReturnsRetained] public extern "C" TISInputSourceRef? TISCopyInputSourceForLanguage(CFStringRef? language);
 
-public extern "C" CFArrayRef TISCreateASCIICapableInputSourceList();
+[ReturnsRetained] public extern "C" CFArrayRef? TISCreateASCIICapableInputSourceList();
 
-public extern "C" OSStatus TISSelectInputSource(TISInputSourceRef inputSource);
+public extern "C" OSStatus TISSelectInputSource(TISInputSourceRef? inputSource);
 
-public extern "C" OSStatus TISDeselectInputSource(TISInputSourceRef inputSource);
+public extern "C" OSStatus TISDeselectInputSource(TISInputSourceRef? inputSource);
 
-public extern "C" OSStatus TISEnableInputSource(TISInputSourceRef inputSource);
+public extern "C" OSStatus TISEnableInputSource(TISInputSourceRef? inputSource);
 
-public extern "C" OSStatus TISDisableInputSource(TISInputSourceRef inputSource);
+public extern "C" OSStatus TISDisableInputSource(TISInputSourceRef? inputSource);
 
-public extern "C" CFStringRef kTISNotifySelectedKeyboardInputSourceChanged;
+public extern "C" CFStringRef? kTISNotifySelectedKeyboardInputSourceChanged;
 
-public extern "C" CFStringRef kTISNotifyEnabledKeyboardInputSourcesChanged;
+public extern "C" CFStringRef? kTISNotifyEnabledKeyboardInputSourcesChanged;
 
-public extern "C" OSStatus TISSetInputMethodKeyboardLayoutOverride(TISInputSourceRef keyboardLayout);
+public extern "C" OSStatus TISSetInputMethodKeyboardLayoutOverride(TISInputSourceRef? keyboardLayout);
 
-public extern "C" TISInputSourceRef TISCopyInputMethodKeyboardLayoutOverride();
+[ReturnsRetained] public extern "C" TISInputSourceRef? TISCopyInputMethodKeyboardLayoutOverride();
 
-public extern "C" OSStatus TISRegisterInputSource(CFURLRef location);
+public extern "C" OSStatus TISRegisterInputSource(CFURLRef? location);
 
 #endif

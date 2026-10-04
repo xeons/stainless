@@ -24,6 +24,7 @@
 module MacOS.CoreServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -52,7 +53,7 @@ public delegate void* WSClientContextRetainCallBackProcPtr(void* arg0);
 
 public delegate void WSClientContextReleaseCallBackProcPtr(void* arg0);
 
-public delegate CFStringRef WSClientContextCopyDescriptionCallBackProcPtr(void* arg0);
+public delegate __CFString* WSClientContextCopyDescriptionCallBackProcPtr(void* arg0);
 
 [Pack(2)]
 public struct WSClientContext
@@ -65,16 +66,16 @@ public struct WSClientContext
 }
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSXMLRPCProtocol;
+public extern "C" CFStringRef? kWSXMLRPCProtocol;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSSOAP1999Protocol;
+public extern "C" CFStringRef? kWSSOAP1999Protocol;
 
 /// Deprecated in macOS 10.8.
-public extern "C" CFStringRef kWSSOAP2001Protocol;
+public extern "C" CFStringRef? kWSSOAP2001Protocol;
 
 /// Deprecated in macOS 10.8.
-public extern "C" WSTypeID WSGetWSTypeIDFromCFType(CFTypeRef @ref);
+public extern "C" WSTypeID WSGetWSTypeIDFromCFType(CFTypeRef? @ref);
 
 /// Deprecated in macOS 10.8.
 public extern "C" CFTypeID WSGetCFTypeIDFromWSTypeID(WSTypeID typeID);

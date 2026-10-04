@@ -24,16 +24,17 @@
 module MacOS.CoreFoundation;
 
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreFoundation")
 
-public delegate void* CFBagRetainCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void* CFBagRetainCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate void CFBagReleaseCallBack(CFAllocatorRef arg0, void* arg1);
+public delegate void CFBagReleaseCallBack(__CFAllocator* arg0, void* arg1);
 
-public delegate CFStringRef CFBagCopyDescriptionCallBack(void* arg0);
+public delegate __CFString* CFBagCopyDescriptionCallBack(void* arg0);
 
 public delegate Boolean CFBagEqualCallBack(void* arg0, void* arg1);
 
@@ -57,42 +58,44 @@ public delegate void CFBagApplierFunction(void* arg0, void* arg1);
 
 public struct __CFBag;
 
-public using CFBagRef = __CFBag*;
+[CFType("CFBagGetTypeID")]
+public extern objc class CFBagRef : CFTypeRef { }
 
-public using CFMutableBagRef = __CFBag*;
+[CFType]
+public extern objc class CFMutableBagRef : CFBagRef { }
 
 public extern "C" CFTypeID CFBagGetTypeID();
 
-public extern "C" CFBagRef CFBagCreate(CFAllocatorRef allocator, void** values, CFIndex numValues, CFBagCallBacks* callBacks);
+[ReturnsRetained] public extern "C" CFBagRef? CFBagCreate(CFAllocatorRef? allocator, void** values, CFIndex numValues, CFBagCallBacks* callBacks);
 
-public extern "C" CFBagRef CFBagCreateCopy(CFAllocatorRef allocator, CFBagRef theBag);
+[ReturnsRetained] public extern "C" CFBagRef? CFBagCreateCopy(CFAllocatorRef? allocator, CFBagRef? theBag);
 
-public extern "C" CFMutableBagRef CFBagCreateMutable(CFAllocatorRef allocator, CFIndex capacity, CFBagCallBacks* callBacks);
+[ReturnsRetained] public extern "C" CFMutableBagRef? CFBagCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, CFBagCallBacks* callBacks);
 
-public extern "C" CFMutableBagRef CFBagCreateMutableCopy(CFAllocatorRef allocator, CFIndex capacity, CFBagRef theBag);
+[ReturnsRetained] public extern "C" CFMutableBagRef? CFBagCreateMutableCopy(CFAllocatorRef? allocator, CFIndex capacity, CFBagRef? theBag);
 
-public extern "C" CFIndex CFBagGetCount(CFBagRef theBag);
+public extern "C" CFIndex CFBagGetCount(CFBagRef? theBag);
 
-public extern "C" CFIndex CFBagGetCountOfValue(CFBagRef theBag, void* value);
+public extern "C" CFIndex CFBagGetCountOfValue(CFBagRef? theBag, void* value);
 
-public extern "C" Boolean CFBagContainsValue(CFBagRef theBag, void* value);
+public extern "C" Boolean CFBagContainsValue(CFBagRef? theBag, void* value);
 
-public extern "C" void* CFBagGetValue(CFBagRef theBag, void* value);
+public extern "C" void* CFBagGetValue(CFBagRef? theBag, void* value);
 
-public extern "C" Boolean CFBagGetValueIfPresent(CFBagRef theBag, void* candidate, void** value);
+public extern "C" Boolean CFBagGetValueIfPresent(CFBagRef? theBag, void* candidate, void** value);
 
-public extern "C" void CFBagGetValues(CFBagRef theBag, void** values);
+public extern "C" void CFBagGetValues(CFBagRef? theBag, void** values);
 
-public extern "C" void CFBagApplyFunction(CFBagRef theBag, CFBagApplierFunction applier, void* context);
+public extern "C" void CFBagApplyFunction(CFBagRef? theBag, CFBagApplierFunction applier, void* context);
 
-public extern "C" void CFBagAddValue(CFMutableBagRef theBag, void* value);
+public extern "C" void CFBagAddValue(CFMutableBagRef? theBag, void* value);
 
-public extern "C" void CFBagReplaceValue(CFMutableBagRef theBag, void* value);
+public extern "C" void CFBagReplaceValue(CFMutableBagRef? theBag, void* value);
 
-public extern "C" void CFBagSetValue(CFMutableBagRef theBag, void* value);
+public extern "C" void CFBagSetValue(CFMutableBagRef? theBag, void* value);
 
-public extern "C" void CFBagRemoveValue(CFMutableBagRef theBag, void* value);
+public extern "C" void CFBagRemoveValue(CFMutableBagRef? theBag, void* value);
 
-public extern "C" void CFBagRemoveAllValues(CFMutableBagRef theBag);
+public extern "C" void CFBagRemoveAllValues(CFMutableBagRef? theBag);
 
 #endif

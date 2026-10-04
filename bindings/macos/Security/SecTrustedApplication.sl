@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -34,10 +35,10 @@ import MacOS.System;
 public extern "C" CFTypeID SecTrustedApplicationGetTypeID();
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecTrustedApplicationCreateFromPath(byte* path, SecTrustedApplicationRef* app);
+public extern "C" OSStatus SecTrustedApplicationCreateFromPath(byte* path, __SecTrustedApplication** app);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecTrustedApplicationCopyData(SecTrustedApplicationRef appRef, CFDataRef* data);
+public extern "C" OSStatus SecTrustedApplicationCopyData(SecTrustedApplicationRef appRef, __CFData** data);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecTrustedApplicationSetData(SecTrustedApplicationRef appRef, CFDataRef data);

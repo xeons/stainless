@@ -25,6 +25,7 @@ module MacOS.CoreText;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,7 +33,8 @@ import MacOS.CoreGraphics;
 
 public struct __CTRun;
 
-public using CTRunRef = __CTRun*;
+[CFType("CTRunGetTypeID")]
+public extern objc class CTRunRef : CFTypeRef { }
 
 [Flags]
 public enum CTRunStatus : uint
@@ -71,7 +73,7 @@ public extern "C" CFRange CTRunGetStringRange(CTRunRef run);
 
 public extern "C" double CTRunGetTypographicBounds(CTRunRef run, CFRange range, CGFloat* ascent, CGFloat* descent, CGFloat* leading);
 
-public extern "C" CGRect CTRunGetImageBounds(CTRunRef run, CGContextRef context, CFRange range);
+public extern "C" CGRect CTRunGetImageBounds(CTRunRef run, CGContextRef? context, CFRange range);
 
 public extern "C" CGAffineTransform CTRunGetTextMatrix(CTRunRef run);
 

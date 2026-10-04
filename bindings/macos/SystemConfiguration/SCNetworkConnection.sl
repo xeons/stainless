@@ -25,6 +25,7 @@ module MacOS.SystemConfiguration;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -32,13 +33,14 @@ import MacOS.System;
 
 public struct __SCNetworkConnection;
 
-public using SCNetworkConnectionRef = __SCNetworkConnection*;
+[CFType("SCNetworkConnectionGetTypeID")]
+public extern objc class SCNetworkConnectionRef : CFTypeRef { }
 
 public delegate void* SCNetworkConnectionContextRetainFunction(void* arg0);
 
 public delegate void SCNetworkConnectionContextReleaseFunction(void* arg0);
 
-public delegate CFStringRef SCNetworkConnectionContextCopyDescriptionFunction(void* arg0);
+public delegate __CFString* SCNetworkConnectionContextCopyDescriptionFunction(void* arg0);
 
 public struct SCNetworkConnectionContext
 {
@@ -76,30 +78,32 @@ public enum SCNetworkConnectionPPPStatus : int
     WaitingForRedial = 13,
 }
 
-public delegate void SCNetworkConnectionCallBack(SCNetworkConnectionRef arg0, SCNetworkConnectionStatus arg1, void* arg2);
+public delegate void SCNetworkConnectionCallBack(__SCNetworkConnection* arg0, SCNetworkConnectionStatus arg1, void* arg2);
 
 public extern "C" CFTypeID SCNetworkConnectionGetTypeID();
 
-public extern "C" Boolean SCNetworkConnectionCopyUserPreferences(CFDictionaryRef selectionOptions, CFStringRef* serviceID, CFDictionaryRef* userOptions);
+public extern "C" Boolean SCNetworkConnectionCopyUserPreferences(CFDictionaryRef? selectionOptions, __CFString** serviceID, __CFDictionary** userOptions);
 
-public extern "C" SCNetworkConnectionRef SCNetworkConnectionCreateWithServiceID(CFAllocatorRef allocator, CFStringRef serviceID, SCNetworkConnectionCallBack callout, SCNetworkConnectionContext* context);
+[ReturnsRetained] public extern "C" SCNetworkConnectionRef? SCNetworkConnectionCreateWithServiceID(CFAllocatorRef? allocator, CFStringRef serviceID, SCNetworkConnectionCallBack callout, SCNetworkConnectionContext* context);
 
-public extern "C" CFStringRef SCNetworkConnectionCopyServiceID(SCNetworkConnectionRef connection);
+[ReturnsRetained] public extern "C" CFStringRef? SCNetworkConnectionCopyServiceID(SCNetworkConnectionRef connection);
 
 public extern "C" SCNetworkConnectionStatus SCNetworkConnectionGetStatus(SCNetworkConnectionRef connection);
 
-public extern "C" CFDictionaryRef SCNetworkConnectionCopyExtendedStatus(SCNetworkConnectionRef connection);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SCNetworkConnectionCopyExtendedStatus(SCNetworkConnectionRef connection);
 
-public extern "C" CFDictionaryRef SCNetworkConnectionCopyStatistics(SCNetworkConnectionRef connection);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SCNetworkConnectionCopyStatistics(SCNetworkConnectionRef connection);
 
-public extern "C" Boolean SCNetworkConnectionStart(SCNetworkConnectionRef connection, CFDictionaryRef userOptions, Boolean linger);
+public extern "C" Boolean SCNetworkConnectionStart(SCNetworkConnectionRef connection, CFDictionaryRef? userOptions, Boolean linger);
 
 public extern "C" Boolean SCNetworkConnectionStop(SCNetworkConnectionRef connection, Boolean forceDisconnect);
 
-public extern "C" CFDictionaryRef SCNetworkConnectionCopyUserOptions(SCNetworkConnectionRef connection);
+[ReturnsRetained] public extern "C" CFDictionaryRef? SCNetworkConnectionCopyUserOptions(SCNetworkConnectionRef connection);
 
 public extern "C" Boolean SCNetworkConnectionScheduleWithRunLoop(SCNetworkConnectionRef connection, CFRunLoopRef runLoop, CFStringRef runLoopMode);
 
 public extern "C" Boolean SCNetworkConnectionUnscheduleFromRunLoop(SCNetworkConnectionRef connection, CFRunLoopRef runLoop, CFStringRef runLoopMode);
+
+public extern "C" Boolean SCNetworkConnectionSetDispatchQueue(SCNetworkConnectionRef connection, dispatch_queue_t? queue);
 
 #endif

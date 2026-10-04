@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,7 +32,8 @@ import MacOS.CoreFoundation;
 
 public struct CGImage;
 
-public using CGImageRef = CGImage*;
+[CFType("CGImageGetTypeID")]
+public extern objc class CGImageRef : CFTypeRef { }
 
 public enum CGImageAlphaInfo : uint
 {
@@ -92,91 +94,87 @@ public enum CGBitmapInfo : uint
 
 public extern "C" CFTypeID CGImageGetTypeID();
 
-public extern "C" CGImageRef CGImageCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef space, CGBitmapInfo bitmapInfo, CGDataProviderRef provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-public extern "C" CGImageRef CGImageMaskCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGDataProviderRef provider, CGFloat* decode, bool shouldInterpolate);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageMaskCreate(nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate);
 
-public extern "C" CGImageRef CGImageCreateCopy(CGImageRef image);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopy(CGImageRef? image);
 
-public extern "C" CGImageRef CGImageCreateWithJPEGDataProvider(CGDataProviderRef source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithJPEGDataProvider(CGDataProviderRef? source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-public extern "C" CGImageRef CGImageCreateWithPNGDataProvider(CGDataProviderRef source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithPNGDataProvider(CGDataProviderRef? source, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-public extern "C" CGImageRef CGImageCreateWithImageInRect(CGImageRef image, CGRect rect);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithImageInRect(CGImageRef? image, CGRect rect);
 
-public extern "C" CGImageRef CGImageCreateWithMask(CGImageRef image, CGImageRef mask);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithMask(CGImageRef? image, CGImageRef? mask);
 
-public extern "C" CGImageRef CGImageCreateWithMaskingColors(CGImageRef image, CGFloat* components);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithMaskingColors(CGImageRef? image, CGFloat* components);
 
-public extern "C" CGImageRef CGImageCreateCopyWithColorSpace(CGImageRef image, CGColorSpaceRef space);
-
-/// macOS 15.0 and later.
-public extern "C" CGImageRef CGImageCreateWithContentHeadroom(float headroom, nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef space, CGBitmapInfo bitmapInfo, CGDataProviderRef provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithColorSpace(CGImageRef? image, CGColorSpaceRef? space);
 
 /// macOS 15.0 and later.
-public extern "C" CGImageRef CGImageCreateCopyWithContentHeadroom(float headroom, CGImageRef image);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithContentHeadroom(float headroom, nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
+
+/// macOS 15.0 and later.
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithContentHeadroom(float headroom, CGImageRef? image);
 
 /// macOS 15.0 and later.
 public extern "C" float kCGDefaultHDRImageContentHeadroom;
 
 /// macOS 15.0 and later.
-public extern "C" float CGImageGetContentHeadroom(CGImageRef image);
+public extern "C" float CGImageGetContentHeadroom(CGImageRef? image);
 
 /// macOS 26.0 and later.
-public extern "C" float CGImageCalculateContentHeadroom(CGImageRef image);
+public extern "C" float CGImageCalculateContentHeadroom(CGImageRef? image);
 
 /// macOS 26.0 and later.
-public extern "C" float CGImageGetContentAverageLightLevel(CGImageRef image);
+public extern "C" float CGImageGetContentAverageLightLevel(CGImageRef? image);
 
 /// macOS 26.0 and later.
-public extern "C" float CGImageCalculateContentAverageLightLevel(CGImageRef image);
+public extern "C" float CGImageCalculateContentAverageLightLevel(CGImageRef? image);
 
 /// macOS 26.0 and later.
-public extern "C" CGImageRef CGImageCreateCopyWithContentAverageLightLevel(CGImageRef image, float avll);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithContentAverageLightLevel(CGImageRef? image, float avll);
 
 /// macOS 26.0 and later.
-public extern "C" CGImageRef CGImageCreateCopyWithCalculatedHDRStats(CGImageRef image);
+[ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithCalculatedHDRStats(CGImageRef? image);
 
-public extern "C" CGImageRef CGImageRetain(CGImageRef image);
+public extern "C" bool CGImageIsMask(CGImageRef? image);
 
-public extern "C" void CGImageRelease(CGImageRef image);
+public extern "C" nuint CGImageGetWidth(CGImageRef? image);
 
-public extern "C" bool CGImageIsMask(CGImageRef image);
+public extern "C" nuint CGImageGetHeight(CGImageRef? image);
 
-public extern "C" nuint CGImageGetWidth(CGImageRef image);
+public extern "C" nuint CGImageGetBitsPerComponent(CGImageRef? image);
 
-public extern "C" nuint CGImageGetHeight(CGImageRef image);
+public extern "C" nuint CGImageGetBitsPerPixel(CGImageRef? image);
 
-public extern "C" nuint CGImageGetBitsPerComponent(CGImageRef image);
+public extern "C" nuint CGImageGetBytesPerRow(CGImageRef? image);
 
-public extern "C" nuint CGImageGetBitsPerPixel(CGImageRef image);
+public extern "C" CGColorSpaceRef? CGImageGetColorSpace(CGImageRef? image);
 
-public extern "C" nuint CGImageGetBytesPerRow(CGImageRef image);
+public extern "C" CGImageAlphaInfo CGImageGetAlphaInfo(CGImageRef? image);
 
-public extern "C" CGColorSpaceRef CGImageGetColorSpace(CGImageRef image);
+public extern "C" CGDataProviderRef? CGImageGetDataProvider(CGImageRef? image);
 
-public extern "C" CGImageAlphaInfo CGImageGetAlphaInfo(CGImageRef image);
+public extern "C" CGFloat* CGImageGetDecode(CGImageRef? image);
 
-public extern "C" CGDataProviderRef CGImageGetDataProvider(CGImageRef image);
+public extern "C" bool CGImageGetShouldInterpolate(CGImageRef? image);
 
-public extern "C" CGFloat* CGImageGetDecode(CGImageRef image);
+public extern "C" CGColorRenderingIntent CGImageGetRenderingIntent(CGImageRef? image);
 
-public extern "C" bool CGImageGetShouldInterpolate(CGImageRef image);
+public extern "C" CGBitmapInfo CGImageGetBitmapInfo(CGImageRef? image);
 
-public extern "C" CGColorRenderingIntent CGImageGetRenderingIntent(CGImageRef image);
+public extern "C" CGImageByteOrderInfo CGImageGetByteOrderInfo(CGImageRef? image);
 
-public extern "C" CGBitmapInfo CGImageGetBitmapInfo(CGImageRef image);
-
-public extern "C" CGImageByteOrderInfo CGImageGetByteOrderInfo(CGImageRef image);
-
-public extern "C" CGImagePixelFormatInfo CGImageGetPixelFormatInfo(CGImageRef image);
+public extern "C" CGImagePixelFormatInfo CGImageGetPixelFormatInfo(CGImageRef? image);
 
 /// macOS 15.0 and later.
-public extern "C" bool CGImageShouldToneMap(CGImageRef image);
+public extern "C" bool CGImageShouldToneMap(CGImageRef? image);
 
 /// macOS 15.0 and later.
-public extern "C" bool CGImageContainsImageSpecificToneMappingMetadata(CGImageRef image);
+public extern "C" bool CGImageContainsImageSpecificToneMappingMetadata(CGImageRef? image);
 
-public extern "C" CFStringRef CGImageGetUTType(CGImageRef image);
+public extern "C" CFStringRef? CGImageGetUTType(CGImageRef? image);
 
 #endif

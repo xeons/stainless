@@ -24,56 +24,57 @@
 module MacOS.ApplicationServices;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "ApplicationServices")
 
-public extern "C" CFStringRef kAXFontTextAttribute;
+public extern "C" CFStringRef? kAXFontTextAttribute;
 
-public extern "C" CFStringRef kAXForegroundColorTextAttribute;
+public extern "C" CFStringRef? kAXForegroundColorTextAttribute;
 
-public extern "C" CFStringRef kAXBackgroundColorTextAttribute;
+public extern "C" CFStringRef? kAXBackgroundColorTextAttribute;
 
-public extern "C" CFStringRef kAXUnderlineColorTextAttribute;
+public extern "C" CFStringRef? kAXUnderlineColorTextAttribute;
 
-public extern "C" CFStringRef kAXStrikethroughColorTextAttribute;
+public extern "C" CFStringRef? kAXStrikethroughColorTextAttribute;
 
-public extern "C" CFStringRef kAXUnderlineTextAttribute;
+public extern "C" CFStringRef? kAXUnderlineTextAttribute;
 
-public extern "C" CFStringRef kAXSuperscriptTextAttribute;
+public extern "C" CFStringRef? kAXSuperscriptTextAttribute;
 
-public extern "C" CFStringRef kAXStrikethroughTextAttribute;
+public extern "C" CFStringRef? kAXStrikethroughTextAttribute;
 
-public extern "C" CFStringRef kAXShadowTextAttribute;
+public extern "C" CFStringRef? kAXShadowTextAttribute;
 
-public extern "C" CFStringRef kAXAttachmentTextAttribute;
+public extern "C" CFStringRef? kAXAttachmentTextAttribute;
 
-public extern "C" CFStringRef kAXLinkTextAttribute;
+public extern "C" CFStringRef? kAXLinkTextAttribute;
 
-public extern "C" CFStringRef kAXNaturalLanguageTextAttribute;
+public extern "C" CFStringRef? kAXNaturalLanguageTextAttribute;
 
-public extern "C" CFStringRef kAXReplacementStringTextAttribute;
+public extern "C" CFStringRef? kAXReplacementStringTextAttribute;
 
-public extern "C" CFStringRef kAXMisspelledTextAttribute;
+public extern "C" CFStringRef? kAXMisspelledTextAttribute;
 
-public extern "C" CFStringRef kAXMarkedMisspelledTextAttribute;
+public extern "C" CFStringRef? kAXMarkedMisspelledTextAttribute;
 
-public extern "C" CFStringRef kAXAutocorrectedTextAttribute;
+public extern "C" CFStringRef? kAXAutocorrectedTextAttribute;
 
-public extern "C" CFStringRef kAXListItemPrefixTextAttribute;
+public extern "C" CFStringRef? kAXListItemPrefixTextAttribute;
 
-public extern "C" CFStringRef kAXListItemIndexTextAttribute;
+public extern "C" CFStringRef? kAXListItemIndexTextAttribute;
 
-public extern "C" CFStringRef kAXListItemLevelTextAttribute;
+public extern "C" CFStringRef? kAXListItemLevelTextAttribute;
 
-public extern "C" CFStringRef kAXFontNameKey;
+public extern "C" CFStringRef? kAXFontNameKey;
 
-public extern "C" CFStringRef kAXFontFamilyKey;
+public extern "C" CFStringRef? kAXFontFamilyKey;
 
-public extern "C" CFStringRef kAXVisibleNameKey;
+public extern "C" CFStringRef? kAXVisibleNameKey;
 
-public extern "C" CFStringRef kAXFontSizeKey;
+public extern "C" CFStringRef? kAXFontSizeKey;
 
 public enum AXUnderlineStyle : uint
 {
@@ -83,6 +84,6 @@ public enum AXUnderlineStyle : uint
     Double = 9,
 }
 
-public extern "C" CFStringRef kAXForegoundColorTextAttribute;
+public extern "C" CFStringRef? kAXForegoundColorTextAttribute;
 
 #endif

@@ -26,6 +26,7 @@ module MacOS.Carbon;
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -97,7 +98,7 @@ public extern "C" OSStatus RunCurrentEventLoop(EventTimeout inTimeout);
 
 public extern "C" OSStatus QuitEventLoop(EventLoopRef inEventLoop);
 
-public extern "C" CFTypeRef GetCFRunLoopFromEventLoop(EventLoopRef inEventLoop);
+public extern "C" CFTypeRef? GetCFRunLoopFromEventLoop(EventLoopRef inEventLoop);
 
 public extern "C" OSStatus ReceiveNextEvent(ItemCount inNumTypes, EventTypeSpec* inList, EventTimeout inTimeout, Boolean inPullEvent, EventRef* outEvent);
 
@@ -107,11 +108,11 @@ public const int kEventAttributeNone = 0;
 public const int kEventAttributeUserEvent = 1;
 public const int kEventAttributeMonitored = 8;
 
-public extern "C" OSStatus CreateEvent(CFAllocatorRef inAllocator, OSType inClassID, UInt32 inKind, EventTime inWhen, EventAttributes inAttributes, EventRef* outEvent);
+public extern "C" OSStatus CreateEvent(CFAllocatorRef? inAllocator, OSType inClassID, UInt32 inKind, EventTime inWhen, EventAttributes inAttributes, EventRef* outEvent);
 
 public extern "C" EventRef CopyEvent(EventRef inOther);
 
-public extern "C" EventRef CopyEventAs(CFAllocatorRef inAllocator, EventRef inOther, OSType inEventClass, UInt32 inEventKind);
+public extern "C" EventRef CopyEventAs(CFAllocatorRef? inAllocator, EventRef inOther, OSType inEventClass, UInt32 inEventKind);
 
 public extern "C" EventRef RetainEvent(EventRef inEvent);
 
@@ -133,9 +134,9 @@ public extern "C" EventTime GetEventTime(EventRef inEvent);
 
 public extern "C" OSStatus SetEventTime(EventRef inEvent, EventTime inTime);
 
-public extern "C" OSStatus CreateEventWithCGEvent(CFAllocatorRef inAllocator, CGEventRef inEvent, EventAttributes inAttributes, EventRef* outEvent);
+public extern "C" OSStatus CreateEventWithCGEvent(CFAllocatorRef? inAllocator, CGEventRef? inEvent, EventAttributes inAttributes, EventRef* outEvent);
 
-public extern "C" CGEventRef CopyEventCGEvent(EventRef inEvent);
+[ReturnsRetained] public extern "C" CGEventRef? CopyEventCGEvent(EventRef inEvent);
 
 public struct OpaqueEventQueueRef;
 

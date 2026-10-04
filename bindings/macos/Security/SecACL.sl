@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -44,31 +45,31 @@ public enum SecKeychainPromptSelector : ushort
 public extern "C" CFTypeID SecACLGetTypeID();
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecACLCreateFromSimpleContents(SecAccessRef access, CFArrayRef applicationList, CFStringRef description, CSSM_ACL_KEYCHAIN_PROMPT_SELECTOR* promptSelector, SecACLRef* newAcl);
+public extern "C" OSStatus SecACLCreateFromSimpleContents(SecAccessRef access, CFArrayRef? applicationList, CFStringRef description, CSSM_ACL_KEYCHAIN_PROMPT_SELECTOR* promptSelector, __SecACL** newAcl);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecACLCreateWithSimpleContents(SecAccessRef access, CFArrayRef applicationList, CFStringRef description, SecKeychainPromptSelector promptSelector, SecACLRef* newAcl);
+public extern "C" OSStatus SecACLCreateWithSimpleContents(SecAccessRef access, CFArrayRef? applicationList, CFStringRef description, SecKeychainPromptSelector promptSelector, __SecACL** newAcl);
 
 /// Deprecated in macOS 10.10.
 public extern "C" OSStatus SecACLRemove(SecACLRef aclRef);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecACLCopySimpleContents(SecACLRef acl, CFArrayRef* applicationList, CFStringRef* description, CSSM_ACL_KEYCHAIN_PROMPT_SELECTOR* promptSelector);
+public extern "C" OSStatus SecACLCopySimpleContents(SecACLRef acl, __CFArray** applicationList, __CFString** description, CSSM_ACL_KEYCHAIN_PROMPT_SELECTOR* promptSelector);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecACLCopyContents(SecACLRef acl, CFArrayRef* applicationList, CFStringRef* description, SecKeychainPromptSelector* promptSelector);
+public extern "C" OSStatus SecACLCopyContents(SecACLRef acl, __CFArray** applicationList, __CFString** description, SecKeychainPromptSelector* promptSelector);
 
 /// Deprecated in macOS 10.7.
-public extern "C" OSStatus SecACLSetSimpleContents(SecACLRef acl, CFArrayRef applicationList, CFStringRef description, CSSM_ACL_KEYCHAIN_PROMPT_SELECTOR* promptSelector);
+public extern "C" OSStatus SecACLSetSimpleContents(SecACLRef acl, CFArrayRef? applicationList, CFStringRef description, CSSM_ACL_KEYCHAIN_PROMPT_SELECTOR* promptSelector);
 
 /// Deprecated in macOS 10.10.
-public extern "C" OSStatus SecACLSetContents(SecACLRef acl, CFArrayRef applicationList, CFStringRef description, SecKeychainPromptSelector promptSelector);
+public extern "C" OSStatus SecACLSetContents(SecACLRef acl, CFArrayRef? applicationList, CFStringRef description, SecKeychainPromptSelector promptSelector);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecACLGetAuthorizations(SecACLRef acl, CSSM_ACL_AUTHORIZATION_TAG* tags, uint32* tagCount);
 
 /// Deprecated in macOS 10.10.
-public extern "C" CFArrayRef SecACLCopyAuthorizations(SecACLRef acl);
+[ReturnsRetained] public extern "C" CFArrayRef SecACLCopyAuthorizations(SecACLRef acl);
 
 /// Deprecated in macOS 10.7.
 public extern "C" OSStatus SecACLSetAuthorizations(SecACLRef acl, CSSM_ACL_AUTHORIZATION_TAG* tags, uint32 tagCount);

@@ -24,6 +24,7 @@
 module MacOS.CoreMedia;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -36,15 +37,15 @@ public using CMAttachmentMode = uint;
 public const uint kCMAttachmentMode_ShouldNotPropagate = 0;
 public const uint kCMAttachmentMode_ShouldPropagate = 1;
 
-public extern "C" void CMSetAttachment(CMAttachmentBearerRef target, CFStringRef key, CFTypeRef value, CMAttachmentMode attachmentMode);
+public extern "C" void CMSetAttachment(CMAttachmentBearerRef target, CFStringRef key, CFTypeRef? value, CMAttachmentMode attachmentMode);
 
-public extern "C" CFTypeRef CMGetAttachment(CMAttachmentBearerRef target, CFStringRef key, CMAttachmentMode* attachmentModeOut);
+public extern "C" CFTypeRef? CMGetAttachment(CMAttachmentBearerRef target, CFStringRef key, CMAttachmentMode* attachmentModeOut);
 
 public extern "C" void CMRemoveAttachment(CMAttachmentBearerRef target, CFStringRef key);
 
 public extern "C" void CMRemoveAllAttachments(CMAttachmentBearerRef target);
 
-public extern "C" CFDictionaryRef CMCopyDictionaryOfAttachments(CFAllocatorRef allocator, CMAttachmentBearerRef target, CMAttachmentMode attachmentMode);
+[ReturnsRetained] public extern "C" CFDictionaryRef? CMCopyDictionaryOfAttachments(CFAllocatorRef? allocator, CMAttachmentBearerRef target, CMAttachmentMode attachmentMode);
 
 public extern "C" void CMSetAttachments(CMAttachmentBearerRef target, CFDictionaryRef theAttachments, CMAttachmentMode attachmentMode);
 

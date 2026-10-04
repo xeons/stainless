@@ -24,18 +24,25 @@
 module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
+import MacOS.Metal;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "CoreVideo")
 
-public extern "C" CFStringRef kCVMetalTextureCacheMaximumTextureAgeKey;
+public extern "C" CFStringRef? kCVMetalTextureCacheMaximumTextureAgeKey;
 
 public struct __CVMetalTextureCache;
 
-public using CVMetalTextureCacheRef = __CVMetalTextureCache*;
+[CFType("CVMetalTextureCacheGetTypeID")]
+public extern objc class CVMetalTextureCacheRef : CFTypeRef { }
 
 public extern "C" CFTypeID CVMetalTextureCacheGetTypeID();
+
+public extern "C" CVReturn CVMetalTextureCacheCreate(CFAllocatorRef? allocator, CFDictionaryRef? cacheAttributes, MTLDevice metalDevice, CFDictionaryRef? textureAttributes, __CVMetalTextureCache** cacheOut);
+
+public extern "C" CVReturn CVMetalTextureCacheCreateTextureFromImage(CFAllocatorRef? allocator, CVMetalTextureCacheRef textureCache, CVImageBufferRef sourceImage, CFDictionaryRef? textureAttributes, MTLPixelFormat pixelFormat, nuint width, nuint height, nuint planeIndex, void** textureOut);
 
 public extern "C" void CVMetalTextureCacheFlush(CVMetalTextureCacheRef textureCache, CVOptionFlags options);
 

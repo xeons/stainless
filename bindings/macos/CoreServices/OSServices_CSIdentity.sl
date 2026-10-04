@@ -26,6 +26,7 @@ module MacOS.CoreServices;
 import MacOS.CoreFoundation;
 import MacOS.Security;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -33,13 +34,15 @@ import MacOS.System;
 
 public struct __CSIdentity;
 
-public using CSIdentityRef = __CSIdentity*;
+[CFType("CSIdentityGetTypeID")]
+public extern objc class CSIdentityRef : CFTypeRef { }
 
 public struct __CSIdentityQuery;
 
-public using CSIdentityQueryRef = __CSIdentityQuery*;
+[CFType("CSIdentityQueryGetTypeID")]
+public extern objc class CSIdentityQueryRef : CFTypeRef { }
 
-public extern "C" CFStringRef kCSIdentityGeneratePosixName;
+public extern "C" CFStringRef? kCSIdentityGeneratePosixName;
 
 public const int kCSIdentityClassUser = 1;
 public const int kCSIdentityClassGroup = 2;
@@ -53,75 +56,75 @@ public using CSIdentityFlags = CFOptionFlags;
 
 public extern "C" CFTypeID CSIdentityGetTypeID();
 
-public extern "C" CSIdentityRef CSIdentityCreate(CFAllocatorRef allocator, CSIdentityClass identityClass, CFStringRef fullName, CFStringRef posixName, CSIdentityFlags flags, CSIdentityAuthorityRef authority);
+[ReturnsRetained] public extern "C" CSIdentityRef? CSIdentityCreate(CFAllocatorRef? allocator, CSIdentityClass identityClass, CFStringRef? fullName, CFStringRef? posixName, CSIdentityFlags flags, CSIdentityAuthorityRef? authority);
 
-public extern "C" CSIdentityRef CSIdentityCreateCopy(CFAllocatorRef allocator, CSIdentityRef identity);
+[ReturnsRetained] public extern "C" CSIdentityRef? CSIdentityCreateCopy(CFAllocatorRef? allocator, CSIdentityRef? identity);
 
-public extern "C" CSIdentityClass CSIdentityGetClass(CSIdentityRef identity);
+public extern "C" CSIdentityClass CSIdentityGetClass(CSIdentityRef? identity);
 
-public extern "C" CSIdentityAuthorityRef CSIdentityGetAuthority(CSIdentityRef identity);
+public extern "C" CSIdentityAuthorityRef? CSIdentityGetAuthority(CSIdentityRef? identity);
 
-public extern "C" CFUUIDRef CSIdentityGetUUID(CSIdentityRef identity);
+public extern "C" CFUUIDRef? CSIdentityGetUUID(CSIdentityRef? identity);
 
-public extern "C" CFStringRef CSIdentityGetFullName(CSIdentityRef identity);
+public extern "C" CFStringRef? CSIdentityGetFullName(CSIdentityRef? identity);
 
-public extern "C" id_t CSIdentityGetPosixID(CSIdentityRef identity);
+public extern "C" id_t CSIdentityGetPosixID(CSIdentityRef? identity);
 
-public extern "C" CFStringRef CSIdentityGetPosixName(CSIdentityRef identity);
+public extern "C" CFStringRef? CSIdentityGetPosixName(CSIdentityRef? identity);
 
-public extern "C" CFStringRef CSIdentityGetEmailAddress(CSIdentityRef identity);
+public extern "C" CFStringRef? CSIdentityGetEmailAddress(CSIdentityRef? identity);
 
-public extern "C" CFURLRef CSIdentityGetImageURL(CSIdentityRef identity);
+public extern "C" CFURLRef? CSIdentityGetImageURL(CSIdentityRef? identity);
 
-public extern "C" CFDataRef CSIdentityGetImageData(CSIdentityRef identity);
+public extern "C" CFDataRef? CSIdentityGetImageData(CSIdentityRef? identity);
 
-public extern "C" CFStringRef CSIdentityGetImageDataType(CSIdentityRef identity);
+public extern "C" CFStringRef? CSIdentityGetImageDataType(CSIdentityRef? identity);
 
-public extern "C" CFArrayRef CSIdentityGetAliases(CSIdentityRef identity);
+public extern "C" CFArrayRef? CSIdentityGetAliases(CSIdentityRef? identity);
 
-public extern "C" Boolean CSIdentityIsMemberOfGroup(CSIdentityRef identity, CSIdentityRef group);
+public extern "C" Boolean CSIdentityIsMemberOfGroup(CSIdentityRef? identity, CSIdentityRef? group);
 
-public extern "C" Boolean CSIdentityIsHidden(CSIdentityRef identity);
+public extern "C" Boolean CSIdentityIsHidden(CSIdentityRef? identity);
 
-public extern "C" CFDataRef CSIdentityCreatePersistentReference(CFAllocatorRef allocator, CSIdentityRef identity);
+[ReturnsRetained] public extern "C" CFDataRef? CSIdentityCreatePersistentReference(CFAllocatorRef? allocator, CSIdentityRef? identity);
 
-public extern "C" Boolean CSIdentityIsEnabled(CSIdentityRef user);
+public extern "C" Boolean CSIdentityIsEnabled(CSIdentityRef? user);
 
-public extern "C" Boolean CSIdentityAuthenticateUsingPassword(CSIdentityRef user, CFStringRef password);
+public extern "C" Boolean CSIdentityAuthenticateUsingPassword(CSIdentityRef? user, CFStringRef? password);
 
-public extern "C" SecCertificateRef CSIdentityGetCertificate(CSIdentityRef user);
+public extern "C" SecCertificateRef? CSIdentityGetCertificate(CSIdentityRef? user);
 
-public extern "C" CSIdentityQueryRef CSIdentityCreateGroupMembershipQuery(CFAllocatorRef allocator, CSIdentityRef group);
+[ReturnsRetained] public extern "C" CSIdentityQueryRef? CSIdentityCreateGroupMembershipQuery(CFAllocatorRef? allocator, CSIdentityRef? group);
 
-public extern "C" void CSIdentitySetFullName(CSIdentityRef identity, CFStringRef fullName);
+public extern "C" void CSIdentitySetFullName(CSIdentityRef? identity, CFStringRef? fullName);
 
-public extern "C" void CSIdentitySetEmailAddress(CSIdentityRef identity, CFStringRef emailAddress);
+public extern "C" void CSIdentitySetEmailAddress(CSIdentityRef? identity, CFStringRef? emailAddress);
 
-public extern "C" void CSIdentitySetImageURL(CSIdentityRef identity, CFURLRef url);
+public extern "C" void CSIdentitySetImageURL(CSIdentityRef? identity, CFURLRef? url);
 
-public extern "C" void CSIdentitySetImageData(CSIdentityRef identity, CFDataRef imageData, CFStringRef imageDataType);
+public extern "C" void CSIdentitySetImageData(CSIdentityRef? identity, CFDataRef? imageData, CFStringRef? imageDataType);
 
-public extern "C" void CSIdentityAddAlias(CSIdentityRef identity, CFStringRef alias);
+public extern "C" void CSIdentityAddAlias(CSIdentityRef? identity, CFStringRef? alias);
 
-public extern "C" void CSIdentityRemoveAlias(CSIdentityRef identity, CFStringRef alias);
+public extern "C" void CSIdentityRemoveAlias(CSIdentityRef? identity, CFStringRef? alias);
 
-public extern "C" void CSIdentityAddMember(CSIdentityRef group, CSIdentityRef member);
+public extern "C" void CSIdentityAddMember(CSIdentityRef? group, CSIdentityRef? member);
 
-public extern "C" void CSIdentityRemoveMember(CSIdentityRef group, CSIdentityRef member);
+public extern "C" void CSIdentityRemoveMember(CSIdentityRef? group, CSIdentityRef? member);
 
-public extern "C" void CSIdentitySetIsEnabled(CSIdentityRef user, Boolean isEnabled);
+public extern "C" void CSIdentitySetIsEnabled(CSIdentityRef? user, Boolean isEnabled);
 
-public extern "C" void CSIdentitySetPassword(CSIdentityRef user, CFStringRef password);
+public extern "C" void CSIdentitySetPassword(CSIdentityRef? user, CFStringRef? password);
 
-public extern "C" void CSIdentitySetCertificate(CSIdentityRef user, SecCertificateRef certificate);
+public extern "C" void CSIdentitySetCertificate(CSIdentityRef? user, SecCertificateRef? certificate);
 
-public extern "C" void CSIdentityDelete(CSIdentityRef identity);
+public extern "C" void CSIdentityDelete(CSIdentityRef? identity);
 
-public extern "C" Boolean CSIdentityCommit(CSIdentityRef identity, AuthorizationRef authorization, CFErrorRef* error);
+public extern "C" Boolean CSIdentityCommit(CSIdentityRef? identity, AuthorizationRef authorization, __CFError** error);
 
 public const int kCSIdentityCommitCompleted = 1;
 
-public delegate void CSIdentityStatusUpdatedCallback(CSIdentityRef arg0, CFIndex arg1, CFErrorRef arg2, void* arg3);
+public delegate void CSIdentityStatusUpdatedCallback(__CSIdentity* arg0, CFIndex arg1, __CFError* arg2, void* arg3);
 
 [Pack(2)]
 public struct CSIdentityClientContext
@@ -134,10 +137,10 @@ public struct CSIdentityClientContext
     public CSIdentityStatusUpdatedCallback statusUpdated;
 }
 
-public extern "C" Boolean CSIdentityCommitAsynchronously(CSIdentityRef identity, CSIdentityClientContext* clientContext, CFRunLoopRef runLoop, CFStringRef runLoopMode, AuthorizationRef authorization);
+public extern "C" Boolean CSIdentityCommitAsynchronously(CSIdentityRef? identity, CSIdentityClientContext* clientContext, CFRunLoopRef? runLoop, CFStringRef? runLoopMode, AuthorizationRef authorization);
 
-public extern "C" Boolean CSIdentityIsCommitting(CSIdentityRef identity);
+public extern "C" Boolean CSIdentityIsCommitting(CSIdentityRef? identity);
 
-public extern "C" void CSIdentityRemoveClient(CSIdentityRef identity);
+public extern "C" void CSIdentityRemoveClient(CSIdentityRef? identity);
 
 #endif

@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -31,25 +32,22 @@ import MacOS.CoreFoundation;
 
 public struct CGShading;
 
-public using CGShadingRef = CGShading*;
+[CFType("CGShadingGetTypeID")]
+public extern objc class CGShadingRef : CFTypeRef { }
 
 public extern "C" CFTypeID CGShadingGetTypeID();
 
-public extern "C" CGShadingRef CGShadingCreateAxial(CGColorSpaceRef space, CGPoint start, CGPoint end, CGFunctionRef function, bool extendStart, bool extendEnd);
+[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateAxial(CGColorSpaceRef? space, CGPoint start, CGPoint end, CGFunctionRef? function, bool extendStart, bool extendEnd);
 
 /// macOS 26.0 and later.
-public extern "C" CGShadingRef CGShadingCreateAxialWithContentHeadroom(float headroom, CGColorSpaceRef space, CGPoint start, CGPoint end, CGFunctionRef function, bool extendStart, bool extendEnd);
+[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateAxialWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGPoint start, CGPoint end, CGFunctionRef? function, bool extendStart, bool extendEnd);
 
-public extern "C" CGShadingRef CGShadingCreateRadial(CGColorSpaceRef space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef function, bool extendStart, bool extendEnd);
-
-/// macOS 26.0 and later.
-public extern "C" CGShadingRef CGShadingCreateRadialWithContentHeadroom(float headroom, CGColorSpaceRef space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef function, bool extendStart, bool extendEnd);
-
-public extern "C" CGShadingRef CGShadingRetain(CGShadingRef shading);
-
-public extern "C" void CGShadingRelease(CGShadingRef shading);
+[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateRadial(CGColorSpaceRef? space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef? function, bool extendStart, bool extendEnd);
 
 /// macOS 26.0 and later.
-public extern "C" float CGShadingGetContentHeadroom(CGShadingRef shading);
+[ReturnsRetained] public extern "C" CGShadingRef? CGShadingCreateRadialWithContentHeadroom(float headroom, CGColorSpaceRef? space, CGPoint start, CGFloat startRadius, CGPoint end, CGFloat endRadius, CGFunctionRef? function, bool extendStart, bool extendEnd);
+
+/// macOS 26.0 and later.
+public extern "C" float CGShadingGetContentHeadroom(CGShadingRef? shading);
 
 #endif

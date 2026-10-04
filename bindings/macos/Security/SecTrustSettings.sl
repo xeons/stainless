@@ -25,6 +25,7 @@ module MacOS.Security;
 
 import MacOS.CoreFoundation;
 import MacOS.System;
+import Standard.ObjC;
 
 #if MACOS
 
@@ -58,17 +59,17 @@ public enum SecTrustSettingsDomain : uint
     System = 2,
 }
 
-public extern "C" OSStatus SecTrustSettingsCopyTrustSettings(SecCertificateRef certRef, SecTrustSettingsDomain domain, CFArrayRef* trustSettings);
+public extern "C" OSStatus SecTrustSettingsCopyTrustSettings(SecCertificateRef certRef, SecTrustSettingsDomain domain, __CFArray** trustSettings);
 
-public extern "C" OSStatus SecTrustSettingsSetTrustSettings(SecCertificateRef certRef, SecTrustSettingsDomain domain, CFTypeRef trustSettingsDictOrArray);
+public extern "C" OSStatus SecTrustSettingsSetTrustSettings(SecCertificateRef certRef, SecTrustSettingsDomain domain, CFTypeRef? trustSettingsDictOrArray);
 
 public extern "C" OSStatus SecTrustSettingsRemoveTrustSettings(SecCertificateRef certRef, SecTrustSettingsDomain domain);
 
-public extern "C" OSStatus SecTrustSettingsCopyCertificates(SecTrustSettingsDomain domain, CFArrayRef* certArray);
+public extern "C" OSStatus SecTrustSettingsCopyCertificates(SecTrustSettingsDomain domain, __CFArray** certArray);
 
-public extern "C" OSStatus SecTrustSettingsCopyModificationDate(SecCertificateRef certRef, SecTrustSettingsDomain domain, CFDateRef* modificationDate);
+public extern "C" OSStatus SecTrustSettingsCopyModificationDate(SecCertificateRef certRef, SecTrustSettingsDomain domain, __CFDate** modificationDate);
 
-public extern "C" OSStatus SecTrustSettingsCreateExternalRepresentation(SecTrustSettingsDomain domain, CFDataRef* trustSettings);
+public extern "C" OSStatus SecTrustSettingsCreateExternalRepresentation(SecTrustSettingsDomain domain, __CFData** trustSettings);
 
 public extern "C" OSStatus SecTrustSettingsImportExternalRepresentation(SecTrustSettingsDomain domain, CFDataRef trustSettings);
 
