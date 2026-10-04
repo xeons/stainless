@@ -1,0 +1,7 @@
+size and alignment agree: true
+struct agrees: true
+scaled 3
+made 5 2.5, summed 7.5
+third agrees: true
+total 3.75, back 3.75, compared true
+integers 3145728, constant 1

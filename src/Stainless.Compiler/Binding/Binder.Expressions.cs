@@ -405,6 +405,8 @@ public sealed partial class Binder
         PrimitiveTypeSymbol { Kind: PrimitiveKind.Float or PrimitiveKind.Double } =>
             _builtins.TextFromDouble,
 
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.NDouble } => _builtins.TextFromNDouble,
+
         PrimitiveTypeSymbol
         {
             Kind: PrimitiveKind.SByte or PrimitiveKind.Short or PrimitiveKind.Int
@@ -1828,9 +1830,13 @@ public sealed partial class Binder
 
         if (left.IsFloat || right.IsFloat)
         {
-            common = left.Kind == PrimitiveKind.Double || right.Kind == PrimitiveKind.Double
-                ? PrimitiveTypeSymbol.Double
-                : PrimitiveTypeSymbol.Float;
+            int rank = Math.Max(left.IsFloat ? left.FloatRank : 0, right.IsFloat ? right.FloatRank : 0);
+            common = rank switch
+            {
+                2 => PrimitiveTypeSymbol.NDouble,
+                1 => PrimitiveTypeSymbol.Double,
+                _ => PrimitiveTypeSymbol.Float,
+            };
             return true;
         }
 

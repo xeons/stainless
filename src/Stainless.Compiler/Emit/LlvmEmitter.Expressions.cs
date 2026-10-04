@@ -376,8 +376,74 @@ public sealed partial class LlvmEmitter
     /// for a float is rounded to one first, which is what `const float Tenth =
     /// 0.1;` meant.
     /// </summary>
-    private static string FormatFloating(double value, TypeSymbol type) =>
-        FormatDouble(type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Float } ? (float)value : value);
+    private static string FormatFloating(double value, TypeSymbol type) => type switch
+    {
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.Float } => FormatDouble((float)value),
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.NDouble } =>
+            FormatFloatAs(value, Binding.TargetPlatform.Current.LongDoubleType),
+        _ => FormatDouble(value),
+    };
+
+    /// <summary>
+    /// A double's value as a constant of <paramref name="llvmType"/>, which
+    /// holds every double exactly: x87's <c>0xK</c> spelling, sign and exponent
+    /// then the 64-bit significand with its integer bit, or IEEE quad's
+    /// <c>0xL</c>, its low 64 bits first.
+    /// </summary>
+    public static string FormatFloatAs(double value, string llvmType)
+    {
+        if (llvmType is "float" or "double") return FormatDouble(value);
+
+        ulong bits = BitConverter.DoubleToUInt64Bits(value);
+        ulong sign = bits >> 63;
+        int exponent = (int)((bits >> 52) & 0x7FF);
+        ulong fraction = bits & 0xFFFFFFFFFFFFFUL;
+
+        // The exponent and significand in the wider format's own terms.
+        int wide;
+        ulong significand;
+        if (exponent == 0x7FF)
+        {
+            wide = 0x7FFF;
+            significand = fraction;
+        }
+        else if (exponent == 0 && fraction == 0)
+        {
+            wide = 0;
+            significand = 0;
+        }
+        else
+        {
+            // A subnormal double is normal in either wider format.
+            int shift = 0;
+            if (exponent == 0)
+            {
+                while ((fraction & (1UL << 52)) == 0)
+                {
+                    fraction <<= 1;
+                    shift++;
+                }
+                fraction &= 0xFFFFFFFFFFFFFUL;
+                exponent = 1;
+            }
+
+            wide = exponent - 1023 - shift + 16383;
+            significand = fraction;
+        }
+
+        if (llvmType == "x86_fp80")
+        {
+            // The integer bit is explicit, and set for every number but zero.
+            ulong integer = wide is 0 ? 0 : 1UL << 63;
+            ulong mantissa = integer | (significand << 11);
+            return $"0xK{(sign << 15) | (ulong)wide:X4}{mantissa:X16}";
+        }
+
+        // fp128: 1 sign bit, 15 exponent bits, 112 fraction bits.
+        ulong high = (sign << 63) | ((ulong)wide << 48) | (significand >> 4);
+        ulong low = significand << 60;
+        return $"0xL{low:X16}{high:X16}";
+    }
 
     private static string FormatInteger(ulong value, TypeSymbol type)
     {

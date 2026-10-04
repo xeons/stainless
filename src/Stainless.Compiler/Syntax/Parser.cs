@@ -2453,7 +2453,7 @@ public sealed class Parser
         TokenKind.LongKeyword, TokenKind.NIntKeyword, TokenKind.Int128Keyword,
         TokenKind.ByteKeyword, TokenKind.UShortKeyword, TokenKind.UIntKeyword,
         TokenKind.ULongKeyword, TokenKind.NUIntKeyword, TokenKind.UInt128Keyword,
-        TokenKind.FloatKeyword, TokenKind.DoubleKeyword,
+        TokenKind.FloatKeyword, TokenKind.DoubleKeyword, TokenKind.NDoubleKeyword,
     ];
 
     private bool AtTypeStart() =>

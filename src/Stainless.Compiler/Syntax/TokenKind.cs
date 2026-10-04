@@ -58,7 +58,7 @@ public enum TokenKind
     VoidKeyword, BoolKeyword, CharKeyword, Char16Keyword, Char32Keyword,
     SByteKeyword, ShortKeyword, IntKeyword, LongKeyword, NIntKeyword, Int128Keyword,
     ByteKeyword, UShortKeyword, UIntKeyword, ULongKeyword, NUIntKeyword, UInt128Keyword,
-    FloatKeyword, DoubleKeyword,
+    FloatKeyword, DoubleKeyword, NDoubleKeyword,
 
     // Punctuation
     OpenParen, CloseParen, OpenBrace, CloseBrace, OpenBracket, CloseBracket,
@@ -169,6 +169,7 @@ public static class TokenKindExtensions
         TokenKind.UInt128Keyword => "uint128",
         TokenKind.FloatKeyword => "float",
         TokenKind.DoubleKeyword => "double",
+        TokenKind.NDoubleKeyword => "ndouble",
         TokenKind.OpenParen => "(",
         TokenKind.CloseParen => ")",
         TokenKind.OpenBrace => "{",

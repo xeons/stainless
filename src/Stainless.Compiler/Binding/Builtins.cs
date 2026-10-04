@@ -217,6 +217,10 @@ public sealed class Builtins
     private FunctionSymbol? _textFromBool;
     private FunctionSymbol? _textFromChar;
     private FunctionSymbol? _textFromDouble;
+    private FunctionSymbol? _textFromNDouble;
+
+    public FunctionSymbol TextFromNDouble => Found(ref _textFromNDouble, Text, "FromDouble",
+        String, PrimitiveTypeSymbol.NDouble);
     public FunctionSymbol StringEquals { get; }
 
     /// <summary>

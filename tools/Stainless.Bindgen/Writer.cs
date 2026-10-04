@@ -214,7 +214,8 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             }
 
             case CMacro { Value: not null } macro when !text.Contains(" float ", StringComparison.Ordinal) &&
-                                                        !text.Contains(" double ", StringComparison.Ordinal):
+                                                        !text.Contains(" double ", StringComparison.Ordinal) &&
+                                                        !text.Contains(" ndouble ", StringComparison.Ordinal):
                 checks.Add(($"({macro.Name})", Identifier(macro.Name)));
                 break;
         }
@@ -516,11 +517,17 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         string? type = MacroType(macro.Type);
         string name = Identifier(macro.Name);
 
-        if (type is "float" or "double")
+        if (type is "float" or "double" or "ndouble")
         {
             var literal = FloatLiteral().Match(macro.Body);
             if (!literal.Success) throw new Unsupported($"a {type} macro that is not a literal ({macro.Body})");
             string text = literal.Groups[1].Value;
+
+            // A literal is a double's: LDBL_MAX's 1.19e4932 is not one.
+            if (!double.TryParse(text, System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out double parsed) ||
+                double.IsInfinity(parsed))
+                throw new Unsupported($"a {type} beyond a double, which a literal holds ({macro.Body})");
             if (!text.Contains('.') && !text.Contains('e') && !text.Contains('E')) text += ".0";
             return $"public const {type} {name} = {text}{(type == "float" ? "f" : "")};\n";
         }
@@ -763,6 +770,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         "unsigned long" or "unsigned long long" => "ulong",
         "float" => "float",
         "double" => "double",
+        "long double" => "ndouble",
         "char16_t" => "char16",
         "char32_t" => "char32",
         "__int128" => "int128",

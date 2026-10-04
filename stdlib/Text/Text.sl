@@ -252,6 +252,9 @@ String FormatUInt128Digits(uint128 value, bool negative)
 /// The shortest text that reads back as the same number.
 public String FromDouble(double value) => sl_string_from_double(value);
 
+/// An `ndouble`, as the `double` nearest it: what the runtime formats.
+public String FromDouble(ndouble value) => sl_string_from_double((double)value);
+
 /// `"true"` or `"false"`.
 public String FromBool(bool value) => sl_string_from_bool(value);
 

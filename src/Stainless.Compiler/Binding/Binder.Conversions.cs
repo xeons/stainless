@@ -1105,8 +1105,10 @@ public sealed partial class Binder
             return target.IsInteger && explicitCast ? ConversionKind.BoolToInteger : null;
         if (target.Kind == PrimitiveKind.Bool) return null;
 
+        // By rank, not size: an ndouble is a double's size on some targets
+        // and still never narrows to one without a cast.
         if (source.IsFloat && target.IsFloat)
-            return target.Size >= source.Size || explicitCast ? ConversionKind.FloatResize : null;
+            return target.FloatRank >= source.FloatRank || explicitCast ? ConversionKind.FloatResize : null;
 
         if (source.IsInteger && target.IsFloat)
             return ConversionKind.IntToFloat;               // implicit, as in C#

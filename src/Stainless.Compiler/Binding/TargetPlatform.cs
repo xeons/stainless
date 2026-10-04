@@ -176,6 +176,33 @@ public sealed record TargetPlatform
     /// <summary>The LLVM integer type a <c>nuint</c> or a <c>nint</c> is.</summary>
     public string NativeIntType => PointerWidth == 8 ? "i64" : "i32";
 
+    /// <summary>
+    /// What C's <c>long double</c> is here, and so <c>ndouble</c>: x87's 80 bits
+    /// on x86 System V, IEEE quad on ARM64 Linux, and a plain <c>double</c> on
+    /// Windows and Apple silicon.
+    /// </summary>
+    public string LongDoubleType => (Architecture, Os) switch
+    {
+        (TargetArch.X64 or TargetArch.X86, TargetOS.Linux or TargetOS.MacOS) => "x86_fp80",
+        (TargetArch.Arm64, TargetOS.Linux) => "fp128",
+        _ => "double",
+    };
+
+    /// <summary>Its size: x87's 80 bits are padded to 16 bytes, or 12 on i386 Linux.</summary>
+    public int LongDoubleSize => LongDoubleType switch
+    {
+        "x86_fp80" => Architecture == TargetArch.X86 ? 12 : 16,
+        "fp128" => 16,
+        _ => 8,
+    };
+
+    public int LongDoubleAlignment => LongDoubleType switch
+    {
+        "x86_fp80" => Architecture == TargetArch.X86 ? 4 : 16,
+        "fp128" => 16,
+        _ => WideScalarAlignment,
+    };
+
     // ------------------------------------------------------------- the set
 
     public static readonly TargetPlatform X64Windows = new()

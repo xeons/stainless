@@ -300,6 +300,7 @@ public static class Mangler
         PrimitiveKind.UInt128 => 'q',
         PrimitiveKind.Float => 'f',
         PrimitiveKind.Double => 'd',
+        PrimitiveKind.NDouble => 'e',
         PrimitiveKind.Bool => 'b',
         PrimitiveKind.Char => 'c',
         PrimitiveKind.Char16 => 'u',

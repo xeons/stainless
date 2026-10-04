@@ -29,6 +29,25 @@ namespace Stainless.UnitTests;
 /// </summary>
 public class EmitterTests
 {
+    // -------------------------------------------------------- wide floats
+
+    /// <summary>
+    /// A constant of x87's 80 bits and of IEEE quad, spelled exactly as clang
+    /// spells <c>long double</c>'s for x86-64 and ARM64 Linux: the 0.1 row is
+    /// a double widened, so its low bits are the double's and not 0.1's.
+    /// </summary>
+    [Theory]
+    [InlineData(3.0, "x86_fp80", "0xK4000C000000000000000")]
+    [InlineData(8.0, "x86_fp80", "0xK40028000000000000000")]
+    [InlineData(0.1, "x86_fp80", "0xK3FFBCCCCCCCCCCCCD000")]
+    [InlineData(3.0, "fp128", "0xL00000000000000004000800000000000")]
+    [InlineData(8.0, "fp128", "0xL00000000000000004002000000000000")]
+    [InlineData(0.1, "fp128", "0xLA0000000000000003FFB999999999999")]
+    [InlineData(0.0, "x86_fp80", "0xK00000000000000000000")]
+    [InlineData(-0.5, "x86_fp80", "0xKBFFE8000000000000000")]
+    public void AWideFloatConstantIsSpelledAsClangSpellsIt(double value, string type, string spelled) =>
+        Assert.Equal(spelled, Stainless.Emit.LlvmEmitter.FormatFloatAs(value, type));
+
     // -------------------------------------------------------- reproducibility
 
     /// <summary>

@@ -267,7 +267,7 @@ public sealed partial class LlvmEmitter
 
             case ConversionKind.FloatResize:
                 if (from == to) return new Val(operand.Ref, to, conversion.Type);
-                return Converted(to == "double" ? "fpext" : "fptrunc");
+                return Converted(FloatWidth(to) > FloatWidth(from) ? "fpext" : "fptrunc");
 
             case ConversionKind.PointerToInteger:
                 return Converted("ptrtoint");
@@ -314,8 +314,8 @@ public sealed partial class LlvmEmitter
             // an ordered compare is false for NaN.
             double low = signed ? -Math.Pow(2, bits - 1) : 0;
             double high = signed ? Math.Pow(2, bits - 1) : Math.Pow(2, bits);
-            string above = Emit("i1", $"fcmp oge {from} {whole}, {FloatConstant(low)}");
-            string below = Emit("i1", $"fcmp olt {from} {whole}, {FloatConstant(high)}");
+            string above = Emit("i1", $"fcmp oge {from} {whole}, {FormatFloatAs(low, from)}");
+            string below = Emit("i1", $"fcmp olt {from} {whole}, {FormatFloatAs(high, from)}");
             string fits = Emit("i1", $"and i1 {above}, {below}");
             AbortUnless(fits);
             return Emit(to, $"{(signed ? "fptosi" : "fptoui")} {from} {value} to {to}");
@@ -327,7 +327,22 @@ public sealed partial class LlvmEmitter
         return Emit(to, $"call {to} @{intrinsic}({from} {value})");
     }
 
-    private static string LlvmFloatSuffix(string type) => type == "float" ? "f32" : "f64";
+    private static string LlvmFloatSuffix(string type) => type switch
+    {
+        "float" => "f32",
+        "x86_fp80" => "f80",
+        "fp128" => "f128",
+        _ => "f64",
+    };
+
+    /// <summary>The bits an LLVM float type carries, to tell a widening from a narrowing.</summary>
+    private static int FloatWidth(string type) => type switch
+    {
+        "float" => 32,
+        "double" => 64,
+        "x86_fp80" => 80,
+        _ => 128,
+    };
 
     private static string FloatConstant(double value) =>
         $"0x{BitConverter.DoubleToInt64Bits(value):X16}";

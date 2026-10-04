@@ -256,6 +256,7 @@ public static class CppMangler
 
         PrimitiveKind.Float => "f",
         PrimitiveKind.Double => "d",
+        PrimitiveKind.NDouble => "e",
         _ => "v",
     };
 
@@ -381,6 +382,7 @@ public static class CppMangler
 
         PrimitiveKind.Float => "M",
         PrimitiveKind.Double => "N",
+        PrimitiveKind.NDouble => "O",
         _ => "X",
     };
 

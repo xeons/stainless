@@ -1282,6 +1282,7 @@ public sealed partial class Binder
         TokenKind.NUIntKeyword => PrimitiveTypeSymbol.NUInt,
         TokenKind.UInt128Keyword => PrimitiveTypeSymbol.UInt128,
         TokenKind.FloatKeyword => PrimitiveTypeSymbol.Float,
+        TokenKind.NDoubleKeyword => PrimitiveTypeSymbol.NDouble,
         _ => PrimitiveTypeSymbol.Double,
     };
 }

@@ -21,7 +21,7 @@ public enum PrimitiveKind
     Void, Bool, Char, Char16, Char32,
     SByte, Short, Int, Long, NInt, Int128,
     Byte, UShort, UInt, ULong, NUInt, UInt128,
-    Float, Double,
+    Float, Double, NDouble,
 }
 
 /// <summary>
@@ -120,6 +120,7 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
     public override int Alignment =>
         Kind is PrimitiveKind.Long or PrimitiveKind.ULong or PrimitiveKind.Double
             ? TargetPlatform.Current.WideScalarAlignment
+            : Kind == PrimitiveKind.NDouble ? TargetPlatform.Current.LongDoubleAlignment
             : Size == 0 ? 1 : Size;
 
     /// <summary>
@@ -130,6 +131,7 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
     public override int Size =>
         Kind is PrimitiveKind.NInt or PrimitiveKind.NUInt
             ? TargetPlatform.Current.PointerWidth
+            : Kind == PrimitiveKind.NDouble ? TargetPlatform.Current.LongDoubleSize
             : _size;
 
     private readonly int _size;
@@ -142,7 +144,19 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
     }
 
     public bool IsInteger => Kind is >= PrimitiveKind.Char and <= PrimitiveKind.UInt128;
-    public bool IsFloat => Kind is PrimitiveKind.Float or PrimitiveKind.Double;
+    public bool IsFloat => Kind is PrimitiveKind.Float or PrimitiveKind.Double or PrimitiveKind.NDouble;
+
+    /// <summary>
+    /// Where a float stands among the floats: <c>float</c>, <c>double</c>,
+    /// then <c>ndouble</c>, which is at least a <c>double</c> on every target and
+    /// so widens from one and narrows only by a cast, whatever its size here.
+    /// </summary>
+    public int FloatRank => Kind switch
+    {
+        PrimitiveKind.Float => 0,
+        PrimitiveKind.Double => 1,
+        _ => 2,
+    };
     public bool IsSigned => Kind is PrimitiveKind.SByte or PrimitiveKind.Short
         or PrimitiveKind.Int or PrimitiveKind.Long or PrimitiveKind.NInt or PrimitiveKind.Int128;
     public bool IsNumeric => IsInteger || IsFloat;
@@ -181,11 +195,12 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
     public static readonly PrimitiveTypeSymbol UInt128 = new(PrimitiveKind.UInt128, "uint128", 16);
     public static readonly PrimitiveTypeSymbol Float = new(PrimitiveKind.Float, "float", 4);
     public static readonly PrimitiveTypeSymbol Double = new(PrimitiveKind.Double, "double", 8);
+    public static readonly PrimitiveTypeSymbol NDouble = new(PrimitiveKind.NDouble, "ndouble", 8);
 
     public static readonly IReadOnlyList<PrimitiveTypeSymbol> All =
     [
         Void, Bool, Char, Char16, Char32, SByte, Short, Int, Long, NInt, Int128,
-        Byte, UShort, UInt, ULong, NUInt, UInt128, Float, Double,
+        Byte, UShort, UInt, ULong, NUInt, UInt128, Float, Double, NDouble,
     ];
 }
 

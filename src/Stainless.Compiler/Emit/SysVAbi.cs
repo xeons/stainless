@@ -234,6 +234,10 @@ public static class SysVAbi
                      isDouble: real.Kind == PrimitiveKind.Double, isPointer: false);
                 return true;
 
+            // x87's class: an aggregate holding one goes in memory.
+            case PrimitiveTypeSymbol { Kind: PrimitiveKind.NDouble }:
+                return false;
+
             // Everything else is a scalar in an integer register: an integer, a
             // bool, a code unit, an enum, a pointer, a function pointer, and
             // every kind of reference.

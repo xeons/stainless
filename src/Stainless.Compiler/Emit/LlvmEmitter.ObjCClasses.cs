@@ -776,6 +776,7 @@ public sealed partial class LlvmEmitter
                     PrimitiveKind.Long or PrimitiveKind.NInt => "q",
                     PrimitiveKind.ULong or PrimitiveKind.NUInt => "Q",
                     PrimitiveKind.Int128 => "t",
+                    PrimitiveKind.NDouble => "D",
                     PrimitiveKind.UInt128 => "T",
                     PrimitiveKind.Float => "f",
                     PrimitiveKind.Double => "d",

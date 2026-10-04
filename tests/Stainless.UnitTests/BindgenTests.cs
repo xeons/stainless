@@ -70,6 +70,7 @@ public class BindgenTests
         Assert.Equal(new CBlock(new CFunction(Void, [], false)), CTypeParser.Parse("void (^)(void)"));
 
     [Theory]
+    [InlineData("long double", "long double")]
     [InlineData("__int128", "__int128")]
     [InlineData("unsigned __int128", "unsigned __int128")]
     public void A128BitIntegerIsABuiltin(string spelling, string name) =>
@@ -122,7 +123,7 @@ public class BindgenTests
             CTypeParser.Parse("union MIDIUniversalMessage::(anonymous union)::(unnamed struct)::(anonymous at /SDK/MIDIMessages.h:601:4)"));
 
     [Theory]
-    [InlineData("long double")]
+
     [InlineData("__attribute__((__vector_size__(4 * sizeof(float)))) float")]
     public void WhatABindingCannotSpellIsSaidToBeSo(string spelling) =>
         Assert.IsType<CUnsupported>(CTypeParser.Parse(spelling));

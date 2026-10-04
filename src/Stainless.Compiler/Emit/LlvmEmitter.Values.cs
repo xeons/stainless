@@ -52,6 +52,7 @@ public sealed partial class LlvmEmitter
             PrimitiveKind.Float => "float",
             PrimitiveKind.Double => "double",
             PrimitiveKind.Int128 or PrimitiveKind.UInt128 => "i128",
+            PrimitiveKind.NDouble => Binding.TargetPlatform.Current.LongDoubleType,
 
             // `nint` and `nuint` are a pointer wide, so they are the two that
             // change with the target. `long` and `ulong` fall here too and are

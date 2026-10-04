@@ -13,6 +13,7 @@ Names and sizes match C# exactly.
 | `nint` `nuint` | 4 or 8: native | `intptr_t` / `size_t` |
 | `int128` `uint128` | 16 | `__int128` / `unsigned __int128` |
 | `float` `double` | 4/8 | `float` / `double` |
+| `ndouble` | 8, 12 or 16: native | `long double` |
 | `bool` | 1 | `bool` |
 | `char` | 1 | `char` — one UTF-8 code unit |
 | `char16` | 2 | `char16_t` — one UTF-16 code unit |
@@ -25,6 +26,22 @@ there. `nuint` is the type of a size, a length, a count and an index -- C's
 `size_t`, Rust's `usize` -- which is why `Length` and `Count` return one and a
 loop over a collection counts in one; `nint` is the signed difference of two
 such. Neither is a pointer, and neither holds one but by a cast.
+
+**`ndouble` is C's `long double`**, whatever this target makes of it -- as
+`nint` is the native integer, this is the native wide float:
+
+| Target | `ndouble` |
+|---|---|
+| Windows, Apple silicon | a `double`: 8 bytes |
+| x86-64 Linux, Intel macOS | x87's 80 bits, in 16 bytes on a 16-byte boundary |
+| 32-bit x86 Linux | x87's 80 bits, in 12 bytes on a 4-byte boundary |
+| ARM64 Linux | IEEE quad: 16 bytes |
+
+It is at least a `double` everywhere, so `float` and `double` widen to it and
+it narrows only by a cast, even where the two are the same size. It is what a
+binding of `sqrtl` or of a struct holding a `long double` takes, and it
+crosses to C as C's own does. Text made from one goes through the `double`
+nearest it.
 
 **`int128` and `uint128`** are 16 bytes on a 16-byte boundary, as clang's
 `__int128` is everywhere. Every narrower integer widens to them as it widens to

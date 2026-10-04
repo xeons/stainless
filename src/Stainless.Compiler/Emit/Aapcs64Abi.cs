@@ -254,7 +254,7 @@ public static class Aapcs64Abi
                 return true;
             }
 
-            case PrimitiveTypeSymbol { Kind: PrimitiveKind.Float or PrimitiveKind.Double } real:
+            case PrimitiveTypeSymbol { Kind: PrimitiveKind.Float or PrimitiveKind.Double or PrimitiveKind.NDouble } real:
                 if (element is not null && element.Kind != real.Kind) return false;
                 element = real;
                 members++;
