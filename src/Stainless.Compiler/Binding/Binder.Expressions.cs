@@ -478,13 +478,15 @@ public sealed partial class Binder
         // The failure has to go somewhere, and the only place is the caller.
         if (_context.Function?.ReturnType is not VariantTypeSymbol target || !IsResult(target))
         {
-            diagnostics.Error("SL0570", syntax.Span,
-                _context.Function is null
-                    ? "'try' passes a failure to the caller, so it belongs in a function"
-                    : $"'{_context.Function.Name}' returns '{_context.Function.ReturnType.Name}', " +
-                      "so a failure has nowhere to go. A function containing 'try' returns a " +
-                      "'Result'; use 'GetValueOrDefault' for a caller that has a sensible default",
-                _context.Function.ReturnType);
+            if (_context.Function is not { } function)
+                diagnostics.Error("SL0570", syntax.Span,
+                    "'try' passes a failure to the caller, so it belongs in a function");
+            else
+                diagnostics.Error("SL0570", syntax.Span,
+                    $"'{function.Name}' returns '{function.ReturnType.Name}', so a failure has " +
+                    "nowhere to go. A function containing 'try' returns a 'Result'; use " +
+                    "'GetValueOrDefault' for a caller that has a sensible default",
+                    function.ReturnType);
             return new BoundErrorExpression(syntax.Span);
         }
 
