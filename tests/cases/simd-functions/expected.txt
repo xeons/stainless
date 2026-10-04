@@ -1,0 +1,19 @@
+dot: -22.5
+sum: -2, squared: 30, length: 5
+distance: 7
+normalized: <0, 1>
+cross: <0, 0, 1> <-3, 6, -3>
+min: <0.5, -2, -1, -4>, max: <1, 2, 3, 4>
+clamp: <1, -1, 2, -1>
+abs: <1, 2, 3, 4> <3, 3, 0, 2147483647>
+sqrt: <1, 2, 3, 1.5>
+rounding: <1, -2, 2, -1> <2, -1, 3, -0> <2, -2, 2, -0> <1, -1, 2, -0>
+fma: <9, 16>
+lerp: <2.5, 12.5>
+less: <0, -1, 0, -1>, all: false, any: true
+equal: <-1, -1, -1, -1> true
+selected: <0.5, -2, -1, -4>
+unsigned order: <-1, 0>
+masks of bytes: <0, -1, -1, -1>
+integer dot: 32, min: <5, 7>
+constants: <0, 0, 0> <1, 1> <1, 1, 1, 1>

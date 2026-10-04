@@ -77,8 +77,14 @@ public sealed record CObjCQualified(CType Base, IReadOnlyList<CType> Arguments) 
 /// <summary>What <c>_Nonnull</c>, <c>_Nullable</c> or nothing said about a pointer.</summary>
 public enum Nullability { Unspecified, Nullable, NonNull }
 
-/// <summary>What a binding cannot spell: a vector, an atomic, <c>long double</c>.</summary>
+/// <summary>What a binding cannot spell: an atomic, a complex number, a 16-bit float.</summary>
 public sealed record CUnsupported(string Why) : CType;
+
+/// <summary>
+/// <c>ext_vector_type(N)</c>, counted in lanes, or <c>vector_size(N)</c>,
+/// counted in bytes: a SIMD vector of <paramref name="Element"/>.
+/// </summary>
+public sealed record CVector(CType Element, int Count, bool CountIsBytes) : CType;
 
 public enum CTagKind { Struct, Union, Enum }
 
@@ -173,6 +179,8 @@ public sealed partial class CTypeParser
         var builtin = new List<string>();
         CType? named = null;
         var nullability = Nullability.Unspecified;
+        (int Count, bool Bytes)? vector = null;
+        bool packed = false;
 
         while (Current is { } token)
         {
@@ -190,8 +198,15 @@ public sealed partial class CTypeParser
             {
                 _at++;
                 string attribute = SkipBalanced();
-                if (attribute.Contains("vector_size") || attribute.Contains("ext_vector_type"))
-                    named = new CUnsupported("a vector type");
+                var declared = VectorAttribute().Match(attribute);
+                if (declared.Success)
+                {
+                    vector = (int.Parse(declared.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture),
+                              declared.Groups[1].Value == "vector_size");
+                    packed = attribute.Contains("aligned", StringComparison.Ordinal);
+                }
+                else if (attribute.Contains("vector_size") || attribute.Contains("ext_vector_type"))
+                    named = new CUnsupported("a vector counted by an expression");
                 continue;
             }
 
@@ -261,10 +276,17 @@ public sealed partial class CTypeParser
             break;
         }
 
-        if (named is not null) return (named, nullability);
-        if (builtin.Count == 0) throw new FormatException($"no type at token {_at}");
-        return (Builtin(builtin), nullability);
+        if (named is null && builtin.Count == 0) throw new FormatException($"no type at token {_at}");
+        var type = named ?? Builtin(builtin);
+
+        // Apple's simd_packed types are aligned to a lane rather than to the
+        // vector, which no Stainless vector is.
+        if (packed) return (new CUnsupported("a packed vector, aligned less than a vector is"), nullability);
+        return (vector is { } lanes ? new CVector(type, lanes.Count, lanes.Bytes) : type, nullability);
     }
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"(?:__)?(ext_vector_type|vector_size)(?:__)?\s*\(\s*(\d+)\s*\)")]
+    private static partial System.Text.RegularExpressions.Regex VectorAttribute();
 
     /// <summary>The builtin <paramref name="words"/> spell, in a canonical order.</summary>
     private static CType Builtin(List<string> words)

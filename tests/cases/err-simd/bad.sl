@@ -20,5 +20,11 @@ int Main()
     vint4 shifted = 1 << new vint4(2);                  // SL0932: shifts its left side
     vint4 implicit = new vbyte4(1);                     // SL0265: no implicit lane change
     vfloat4 flipped = !a;                               // SL0232: not a bool
+    vfloat4 unknown = vfloat4.Spin(a);                  // SL0934: no such function
+    vint4 rooted = vint4.Sqrt(new vint4(4));            // SL0934: for float lanes
+    vfloat3 crossed = vfloat4.Cross(a, b);              // SL0934: three lanes only
+    float dot = vfloat4.Dot(a);                         // SL0934: two arguments
+    int length = new vint2(3, 4).Length;                // SL0934: a square root of ints
+    vfloat4 unit = vfloat4.Unit;                        // SL0934: Zero and One only
     return 0;
 }

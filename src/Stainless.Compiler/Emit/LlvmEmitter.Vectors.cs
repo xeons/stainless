@@ -216,6 +216,128 @@ public sealed partial class LlvmEmitter
         return new Val(Emit(type, $"{opcode} {type} {left.Ref}, {operand}"), type, binary.Type);
     }
 
+    /// <summary>
+    /// A vector's built-in function. Each is an LLVM intrinsic or a few vector
+    /// instructions, which every target lowers to what it has.
+    /// </summary>
+    private Val EmitVectorFunction(BoundVectorFunction called)
+    {
+        var vector = called.Vector;
+        string type = LlvmTypeOf(vector);
+        string lane = LlvmTypeOf(vector.Element);
+        bool isFloat = vector.Element.IsFloat;
+        bool signed = vector.Element.IsSigned;
+        string suffix = OverloadSuffix(type);
+        var arguments = called.Arguments.Select(a => EmitExpression(a).Ref).ToList();
+
+        string Unary(string name, string value) => CallIntrinsic($"llvm.{name}.{suffix}", type, (type, value));
+        string Binary(string name, string left, string right) =>
+            CallIntrinsic($"llvm.{name}.{suffix}", type, (type, left), (type, right));
+        string Lowest(string left, string right) =>
+            Binary(isFloat ? "minnum" : signed ? "smin" : "umin", left, right);
+        string Highest(string left, string right) =>
+            Binary(isFloat ? "maxnum" : signed ? "smax" : "umax", left, right);
+        string Arithmetic(string floating, string integer, string left, string right) =>
+            Emit(type, $"{(isFloat ? floating : integer)} {type} {left}, {right}");
+
+        // Added in lane order, from negative zero for floats, which is the
+        // sum a loop over the lanes would give.
+        string Total(string value) => isFloat
+            ? CallIntrinsic($"llvm.vector.reduce.fadd.{suffix}", lane, (lane, "0x8000000000000000"), (type, value))
+            : CallIntrinsic($"llvm.vector.reduce.add.{suffix}", lane, (type, value));
+        string DotOf(string left, string right) => Total(Arithmetic("fmul", "mul", left, right));
+        string LengthOf(string value) =>
+            CallIntrinsic($"llvm.sqrt.{OverloadSuffix(lane)}", lane, (lane, DotOf(value, value)));
+
+        string Compared(string floating, string integer)
+        {
+            string bits = Emit($"<{vector.Lanes} x i1>",
+                $"{(isFloat ? "fcmp " + floating : "icmp " + integer)} {type} {arguments[0]}, {arguments[1]}");
+            return Emit(LlvmTypeOf(vector.MaskType), $"sext <{vector.Lanes} x i1> {bits} to {LlvmTypeOf(vector.MaskType)}");
+        }
+
+        string Ordered(string floating, string signedCompare, string unsignedCompare) =>
+            Compared(floating, signed ? signedCompare : unsignedCompare);
+
+        string result = called.Function switch
+        {
+            VectorFunction.Dot => DotOf(arguments[0], arguments[1]),
+            VectorFunction.Sum => Total(arguments[0]),
+            VectorFunction.LengthSquared => DotOf(arguments[0], arguments[0]),
+            VectorFunction.Length => LengthOf(arguments[0]),
+            VectorFunction.Distance => LengthOf(Arithmetic("fsub", "sub", arguments[0], arguments[1])),
+            VectorFunction.Normalize => Emit(type,
+                $"fdiv {type} {arguments[0]}, {Splat(vector, LengthOf(arguments[0]))}"),
+            VectorFunction.Cross => Cross(type, arguments[0], arguments[1]),
+            VectorFunction.Min => Lowest(arguments[0], arguments[1]),
+            VectorFunction.Max => Highest(arguments[0], arguments[1]),
+            VectorFunction.Clamp => Lowest(Highest(arguments[0], arguments[1]), arguments[2]),
+            VectorFunction.Abs => isFloat
+                ? Unary("fabs", arguments[0])
+                : CallIntrinsic($"llvm.abs.{suffix}", type, (type, arguments[0]), ("i1", "false")),
+            VectorFunction.Sqrt => Unary("sqrt", arguments[0]),
+            VectorFunction.Floor => Unary("floor", arguments[0]),
+            VectorFunction.Ceiling => Unary("ceil", arguments[0]),
+            VectorFunction.Round => Unary("roundeven", arguments[0]),
+            VectorFunction.Truncate => Unary("trunc", arguments[0]),
+            VectorFunction.FusedMultiplyAdd => CallIntrinsic($"llvm.fma.{suffix}", type,
+                (type, arguments[0]), (type, arguments[1]), (type, arguments[2])),
+            VectorFunction.Lerp => Emit(type, $"fadd {type} {arguments[0]}, " +
+                Emit(type, $"fmul {type} {Emit(type, $"fsub {type} {arguments[1]}, {arguments[0]}")}, {arguments[2]}")),
+            VectorFunction.Equal => Compared("oeq", "eq"),
+            VectorFunction.NotEqual => Compared("une", "ne"),
+            VectorFunction.LessThan => Ordered("olt", "slt", "ult"),
+            VectorFunction.LessThanOrEqual => Ordered("ole", "sle", "ule"),
+            VectorFunction.GreaterThan => Ordered("ogt", "sgt", "ugt"),
+            VectorFunction.GreaterThanOrEqual => Ordered("oge", "sge", "uge"),
+            VectorFunction.Select => Selected(vector, arguments[0], arguments[1], arguments[2]),
+            VectorFunction.All => ReduceLanes("and", vector.Lanes,
+                Emit($"<{vector.Lanes} x i1>", $"icmp ne {type} {arguments[0]}, zeroinitializer")),
+            _ => ReduceLanes("or", vector.Lanes,
+                Emit($"<{vector.Lanes} x i1>", $"icmp ne {type} {arguments[0]}, zeroinitializer")),
+        };
+
+        string resultType = LlvmTypeOf(called.Type);
+        return new Val(result, resultType, called.Type);
+    }
+
+    /// <summary>Calls an LLVM intrinsic, declaring it once.</summary>
+    private string CallIntrinsic(string name, string result, params (string Type, string Value)[] arguments)
+    {
+        _overflowIntrinsics.Add(
+            $"declare {result} @{name}({string.Join(", ", arguments.Select(a => a.Type))}) " +
+            "nounwind willreturn memory(none) speculatable");
+        return Emit(result, $"call {result} @{name}({string.Join(", ", arguments.Select(a => $"{a.Type} {a.Value}"))})");
+    }
+
+    /// <summary>A vector with every lane <paramref name="lane"/>, worked out at run time.</summary>
+    private string Splat(VectorTypeSymbol vector, string lane)
+    {
+        string type = LlvmTypeOf(vector);
+        string first = Emit(type, $"insertelement {type} poison, {LlvmTypeOf(vector.Element)} {lane}, i32 0");
+        return Emit(type, $"shufflevector {type} {first}, {type} poison, <{vector.Lanes} x i32> zeroinitializer");
+    }
+
+    /// <summary><c>a.yzx * b.zxy - a.zxy * b.yzx</c>.</summary>
+    private string Cross(string type, string left, string right)
+    {
+        string Turned(string value, int a, int b, int c) =>
+            Emit(type, $"shufflevector {type} {value}, {type} poison, {Mask([a, b, c])}");
+
+        string first = Emit(type, $"fmul {type} {Turned(left, 1, 2, 0)}, {Turned(right, 2, 0, 1)}");
+        string second = Emit(type, $"fmul {type} {Turned(left, 2, 0, 1)}, {Turned(right, 1, 2, 0)}");
+        return Emit(type, $"fsub {type} {first}, {second}");
+    }
+
+    /// <summary>Each lane from <paramref name="whenSet"/> where the mask's is not zero, else from <paramref name="otherwise"/>.</summary>
+    private string Selected(VectorTypeSymbol vector, string mask, string whenSet, string otherwise)
+    {
+        string type = LlvmTypeOf(vector);
+        string maskType = LlvmTypeOf(vector.MaskType);
+        string bits = Emit($"<{vector.Lanes} x i1>", $"icmp ne {maskType} {mask}, zeroinitializer");
+        return Emit(type, $"select <{vector.Lanes} x i1> {bits}, {type} {whenSet}, {type} {otherwise}");
+    }
+
     /// <summary>Whether all (<c>and</c>) or any (<c>or</c>) of a vector of bits is set.</summary>
     private string ReduceLanes(string how, int lanes, string bits)
     {

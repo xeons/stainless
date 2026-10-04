@@ -3446,6 +3446,36 @@ Two different vectors do not mix (SL0932): one is cast to the other first.
 A vector is not ordered as a whole, so `<` is refused (SL0932); comparing lane
 by lane gives a mask, which is a function and not an operator.
 
+**Its functions are static members of the type**, as .NET's are, so they are
+written with the type in front and collide with nothing:
+
+```csharp
+float d = vfloat4.Dot(a, b);
+vfloat3 n = vfloat3.Normalize(vfloat3.Cross(u, v));
+vfloat4 c = vfloat4.Clamp(color, 0, 1);
+vint4 nearer = vfloat4.LessThan(a, b);              // -1 where a is less, 0 elsewhere
+vfloat4 m = vfloat4.Select(nearer, a, b);
+bool none = !vint4.Any(nearer);
+```
+
+| | |
+|---|---|
+| Every vector | `Dot`, `Min`, `Max`, `Clamp`, `Equal`, `NotEqual`, `LessThan`, `LessThanOrEqual`, `GreaterThan`, `GreaterThanOrEqual`, `Select` |
+| Float lanes | `Sqrt`, `Floor`, `Ceiling`, `Round` (to even), `Truncate`, `FusedMultiplyAdd`, `Lerp`, `Distance`, `Normalize` |
+| Signed or float lanes | `Abs` |
+| Three float lanes | `Cross` |
+| Integer lanes | `All`, `Any`: whether every lane, or any, is not zero |
+
+A comparison answers in the signed integers of the lanes' width -- `vint4` for
+a `vfloat4`, `vlong2` for a `vdouble2` -- all ones where it holds, which is the
+mask `Select` takes. A lane given where a vector is wanted fills it, so
+`vfloat4.Max(v, 0)` works. What a vector answers about itself is a property:
+`v.Sum`, `v.LengthSquared`, and `v.Length` for float lanes. `vfloat4.Zero` and
+`vfloat4.One` are what they say. Each is an LLVM intrinsic or a few vector
+instructions; `Dot` and `Sum` add the lanes in order, as a loop would, so a
+float answer is the same on every target. A function that does not exist, or
+is not for these lanes, or is given the wrong count is SL0934.
+
 **A cast converts each lane**, as each lane alone would convert -- saturating
 from float to integer, wrapping from wider integer to narrower -- between
 vectors of the same count. Nothing converts implicitly.

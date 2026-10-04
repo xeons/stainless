@@ -191,6 +191,17 @@ public sealed partial class Binder
         // `Module.Member` is a qualified name, not a value access. A module,
         // a variant and an enum are all names, so `->` reaches none of them:
         // there is nothing there to be pointed at.
+        if (!syntax.ThroughPointer && VectorPrefix(syntax.Target) is { } vectorType)
+        {
+            if (BindVectorConstant(syntax, vectorType) is { } constant) return constant;
+
+            diagnostics.Error("SL0934", syntax.Span,
+                $"'{vectorType.Name}' has no member named '{syntax.Member}'; it has Zero and One, " +
+                "and functions called as 'vfloat4.Dot(a, b)'",
+                vectorType);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         if (!syntax.ThroughPointer && ResolveModulePrefix(syntax.Target) is { } importedModule)
         {
             if (importedModule.Constants.TryGetValue(syntax.Member, out var constant) && constant.IsPublic)

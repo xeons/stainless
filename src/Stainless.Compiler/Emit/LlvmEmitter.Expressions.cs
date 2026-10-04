@@ -103,6 +103,7 @@ public sealed partial class LlvmEmitter
             case BoundTupleCreate tuple: return EmitTupleCreate(tuple);
             case BoundVectorNew made: return EmitVectorNew(made);
             case BoundVectorShuffle shuffle: return EmitVectorShuffle(shuffle);
+            case BoundVectorFunction called: return EmitVectorFunction(called);
             case BoundSwizzleAssignment written: return EmitSwizzleAssignment(written);
             case BoundConversion conversion: return EmitConversion(conversion);
 

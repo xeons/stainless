@@ -56,6 +56,10 @@ public sealed partial class Binder
             return BindVariantDraft(syntax, bare, arguments);
 
 
+        if (syntax.Callee is MemberAccessSyntax { TypeArguments: null, ThroughPointer: false } vectorCall &&
+            VectorPrefix(vectorCall.Target) is { } vectorType)
+            return BindVectorFunction(syntax, vectorCall.Member, vectorType, arguments);
+
         // `Shape.Circle(2.0)` names the variant as well as the case, so it
         // needs nothing from the surrounding expression to settle it.
         if (syntax.Callee is MemberAccessSyntax { TypeArguments: null } named &&

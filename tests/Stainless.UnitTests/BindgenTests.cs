@@ -125,8 +125,18 @@ public class BindgenTests
     [Theory]
 
     [InlineData("__attribute__((__vector_size__(4 * sizeof(float)))) float")]
+    [InlineData("__attribute__((__ext_vector_type__(4),__aligned__(4))) float")]
     public void WhatABindingCannotSpellIsSaidToBeSo(string spelling) =>
         Assert.IsType<CUnsupported>(CTypeParser.Parse(spelling));
+
+    /// <summary>The spellings Apple's simd headers and the x86 intrinsics headers use.</summary>
+    [Theory]
+    [InlineData("__attribute__((__ext_vector_type__(4))) float", "float", 4, false)]
+    [InlineData("__attribute__((__ext_vector_type__(3))) unsigned char", "unsigned char", 3, false)]
+    [InlineData("float __attribute__((ext_vector_type(2)))", "float", 2, false)]
+    [InlineData("__attribute__((__vector_size__(16))) long long", "long long", 16, true)]
+    public void AVectorIsItsElementAndCount(string spelling, string element, int count, bool bytes) =>
+        Assert.Equal(new CVector(new CBuiltin(element), count, bytes), CTypeParser.Parse(spelling));
 
     // ------------------------------------------------------------ the fixture
 

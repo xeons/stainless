@@ -776,6 +776,14 @@ public abstract class BoundTreeRewriter
                 return Same(made.Parts, parts) ? made : new BoundVectorNew(made.Span, made.Vector, parts);
             }
 
+            case BoundVectorFunction called:
+            {
+                var arguments = RewriteAll(called.Arguments);
+                return Same(called.Arguments, arguments)
+                    ? called
+                    : new BoundVectorFunction(called.Span, called.Type, called.Function, called.Vector, arguments);
+            }
+
             case BoundVectorShuffle shuffle:
             {
                 var vector = Rewrite(shuffle.Vector);

@@ -83,7 +83,8 @@ last person to edit it -- the suite is the authority.
   `new`, read and written by lane, by index and by swizzle, operated on lane by
   lane, `==` true when every lane is, cast lane by lane, written in an
   interpolation, and passed across `extern "C"` as clang passes them on each
-  of the eight targets
+  of the eight targets. `Dot`, `Cross`, `Min`, `Max`, `Sqrt`, per-lane
+  comparisons, `Select` and the rest are static members of the type
 - `struct` with fields, methods and constructors; exact C layout; value copy
   semantics. `new Point(3, 4)` allocates nothing: the constructor runs over the
   slot the expression needed, zeroed first, so a constructor adds no header and
@@ -1098,8 +1099,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   which this language means. `[Reflect]` is refused on a type with bit-fields
   (SL0475): the field tables describe a byte offset, and a bit-field has none.
 - **There is no alignment on a single field**, only on a whole type.
-- **A vector has no functions yet**: no `Dot`, `Min`, `Sqrt`, per-lane
-  comparison or `Select`. They come next, as static members of the type.
 - **A slice is owning, and there is no borrowed one.** It retains the array it
   came from, which is what makes it impossible to dangle and also what makes it
   cost a reference count per copy and keep a large array alive for a small view

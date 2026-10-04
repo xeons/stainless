@@ -82,12 +82,168 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// What a built-in function takes, one letter per parameter -- <c>V</c> the
+    /// vector, a lane filling it if given one; <c>M</c> its mask -- what it
+    /// answers, and which lanes it is for.
+    /// </summary>
+    private enum VectorResult { Vector, Lane, Mask, Bool }
+
+    private enum VectorLanes { Any, Float, Signed, Integer, FloatThree }
+
+    private static (VectorFunction Function, string Parameters, VectorResult Result, VectorLanes Lanes)? VectorSignature(string name) =>
+        name switch
+        {
+            "Dot" => (VectorFunction.Dot, "VV", VectorResult.Lane, VectorLanes.Any),
+            "Cross" => (VectorFunction.Cross, "VV", VectorResult.Vector, VectorLanes.FloatThree),
+            "Distance" => (VectorFunction.Distance, "VV", VectorResult.Lane, VectorLanes.Float),
+            "Normalize" => (VectorFunction.Normalize, "V", VectorResult.Vector, VectorLanes.Float),
+            "Min" => (VectorFunction.Min, "VV", VectorResult.Vector, VectorLanes.Any),
+            "Max" => (VectorFunction.Max, "VV", VectorResult.Vector, VectorLanes.Any),
+            "Clamp" => (VectorFunction.Clamp, "VVV", VectorResult.Vector, VectorLanes.Any),
+            "Abs" => (VectorFunction.Abs, "V", VectorResult.Vector, VectorLanes.Signed),
+            "Sqrt" => (VectorFunction.Sqrt, "V", VectorResult.Vector, VectorLanes.Float),
+            "Floor" => (VectorFunction.Floor, "V", VectorResult.Vector, VectorLanes.Float),
+            "Ceiling" => (VectorFunction.Ceiling, "V", VectorResult.Vector, VectorLanes.Float),
+            "Round" => (VectorFunction.Round, "V", VectorResult.Vector, VectorLanes.Float),
+            "Truncate" => (VectorFunction.Truncate, "V", VectorResult.Vector, VectorLanes.Float),
+            "FusedMultiplyAdd" => (VectorFunction.FusedMultiplyAdd, "VVV", VectorResult.Vector, VectorLanes.Float),
+            "Lerp" => (VectorFunction.Lerp, "VVV", VectorResult.Vector, VectorLanes.Float),
+            "Equal" => (VectorFunction.Equal, "VV", VectorResult.Mask, VectorLanes.Any),
+            "NotEqual" => (VectorFunction.NotEqual, "VV", VectorResult.Mask, VectorLanes.Any),
+            "LessThan" => (VectorFunction.LessThan, "VV", VectorResult.Mask, VectorLanes.Any),
+            "LessThanOrEqual" => (VectorFunction.LessThanOrEqual, "VV", VectorResult.Mask, VectorLanes.Any),
+            "GreaterThan" => (VectorFunction.GreaterThan, "VV", VectorResult.Mask, VectorLanes.Any),
+            "GreaterThanOrEqual" => (VectorFunction.GreaterThanOrEqual, "VV", VectorResult.Mask, VectorLanes.Any),
+            "Select" => (VectorFunction.Select, "MVV", VectorResult.Vector, VectorLanes.Any),
+            "All" => (VectorFunction.All, "V", VectorResult.Bool, VectorLanes.Integer),
+            "Any" => (VectorFunction.Any, "V", VectorResult.Bool, VectorLanes.Integer),
+            _ => null,
+        };
+
+    private static string? LanesRefused(VectorLanes lanes, VectorTypeSymbol vector) => lanes switch
+    {
+        VectorLanes.Float when !vector.Element.IsFloat => "floating-point lanes",
+        VectorLanes.Signed when !vector.Element.IsSigned && !vector.Element.IsFloat => "signed lanes",
+        VectorLanes.Integer when !vector.Element.IsInteger => "integer lanes, as a mask has",
+        VectorLanes.FloatThree when !vector.Element.IsFloat || vector.Lanes != 3 => "three floating-point lanes",
+        _ => null,
+    };
+
+    /// <summary>
+    /// The vector a call's or a member's prefix names: a bare <c>vfloat4</c>
+    /// that no local, field or type of the program's own is called, or a type
+    /// parameter given a vector.
+    /// </summary>
+    private VectorTypeSymbol? VectorPrefix(ExpressionSyntax target) =>
+        target is NameSyntax { Name.Parts: [var name] } &&
+        !NamesAValue(name) && LookupLocal(name) is null &&
+        (TypeNamed([name]) ?? VectorTypeSymbol.Named(name)) is VectorTypeSymbol vector
+            ? vector
+            : null;
+
+    /// <summary><c>vfloat4.Dot(a, b)</c> and the rest of the vector's functions.</summary>
+    private BoundExpression BindVectorFunction(
+        CallSyntax syntax, string name, VectorTypeSymbol vector, List<BoundExpression> arguments)
+    {
+        if (VectorSignature(name) is not { } signature)
+        {
+            diagnostics.Error("SL0934", syntax.Span,
+                $"'{vector.Name}' has no function named '{name}'; it has Dot, Cross, Distance, " +
+                "Normalize, Min, Max, Clamp, Abs, Sqrt, Floor, Ceiling, Round, Truncate, FusedMultiplyAdd, " +
+                "Lerp, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual, " +
+                "Select, All and Any",
+                vector);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (LanesRefused(signature.Lanes, vector) is { } wanted)
+        {
+            diagnostics.Error("SL0934", syntax.Span,
+                $"'{vector.Name}.{name}' is for a vector of {wanted}, and '{vector.Name}' is not one",
+                vector);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (arguments.Count != signature.Parameters.Length)
+        {
+            diagnostics.Error("SL0934", syntax.Span,
+                $"'{vector.Name}.{name}' takes {Counted(signature.Parameters.Length, "argument")}, " +
+                $"and {arguments.Count} {(arguments.Count == 1 ? "was" : "were")} given",
+                vector);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var converted = new List<BoundExpression>();
+        for (int i = 0; i < arguments.Count; i++)
+        {
+            var argument = arguments[i];
+            var given = signature.Parameters[i] == 'M'
+                ? BindConversion(argument, vector.MaskType, argument.Span)
+                : argument.Type is VectorTypeSymbol
+                    ? BindConversion(argument, vector, argument.Span)
+                    : VectorOperand(argument, vector);
+            if (given.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+            converted.Add(given);
+        }
+
+        return new BoundVectorFunction(syntax.Span, VectorResultType(signature.Result, vector),
+            signature.Function, vector, converted);
+    }
+
+    private static TypeSymbol VectorResultType(VectorResult result, VectorTypeSymbol vector) => result switch
+    {
+        VectorResult.Vector => vector,
+        VectorResult.Lane => vector.Element,
+        VectorResult.Mask => vector.MaskType,
+        _ => PrimitiveTypeSymbol.Bool,
+    };
+
+    /// <summary><c>vfloat4.Zero</c> and <c>vfloat4.One</c>, or null for any other name.</summary>
+    private BoundExpression? BindVectorConstant(MemberAccessSyntax syntax, VectorTypeSymbol vector) =>
+        syntax.Member switch
+        {
+            "Zero" => new BoundVectorNew(syntax.Span, vector, []),
+            "One" => new BoundVectorNew(syntax.Span, vector,
+                [BindConversion(new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Int, 1UL), vector.Element, syntax.Span)]),
+            _ => null,
+        };
+
+    /// <summary>
+    /// <c>v.Length</c>, <c>v.LengthSquared</c> and <c>v.Sum</c>: what a vector
+    /// answers about itself, or null for any other name.
+    /// </summary>
+    private BoundExpression? BindVectorProperty(BoundExpression receiver, VectorTypeSymbol vector, MemberAccessSyntax syntax)
+    {
+        var function = syntax.Member switch
+        {
+            "Sum" => VectorFunction.Sum,
+            "LengthSquared" => VectorFunction.LengthSquared,
+            "Length" => VectorFunction.Length,
+            _ => (VectorFunction?)null,
+        };
+        if (function is null) return null;
+
+        if (function == VectorFunction.Length && !vector.Element.IsFloat)
+        {
+            diagnostics.Error("SL0934", syntax.Span,
+                $"'Length' is a square root, which a vector of '{vector.Element.Name}' has no lanes to hold; " +
+                "'LengthSquared' is exact",
+                vector);
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundVectorFunction(syntax.Span, vector.Element, function.Value, vector, [receiver]);
+    }
+
+    /// <summary>
     /// <c>v.x</c>, which is a lane and so storage; <c>v.zyx</c>, a vector of
     /// the lanes named; and <c>v.lo</c>, <c>v.hi</c>, <c>v.even</c> and
     /// <c>v.odd</c>, the halves of a vector with an even number of lanes.
     /// </summary>
     private BoundExpression BindVectorMember(BoundExpression receiver, VectorTypeSymbol vector, MemberAccessSyntax syntax)
     {
+        if (BindVectorProperty(receiver, vector, syntax) is { } property) return property;
+
         string member = syntax.Member;
         int[]? lanes = member switch
         {

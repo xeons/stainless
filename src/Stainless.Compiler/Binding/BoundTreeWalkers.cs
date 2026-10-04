@@ -316,6 +316,7 @@ public abstract class BoundTreeWalker
             case BoundTupleCreate tuple: VisitAll(tuple.Elements); break;
             case BoundVectorNew made: VisitAll(made.Parts); break;
             case BoundVectorShuffle shuffle: Visit(shuffle.Vector); break;
+            case BoundVectorFunction called: VisitAll(called.Arguments); break;
             case BoundSwizzleAssignment written:
                 Visit(written.Target);
                 Visit(written.Value);

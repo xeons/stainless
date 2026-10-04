@@ -929,6 +929,29 @@ public sealed class BoundVectorShuffle(
     public IReadOnlyList<int> Lanes { get; } = lanes;
 }
 
+/// <summary>A vector's built-in function: <c>vfloat4.Dot(a, b)</c>, and <c>v.Length</c>.</summary>
+public enum VectorFunction
+{
+    Dot, Cross, Sum, Length, LengthSquared, Distance, Normalize,
+    Min, Max, Clamp, Abs, Sqrt, Floor, Ceiling, Round, Truncate, FusedMultiplyAdd, Lerp,
+    Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual,
+    Select, All, Any,
+}
+
+/// <summary>
+/// One of <see cref="VectorFunction"/> over <paramref name="vector"/>, its
+/// arguments already converted: vectors of that type, a mask, or a lane.
+/// </summary>
+public sealed class BoundVectorFunction(
+    SourceSpan span, TypeSymbol type, VectorFunction function, VectorTypeSymbol vector,
+    IReadOnlyList<BoundExpression> arguments)
+    : BoundExpression(span, type)
+{
+    public VectorFunction Function { get; } = function;
+    public VectorTypeSymbol Vector { get; } = vector;
+    public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+}
+
 /// <summary>
 /// <c>v.xy = p</c>: the value's lanes written into the named lanes of a
 /// vector with storage, which is read and written once.

@@ -768,6 +768,9 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             case CBuiltin builtin:
                 return Builtin(builtin.Name);
 
+            case CVector vector:
+                return SpellVector(vector);
+
             case CUnsupported unsupported:
                 throw new Unsupported(unsupported.Why);
 
@@ -813,6 +816,42 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             default:
                 throw new Unsupported($"the type {type}");
         }
+    }
+
+    /// <summary>
+    /// A C vector as the Stainless one: <c>vfloat4</c>. C's <c>char</c> is
+    /// signed on every Apple target, so a vector of it is of <c>sbyte</c>.
+    /// </summary>
+    private string SpellVector(CVector vector)
+    {
+        if (Canonical(vector.Element) is not CBuiltin { Name: var c })
+            throw new Unsupported($"a vector of {vector.Element}");
+
+        var (element, size) = c switch
+        {
+            "char" or "signed char" => ("sbyte", 1),
+            "unsigned char" => ("byte", 1),
+            "short" => ("short", 2),
+            "unsigned short" => ("ushort", 2),
+            "int" => ("int", 4),
+            "unsigned int" => ("uint", 4),
+            "float" => ("float", 4),
+            "long" or "long long" => ("long", 8),
+            "unsigned long" or "unsigned long long" => ("ulong", 8),
+            "double" => ("double", 8),
+            _ => throw new Unsupported($"a vector of {c}"),
+        };
+
+        int lanes = vector.CountIsBytes ? vector.Count / size : vector.Count;
+        int[] counts = size switch
+        {
+            1 => [2, 3, 4, 8, 16, 32, 64],
+            2 => [2, 3, 4, 8, 16, 32],
+            4 => [2, 3, 4, 8, 16],
+            _ => [2, 3, 4, 8],
+        };
+        if (!counts.Contains(lanes)) throw new Unsupported($"a vector of {lanes} {c}");
+        return $"v{element}{lanes}";
     }
 
     private static string Builtin(string name) => name switch
