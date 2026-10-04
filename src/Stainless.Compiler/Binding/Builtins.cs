@@ -170,6 +170,12 @@ public sealed class Builtins
     public FunctionSymbol TextFromULong => Found(ref _textFromULong, Text, "FromInteger",
         String, PrimitiveTypeSymbol.ULong);
 
+    public FunctionSymbol TextFromInt128 => Found(ref _textFromInt128, Text, "FromInteger",
+        String, PrimitiveTypeSymbol.Int128);
+
+    public FunctionSymbol TextFromUInt128 => Found(ref _textFromUInt128, Text, "FromInteger",
+        String, PrimitiveTypeSymbol.UInt128);
+
     public FunctionSymbol TextFromBool => Found(ref _textFromBool, Text, "FromBool",
         String, PrimitiveTypeSymbol.Bool);
 
@@ -206,6 +212,8 @@ public sealed class Builtins
     private InterfaceTypeSymbol? _formattable;
     private FunctionSymbol? _textFromLong;
     private FunctionSymbol? _textFromULong;
+    private FunctionSymbol? _textFromInt128;
+    private FunctionSymbol? _textFromUInt128;
     private FunctionSymbol? _textFromBool;
     private FunctionSymbol? _textFromChar;
     private FunctionSymbol? _textFromDouble;

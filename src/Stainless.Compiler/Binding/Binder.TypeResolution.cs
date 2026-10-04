@@ -245,7 +245,25 @@ public sealed partial class Binder
                 return ResolveFixedArray(fixedArray, scope);
 
             case PrimitiveTypeSyntax primitive:
+            {
+                // compiler-rt divides 128-bit integers for a 64-bit target
+                // alone, and clang has no __int128 on a 32-bit one: a program
+                // that divided would fail to link with nothing to say why. The
+                // standard library may name the type everywhere, since what
+                // nothing reaches is never emitted.
+                if (primitive.Keyword is TokenKind.Int128Keyword or TokenKind.UInt128Keyword &&
+                    TargetPlatform.Current.PointerWidth < 8 && !_reportedNarrowInt128 &&
+                    !IsStandardLibrary(scope.Module))
+                {
+                    _reportedNarrowInt128 = true;
+                    diagnostics.Error("SL0831", primitive.Span,
+                        $"'{primitive.Keyword.FixedText()}' needs a 64-bit target, and " +
+                        $"'{TargetPlatform.Current.Name}' is 32-bit: clang has no __int128 there, and " +
+                        "nothing divides one");
+                }
+
                 return PrimitiveFor(primitive.Keyword);
+            }
 
             case PointerTypeSyntax pointer:
             {
@@ -1238,6 +1256,12 @@ public sealed partial class Binder
         return BuildCall(syntax, function, self, arguments, nonVirtual: member.Target is BaseSyntax);
     }
 
+    /// <summary>True once SL0831 has been said; it is about the target, not each use.</summary>
+    private bool _reportedNarrowInt128;
+
+    private static bool IsStandardLibrary(ModuleSymbol module) =>
+        module.Name == "Standard" || module.Name.StartsWith("Standard.", StringComparison.Ordinal);
+
     private static PrimitiveTypeSymbol PrimitiveFor(TokenKind keyword) => keyword switch
     {
         TokenKind.VoidKeyword => PrimitiveTypeSymbol.Void,
@@ -1250,11 +1274,13 @@ public sealed partial class Binder
         TokenKind.IntKeyword => PrimitiveTypeSymbol.Int,
         TokenKind.LongKeyword => PrimitiveTypeSymbol.Long,
         TokenKind.NIntKeyword => PrimitiveTypeSymbol.NInt,
+        TokenKind.Int128Keyword => PrimitiveTypeSymbol.Int128,
         TokenKind.ByteKeyword => PrimitiveTypeSymbol.Byte,
         TokenKind.UShortKeyword => PrimitiveTypeSymbol.UShort,
         TokenKind.UIntKeyword => PrimitiveTypeSymbol.UInt,
         TokenKind.ULongKeyword => PrimitiveTypeSymbol.ULong,
         TokenKind.NUIntKeyword => PrimitiveTypeSymbol.NUInt,
+        TokenKind.UInt128Keyword => PrimitiveTypeSymbol.UInt128,
         TokenKind.FloatKeyword => PrimitiveTypeSymbol.Float,
         _ => PrimitiveTypeSymbol.Double,
     };

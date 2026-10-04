@@ -56,8 +56,8 @@ public enum TokenKind
 
     // Primitive type keywords
     VoidKeyword, BoolKeyword, CharKeyword, Char16Keyword, Char32Keyword,
-    SByteKeyword, ShortKeyword, IntKeyword, LongKeyword, NIntKeyword,
-    ByteKeyword, UShortKeyword, UIntKeyword, ULongKeyword, NUIntKeyword,
+    SByteKeyword, ShortKeyword, IntKeyword, LongKeyword, NIntKeyword, Int128Keyword,
+    ByteKeyword, UShortKeyword, UIntKeyword, ULongKeyword, NUIntKeyword, UInt128Keyword,
     FloatKeyword, DoubleKeyword,
 
     // Punctuation
@@ -160,11 +160,13 @@ public static class TokenKindExtensions
         TokenKind.IntKeyword => "int",
         TokenKind.LongKeyword => "long",
         TokenKind.NIntKeyword => "nint",
+        TokenKind.Int128Keyword => "int128",
         TokenKind.ByteKeyword => "byte",
         TokenKind.UShortKeyword => "ushort",
         TokenKind.UIntKeyword => "uint",
         TokenKind.ULongKeyword => "ulong",
         TokenKind.NUIntKeyword => "nuint",
+        TokenKind.UInt128Keyword => "uint128",
         TokenKind.FloatKeyword => "float",
         TokenKind.DoubleKeyword => "double",
         TokenKind.OpenParen => "(",

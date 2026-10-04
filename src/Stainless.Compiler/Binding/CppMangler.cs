@@ -251,6 +251,8 @@ public static class CppMangler
         PrimitiveKind.ULong => "y",
         PrimitiveKind.NInt => "l",
         PrimitiveKind.NUInt => "m",
+        PrimitiveKind.Int128 => "n",
+        PrimitiveKind.UInt128 => "o",
 
         PrimitiveKind.Float => "f",
         PrimitiveKind.Double => "d",
@@ -372,6 +374,10 @@ public static class CppMangler
         PrimitiveKind.ULong => "_K",
         PrimitiveKind.NInt => "_J",
         PrimitiveKind.NUInt => "_K",
+
+        // What clang calls __int128 on a Microsoft target, which MSVC has not got.
+        PrimitiveKind.Int128 => "_L",
+        PrimitiveKind.UInt128 => "_M",
 
         PrimitiveKind.Float => "M",
         PrimitiveKind.Double => "N",

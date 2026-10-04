@@ -214,6 +214,41 @@ public String FromInteger(ulong value) => sl_string_from_unsigned(value);
 /// stack, and `$"{n}"` printed 8612659968337772549 for 5.
 public String FromInteger(nuint value) => sl_string_from_size(value);
 
+/// A signed 128-bit integer in base ten.
+public String FromInteger(int128 value)
+{
+    if (value >= 0) return FormatUInt128Digits((uint128)value, negative: false);
+
+    // The magnitude of the most negative int128 is no int128, and is a uint128.
+    return FormatUInt128Digits((uint128)0 - (uint128)value, negative: true);
+}
+
+/// An unsigned 128-bit integer in base ten.
+public String FromInteger(uint128 value) => FormatUInt128Digits(value, negative: false);
+
+/// A 128-bit magnitude's digits, written backwards from the end of a buffer
+/// long enough for the 39 of the largest and a sign.
+String FormatUInt128Digits(uint128 value, bool negative)
+{
+    byte[40] buffer;
+    int at = 40;
+    do
+    {
+        at--;
+        buffer[at] = (byte)((uint128)'0' + value % 10);
+        value = value / 10;
+    }
+    while (value != 0);
+
+    if (negative)
+    {
+        at--;
+        buffer[at] = (byte)'-';
+    }
+
+    return FromBytes(&buffer[at], (nuint)(40 - at));
+}
+
 /// The shortest text that reads back as the same number.
 public String FromDouble(double value) => sl_string_from_double(value);
 

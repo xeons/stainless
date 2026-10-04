@@ -67,7 +67,7 @@ public class TypeSystemTests
     {
         foreach (var kind in Enum.GetValues<PrimitiveKind>())
         {
-            bool inRange = kind is >= PrimitiveKind.Char and <= PrimitiveKind.NUInt;
+            bool inRange = kind is >= PrimitiveKind.Char and <= PrimitiveKind.UInt128;
             bool isInteger = kind is not (PrimitiveKind.Void or PrimitiveKind.Bool
                 or PrimitiveKind.Float or PrimitiveKind.Double);
 

@@ -720,6 +720,15 @@ public sealed class Toolchain
         if (target.Architecture == Binding.TargetArch.X86 && target.IsWindows)
             arguments.Add("-llegacy_stdio_definitions");
 
+        // 128-bit division and the conversions between int128 and the floats
+        // are calls into compiler-rt, which the MSVC runtime has not got and
+        // every other target's C library carries. Asked only where LLVM ships
+        // the library for this architecture, so an install without it still
+        // links whatever does not need it.
+        if (target.IsWindows && EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) &&
+            HasCompilerRtBuiltins)
+            arguments.Add("--rtlib=compiler-rt");
+
         // One or the other: the runtime is either compiled into this binary or
         // reached in the one library everything shares. Both at once would be
         // two allocators and two sets of counts, which is the whole thing the
@@ -825,6 +834,25 @@ public sealed class Toolchain
         ]);
 
     /// <summary>Whether <c>lld-link</c> ships beside clang, as it does in LLVM's Windows installer.</summary>
+    private bool? _hasCompilerRtBuiltins;
+
+    /// <summary>Whether clang has compiler-rt's builtins library for the target, asked once.</summary>
+    private bool HasCompilerRtBuiltins => _hasCompilerRtBuiltins ??= AskCompilerRtBuiltins();
+
+    private bool AskCompilerRtBuiltins()
+    {
+        try
+        {
+            var asked = Run(ClangPath, [.. TargetArguments, "--rtlib=compiler-rt", "-print-libgcc-file-name"]);
+            string path = asked.StandardOutput.Trim();
+            return path.Length > 0 && File.Exists(path);
+        }
+        catch (Exception e) when (e is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            return false;
+        }
+    }
+
     private bool HasLldLinkBesideClang =>
         new[] { ClangPath, RealPath(ClangPath) }
             .Select(Path.GetDirectoryName)

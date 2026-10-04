@@ -423,6 +423,9 @@ public sealed partial class Binder
                 or PrimitiveKind.ULong or PrimitiveKind.NUInt
         } => _builtins.TextFromULong,
 
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.Int128 } => _builtins.TextFromInt128,
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.UInt128 } => _builtins.TextFromUInt128,
+
         _ => null,
     };
 

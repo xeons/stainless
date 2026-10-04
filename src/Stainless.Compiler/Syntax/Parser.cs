@@ -2450,9 +2450,9 @@ public sealed class Parser
         TokenKind.VoidKeyword, TokenKind.BoolKeyword, TokenKind.CharKeyword,
         TokenKind.Char16Keyword, TokenKind.Char32Keyword,
         TokenKind.SByteKeyword, TokenKind.ShortKeyword, TokenKind.IntKeyword,
-        TokenKind.LongKeyword, TokenKind.NIntKeyword,
+        TokenKind.LongKeyword, TokenKind.NIntKeyword, TokenKind.Int128Keyword,
         TokenKind.ByteKeyword, TokenKind.UShortKeyword, TokenKind.UIntKeyword,
-        TokenKind.ULongKeyword, TokenKind.NUIntKeyword,
+        TokenKind.ULongKeyword, TokenKind.NUIntKeyword, TokenKind.UInt128Keyword,
         TokenKind.FloatKeyword, TokenKind.DoubleKeyword,
     ];
 

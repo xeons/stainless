@@ -10,13 +10,31 @@ Names and sizes match C# exactly.
 |---|---|---|
 | `sbyte` `short` `int` `long` | 1/2/4/8 | `int8_t` … `int64_t` |
 | `byte` `ushort` `uint` `ulong` | 1/2/4/8 | `uint8_t` … `uint64_t` |
-| `nint` `nuint` | pointer | `intptr_t` / `size_t` |
+| `nint` `nuint` | 4 or 8: native | `intptr_t` / `size_t` |
+| `int128` `uint128` | 16 | `__int128` / `unsigned __int128` |
 | `float` `double` | 4/8 | `float` / `double` |
 | `bool` | 1 | `bool` |
 | `char` | 1 | `char` — one UTF-8 code unit |
 | `char16` | 2 | `char16_t` — one UTF-16 code unit |
 | `char32` | 4 | `char32_t` — one Unicode scalar |
 | `void` | 0 | `void` |
+
+**`nint` and `nuint` are the native integers**, the width the target computes
+in: 8 bytes on a 64-bit target and 4 on a 32-bit one, the width of a pointer
+there. `nuint` is the type of a size, a length, a count and an index -- C's
+`size_t`, Rust's `usize` -- which is why `Length` and `Count` return one and a
+loop over a collection counts in one; `nint` is the signed difference of two
+such. Neither is a pointer, and neither holds one but by a cast.
+
+**`int128` and `uint128`** are 16 bytes on a 16-byte boundary, as clang's
+`__int128` is everywhere. Every narrower integer widens to them as it widens to
+`long`, and they narrow by a cast. A literal holds 64 bits, so a larger
+constant is built as C builds one: `~(uint128)0`, `(int128)1 << 100`.
+Division and the conversions to and from the floats are calls into
+compiler-rt, which each target's C library carries; on Windows the compiler
+links LLVM's copy, since the MSVC runtime has none. They need a 64-bit target
+(SL0831): clang has no `__int128` on a 32-bit one, and nothing there divides
+one.
 
 `void` is the absence of a value rather than a value of no size, so the only
 place it can be written is what a function returns (SL0309). There is no

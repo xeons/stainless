@@ -70,6 +70,12 @@ public class BindgenTests
         Assert.Equal(new CBlock(new CFunction(Void, [], false)), CTypeParser.Parse("void (^)(void)"));
 
     [Theory]
+    [InlineData("__int128", "__int128")]
+    [InlineData("unsigned __int128", "unsigned __int128")]
+    public void A128BitIntegerIsABuiltin(string spelling, string name) =>
+        Assert.Equal(new CBuiltin(name), CTypeParser.Parse(spelling));
+
+    [Theory]
     [InlineData("char [16]", 16L)]
     [InlineData("unsigned char[256]", 256L)]
     public void AnArrayKeepsItsLength(string spelling, long length) =>
@@ -117,7 +123,6 @@ public class BindgenTests
 
     [Theory]
     [InlineData("long double")]
-    [InlineData("__int128")]
     [InlineData("__attribute__((__vector_size__(4 * sizeof(float)))) float")]
     public void WhatABindingCannotSpellIsSaidToBeSo(string spelling) =>
         Assert.IsType<CUnsupported>(CTypeParser.Parse(spelling));

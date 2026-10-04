@@ -78,6 +78,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         ["intptr_t"] = "nint", ["uintptr_t"] = "nuint", ["size_t"] = "nuint", ["ssize_t"] = "nint",
         ["ptrdiff_t"] = "nint", ["u_int8_t"] = "byte", ["u_int16_t"] = "ushort", ["u_int32_t"] = "uint",
         ["u_int64_t"] = "ulong", ["intmax_t"] = "long", ["uintmax_t"] = "ulong",
+        ["__int128_t"] = "int128", ["__uint128_t"] = "uint128",
     };
 
     /// <summary>The declarations of <see cref="SystemOwner"/> something used, which that module is made of.</summary>
@@ -611,6 +612,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         {
             "sbyte" => (8, true), "byte" => (8, false), "short" => (16, true), "ushort" => (16, false),
             "int" => (32, true), "uint" => (32, false), "long" or "nint" => (64, true),
+            "int128" => (128, true), "uint128" => (128, false),
             _ => (64, false),
         };
 
@@ -763,6 +765,8 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         "double" => "double",
         "char16_t" => "char16",
         "char32_t" => "char32",
+        "__int128" => "int128",
+        "unsigned __int128" => "uint128",
         _ => throw new Unsupported($"the builtin type '{name}'"),
     };
 
@@ -922,7 +926,8 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
                 {
                     "sbyte" => "signed char", "byte" => "unsigned char", "short" => "short",
                     "ushort" => "unsigned short", "int" => "int", "uint" => "unsigned int",
-                    "long" or "nint" => "long", _ => "unsigned long",
+                    "long" or "nint" => "long", "int128" => "__int128",
+                    "uint128" => "unsigned __int128", _ => "unsigned long",
                 })
                 // clang's own `typedef id id` names itself.
                 : translation.Typedefs.TryGetValue(typedef.Name, out var declared) && declared.Type != type

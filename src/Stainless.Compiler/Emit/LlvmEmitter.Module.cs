@@ -293,6 +293,7 @@ public sealed partial class LlvmEmitter
             PrimitiveKind.Int or PrimitiveKind.UInt
                 or PrimitiveKind.Char32 or PrimitiveKind.Float => (4, 4),
             PrimitiveKind.NInt or PrimitiveKind.NUInt => (PointerBytes, PointerBytes),
+            PrimitiveKind.Int128 or PrimitiveKind.UInt128 => (16, 16),
 
             // i386 System V's four, which LLVM's data layout for that triple
             // says as well.

@@ -19,8 +19,8 @@ namespace Stainless.Binding;
 public enum PrimitiveKind
 {
     Void, Bool, Char, Char16, Char32,
-    SByte, Short, Int, Long, NInt,
-    Byte, UShort, UInt, ULong, NUInt,
+    SByte, Short, Int, Long, NInt, Int128,
+    Byte, UShort, UInt, ULong, NUInt, UInt128,
     Float, Double,
 }
 
@@ -141,10 +141,10 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
         _size = size;
     }
 
-    public bool IsInteger => Kind is >= PrimitiveKind.Char and <= PrimitiveKind.NUInt;
+    public bool IsInteger => Kind is >= PrimitiveKind.Char and <= PrimitiveKind.UInt128;
     public bool IsFloat => Kind is PrimitiveKind.Float or PrimitiveKind.Double;
     public bool IsSigned => Kind is PrimitiveKind.SByte or PrimitiveKind.Short
-        or PrimitiveKind.Int or PrimitiveKind.Long or PrimitiveKind.NInt;
+        or PrimitiveKind.Int or PrimitiveKind.Long or PrimitiveKind.NInt or PrimitiveKind.Int128;
     public bool IsNumeric => IsInteger || IsFloat;
 
     /// <summary>
@@ -172,18 +172,20 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
     public static readonly PrimitiveTypeSymbol Int = new(PrimitiveKind.Int, "int", 4);
     public static readonly PrimitiveTypeSymbol Long = new(PrimitiveKind.Long, "long", 8);
     public static readonly PrimitiveTypeSymbol NInt = new(PrimitiveKind.NInt, "nint", 8);
+    public static readonly PrimitiveTypeSymbol Int128 = new(PrimitiveKind.Int128, "int128", 16);
     public static readonly PrimitiveTypeSymbol Byte = new(PrimitiveKind.Byte, "byte", 1);
     public static readonly PrimitiveTypeSymbol UShort = new(PrimitiveKind.UShort, "ushort", 2);
     public static readonly PrimitiveTypeSymbol UInt = new(PrimitiveKind.UInt, "uint", 4);
     public static readonly PrimitiveTypeSymbol ULong = new(PrimitiveKind.ULong, "ulong", 8);
     public static readonly PrimitiveTypeSymbol NUInt = new(PrimitiveKind.NUInt, "nuint", 8);
+    public static readonly PrimitiveTypeSymbol UInt128 = new(PrimitiveKind.UInt128, "uint128", 16);
     public static readonly PrimitiveTypeSymbol Float = new(PrimitiveKind.Float, "float", 4);
     public static readonly PrimitiveTypeSymbol Double = new(PrimitiveKind.Double, "double", 8);
 
     public static readonly IReadOnlyList<PrimitiveTypeSymbol> All =
     [
-        Void, Bool, Char, Char16, Char32, SByte, Short, Int, Long, NInt,
-        Byte, UShort, UInt, ULong, NUInt, Float, Double,
+        Void, Bool, Char, Char16, Char32, SByte, Short, Int, Long, NInt, Int128,
+        Byte, UShort, UInt, ULong, NUInt, UInt128, Float, Double,
     ];
 }
 

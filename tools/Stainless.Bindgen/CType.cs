@@ -270,7 +270,8 @@ public sealed partial class CTypeParser
     private static CType Builtin(List<string> words)
     {
         if (words.Contains("_Complex")) return new CUnsupported("a complex number");
-        if (words.Contains("__int128")) return new CUnsupported("a 128-bit integer");
+        if (words.Contains("__int128"))
+            return new CBuiltin(words.Contains("unsigned") ? "unsigned __int128" : "__int128");
         if (words is ["long", "double"] or ["double", "long"]) return new CUnsupported("a long double");
         if (words.Contains("_Float16") || words.Contains("__fp16") || words.Contains("__bf16"))
             return new CUnsupported("a 16-bit float");

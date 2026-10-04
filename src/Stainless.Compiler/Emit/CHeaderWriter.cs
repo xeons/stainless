@@ -421,6 +421,8 @@ public static class CHeaderWriter
             PrimitiveKind.Int => "int32_t",
             PrimitiveKind.Long => "int64_t",
             PrimitiveKind.NInt => "intptr_t",
+            PrimitiveKind.Int128 => "__int128",
+            PrimitiveKind.UInt128 => "unsigned __int128",
             PrimitiveKind.Byte => "uint8_t",
             PrimitiveKind.UShort => "uint16_t",
             PrimitiveKind.UInt => "uint32_t",
