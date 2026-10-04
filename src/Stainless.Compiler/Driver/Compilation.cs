@@ -286,6 +286,13 @@ public static class LinkDiagnosis
         if (FindNativeSourceError(linkerOutput) is string source)
             return $"'{source}' did not compile:\n" + linkerOutput;
 
+        // A library or framework the program named and the system has not
+        // got: what to link is the program's to say.
+        if (MissingLibrary(linkerOutput) is { } missing)
+            return $"the linker could not find {missing}:\n" + linkerOutput +
+                   "\nCheck the name written in '#pragma comment' or on the command line. A framework " +
+                   "that is only headers, as CoreAudioTypes is, has nothing to link.";
+
         if (!Undefined(linkerOutput))
             return "the native toolchain rejected the generated IR:\n" + linkerOutput +
                    $"\nThe IR is at {irPath}; this is a compiler bug, not a bug in your program.";
@@ -335,6 +342,27 @@ public static class LinkDiagnosis
             @"^(.+?\.(?:c|cc|cpp|cxx|m|mm|h|hh|hpp|hxx)):\d+:\d+: (?:fatal )?error:",
             RegexOptions.Multiline | RegexOptions.IgnoreCase);
         return match.Success ? match.Groups[1].Value : null;
+    }
+
+    /// <summary>
+    /// The library or framework a linker could not find, as ld64
+    /// (<c>framework 'X' not found</c>, <c>library 'X' not found</c>,
+    /// <c>library not found for -lX</c>), GNU ld and lld (<c>cannot find -lX</c>,
+    /// <c>unable to find library -lX</c>) and link.exe (<c>cannot open input
+    /// file 'X.lib'</c>) write it, or null.
+    /// </summary>
+    private static string? MissingLibrary(string output)
+    {
+        var framework = Regex.Match(output, @"framework '([^']+)' not found");
+        if (framework.Success) return $"the framework '{framework.Groups[1].Value}'";
+
+        var library = Regex.Match(output,
+            @"library '([^']+)' not found|library not found for -l([^\s:]+)|cannot find -l([^\s:]+)|" +
+            @"unable to find library -l([^\s:]+)|cannot open input file '([^']+)'|could not open '([^']+\.lib)'");
+        if (!library.Success) return null;
+
+        string name = library.Groups.Values.Skip(1).First(g => g.Success).Value;
+        return $"the library '{name}'";
     }
 
     private static string Listed(IReadOnlyList<string> libraries) =>

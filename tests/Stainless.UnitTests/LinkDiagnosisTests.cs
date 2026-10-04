@@ -81,6 +81,24 @@ public class LinkDiagnosisTests
         Assert.DoesNotContain("compiler bug", text);
     }
 
+    /// <summary>
+    /// A library or framework the program named and the system has not got
+    /// is the program's to fix, whichever linker said so.
+    /// </summary>
+    [Theory]
+    [InlineData("ld: framework 'CoreAudioTypes' not found\nclang: error: linker command failed", "the framework 'CoreAudioTypes'")]
+    [InlineData("ld: library 'nonesuch' not found", "the library 'nonesuch'")]
+    [InlineData("ld: library not found for -lnonesuch", "the library 'nonesuch'")]
+    [InlineData("/usr/bin/ld: cannot find -lnonesuch: No such file or directory", "the library 'nonesuch'")]
+    [InlineData("lld-link: error: could not open 'nonesuch.lib': no such file or directory", "the library 'nonesuch.lib'")]
+    public void AMissingLibraryIsTheProgramsNotTheCompilers(string output, string missing)
+    {
+        string text = LinkDiagnosis.Explain(output, "app.ll");
+
+        Assert.StartsWith($"the linker could not find {missing}:", text);
+        Assert.DoesNotContain("compiler bug", text);
+    }
+
     [Fact]
     public void AnErrorInTheIrIsStillTheCompilers()
     {
