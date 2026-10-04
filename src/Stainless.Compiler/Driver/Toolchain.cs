@@ -75,9 +75,15 @@ public sealed class Toolchain
     ///
     /// Darwin always names one. Its triple carries the deployment version, and
     /// the program and the runtime MUST agree on it.
+    ///
+    /// A Darwin build on a Mac with <c>SDKROOT</c> set names that SDK too.
+    /// Apple's clang reads it on its own; Homebrew's has the Command Line
+    /// Tools' SDK in its configuration file, which only an explicit
+    /// <c>-isysroot</c> overrides. The headers and the linker MUST come from
+    /// one release: a newer SDK's clang emits stubs an older ld cannot make.
     /// </summary>
     public static IReadOnlyList<string> TargetArgumentsFor(
-        Binding.TargetPlatform target, Binding.TargetPlatform host)
+        Binding.TargetPlatform target, Binding.TargetPlatform host, string? sdkRoot = null)
     {
         List<string> arguments = [];
         if (NamesTriple(target, host))
@@ -86,6 +92,9 @@ public sealed class Toolchain
         if (target.Cpu is { } cpu)
             arguments.Add("-march=" + cpu);
 
+        if (target.IsDarwin && host.IsDarwin && !string.IsNullOrWhiteSpace(sdkRoot))
+            arguments.AddRange(["-isysroot", sdkRoot]);
+
         return arguments;
     }
 
@@ -93,7 +102,8 @@ public sealed class Toolchain
         target.IsDarwin || target.Architecture != host.Architecture || target.Os != host.Os;
 
     private static IReadOnlyList<string> TargetArguments =>
-        TargetArgumentsFor(Binding.TargetPlatform.Current, Binding.TargetPlatform.Host);
+        TargetArgumentsFor(Binding.TargetPlatform.Current, Binding.TargetPlatform.Host,
+                           Environment.GetEnvironmentVariable("SDKROOT"));
 
     /// <summary>
     /// The triple this build actually uses: the one named on the command line
@@ -497,7 +507,7 @@ public sealed class Toolchain
 
             // -O0 alongside -g, because a runtime compiled at -O2 has had the
             // frames a debugger wants to show inlined away.
-            arguments.InsertRange(2, debug ? ["-O0", "-g"] : ["-O2"]);
+            arguments.AddRange(debug ? ["-O0", "-g"] : ["-O2"]);
 
             var result = Run(ClangPath, arguments);
             if (!result.Success)

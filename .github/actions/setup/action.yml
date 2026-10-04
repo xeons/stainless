@@ -43,9 +43,9 @@ runs:
         fi
 
     # The generated bindings cases check what one SDK's headers say, and
-    # sdk.txt names it. The Xcode that ships it is selected, and SDKROOT is
-    # what Homebrew's clang compiles against; without that Xcode the cases
-    # are skipped, saying why.
+    # sdk.txt names it. The Xcode that ships it is selected, which is the
+    # linker, and SDKROOT names its SDK, which the compiler passes to clang
+    # as -isysroot; without that Xcode the cases are skipped, saying why.
     - name: Select the SDK the bindings were generated from
       if: runner.os == 'macOS'
       shell: bash

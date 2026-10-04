@@ -70,6 +70,19 @@ public class ToolchainTests
     }
 
     [Fact]
+    public void ADarwinBuildOnAMacNamesSdkRoot()
+    {
+        const string sdk = "/Applications/Xcode_26.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+
+        var arguments = Toolchain.TargetArgumentsFor(TargetPlatform.Arm64MacOS, Mac, sdk);
+        Assert.Equal(["-isysroot", sdk], arguments.Skip(arguments.Count - 2));
+
+        Assert.DoesNotContain("-isysroot", Toolchain.TargetArgumentsFor(TargetPlatform.Arm64MacOS, Mac));
+        Assert.DoesNotContain("-isysroot", Toolchain.TargetArgumentsFor(TargetPlatform.Arm64MacOS, Windows, sdk));
+        Assert.DoesNotContain("-isysroot", Toolchain.TargetArgumentsFor(TargetPlatform.X64Linux, Mac, sdk));
+    }
+
+    [Fact]
     public void ANativeBuildElsewhereNamesNoTriple()
     {
         Assert.Empty(Toolchain.TargetArgumentsFor(TargetPlatform.X64Windows, Windows));
