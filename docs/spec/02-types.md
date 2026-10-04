@@ -513,12 +513,13 @@ Only a struct's or a union's field may be packed, and not a bit-field (SL0463).
 A header written for a library carrying one cannot be compiled by MSVC, which
 has no way to say it, and says so.
 
-**N is capped at 16.** That is `max_align_t` — what `malloc` guarantees — and a
-class holding a more-aligned field would be handed memory that does not honour
-it. A local could be aligned further and a heap object could too, once the
-runtime allocates by a type's alignment as well as by its size; until then a
-stated limit is better than a rule that holds in some places and not others
-(SL0466).
+**N may be up to 4096, a page** (SL0466), and the boundary holds wherever the
+value lives: a local, a static, a field of an object, an array's element,
+what a closure captured. `malloc` promises sixteen, so an object or array
+whose storage needs more is allocated over-sized by the runtime and placed on
+the boundary -- an array with its first element there -- and freed through the
+same path. A cache line, `[Align(64)]`, is what keeps two threads' counters
+from sharing one.
 
 They apply to a `struct`, and `[Pack]` to a `union` as well, and to nothing else. A class's fields sit behind an
 object header the compiler owns, and a variant's payload area is not a field the

@@ -298,7 +298,19 @@ struct SlTypeInfo {
      * way reflection makes an object, so one it makes is a value of its type.
      */
     void             *(*create)(void);
+
+    /*
+     * What an instance's storage must be aligned to when that is more than
+     * malloc promises (SL_MALLOC_ALIGNMENT), or 0: a class's, or an array's
+     * elements'. Such an object is allocated over-sized and placed on the
+     * boundary, the pointer malloc gave kept in the word before it, which is
+     * where freeing it looks. Appended on the same terms as everything above.
+     */
+    size_t                  alignment;
 };
+
+/* What malloc aligns every allocation to, on every target the compiler builds. */
+#define SL_MALLOC_ALIGNMENT 16
 
 typedef struct SlObject {
     size_t              strong;
@@ -315,6 +327,7 @@ typedef struct SlObject {
 
 /* arc.c */
 SL_API void *sl_alloc(const SlTypeInfo *type);
+SL_API void *sl_alloc_aligned_at(size_t size, size_t alignment, size_t at);
 SL_API void  sl_retain(void *pointer);
 SL_API void  sl_release(void *pointer);
 SL_API void  sl_weak_retain(void *pointer);

@@ -361,9 +361,40 @@ void sl_make_immortal(void *pointer)
     object->strong = SL_IMMORTAL;
 }
 
+/*
+ * Zeroed storage of `size` bytes whose byte `at` is on an `alignment`
+ * boundary: an object's start, or an array's first element. malloc's own
+ * pointer is kept in the word before the object, for sl_free_object.
+ */
+void *sl_alloc_aligned_at(size_t size, size_t alignment, size_t at)
+{
+    size_t extra = alignment + sizeof(void *);
+    if (size > SIZE_MAX - extra) sl_fail("out of memory");
+
+    char *raw = (char *)calloc(1, size + extra);
+    if (raw == NULL) sl_fail("out of memory");
+
+    uintptr_t first = (uintptr_t)raw + sizeof(void *) + at;
+    uintptr_t aligned = (first + alignment - 1) & ~(uintptr_t)(alignment - 1);
+    char *object = (char *)(aligned - at);
+    ((void **)object)[-1] = raw;
+    return object;
+}
+
+/* Frees what sl_alloc or sl_array_alloc made, however it was placed. */
+static void sl_free_object(SlObject *object)
+{
+    if (object->type != NULL && object->type->alignment > SL_MALLOC_ALIGNMENT)
+        free(((void **)object)[-1]);
+    else
+        free(object);
+}
+
 void *sl_alloc(const SlTypeInfo *type)
 {
-    SlObject *object = (SlObject *)calloc(1, type->size);
+    SlObject *object = type->alignment > SL_MALLOC_ALIGNMENT
+        ? (SlObject *)sl_alloc_aligned_at(type->size, type->alignment, 0)
+        : (SlObject *)calloc(1, type->size);
     if (object == NULL) sl_fail("out of memory");
 
     sl_object_init(object, type);
@@ -402,7 +433,7 @@ void sl_weak_release(void *pointer)
 
     if (__atomic_fetch_sub(&object->weak, 1, __ATOMIC_ACQ_REL) == 1) {
         SL_LEAK_FORGET(object);
-        free(object);
+        sl_free_object(object);
     }
 }
 

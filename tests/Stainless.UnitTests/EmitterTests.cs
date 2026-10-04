@@ -1198,9 +1198,10 @@ public class EmitterTests
         Assert.Contains("call ptr @sl_alloc(ptr @_SLtiTest_Made)", maker);
         Assert.Matches(@"call void @_SL4Test4Made\S*\(ptr %object\)", maker);
 
-        Assert.EndsWith("ptr @_SLmake_Test_Made }", TypeInfoLine(ir, "Made"));
-        Assert.EndsWith("ptr null }", TypeInfoLine(ir, "Argued"));
-        Assert.EndsWith("ptr null }", TypeInfoLine(ir, "Abstract"));
+        // The maker, then the storage alignment, which is malloc's own (0) here.
+        Assert.EndsWith("ptr @_SLmake_Test_Made, i64 0 }", TypeInfoLine(ir, "Made"));
+        Assert.EndsWith("ptr null, i64 0 }", TypeInfoLine(ir, "Argued"));
+        Assert.EndsWith("ptr null, i64 0 }", TypeInfoLine(ir, "Abstract"));
     }
 
     private static string TypeInfoLine(string ir, string type) =>

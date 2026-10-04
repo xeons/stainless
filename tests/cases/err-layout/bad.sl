@@ -5,8 +5,8 @@ module Bad;
 [Align(3)]
 public struct Odd { public int A; }
 
-// More than the allocator guarantees.
-[Align(64)]
+// More than a page.
+[Align(8192)]
 public struct TooWide { public double X; }
 
 // Neither applies to a class.

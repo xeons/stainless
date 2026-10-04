@@ -1,0 +1,6 @@
+layout agrees: true
+local true, page true, static true
+C reads it 2.5
+a field of a hundred objects true
+array elements true, pages true
+captured 4.5

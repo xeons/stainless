@@ -42,7 +42,10 @@ void *sl_array_alloc(const SlTypeInfo *type, size_t length, size_t elementSize)
     if (elementSize != 0 && length > (SIZE_MAX - sizeof(SlArray)) / elementSize)
         sl_fail("array is too large to allocate");
 
-    SlArray *array = (SlArray *)calloc(1, sizeof(SlArray) + length * elementSize);
+    /* Elements aligned past what malloc promises put the first of them on the boundary. */
+    SlArray *array = type->alignment > SL_MALLOC_ALIGNMENT
+        ? (SlArray *)sl_alloc_aligned_at(sizeof(SlArray) + length * elementSize, type->alignment, sizeof(SlArray))
+        : (SlArray *)calloc(1, sizeof(SlArray) + length * elementSize);
     if (array == NULL) sl_fail("out of memory");
 
     sl_object_init(array, type);

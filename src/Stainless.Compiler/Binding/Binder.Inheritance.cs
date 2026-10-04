@@ -1576,7 +1576,9 @@ public sealed partial class Binder
 
     private void ReadLayoutAttributes(NamedTypeSymbol type, SourceSpan span)
     {
-        const int MaxAlignment = 16;
+        // A page: as far as anything a C header asks goes, and the allocator
+        // places an object on any boundary up to it.
+        const int MaxAlignment = 4096;
 
         if (type.Attributes.Any(a => a.Type == _builtins.Packed))
         {
@@ -1616,10 +1618,9 @@ public sealed partial class Binder
         if (requested > MaxAlignment)
         {
             diagnostics.Error("SL0466", span,
-                $"'[Align({requested})]' is more than the {MaxAlignment} bytes the allocator " +
-                "guarantees, so an object holding one of these would not honour it. " +
-                $"{MaxAlignment} is the most that can be promised until the runtime allocates " +
-                "by alignment as well as by size");
+                $"'[Align({requested})]' is more than a page, {MaxAlignment} bytes, which is " +
+                "the most a struct may ask: the allocator places an object on any boundary up " +
+                "to it, and nothing a C header declares asks more");
             return;
         }
 

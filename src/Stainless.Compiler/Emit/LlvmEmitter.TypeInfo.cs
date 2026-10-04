@@ -168,7 +168,7 @@ public sealed partial class LlvmEmitter
                 $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)}, " +
                 $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout}, " +
                 $"{PropertyTable(classType)}, ptr null, {EventTable(classType)}, " +
-                $"ptr {ReflectedMaker(classType)} }}");
+                $"ptr {ReflectedMaker(classType)}, {Word} {StorageAlignment(classType.FieldsAlignment)} }}");
         }
 
         PatchBasesAtStartup(patched);
@@ -184,7 +184,7 @@ public sealed partial class LlvmEmitter
                 $"{{ {Word} {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
                 $"ptr {nameConstant}, ptr null, {Word} 0, ptr null, {Word} 0, ptr null, " +
                 $"ptr null, ptr null, ptr null, {Word} 0, ptr null, ptr null, {Word} 0, ptr null, " +
-                "ptr null }");
+                $"ptr null, {Word} {StorageAlignment(arrayType.Element.Alignment)} }}");
         }
 
         foreach (var structType in program.Modules
@@ -199,7 +199,7 @@ public sealed partial class LlvmEmitter
                 $"@{StructTypeInfoName(structType)} = internal constant %SlTypeInfo " +
                 $"{{ {Word} {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
                 $"{Metadata(structType, 0)}, ptr null, ptr null, ptr null, " +
-                $"{PropertyTable(structType)}, ptr null, {Word} 0, ptr null, ptr null }}");
+                $"{PropertyTable(structType)}, ptr null, {Word} 0, ptr null, ptr null, {Word} 0 }}");
         }
 
         if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
@@ -690,9 +690,16 @@ public sealed partial class LlvmEmitter
         _metadata.AppendLine(
             $"{info} = internal constant %SlTypeInfo {{ {Word} {type.Size}, ptr null, " +
             $"ptr {name}, ptr null, {Word} 0, ptr null, {attributes}, ptr null, ptr null, " +
-            $"ptr null, {Word} 0, ptr null, ptr {members}, {Word} 0, ptr null, ptr null }}");
+            $"ptr null, {Word} 0, ptr null, ptr {members}, {Word} 0, ptr null, ptr null, {Word} 0 }}");
         return info;
     }
+
+    /// <summary>
+    /// What a TypeInfo says its instances' storage is aligned to: the
+    /// alignment, when it is more than malloc's sixteen, and 0 otherwise, which
+    /// the runtime reads as malloc's own.
+    /// </summary>
+    private static int StorageAlignment(int alignment) => alignment > 16 ? alignment : 0;
 
     private readonly StringBuilder _metadata = new();
     private int _nextMetadata;

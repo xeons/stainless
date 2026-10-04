@@ -431,7 +431,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             alignment = Math.Max(alignment ?? 1, wanted);
         }
 
-        if (alignment is > 16)
+        if (alignment is > 4096)
             throw new Unsupported($"aligned to {alignment} bytes, more than [Align] allows");
         // Under `#pragma pack`, the most any field is aligned to; a record with
         // no tag nested in one was declared under the same pragma.

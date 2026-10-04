@@ -190,6 +190,9 @@ public sealed partial class LlvmEmitter
         // that asked for it is.
         "i128" => 16,
 
+        // C's long double, as ndouble is laid out here.
+        "x86_fp80" or "fp128" => Binding.TargetPlatform.Current.LongDoubleAlignment,
+
         _ when llvmType.StartsWith('%') =>
             _structAlignment.TryGetValue(llvmType, out int declared) ? declared : 1,
         _ => 8,

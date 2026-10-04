@@ -102,12 +102,12 @@ public sealed partial class LlvmEmitter
 
         // size, destroy, name, interfaces, fieldCount, fields, attributeCount,
         // attributes, base, vtable, com, propertyCount, properties,
-        // enumeration, eventCount, events, create. Everything after
+        // enumeration, eventCount, events, create, alignment. Everything after
         // `attributes` is appended rather than inserted so that every offset
         // the emitter already hard-codes goes on meaning what it meant.
         _module.AppendLine(
             $"%SlTypeInfo = type {{ {word}, ptr, ptr, ptr, {word}, ptr, {word}, ptr, "
-            + $"ptr, ptr, ptr, {word}, ptr, ptr, {word}, ptr, ptr }}");
+            + $"ptr, ptr, ptr, {word}, ptr, ptr, {word}, ptr, ptr, {word} }}");
 
         // count, names, values, kind; and name, handlerType.
         _module.AppendLine($"%SlEnumInfo = type {{ {word}, ptr, ptr, i32 }}");
