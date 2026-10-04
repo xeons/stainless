@@ -25,6 +25,7 @@ module MacOS.Metal;
 
 import MacOS.CoreGraphics;
 import MacOS.Foundation;
+import MacOS.IOSurface;
 import MacOS.System;
 import Standard.ObjC;
 

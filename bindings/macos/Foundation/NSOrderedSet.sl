@@ -100,6 +100,7 @@ public extern objc class NSOrderedSet
     [Selector("orderedSet")] public static Self OrderedSet();
     [Selector("orderedSetWithObject:")] public static Self OrderedSetWithObject(AnyObject object);
     [Selector("orderedSetWithObjects:count:")] public static Self OrderedSetWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("orderedSetWithObjects:")] public static Self OrderedSetWithObjects(AnyObject firstObj, ...);
     [Selector("orderedSetWithOrderedSet:")] public static Self OrderedSetWithOrderedSet(NSOrderedSet set);
     [Selector("orderedSetWithOrderedSet:range:copyItems:")] public static Self OrderedSetWithOrderedSetRangeCopyItems(NSOrderedSet set, NSRange range, bool flag);
     [Selector("orderedSetWithArray:")] public static Self OrderedSetWithArray(NSArray array);
@@ -107,6 +108,7 @@ public extern objc class NSOrderedSet
     [Selector("orderedSetWithSet:")] public static Self OrderedSetWithSet(NSSet set);
     [Selector("orderedSetWithSet:copyItems:")] public static Self OrderedSetWithSetCopyItems(NSSet set, bool flag);
     [Selector("initWithObject:")] public Self InitWithObject(AnyObject object);
+    [Selector("initWithObjects:")] public Self InitWithObjects(AnyObject firstObj, ...);
     [Selector("initWithOrderedSet:")] public Self InitWithOrderedSet(NSOrderedSet set);
     [Selector("initWithOrderedSet:copyItems:")] public Self InitWithOrderedSetCopyItems(NSOrderedSet set, bool flag);
     [Selector("initWithOrderedSet:range:copyItems:")] public Self InitWithOrderedSetRangeCopyItems(NSOrderedSet set, NSRange range, bool flag);

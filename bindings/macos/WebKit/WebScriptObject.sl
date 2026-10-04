@@ -24,6 +24,7 @@
 module MacOS.WebKit;
 
 import MacOS.Foundation;
+import MacOS.JavaScriptCore;
 import MacOS.System;
 import Standard.ObjC;
 
@@ -47,6 +48,7 @@ public extern objc class NSObject
 public extern objc class WebScriptObject : NSObject
 {
     [Selector("throwException:")] public static bool ThrowException(NSString? exceptionMessage);
+    [Selector("JSObject")] public JSObjectRef JSObject();
     [Selector("callWebScriptMethod:withArguments:")] public AnyObject? CallWebScriptMethodWithArguments(NSString? name, NSArray? arguments);
     [Selector("evaluateWebScript:")] public AnyObject? EvaluateWebScript(NSString? script);
     [Selector("removeWebScriptKey:")] public void RemoveWebScriptKey(NSString? name);
@@ -54,6 +56,7 @@ public extern objc class WebScriptObject : NSObject
     [Selector("webScriptValueAtIndex:")] public AnyObject? WebScriptValueAtIndex(uint index);
     [Selector("setWebScriptValueAtIndex:value:")] public void SetWebScriptValueAtIndexValue(uint index, AnyObject? value);
     [Selector("setException:")] public void SetException(NSString? description);
+    [Selector("JSValue")] public JSValue? JSValue();
 }
 
 /// Deprecated in macOS 10.14.

@@ -4,11 +4,13 @@ module BindingsRuntime;
 
 import Standard.Console;
 
+#pragma comment(framework, "Foundation")
+
 extern "C" long SLRuntimeMissing();
 
 int Main()
 {
     long missing = SLRuntimeMissing();
-    Console.WriteLine(missing == 0 ? "23380 checks, none missing" : $"{missing} missing");
+    Console.WriteLine(missing == 0 ? "none missing" : $"{missing} missing");
     return 0;
 }

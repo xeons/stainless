@@ -24,6 +24,7 @@
 module MacOS.WebKit;
 
 import MacOS.Foundation;
+import MacOS.JavaScriptCore;
 import MacOS.System;
 import Standard.ObjC;
 
@@ -44,6 +45,8 @@ public extern objc class WebFrame : NSObject
     [Selector("parentFrame")] public WebFrame? ParentFrame { get; }
     [Selector("childFrames")] public NSArray? ChildFrames { get; }
     [Selector("windowObject")] public WebScriptObject? WindowObject { get; }
+    [Selector("globalContext")] public JSGlobalContextRef GlobalContext { get; }
+    [Selector("javaScriptContext")] public JSContext? JavaScriptContext { get; }
     [Selector("initWithName:webFrameView:webView:")] public Self? InitWithNameWebFrameViewWebView(NSString? name, WebFrameView? view, WebView? webView);
     [Selector("loadRequest:")] public void LoadRequest(NSURLRequest? request);
     [Selector("loadData:MIMEType:textEncodingName:baseURL:")] public void LoadDataMIMETypeTextEncodingNameBaseURL(NSData? data, NSString? MIMEType, NSString? encodingName, NSURL? URL);

@@ -23,7 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AppKit;
 
+import MacOS.CloudKit;
 import MacOS.Foundation;
+import MacOS.Intents;
 import MacOS.System;
 import Standard.ObjC;
 
@@ -239,12 +241,14 @@ public objc interface NSApplicationDelegate : NSObjectProtocol
     [Optional] [Selector("application:didFailToRegisterForRemoteNotificationsWithError:")] void ApplicationDidFailToRegisterForRemoteNotificationsWithError(NSApplication application, NSError error);
     [Optional] [Selector("application:didReceiveRemoteNotification:")] void ApplicationDidReceiveRemoteNotification(NSApplication application, NSDictionary userInfo);
     [Optional] [Selector("applicationSupportsSecureRestorableState:")] bool ApplicationSupportsSecureRestorableState(NSApplication app);
+    [Optional] [Selector("application:handlerForIntent:")] AnyObject? ApplicationHandlerForIntent(NSApplication application, INIntent intent);
     [Optional] [Selector("application:willEncodeRestorableState:")] void ApplicationWillEncodeRestorableState(NSApplication app, NSCoder coder);
     [Optional] [Selector("application:didDecodeRestorableState:")] void ApplicationDidDecodeRestorableState(NSApplication app, NSCoder coder);
     [Optional] [Selector("application:willContinueUserActivityWithType:")] bool ApplicationWillContinueUserActivityWithType(NSApplication application, NSString userActivityType);
     [Optional] [Selector("application:continueUserActivity:restorationHandler:")] bool ApplicationContinueUserActivityRestorationHandler(NSApplication application, NSUserActivity userActivity, NSApplicationDelegateApplicationContinueUserActivityRestorationHandlerRestorationHandlerBlock restorationHandler);
     [Optional] [Selector("application:didFailToContinueUserActivityWithType:error:")] void ApplicationDidFailToContinueUserActivityWithTypeError(NSApplication application, NSString userActivityType, NSError error);
     [Optional] [Selector("application:didUpdateUserActivity:")] void ApplicationDidUpdateUserActivity(NSApplication application, NSUserActivity userActivity);
+    [Optional] [Selector("application:userDidAcceptCloudKitShareWithMetadata:")] void ApplicationUserDidAcceptCloudKitShareWithMetadata(NSApplication application, CKShareMetadata metadata);
     [Optional] [Selector("application:delegateHandlesKey:")] bool ApplicationDelegateHandlesKey(NSApplication sender, NSString key);
     [Optional] [Selector("applicationShouldAutomaticallyLocalizeKeyEquivalents:")] bool ApplicationShouldAutomaticallyLocalizeKeyEquivalents(NSApplication application);
     [Optional] [Selector("applicationWillFinishLaunching:")] void ApplicationWillFinishLaunching(NSNotification notification);

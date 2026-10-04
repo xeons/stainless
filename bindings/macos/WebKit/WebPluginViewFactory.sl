@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.WebKit;
 
+import MacOS.AppKit;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -47,6 +48,9 @@ public extern "C" NSString? WebPlugInContainingElementKey;
 public extern "C" NSString? WebPlugInShouldLoadMainResourceKey;
 
 /// Deprecated in macOS 10.14.
-public objc interface WebPlugInViewFactory : NSObjectProtocol { }
+public objc interface WebPlugInViewFactory : NSObjectProtocol
+{
+    [Selector("plugInViewWithArguments:")] static abstract NSView? PlugInViewWithArguments(NSDictionary? arguments);
+}
 
 #endif

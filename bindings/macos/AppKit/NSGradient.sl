@@ -45,6 +45,7 @@ public extern objc class NSGradient : NSObject, NSCopying, NSSecureCoding
     [Selector("numberOfColorStops")] public NSInteger NumberOfColorStops { get; }
     [Selector("initWithStartingColor:endingColor:")] public Self? InitWithStartingColorEndingColor(NSColor startingColor, NSColor endingColor);
     [Selector("initWithColors:")] public Self? InitWithColors(NSArray colorArray);
+    [Selector("initWithColorsAndLocations:")] public Self? InitWithColorsAndLocations(NSColor firstColor, ...);
     [Selector("initWithColors:atLocations:colorSpace:")] public Self? InitWithColorsAtLocationsColorSpace(NSArray colorArray, CGFloat* locations, NSColorSpace colorSpace);
     [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
     [Selector("drawFromPoint:toPoint:options:")] public void DrawFromPointToPointOptions(NSPoint startingPoint, NSPoint endingPoint, NSGradientDrawingOptions options);

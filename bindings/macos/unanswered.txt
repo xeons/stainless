@@ -2,6 +2,26 @@
 # does not answer on macOS 15.7, each with why. The runtime case does not ask
 # these; anything else it cannot find is a binding that names nothing.
 
++[GKGameSession addEventListener:] -- declared, and answered by nothing on macOS 15.7
++[GKGameSession removeEventListener:] -- declared, and answered by nothing on macOS 15.7
++[NSCell _bulletStringForString:bulletCharacter:] -- a private method in a public header
++[NSObject webScriptNameForKey:] -- an informal protocol: declared on NSObject for an object to implement
++[NSObject webScriptNameForSelector:] -- an informal protocol: declared on NSObject for an object to implement
++[NSWindow menuChanged:] -- declared, and answered by nothing on macOS 15.7
++[SFSpeechLanguageModel prepareCustomLanguageModelForUrl:configuration:completion:] -- declared, and answered by nothing on macOS 15.7
++[SFSpeechLanguageModel prepareCustomLanguageModelForUrl:configuration:ignoresCache:completion:] -- declared, and answered by nothing on macOS 15.7
++[VTFrameRateConversionConfiguration isSupported] -- declared, and answered by nothing on macOS 15.7
++[VTMotionBlurConfiguration isSupported] -- declared, and answered by nothing on macOS 15.7
++[VTOpticalFlowConfiguration isSupported] -- declared, and answered by nothing on macOS 15.7
+-[ABPersonView editing] -- declared, and answered by nothing on macOS 15.7
+-[ABPersonView person] -- declared, and answered by nothing on macOS 15.7
+-[ABPersonView setEditing:] -- declared, and answered by nothing on macOS 15.7
+-[ABPersonView setShouldShowLinkedPeople:] -- declared, and answered by nothing on macOS 15.7
+-[ABPersonView shouldShowLinkedPeople] -- declared, and answered by nothing on macOS 15.7
+-[ASCredentialProviderViewController reportAllAcceptedPublicKeyCredentialsForRelyingParty:userHandle:acceptedCredentialIDs:] -- declared, and answered by nothing on macOS 15.7
+-[ASCredentialProviderViewController reportPublicKeyCredentialUpdateForRelyingParty:userHandle:newName:] -- declared, and answered by nothing on macOS 15.7
+-[ASCredentialProviderViewController reportUnknownPublicKeyCredentialForRelyingParty:credentialID:] -- declared, and answered by nothing on macOS 15.7
+-[ASCredentialProviderViewController reportUnusedPasswordCredentialForDomain:userName:] -- declared, and answered by nothing on macOS 15.7
 -[AUAudioUnit inputHandler] -- declared, and answered by nothing on macOS 15.7
 -[AVAssetDownloadTask URLAsset] -- declared, and answered by nothing on macOS 15.7
 -[AVAssetDownloadTask loadedTimeRanges] -- declared, and answered by nothing on macOS 15.7
@@ -11,14 +31,113 @@
 -[AVCaptureDevice transportControlsSpeed] -- declared, and answered by nothing on macOS 15.7
 -[AVCaptureDevice transportControlsSupported] -- declared, and answered by nothing on macOS 15.7
 -[AVContentKeyRequest originatingRecipient] -- declared, and answered by nothing on macOS 15.7
-AVMetricDownloadSummaryEvent -- declared available on macOS 15 and absent from it
 -[AVMetricHLSMediaSegmentRequestEvent segmentDuration] -- declared, and answered by nothing on macOS 15.7
-AVPlaybackCoordinationMedium -- its header ends API_AVAILABLE in a semicolon, so the class carries no availability; it is macOS 26
+-[CXProviderConfiguration setSupportsAudioTranslation:] -- declared, and answered by nothing on macOS 15.7
+-[CXProviderConfiguration supportsAudioTranslation] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice setWifiAwareModelName:] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice setWifiAwareServiceName:] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice setWifiAwareServiceRole:] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice setWifiAwareVendorName:] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice wifiAwareModelName] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice wifiAwareServiceName] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice wifiAwareServiceRole] -- declared, and answered by nothing on macOS 15.7
+-[DDDevice wifiAwareVendorName] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievement identifier] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievement isHidden] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievement lastReportedDate] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievement percentComplete] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievement setIdentifier:] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievement setPercentComplete:] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription groupIdentifier] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription identifier] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription isHidden] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription isReplayable] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription maximumPoints] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription rarityPercent] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription releaseState] -- declared, and answered by nothing on macOS 15.7
+-[GKChallenge completionDate] -- declared, and answered by nothing on macOS 15.7
+-[GKChallenge issueDate] -- declared, and answered by nothing on macOS 15.7
+-[GKChallenge message] -- declared, and answered by nothing on macOS 15.7
+-[GKChallenge state] -- declared, and answered by nothing on macOS 15.7
+-[GKChallengesViewController challengeDelegate] -- declared, and answered by nothing on macOS 15.7
+-[GKChallengesViewController setChallengeDelegate:] -- declared, and answered by nothing on macOS 15.7
+-[GKInvite playerAttributes] -- declared, and answered by nothing on macOS 15.7
+-[GKInvite playerGroup] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard baseLeaderboardID] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard category] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard groupIdentifier] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard identifier] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard maxRange] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard nextStartDate] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard setCategory:] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard setIdentifier:] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard startDate] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard title] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard type] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardEntry context] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardEntry date] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardEntry formattedScore] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardEntry rank] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardEntry score] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardSet groupIdentifier] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardSet identifier] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardSet setIdentifier:] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboardSet title] -- declared, and answered by nothing on macOS 15.7
+-[GKLocalPlayer isUnderage] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest defaultNumberOfPlayers] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest maxPlayers] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest minPlayers] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest playerAttributes] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest playerGroup] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest properties] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest queueName] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest restrictToAutomatch] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest setDefaultNumberOfPlayers:] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest setMaxPlayers:] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest setMinPlayers:] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest setPlayerAttributes:] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest setPlayerGroup:] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest setQueueName:] -- declared, and answered by nothing on macOS 15.7
+-[GKMatchRequest setRestrictToAutomatch:] -- declared, and answered by nothing on macOS 15.7
+-[GKPlayer guestIdentifier] -- declared, and answered by nothing on macOS 15.7
+-[GKPlayer isFriend] -- declared, and answered by nothing on macOS 15.7
+-[GKScore category] -- declared, and answered by nothing on macOS 15.7
+-[GKScore context] -- declared, and answered by nothing on macOS 15.7
+-[GKScore date] -- declared, and answered by nothing on macOS 15.7
+-[GKScore formattedValue] -- declared, and answered by nothing on macOS 15.7
+-[GKScore leaderboardIdentifier] -- declared, and answered by nothing on macOS 15.7
+-[GKScore rank] -- declared, and answered by nothing on macOS 15.7
+-[GKScore setCategory:] -- declared, and answered by nothing on macOS 15.7
+-[GKScore setContext:] -- declared, and answered by nothing on macOS 15.7
+-[GKScore setLeaderboardIdentifier:] -- declared, and answered by nothing on macOS 15.7
+-[GKScore setValue:] -- declared, and answered by nothing on macOS 15.7
+-[GKScore value] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedExchange completionDate] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedExchange data] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedExchange exchangeID] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedExchange sendDate] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedExchange timeoutDate] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedExchangeReply data] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedExchangeReply replyDate] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedMatch creationDate] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedMatch matchData] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedMatch matchID] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedParticipant matchOutcome] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedParticipant setMatchOutcome:] -- declared, and answered by nothing on macOS 15.7
+-[GKTurnBasedParticipant timeoutDate] -- declared, and answered by nothing on macOS 15.7
+-[HKHealthStore workoutSessionMirroringStartHandler] -- declared, and answered by nothing on macOS 15.7
+-[IKFilterBrowserPanel finish:] -- declared, and answered by nothing on macOS 15.7
+-[IMKServer bundle] -- declared, and answered by nothing on macOS 15.7
+-[IMKServer initWithName:bundleIdentifier:] -- declared, and answered by nothing on macOS 15.7
+-[IMKServer initWithName:controllerClass:delegateClass:] -- declared, and answered by nothing on macOS 15.7
+-[IMKServer lastKeyEventWasDeadKey] -- declared, and answered by nothing on macOS 15.7
+-[IMKServer paletteWillTerminate] -- declared, and answered by nothing on macOS 15.7
+-[IOUSBHostObject currentMicroframeWithTime:error:] -- declared, and answered by nothing on macOS 15.7
+-[IOUSBHostObject referenceMicroframeWithTime:error:] -- declared, and answered by nothing on macOS 15.7
 -[MTLCaptureManager newCaptureScopeWithMTL4CommandQueue:] -- declared, and answered by nothing on macOS 15.7
 -[NSATSTypesetter getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:] -- declared, and answered by nothing on macOS 15.7
 -[NSATSTypesetter willSetLineFragmentRect:forGlyphRange:usedRect:baselineOffset:] -- declared, and answered by nothing on macOS 15.7
 -[NSApplication application:printFiles:] -- declared, and answered by nothing on macOS 15.7
-+[NSCell _bulletStringForString:bulletCharacter:] -- a private method in a public header
 -[NSMenu submenuAction:] -- declared, and answered by nothing on macOS 15.7
 -[NSObject URL:resourceDataDidBecomeAvailable:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject URL:resourceDidFailLoadingWithReason:] -- an informal protocol: declared on NSObject for an object to implement
@@ -26,11 +145,30 @@ AVPlaybackCoordinationMedium -- its header ends API_AVAILABLE in a semicolon, so
 -[NSObject URLResourceDidFinishLoading:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject accessibilityNotifiesWhenDestroyed] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject application:delegateHandlesKey:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject attributedStringForIdentityPropertiesWithNames:inRecord:comparisonRecords:firstLineAttributes:secondLineAttributes:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject attributedStringForPropertiesWithNames:inRecord:comparisonRecords:defaultAttributes:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject authorizationViewCreatedAuthorization:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject authorizationViewDidHide:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject authorizationViewReleasedAuthorization:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject certificatePanelShowHelp:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject chooseIdentityPanelShowHelp:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject draggedImage:endedAt:deposited:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject exceptionHandler:shouldHandleException:mask:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject exceptionHandler:shouldLogException:mask:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject fileManager:willProcessPath:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject fileTransferServicesCreateFolderComplete:error:folder:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject fileTransferServicesPathChangeComplete:error:finalPath:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject fileTransferServicesRemoveItemComplete:error:removedItem:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject fileTransferServicesRetrieveFolderListingComplete:error:listing:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject finalizeForWebScript] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject fontManager:willIncludeFont:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject getOpenGLBufferContext:pixelFormat:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject getPixelBufferPixelFormat:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject imageBrowser:backgroundWasRightClickedWithEvent:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject imageBrowser:moveItemsAtIndexes:toIndex:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject indicesOfObjectsByEvaluatingObjectSpecifier:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject inputText:client:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject inputText:key:modifiers:client:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject invokeDefaultMethodWithArguments:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject invokeUndefinedMethodFromWebScript:withArguments:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject objectForWebScript] -- an informal protocol: declared on NSObject for an object to implement
@@ -38,6 +176,28 @@ AVPlaybackCoordinationMedium -- its header ends API_AVAILABLE in a semicolon, so
 -[NSObject panel:directoryDidChange:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject panel:shouldShowFilename:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject provideImageData:bytesPerRow:origin::size::userInfo:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject quartzFilterManager:didAddFilter:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject quartzFilterManager:didModifyFilter:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject quartzFilterManager:didRemoveFilter:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject quartzFilterManager:didSelectFilter:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject readLinkQualityForDeviceComplete:device:info:error:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject readRSSIForDeviceComplete:device:info:error:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject renderIntoOpenGLBuffer:onScreen:forTime:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject renderIntoPixelBuffer:forTime:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject saveOptions:shouldShowUTType:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:didNegotiateAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:didPullAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:didPushAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:didReceiveSyncAlertAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:didRegisterClientAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:willFinishSessionAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:willNegotiateAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:willPullAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriver:willPushAndReturnError:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriverDidCancelSession:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriverDidFinishSession:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject sessionDriverWillCancelSession:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject setupPanel:determineBestDeviceOfA:orB:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject tableView:writeRows:toPasteboard:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject textStorageDidProcessEditing:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject textStorageWillProcessEditing:] -- an informal protocol: declared on NSObject for an object to implement
@@ -51,17 +211,26 @@ AVPlaybackCoordinationMedium -- its header ends API_AVAILABLE in a semicolon, so
 -[NSObject webPlugInSetIsSelected:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject webPlugInStart] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject webPlugInStop] -- an informal protocol: declared on NSObject for an object to implement
-+[NSObject webScriptNameForKey:] -- an informal protocol: declared on NSObject for an object to implement
-+[NSObject webScriptNameForSelector:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject workflowControllerWillStop:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSResponder newWindowForTab:] -- declared, and answered by nothing on macOS 15.7
 -[NSSavePanel selectText:] -- declared, and answered by nothing on macOS 15.7
 -[NSTypesetter willSetLineFragmentRect:forGlyphRange:usedRect:baselineOffset:] -- declared, and answered by nothing on macOS 15.7
 -[NSView additionalSafeAreaInsets] -- declared, and answered by nothing on macOS 15.7
 -[NSView safeAreaRect] -- declared, and answered by nothing on macOS 15.7
 -[NSView setAdditionalSafeAreaInsets:] -- declared, and answered by nothing on macOS 15.7
-+[NSWindow menuChanged:] -- declared, and answered by nothing on macOS 15.7
 -[NSWindow setTitlebarAccessoryViewControllers:] -- declared, and answered by nothing on macOS 15.7
+-[PKIdentityDocumentMetadata documentType] -- declared, and answered by nothing on macOS 15.7
+-[PKIdentityDocumentMetadata issuingCountryCode] -- declared, and answered by nothing on macOS 15.7
+-[PKPaymentRequest attributionIdentifier] -- declared, and answered by nothing on macOS 15.7
+-[PKPaymentRequest setAttributionIdentifier:] -- declared, and answered by nothing on macOS 15.7
+-[PKStrokePoint initWithLocation:timeOffset:size:opacity:force:azimuth:altitude:secondaryScale:threshold:] -- declared, and answered by nothing on macOS 15.7
 -[VTFrameProcessor processWithParameters:frameOutputHandler:] -- declared, and answered by nothing on macOS 15.7
-+[VTFrameRateConversionConfiguration isSupported] -- declared, and answered by nothing on macOS 15.7
-+[VTMotionBlurConfiguration isSupported] -- declared, and answered by nothing on macOS 15.7
-+[VTOpticalFlowConfiguration isSupported] -- declared, and answered by nothing on macOS 15.7
+AVMetricDownloadSummaryEvent -- declared available on macOS 15 and absent from it
+AVPlaybackCoordinationMedium -- its header ends API_AVAILABLE in a semicolon, so the class carries no availability; it is macOS 26
+GSSyncedDirectory -- declared available on this macOS and absent from it
+GSSyncedDirectoryState -- declared available on this macOS and absent from it
+GSSyncedDirectoryVersion -- declared available on this macOS and absent from it
+NEURLFilter -- declared available on this macOS and absent from it
+PKAddIdentityDocumentMetadata -- declared available on this macOS and absent from it
+SCScreenshotConfiguration -- declared available on this macOS and absent from it
+SCScreenshotOutput -- declared available on this macOS and absent from it

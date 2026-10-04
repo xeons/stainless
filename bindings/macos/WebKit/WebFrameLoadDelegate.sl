@@ -25,6 +25,7 @@ module MacOS.WebKit;
 
 import MacOS.AppKit;
 import MacOS.Foundation;
+import MacOS.JavaScriptCore;
 import MacOS.System;
 import Standard.ObjC;
 
@@ -50,6 +51,7 @@ public objc interface WebFrameLoadDelegate : NSObjectProtocol
     [Optional] [Selector("webView:didClearWindowObject:forFrame:")] void WebViewDidClearWindowObjectForFrame(WebView? webView, WebScriptObject? windowObject, WebFrame? frame);
     /// Deprecated in macOS 10.5.
     [Optional] [Selector("webView:windowScriptObjectAvailable:")] void WebViewWindowScriptObjectAvailable(WebView? webView, WebScriptObject? windowScriptObject);
+    [Optional] [Selector("webView:didCreateJavaScriptContext:forFrame:")] void WebViewDidCreateJavaScriptContextForFrame(WebView? webView, JSContext? context, WebFrame? frame);
 }
 
 #endif

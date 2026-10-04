@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AppKit;
 
+import MacOS.CloudKit;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -140,10 +141,20 @@ public objc interface NSCloudSharingServiceDelegate : NSSharingServiceDelegate
 {
     [Optional] [Selector("sharingService:didCompleteForItems:error:")] void SharingServiceDidCompleteForItemsError(NSSharingService sharingService, NSArray items, NSError? error);
     [Optional] [Selector("optionsForSharingService:shareProvider:")] NSCloudKitSharingServiceOptions OptionsForSharingServiceShareProvider(NSSharingService cloudKitSharingService, NSItemProvider provider);
+    [Optional] [Selector("sharingService:didSaveShare:")] void SharingServiceDidSaveShare(NSSharingService sharingService, CKShare share);
+    [Optional] [Selector("sharingService:didStopSharing:")] void SharingServiceDidStopSharing(NSSharingService sharingService, CKShare share);
 }
 
+public objc closure void NSItemProviderRegisterCloudKitShareWithPreparationHandlerPreparationHandlerBlockArg0Block(CKShare? arg0, CKContainer? arg1, NSError? arg2);
+
+public objc closure void NSItemProviderRegisterCloudKitShareWithPreparationHandlerPreparationHandlerBlock(NSItemProviderRegisterCloudKitShareWithPreparationHandlerPreparationHandlerBlockArg0Block arg0);
+
 /// NSCloudKitSharing, a category of NSItemProvider.
-public extern objc class NSItemProvider { }
+public extern objc class NSItemProvider
+{
+    [Selector("registerCloudKitShareWithPreparationHandler:")] public void RegisterCloudKitShareWithPreparationHandler(NSItemProviderRegisterCloudKitShareWithPreparationHandlerPreparationHandlerBlock preparationHandler);
+    [Selector("registerCloudKitShare:container:")] public void RegisterCloudKitShareContainer(CKShare share, CKContainer container);
+}
 
 public extern objc class NSSharingServicePicker : NSObject
 {

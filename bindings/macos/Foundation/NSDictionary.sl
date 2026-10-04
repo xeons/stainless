@@ -98,8 +98,10 @@ public extern objc class NSDictionary
     [Selector("dictionary")] public static Self Dictionary();
     [Selector("dictionaryWithObject:forKey:")] public static Self DictionaryWithObjectForKey(AnyObject object, NSCopying key);
     [Selector("dictionaryWithObjects:forKeys:count:")] public static Self DictionaryWithObjectsForKeysCount(void** objects, void** keys, NSUInteger cnt);
+    [Selector("dictionaryWithObjectsAndKeys:")] public static Self DictionaryWithObjectsAndKeys(AnyObject firstObject, ...);
     [Selector("dictionaryWithDictionary:")] public static Self DictionaryWithDictionary(NSDictionary dict);
     [Selector("dictionaryWithObjects:forKeys:")] public static Self DictionaryWithObjectsForKeys(NSArray objects, NSArray keys);
+    [Selector("initWithObjectsAndKeys:")] public Self InitWithObjectsAndKeys(AnyObject firstObject, ...);
     [Selector("initWithDictionary:")] public Self InitWithDictionary(NSDictionary otherDictionary);
     [Selector("initWithDictionary:copyItems:")] public Self InitWithDictionaryCopyItems(NSDictionary otherDictionary, bool flag);
     [Selector("initWithObjects:forKeys:")] public Self InitWithObjectsForKeys(NSArray objects, NSArray keys);

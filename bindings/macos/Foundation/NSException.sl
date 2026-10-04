@@ -73,7 +73,10 @@ public extern objc class NSException : NSObject, NSCopying, NSSecureCoding
 }
 
 /// NSExceptionRaisingConveniences, a category of NSException.
-public extern objc class NSException { }
+public extern objc class NSException
+{
+    [Selector("raise:format:")] public static void RaiseFormat(NSExceptionName name, NSString format, ...);
+}
 
 public delegate void NSUncaughtExceptionHandler(void* arg0);
 
@@ -86,6 +89,8 @@ public extern "C" NSString NSAssertionHandlerKey;
 public extern objc class NSAssertionHandler : NSObject
 {
     [Selector("currentHandler")] public static NSAssertionHandler CurrentHandler { get; }
+    [Selector("handleFailureInMethod:object:file:lineNumber:description:")] public void HandleFailureInMethodObjectFileLineNumberDescription(Selector selector, AnyObject object, NSString fileName, NSInteger line, NSString? format, ...);
+    [Selector("handleFailureInFunction:file:lineNumber:description:")] public void HandleFailureInFunctionFileLineNumberDescription(NSString functionName, NSString fileName, NSInteger line, NSString? format, ...);
 }
 
 #endif

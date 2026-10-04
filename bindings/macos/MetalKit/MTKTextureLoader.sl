@@ -28,6 +28,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.Foundation;
 import MacOS.Metal;
+import MacOS.ModelIO;
 import MacOS.System;
 import Standard.ObjC;
 
@@ -90,10 +91,12 @@ public extern objc class MTKTextureLoader : NSObject
     [Selector("newTexturesWithNames:scaleFactor:displayGamut:bundle:options:completionHandler:")] public void NewTexturesWithNamesScaleFactorDisplayGamutBundleOptionsCompletionHandler(NSArray names, CGFloat scaleFactor, NSDisplayGamut displayGamut, NSBundle? bundle, NSDictionary? options, MTKTextureLoaderArrayCallback completionHandler);
     [Selector("newTextureWithData:options:completionHandler:")] public void NewTextureWithDataOptionsCompletionHandler(NSData data, NSDictionary? options, MTKTextureLoaderCallback completionHandler);
     [Selector("newTextureWithCGImage:options:completionHandler:")] public void NewTextureWithCGImageOptionsCompletionHandler(CGImageRef cgImage, NSDictionary? options, MTKTextureLoaderCallback completionHandler);
+    [Selector("newTextureWithMDLTexture:options:completionHandler:")] public void NewTextureWithMDLTextureOptionsCompletionHandler(MDLTexture texture, NSDictionary? options, MTKTextureLoaderCallback completionHandler);
     [Selector("newTextureWithContentsOfURL:options:error:")] public MTLTexture? NewTextureWithContentsOfURLOptionsError(NSURL URL, NSDictionary? options, out NSError? error);
     [Selector("newTexturesWithContentsOfURLs:options:error:")] public NSArray NewTexturesWithContentsOfURLsOptionsError(NSArray URLs, NSDictionary? options, out NSError? error);
     [Selector("newTextureWithData:options:error:")] public MTLTexture? NewTextureWithDataOptionsError(NSData data, NSDictionary? options, out NSError? error);
     [Selector("newTextureWithCGImage:options:error:")] public MTLTexture? NewTextureWithCGImageOptionsError(CGImageRef cgImage, NSDictionary? options, out NSError? error);
+    [Selector("newTextureWithMDLTexture:options:error:")] public MTLTexture? NewTextureWithMDLTextureOptionsError(MDLTexture texture, NSDictionary? options, out NSError? error);
     [Selector("newTextureWithName:scaleFactor:bundle:options:error:")] public MTLTexture? NewTextureWithNameScaleFactorBundleOptionsError(NSString name, CGFloat scaleFactor, NSBundle? bundle, NSDictionary? options, out NSError? error);
     [Selector("newTextureWithName:scaleFactor:displayGamut:bundle:options:error:")] public MTLTexture? NewTextureWithNameScaleFactorDisplayGamutBundleOptionsError(NSString name, CGFloat scaleFactor, NSDisplayGamut displayGamut, NSBundle? bundle, NSDictionary? options, out NSError? error);
 }

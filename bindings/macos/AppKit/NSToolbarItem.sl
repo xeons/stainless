@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AppKit;
 
+import MacOS.CloudKit;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -93,7 +94,10 @@ public extern objc class NSObject
     [Selector("validateToolbarItem:")] public bool ValidateToolbarItem(NSToolbarItem item);
 }
 
-public objc interface NSCloudSharingValidation : NSObjectProtocol { }
+public objc interface NSCloudSharingValidation : NSObjectProtocol
+{
+    [Selector("cloudShareForUserInterfaceItem:")] CKShare? CloudShareForUserInterfaceItem(NSValidatedUserInterfaceItem item);
+}
 
 public extern "C" NSToolbarItemIdentifier? NSToolbarSpaceItemIdentifier;
 

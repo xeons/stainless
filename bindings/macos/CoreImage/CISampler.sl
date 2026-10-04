@@ -37,8 +37,10 @@ public extern objc class CISampler : NSObject, NSCopying
     [Selector("definition")] public CIFilterShape Definition { get; }
     [Selector("extent")] public CGRect Extent { get; }
     [Selector("samplerWithImage:")] public static Self SamplerWithImage(CIImage im);
+    [Selector("samplerWithImage:keysAndValues:")] public static Self SamplerWithImageKeysAndValues(CIImage im, AnyObject? key0, ...);
     [Selector("samplerWithImage:options:")] public static Self SamplerWithImageOptions(CIImage im, NSDictionary? dict);
     [Selector("initWithImage:")] public Self InitWithImage(CIImage im);
+    [Selector("initWithImage:keysAndValues:")] public Self InitWithImageKeysAndValues(CIImage im, AnyObject? key0, ...);
     [Selector("initWithImage:options:")] public Self InitWithImageOptions(CIImage im, NSDictionary? dict);
 }
 

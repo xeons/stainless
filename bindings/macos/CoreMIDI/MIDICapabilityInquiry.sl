@@ -42,6 +42,8 @@ public struct MIDICIDeviceIdentification
 
 public using MIDICIInitiatiorMUID = NSNumber;
 
+public using MIDICIProfileStateList = NSArray;
+
 /// Deprecated in macOS 15.0.
 public extern objc class MIDICIDeviceInfo : NSObject, NSSecureCoding
 {
@@ -135,6 +137,7 @@ public extern objc class MIDICIResponder : NSObject
     [Selector("initiators")] public NSArray Initiators { get; }
     [Selector("profileDelegate")] public MIDICIProfileResponderDelegate ProfileDelegate { get; }
     [Selector("deviceInfo")] public MIDICIDeviceInfo DeviceInfo { get; }
+    [Selector("initWithDeviceInfo:profileDelegate:profileStates:supportProperties:")] public Self InitWithDeviceInfoProfileDelegateProfileStatesSupportProperties(MIDICIDeviceInfo deviceInfo, MIDICIProfileResponderDelegate @delegate, MIDICIProfileStateList profileList, bool propertiesSupported);
     [Selector("notifyProfile:onChannel:isEnabled:")] public bool NotifyProfileOnChannelIsEnabled(MIDICIProfile aProfile, MIDIChannelNumber channel, bool enabledState);
     [Selector("sendProfile:onChannel:profileData:")] public bool SendProfileOnChannelProfileData(MIDICIProfile aProfile, MIDIChannelNumber channel, NSData profileSpecificData);
     [Selector("start")] public bool Start();

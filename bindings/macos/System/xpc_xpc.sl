@@ -33,4 +33,6 @@ public struct _xpc_type_s;
 
 public using xpc_type_t = _xpc_type_s*;
 
+public using xpc_connection_t = xpc_object_t;
+
 #endif

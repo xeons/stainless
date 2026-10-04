@@ -62,6 +62,9 @@ public sealed record CField(string? Name, CType Type, int? BitWidth)
 
     /// <summary>What <c>__attribute__((aligned))</c> on the field asks for, or null.</summary>
     public int? Alignment { get; init; }
+
+    /// <summary><c>__attribute__((packed))</c> on the field alone: aligned to one byte.</summary>
+    public bool IsPacked { get; init; }
 }
 
 public sealed record CRecordDecl(string Name, string File, CTagKind Kind) : CDecl(Name, File)

@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreData;
 
+import MacOS.CoreSpotlight;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -35,6 +36,10 @@ public extern "C" NSNotificationName NSCoreDataCoreSpotlightDelegateIndexDidUpda
 
 public objc closure void NSCoreDataCoreSpotlightDelegateDeleteSpotlightIndexWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
 
+public objc closure void NSCoreDataCoreSpotlightDelegateSearchableIndexReindexAllSearchableItemsWithAcknowledgementHandlerAcknowledgementHandlerBlock();
+
+public objc closure void NSCoreDataCoreSpotlightDelegateSearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandlerAcknowledgementHandlerBlock();
+
 public extern objc class NSCoreDataCoreSpotlightDelegate : NSObject
 {
     [Selector("isIndexingEnabled")] public bool IndexingEnabled { get; }
@@ -46,6 +51,9 @@ public extern objc class NSCoreDataCoreSpotlightDelegate : NSObject
     [Selector("startSpotlightIndexing")] public void StartSpotlightIndexing();
     [Selector("stopSpotlightIndexing")] public void StopSpotlightIndexing();
     [Selector("deleteSpotlightIndexWithCompletionHandler:")] public void DeleteSpotlightIndexWithCompletionHandler(NSCoreDataCoreSpotlightDelegateDeleteSpotlightIndexWithCompletionHandlerCompletionHandlerBlock completionHandler);
+    [Selector("attributeSetForObject:")] public CSSearchableItemAttributeSet? AttributeSetForObject(NSManagedObject object);
+    [Selector("searchableIndex:reindexAllSearchableItemsWithAcknowledgementHandler:")] public void SearchableIndexReindexAllSearchableItemsWithAcknowledgementHandler(CSSearchableIndex searchableIndex, NSCoreDataCoreSpotlightDelegateSearchableIndexReindexAllSearchableItemsWithAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
+    [Selector("searchableIndex:reindexSearchableItemsWithIdentifiers:acknowledgementHandler:")] public void SearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandler(CSSearchableIndex searchableIndex, NSArray identifiers, NSCoreDataCoreSpotlightDelegateSearchableIndexReindexSearchableItemsWithIdentifiersAcknowledgementHandlerAcknowledgementHandlerBlock acknowledgementHandler);
 }
 
 #endif

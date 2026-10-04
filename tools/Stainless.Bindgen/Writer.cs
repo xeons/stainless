@@ -32,6 +32,9 @@ public sealed record Emitted(string Key, string Owner, string Header, string Tex
     /// <summary>What the layout probe compares it on, as C and as Stainless spell it.</summary>
     public IReadOnlyList<(string C, string Stainless)> Checks { get; init; } = [];
 
+    /// <summary>The framework whose translation wrote it, whose headers its checks are compiled with.</summary>
+    public string Source { get; init; } = "";
+
     /// <summary>The classes and messages it binds, which the runtime probe asks the Objective-C runtime for.</summary>
     public IReadOnlyList<RuntimeCheck> Runtime { get; init; } = [];
 }
@@ -262,10 +265,11 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             ? "void"
             : Spell(function.Result, context, function.Name + "Result", Placement.Value, function.ResultNullability);
         var parameters = new List<string>();
+        var parameterNames = ParameterNames(function.Parameters);
         for (int i = 0; i < function.Parameters.Count; i++)
         {
             var parameter = function.Parameters[i];
-            string name = ParameterName(parameter.Name, i);
+            string name = parameterNames[i];
             string type = SpellParameter(parameter.Type, context, function.Name + Capitalized(name), parameter.Nullability);
             parameters.Add($"{type} {name}");
         }
@@ -312,8 +316,14 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
 
         if (IsCFTypedef(typedef.Name))
             return WriteCFType(typedef, context);
+        if (ClassAliased(typedef.Name) is { } aliasedClass)
+            return $"public using {Identifier(typedef.Name)} = {SpellObjCDecl(aliasedClass, aliasedClass.Name, context)};\n";
         if (typedef.Type is not CBlock && IsManaged(typedef.Type, context))
-            return $"public using {Identifier(typedef.Name)} = {SpellManaged(typedef.Type, context, typedef.Name + "Type")};\n";
+        {
+            // `typedef id<NSFileProviderItem> NSFileProviderItem` names what is named already.
+            string aliased = SpellManaged(typedef.Type, context, typedef.Name + "Type");
+            return aliased == Identifier(typedef.Name) ? null : $"public using {Identifier(typedef.Name)} = {aliased};\n";
+        }
 
         switch (typedef.Type)
         {
@@ -344,6 +354,11 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
             // field holds whole and a parameter receives as a pointer.
             case CArray { Length: not null } array:
                 return $"public using {Identifier(typedef.Name)} = {Spell(array, context, typedef.Name + "Type", Placement.Field)};\n";
+
+            // `typedef __darwin_uuid_t uuid_t`: an array through a typedef is
+            // an array too.
+            case var _ when Canonical(typedef.Type) is CArray { Length: not null }:
+                return $"public using {Identifier(typedef.Name)} = {Spell(typedef.Type, context, typedef.Name + "Type", Placement.Field)};\n";
 
             default:
                 return $"public using {Identifier(typedef.Name)} = {Spell(typedef.Type, context, typedef.Name + "Type")};\n";
@@ -483,7 +498,8 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
 
             string type = Spell(field.Type, context, owner + Capitalized(field.Name), Placement.Field);
             string width = field.BitWidth is { } bits ? $" : {bits}" : "";
-            text.Append($"{indent}public {type} {Identifier(field.Name)}{width};\n");
+            string packed = field.IsPacked ? "[Packed] " : "";
+            text.Append($"{indent}{packed}public {type} {Identifier(field.Name)}{width};\n");
         }
     }
 
@@ -688,7 +704,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
                 throw new Unsupported(unsupported.Why);
 
             case CTypedef typedef:
-                return SpellTypedef(typedef.Name, context, hint);
+                return SpellTypedef(typedef.Name, context, hint, use);
 
             case CTag tag:
                 return SpellTag(tag, context);
@@ -750,7 +766,7 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         _ => throw new Unsupported($"the builtin type '{name}'"),
     };
 
-    private string SpellTypedef(string name, Context context, string hint)
+    private string SpellTypedef(string name, Context context, string hint, Placement use)
     {
         if (context.TypeParameters.Contains(name)) return "void*";
         if (Primitives.TryGetValue(name, out string? primitive)) return primitive;
@@ -764,8 +780,10 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
 
         // `__darwin_size_t` and the like are the implementation's: what they
         // stand for is written instead.
+        // Spelled where it is written, so a private typedef of an array is
+        // the array inside a struct, as `uuid_t`'s `__darwin_uuid_t` is.
         if (owner is null || IsPrivateName(name))
-            return Spell(typedef.Type, context, hint);
+            return Spell(typedef.Type, context, hint, use);
 
         // A typedef of a tag of its own name, or of a struct with no body,
         // is spelled as the tag: a value of an incomplete type is no type.
@@ -917,6 +935,16 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         translation.Records.TryGetValue((tag.Kind, tag.Name), out var record) && !record.IsComplete;
 
     private static bool IsPrivateName(string name) => name.StartsWith("__", StringComparison.Ordinal);
+
+    /// <summary>Each parameter's name, made unique where a header gives two the same one.</summary>
+    private static List<string> ParameterNames(IReadOnlyList<CParameter> parameters)
+    {
+        var names = parameters.Select((p, i) => ParameterName(p.Name, i)).ToList();
+        for (int i = 0; i < names.Count; i++)
+            if (names.IndexOf(names[i]) != i)
+                names[i] += i;
+        return names;
+    }
 
     private static string ParameterName(string? name, int index) =>
         Identifier(string.IsNullOrEmpty(name) ? $"arg{index}" : name);

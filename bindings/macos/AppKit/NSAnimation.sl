@@ -114,6 +114,7 @@ public objc interface NSAnimatablePropertyContainer
     [Selector("animations", "setAnimations:")] NSDictionary? Animations { get; set; }
     [Selector("animator")] Self Animator();
     [Selector("animationForKey:")] AnyObject? AnimationForKey(NSAnimatablePropertyKey key);
+    [Selector("defaultAnimationForKey:")] static abstract AnyObject? DefaultAnimationForKey(NSAnimatablePropertyKey key);
 }
 
 public extern "C" NSAnimatablePropertyKey? NSAnimationTriggerOrderIn;

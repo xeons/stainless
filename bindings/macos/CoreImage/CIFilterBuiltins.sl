@@ -25,6 +25,7 @@ module MacOS.CoreImage;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import MacOS.CoreML;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -1109,6 +1110,7 @@ public objc interface CIConvolution : CIFilterProtocol
 public objc interface CICoreMLModel : CIFilterProtocol
 {
     [Selector("inputImage", "setInputImage:")] CIImage? InputImage { get; set; }
+    [Selector("model", "setModel:")] MLModel Model { get; set; }
     [Selector("headIndex", "setHeadIndex:")] float HeadIndex { get; set; }
     [Selector("softmaxNormalization", "setSoftmaxNormalization:")] bool SoftmaxNormalization { get; set; }
 }

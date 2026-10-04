@@ -23,15 +23,9 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreGraphics;
 
-import MacOS.CoreFoundation;
-import Standard.ObjC;
-
 #if MACOS
 
 #pragma comment(framework, "CoreGraphics")
-
-[CFType]
-public extern objc class IOSurfaceRef : CFTypeRef { }
 
 public const int CG_OS_VERSION_2020 = 1;
 

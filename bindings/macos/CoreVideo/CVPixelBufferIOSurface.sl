@@ -25,6 +25,7 @@ module MacOS.CoreVideo;
 
 import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
+import MacOS.IOSurface;
 import Standard.ObjC;
 
 #if MACOS

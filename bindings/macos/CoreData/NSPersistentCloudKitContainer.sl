@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreData;
 
+import MacOS.CloudKit;
 import MacOS.Foundation;
 import Standard.ObjC;
 
@@ -41,7 +42,9 @@ public enum NSPersistentCloudKitContainerSchemaInitializationOptions : ulong
 public extern objc class NSPersistentCloudKitContainer : NSPersistentContainer
 {
     [Selector("initializeCloudKitSchemaWithOptions:error:")] public bool InitializeCloudKitSchemaWithOptionsError(NSPersistentCloudKitContainerSchemaInitializationOptions options, out NSError? error);
+    [Selector("recordForManagedObjectID:")] public CKRecord? RecordForManagedObjectID(NSManagedObjectID managedObjectID);
     [Selector("recordsForManagedObjectIDs:")] public NSDictionary RecordsForManagedObjectIDs(NSArray managedObjectIDs);
+    [Selector("recordIDForManagedObjectID:")] public CKRecordID? RecordIDForManagedObjectID(NSManagedObjectID managedObjectID);
     [Selector("recordIDsForManagedObjectIDs:")] public NSDictionary RecordIDsForManagedObjectIDs(NSArray managedObjectIDs);
     [Selector("canUpdateRecordForManagedObjectWithID:")] public bool CanUpdateRecordForManagedObjectWithID(NSManagedObjectID objectID);
     [Selector("canDeleteRecordForManagedObjectWithID:")] public bool CanDeleteRecordForManagedObjectWithID(NSManagedObjectID objectID);

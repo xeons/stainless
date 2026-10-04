@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreData;
 
+import MacOS.CloudKit;
 import MacOS.Foundation;
 import Standard.ObjC;
 
@@ -32,15 +33,24 @@ import Standard.ObjC;
 
 public objc closure void NSPersistentCloudKitContainerAcceptShareInvitationsFromMetadataIntoPersistentStoreCompletionCompletionBlock(NSArray? arg0, NSError? arg1);
 
+public objc closure void NSPersistentCloudKitContainerPurgeObjectsAndRecordsInZoneWithIDInPersistentStoreCompletionCompletionBlock(CKRecordZoneID? arg0, NSError? arg1);
+
+public objc closure void NSPersistentCloudKitContainerPersistUpdatedShareInPersistentStoreCompletionCompletionBlock(CKShare? arg0, NSError? arg1);
+
 public objc closure void NSPersistentCloudKitContainerFetchParticipantsMatchingLookupInfosIntoPersistentStoreCompletionCompletionBlock(NSArray? arg0, NSError? arg1);
+
+public objc closure void NSPersistentCloudKitContainerShareManagedObjectsToShareCompletionCompletionBlock(NSSet? arg0, CKShare? arg1, CKContainer? arg2, NSError? arg3);
 
 /// Sharing, a category of NSPersistentCloudKitContainer.
 public extern objc class NSPersistentCloudKitContainer
 {
     [Selector("acceptShareInvitationsFromMetadata:intoPersistentStore:completion:")] public void AcceptShareInvitationsFromMetadataIntoPersistentStoreCompletion(NSArray metadata, NSPersistentStore persistentStore, NSPersistentCloudKitContainerAcceptShareInvitationsFromMetadataIntoPersistentStoreCompletionCompletionBlock? completion);
+    [Selector("purgeObjectsAndRecordsInZoneWithID:inPersistentStore:completion:")] public void PurgeObjectsAndRecordsInZoneWithIDInPersistentStoreCompletion(CKRecordZoneID zoneID, NSPersistentStore? persistentStore, NSPersistentCloudKitContainerPurgeObjectsAndRecordsInZoneWithIDInPersistentStoreCompletionCompletionBlock? completion);
+    [Selector("persistUpdatedShare:inPersistentStore:completion:")] public void PersistUpdatedShareInPersistentStoreCompletion(CKShare share, NSPersistentStore persistentStore, NSPersistentCloudKitContainerPersistUpdatedShareInPersistentStoreCompletionCompletionBlock? completion);
     [Selector("fetchParticipantsMatchingLookupInfos:intoPersistentStore:completion:")] public void FetchParticipantsMatchingLookupInfosIntoPersistentStoreCompletion(NSArray lookupInfos, NSPersistentStore persistentStore, NSPersistentCloudKitContainerFetchParticipantsMatchingLookupInfosIntoPersistentStoreCompletionCompletionBlock completion);
     [Selector("fetchSharesMatchingObjectIDs:error:")] public NSDictionary? FetchSharesMatchingObjectIDsError(NSArray objectIDs, out NSError? error);
     [Selector("fetchSharesInPersistentStore:error:")] public NSArray? FetchSharesInPersistentStoreError(NSPersistentStore? persistentStore, out NSError? error);
+    [Selector("shareManagedObjects:toShare:completion:")] public void ShareManagedObjectsToShareCompletion(NSArray managedObjects, CKShare? share, NSPersistentCloudKitContainerShareManagedObjectsToShareCompletionCompletionBlock completion);
 }
 
 #endif

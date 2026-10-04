@@ -24,6 +24,7 @@
 module MacOS.CoreGraphics;
 
 import MacOS.CoreFoundation;
+import MacOS.IOSurface;
 import Standard.ObjC;
 
 #if MACOS

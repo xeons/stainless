@@ -68,6 +68,7 @@ public extern objc class NSExpression : NSObject, NSSecureCoding, NSCopying
     [Selector("falseExpression")] public NSExpression FalseExpression { get; }
     [Selector("expressionBlock")] public NSExpressionExpressionBlock ExpressionBlock { get; }
     [Selector("expressionWithFormat:argumentArray:")] public static NSExpression ExpressionWithFormatArgumentArray(NSString expressionFormat, NSArray arguments);
+    [Selector("expressionWithFormat:")] public static NSExpression ExpressionWithFormat(NSString expressionFormat, ...);
     [Selector("expressionForConstantValue:")] public static NSExpression ExpressionForConstantValue(AnyObject? obj);
     [Selector("expressionForEvaluatedObject")] public static NSExpression ExpressionForEvaluatedObject();
     [Selector("expressionForVariable:")] public static NSExpression ExpressionForVariable(NSString string);

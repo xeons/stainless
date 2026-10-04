@@ -283,18 +283,21 @@ public extern objc class CIFilter : NSObject, NSSecureCoding, NSCopying
     [Selector("attributes")] public NSDictionary Attributes { get; }
     [Selector("setDefaults")] public void SetDefaults();
     [Selector("apply:arguments:options:")] public CIImage? ApplyArgumentsOptions(CIKernel k, NSArray? args, NSDictionary? dict);
+    [Selector("apply:")] public CIImage? Apply(CIKernel k, ...);
 }
 
 [ObjCName("CIFilter")]
 public objc interface CIFilterProtocol
 {
     [Selector("outputImage")] CIImage? OutputImage { get; }
+    [Optional] [Selector("customAttributes")] static abstract NSDictionary? CustomAttributes();
 }
 
 /// CIFilterRegistry, a category of CIFilter.
 public extern objc class CIFilter
 {
     [Selector("filterWithName:")] public static CIFilter? FilterWithName(NSString name);
+    [Selector("filterWithName:keysAndValues:")] public static CIFilter? FilterWithNameKeysAndValues(NSString name, AnyObject? key0, ...);
     [Selector("filterWithName:withInputParameters:")] public static CIFilter? FilterWithNameWithInputParameters(NSString name, NSDictionary? params);
     [Selector("filterNamesInCategory:")] public static NSArray FilterNamesInCategory(NSString? category);
     [Selector("filterNamesInCategories:")] public static NSArray FilterNamesInCategories(NSArray? categories);

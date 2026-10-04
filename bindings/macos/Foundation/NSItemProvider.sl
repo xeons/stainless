@@ -47,12 +47,18 @@ public objc closure void NSItemProviderWritingLoadDataWithTypeIdentifierForItemP
 
 public objc interface NSItemProviderWriting : NSObjectProtocol
 {
-    [Optional] [Selector("writableTypeIdentifiersForItemProvider")] NSArray WritableTypeIdentifiersForItemProvider { get; }
-    [Optional] [Selector("itemProviderVisibilityForRepresentationWithTypeIdentifier:")] NSItemProviderRepresentationVisibility ItemProviderVisibilityForRepresentationWithTypeIdentifier(NSString typeIdentifier);
+    [Selector("writableTypeIdentifiersForItemProvider")] static abstract NSArray WritableTypeIdentifiersForItemProvider { get; }
+    [Optional] [Selector("writableTypeIdentifiersForItemProvider")] NSArray WritableTypeIdentifiersForItemProviderProperty { get; }
+    [Optional] [Selector("itemProviderVisibilityForRepresentationWithTypeIdentifier:")] static abstract NSItemProviderRepresentationVisibility ItemProviderVisibilityForRepresentationWithTypeIdentifier(NSString typeIdentifier);
+    [Optional] [Selector("itemProviderVisibilityForRepresentationWithTypeIdentifier:")] NSItemProviderRepresentationVisibility ItemProviderVisibilityForRepresentationWithTypeIdentifierMethod(NSString typeIdentifier);
     [Selector("loadDataWithTypeIdentifier:forItemProviderCompletionHandler:")] NSProgress? LoadDataWithTypeIdentifierForItemProviderCompletionHandler(NSString typeIdentifier, NSItemProviderWritingLoadDataWithTypeIdentifierForItemProviderCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
-public objc interface NSItemProviderReading : NSObjectProtocol { }
+public objc interface NSItemProviderReading : NSObjectProtocol
+{
+    [Selector("readableTypeIdentifiersForItemProvider")] static abstract NSArray ReadableTypeIdentifiersForItemProvider { get; }
+    [Selector("objectWithItemProviderData:typeIdentifier:error:")] static abstract Self? ObjectWithItemProviderDataTypeIdentifierError(NSData data, NSString typeIdentifier, out NSError? outError);
+}
 
 public objc closure void NSItemProviderCompletionHandler(NSSecureCoding? arg0, NSError? arg1);
 

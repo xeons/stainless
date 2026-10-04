@@ -23,13 +23,13 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.OpenGL;
 
+import MacOS.CoreGraphics;
 import MacOS.IOSurface;
+import Standard.ObjC;
 
 #if MACOS
 
 #pragma comment(framework, "OpenGL")
-
-public using IOSurfaceRef = __IOSurface*;
 
 public extern "C" CGLError CGLTexImageIOSurface2D(CGLContextObj ctx, GLenum target, GLenum internal_format, GLsizei width, GLsizei height, GLenum format, GLenum type, IOSurfaceRef ioSurface, GLuint plane);
 

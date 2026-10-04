@@ -137,10 +137,29 @@ public sealed partial class Writer
     /// <summary><c>NSString</c> or <c>NSArray&lt;T&gt;</c>, which only a pointer is ever to.</summary>
     private bool IsObjCClass(CType type) => type switch
     {
-        CTypedef named => translation.Interfaces.ContainsKey(named.Name),
+        CTypedef named => translation.Interfaces.ContainsKey(named.Name) || ClassAliased(named.Name) is not null,
         CObjCQualified { Base: CTypedef named } => translation.Interfaces.ContainsKey(named.Name),
         _ => false,
     };
+
+    /// <summary>
+    /// The class a typedef names, as <c>typedef NSArray&lt;MIDICIProfileState *&gt;
+    /// MIDICIProfileStateList</c> does -- the class itself, which only a pointer
+    /// is ever to -- or null.
+    /// </summary>
+    private CObjCInterface? ClassAliased(string typedef)
+    {
+        if (!translation.Typedefs.TryGetValue(typedef, out var declared)) return null;
+        string? name = declared.Type switch
+        {
+            CTypedef named => named.Name,
+            CObjCQualified { Base: CTypedef named } => named.Name,
+            _ => null,
+        };
+        return name is not null && name != typedef && translation.Interfaces.TryGetValue(name, out var objcClass)
+            ? objcClass
+            : null;
+    }
 
     /// <summary>
     /// An object type as a value: the class, protocol, closure, Core
@@ -179,6 +198,13 @@ public sealed partial class Writer
 
             case CPointer { Pointee: CTypedef named } when translation.Interfaces.TryGetValue(named.Name, out var objcClass):
                 return SpellObjCDecl(objcClass, objcClass.Name, context);
+
+            case CPointer { Pointee: CTypedef aliased } when ClassAliased(aliased.Name) is not null:
+            {
+                var typedef = translation.Typedefs[aliased.Name];
+                Use(OwnerOf(typedef.File) ?? SystemOwner, typedef, context);
+                return Identifier(aliased.Name);
+            }
 
             case CPointer { Pointee: CObjCQualified { Base: CTypedef named } } when translation.Interfaces.TryGetValue(named.Name, out var generic):
                 return SpellObjCDecl(generic, generic.Name, context);
@@ -294,6 +320,10 @@ public sealed partial class Writer
 
         return false;
     }
+
+    /// <summary>What a type synthesized for a member is named after: its class, or its protocol as declared.</summary>
+    private string HintOwner(string owner) =>
+        owner.StartsWith("protocol ", StringComparison.Ordinal) ? ProtocolName(owner["protocol ".Length..]) : owner;
 
     /// <summary>The version a declaration appeared in, when that is later than the oldest built for.</summary>
     private static string? Later(Availability availability) =>
@@ -411,10 +441,8 @@ public sealed partial class Writer
     private string? WriteProperty(string owner, CObjCProperty property, bool isProtocol, Context context)
     {
         if (property.Availability.Unavailable) return null;
-        if (isProtocol && property.IsClass)
-            throw new Unsupported("a class property of a protocol, which has no class to send it to");
 
-        string type = SpellValue(property.Type, property.Nullability, context, owner + MemberName(property.Name));
+        string type = SpellValue(property.Type, property.Nullability, context, HintOwner(owner) + MemberName(property.Name));
         var selectors = property.IsReadOnly
             ? (IReadOnlyList<string>)[property.GetterSelector]
             : [property.GetterSelector, property.SetterSelector];
@@ -430,7 +458,8 @@ public sealed partial class Writer
         string accessors = property.IsReadOnly ? "{ get; }" : "{ get; set; }";
         string optional = property.IsOptional ? "[Optional] " : "";
         string visibility = isProtocol ? "" : "public ";
-        string isStatic = property.IsClass ? "static " : "";
+        // A protocol's class member is one each adopting class answers.
+        string isStatic = !property.IsClass ? "" : isProtocol ? "static abstract " : "static ";
         return Indented(Documentation(property.Availability)) +
                $"    {optional}[Selector({selector})] {visibility}{isStatic}{type} {Identifier(name)} {accessors}\n";
     }
@@ -438,15 +467,11 @@ public sealed partial class Writer
     private string? WriteMethod(string owner, CObjCContainer container, CObjCMethod method, bool isProtocol, Context context)
     {
         if (method.Availability.Unavailable) return null;
-        if (method.IsVariadic)
-            throw new Unsupported("a variadic message, which Stainless cannot send");
-        if (isProtocol && !method.IsInstance)
-            throw new Unsupported("a class method of a protocol, which has no class to send it to");
         if (method.Parameters.FirstOrDefault(p => p.IsConsumed) is { } consumed)
             throw new Unsupported($"it takes ownership of '{consumed.Name}', which a binding cannot hand over");
 
         string memberName = MemberName(method.Selector);
-        string hint = (owner.StartsWith("protocol ", StringComparison.Ordinal) ? ProtocolName(container.Name) : owner) + memberName;
+        string hint = HintOwner(owner) + memberName;
 
         // `alloc` fails by stopping the program, never by answering nil; what
         // the unaudited objc/NSObject.h leaves unsaid is that.
@@ -458,10 +483,11 @@ public sealed partial class Writer
             : SpellValue(method.Result, resultNullability, context, hint + "Result");
 
         var parameters = new List<string>();
+        var parameterNames = ParameterNames(method.Parameters);
         for (int i = 0; i < method.Parameters.Count; i++)
         {
             var parameter = method.Parameters[i];
-            string name = ParameterName(parameter.Name, i);
+            string name = parameterNames[i];
 
             // `NSError **error`: an object the callee stores for the caller,
             // which the call writes back.
@@ -476,6 +502,7 @@ public sealed partial class Writer
         }
 
         string? claimed = _names.Claim(owner, memberName, [method.Selector], !method.IsInstance, isProperty: false, parameters.Count);
+        if (method.IsVariadic) parameters.Add("...");
         if (claimed is null) return null;
 
         bool returnsObject = IsManaged(method.Result, context);
@@ -492,7 +519,7 @@ public sealed partial class Writer
 
         string optional = method.IsOptional ? "[Optional] " : "";
         string visibility = isProtocol ? "" : "public ";
-        string isStatic = method.IsInstance ? "" : "static ";
+        string isStatic = method.IsInstance ? "" : isProtocol ? "static abstract " : "static ";
         return Indented(Documentation(method.Availability)) +
                $"    {optional}{ownership}[Selector(\"{method.Selector}\")] {visibility}{isStatic}{result} " +
                $"{Identifier(claimed)}({string.Join(", ", parameters)});\n";

@@ -120,7 +120,9 @@ public extern objc class NSArray
     [Selector("array")] public static Self Array();
     [Selector("arrayWithObject:")] public static Self ArrayWithObject(AnyObject anObject);
     [Selector("arrayWithObjects:count:")] public static Self ArrayWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("arrayWithObjects:")] public static Self ArrayWithObjects(AnyObject firstObj, ...);
     [Selector("arrayWithArray:")] public static Self ArrayWithArray(NSArray array);
+    [Selector("initWithObjects:")] public Self InitWithObjects(AnyObject firstObj, ...);
     [Selector("initWithArray:")] public Self InitWithArray(NSArray array);
     [Selector("initWithArray:copyItems:")] public Self InitWithArrayCopyItems(NSArray array, bool flag);
     [Selector("initWithContentsOfURL:error:")] public NSArray? InitWithContentsOfURLError(NSURL url, out NSError? error);

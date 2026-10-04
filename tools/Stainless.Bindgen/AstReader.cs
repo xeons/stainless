@@ -616,6 +616,7 @@ public sealed class AstReader
                     {
                         Alignment = Inner(child).Where(a => Text(a, "kind") == "AlignedAttr")
                             .Select(a => (int?)AlignmentOf(a)).Max(),
+                        IsPacked = Inner(child).Any(a => Text(a, "kind") == "PackedAttr"),
                     };
                     // A member with no name is the record declared just before
                     // it, whatever its type is spelled as; a named one of an

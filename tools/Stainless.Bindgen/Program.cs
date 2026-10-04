@@ -101,21 +101,33 @@ internal static class Program
 
             ShareObjCDefinitions(translations.Values);
 
-            foreach (string framework in frameworks)
+            var generated = frameworks.ToHashSet(StringComparer.Ordinal);
+            var writers = frameworks.ToDictionary(
+                f => f, f => new Writer(translations[f], generated, names), StringComparer.Ordinal);
+
+            // Each framework's declarations from its own translation first;
+            // then any a framework owns that only another's headers include,
+            // as IOUSBHost's include IOKit's usb/. A declaration is written
+            // once, where it is first met: a forward declaration writes
+            // nothing once its definition is known, and the definition is kept.
+            var attempted = new HashSet<(string Owner, string Key)>();
+            foreach (bool own in (bool[])[true, false])
+                foreach (string framework in frameworks)
+                    foreach (var declaration in translations[framework].Declarations)
+                    {
+                        string? owner = Writer.OwnerOf(declaration.File);
+                        if (owner is null || owner == Writer.SystemOwner || !generated.Contains(owner)) continue;
+                        if (own != (owner == framework)) continue;
+                        if (!own && attempted.Contains((owner, Writer.Key(declaration)))) continue;
+
+                        var emitted = writers[framework].Write(declaration);
+                        if (emitted is not null && attempted.Add((emitted.Owner, emitted.Key)))
+                            written.Add(emitted with { Source = framework });
+                        else if (emitted is null && !own) attempted.Add((owner, Writer.Key(declaration)));
+                    }
+
+            foreach (var (framework, writer) in writers)
             {
-                var translation = translations[framework];
-                translations.Remove(framework);
-                var writer = new Writer(translation, frameworks.ToHashSet(StringComparer.Ordinal), names);
-
-                // On what was written: a forward declaration writes nothing
-                // once its definition is known, and the definition is kept.
-                var seen = new HashSet<string>(StringComparer.Ordinal);
-                foreach (var declaration in translation.Declarations)
-                {
-                    if (Writer.OwnerOf(declaration.File) != framework) continue;
-                    if (writer.Write(declaration) is { } emitted && seen.Add(emitted.Key)) written.Add(emitted);
-                }
-
                 // What the framework used from outside every framework, and
                 // what that uses in turn.
                 var done = new HashSet<CDecl>();
@@ -125,7 +137,7 @@ internal static class Program
                     {
                         done.Add(declaration);
                         if (writer.Write(declaration) is { } emitted)
-                            system.TryAdd(emitted.Key, emitted);
+                            system.TryAdd(emitted.Key, emitted with { Source = framework });
                     }
                 }
 
@@ -149,7 +161,8 @@ internal static class Program
         if (probeCase is not null)
             LayoutCase.Write(probeCase, output, frameworks, perTarget["arm64"], perTarget["x64"], Includes);
         if (runtimeCase is not null)
-            RuntimeCase.Write(runtimeCase, output, perTarget["arm64"], ReadUnanswered(output));
+            RuntimeCase.Write(runtimeCase, output, perTarget["arm64"], perTarget["x64"], ReadUnanswered(output),
+                linkable.Order(StringComparer.Ordinal));
         return 0;
     }
 
@@ -181,6 +194,10 @@ internal static class Program
         }
     }
 
+    /// <summary>A Core Foundation type, which is a class and so declared by one module alone.</summary>
+    private static bool IsCFType(Emitted emitted) =>
+        emitted.Key.StartsWith("typedef ", StringComparison.Ordinal) && emitted.Text.Contains("[CFType", StringComparison.Ordinal);
+
     /// <summary>
     /// One struct, one module. A struct declared with no body in one
     /// framework's header and defined in another's is the defined one; a
@@ -203,8 +220,15 @@ internal static class Program
                 keeper[emitted.Key] = emitted.Owner;
         }
 
+        // A Core Foundation type is a class, which one module declares: the
+        // first framework typedef-ing it keeps it, as IOSurface does
+        // IOSurfaceRef, which CoreGraphics and OpenGL typedef too.
+        foreach (var emitted in written.Where(IsCFType))
+            if (!keeper.TryGetValue(emitted.Key, out string? current) || Rank(emitted.Owner) < Rank(current))
+                keeper[emitted.Key] = emitted.Owner;
+
         var kept = written
-            .Where(e => !e.Key.StartsWith("Struct ", StringComparison.Ordinal) || keeper[e.Key] == e.Owner)
+            .Where(e => !(e.Key.StartsWith("Struct ", StringComparison.Ordinal) || IsCFType(e)) || keeper[e.Key] == e.Owner)
             .ToList();
 
         foreach (var emitted in kept)
@@ -241,10 +265,10 @@ internal static class Program
         // framework's.
         var source = new StringBuilder();
         if (File.Exists(umbrella))
-            source.Append($"#include <{framework}/{framework}.h>\n");
+            source.Append($"#import <{framework}/{framework}.h>\n");
         foreach (string header in Directory.GetFiles(headers, "*.h").Order(StringComparer.Ordinal))
             if (!Excluded.Contains($"{framework}/{Path.GetFileName(header)}"))
-                source.Append($"#include \"{header}\"\n");
+                source.Append($"#import \"{header}\"\n");
 
         string subframeworks = Path.Combine(sdk, "System/Library/Frameworks", framework + ".framework", "Frameworks");
         if (Directory.Exists(subframeworks))
@@ -256,7 +280,7 @@ internal static class Program
                          .Where(Directory.Exists)
                          .SelectMany(h => Directory.GetFiles(h, "*.h"))
                          .Order(StringComparer.Ordinal))
-                source.Append($"#include \"{header}\"\n");
+                source.Append($"#import \"{header}\"\n");
 
         string directory = Path.Combine(Path.GetTempPath(), "stainless-bindgen");
         Directory.CreateDirectory(directory);
@@ -461,14 +485,7 @@ internal static class Program
     private static void WriteSkipped(string output, IEnumerable<Skipped> skips, IReadOnlyList<string> frameworks)
     {
         string path = Path.Combine(output, "skipped.txt");
-        var kept = File.Exists(path)
-            ? File.ReadAllLines(path).Where(l => l.Length > 0 && !l.StartsWith('#') &&
-                                                 !frameworks.Contains(l.Split('/')[0]) &&
-                                                 !l.StartsWith(Writer.SystemOwner + "/", StringComparison.Ordinal))
-            : [];
-
         var lines = skips.Select(s => $"{s.Owner}/{s.Header}: {s.Name} -- {s.Reason}")
-            .Concat(kept)
             .Distinct()
             .Order(StringComparer.Ordinal);
 

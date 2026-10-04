@@ -57,13 +57,26 @@ public using FourCharCode = UInt32;
 
 public using OSType = FourCharCode;
 
-public using UniCharCount = ulong;
+[Pack(2)]
+public struct Float80
+{
+    public SInt16 exp;
+    public UInt16[4] man;
+}
 
-public using Fixed = SInt32;
+public using extended80 = Float80;
+
+public using OSStatus = SInt32;
+
+public using ResType = FourCharCode;
+
+public using Size = long;
+
+public using UniCharCount = ulong;
 
 public using UInt64 = ulong;
 
-public using OSStatus = SInt32;
+public using Fixed = SInt32;
 
 public using SInt64 = long;
 
@@ -122,10 +135,6 @@ public using Str31 = byte[32];
 
 public delegate long ProcPtr();
 
-public using Size = long;
-
-public using ResType = FourCharCode;
-
 public using SignedByte = SInt8;
 
 public using OptionBits = UInt32;
@@ -148,15 +157,6 @@ public struct UnsignedWide
 public using AbsoluteTime = UnsignedWide;
 
 public using PBVersion = UInt32;
-
-[Pack(2)]
-public struct Float80
-{
-    public SInt16 exp;
-    public UInt16[4] man;
-}
-
-public using extended80 = Float80;
 
 public using ConstLogicalAddress = void*;
 
@@ -218,5 +218,7 @@ public struct Float32Point
 public using PRefCon = void*;
 
 public using StyleField = Style;
+
+public using UTF16Char = UInt16;
 
 #endif

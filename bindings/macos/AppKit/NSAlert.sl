@@ -70,6 +70,8 @@ public objc interface NSAlertDelegate : NSObjectProtocol
 public extern objc class NSAlert
 {
     /// Deprecated in macOS 10.10.
+    [Selector("alertWithMessageText:defaultButton:alternateButton:otherButton:informativeTextWithFormat:")] public static NSAlert AlertWithMessageTextDefaultButtonAlternateButtonOtherButtonInformativeTextWithFormat(NSString? message, NSString? defaultButton, NSString? alternateButton, NSString? otherButton, NSString format, ...);
+    /// Deprecated in macOS 10.10.
     [Selector("beginSheetModalForWindow:modalDelegate:didEndSelector:contextInfo:")] public void BeginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(NSWindow window, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);
 }
 

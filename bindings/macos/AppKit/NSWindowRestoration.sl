@@ -31,7 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-public objc interface NSWindowRestoration : NSObjectProtocol { }
+public objc closure void NSWindowRestorationRestoreWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock(NSWindow? arg0, NSError? arg1);
+
+public objc interface NSWindowRestoration : NSObjectProtocol
+{
+    [Selector("restoreWindowWithIdentifier:state:completionHandler:")] static abstract void RestoreWindowWithIdentifierStateCompletionHandler(NSUserInterfaceItemIdentifier identifier, NSCoder state, NSWindowRestorationRestoreWindowWithIdentifierStateCompletionHandlerCompletionHandlerBlock completionHandler);
+}
 
 /// NSWindowRestoration, a category of NSDocumentController.
 public extern objc class NSDocumentController : NSWindowRestoration { }

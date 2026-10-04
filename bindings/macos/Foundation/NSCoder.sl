@@ -59,10 +59,12 @@ public extern objc class NSCoder
     [Selector("encodeBycopyObject:")] public void EncodeBycopyObject(AnyObject? anObject);
     [Selector("encodeByrefObject:")] public void EncodeByrefObject(AnyObject? anObject);
     [Selector("encodeConditionalObject:")] public void EncodeConditionalObject(AnyObject? object);
+    [Selector("encodeValuesOfObjCTypes:")] public void EncodeValuesOfObjCTypes(byte* types, ...);
     [Selector("encodeArrayOfObjCType:count:at:")] public void EncodeArrayOfObjCTypeCountAt(byte* type, NSUInteger count, void* array);
     [Selector("encodeBytes:length:")] public void EncodeBytesLength(void* byteaddr, NSUInteger length);
     [Selector("decodeObject")] public AnyObject? DecodeObject();
     [Selector("decodeTopLevelObjectAndReturnError:")] public AnyObject? DecodeTopLevelObjectAndReturnError(out NSError? error);
+    [Selector("decodeValuesOfObjCTypes:")] public void DecodeValuesOfObjCTypes(byte* types, ...);
     [Selector("decodeArrayOfObjCType:count:at:")] public void DecodeArrayOfObjCTypeCountAt(byte* itemType, NSUInteger count, void* array);
     [Selector("decodeBytesWithReturnedLength:")] public void* DecodeBytesWithReturnedLength(NSUInteger* lengthp);
     [Selector("encodePropertyList:")] public void EncodePropertyList(AnyObject aPropertyList);

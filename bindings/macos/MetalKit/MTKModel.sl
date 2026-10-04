@@ -25,6 +25,7 @@ module MacOS.MetalKit;
 
 import MacOS.Foundation;
 import MacOS.Metal;
+import MacOS.ModelIO;
 import MacOS.System;
 import Standard.ObjC;
 
@@ -38,18 +39,20 @@ public extern "C" MTKModelError? MTKModelErrorDomain;
 
 public extern "C" MTKModelError? MTKModelErrorKey;
 
-public extern objc class MTKMeshBufferAllocator : NSObject
+public extern objc class MTKMeshBufferAllocator : NSObject, MDLMeshBufferAllocator
 {
     [Selector("device")] public MTLDevice Device { get; }
     [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
 }
 
-public extern objc class MTKMeshBuffer : NSObject
+public extern objc class MTKMeshBuffer : NSObject, MDLMeshBuffer, MDLNamed
 {
     [Selector("length")] public NSUInteger Length { get; }
     [Selector("allocator")] public MTKMeshBufferAllocator Allocator { get; }
+    [Selector("zone")] public MDLMeshBufferZone? Zone { get; }
     [Selector("buffer")] public MTLBuffer Buffer { get; }
     [Selector("offset")] public NSUInteger Offset { get; }
+    [Selector("type")] public MDLMeshBufferType Type { get; }
 }
 
 public extern objc class MTKSubmesh : NSObject
@@ -65,9 +68,24 @@ public extern objc class MTKSubmesh : NSObject
 public extern objc class MTKMesh : NSObject
 {
     [Selector("vertexBuffers")] public NSArray VertexBuffers { get; }
+    [Selector("vertexDescriptor")] public MDLVertexDescriptor VertexDescriptor { get; }
     [Selector("submeshes")] public NSArray Submeshes { get; }
     [Selector("vertexCount")] public NSUInteger VertexCount { get; }
     [Selector("name", "setName:")] public NSString Name { get; set; }
+    [Selector("initWithMesh:device:error:")] public Self? InitWithMeshDeviceError(MDLMesh mesh, MTLDevice device, out NSError? error);
+    [Selector("newMeshesFromAsset:device:sourceMeshes:error:")] public static NSArray? NewMeshesFromAssetDeviceSourceMeshesError(MDLAsset asset, MTLDevice device, out NSArray? sourceMeshes, out NSError? error);
 }
+
+public extern "C" MDLVertexDescriptor MTKModelIOVertexDescriptorFromMetal(MTLVertexDescriptor metalDescriptor);
+
+public extern "C" MDLVertexDescriptor MTKModelIOVertexDescriptorFromMetalWithError(MTLVertexDescriptor metalDescriptor, void** error);
+
+public extern "C" MTLVertexDescriptor? MTKMetalVertexDescriptorFromModelIO(MDLVertexDescriptor modelIODescriptor);
+
+public extern "C" MTLVertexDescriptor? MTKMetalVertexDescriptorFromModelIOWithError(MDLVertexDescriptor modelIODescriptor, void** error);
+
+public extern "C" MDLVertexFormat MTKModelIOVertexFormatFromMetal(MTLVertexFormat vertexFormat);
+
+public extern "C" MTLVertexFormat MTKMetalVertexFormatFromModelIO(MDLVertexFormat vertexFormat);
 
 #endif

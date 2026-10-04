@@ -27,6 +27,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.CoreVideo;
 import MacOS.Foundation;
+import MacOS.IOSurface;
 import MacOS.Metal;
 import MacOS.System;
 import Standard.ObjC;

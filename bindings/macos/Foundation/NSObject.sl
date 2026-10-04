@@ -46,7 +46,10 @@ public objc interface NSCoding
     [Selector("initWithCoder:")] Self? InitWithCoder(NSCoder coder);
 }
 
-public objc interface NSSecureCoding : NSCoding { }
+public objc interface NSSecureCoding : NSCoding
+{
+    [Selector("supportsSecureCoding")] static abstract bool SupportsSecureCoding { get; }
+}
 
 /// NSCoderMethods, a category of NSObject.
 public extern objc class NSObject

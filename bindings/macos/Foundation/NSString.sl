@@ -151,6 +151,7 @@ public extern objc class NSString
     [Selector("rangeOfComposedCharacterSequenceAtIndex:")] public NSRange RangeOfComposedCharacterSequenceAtIndex(NSUInteger index);
     [Selector("rangeOfComposedCharacterSequencesForRange:")] public NSRange RangeOfComposedCharacterSequencesForRange(NSRange range);
     [Selector("stringByAppendingString:")] public NSString StringByAppendingString(NSString aString);
+    [Selector("stringByAppendingFormat:")] public NSString StringByAppendingFormat(NSString format, ...);
     [Selector("uppercaseStringWithLocale:")] public NSString UppercaseStringWithLocale(NSLocale? locale);
     [Selector("lowercaseStringWithLocale:")] public NSString LowercaseStringWithLocale(NSLocale? locale);
     [Selector("capitalizedStringWithLocale:")] public NSString CapitalizedStringWithLocale(NSLocale? locale);
@@ -185,6 +186,10 @@ public extern objc class NSString
     [Selector("initWithCharacters:length:")] public Self InitWithCharactersLength(unichar* characters, NSUInteger length);
     [Selector("initWithUTF8String:")] public Self? InitWithUTF8String(byte* nullTerminatedCString);
     [Selector("initWithString:")] public Self InitWithString(NSString aString);
+    [Selector("initWithFormat:")] public Self InitWithFormat(NSString format, ...);
+    [Selector("initWithFormat:locale:")] public Self InitWithFormatLocale(NSString format, AnyObject? locale, ...);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
+    [Selector("initWithValidatedFormat:validFormatSpecifiers:locale:error:")] public Self? InitWithValidatedFormatValidFormatSpecifiersLocaleError(NSString format, NSString validFormatSpecifiers, AnyObject? locale, out NSError? error, ...);
     [Selector("initWithData:encoding:")] public Self? InitWithDataEncoding(NSData data, NSStringEncoding encoding);
     [Selector("initWithBytes:length:encoding:")] public Self? InitWithBytesLengthEncoding(void* bytes, NSUInteger len, NSStringEncoding encoding);
     [Selector("initWithBytesNoCopy:length:encoding:freeWhenDone:")] public Self? InitWithBytesNoCopyLengthEncodingFreeWhenDone(void* bytes, NSUInteger len, NSStringEncoding encoding, bool freeBuffer);
@@ -193,6 +198,10 @@ public extern objc class NSString
     [Selector("stringWithString:")] public static Self StringWithString(NSString string);
     [Selector("stringWithCharacters:length:")] public static Self StringWithCharactersLength(unichar* characters, NSUInteger length);
     [Selector("stringWithUTF8String:")] public static Self? StringWithUTF8String(byte* nullTerminatedCString);
+    [Selector("stringWithFormat:")] public static Self StringWithFormat(NSString format, ...);
+    [Selector("localizedStringWithFormat:")] public static Self LocalizedStringWithFormat(NSString format, ...);
+    [Selector("stringWithValidatedFormat:validFormatSpecifiers:error:")] public static Self? StringWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
+    [Selector("localizedStringWithValidatedFormat:validFormatSpecifiers:error:")] public static Self? LocalizedStringWithValidatedFormatValidFormatSpecifiersError(NSString format, NSString validFormatSpecifiers, out NSError? error, ...);
     [Selector("initWithCString:encoding:")] public Self? InitWithCStringEncoding(byte* nullTerminatedCString, NSStringEncoding encoding);
     [Selector("stringWithCString:encoding:")] public static Self? StringWithCStringEncoding(byte* cString, NSStringEncoding enc);
     [Selector("initWithContentsOfURL:encoding:error:")] public Self? InitWithContentsOfURLEncodingError(NSURL url, NSStringEncoding enc, out NSError? error);
@@ -290,6 +299,7 @@ public extern objc class NSMutableString
     [Selector("insertString:atIndex:")] public void InsertStringAtIndex(NSString aString, NSUInteger loc);
     [Selector("deleteCharactersInRange:")] public void DeleteCharactersInRange(NSRange range);
     [Selector("appendString:")] public void AppendString(NSString aString);
+    [Selector("appendFormat:")] public void AppendFormat(NSString format, ...);
     [Selector("setString:")] public void SetString(NSString aString);
     [Selector("replaceOccurrencesOfString:withString:options:range:")] public NSUInteger ReplaceOccurrencesOfStringWithStringOptionsRange(NSString target, NSString replacement, NSStringCompareOptions options, NSRange searchRange);
     [Selector("applyTransform:reverse:range:updatedRange:")] public bool ApplyTransformReverseRangeUpdatedRange(NSStringTransform transform, bool reverse, NSRange range, NSRangePointer resultingRange);

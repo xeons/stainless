@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreData;
 
+import MacOS.CloudKit;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -34,6 +35,7 @@ import Standard.ObjC;
 public extern objc class NSPersistentCloudKitContainerOptions : NSObject
 {
     [Selector("containerIdentifier")] public NSString ContainerIdentifier { get; }
+    [Selector("databaseScope", "setDatabaseScope:")] public CKDatabaseScope DatabaseScope { get; set; }
     [Selector("initWithContainerIdentifier:")] public Self InitWithContainerIdentifier(NSString containerIdentifier);
 }
 

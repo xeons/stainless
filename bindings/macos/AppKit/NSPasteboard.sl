@@ -230,6 +230,8 @@ public enum NSPasteboardReadingOptions : ulong
 
 public objc interface NSPasteboardReading : NSObjectProtocol
 {
+    [Selector("readableTypesForPasteboard:")] static abstract NSArray ReadableTypesForPasteboard(NSPasteboard pasteboard);
+    [Optional] [Selector("readingOptionsForType:pasteboard:")] static abstract NSPasteboardReadingOptions ReadingOptionsForTypePasteboard(NSPasteboardType type, NSPasteboard pasteboard);
     [Optional] [Selector("initWithPasteboardPropertyList:ofType:")] AnyObject? InitWithPasteboardPropertyListOfType(AnyObject propertyList, NSPasteboardType type);
 }
 

@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.CoreGraphics;
 
+import MacOS.ColorSync;
 import MacOS.CoreFoundation;
 import Standard.ObjC;
 
@@ -159,9 +160,6 @@ public extern "C" CFStringRef kCGColorSpaceCoreMedia709;
 [ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateIndexed(CGColorSpaceRef? baseSpace, nuint lastIndex, byte* colorTable);
 
 [ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreatePattern(CGColorSpaceRef? baseSpace);
-
-[CFType]
-public extern objc class ColorSyncProfileRef : CFTypeRef { }
 
 public extern "C" CFStringRef kCGColorSpaceExtendedRange;
 

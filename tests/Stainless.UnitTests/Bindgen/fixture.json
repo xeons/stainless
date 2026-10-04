@@ -1,5 +1,5 @@
 {
-  "id": "0x14006c208",
+  "id": "0x12086ae08",
   "kind": "TranslationUnitDecl",
   "loc": {},
   "range": {
@@ -8,7 +8,7 @@
   },
   "inner": [
     {
-      "id": "0x140155c88",
+      "id": "0x120954888",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -22,7 +22,7 @@
       },
       "inner": [
         {
-          "id": "0x14006c7d0",
+          "id": "0x12086b3d0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__int128"
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "id": "0x140155cf8",
+      "id": "0x1209548f8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -45,7 +45,7 @@
       },
       "inner": [
         {
-          "id": "0x14006c7f0",
+          "id": "0x12086b3f0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "unsigned __int128"
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "id": "0x140155d98",
+      "id": "0x120954998",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -68,14 +68,14 @@
       },
       "inner": [
         {
-          "id": "0x140155d50",
+          "id": "0x120954950",
           "kind": "PointerType",
           "type": {
             "qualType": "SEL *"
           },
           "inner": [
             {
-              "id": "0x14006c990",
+              "id": "0x12086b590",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "SEL"
@@ -86,7 +86,7 @@
       ]
     },
     {
-      "id": "0x140155e80",
+      "id": "0x120954a80",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -100,14 +100,14 @@
       },
       "inner": [
         {
-          "id": "0x140155e20",
+          "id": "0x120954a20",
           "kind": "ObjCObjectPointerType",
           "type": {
             "qualType": "id"
           },
           "inner": [
             {
-              "id": "0x140155df0",
+              "id": "0x1209549f0",
               "kind": "ObjCObjectType",
               "type": {
                 "qualType": "id"
@@ -118,7 +118,7 @@
       ]
     },
     {
-      "id": "0x140155f70",
+      "id": "0x120954b70",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -132,14 +132,14 @@
       },
       "inner": [
         {
-          "id": "0x140155f10",
+          "id": "0x120954b10",
           "kind": "ObjCObjectPointerType",
           "type": {
             "qualType": "Class"
           },
           "inner": [
             {
-              "id": "0x140155ee0",
+              "id": "0x120954ae0",
               "kind": "ObjCObjectType",
               "type": {
                 "qualType": "Class"
@@ -150,7 +150,7 @@
       ]
     },
     {
-      "id": "0x140155fc8",
+      "id": "0x120954bc8",
       "kind": "ObjCInterfaceDecl",
       "loc": {},
       "range": {
@@ -168,7 +168,7 @@
       }
     },
     {
-      "id": "0x140156338",
+      "id": "0x120954f38",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -182,13 +182,13 @@
       },
       "inner": [
         {
-          "id": "0x140156300",
+          "id": "0x120954f00",
           "kind": "RecordType",
           "type": {
             "qualType": "struct __NSConstantString_tag"
           },
           "decl": {
-            "id": "0x140156080",
+            "id": "0x120954c80",
             "kind": "RecordDecl",
             "name": "__NSConstantString_tag"
           }
@@ -196,7 +196,7 @@
       ]
     },
     {
-      "id": "0x1401563d8",
+      "id": "0x120954fd8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -210,7 +210,7 @@
       },
       "inner": [
         {
-          "id": "0x140156390",
+          "id": "0x120954f90",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(8))) signed char"
@@ -219,7 +219,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c2d0",
+              "id": "0x12086aed0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "signed char"
@@ -230,7 +230,7 @@
       ]
     },
     {
-      "id": "0x140156478",
+      "id": "0x120955078",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -244,7 +244,7 @@
       },
       "inner": [
         {
-          "id": "0x140156430",
+          "id": "0x120955030",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(4))) short"
@@ -253,7 +253,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c2f0",
+              "id": "0x12086aef0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "short"
@@ -264,7 +264,7 @@
       ]
     },
     {
-      "id": "0x140156518",
+      "id": "0x120955118",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -278,7 +278,7 @@
       },
       "inner": [
         {
-          "id": "0x1401564d0",
+          "id": "0x1209550d0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(2))) int"
@@ -287,7 +287,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c310",
+              "id": "0x12086af10",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "int"
@@ -298,7 +298,7 @@
       ]
     },
     {
-      "id": "0x1401565b8",
+      "id": "0x1209551b8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -312,7 +312,7 @@
       },
       "inner": [
         {
-          "id": "0x140156570",
+          "id": "0x120955170",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(8))) unsigned char"
@@ -321,7 +321,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c370",
+              "id": "0x12086af70",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned char"
@@ -332,7 +332,7 @@
       ]
     },
     {
-      "id": "0x140156658",
+      "id": "0x120955258",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -346,7 +346,7 @@
       },
       "inner": [
         {
-          "id": "0x140156610",
+          "id": "0x120955210",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(4))) unsigned short"
@@ -355,7 +355,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c390",
+              "id": "0x12086af90",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned short"
@@ -366,7 +366,7 @@
       ]
     },
     {
-      "id": "0x1401566f8",
+      "id": "0x1209552f8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -380,7 +380,7 @@
       },
       "inner": [
         {
-          "id": "0x1401566b0",
+          "id": "0x1209552b0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(2))) unsigned int"
@@ -389,7 +389,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c3b0",
+              "id": "0x12086afb0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned int"
@@ -400,7 +400,7 @@
       ]
     },
     {
-      "id": "0x140156798",
+      "id": "0x120955398",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -414,7 +414,7 @@
       },
       "inner": [
         {
-          "id": "0x140156750",
+          "id": "0x120955350",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(4))) __fp16"
@@ -423,7 +423,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006d120",
+              "id": "0x12086bd20",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "__fp16"
@@ -434,7 +434,7 @@
       ]
     },
     {
-      "id": "0x140156838",
+      "id": "0x120955438",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -448,7 +448,7 @@
       },
       "inner": [
         {
-          "id": "0x1401567f0",
+          "id": "0x1209553f0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(2))) float"
@@ -457,7 +457,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c410",
+              "id": "0x12086b010",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "float"
@@ -468,7 +468,7 @@
       ]
     },
     {
-      "id": "0x1401568d8",
+      "id": "0x1209554d8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -482,7 +482,7 @@
       },
       "inner": [
         {
-          "id": "0x140156890",
+          "id": "0x120955490",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_polyvector_type(8))) unsigned char"
@@ -491,7 +491,7 @@
           "vectorKind": "neon poly",
           "inner": [
             {
-              "id": "0x14006c370",
+              "id": "0x12086af70",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned char"
@@ -502,7 +502,7 @@
       ]
     },
     {
-      "id": "0x140156978",
+      "id": "0x120955578",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -516,7 +516,7 @@
       },
       "inner": [
         {
-          "id": "0x140156930",
+          "id": "0x120955530",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_polyvector_type(4))) unsigned short"
@@ -525,7 +525,7 @@
           "vectorKind": "neon poly",
           "inner": [
             {
-              "id": "0x14006c390",
+              "id": "0x12086af90",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned short"
@@ -536,7 +536,7 @@
       ]
     },
     {
-      "id": "0x140156a18",
+      "id": "0x120955618",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -550,7 +550,7 @@
       },
       "inner": [
         {
-          "id": "0x1401569d0",
+          "id": "0x1209555d0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(4))) __bf16"
@@ -559,7 +559,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006d140",
+              "id": "0x12086bd40",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "__bf16"
@@ -570,7 +570,7 @@
       ]
     },
     {
-      "id": "0x140156ab8",
+      "id": "0x1209556b8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -584,7 +584,7 @@
       },
       "inner": [
         {
-          "id": "0x140156a70",
+          "id": "0x120955670",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(16))) signed char"
@@ -593,7 +593,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c2d0",
+              "id": "0x12086aed0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "signed char"
@@ -604,7 +604,7 @@
       ]
     },
     {
-      "id": "0x140156b58",
+      "id": "0x120955758",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -618,7 +618,7 @@
       },
       "inner": [
         {
-          "id": "0x140156b10",
+          "id": "0x120955710",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(8))) short"
@@ -627,7 +627,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c2f0",
+              "id": "0x12086aef0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "short"
@@ -638,7 +638,7 @@
       ]
     },
     {
-      "id": "0x140157a00",
+      "id": "0x120956600",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -652,7 +652,7 @@
       },
       "inner": [
         {
-          "id": "0x140156bb0",
+          "id": "0x1209557b0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(4))) int"
@@ -661,7 +661,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c310",
+              "id": "0x12086af10",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "int"
@@ -672,7 +672,7 @@
       ]
     },
     {
-      "id": "0x140157aa8",
+      "id": "0x1209566a8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -686,7 +686,7 @@
       },
       "inner": [
         {
-          "id": "0x140157a60",
+          "id": "0x120956660",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(2))) long"
@@ -695,7 +695,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c330",
+              "id": "0x12086af30",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "long"
@@ -706,7 +706,7 @@
       ]
     },
     {
-      "id": "0x140157b48",
+      "id": "0x120956748",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -720,7 +720,7 @@
       },
       "inner": [
         {
-          "id": "0x140157b00",
+          "id": "0x120956700",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(16))) unsigned char"
@@ -729,7 +729,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c370",
+              "id": "0x12086af70",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned char"
@@ -740,7 +740,7 @@
       ]
     },
     {
-      "id": "0x140157be8",
+      "id": "0x1209567e8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -754,7 +754,7 @@
       },
       "inner": [
         {
-          "id": "0x140157ba0",
+          "id": "0x1209567a0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(8))) unsigned short"
@@ -763,7 +763,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c390",
+              "id": "0x12086af90",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned short"
@@ -774,7 +774,7 @@
       ]
     },
     {
-      "id": "0x140157c88",
+      "id": "0x120956888",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -788,7 +788,7 @@
       },
       "inner": [
         {
-          "id": "0x140157c40",
+          "id": "0x120956840",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(4))) unsigned int"
@@ -797,7 +797,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c3b0",
+              "id": "0x12086afb0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned int"
@@ -808,7 +808,7 @@
       ]
     },
     {
-      "id": "0x140157d28",
+      "id": "0x120956928",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -822,7 +822,7 @@
       },
       "inner": [
         {
-          "id": "0x140157ce0",
+          "id": "0x1209568e0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(2))) unsigned long"
@@ -831,7 +831,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c3d0",
+              "id": "0x12086afd0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned long"
@@ -842,7 +842,7 @@
       ]
     },
     {
-      "id": "0x140157dc8",
+      "id": "0x1209569c8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -856,7 +856,7 @@
       },
       "inner": [
         {
-          "id": "0x140157d80",
+          "id": "0x120956980",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(8))) __fp16"
@@ -865,7 +865,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006d120",
+              "id": "0x12086bd20",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "__fp16"
@@ -876,7 +876,7 @@
       ]
     },
     {
-      "id": "0x140157e68",
+      "id": "0x120956a68",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -890,7 +890,7 @@
       },
       "inner": [
         {
-          "id": "0x140157e20",
+          "id": "0x120956a20",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(4))) float"
@@ -899,7 +899,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c410",
+              "id": "0x12086b010",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "float"
@@ -910,7 +910,7 @@
       ]
     },
     {
-      "id": "0x140157f08",
+      "id": "0x120956b08",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -924,7 +924,7 @@
       },
       "inner": [
         {
-          "id": "0x140157ec0",
+          "id": "0x120956ac0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(2))) double"
@@ -933,7 +933,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006c430",
+              "id": "0x12086b030",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "double"
@@ -944,7 +944,7 @@
       ]
     },
     {
-      "id": "0x140157fa8",
+      "id": "0x120956ba8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -958,7 +958,7 @@
       },
       "inner": [
         {
-          "id": "0x140157f60",
+          "id": "0x120956b60",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_polyvector_type(16))) unsigned char"
@@ -967,7 +967,7 @@
           "vectorKind": "neon poly",
           "inner": [
             {
-              "id": "0x14006c370",
+              "id": "0x12086af70",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned char"
@@ -978,7 +978,7 @@
       ]
     },
     {
-      "id": "0x140158048",
+      "id": "0x120956c48",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -992,7 +992,7 @@
       },
       "inner": [
         {
-          "id": "0x140158000",
+          "id": "0x120956c00",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_polyvector_type(8))) unsigned short"
@@ -1001,7 +1001,7 @@
           "vectorKind": "neon poly",
           "inner": [
             {
-              "id": "0x14006c390",
+              "id": "0x12086af90",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned short"
@@ -1012,7 +1012,7 @@
       ]
     },
     {
-      "id": "0x1401580e8",
+      "id": "0x120956ce8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1026,7 +1026,7 @@
       },
       "inner": [
         {
-          "id": "0x1401580a0",
+          "id": "0x120956ca0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_polyvector_type(2))) unsigned long"
@@ -1035,7 +1035,7 @@
           "vectorKind": "neon poly",
           "inner": [
             {
-              "id": "0x14006c3d0",
+              "id": "0x12086afd0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "unsigned long"
@@ -1046,7 +1046,7 @@
       ]
     },
     {
-      "id": "0x140158188",
+      "id": "0x120956d88",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1060,7 +1060,7 @@
       },
       "inner": [
         {
-          "id": "0x140158140",
+          "id": "0x120956d40",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(8))) __bf16"
@@ -1069,7 +1069,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006d140",
+              "id": "0x12086bd40",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "__bf16"
@@ -1080,7 +1080,7 @@
       ]
     },
     {
-      "id": "0x140158228",
+      "id": "0x120956e28",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1094,7 +1094,7 @@
       },
       "inner": [
         {
-          "id": "0x1401581e0",
+          "id": "0x120956de0",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(8))) __mfp8"
@@ -1103,7 +1103,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006d0b0",
+              "id": "0x12086bcb0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "__mfp8"
@@ -1114,7 +1114,7 @@
       ]
     },
     {
-      "id": "0x1401582c8",
+      "id": "0x120956ec8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1128,7 +1128,7 @@
       },
       "inner": [
         {
-          "id": "0x140158280",
+          "id": "0x120956e80",
           "kind": "VectorType",
           "type": {
             "qualType": "__attribute__((neon_vector_type(16))) __mfp8"
@@ -1137,7 +1137,7 @@
           "vectorKind": "neon",
           "inner": [
             {
-              "id": "0x14006d0b0",
+              "id": "0x12086bcb0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "__mfp8"
@@ -1148,7 +1148,7 @@
       ]
     },
     {
-      "id": "0x140158330",
+      "id": "0x120956f30",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1162,7 +1162,7 @@
       },
       "inner": [
         {
-          "id": "0x14006c9b0",
+          "id": "0x12086b5b0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVInt8_t"
@@ -1171,7 +1171,7 @@
       ]
     },
     {
-      "id": "0x140158398",
+      "id": "0x120956f98",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1185,7 +1185,7 @@
       },
       "inner": [
         {
-          "id": "0x14006c9d0",
+          "id": "0x12086b5d0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVInt16_t"
@@ -1194,7 +1194,7 @@
       ]
     },
     {
-      "id": "0x140158400",
+      "id": "0x120957000",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1208,7 +1208,7 @@
       },
       "inner": [
         {
-          "id": "0x14006c9f0",
+          "id": "0x12086b5f0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVInt32_t"
@@ -1217,7 +1217,7 @@
       ]
     },
     {
-      "id": "0x140158468",
+      "id": "0x120957068",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1231,7 +1231,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ca10",
+          "id": "0x12086b610",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVInt64_t"
@@ -1240,7 +1240,7 @@
       ]
     },
     {
-      "id": "0x1401584d0",
+      "id": "0x1209570d0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1254,7 +1254,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ca30",
+          "id": "0x12086b630",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVUint8_t"
@@ -1263,7 +1263,7 @@
       ]
     },
     {
-      "id": "0x140158538",
+      "id": "0x120957138",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1277,7 +1277,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ca50",
+          "id": "0x12086b650",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVUint16_t"
@@ -1286,7 +1286,7 @@
       ]
     },
     {
-      "id": "0x1401585a0",
+      "id": "0x1209571a0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1300,7 +1300,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ca70",
+          "id": "0x12086b670",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVUint32_t"
@@ -1309,7 +1309,7 @@
       ]
     },
     {
-      "id": "0x140158608",
+      "id": "0x120957208",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1323,7 +1323,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ca90",
+          "id": "0x12086b690",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVUint64_t"
@@ -1332,7 +1332,7 @@
       ]
     },
     {
-      "id": "0x140158670",
+      "id": "0x120957270",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1346,7 +1346,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cab0",
+          "id": "0x12086b6b0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVFloat16_t"
@@ -1355,7 +1355,7 @@
       ]
     },
     {
-      "id": "0x1401586d8",
+      "id": "0x1209572d8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1369,7 +1369,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cad0",
+          "id": "0x12086b6d0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVFloat32_t"
@@ -1378,7 +1378,7 @@
       ]
     },
     {
-      "id": "0x140158740",
+      "id": "0x120957340",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1392,7 +1392,7 @@
       },
       "inner": [
         {
-          "id": "0x14006caf0",
+          "id": "0x12086b6f0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVFloat64_t"
@@ -1401,7 +1401,7 @@
       ]
     },
     {
-      "id": "0x1401587a8",
+      "id": "0x1209573a8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1415,7 +1415,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cb10",
+          "id": "0x12086b710",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVBfloat16_t"
@@ -1424,7 +1424,7 @@
       ]
     },
     {
-      "id": "0x140158810",
+      "id": "0x120957410",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1438,7 +1438,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cb30",
+          "id": "0x12086b730",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVMfloat8_t"
@@ -1447,7 +1447,7 @@
       ]
     },
     {
-      "id": "0x140158878",
+      "id": "0x120957478",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1461,7 +1461,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cb50",
+          "id": "0x12086b750",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint8x2_t"
@@ -1470,7 +1470,7 @@
       ]
     },
     {
-      "id": "0x1401588e0",
+      "id": "0x1209574e0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1484,7 +1484,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cb70",
+          "id": "0x12086b770",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint16x2_t"
@@ -1493,7 +1493,7 @@
       ]
     },
     {
-      "id": "0x140158948",
+      "id": "0x120957548",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1507,7 +1507,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cb90",
+          "id": "0x12086b790",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint32x2_t"
@@ -1516,7 +1516,7 @@
       ]
     },
     {
-      "id": "0x140158a00",
+      "id": "0x120957600",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1530,7 +1530,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cbb0",
+          "id": "0x12086b7b0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint64x2_t"
@@ -1539,7 +1539,7 @@
       ]
     },
     {
-      "id": "0x140158a68",
+      "id": "0x120957668",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1553,7 +1553,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cbd0",
+          "id": "0x12086b7d0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint8x2_t"
@@ -1562,7 +1562,7 @@
       ]
     },
     {
-      "id": "0x140158ad0",
+      "id": "0x1209576d0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1576,7 +1576,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cbf0",
+          "id": "0x12086b7f0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint16x2_t"
@@ -1585,7 +1585,7 @@
       ]
     },
     {
-      "id": "0x140158b38",
+      "id": "0x120957738",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1599,7 +1599,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cc10",
+          "id": "0x12086b810",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint32x2_t"
@@ -1608,7 +1608,7 @@
       ]
     },
     {
-      "id": "0x140158ba0",
+      "id": "0x1209577a0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1622,7 +1622,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cc30",
+          "id": "0x12086b830",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint64x2_t"
@@ -1631,7 +1631,7 @@
       ]
     },
     {
-      "id": "0x140158c08",
+      "id": "0x120957808",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1645,7 +1645,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cc50",
+          "id": "0x12086b850",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat16x2_t"
@@ -1654,7 +1654,7 @@
       ]
     },
     {
-      "id": "0x140158c70",
+      "id": "0x120957870",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1668,7 +1668,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cc70",
+          "id": "0x12086b870",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat32x2_t"
@@ -1677,7 +1677,7 @@
       ]
     },
     {
-      "id": "0x140158cd8",
+      "id": "0x1209578d8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1691,7 +1691,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cc90",
+          "id": "0x12086b890",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat64x2_t"
@@ -1700,7 +1700,7 @@
       ]
     },
     {
-      "id": "0x140158d40",
+      "id": "0x120957940",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1714,7 +1714,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ccb0",
+          "id": "0x12086b8b0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svbfloat16x2_t"
@@ -1723,7 +1723,7 @@
       ]
     },
     {
-      "id": "0x140158da8",
+      "id": "0x1209579a8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1737,7 +1737,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ccd0",
+          "id": "0x12086b8d0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svmfloat8x2_t"
@@ -1746,7 +1746,7 @@
       ]
     },
     {
-      "id": "0x140158e10",
+      "id": "0x120957a10",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1760,7 +1760,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ccf0",
+          "id": "0x12086b8f0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint8x3_t"
@@ -1769,7 +1769,7 @@
       ]
     },
     {
-      "id": "0x140158e78",
+      "id": "0x120957a78",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1783,7 +1783,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cd10",
+          "id": "0x12086b910",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint16x3_t"
@@ -1792,7 +1792,7 @@
       ]
     },
     {
-      "id": "0x140158ee0",
+      "id": "0x120957ae0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1806,7 +1806,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cd30",
+          "id": "0x12086b930",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint32x3_t"
@@ -1815,7 +1815,7 @@
       ]
     },
     {
-      "id": "0x140158f48",
+      "id": "0x120957b48",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1829,7 +1829,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cd50",
+          "id": "0x12086b950",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint64x3_t"
@@ -1838,7 +1838,7 @@
       ]
     },
     {
-      "id": "0x140158fb0",
+      "id": "0x120957bb0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1852,7 +1852,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cd70",
+          "id": "0x12086b970",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint8x3_t"
@@ -1861,7 +1861,7 @@
       ]
     },
     {
-      "id": "0x140159018",
+      "id": "0x120957c18",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1875,7 +1875,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cd90",
+          "id": "0x12086b990",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint16x3_t"
@@ -1884,7 +1884,7 @@
       ]
     },
     {
-      "id": "0x140159080",
+      "id": "0x120957c80",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1898,7 +1898,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cdb0",
+          "id": "0x12086b9b0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint32x3_t"
@@ -1907,7 +1907,7 @@
       ]
     },
     {
-      "id": "0x1401590e8",
+      "id": "0x120957ce8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1921,7 +1921,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cdd0",
+          "id": "0x12086b9d0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint64x3_t"
@@ -1930,7 +1930,7 @@
       ]
     },
     {
-      "id": "0x140159150",
+      "id": "0x120957d50",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1944,7 +1944,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cdf0",
+          "id": "0x12086b9f0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat16x3_t"
@@ -1953,7 +1953,7 @@
       ]
     },
     {
-      "id": "0x1401591b8",
+      "id": "0x120957db8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1967,7 +1967,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ce10",
+          "id": "0x12086ba10",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat32x3_t"
@@ -1976,7 +1976,7 @@
       ]
     },
     {
-      "id": "0x140159220",
+      "id": "0x120957e20",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -1990,7 +1990,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ce30",
+          "id": "0x12086ba30",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat64x3_t"
@@ -1999,7 +1999,7 @@
       ]
     },
     {
-      "id": "0x140159288",
+      "id": "0x120957e88",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2013,7 +2013,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ce50",
+          "id": "0x12086ba50",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svbfloat16x3_t"
@@ -2022,7 +2022,7 @@
       ]
     },
     {
-      "id": "0x1401592f0",
+      "id": "0x120957ef0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2036,7 +2036,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ce70",
+          "id": "0x12086ba70",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svmfloat8x3_t"
@@ -2045,7 +2045,7 @@
       ]
     },
     {
-      "id": "0x140159358",
+      "id": "0x120957f58",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2059,7 +2059,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ce90",
+          "id": "0x12086ba90",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint8x4_t"
@@ -2068,7 +2068,7 @@
       ]
     },
     {
-      "id": "0x1401593c0",
+      "id": "0x120957fc0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2082,7 +2082,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ceb0",
+          "id": "0x12086bab0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint16x4_t"
@@ -2091,7 +2091,7 @@
       ]
     },
     {
-      "id": "0x140159428",
+      "id": "0x120958028",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2105,7 +2105,7 @@
       },
       "inner": [
         {
-          "id": "0x14006ced0",
+          "id": "0x12086bad0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint32x4_t"
@@ -2114,7 +2114,7 @@
       ]
     },
     {
-      "id": "0x140159490",
+      "id": "0x120958090",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2128,7 +2128,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cef0",
+          "id": "0x12086baf0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svint64x4_t"
@@ -2137,7 +2137,7 @@
       ]
     },
     {
-      "id": "0x1401594f8",
+      "id": "0x1209580f8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2151,7 +2151,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cf10",
+          "id": "0x12086bb10",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint8x4_t"
@@ -2160,7 +2160,7 @@
       ]
     },
     {
-      "id": "0x140159560",
+      "id": "0x120958160",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2174,7 +2174,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cf30",
+          "id": "0x12086bb30",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint16x4_t"
@@ -2183,7 +2183,7 @@
       ]
     },
     {
-      "id": "0x1401595c8",
+      "id": "0x1209581c8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2197,7 +2197,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cf50",
+          "id": "0x12086bb50",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint32x4_t"
@@ -2206,7 +2206,7 @@
       ]
     },
     {
-      "id": "0x140159630",
+      "id": "0x120958230",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2220,7 +2220,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cf70",
+          "id": "0x12086bb70",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svuint64x4_t"
@@ -2229,7 +2229,7 @@
       ]
     },
     {
-      "id": "0x140159698",
+      "id": "0x120958298",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2243,7 +2243,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cf90",
+          "id": "0x12086bb90",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat16x4_t"
@@ -2252,7 +2252,7 @@
       ]
     },
     {
-      "id": "0x140159700",
+      "id": "0x120958300",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2266,7 +2266,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cfb0",
+          "id": "0x12086bbb0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat32x4_t"
@@ -2275,7 +2275,7 @@
       ]
     },
     {
-      "id": "0x140159768",
+      "id": "0x120958368",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2289,7 +2289,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cfd0",
+          "id": "0x12086bbd0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svfloat64x4_t"
@@ -2298,7 +2298,7 @@
       ]
     },
     {
-      "id": "0x1401597d0",
+      "id": "0x1209583d0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2312,7 +2312,7 @@
       },
       "inner": [
         {
-          "id": "0x14006cff0",
+          "id": "0x12086bbf0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svbfloat16x4_t"
@@ -2321,7 +2321,7 @@
       ]
     },
     {
-      "id": "0x140159838",
+      "id": "0x120958438",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2335,7 +2335,7 @@
       },
       "inner": [
         {
-          "id": "0x14006d010",
+          "id": "0x12086bc10",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svmfloat8x4_t"
@@ -2344,7 +2344,7 @@
       ]
     },
     {
-      "id": "0x1401598a0",
+      "id": "0x1209584a0",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2358,7 +2358,7 @@
       },
       "inner": [
         {
-          "id": "0x14006d030",
+          "id": "0x12086bc30",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVBool_t"
@@ -2367,7 +2367,7 @@
       ]
     },
     {
-      "id": "0x140159908",
+      "id": "0x120958508",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2381,7 +2381,7 @@
       },
       "inner": [
         {
-          "id": "0x14006d050",
+          "id": "0x12086bc50",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svboolx2_t"
@@ -2390,7 +2390,7 @@
       ]
     },
     {
-      "id": "0x140159970",
+      "id": "0x120958570",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2404,7 +2404,7 @@
       },
       "inner": [
         {
-          "id": "0x14006d070",
+          "id": "0x12086bc70",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__clang_svboolx4_t"
@@ -2413,7 +2413,7 @@
       ]
     },
     {
-      "id": "0x14015a200",
+      "id": "0x120958e00",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2427,7 +2427,7 @@
       },
       "inner": [
         {
-          "id": "0x14006d090",
+          "id": "0x12086bc90",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__SVCount_t"
@@ -2436,7 +2436,7 @@
       ]
     },
     {
-      "id": "0x14015a268",
+      "id": "0x120958e68",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2450,7 +2450,7 @@
       },
       "inner": [
         {
-          "id": "0x14006d0b0",
+          "id": "0x12086bcb0",
           "kind": "BuiltinType",
           "type": {
             "qualType": "__mfp8"
@@ -2459,7 +2459,7 @@
       ]
     },
     {
-      "id": "0x14006d1a8",
+      "id": "0x12086bda8",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2473,14 +2473,14 @@
       },
       "inner": [
         {
-          "id": "0x14006d160",
+          "id": "0x12086bd60",
           "kind": "PointerType",
           "type": {
             "qualType": "char *"
           },
           "inner": [
             {
-              "id": "0x14006c2b0",
+              "id": "0x12086aeb0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "char"
@@ -2491,7 +2491,7 @@
       ]
     },
     {
-      "id": "0x140155c18",
+      "id": "0x120954818",
       "kind": "TypedefDecl",
       "loc": {},
       "range": {
@@ -2505,14 +2505,14 @@
       },
       "inner": [
         {
-          "id": "0x14006d160",
+          "id": "0x12086bd60",
           "kind": "PointerType",
           "type": {
             "qualType": "char *"
           },
           "inner": [
             {
-              "id": "0x14006c2b0",
+              "id": "0x12086aeb0",
               "kind": "BuiltinType",
               "type": {
                 "qualType": "char"
@@ -2523,7 +2523,7 @@
       ]
     },
     {
-      "id": "0x14015a2d8",
+      "id": "0x120958ed8",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 214,
@@ -2551,7 +2551,7 @@
       },
       "inner": [
         {
-          "id": "0x14006c330",
+          "id": "0x12086af30",
           "kind": "BuiltinType",
           "type": {
             "qualType": "long"
@@ -2560,7 +2560,7 @@
       ]
     },
     {
-      "id": "0x14015a330",
+      "id": "0x120958f30",
       "kind": "RecordDecl",
       "loc": {
         "offset": 236,
@@ -2585,7 +2585,7 @@
       "completeDefinition": true,
       "inner": [
         {
-          "id": "0x14015a3e8",
+          "id": "0x120958fe8",
           "kind": "FieldDecl",
           "loc": {
             "offset": 250,
@@ -2608,11 +2608,11 @@
           "type": {
             "desugaredQualType": "long",
             "qualType": "Index",
-            "typeAliasDeclId": "0x14015a2d8"
+            "typeAliasDeclId": "0x120958ed8"
           }
         },
         {
-          "id": "0x14015a450",
+          "id": "0x120959050",
           "kind": "FieldDecl",
           "loc": {
             "offset": 266,
@@ -2635,13 +2635,13 @@
           "type": {
             "desugaredQualType": "long",
             "qualType": "Index",
-            "typeAliasDeclId": "0x14015a2d8"
+            "typeAliasDeclId": "0x120958ed8"
           }
         }
       ]
     },
     {
-      "id": "0x14015a508",
+      "id": "0x120959108",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 276,
@@ -2667,13 +2667,13 @@
       },
       "inner": [
         {
-          "id": "0x14015a4d0",
+          "id": "0x1209590d0",
           "kind": "RecordType",
           "type": {
             "qualType": "struct Range"
           },
           "decl": {
-            "id": "0x14015a330",
+            "id": "0x120958f30",
             "kind": "RecordDecl",
             "name": "Range"
           },
@@ -2682,7 +2682,7 @@
       ]
     },
     {
-      "id": "0x14015a578",
+      "id": "0x120959178",
       "kind": "RecordDecl",
       "loc": {
         "offset": 291,
@@ -2706,7 +2706,7 @@
       "completeDefinition": true,
       "inner": [
         {
-          "id": "0x14015a610",
+          "id": "0x120959210",
           "kind": "FieldDecl",
           "loc": {
             "offset": 307,
@@ -2731,7 +2731,7 @@
           }
         },
         {
-          "id": "0x14015a678",
+          "id": "0x120959278",
           "kind": "FieldDecl",
           "loc": {
             "offset": 317,
@@ -2758,7 +2758,7 @@
       ]
     },
     {
-      "id": "0x14015a738",
+      "id": "0x120959338",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 322,
@@ -2783,13 +2783,13 @@
       },
       "inner": [
         {
-          "id": "0x14015a700",
+          "id": "0x120959300",
           "kind": "RecordType",
           "type": {
             "qualType": "struct Point"
           },
           "decl": {
-            "id": "0x14015a578",
+            "id": "0x120959178",
             "kind": "RecordDecl",
             "name": ""
           },
@@ -2798,7 +2798,7 @@
       ]
     },
     {
-      "id": "0x14015a7a8",
+      "id": "0x1209593a8",
       "kind": "RecordDecl",
       "loc": {
         "offset": 350,
@@ -2822,7 +2822,7 @@
       "tagUsed": "struct"
     },
     {
-      "id": "0x14015a900",
+      "id": "0x120959500",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 360,
@@ -2848,14 +2848,14 @@
       },
       "inner": [
         {
-          "id": "0x14015a8b0",
+          "id": "0x1209594b0",
           "kind": "PointerType",
           "type": {
             "qualType": "const struct __Opaque *"
           },
           "inner": [
             {
-              "id": "0x14015a861",
+              "id": "0x120959461",
               "kind": "QualType",
               "type": {
                 "qualType": "const struct __Opaque"
@@ -2863,13 +2863,13 @@
               "qualifiers": "const",
               "inner": [
                 {
-                  "id": "0x14015a860",
+                  "id": "0x120959460",
                   "kind": "RecordType",
                   "type": {
                     "qualType": "struct __Opaque"
                   },
                   "decl": {
-                    "id": "0x14015a7a8",
+                    "id": "0x1209593a8",
                     "kind": "RecordDecl",
                     "name": "__Opaque"
                   },
@@ -2882,7 +2882,7 @@
       ]
     },
     {
-      "id": "0x14015a970",
+      "id": "0x120959570",
       "kind": "RecordDecl",
       "loc": {
         "offset": 385,
@@ -2907,7 +2907,7 @@
       "completeDefinition": true,
       "inner": [
         {
-          "id": "0x14015aa08",
+          "id": "0x120959608",
           "kind": "FieldDecl",
           "loc": {
             "offset": 396,
@@ -2932,7 +2932,7 @@
           }
         },
         {
-          "id": "0x14015ab18",
+          "id": "0x120959718",
           "kind": "FieldDecl",
           "loc": {
             "offset": 409,
@@ -2959,7 +2959,7 @@
       ]
     },
     {
-      "id": "0x14015abd8",
+      "id": "0x1209597d8",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 422,
@@ -2984,13 +2984,13 @@
       },
       "inner": [
         {
-          "id": "0x14015aba0",
+          "id": "0x1209597a0",
           "kind": "RecordType",
           "type": {
             "qualType": "union Word"
           },
           "decl": {
-            "id": "0x14015a970",
+            "id": "0x120959570",
             "kind": "RecordDecl",
             "name": "Word"
           },
@@ -2999,7 +2999,7 @@
       ]
     },
     {
-      "id": "0x14015ac48",
+      "id": "0x120959848",
       "kind": "RecordDecl",
       "loc": {
         "offset": 435,
@@ -3024,7 +3024,7 @@
       "completeDefinition": true,
       "inner": [
         {
-          "id": "0x14015ad20",
+          "id": "0x120959920",
           "kind": "FieldDecl",
           "loc": {
             "offset": 456,
@@ -3050,7 +3050,7 @@
           "isBitfield": true,
           "inner": [
             {
-              "id": "0x14015ad00",
+              "id": "0x120959900",
               "kind": "ConstantExpr",
               "range": {
                 "begin": {
@@ -3071,7 +3071,7 @@
               "value": "1",
               "inner": [
                 {
-                  "id": "0x14015acc8",
+                  "id": "0x1209598c8",
                   "kind": "IntegerLiteral",
                   "range": {
                     "begin": {
@@ -3096,7 +3096,7 @@
           ]
         },
         {
-          "id": "0x14015adc8",
+          "id": "0x1209599c8",
           "kind": "FieldDecl",
           "loc": {
             "offset": 480,
@@ -3122,7 +3122,7 @@
           "isBitfield": true,
           "inner": [
             {
-              "id": "0x14015ada8",
+              "id": "0x1209599a8",
               "kind": "ConstantExpr",
               "range": {
                 "begin": {
@@ -3143,7 +3143,7 @@
               "value": "3",
               "inner": [
                 {
-                  "id": "0x14015ad70",
+                  "id": "0x120959970",
                   "kind": "IntegerLiteral",
                   "range": {
                     "begin": {
@@ -3170,7 +3170,7 @@
       ]
     },
     {
-      "id": "0x14015ae18",
+      "id": "0x120959a18",
       "kind": "RecordDecl",
       "loc": {
         "offset": 524,
@@ -3195,7 +3195,7 @@
       "completeDefinition": true,
       "inner": [
         {
-          "id": "0x14015ae98",
+          "id": "0x120959a98",
           "kind": "PackedAttr",
           "range": {
             "begin": {
@@ -3211,7 +3211,7 @@
           }
         },
         {
-          "id": "0x14015af00",
+          "id": "0x120959b00",
           "kind": "FieldDecl",
           "loc": {
             "offset": 536,
@@ -3236,7 +3236,7 @@
           }
         },
         {
-          "id": "0x14015af68",
+          "id": "0x120959b68",
           "kind": "FieldDecl",
           "loc": {
             "offset": 545,
@@ -3263,7 +3263,7 @@
       ]
     },
     {
-      "id": "0x14015afe0",
+      "id": "0x120959be0",
       "kind": "RecordDecl",
       "loc": {
         "offset": 562,
@@ -3288,7 +3288,7 @@
       "completeDefinition": true,
       "inner": [
         {
-          "id": "0x14015b078",
+          "id": "0x120959c78",
           "kind": "FieldDecl",
           "loc": {
             "offset": 575,
@@ -3313,7 +3313,7 @@
           }
         },
         {
-          "id": "0x14015b0c8",
+          "id": "0x120959cc8",
           "kind": "RecordDecl",
           "loc": {
             "offset": 582,
@@ -3336,7 +3336,7 @@
           "completeDefinition": true,
           "inner": [
             {
-              "id": "0x14015b160",
+              "id": "0x120959d60",
               "kind": "FieldDecl",
               "loc": {
                 "offset": 594,
@@ -3361,7 +3361,7 @@
               }
             },
             {
-              "id": "0x14017c400",
+              "id": "0x12097b000",
               "kind": "FieldDecl",
               "loc": {
                 "offset": 607,
@@ -3388,7 +3388,7 @@
           ]
         },
         {
-          "id": "0x14017c4b8",
+          "id": "0x12097b0b8",
           "kind": "FieldDecl",
           "loc": {
             "offset": 582,
@@ -3413,7 +3413,7 @@
           }
         },
         {
-          "id": "0x14017c518",
+          "id": "0x12097b118",
           "kind": "IndirectFieldDecl",
           "loc": {
             "offset": 594,
@@ -3436,7 +3436,7 @@
           "name": "asInt"
         },
         {
-          "id": "0x14017c570",
+          "id": "0x12097b170",
           "kind": "IndirectFieldDecl",
           "loc": {
             "offset": 607,
@@ -3459,7 +3459,7 @@
           "name": "asFloat"
         },
         {
-          "id": "0x14017c5b8",
+          "id": "0x12097b1b8",
           "kind": "RecordDecl",
           "loc": {
             "offset": 619,
@@ -3482,7 +3482,7 @@
           "completeDefinition": true,
           "inner": [
             {
-              "id": "0x14017c650",
+              "id": "0x12097b250",
               "kind": "FieldDecl",
               "loc": {
                 "offset": 632,
@@ -3507,7 +3507,7 @@
               }
             },
             {
-              "id": "0x14017c6b8",
+              "id": "0x12097b2b8",
               "kind": "FieldDecl",
               "loc": {
                 "offset": 639,
@@ -3534,7 +3534,7 @@
           ]
         },
         {
-          "id": "0x14017c778",
+          "id": "0x12097b378",
           "kind": "FieldDecl",
           "loc": {
             "offset": 644,
@@ -3559,7 +3559,7 @@
           }
         },
         {
-          "id": "0x14017c860",
+          "id": "0x12097b460",
           "kind": "FieldDecl",
           "loc": {
             "offset": 655,
@@ -3586,7 +3586,7 @@
       ]
     },
     {
-      "id": "0x14017c8c8",
+      "id": "0x12097b4c8",
       "kind": "EnumDecl",
       "loc": {
         "offset": 681,
@@ -3612,7 +3612,7 @@
       },
       "inner": [
         {
-          "id": "0x14017c9e0",
+          "id": "0x12097b5e0",
           "kind": "EnumConstantDecl",
           "loc": {
             "offset": 698,
@@ -3637,7 +3637,7 @@
           },
           "inner": [
             {
-              "id": "0x14017c9c8",
+              "id": "0x12097b5c8",
               "kind": "ImplicitCastExpr",
               "range": {
                 "begin": {
@@ -3658,7 +3658,7 @@
               "castKind": "IntegralCast",
               "inner": [
                 {
-                  "id": "0x14017c9a8",
+                  "id": "0x12097b5a8",
                   "kind": "ConstantExpr",
                   "range": {
                     "begin": {
@@ -3679,7 +3679,7 @@
                   "value": "-1",
                   "inner": [
                     {
-                      "id": "0x14017c990",
+                      "id": "0x12097b590",
                       "kind": "UnaryOperator",
                       "range": {
                         "begin": {
@@ -3701,7 +3701,7 @@
                       "opcode": "-",
                       "inner": [
                         {
-                          "id": "0x14017c970",
+                          "id": "0x12097b570",
                           "kind": "IntegerLiteral",
                           "range": {
                             "begin": {
@@ -3730,7 +3730,7 @@
           ]
         },
         {
-          "id": "0x14017ca90",
+          "id": "0x12097b690",
           "kind": "EnumConstantDecl",
           "loc": {
             "offset": 717,
@@ -3755,7 +3755,7 @@
           },
           "inner": [
             {
-              "id": "0x14017ca78",
+              "id": "0x12097b678",
               "kind": "ImplicitCastExpr",
               "range": {
                 "begin": {
@@ -3776,7 +3776,7 @@
               "castKind": "IntegralCast",
               "inner": [
                 {
-                  "id": "0x14017ca58",
+                  "id": "0x12097b658",
                   "kind": "ConstantExpr",
                   "range": {
                     "begin": {
@@ -3797,7 +3797,7 @@
                   "value": "0",
                   "inner": [
                     {
-                      "id": "0x14017ca38",
+                      "id": "0x12097b638",
                       "kind": "IntegerLiteral",
                       "range": {
                         "begin": {
@@ -3824,7 +3824,7 @@
           ]
         },
         {
-          "id": "0x14017cb40",
+          "id": "0x12097b740",
           "kind": "EnumConstantDecl",
           "loc": {
             "offset": 735,
@@ -3849,7 +3849,7 @@
           },
           "inner": [
             {
-              "id": "0x14017cb28",
+              "id": "0x12097b728",
               "kind": "ImplicitCastExpr",
               "range": {
                 "begin": {
@@ -3870,7 +3870,7 @@
               "castKind": "IntegralCast",
               "inner": [
                 {
-                  "id": "0x14017cb08",
+                  "id": "0x12097b708",
                   "kind": "ConstantExpr",
                   "range": {
                     "begin": {
@@ -3891,7 +3891,7 @@
                   "value": "1",
                   "inner": [
                     {
-                      "id": "0x14017cae8",
+                      "id": "0x12097b6e8",
                       "kind": "IntegerLiteral",
                       "range": {
                         "begin": {
@@ -3920,7 +3920,7 @@
       ]
     },
     {
-      "id": "0x14017cc08",
+      "id": "0x12097b808",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 754,
@@ -3945,13 +3945,13 @@
       },
       "inner": [
         {
-          "id": "0x14017cbd0",
+          "id": "0x12097b7d0",
           "kind": "EnumType",
           "type": {
             "qualType": "enum Compare"
           },
           "decl": {
-            "id": "0x14017c8c8",
+            "id": "0x12097b4c8",
             "kind": "EnumDecl",
             "name": "Compare"
           },
@@ -3960,7 +3960,7 @@
       ]
     },
     {
-      "id": "0x14017cc90",
+      "id": "0x12097b890",
       "kind": "EnumDecl",
       "loc": {
         "offset": 803,
@@ -3986,7 +3986,7 @@
       },
       "inner": [
         {
-          "id": "0x14017cd38",
+          "id": "0x12097b938",
           "kind": "FlagEnumAttr",
           "range": {
             "begin": {
@@ -4002,7 +4002,7 @@
           }
         },
         {
-          "id": "0x14017cde8",
+          "id": "0x12097b9e8",
           "kind": "EnumConstantDecl",
           "loc": {
             "offset": 828,
@@ -4027,7 +4027,7 @@
           },
           "inner": [
             {
-              "id": "0x14017cdd0",
+              "id": "0x12097b9d0",
               "kind": "ImplicitCastExpr",
               "range": {
                 "begin": {
@@ -4048,7 +4048,7 @@
               "castKind": "IntegralCast",
               "inner": [
                 {
-                  "id": "0x14017cdb0",
+                  "id": "0x12097b9b0",
                   "kind": "ConstantExpr",
                   "range": {
                     "begin": {
@@ -4069,7 +4069,7 @@
                   "value": "0",
                   "inner": [
                     {
-                      "id": "0x14017cd90",
+                      "id": "0x12097b990",
                       "kind": "IntegerLiteral",
                       "range": {
                         "begin": {
@@ -4096,7 +4096,7 @@
           ]
         },
         {
-          "id": "0x14017ce98",
+          "id": "0x12097ba98",
           "kind": "EnumConstantDecl",
           "loc": {
             "offset": 845,
@@ -4121,7 +4121,7 @@
           },
           "inner": [
             {
-              "id": "0x14017ce80",
+              "id": "0x12097ba80",
               "kind": "ImplicitCastExpr",
               "range": {
                 "begin": {
@@ -4142,7 +4142,7 @@
               "castKind": "IntegralCast",
               "inner": [
                 {
-                  "id": "0x14017ce60",
+                  "id": "0x12097ba60",
                   "kind": "ConstantExpr",
                   "range": {
                     "begin": {
@@ -4163,7 +4163,7 @@
                   "value": "1",
                   "inner": [
                     {
-                      "id": "0x14017ce40",
+                      "id": "0x12097ba40",
                       "kind": "IntegerLiteral",
                       "range": {
                         "begin": {
@@ -4190,7 +4190,7 @@
           ]
         },
         {
-          "id": "0x14017cf48",
+          "id": "0x12097bb48",
           "kind": "EnumConstantDecl",
           "loc": {
             "offset": 862,
@@ -4215,7 +4215,7 @@
           },
           "inner": [
             {
-              "id": "0x14017cf30",
+              "id": "0x12097bb30",
               "kind": "ImplicitCastExpr",
               "range": {
                 "begin": {
@@ -4236,7 +4236,7 @@
               "castKind": "IntegralCast",
               "inner": [
                 {
-                  "id": "0x14017cf10",
+                  "id": "0x12097bb10",
                   "kind": "ConstantExpr",
                   "range": {
                     "begin": {
@@ -4257,7 +4257,7 @@
                   "value": "2",
                   "inner": [
                     {
-                      "id": "0x14017cef0",
+                      "id": "0x12097baf0",
                       "kind": "IntegerLiteral",
                       "range": {
                         "begin": {
@@ -4286,7 +4286,7 @@
       ]
     },
     {
-      "id": "0x14017d008",
+      "id": "0x12097bc08",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 880,
@@ -4311,13 +4311,13 @@
       },
       "inner": [
         {
-          "id": "0x14017cfd0",
+          "id": "0x12097bbd0",
           "kind": "EnumType",
           "type": {
             "qualType": "enum Options"
           },
           "decl": {
-            "id": "0x14017cc90",
+            "id": "0x12097b890",
             "kind": "EnumDecl",
             "name": "Options"
           },
@@ -4326,7 +4326,7 @@
       ]
     },
     {
-      "id": "0x14017d078",
+      "id": "0x12097bc78",
       "kind": "EnumDecl",
       "loc": {
         "offset": 889,
@@ -4348,7 +4348,7 @@
       },
       "inner": [
         {
-          "id": "0x14017d178",
+          "id": "0x12097bd78",
           "kind": "EnumConstantDecl",
           "loc": {
             "offset": 896,
@@ -4373,7 +4373,7 @@
           },
           "inner": [
             {
-              "id": "0x14017d158",
+              "id": "0x12097bd58",
               "kind": "ConstantExpr",
               "range": {
                 "begin": {
@@ -4394,7 +4394,7 @@
               "value": "-1",
               "inner": [
                 {
-                  "id": "0x14017d140",
+                  "id": "0x12097bd40",
                   "kind": "UnaryOperator",
                   "range": {
                     "begin": {
@@ -4416,7 +4416,7 @@
                   "opcode": "-",
                   "inner": [
                     {
-                      "id": "0x14017d120",
+                      "id": "0x12097bd20",
                       "kind": "IntegerLiteral",
                       "range": {
                         "begin": {
@@ -4445,7 +4445,7 @@
       ]
     },
     {
-      "id": "0x140180440",
+      "id": "0x12097f040",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 929,
@@ -4471,21 +4471,21 @@
       },
       "inner": [
         {
-          "id": "0x14017d3d0",
+          "id": "0x12097bfd0",
           "kind": "PointerType",
           "type": {
             "qualType": "void (*)(void *, Index)"
           },
           "inner": [
             {
-              "id": "0x14017d370",
+              "id": "0x12097bf70",
               "kind": "ParenType",
               "type": {
                 "qualType": "void (void *, Index)"
               },
               "inner": [
                 {
-                  "id": "0x14017d330",
+                  "id": "0x12097bf30",
                   "kind": "FunctionProtoType",
                   "type": {
                     "qualType": "void (void *, Index)"
@@ -4493,21 +4493,21 @@
                   "cc": "cdecl",
                   "inner": [
                     {
-                      "id": "0x14006c270",
+                      "id": "0x12086ae70",
                       "kind": "BuiltinType",
                       "type": {
                         "qualType": "void"
                       }
                     },
                     {
-                      "id": "0x14006d0d0",
+                      "id": "0x12086bcd0",
                       "kind": "PointerType",
                       "type": {
                         "qualType": "void *"
                       },
                       "inner": [
                         {
-                          "id": "0x14006c270",
+                          "id": "0x12086ae70",
                           "kind": "BuiltinType",
                           "type": {
                             "qualType": "void"
@@ -4516,19 +4516,19 @@
                       ]
                     },
                     {
-                      "id": "0x14015a3b0",
+                      "id": "0x120958fb0",
                       "kind": "TypedefType",
                       "type": {
                         "qualType": "Index"
                       },
                       "decl": {
-                        "id": "0x14015a2d8",
+                        "id": "0x120958ed8",
                         "kind": "TypedefDecl",
                         "name": "Index"
                       },
                       "inner": [
                         {
-                          "id": "0x14006c330",
+                          "id": "0x12086af30",
                           "kind": "BuiltinType",
                           "type": {
                             "qualType": "long"
@@ -4545,7 +4545,7 @@
       ]
     },
     {
-      "id": "0x140180678",
+      "id": "0x12097f278",
       "kind": "TypedefDecl",
       "loc": {
         "offset": 980,
@@ -4571,21 +4571,21 @@
       },
       "inner": [
         {
-          "id": "0x140180610",
+          "id": "0x12097f210",
           "kind": "BlockPointerType",
           "type": {
             "qualType": "void (^)(Index)"
           },
           "inner": [
             {
-              "id": "0x1401805b0",
+              "id": "0x12097f1b0",
               "kind": "ParenType",
               "type": {
                 "qualType": "void (Index)"
               },
               "inner": [
                 {
-                  "id": "0x140180570",
+                  "id": "0x12097f170",
                   "kind": "FunctionProtoType",
                   "type": {
                     "qualType": "void (Index)"
@@ -4593,26 +4593,26 @@
                   "cc": "cdecl",
                   "inner": [
                     {
-                      "id": "0x14006c270",
+                      "id": "0x12086ae70",
                       "kind": "BuiltinType",
                       "type": {
                         "qualType": "void"
                       }
                     },
                     {
-                      "id": "0x14015a3b0",
+                      "id": "0x120958fb0",
                       "kind": "TypedefType",
                       "type": {
                         "qualType": "Index"
                       },
                       "decl": {
-                        "id": "0x14015a2d8",
+                        "id": "0x120958ed8",
                         "kind": "TypedefDecl",
                         "name": "Index"
                       },
                       "inner": [
                         {
-                          "id": "0x14006c330",
+                          "id": "0x12086af30",
                           "kind": "BuiltinType",
                           "type": {
                             "qualType": "long"
@@ -4629,7 +4629,7 @@
       ]
     },
     {
-      "id": "0x140180708",
+      "id": "0x12097f308",
       "kind": "VarDecl",
       "loc": {
         "offset": 1026,
@@ -4654,12 +4654,12 @@
       "type": {
         "desugaredQualType": "const struct __Opaque *const",
         "qualType": "const OpaqueRef",
-        "typeAliasDeclId": "0x14015a900"
+        "typeAliasDeclId": "0x120959500"
       },
       "storageClass": "extern"
     },
     {
-      "id": "0x1401809d0",
+      "id": "0x12097f5d0",
       "kind": "FunctionDecl",
       "loc": {
         "offset": 1055,
@@ -4688,7 +4688,7 @@
       "variadic": true,
       "inner": [
         {
-          "id": "0x140180810",
+          "id": "0x12097f410",
           "kind": "ParmVarDecl",
           "loc": {
             "offset": 1070,
@@ -4711,11 +4711,11 @@
           "type": {
             "desugaredQualType": "struct Range",
             "qualType": "Range",
-            "typeAliasDeclId": "0x14015a508"
+            "typeAliasDeclId": "0x120959108"
           }
         },
         {
-          "id": "0x140180890",
+          "id": "0x12097f490",
           "kind": "ParmVarDecl",
           "loc": {
             "offset": 1089,
@@ -4742,7 +4742,7 @@
       ]
     },
     {
-      "id": "0x140180bc8",
+      "id": "0x12097f7c8",
       "kind": "FunctionDecl",
       "loc": {
         "offset": 1122,
@@ -4771,7 +4771,7 @@
       "inline": true,
       "inner": [
         {
-          "id": "0x140180ab8",
+          "id": "0x12097f6b8",
           "kind": "ParmVarDecl",
           "loc": {
             "offset": 1134,
@@ -4795,11 +4795,11 @@
           "type": {
             "desugaredQualType": "long",
             "qualType": "Index",
-            "typeAliasDeclId": "0x14015a2d8"
+            "typeAliasDeclId": "0x120958ed8"
           }
         },
         {
-          "id": "0x140180d18",
+          "id": "0x12097f918",
           "kind": "CompoundStmt",
           "range": {
             "begin": {
@@ -4815,7 +4815,7 @@
           },
           "inner": [
             {
-              "id": "0x140180d08",
+              "id": "0x12097f908",
               "kind": "ReturnStmt",
               "range": {
                 "begin": {
@@ -4831,7 +4831,7 @@
               },
               "inner": [
                 {
-                  "id": "0x140180ce8",
+                  "id": "0x12097f8e8",
                   "kind": "BinaryOperator",
                   "range": {
                     "begin": {
@@ -4848,13 +4848,13 @@
                   "type": {
                     "desugaredQualType": "long",
                     "qualType": "Index",
-                    "typeAliasDeclId": "0x14015a2d8"
+                    "typeAliasDeclId": "0x120958ed8"
                   },
                   "valueCategory": "prvalue",
                   "opcode": "*",
                   "inner": [
                     {
-                      "id": "0x140180cb8",
+                      "id": "0x12097f8b8",
                       "kind": "ImplicitCastExpr",
                       "range": {
                         "begin": {
@@ -4871,13 +4871,13 @@
                       "type": {
                         "desugaredQualType": "long",
                         "qualType": "Index",
-                        "typeAliasDeclId": "0x14015a2d8"
+                        "typeAliasDeclId": "0x120958ed8"
                       },
                       "valueCategory": "prvalue",
                       "castKind": "LValueToRValue",
                       "inner": [
                         {
-                          "id": "0x140180c78",
+                          "id": "0x12097f878",
                           "kind": "DeclRefExpr",
                           "range": {
                             "begin": {
@@ -4894,24 +4894,24 @@
                           "type": {
                             "desugaredQualType": "long",
                             "qualType": "Index",
-                            "typeAliasDeclId": "0x14015a2d8"
+                            "typeAliasDeclId": "0x120958ed8"
                           },
                           "valueCategory": "lvalue",
                           "referencedDecl": {
-                            "id": "0x140180ab8",
+                            "id": "0x12097f6b8",
                             "kind": "ParmVarDecl",
                             "name": "value",
                             "type": {
                               "desugaredQualType": "long",
                               "qualType": "Index",
-                              "typeAliasDeclId": "0x14015a2d8"
+                              "typeAliasDeclId": "0x120958ed8"
                             }
                           }
                         }
                       ]
                     },
                     {
-                      "id": "0x140180cd0",
+                      "id": "0x12097f8d0",
                       "kind": "ImplicitCastExpr",
                       "range": {
                         "begin": {
@@ -4928,13 +4928,13 @@
                       "type": {
                         "desugaredQualType": "long",
                         "qualType": "Index",
-                        "typeAliasDeclId": "0x14015a2d8"
+                        "typeAliasDeclId": "0x120958ed8"
                       },
                       "valueCategory": "prvalue",
                       "castKind": "IntegralCast",
                       "inner": [
                         {
-                          "id": "0x140180c98",
+                          "id": "0x12097f898",
                           "kind": "IntegerLiteral",
                           "range": {
                             "begin": {
@@ -4965,7 +4965,7 @@
       ]
     },
     {
-      "id": "0x140180fb0",
+      "id": "0x12097fbb0",
       "kind": "FunctionDecl",
       "loc": {
         "offset": 1175,
@@ -4993,7 +4993,7 @@
       "storageClass": "extern",
       "inner": [
         {
-          "id": "0x140180ea0",
+          "id": "0x12097faa0",
           "kind": "ParmVarDecl",
           "loc": {
             "offset": 1190,
@@ -5015,6 +5015,288 @@
           "name": "block",
           "type": {
             "qualType": "void (^)(void)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12097fc60",
+      "kind": "RecordDecl",
+      "loc": {
+        "offset": 1212,
+        "line": 21,
+        "col": 8,
+        "tokLen": 5
+      },
+      "range": {
+        "begin": {
+          "offset": 1205,
+          "col": 1,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 1281,
+          "col": 77,
+          "tokLen": 1
+        }
+      },
+      "name": "Event",
+      "tagUsed": "struct",
+      "completeDefinition": true,
+      "inner": [
+        {
+          "id": "0x12097fcf8",
+          "kind": "FieldDecl",
+          "loc": {
+            "offset": 1224,
+            "col": 20,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 1220,
+              "col": 16,
+              "tokLen": 3
+            },
+            "end": {
+              "offset": 1224,
+              "col": 20,
+              "tokLen": 4
+            }
+          },
+          "name": "type",
+          "type": {
+            "qualType": "int"
+          }
+        },
+        {
+          "id": "0x12097fd60",
+          "kind": "FieldDecl",
+          "loc": {
+            "offset": 1240,
+            "col": 36,
+            "tokLen": 4
+          },
+          "range": {
+            "begin": {
+              "offset": 1230,
+              "col": 26,
+              "tokLen": 4
+            },
+            "end": {
+              "offset": 1240,
+              "col": 36,
+              "tokLen": 4
+            }
+          },
+          "name": "time",
+          "type": {
+            "qualType": "long long"
+          },
+          "inner": [
+            {
+              "id": "0x12097fdb0",
+              "kind": "PackedAttr",
+              "range": {
+                "begin": {
+                  "offset": 1260,
+                  "col": 56,
+                  "tokLen": 6
+                },
+                "end": {
+                  "offset": 1260,
+                  "col": 56,
+                  "tokLen": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "0x12097fe20",
+          "kind": "FieldDecl",
+          "loc": {
+            "offset": 1274,
+            "col": 70,
+            "tokLen": 5
+          },
+          "range": {
+            "begin": {
+              "offset": 1270,
+              "col": 66,
+              "tokLen": 3
+            },
+            "end": {
+              "offset": 1274,
+              "col": 70,
+              "tokLen": 5
+            }
+          },
+          "name": "flags",
+          "type": {
+            "qualType": "int"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0x12097ff08",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 1306,
+        "line": 22,
+        "col": 23,
+        "tokLen": 12
+      },
+      "range": {
+        "begin": {
+          "offset": 1284,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 1321,
+          "col": 38,
+          "tokLen": 1
+        }
+      },
+      "isReferenced": true,
+      "name": "__private_id",
+      "type": {
+        "qualType": "unsigned char[16]"
+      },
+      "inner": [
+        {
+          "id": "0x12097feb0",
+          "kind": "ConstantArrayType",
+          "type": {
+            "qualType": "unsigned char[16]"
+          },
+          "size": 16,
+          "inner": [
+            {
+              "id": "0x12086af70",
+              "kind": "BuiltinType",
+              "type": {
+                "qualType": "unsigned char"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x12097ff98",
+      "kind": "TypedefDecl",
+      "loc": {
+        "offset": 1345,
+        "line": 23,
+        "col": 22,
+        "tokLen": 8
+      },
+      "range": {
+        "begin": {
+          "offset": 1324,
+          "col": 1,
+          "tokLen": 7
+        },
+        "end": {
+          "offset": 1345,
+          "col": 22,
+          "tokLen": 8
+        }
+      },
+      "isReferenced": true,
+      "name": "PublicId",
+      "type": {
+        "desugaredQualType": "unsigned char[16]",
+        "qualType": "__private_id",
+        "typeAliasDeclId": "0x12097ff08"
+      },
+      "inner": [
+        {
+          "id": "0x12097ff60",
+          "kind": "TypedefType",
+          "type": {
+            "qualType": "__private_id"
+          },
+          "decl": {
+            "id": "0x12097ff08",
+            "kind": "TypedefDecl",
+            "name": "__private_id"
+          },
+          "inner": [
+            {
+              "id": "0x12097feb0",
+              "kind": "ConstantArrayType",
+              "type": {
+                "qualType": "unsigned char[16]"
+              },
+              "size": 16,
+              "inner": [
+                {
+                  "id": "0x12086af70",
+                  "kind": "BuiltinType",
+                  "type": {
+                    "qualType": "unsigned char"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0x120980c00",
+      "kind": "RecordDecl",
+      "loc": {
+        "offset": 1362,
+        "line": 24,
+        "col": 8,
+        "tokLen": 5
+      },
+      "range": {
+        "begin": {
+          "offset": 1355,
+          "col": 1,
+          "tokLen": 6
+        },
+        "end": {
+          "offset": 1383,
+          "col": 29,
+          "tokLen": 1
+        }
+      },
+      "name": "HasId",
+      "tagUsed": "struct",
+      "completeDefinition": true,
+      "inner": [
+        {
+          "id": "0x120980cb8",
+          "kind": "FieldDecl",
+          "loc": {
+            "offset": 1379,
+            "col": 25,
+            "tokLen": 2
+          },
+          "range": {
+            "begin": {
+              "offset": 1370,
+              "col": 16,
+              "tokLen": 8
+            },
+            "end": {
+              "offset": 1379,
+              "col": 25,
+              "tokLen": 2
+            }
+          },
+          "name": "id",
+          "type": {
+            "desugaredQualType": "unsigned char[16]",
+            "qualType": "PublicId",
+            "typeAliasDeclId": "0x12097ff98"
           }
         }
       ]

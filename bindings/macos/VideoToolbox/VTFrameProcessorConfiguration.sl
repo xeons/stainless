@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.VideoToolbox;
 
+import MacOS.CoreMedia;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -34,11 +35,14 @@ import Standard.ObjC;
 /// macOS 15.4 and later.
 public objc interface VTFrameProcessorConfiguration : NSObjectProtocol
 {
+    [Selector("isSupported")] static abstract bool Supported { get; }
     [Selector("frameSupportedPixelFormats")] NSArray? FrameSupportedPixelFormats { get; }
     [Selector("sourcePixelBufferAttributes")] NSDictionary SourcePixelBufferAttributes { get; }
     [Selector("destinationPixelBufferAttributes")] NSDictionary DestinationPixelBufferAttributes { get; }
     [Optional] [Selector("nextFrameCount")] NSInteger NextFrameCount { get; }
     [Optional] [Selector("previousFrameCount")] NSInteger PreviousFrameCount { get; }
+    [Optional] [Selector("maximumDimensions")] static abstract CMVideoDimensions MaximumDimensions { get; }
+    [Optional] [Selector("minimumDimensions")] static abstract CMVideoDimensions MinimumDimensions { get; }
 }
 
 #endif

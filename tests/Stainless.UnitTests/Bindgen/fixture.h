@@ -18,3 +18,7 @@ extern const OpaqueRef kDefaultOpaque;
 extern Index RangeEnd(Range range, const char *label, ...);
 static inline Index Twice(Index value) { return value * 2; }
 extern void Perform(void (^block)(void));
+struct Event { int type; long long time __attribute__((packed)); int flags; };
+typedef unsigned char __private_id[16];
+typedef __private_id PublicId;
+struct HasId { PublicId id; };

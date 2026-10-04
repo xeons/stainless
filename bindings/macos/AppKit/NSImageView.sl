@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.AppKit;
 
+import MacOS.Symbols;
 import Standard.ObjC;
 
 #if MACOS
@@ -62,7 +63,27 @@ public extern objc class NSImageView : NSControl, NSAccessibilityImage, NSMenuIt
 public extern objc class NSImageView
 {
     /// macOS 14.0 and later.
+    [Selector("addSymbolEffect:")] public void AddSymbolEffect(NSSymbolEffect symbolEffect);
+    /// macOS 14.0 and later.
+    [Selector("addSymbolEffect:options:")] public void AddSymbolEffectOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
+    /// macOS 14.0 and later.
+    [Selector("addSymbolEffect:options:animated:")] public void AddSymbolEffectOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
+    /// macOS 14.0 and later.
+    [Selector("removeSymbolEffectOfType:")] public void RemoveSymbolEffectOfType(NSSymbolEffect symbolEffect);
+    /// macOS 14.0 and later.
+    [Selector("removeSymbolEffectOfType:options:")] public void RemoveSymbolEffectOfTypeOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
+    /// macOS 14.0 and later.
+    [Selector("removeSymbolEffectOfType:options:animated:")] public void RemoveSymbolEffectOfTypeOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
+    /// macOS 14.0 and later.
     [Selector("removeAllSymbolEffects")] public void RemoveAllSymbolEffects();
+    /// macOS 14.0 and later.
+    [Selector("removeAllSymbolEffectsWithOptions:")] public void RemoveAllSymbolEffectsWithOptions(NSSymbolEffectOptions options);
+    /// macOS 14.0 and later.
+    [Selector("removeAllSymbolEffectsWithOptions:animated:")] public void RemoveAllSymbolEffectsWithOptionsAnimated(NSSymbolEffectOptions options, bool animated);
+    /// macOS 14.0 and later.
+    [Selector("setSymbolImage:withContentTransition:")] public void SetSymbolImageWithContentTransition(NSImage symbolImage, NSSymbolContentTransition transition);
+    /// macOS 14.0 and later.
+    [Selector("setSymbolImage:withContentTransition:options:")] public void SetSymbolImageWithContentTransitionOptions(NSImage symbolImage, NSSymbolContentTransition transition, NSSymbolEffectOptions options);
 }
 
 #endif

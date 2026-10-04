@@ -76,8 +76,10 @@ public extern objc class NSSet
     [Selector("set")] public static Self Set();
     [Selector("setWithObject:")] public static Self SetWithObject(AnyObject object);
     [Selector("setWithObjects:count:")] public static Self SetWithObjectsCount(void** objects, NSUInteger cnt);
+    [Selector("setWithObjects:")] public static Self SetWithObjects(AnyObject firstObj, ...);
     [Selector("setWithSet:")] public static Self SetWithSet(NSSet set);
     [Selector("setWithArray:")] public static Self SetWithArray(NSArray array);
+    [Selector("initWithObjects:")] public Self InitWithObjects(AnyObject firstObj, ...);
     [Selector("initWithSet:")] public Self InitWithSet(NSSet set);
     [Selector("initWithSet:copyItems:")] public Self InitWithSetCopyItems(NSSet set, bool flag);
     [Selector("initWithArray:")] public Self InitWithArray(NSArray array);

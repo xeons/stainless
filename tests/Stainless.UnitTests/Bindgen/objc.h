@@ -48,6 +48,7 @@ __attribute__((objc_root_class))
 
 @protocol Copying
 - (id)copyWithZone:(void *_Nullable)zone;
++ (BOOL)supportsCopying;
 @optional
 - (void)optionalThing;
 @property (readonly) BOOL optionalFlag;

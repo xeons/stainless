@@ -22,26 +22,24 @@ the bindings compile on every host and mean something on a Mac.
 Every directory but `api/` is written by
 [tools/Stainless.Bindgen](../../tools/Stainless.Bindgen) from the SDK and MUST
 NOT be edited; [tools/bindgen.sh](../../tools/bindgen.sh) regenerates them on a
-Mac. They are 52 frameworks. The 41 whose API is C:
+Mac. Every framework in the SDK with a C or Objective-C header is generated --
+195 of them, 431,000 lines -- except these:
 
-> Accelerate, ApplicationServices, AudioToolbox, AudioUnit, Carbon, CFNetwork,
-> ColorSync, CoreAudio, CoreAudioTypes, CoreFoundation, CoreGraphics, CoreMedia,
-> CoreMIDI, CoreServices, CoreText, CoreVideo, DirectoryService, DiskArbitration,
-> DVDPlayback, ForceFeedback, GLUT, GSS, Hypervisor, ICADevices, ImageIO, IOKit,
-> IOSurface, LatentSemanticMapping, LDAP, MediaToolbox, NetFS, OpenAL, OpenCL,
-> OpenGL, PCSC, Security, SystemConfiguration, TWAIN, VideoDecodeAcceleration,
-> VideoToolbox, vmnet
+| Left out | Why |
+|---|---|
+| Kernel, DriverKit | kernel and driver extensions, which no program links |
+| Kerberos | its `gssapi.h` is GSS's, which supersedes it |
+| Tcl, Tk, Ruby | interpreters' own C APIs, deprecated, and in `usr/include` too |
+| vecLib | the same headers as Accelerate's vecLib subframework |
+| Cocoa | an umbrella over Foundation, AppKit and CoreData |
+| AccessorySetupKit | its headers import UIKit, which macOS has not got |
+| the `_X_SwiftUI` overlays and the 70 Swift-only frameworks | no C or Objective-C header to read |
 
-and the 11 whose API is Objective-C:
-
-> AppKit, AVFAudio, AVFoundation, CoreData, CoreImage, Foundation, Metal,
-> MetalKit, QuartzCore, UniformTypeIdentifiers, WebKit
-
-A program names a framework's directory, and those of the modules it
-imports, as sources, and imports the module:
+A program names the directories as sources -- all of them is simplest -- and
+imports the modules it uses:
 
 ```
-stainless build app.sl bindings/macos/CoreFoundation bindings/macos/System
+stainless build app.sl $(ls -d bindings/macos/*/ | grep -v api/)
 ```
 
 ```csharp
@@ -53,11 +51,25 @@ Console.WriteLine($"{CFStringGetLength(text)}");      // 5; ARC releases it
 var same = (NSString)text;                            // toll-free bridged
 ```
 
-Each module names its framework with `#pragma comment(framework, ...)`, so a
-program using it links it; one that is only headers, as CoreAudioTypes is,
-names nothing. Naming every module costs little: an AppKit program built
-against every directory takes about a second and a half on an M4, and code
-is emitted only for what the program reaches.
+Each module names its framework with `#pragma comment(framework, ...)`, and
+a framework is linked when the program reaches something its module declares:
+a function it calls, a variable it reads, a class it names or derives from, a
+message a member of the module declares (so a category's methods link the
+category's framework). A program naming every directory links only what it
+uses, and one built against the newest SDK runs on an older macOS that lacks
+frameworks it never touched. A framework that is only headers, as
+CoreAudioTypes is, names nothing.
+
+Naming every module costs little, and code is emitted only for what the
+program reaches. Measured on an M4, a whole build of a small program:
+
+| A program importing | Modules it compiles | Lines | Build |
+|---|---|---|---|
+| Foundation, or AppKit | 38 | 196,000 | 1.3 s |
+| every module | 196 | 431,000 | 2.4 s |
+
+Foundation's closure is AppKit's because `NSUserNotification` names AppKit's
+`NSImage`; whole-program binding makes the cycle cost nothing but parsing.
 
 ### What C becomes
 
@@ -66,6 +78,7 @@ is emitted only for what the program reaches.
 | function | `public extern "C"`; a variadic one stays variadic |
 | `static inline` function | not bound: nothing exports it |
 | struct, union, bit-field | the same, with `[Packed]`, `[Align(N)]` and `[Pack(N)]` |
+| `__attribute__((packed))` on a field | `[Packed]` on the field |
 | `#pragma pack(N)` | `[Pack(N)]` |
 | struct declared with no body | `public struct X;`, used behind a pointer |
 | `typedef` of a type | `public using`; of a function pointer, a `delegate`; of a block, an `objc closure` |
@@ -91,7 +104,8 @@ is emitted only for what the program reaches.
 | `@optional` | `[Optional]` |
 | category | the class declared again, in the category's module, with its members and protocols |
 | method | a `[Selector]` method named by its whole selector: `initWithFrame:display:` is `InitWithFrameDisplay` |
-| `+` method, `class` property | `static` |
+| `+` method, `class` property | `static`; on a protocol, `static abstract` |
+| `...` | `...`: a variadic message is sent as C sends one |
 | property | a `[Selector(getter, setter)]` property; `readonly` has the getter alone |
 | `instancetype` | `Self` |
 | `id`, `id<P>`, `Class`, `SEL` | `AnyObject`, `P`, `Class`, `Selector` |
@@ -174,8 +188,7 @@ binding. Most are:
   library exports.
 - **A type from a framework not generated** -- CloudKit's, Intents' -- named
   in the reason.
-- **A variadic message**, `stringWithFormat:`, which Stainless cannot send,
-  and a class member of a protocol, which has no class to send it to.
+- **A variadic function pointer**, which a delegate cannot be.
 - **A `va_list`**, which Stainless has no way to make, and **`long double`**.
 - **A string or object `#define`**, which a `const` cannot hold.
 - **Anything that uses something above**, named in the reason.
@@ -195,15 +208,21 @@ Left out whole:
 [tests/cases/macos-bindings-layout](../../tests/cases/macos-bindings-layout),
 also generated, holds every bound struct's size, alignment and field offsets
 and every bound enumerator's and integer macro's value against what clang
-says, built for the target the suite runs as. The macOS lane runs it on Apple
-silicon and the Rosetta lane as Intel code.
+says -- 61,916 checks -- built for the target the suite runs as. Each
+framework's checks are compiled with that framework's headers alone, a file
+each: every framework's headers compile by themselves, and not all of them
+together. The macOS lane runs it on Apple silicon and the Rosetta lane as
+Intel code.
 
 [tests/cases/macos-bindings-runtime](../../tests/cases/macos-bindings-runtime),
 generated too, asks the Objective-C runtime for every bound class and every
-message a class is declared to answer -- 23,375 checks -- skipping what
-appeared in a later macOS than the one running. A message counts as answered
-when the class or one derived from it answers it: an abstract class's `alloc`
-may make a private subclass, as Metal's descriptors' does.
+message a class is declared to answer -- about 67,000 checks -- skipping what
+appeared in a later macOS than the one running, and asking what one target
+alone binds on that target alone. It loads every framework first, since a
+program links only what it reaches. A message counts as answered when the
+class or one derived from it answers it: an abstract class's `alloc` may make
+a private subclass, as Metal's descriptors' does. A subclass is read, not
+asked, so no class's `+initialize` runs.
 [unanswered.txt](unanswered.txt) lists what the headers declare and the
 runtime answers nowhere -- an informal protocol on `NSObject`, a method
 nothing implements -- each with why; the case does not ask those.
@@ -215,7 +234,7 @@ program over the bindings: Foundation, a block, AppKit's category on
 ### Regenerating
 
 ```
-tools/bindgen.sh          # on a Mac; about four minutes on an M4
+tools/bindgen.sh          # on a Mac; about 26 minutes and 8 GB on an M4
 ```
 
 The generator compiles each framework's headers, its subframeworks' included,
@@ -223,7 +242,10 @@ as Objective-C for `arm64-apple-macosx13.0` and `x86_64-apple-macosx13.0`
 with `-ast-dump=json`, and keeps the declarations whose header is in the
 framework. Every framework is read before any is written: a class one
 framework names only with `@class` is defined by another, which may name the
-first. What the dump does not say -- whether `@class X;` is a definition,
+first. A declaration is written by the framework whose header holds it, from
+whichever framework's headers included it: IOKit's `usb/` headers are only
+included by IOUSBHost's. A Core Foundation type several frameworks typedef,
+as `IOSurfaceRef` is, is declared once, by the first. What the dump does not say -- whether `@class X;` is a definition,
 whether a protocol's method follows `@optional` -- is read from the header's
 line. A `#define` is asked of clang in the same translation unit, as
 `enum { v = (NAME) }` for its value and `__typeof__((NAME))` for its type; a

@@ -25,6 +25,12 @@ module MacOS.System;
 
 #if MACOS
 
+[Pack(4)]
+public struct audit_token_t
+{
+    public uint[8] val;
+}
+
 public using mach_msg_size_t = natural_t;
 
 public using mach_msg_bits_t = uint;
@@ -46,12 +52,6 @@ public struct mach_msg_header_t
 public struct mach_msg_body_t
 {
     public mach_msg_size_t msgh_descriptor_count;
-}
-
-[Pack(4)]
-public struct audit_token_t
-{
-    public uint[8] val;
 }
 
 #if X64
