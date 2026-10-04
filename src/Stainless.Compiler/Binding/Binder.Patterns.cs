@@ -325,7 +325,7 @@ public sealed partial class Binder
 
         // `case Twig:` is a type and not a value, and over anything but a
         // reference it is the mistake of asking a value what class it is.
-        if (syntax.Value is NameSyntax typeName && LooksLikeType(typeName))
+        if (TypeNameIn(syntax.Value) is { } typeName && LooksLikeType(typeName))
             return BindTypePattern(
                 new TypePatternSyntax(
                     syntax.Span,
@@ -402,6 +402,21 @@ public sealed partial class Binder
     /// Quietly: nothing is reported if it does not, because the name is then an
     /// ordinary constant and the constant path will say what is wrong with it.
     /// </summary>
+    /// <summary>
+    /// What a constant pattern's value is as a type's name: the name itself,
+    /// or <c>Forms.Image</c> -- qualified by its module, and so parsed as a
+    /// member access -- unless its first part names a value. Null otherwise.
+    /// </summary>
+    private NameSyntax? TypeNameIn(ExpressionSyntax value)
+    {
+        if (value is NameSyntax name)
+            return name;
+        if (value is MemberAccessSyntax { ThroughPointer: false } &&
+            FlattenName(value) is { } dotted && !NamesAValue(dotted[0]))
+            return new NameSyntax(value.Span, new QualifiedName(value.Span, dotted));
+        return null;
+    }
+
     private bool LooksLikeType(NameSyntax name)
     {
         var resolved = ResolveTypeQuietly(
@@ -1450,9 +1465,9 @@ public sealed partial class Binder
             {
                 // `case Owner:` names a class, which is a type test however
                 // it was written, and over a value is refused as one.
-                ConstantPatternSyntax { Value: NameSyntax name } =>
-                    subject is not VariantTypeSymbol && LooksLikeType(name),
-                ConstantPatternSyntax => false,
+                ConstantPatternSyntax constant =>
+                    subject is not VariantTypeSymbol && TypeNameIn(constant.Value) is { } name &&
+                    LooksLikeType(name),
 
                 // Over a variant this is `case Circle c:`, which the variant
                 // form checks; over anything else it is a type test.
