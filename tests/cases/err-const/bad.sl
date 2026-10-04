@@ -12,9 +12,12 @@ const bool Always = true;
 const char Newline = '\n';
 const int FromCharacter = 'A';
 
-// Not fine: a String is a counted object, and a constant is inlined at every
-// use. `static readonly` is the one with storage.
-const String Greeting = "hello";                    // SL0478
+const String Greeting = "hello";
+
+// Not fine: an object is built at run time, and a constant is inlined at
+// every use. `static readonly` is the one with storage.
+sealed class Box { }
+const Box Empty = null;                             // SL0478
 
 // Not fine either: the initializer is not a literal.
 const int Computed = 32 + 32;                       // SL0215

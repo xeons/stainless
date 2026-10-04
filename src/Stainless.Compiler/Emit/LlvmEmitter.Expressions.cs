@@ -481,6 +481,10 @@ public sealed partial class LlvmEmitter
             float number => FormatFloating(number, constant.Type),
             ulong number => FormatInteger(number, constant.Type),
             string s when IsObjCReference(constant.Type) => ConstantStringObject(s),
+            string s when constant.Type is PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Char16 } } =>
+                InternWide(s, 16),
+            string s when constant.Type is PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Char32 } } =>
+                InternWide(s, 32),
             string s => InternBytes(s),
             _ => throw new InternalCompilerError(
                 $"a constant holding {constant.Value?.GetType().Name ?? "null"}", access.Span),

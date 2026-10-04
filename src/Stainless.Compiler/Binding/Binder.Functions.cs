@@ -1208,9 +1208,7 @@ public sealed partial class Binder
         }
 
         // A constant is a value inlined at every use, so it has to be something
-        // that fits in one. A String is a counted object, and inlining a pointer
-        // to its bytes would produce something that looks like a String, passes
-        // every check, and is not one -- which is worse than not compiling.
+        // that fits in one: a scalar, or the address of text in read-only data.
         // Registered anyway, so that every use of it does not then report an
         // undefined name on top of the one real error.
         if (!settledLater && type is not (PrimitiveTypeSymbol or EnumTypeSymbol) &&
@@ -1242,8 +1240,9 @@ public sealed partial class Binder
 
     private void ReportUnsuitableConstantType(GlobalConstDeclSyntax declaration, TypeSymbol type) =>
         diagnostics.Error("SL0478", declaration.Span,
-            $"a 'const' holds a number, a bool, a char, an enum, a C string ('byte*') or a " +
-            $"string object ('NSString', 'CFStringRef'), and '{type.Name}' is none of those. " +
+            $"a 'const' holds a number, a bool, a char, an enum, a 'String', a C string " +
+            $"('byte*', 'char16*', 'char32*') or an Objective-C string ('NSString', 'CFStringRef'), " +
+            $"and '{type.Name}' is none of those. " +
             $"Write 'static readonly {type.Name} {declaration.Name} = ...' instead, " +
             "which has storage rather than being inlined",
             type);
@@ -1261,7 +1260,7 @@ public sealed partial class Binder
     /// the worst of the three possible outcomes: it compiles, it runs, and the
     /// number it stands for is wrong everywhere it was used.
     /// </summary>
-    private static bool Suits(TokenKind kind, TypeSymbol type)
+    private bool Suits(TokenKind kind, TypeSymbol type)
     {
         if (type.IsError()) return true;
         var underlying = type is EnumTypeSymbol enumType ? enumType.UnderlyingType : type;
@@ -1281,29 +1280,38 @@ public sealed partial class Binder
         };
     }
 
-    /// <summary>The literal a constant initializer is, looking through one minus.</summary>
     /// <summary>
-    /// What a string literal may be the constant value of: a C string, its
-    /// bytes compiled in and inlined as their address; or a string object --
-    /// <c>NSString</c> or <c>CFStringRef</c>, not a mutable one -- compiled in as
-    /// the constant object clang makes of <c>@"..."</c> and <c>CFSTR("...")</c>.
+    /// What a string literal may be the constant value of, each compiled into
+    /// read-only data and inlined as its address: a <c>String</c>, the immortal
+    /// object a literal is; a C string of UTF-8, UTF-16 or UTF-32 units,
+    /// zero-terminated; or an Objective-C string -- <c>NSString</c> or
+    /// <c>CFStringRef</c>, not a mutable one -- as clang makes <c>@"..."</c>
+    /// and <c>CFSTR("...")</c>.
     /// </summary>
-    internal static bool IsConstantStringType(TypeSymbol type) => type switch
+    private bool IsConstantStringType(TypeSymbol type) => type switch
     {
-        PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } } => true,
+        _ when _builtins.IsString(type) => true,
+        PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte or PrimitiveKind.Char16 or PrimitiveKind.Char32 } } => true,
         ClassTypeSymbol { IsCoreFoundation: true, CFTypeIDFunction: "CFStringGetTypeID" } => true,
         ClassTypeSymbol { ObjC: ObjCClassKind.Imported, IsCoreFoundation: false } objcClass =>
             (objcClass.ObjCRuntimeName ?? objcClass.SimpleName) == "NSString",
         _ => false,
     };
 
-    /// <summary>A named constant read; one that is a string object is Objective-C's, and Apple's alone.</summary>
-    private BoundConstantAccess ConstantAccess(Source.SourceSpan span, ConstantSymbol constant)
+    /// <summary>
+    /// A named constant read. A <c>String</c> constant is its literal, so it is
+    /// one wherever a literal is asked for: a <c>case</c> label, a default. One
+    /// that is a string object is Objective-C's, and Apple's alone.
+    /// </summary>
+    private BoundExpression ConstantAccess(Source.SourceSpan span, ConstantSymbol constant)
     {
+        if (_builtins.IsString(constant.Type) && constant.Value is string text)
+            return new BoundStringLiteral(span, constant.Type, text);
         if (IsObjCReference(constant.Type)) RequireDarwin(span);
         return new BoundConstantAccess(span, constant);
     }
 
+    /// <summary>The literal a constant initializer is, looking through one minus.</summary>
     private static LiteralSyntax? ConstantLiteral(ExpressionSyntax value) => value switch
     {
         LiteralSyntax literal => literal,

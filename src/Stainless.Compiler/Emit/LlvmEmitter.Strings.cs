@@ -87,7 +87,9 @@ public sealed partial class LlvmEmitter
 
     private void StringConstants()
     {
-        if (_byteConstants.Count == 0 && _stringObjects.Count == 0 && _utf8Arrays.Count == 0) return;
+        if (_byteConstants.Count == 0 && _stringObjects.Count == 0 && _utf8Arrays.Count == 0 &&
+            _wideConstants.Count == 0)
+            return;
 
         _module.AppendLine();
 
@@ -113,6 +115,17 @@ public sealed partial class LlvmEmitter
             _module.AppendLine(
                 $"{name} = private unnamed_addr constant " +
                 $"[{bytes.Length + 1} x i8] c\"{EscapeBytes(bytes)}\"");
+        }
+
+        foreach (var ((width, text), name) in _wideConstants)
+        {
+            var units = width == 16
+                ? text.Select(c => (int)c)
+                : text.EnumerateRunes().Select(r => r.Value);
+            var cells = units.Append(0).Select(u => $"i{width} {u}").ToList();
+            _module.AppendLine(
+                $"{name} = private unnamed_addr constant [{cells.Count} x i{width}] " +
+                $"[{string.Join(", ", cells)}], align {width / 8}");
         }
 
         // A string literal is a complete String object in static storage, laid
@@ -218,6 +231,15 @@ public sealed partial class LlvmEmitter
                 escaped.Append('\\').Append(b.ToString("X2", CultureInfo.InvariantCulture));
         }
         return escaped.ToString();
+    }
+
+    /// <summary>A zero-terminated array of UTF-16 or UTF-32 units, for a wide C string.</summary>
+    private string InternWide(string text, int width)
+    {
+        if (_wideConstants.TryGetValue((width, text), out var existing)) return existing;
+        string name = $"@.wide.{_wideConstants.Count}";
+        _wideConstants[(width, text)] = name;
+        return name;
     }
 
     /// <summary>A bare NUL-terminated byte array, for C strings and TypeInfo names.</summary>

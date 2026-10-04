@@ -1,0 +1,9 @@
+'hello', 5 bytes
+a default: 'unnamed', 7 bytes
+equal to a literal: true, joined: hello, world
+in a type: unnamed
+matched as a case
+read ten thousand times: 50000
+UTF-16: 7 units, e is 00E9, then D83D DE00
+UTF-32: 6 units, e is 00E9, then 1F600
+the same address: true

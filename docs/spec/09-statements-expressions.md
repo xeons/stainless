@@ -493,13 +493,18 @@ The one place it does not reach is an inline array's length, `T[N]`,
 which is settled during layout — before any type has its members — so a length
 there must still be a literal or a module-level `const`.
 
-**A string literal makes two kinds of constant**, the two a C or Objective-C
-header defines with a macro:
+**A string literal makes three kinds of constant**, each compiled into
+read-only data once and named by its address:
 
-- **A C string**, `byte*`: the bytes are compiled in once, terminated with a
-  zero, and the constant is their address wherever it is named. IOKit's
-  `#define kIOServiceClass "IOService"` is `const byte* IOServiceClass =
-  "IOService";`.
+- **A `String`**: the immortal object the literal is, so naming the constant
+  counts nothing. It is the literal wherever it is named, and so it is one
+  wherever a literal is asked for in a body -- a `case` label, a parameter's
+  default. An attribute's argument is still written as a literal.
+- **A C string**, `byte*`, `char16*` or `char32*`: the text as UTF-8, UTF-16
+  or UTF-32 units, terminated with a zero -- C's `"..."`, `u"..."` and
+  `U"..."`. IOKit's `#define kIOServiceClass "IOService"` is
+  `const byte* IOServiceClass = "IOService";`, and a Win32 class name is a
+  `const char16*`.
 - **A string object**, `NSString` or a `[CFType("CFStringGetTypeID")]` class
   such as `CFStringRef`, on Apple's platforms only: the constant object clang
   makes of `@"..."` and `CFSTR("...")`, laid out as clang lays it out, in
@@ -508,21 +513,20 @@ header defines with a macro:
   counted.
 
 ```csharp
+public const String Greeting = "hello";
+public const char16* WindowClass = "StainlessWindow";
 public const NSString NotificationName = "SLDidFinish";
 public const CFStringRef AccessibleKey = "kSecAttrAccessible";
 ```
 
-A mutable string class is refused, since the object is in read-only data.
-
-A `String` is not one of them. It is a counted object, and inlining a pointer to
-its bytes would produce something that looks like a `String`, passes every check
-and is not one, so it is refused with the alternative:
+A mutable string class is refused, since the object is in read-only data. So
+is anything else built at run time, with the alternative:
 
 ```
-error[SL0478]: a 'const' holds a number, a bool, a char, an enum, a C string
-('byte*') or a string object ('NSString', 'CFStringRef'), and 'String' is none
-of those. Write 'static readonly String Greeting = ...' instead, which has
-storage rather than being inlined
+error[SL0478]: a 'const' holds a number, a bool, a char, an enum, a 'String', a
+C string ('byte*', 'char16*', 'char32*') or an Objective-C string ('NSString',
+'CFStringRef'), and 'Registry' is none of those. Write 'static readonly
+Registry Shared = ...' instead, which has storage rather than being inlined
 ```
 
 The literal has to suit the declared type, because the alternative is not an

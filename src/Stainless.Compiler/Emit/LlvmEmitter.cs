@@ -159,6 +159,9 @@ public sealed partial class LlvmEmitter(
     private readonly StringBuilder _body = new();
     private readonly Dictionary<string, string> _byteConstants = new(StringComparer.Ordinal);
 
+    /// <summary>Zero-terminated UTF-16 and UTF-32 text, by its width and text.</summary>
+    private readonly Dictionary<(int Width, string Text), string> _wideConstants = [];
+
     /// <summary>
     /// What each named struct type must be aligned to. LLVM struct types carry
     /// no alignment of their own, so an alloca or a global has to say it, and

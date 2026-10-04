@@ -398,8 +398,9 @@ last person to edit it -- the suite is the authority.
   member of a type — inlined like a module-level one, reached as `Type.Name`
   from outside and inherited down a class chain — and a `--shared` library may
   carry one, since there is nothing to initialize. A string literal makes a
-  `const byte*` C string, or on Apple's platforms a `const NSString` or
-  `const CFStringRef` laid out as clang's `@"..."` and `CFSTR("...")` are
+  `const String`, which is the literal wherever it is named; a `const byte*`,
+  `char16*` or `char32*` C string; or on Apple's platforms a `const NSString`
+  or `const CFStringRef` laid out as clang's `@"..."` and `CFSTR("...")` are
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate. UTF-16 converts
   back with `ToText()` or, from a buffer a platform API filled, with

@@ -15,8 +15,8 @@ public extern objc class NSMutableString : NSString { }
 // A constant string cannot be mutated, so it is no NSMutableString.
 public const NSMutableString Growing = "no";
 
-// A String is a counted object of Stainless's own.
-public const String Named = "no";
+// Text is not a list of numbers.
+public const int* Numbers = "no";
 
 // An int is not a string.
 public const byte* Wrong = 5;
