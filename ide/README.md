@@ -189,6 +189,8 @@ backends render it. The IDE is what found the faults listed in
   click on the form to place one, inside a `Panel`, `GroupBox` or tab page if
   that is what was clicked. A `TabControl` comes with a page, and a `TabPage`
   goes on the `TabControl` clicked; a `Timer` goes in a tray under the form.
+  An `Image` has no window of its own and is designed all the same, framed
+  with a dashed line so an empty one can be seen, as Lazarus frames a `TImage`.
   The grid shows the selected control's properties -- or the form's title and
   size -- and sets them on the live control and in the file as they are
   changed; an enum is a list of its members and a `[Flags]` enum a box per
@@ -267,8 +269,9 @@ Named honestly, since the point of the page is to say where the edges are.
   putting a pane back on an edge it was not built on is the one thing that
   cannot happen live.
 - **The Properties grid edits what reflection can set**: text, true or false,
-  numbers, enums (with `[Flags]` ones as a box per member), colours, fonts and
-  a list's items. A picture is none of those and is written in the text. With
+  numbers, enums (with `[Flags]` ones as a box per member), colours, fonts,
+  pictures and a list's items. A picture is chosen from beside the form file
+  and embedded in the program by the generated half. With
   several controls selected it shows and sets the first, not what they share.
   A tab is not chosen by clicking it, since the overlay takes the click; it is
   chosen by selecting something on its page, or with `SelectedIndex`.

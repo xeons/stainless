@@ -33,7 +33,7 @@ import Ide.Designer;
 public String[] ListDesignableTypes() =>
     ["Button", "Label", "TextBox", "CheckBox", "RadioButton", "ToggleButton",
      "ListBox", "ComboBox", "CheckListBox", "SpinEdit", "ProgressBar", "TrackBar",
-     "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Timer"];
+     "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Image", "Timer"];
 
 /// Whether controls may be put inside one of these. A `TabControl` holds
 /// pages and nothing else, so it is not one.
@@ -45,8 +45,9 @@ public bool IsDesignableContainer(String typeName) =>
 public bool IsNonVisualType(String typeName) => typeName == "Timer";
 
 /// A control of the named type inside `parent`, or null for a name the
-/// designer does not know.
-public WindowedControl? CreateDesignedControl(String typeName, WindowedControl parent)
+/// designer does not know. An `Image` has no window and is drawn by its
+/// parent; it is designed all the same, as the LCL designs any `TControl`.
+public Control? CreateDesignedControl(String typeName, WindowedControl parent)
 {
     switch (typeName)
     {
@@ -68,6 +69,7 @@ public WindowedControl? CreateDesignedControl(String typeName, WindowedControl p
         case "GroupBox": return new GroupBox(parent);
         case "TabControl": return new TabControl(parent);
         case "TabPage": return parent is TabControl tabs ? new TabPage(tabs) : null;
+        case "Image": return new Image(parent);
         default: return null;
     }
 }
@@ -83,7 +85,8 @@ public Type FindDesignedType(String typeName) =>
 /// `Bounds` is several values and goes to `SetBounds`. A property that would
 /// make the designer behave as the program does is not applied; see
 /// `IsDesignInert`.
-public bool ApplyDesignedProperty(WindowedControl control, Type type, FormProperty property)
+public bool ApplyDesignedProperty(Control control, Type type, FormProperty property,
+                                  String baseDirectory)
 {
     var items = property.Value.Items;
     if (property.Name == "Bounds")
@@ -94,7 +97,7 @@ public bool ApplyDesignedProperty(WindowedControl control, Type type, FormProper
                           ReadDesignedInteger(items[2u]), ReadDesignedInteger(items[3u]));
         return true;
     }
-    return ApplyReflectedProperty((byte*)control, type, property);
+    return ApplyReflectedProperty((byte*)control, type, property, baseDirectory);
 }
 
 /// What the file says and the designer does not do: a hidden control stays
@@ -104,8 +107,9 @@ public bool IsDesignInert(Type type, String propertyName) =>
     propertyName == "Visible" || (propertyName == "Enabled" && type.Exists && type.Name == "Forms.Timer");
 
 /// The same for any object reflection describes: a control, or a component
-/// with no window.
-public bool ApplyReflectedProperty(byte* raw, Type type, FormProperty property)
+/// with no window. A picture is read from beside the form file, which is
+/// where the generated half embeds it from.
+public bool ApplyReflectedProperty(byte* raw, Type type, FormProperty property, String baseDirectory)
 {
     var items = property.Value.Items;
     if (items.Count != 1u || !type.Exists || IsDesignInert(type, property.Name))
@@ -139,6 +143,16 @@ public bool ApplyReflectedProperty(byte* raw, Type type, FormProperty property)
         if (font.Ok)
             SetAggregate(raw, target, (byte*)font.Value);
         return font.Ok;
+    }
+    if (kind == KindClass && enumeration.Exists && enumeration.Name == DesignedBitmapType)
+    {
+        var path = ReadDesignedPicturePath(item);
+        if (!path.Ok)
+            return false;
+        var picture = Bitmap.FromFile(FindDesignedPicture(baseDirectory, path.Value));
+        if (picture.Ok)
+            SetAggregate(raw, target, (byte*)picture.Value);
+        return picture.Ok;
     }
     if (kind == KindArray && target.ElementKind == KindString)
     {

@@ -553,7 +553,20 @@ public class GtkWidgetSet : IWidgetSet
         {
             return Fail($"this program has no bitmap resource with id {id}");
         }
+        return DecodePixbuf(whole, $"bitmap resource {id}");
+    }
 
+    /// Whatever `gdk-pixbuf` has a loader for, from memory.
+    public Result<IBitmapBackend, String> DecodeBitmap(byte[] encoded)
+    {
+        EnsureStarted();
+        if (encoded.Length == 0)
+            return Fail("there are no bytes to decode");
+        return DecodePixbuf(encoded, "the picture");
+    }
+
+    Result<IBitmapBackend, String> DecodePixbuf(byte[] whole, String what)
+    {
         var loader = gdk_pixbuf_loader_new();
         if (loader == null)
             return Fail("could not start an image loader");
@@ -568,7 +581,7 @@ public class GtkWidgetSet : IWidgetSet
         var decoded = gdk_pixbuf_loader_get_pixbuf(loader);
         if (decoded == null)
         {
-            var why = $"bitmap resource {id} could not be decoded";
+            var why = what + " could not be decoded";
             if (failed != null)
             {
                 if (failed->Message != null)

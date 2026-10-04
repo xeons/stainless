@@ -39,7 +39,7 @@ import Ide.Designer;
 public closure void HandlerChosenHandler(String method, String handlerType);
 public closure void GridMessageHandler(String message);
 
-enum GridRowKind { Name, Text, Boolean, Integer, Floating, Choice, Flags, Colour, Typeface, Lines }
+enum GridRowKind { Name, Text, Boolean, Integer, Floating, Choice, Flags, Colour, Typeface, Lines, Picture }
 
 class GridRow
 {
@@ -265,6 +265,8 @@ public class PropertyGrid : Panel
                 shown = GridRowKind.Typeface;
             else if (kind == KindArray && property.ElementKind == KindString)
                 shown = GridRowKind.Lines;
+            else if (kind == KindClass && enumeration.Exists && enumeration.Name == DesignedBitmapType)
+                shown = GridRowKind.Picture;
             else if (kind == KindString)
                 shown = GridRowKind.Text;
             else if (kind == KindBool)
@@ -365,9 +367,18 @@ public class PropertyGrid : Panel
                 return DescribeColour(colour);
             }
             case GridRowKind.Typeface:
-                return FindLive() is WindowedControl control ? DescribeDesignedFont(control.Font) : "";
+                return FindLive() is Control control ? DescribeDesignedFont(control.Font) : "";
             case GridRowKind.Lines:
                 return SpellDesignedTextArray(GetTextArray(raw, row.Reflected));
+            case GridRowKind.Picture:
+            {
+                // The file says which picture; the control holds only pixels.
+                FormProperty? written = component.FindProperty(row.Name);
+                if (written == null)
+                    return "";
+                var path = ReadDesignedPicturePath(((FormProperty)written).Value.Items[0u]);
+                return path.Ok ? path.Value : ((FormProperty)written).Value.Items[0u];
+            }
             default:
                 return "";
         }
@@ -408,7 +419,7 @@ public class PropertyGrid : Panel
 
     /// The selected control, or null for the form and for a component with
     /// no window.
-    private WindowedControl? FindLive()
+    private Control? FindLive()
     {
         var surface = _surface;
         if (surface == null)
@@ -555,6 +566,7 @@ public class PropertyGrid : Panel
 
             case GridRowKind.Colour:
             case GridRowKind.Typeface:
+            case GridRowKind.Picture:
                 _text.Text = value;
                 _text.Visible = true;
                 _pick.Visible = true;
@@ -588,11 +600,11 @@ public class PropertyGrid : Panel
     private void OnPickClicked(Control sender)
     {
         var chosen = CurrentRow();
-        WindowedControl? live = FindLive();
+        Control? live = FindLive();
         if (chosen == null || live == null)
             return;
         var row = (GridRow)chosen;
-        var control = (WindowedControl)live;
+        var control = (Control)live;
 
         if (row.Kind == GridRowKind.Colour)
         {
@@ -612,6 +624,15 @@ public class PropertyGrid : Panel
             var answer = dialog.ShowDialog(this);
             if (answer.Ok)
                 ApplyText(SpellDesignedFont(answer.Value));
+            return;
+        }
+        if (row.Kind == GridRowKind.Picture)
+        {
+            var dialog = new OpenDialog();
+            dialog.AddFilter("Pictures", "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+            var answer = dialog.ShowDialog(this);
+            if (answer.Ok)
+                ApplyText(Standard.Path.GetRelativePath(((DesignSurface)_surface).BaseDirectory, answer.Value));
         }
     }
 
@@ -721,6 +742,10 @@ public class PropertyGrid : Panel
                 ApplyColour(row, typed);
                 break;
 
+            case GridRowKind.Picture:
+                ApplyPicture(row, typed.Trim());
+                break;
+
             case GridRowKind.Typeface:
             {
                 var font = ReadDesignedFont(typed);
@@ -766,6 +791,32 @@ public class PropertyGrid : Panel
                 break;
         }
         ShowSurface(_surface);
+    }
+
+    /// Sets a picture from a path relative to the form file, which the
+    /// generated half embeds; nothing at all takes the picture away.
+    private void ApplyPicture(GridRow row, String path)
+    {
+        var designer = (DesignSurface)_surface;
+        var component = (FormComponent)_component;
+        if (path == "")
+        {
+            if (FindTarget() != null)
+                SetAggregate(FindTarget(), row.Reflected, null);
+            designer.RemoveComponentProperty(component, row.Name);
+            return;
+        }
+
+        var picture = Bitmap.FromFile(FindDesignedPicture(designer.BaseDirectory, path));
+        if (!picture.Ok)
+        {
+            Message(picture.Error + ".");
+            return;
+        }
+        if (FindTarget() != null)
+            SetAggregate(FindTarget(), row.Reflected, (byte*)picture.Value);
+        designer.RequireImport(DesignedDrawingModule);
+        designer.StoreComponentProperty(component, row.Name, FormValue.FromName(SpellDesignedPicture(path)));
     }
 
     /// Sets a colour from a name or its channels. A theme's colour is written

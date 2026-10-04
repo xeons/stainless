@@ -13,6 +13,7 @@ import Standard.Console;
 import Standard.Env;
 import Standard.Text;
 import Forms;
+import Forms.Drawing;
 import Forms.Platform;
 
 public class GreeterForm
@@ -41,6 +42,11 @@ public class GreeterForm
         ok = CheckSame("the title is the form file's", "Greeter", Text) && ok;
         ok = CheckSame("a nested control is parented", "True",
                        _greeting.Parent == _footer ? "True" : "False") && ok;
+
+        // Embedded by the generated half, so it is here wherever this runs.
+        var picture = _greet.Image;
+        ok = CheckSame("the button's picture travels in the program", "16",
+                       picture == null ? "none" : Standard.Text.FromInteger(((Bitmap)picture).Width)) && ok;
         return ok;
     }
 

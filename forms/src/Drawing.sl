@@ -602,6 +602,9 @@ public sealed class Graphics
 ///
 /// There is still no drawing on to one and no saving from one. Draw on a
 /// `Standard.Drawing.Image` and bring the result across.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public sealed class Bitmap
 {
     IBitmapBackend _backend;
@@ -635,6 +638,36 @@ public sealed class Bitmap
         if (!loaded.Ok)
             return Fail(loaded.Error);
         return Ok(new Bitmap(loaded.Value));
+    }
+
+    /// A picture from the bytes of its file -- PNG, JPEG, GIF or BMP -- which
+    /// the program already holds. What `[Embed]` gives, and so how a picture
+    /// travels inside a program rather than beside it.
+    public static Result<Bitmap, String> FromBytes(byte[] encoded)
+    {
+        if (Standard.Drawing.Imaging.IsAvailable)
+        {
+            var read = Standard.Drawing.Image.FromBytes(encoded);
+            if (read.Ok)
+                return FromImage(read.Value);
+        }
+
+        var decoded = WidgetSet.Current.DecodeBitmap(encoded);
+        if (!decoded.Ok)
+            return Fail(decoded.Error);
+        return Ok(new Bitmap(decoded.Value));
+    }
+
+    /// The same for a picture embedded in the program, or null when this
+    /// machine cannot decode it. What a form file's generated half calls:
+    /// the build has checked the file is there, so what is left to fail is a
+    /// decoder, and a control with no picture is the right thing to show.
+    public static Bitmap? FromEmbedded(byte[] encoded)
+    {
+        var made = FromBytes(encoded);
+        if (!made.Ok)
+            return null;
+        return made.Value;
     }
 
     /// A picture the program decoded, drew or generated, handed to the widget

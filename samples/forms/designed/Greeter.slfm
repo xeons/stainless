@@ -2,6 +2,8 @@
 
 module Greeter;
 
+import Forms.Drawing;
+
 form GreeterForm : Form
 {
     Text = "Greeter";
@@ -24,6 +26,7 @@ form GreeterForm : Form
     {
         Text = "Greet";
         Bounds = 250, 56, 90, 28;
+        Image = Embed("greet.png");
         Anchors = AnchorStyles.Top | AnchorStyles.Right;
         Click += OnGreet;
     }

@@ -1316,6 +1316,14 @@ public interface IWidgetSet
     /// wearing a similar name.
     Result<IBitmapBackend, String> LoadBitmapResource(int id);
 
+    /// A picture from the bytes of its file, PNG or the like, which the
+    /// program already holds -- an embedded one, most often.
+    ///
+    /// **`Bitmap.FromBytes` tries `Standard.Drawing` first**, as `FromFile`
+    /// does, so this is the path for a machine with no imaging library. A
+    /// backend with no decoder of its own says so in the error.
+    Result<IBitmapBackend, String> DecodeBitmap(byte[] encoded);
+
     IImageListBackend CreateImageList(Size imageSize);
 
     /// The theme's colour for one role, read now rather than cached, so a

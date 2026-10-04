@@ -446,6 +446,9 @@ public class LabeledEdit : Panel
 /// -- one resizes the picture to the control and the other the control to the
 /// picture -- and `AutoSize` wins, because it is the one that says what the
 /// control is for.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Image : GraphicControl
 {
     Bitmap? _picture;
@@ -548,6 +551,9 @@ public class Image : GraphicControl
         }
     }
 
+    /// Designed, it is framed with a dashed line, as the LCL's `TImage` is:
+    /// an image with no picture is otherwise nothing at all to see or to
+    /// take hold of.
     protected override void OnPaint(PaintEventArgs args)
     {
         var held = _picture;
@@ -556,6 +562,9 @@ public class Image : GraphicControl
             var shown = (Bitmap)held;
             args.Graphics.DrawBitmap(shown, ComputePlacement(shown));
         }
+        if (IsDesigning)
+            args.Graphics.DrawRectangle(new Pen(Colors.Black, 1, PenStyle.Dash),
+                                        Rectangle.FromBounds(0, 0, Width - 1, Height - 1));
         base.OnPaint(args);
     }
 

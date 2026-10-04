@@ -1025,6 +1025,13 @@ public class Win32WidgetSet : IWidgetSet
         return LoadResourceBitmap(id);
     }
 
+    /// Windows decodes nothing in memory without GDI+, which is what
+    /// `Standard.Drawing` already tried by the time this is asked.
+    public Result<IBitmapBackend, String> DecodeBitmap(byte[] encoded)
+    {
+        return Fail("decoding a picture needs GDI+, and it could not be loaded");
+    }
+
     public Result<IBitmapBackend, String> CreateBitmap(int width, int height, byte[] pixels)
     {
         return CreateBitmapFromPixels(width, height, pixels);

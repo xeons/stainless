@@ -108,6 +108,7 @@ public abstract class GraphicControl : Control
     protected override void ApplyFont()      => Invalidate();
     protected override void ApplyForeColor() => Invalidate();
     protected override void ApplyBackColor() => Invalidate();
+    protected override void ApplyDesigning() => Invalidate();
 
     /// Draws this control on its parent's surface.
     ///
@@ -156,7 +157,6 @@ public abstract class WindowedControl : Control
     /// by calling `AttachContainerPeer` instead of `AttachPeer`.
     IContainerPeer? _containerPeer;
     List<Control> _children;
-    bool _isDesigning;
     ControlList _controls;
     bool _isLayingOut;
 
@@ -166,7 +166,6 @@ public abstract class WindowedControl : Control
         _peer = null;
         _containerPeer = null;
         _children = new List<Control>();
-        _isDesigning = false;
         _controls = new ControlList(_children);
         _isLayingOut = false;
         _grabbed = null;
@@ -532,20 +531,11 @@ public abstract class WindowedControl : Control
             ((IControlPeer)mine).BringToFront();
     }
 
-    /// Whether this control is being designed: drawn as it will look, and
-    /// given none of the pointer, so it is never hot or pressed under a
-    /// designer's overlay. `Paint` is raised after it draws itself, which is
-    /// when a designer draws its handles again. Lazarus's `csDesigning`.
-    public bool IsDesigning
+    protected override void ApplyDesigning()
     {
-        get => _isDesigning;
-        set
-        {
-            _isDesigning = value;
-            var mine = _peer;
-            if (mine != null)
-                ((IControlPeer)mine).SetDesigning(value);
-        }
+        var mine = _peer;
+        if (mine != null)
+            ((IControlPeer)mine).SetDesigning(IsDesigning);
     }
 
     public override Point GetPointerPosition()

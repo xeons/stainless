@@ -36,13 +36,13 @@ public class DesignedItem
     public FormComponent Component;
 
     /// The control, or for a component with no window its entry in the tray.
-    public WindowedControl Live;
+    public Control Live;
 
     /// A component with no window, made for the Properties grid to read and
     /// write. A `Timer` is the one kind today.
     public Timer? Held;
 
-    public DesignedItem(FormComponent component, WindowedControl live)
+    public DesignedItem(FormComponent component, Control live)
     {
         Component = component;
         Live = live;
@@ -154,11 +154,15 @@ public class DesignSurface : Panel
         _tray = new Panel(this);
         _tray.BackColor = SystemColors.Window;
         _tray.Visible = false;
+        BaseDirectory = "";
     }
 
     /// Something a person asked for that the surface could not do, for the
     /// status line.
     public event DesignMessageHandler Message;
+
+    /// The form file's directory, which a picture it names is relative to.
+    public String BaseDirectory;
 
     /// Raised after every change to the document.
     public event DesignChangedHandler Changed;
@@ -192,7 +196,7 @@ public class DesignSurface : Panel
 
     /// The live control of the first selected component, or null for the form
     /// and for a component with no window.
-    public WindowedControl? SelectedLive
+    public Control? SelectedLive
     {
         get
         {
@@ -253,7 +257,7 @@ public class DesignSurface : Panel
     }
 
     /// The live control made for a component, or null.
-    public WindowedControl? FindLiveControl(String name)
+    public Control? FindLiveControl(String name)
     {
         foreach (var item in _items)
         {
@@ -465,24 +469,25 @@ public class DesignSurface : Panel
                 continue;
             }
 
-            WindowedControl? made = CreateDesignedControl(child.TypeName, parent);
+            Control? made = CreateDesignedControl(child.TypeName, parent);
             if (made == null)
             {
                 unknown.Add(child.Name);
                 continue;
             }
 
-            var live = (WindowedControl)made;
+            var live = (Control)made;
             live.IsDesigning = true;
             live.Paint += this.OnLiveControlPaint;
             var type = FindDesignedType(child.TypeName);
             for (nuint i = 0u; i < child.Members.Count; i++)
             {
                 if (child.Members[i] is FormProperty property)
-                    ApplyDesignedProperty(live, type, property);
+                    ApplyDesignedProperty(live, type, property, BaseDirectory);
             }
             _items.Add(new DesignedItem(child, live));
-            CreateDesignedChildren(child, live, unknown);
+            if (live is WindowedControl container)
+                CreateDesignedChildren(child, container, unknown);
         }
     }
 
@@ -497,7 +502,7 @@ public class DesignSurface : Panel
         for (nuint i = 0u; i < component.Members.Count; i++)
         {
             if (component.Members[i] is FormProperty property)
-                ApplyReflectedProperty(item.Target, type, property);
+                ApplyReflectedProperty(item.Target, type, property, BaseDirectory);
         }
         _items.Add(item);
     }
@@ -987,6 +992,14 @@ public class DesignSurface : Panel
         _document.Imports.Add(moduleName);
     }
 
+    /// Takes a property out of a component in the document, which leaves it
+    /// at whatever its control starts with.
+    public void RemoveComponentProperty(FormComponent component, String name)
+    {
+        if (component.RemoveProperty(name))
+            AnnounceChange();
+    }
+
     /// Wires an event of a component to a method, or unwires it for an empty
     /// name.
     public void StoreComponentHandler(FormComponent component, String eventName, String method)
@@ -1060,8 +1073,8 @@ public class DesignSurface : Panel
             {
                 var container = (DesignedItem)under;
                 Rectangle outer = FindClientBounds(container.Live);
-                x = at.X - outer.X - container.Live.ClientOrigin.X;
-                y = at.Y - outer.Y - container.Live.ClientOrigin.Y;
+                x = at.X - outer.X - ((WindowedControl)container.Live).ClientOrigin.X;
+                y = at.Y - outer.Y - ((WindowedControl)container.Live).ClientOrigin.Y;
                 parent = container.Component;
             }
             Size extent = FindDefaultExtent(typeName);
@@ -1155,6 +1168,7 @@ public class DesignSurface : Panel
             case "Panel":
             case "GroupBox": return Size.FromDimensions(160, 96);
             case "TabControl": return Size.FromDimensions(200, 128);
+            case "Image": return Size.FromDimensions(64, 64);
             default: return Size.FromDimensions(80, 24);
         }
     }
@@ -1171,8 +1185,8 @@ public class DesignSurface : Panel
             return Rectangle.FromBounds(ReadDesignedInteger(items[0u]), ReadDesignedInteger(items[1u]),
                                         ReadDesignedInteger(items[2u]), ReadDesignedInteger(items[3u]));
         }
-        WindowedControl? live = FindLiveControl(component.Name);
-        return live == null ? Rectangle.Empty : ((WindowedControl)live).Bounds;
+        Control? live = FindLiveControl(component.Name);
+        return live == null ? Rectangle.Empty : ((Control)live).Bounds;
     }
 
     /// Moves a component in the file and on the surface, by the rectangle

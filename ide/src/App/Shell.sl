@@ -2696,6 +2696,7 @@ public class Shell : Form
             return false;
         }
 
+        surface.BaseDirectory = Path.GetDirectoryName(tab.Editor.Contents.Location);
         var unknown = surface.LoadDocument(read.Value);
         tab.Editor.Visible = false;
         surface.Visible = true;
@@ -5023,7 +5024,10 @@ public class Shell : Form
     {
         bool ok = true;
         var pad = AddTab(new Document());
-        pad.Editor.Contents.Location = "selftest-grid.slfm";
+        // Beside this program, so a picture the form names can be written
+        // there and found again.
+        String besideSelf = Path.GetDirectoryName(Env.GetProcessPath());
+        pad.Editor.Contents.Location = Path.Join(besideSelf, "selftest-grid.slfm");
         pad.Editor.TypeText("module Test;" + Newline + Newline
             + "form Probe : Form" + Newline + "{" + Newline
             + "    Bounds = 0, 0, 320, 240;" + Newline + Newline
@@ -5170,6 +5174,44 @@ public class Shell : Form
         if (!pad.Editor.Contents.GetText().Contains("Interval = 250;") || _grid.FindEventIndex("Tick") < 0)
         {
             Console.WriteLine("FAIL: a Timer's properties and events were not offered through reflection");
+            ok = false;
+        }
+        surface.SelectComponent("_ok");
+
+        // A picture is read from beside the form file, and written as an
+        // embed the generated half carries in the program.
+        var drawn = Standard.Drawing.Image.Create(4, 4);
+        bool saved = drawn.Ok && drawn.Value.Save(Path.Join(besideSelf, "selftest-art.png"),
+                                                  Standard.Drawing.ImageFormat.Png) == Standard.Drawing.ImageError.None;
+        _grid.SelectProperty("Image");
+        _grid.ApplyText("selftest-art.png");
+        live = surface.FindLiveControl("_ok");
+        if (!saved || !pad.Editor.Contents.GetText().Contains("Image = Embed(\"selftest-art.png\");")
+            || live == null || ((Button)live).Image == null || _grid.ReadPropertyValue("Image") != "selftest-art.png")
+        {
+            Console.WriteLine("FAIL: a picture set in the grid did not reach the control, or was not written as an embed");
+            ok = false;
+        }
+        _grid.SelectProperty("Image");
+        _grid.ApplyText("");
+        if (pad.Editor.Contents.GetText().Contains("Image =") || ((Button)live).Image != null)
+        {
+            Console.WriteLine("FAIL: clearing a picture in the grid left it in the file or on the control");
+            ok = false;
+        }
+
+        // An Image has no window, and is placed, given a picture and found
+        // under the pointer as a control with one is.
+        surface.PlaceComponent("Image", Point.FromXY(200, 152));
+        _grid.SelectProperty("Picture");
+        _grid.ApplyText("selftest-art.png");
+        var image = surface.FindLiveControl("_image1");
+        surface.SelectWithin(Rectangle.FromBounds(204, 156, 8, 8));
+        if (!pad.Editor.Contents.GetText().Contains("Picture = Embed(\"selftest-art.png\");")
+            || image == null || !(image is Forms.Image) || ((Forms.Image)image).Picture == null
+            || !surface.IsComponentSelected("_image1"))
+        {
+            Console.WriteLine("FAIL: an Image was not placed, given its picture, or found under a band");
             ok = false;
         }
         surface.SelectComponent("_ok");

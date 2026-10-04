@@ -261,9 +261,11 @@ public abstract class Control : IControlNotify
     bool _isEchoing;
     CursorKind _cursor;
     String _toolTip;
+    bool _isDesigning;
 
     protected Control()
     {
+        _isDesigning = false;
         _parent = null;
         _bounds = Rectangle.FromBounds(0, 0, 100, 24);
         _requestedBounds = _bounds;
@@ -825,6 +827,21 @@ public abstract class Control : IControlNotify
     protected virtual void ApplyFont()      { }
     protected virtual void ApplyForeColor() { }
     protected virtual void ApplyBackColor() { }
+    protected virtual void ApplyDesigning() { }
+
+    /// Whether this control is being designed: drawn as it will look, and
+    /// given none of the pointer, so it is never hot or pressed under a
+    /// designer's overlay. `Paint` is raised after it draws itself, which is
+    /// when a designer draws its handles again. Lazarus's `csDesigning`.
+    public bool IsDesigning
+    {
+        get => _isDesigning;
+        set
+        {
+            _isDesigning = value;
+            ApplyDesigning();
+        }
+    }
 
     /// What the pointer looks like over this control.
     public CursorKind Cursor

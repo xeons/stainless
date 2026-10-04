@@ -32,6 +32,9 @@ public const String DesignedColorType = "Forms.Drawing.Color";
 /// The type a font property is.
 public const String DesignedFontType = "Forms.Drawing.Font";
 
+/// The type a picture property is.
+public const String DesignedBitmapType = "Forms.Drawing.Bitmap";
+
 /// The module the generated half needs for either.
 public const String DesignedDrawingModule = "Forms.Drawing";
 
@@ -256,6 +259,30 @@ public String SpellDesignedTextArray(String[] lines)
         quoted.Add(QuoteFormText(line));
     return "[" + ", ".Join(quoted.ToArray()) + "]";
 }
+
+// ------------------------------------------------------------ pictures
+
+/// The path in a picture as the file writes it, `Embed("art/logo.png")`:
+/// relative to the form file, and embedded in the program by the generated
+/// half.
+public Result<String, String> ReadDesignedPicturePath(String item)
+{
+    String text = item.Trim();
+    if (!text.StartsWith("Embed(") || !text.EndsWith(")"))
+        return Fail("'" + text + "' is not a picture: write it as Embed(\"art/logo.png\")");
+    var parts = SplitDesignedArguments(text.Substring(6u, text.ByteLength() - 7u));
+    if (parts.Count != 1u || !parts[0u].Trim().StartsWith("\""))
+        return Fail("a picture names one file, as a string");
+    return Ok(UnquoteFormText(parts[0u].Trim()));
+}
+
+/// How the file writes a picture. `/` separates the parts on every platform,
+/// so a form file reads the same wherever it is checked out.
+public String SpellDesignedPicture(String path) => "Embed(" + QuoteFormText(path.Replace("\\", "/")) + ")";
+
+/// Where a picture the file names is, from the form file's directory.
+public String FindDesignedPicture(String baseDirectory, String path) =>
+    Standard.Path.IsPathRooted(path) ? path : Standard.Path.Join(baseDirectory, path);
 
 // ------------------------------------------------------------ arguments
 

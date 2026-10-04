@@ -5,6 +5,7 @@
 module Greeter;
 
 import Forms;
+import Forms.Drawing;
 
 public class GreeterForm : Form
 {
@@ -13,6 +14,9 @@ public class GreeterForm : Form
     private Button _greet;
     private Panel _footer;
     private Label _greeting;
+
+    [Embed("greet.png")]
+    private static readonly byte[] s_greetImage;
 
     private void InitializeComponent()
     {
@@ -31,6 +35,7 @@ public class GreeterForm : Form
         _greet = new Button(this);
         _greet.Text = "Greet";
         _greet.SetBounds(250, 56, 90, 28);
+        _greet.Image = Bitmap.FromEmbedded(s_greetImage);
         _greet.Anchors = AnchorStyles.Top | AnchorStyles.Right;
         _greet.Click += this.OnGreet;
 

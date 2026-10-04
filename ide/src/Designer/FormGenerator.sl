@@ -24,6 +24,10 @@
 // is copied as written; several values go to `SetName(...)` rather than to
 // `Name`; a handler is `+=` on `this.Method`; a control is made with its
 // parent unless the file says how it is made. The compiler checks the result.
+//
+// One value is not copied: `Embed("logo.png")`, a picture carried in the
+// program. An embed is a static and nothing else, so it becomes one -- an
+// `[Embed]` field of the class -- and the property is set from its bytes.
 module Ide.Designer;
 
 import Standard.Collections;
@@ -77,6 +81,24 @@ public String GenerateFormSource(FormDocument document, String sourceName)
     if (fields.Count > 0u)
         text.AppendLine();
 
+    fields.Insert(0u, form);
+    bool embeds = false;
+    foreach (var component in fields)
+    {
+        for (nuint i = 0u; i < component.Members.Count; i++)
+        {
+            if (component.Members[i] is FormProperty property && IsEmbeddedValue(property.Value))
+            {
+                String target = component == form ? "" : component.Name;
+                text.AppendLine("    [" + property.Value.Items[0u] + "]");
+                text.AppendLine("    private static readonly byte[] " + NameEmbeddedField(target, property.Name) + ";");
+                embeds = true;
+            }
+        }
+    }
+    if (embeds)
+        text.AppendLine();
+
     text.AppendLine("    private void InitializeComponent()");
     text.AppendLine("    {");
     var body = new StringBuilder();
@@ -106,6 +128,20 @@ public Result<bool, String> WriteFormSource(FormDocument document, String formPa
     return Ok(true);
 }
 
+/// `Embed("logo.png")`: a picture's bytes, embedded in the program. The path
+/// is relative to the form file, which is where the generated half is too.
+public bool IsEmbeddedValue(FormValue value) =>
+    value.Items.Count == 1u && value.Items[0u].StartsWith("Embed(") && value.Items[0u].EndsWith(")");
+
+/// The static an embedded value is held in: `s_okImage` for `_ok`'s `Image`,
+/// and `s_Icon` for the form's own.
+String NameEmbeddedField(String component, String property)
+{
+    while (component.StartsWith("_"))
+        component = component.Substring(1u);
+    return "s_" + component + property;
+}
+
 void CollectFormFields(FormComponent component, List<FormComponent> into)
 {
     for (nuint i = 0u; i < component.Members.Count; i++)
@@ -132,7 +168,10 @@ void GenerateFormMembers(StringBuilder text, FormComponent component, String tar
 
         if (member is FormProperty property)
         {
-            if (property.Value.IsList)
+            if (IsEmbeddedValue(property.Value))
+                text.AppendLine(indent + target + property.Name + " = Bitmap.FromEmbedded(" +
+                                NameEmbeddedField(target == "" ? "" : component.Name, property.Name) + ");");
+            else if (property.Value.IsList)
                 text.AppendLine(indent + target + "Set" + property.Name + "(" +
                                 property.Value.ToFormText() + ");");
             else

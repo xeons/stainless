@@ -71,6 +71,24 @@ it is written, so a value means what it would mean in Stainless and the
 compiler is what checks it. The commas inside a call or an array are its own,
 so either is one value.
 
+**A picture is embedded**, and is the one value not copied as written.
+`Image = Embed("art/ok.png");` names a file relative to the form file, and the
+generated half makes it a static of the class and the property its bytes:
+
+```csharp
+[Embed("art/ok.png")]
+private static readonly byte[] s_greetImage;
+...
+_greet.Image = Bitmap.FromEmbedded(s_greetImage);
+```
+
+An embed is a static and nothing else ([section 8.8](spec/08-interop-libraries.md#88-embedding-a-file)),
+so this is the spelling that can stand where a value does. The build checks the
+file is there, and the picture travels in the program rather than beside it,
+where a path would be a promise about a file the binary may have left behind.
+`Bitmap.FromEmbedded` answers null on a machine with no decoder for the format,
+which shows a control without its picture rather than stopping the program.
+
 The designer reads the values it writes: a colour as a member of `Colors` or
 `SystemColors` or its channels, a font as `new Font(...)`, and a list of
 strings as an array. A colour or a font adds `import Forms.Drawing;`, which is
@@ -209,6 +227,7 @@ with `partial`, and Stainless allows it for a class.
 - **Items that are not strings.** A list's rows are an array, but a
   `MenuItem`'s children and a `ToolBar`'s buttons are made by calling methods,
   not by setting properties.
-- **A picture as a value.** A path is a promise about a file beside a binary
-  that may have moved, and embedding one needs a declaration the generated half
-  does not yet write.
+- **The other drawn controls.** `Image` is designed as the LCL designs any
+  `TControl`, window or none, and framed with a dashed line while it is;
+  `PaintBox`, `Shape` and `Bevel` are drawn the same way and are not in the
+  Toolbox yet.
