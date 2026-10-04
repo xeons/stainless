@@ -19,7 +19,7 @@ platforms, and it says which rather than picking one.
 
 ## Contents
 
-**Functions** &nbsp; [ChangeExtension](#changeextension-function) &middot; [GetDirectoryName](#getdirectoryname-function) &middot; [GetExtension](#getextension-function) &middot; [GetFileName](#getfilename-function) &middot; [GetFileNameWithoutExtension](#getfilenamewithoutextension-function) &middot; [IsPathRooted](#ispathrooted-function) &middot; [IsSamePath](#issamepath-function) &middot; [Join](#join-function) &middot; [Join](#join-function) &middot; [SplitPath](#splitpath-function)
+**Functions** &nbsp; [ChangeExtension](#changeextension-function) &middot; [GetDirectoryName](#getdirectoryname-function) &middot; [GetExtension](#getextension-function) &middot; [GetFileName](#getfilename-function) &middot; [GetFileNameWithoutExtension](#getfilenamewithoutextension-function) &middot; [GetRelativePath](#getrelativepath-function) &middot; [IsPathRooted](#ispathrooted-function) &middot; [IsSamePath](#issamepath-function) &middot; [Join](#join-function) &middot; [Join](#join-function) &middot; [SplitPath](#splitpath-function)
 
 **Constants** &nbsp; [AltDirectorySeparatorChar](#altdirectoryseparatorchar-constant) &middot; [DirectorySeparatorChar](#directoryseparatorchar-constant)
 
@@ -96,6 +96,25 @@ The last part with its extension removed. A trailing dot goes with it.
 **See also** &nbsp; [Path.GetExtension](#getextension-function)
 
 <sub>[stdlib/Path.sl:197](../../stdlib/Path.sl#L197)</sub>
+
+### GetRelativePath *function*
+
+```
+String GetRelativePath(String relativeTo, String path)
+```
+
+`path` as reached from the directory `relativeTo`: `src/forms` and
+`src/forms/art/logo.png` give `art/logo.png`, and `src/forms` and
+`src/art/logo.png` give `../art/logo.png`. The same directory is `.`.
+
+Parts are compared as `IsSamePath` compares them, and the answer is joined
+with this platform's separator. Nothing is resolved, so both MUST be
+absolute or both relative to one place; a `..` already in either is a name
+like any other. Two paths that share no root -- a relative one and an
+absolute one, or two Windows drives -- answer `path` unchanged, since no
+relative path reaches it.
+
+<sub>[stdlib/Path.sl:318](../../stdlib/Path.sl#L318)</sub>
 
 ### IsPathRooted *function*
 
@@ -176,7 +195,7 @@ List<String> SplitPath(String path)
 
 The parts, with the separators dropped and empty parts skipped.
 
-<sub>[stdlib/Path.sl:309](../../stdlib/Path.sl#L309)</sub>
+<sub>[stdlib/Path.sl:343](../../stdlib/Path.sl#L343)</sub>
 
 ## Constants
 

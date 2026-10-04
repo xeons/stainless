@@ -305,6 +305,40 @@ bool IsSameByteInAPath(byte left, byte right) => false;
 
 #endif
 
+/// `path` as reached from the directory `relativeTo`: `src/forms` and
+/// `src/forms/art/logo.png` give `art/logo.png`, and `src/forms` and
+/// `src/art/logo.png` give `../art/logo.png`. The same directory is `.`.
+///
+/// Parts are compared as `IsSamePath` compares them, and the answer is joined
+/// with this platform's separator. Nothing is resolved, so both MUST be
+/// absolute or both relative to one place; a `..` already in either is a name
+/// like any other. Two paths that share no root -- a relative one and an
+/// absolute one, or two Windows drives -- answer `path` unchanged, since no
+/// relative path reaches it.
+public String GetRelativePath(String relativeTo, String path)
+{
+    if (IsPathRooted(relativeTo) != IsPathRooted(path))
+        return path;
+
+    var from = SplitPath(relativeTo);
+    var to = SplitPath(path);
+    nuint shared = 0;
+    while (shared < from.Count && shared < to.Count && IsSamePath(from[shared], to[shared]))
+        shared++;
+
+#if WINDOWS
+    if (shared == 0 && IsPathRooted(path))
+        return path;
+#endif
+
+    String answer = "";
+    for (nuint i = shared; i < from.Count; i++)
+        answer = Join(answer, "..");
+    for (nuint i = shared; i < to.Count; i++)
+        answer = Join(answer, to[i]);
+    return answer.ByteLength() == 0 ? "." : answer;
+}
+
 /// The parts, with the separators dropped and empty parts skipped.
 public List<String> SplitPath(String path)
 {

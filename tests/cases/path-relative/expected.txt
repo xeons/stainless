@@ -1,0 +1,10 @@
+below: art/logo.png
+beside: ../art/logo.png
+same: .
+above: ../..
+trailing separator: a.png
+nothing shared: ../../three
+absolute: ../art/a.png
+no common root: /absolute/a.png
+another drive: D:/art/a.png
+one drive, either case: ../art/a.png
