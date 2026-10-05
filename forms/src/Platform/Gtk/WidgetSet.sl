@@ -41,7 +41,7 @@ import Forms.Drawing;
 import Forms;
 import Forms.Platform;
 import Standard.Resources;
-#if UNIX
+#if UNIX && !(MACOS && FORMS_APPKIT)
 import Gtk.GLib;
 import Gtk.GObject;
 import Gtk.Gdk;

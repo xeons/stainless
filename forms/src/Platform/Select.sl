@@ -36,6 +36,8 @@ import Forms.Platform;
 
 #if WINDOWS
 import Forms.Platform.Win32;
+#elif MACOS && FORMS_APPKIT
+import Forms.Platform.AppKit;
 #else
 import Forms.Platform.Gtk;
 #endif
@@ -49,6 +51,8 @@ IWidgetSet CreateWidgetSet()
 {
 #if WINDOWS
     return new Win32WidgetSet();
+#elif MACOS && FORMS_APPKIT
+    return new AppKitWidgetSet();
 #else
     return new GtkWidgetSet();
 #endif

@@ -129,7 +129,14 @@ src/Controls/Groups.sl      RadioGroup, CheckGroup, LabeledEdit, Image,
 src/Platform/Select.sl      which backend this build links  (lcl/interfaces/)
 src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 src/Platform/Gtk/*.sl       the GTK 3 backend           (lcl/interfaces/gtk3/)
+src/Platform/AppKit/*.sl    the AppKit backend, in progress (lcl/interfaces/cocoa/)
 ```
+
+**AppKit is being built.** A macOS build defining `FORMS_APPKIT` uses it,
+naming `bindings/macos` among its sources; without the define macOS uses GTK,
+as before. It has windows, panels, drawn controls, the drawing surface, timers
+and the mouse and keyboard so far, and refuses every other control by name.
+Once it runs the IDE it becomes the default and `FORMS_GTK` selects GTK.
 
 Roughly 12,900 lines of portable code against the LCL's 276,000 -- which is the
 scope difference, not a compression ratio -- plus about 7,700 per backend. See

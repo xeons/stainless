@@ -1,0 +1,3 @@
+# 3: the queue another thread posts work on, a static readonly and so immortal
+# rather than leaked. The AppKit backend keeps no tables of its own.
+3
