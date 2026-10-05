@@ -192,15 +192,15 @@ public class AppKitWidgetSet : IWidgetSet
     public ILabelPeer CreateLabel(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitLabelPeer(owner));
     public ITextEntryPeer CreateTextEntry(IControlNotify owner, IContainerPeer parent, bool multiline) =>
         Adopt(parent, new AppKitTextEntryPeer(owner, multiline));
-    public IListPeer CreateList(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IListPeer>("list box");
-    public IComboPeer CreateCombo(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IComboPeer>("combo box");
+    public IListPeer CreateList(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitListPeer(owner, false));
+    public IComboPeer CreateCombo(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitComboPeer(owner));
     public IGroupPeer CreateGroup(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitGroupPeer(owner));
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent, bool vertical) =>
         Adopt(parent, new AppKitScrollBarPeer(owner, vertical));
     public ISpinPeer CreateSpin(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitSpinPeer(owner));
     public ICheckListPeer CreateCheckList(IControlNotify owner, IContainerPeer parent) =>
-        RefuseAppKitControl<ICheckListPeer>("check list");
-    public IHeaderPeer CreateHeader(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IHeaderPeer>("header");
+        Adopt(parent, new AppKitCheckListPeer(owner));
+    public IHeaderPeer CreateHeader(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitHeaderPeer(owner));
     public IToolBarPeer CreateToolBar(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IToolBarPeer>("tool bar");
     public IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent) =>
         RefuseAppKitControl<IStatusBarPeer>("status bar");
@@ -211,9 +211,9 @@ public class AppKitWidgetSet : IWidgetSet
     public ITabControlPeer CreateTabControl(IControlNotify owner, IContainerPeer parent) =>
         RefuseAppKitControl<ITabControlPeer>("tab control");
     public ITreeViewPeer CreateTreeView(IControlNotify owner, IContainerPeer parent) =>
-        RefuseAppKitControl<ITreeViewPeer>("tree view");
+        Adopt(parent, new AppKitTreePeer(owner));
     public IListViewPeer CreateListView(IControlNotify owner, IContainerPeer parent) =>
-        RefuseAppKitControl<IListViewPeer>("list view");
+        Adopt(parent, new AppKitListViewPeer(owner));
     public IMenuPeer CreateMenu() => RefuseAppKitControl<IMenuPeer>("menu");
     public IMenuPeer CreateMenuBar() => RefuseAppKitControl<IMenuPeer>("menu bar");
 

@@ -183,11 +183,11 @@ public class DemoForm : Form
         bool ok = true;
 
         // Which backend, rather than that it is a particular one: this
-        // sample is the same source on both, and the name is the one place
-        // anything in `forms/` says a platform out loud.
+        // sample is the same source on all three, and the name is the one
+        // place anything in `forms/` says a platform out loud.
         var platform = Application.PlatformName;
         ok = Check(ok, "widget set is " + platform,
-                   platform == "Win32" || platform == "GTK3");
+                   platform == "Win32" || platform == "GTK3" || platform == "AppKit");
 
         // Docking: the header took the top of the client area and the status
         // line the bottom, each across the full width.
@@ -223,10 +223,11 @@ public class DemoForm : Form
         ok = Check(ok, "controls have native handles",
                    Handle != 0u && _add.Handle != 0u && _items.Handle != 0u);
 
-        // A button asks Windows how big it wants to be.
+        // A button asks the platform how big it wants to be: 75 by 23 at the
+        // least on Windows, and an AppKit push button is 20 points tall.
         var wanted = _add.PreferredSize;
         ok = Check(ok, "button has a preferred size from the theme",
-                   wanted.Width >= 75 && wanted.Height >= 23);
+                   wanted.Height >= 20 && wanted.Width > wanted.Height);
 
         // Fonts are inherited until set.
         ok = Check(ok, "font is inherited from the form",

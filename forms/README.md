@@ -137,7 +137,9 @@ naming `bindings/macos` among its sources; without the define macOS uses GTK,
 as before. It has windows, panels, drawn controls, the drawing surface, timers,
 the mouse and keyboard, and the standard controls -- buttons, check and radio
 buttons, labels, text boxes, group boxes, progress and track bars, spin edits
-and scroll bars -- each a native control, and refuses the rest by name. Once it
+and scroll bars -- and the lists: list boxes, check lists, combo boxes, headers,
+trees and details lists. Each is a native control; the five on a table are
+`NSTableView`, as GTK's are `GtkTreeView`. It refuses the rest by name. Once it
 runs the IDE it becomes the default and `FORMS_GTK` selects GTK.
 
 `STAINLESS_FORMS_SHOT=dir` writes each form's content to `dir/<title>.png`

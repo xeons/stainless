@@ -731,16 +731,16 @@ public class AppKitTextEntryPeer : AppKitPeer, ITextEntryPeer
         View.Frame = View.FrameForAlignmentRect(ToNSRect(bounds));
     }
 
-    public override void Focus()
+    protected override NSView FocusView
     {
-        var window = View.Window;
-        if (window == null)
-            return;
-        var field = _field;
-        if (field != null)
-            ((NSWindow)window).MakeFirstResponder((NSTextField)field);
-        else if (_text is FormsTextView view)
-            ((NSWindow)window).MakeFirstResponder(view);
+        get
+        {
+            if (_field is NSTextField entry)
+                return entry;
+            if (_text is FormsTextView view)
+                return view;
+            return View;
+        }
     }
 
     public override bool AcceptsTabFocus => !View.Hidden;
@@ -1136,12 +1136,7 @@ public class AppKitSpinPeer : AppKitContainerPeer, ISpinPeer
         _stepper.Enabled = enabled;
     }
 
-    public override void Focus()
-    {
-        var window = View.Window;
-        if (window != null)
-            ((NSWindow)window).MakeFirstResponder(_field);
-    }
+    protected override NSView FocusView => _field;
 
     public override bool AcceptsTabFocus => !View.Hidden && _field.Enabled;
 

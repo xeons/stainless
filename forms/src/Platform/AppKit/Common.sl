@@ -606,13 +606,19 @@ public class AppKitPeer : IControlPeer
 
     public void Update() => View.DisplayIfNeeded();
 
-    public virtual void Focus()
+    /// The view that takes the keyboard, which for a control in a scroll view
+    /// or a box is not the one the parent places.
+    protected virtual NSView FocusView => View;
+
+    public void Focus()
     {
         var window = View.Window;
         if (window != null)
-            ((NSWindow)window).MakeFirstResponder(View);
+            ((NSWindow)window).MakeFirstResponder(FocusView);
     }
 
+    /// A field being edited is not the first responder; the window's field
+    /// editor is, on the field's behalf.
     public bool HasFocus
     {
         get
@@ -620,8 +626,11 @@ public class AppKitPeer : IControlPeer
             var window = View.Window;
             if (window == null)
                 return false;
+            var focused = FocusView;
             var first = ((NSWindow)window).FirstResponder;
-            return first != null && (NSResponder)first == (NSResponder)View;
+            if (first != null && (NSResponder)first == (NSResponder)focused)
+                return true;
+            return focused is NSControl control && control.CurrentEditor() != null;
         }
     }
 

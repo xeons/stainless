@@ -1,0 +1,2 @@
+# The AppKit backend, which GTK stands in for on macOS until it covers the IDE.
+FORMS_APPKIT
