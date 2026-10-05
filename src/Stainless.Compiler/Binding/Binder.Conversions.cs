@@ -795,6 +795,13 @@ public sealed partial class Binder
     /// False only for a sealed class that does not -- the one case where the
     /// test could never hold, and so the one worth refusing.
     /// </summary>
+    /// <summary>
+    /// Whether a reference to <paramref name="from"/> is already one to
+    /// <paramref name="to"/>: the same type, or a class and one of its bases.
+    /// </summary>
+    private static bool IsSameOrBaseClass(TypeSymbol from, TypeSymbol to) =>
+        from.Equals(to) || (from is ClassTypeSymbol derived && to is ClassTypeSymbol baseClass && derived.DerivesFrom(baseClass));
+
     private static bool CouldImplement(ClassTypeSymbol candidate, InterfaceTypeSymbol wanted) =>
         candidate.AllInterfaces().Contains(wanted) || !candidate.IsSealed;
 
@@ -983,18 +990,19 @@ public sealed partial class Binder
             return explicitCast && fromArray.Element.Equals(to) ? ConversionKind.AssertPresent : null;
 
         if (from is WeakTypeSymbol fromWeak && to is OptionalTypeSymbol weakTarget)
-            return fromWeak.Element.Equals(weakTarget.Element) ? ConversionKind.ReferenceToOptional : null;
+            return IsSameOrBaseClass(fromWeak.Element, weakTarget.Element) ? ConversionKind.ReferenceToOptional : null;
 
         // C -> weak C?  and  C? -> weak C?. This is the only way to break a
         // reference cycle, since ARC cannot collect one, so it is implicit: the
         // weak slot already says what is meant, and requiring a cast as well
         // would put punctuation between the programmer and the one escape hatch
-        // they have.
+        // they have. A derived class goes into its base's slot as it goes into
+        // its base's variable: the reference is the same pointer.
         if (to is WeakTypeSymbol toWeak)
         {
             var referenced = from is OptionalTypeSymbol weakSource ? weakSource.Element : from;
             return referenced is NamedTypeSymbol { IsReferenceType: true } &&
-                   referenced.Equals(toWeak.Element)
+                   IsSameOrBaseClass(referenced, toWeak.Element)
                 ? ConversionKind.ReferenceToWeak
                 : null;
         }
