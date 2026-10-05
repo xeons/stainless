@@ -24,8 +24,10 @@ import Forms.Platform;
 #if WINDOWS
 import Win32.Handles;
 import Win32.User32;
-#endif
-#if UNIX
+#elif MACOS && FORMS_APPKIT
+import Forms.Platform.AppKit;
+import MacOS.AppKit;
+#elif UNIX
 import Gtk.Api;
 #endif
 
@@ -473,8 +475,9 @@ public class CoreForm : Form
         ok = Check(ok, "a form is hidden until it is shown", !spare.Visible);
 #if WINDOWS
         ok = Check(ok, "and so is its window", IsWindowVisible((HWND)(void*)spare.Handle) == 0);
-#endif
-#if UNIX
+#elif MACOS && FORMS_APPKIT
+        ok = Check(ok, "and so is its window", !((AppKitWindowPeer)spare.WindowPeer).Window.Visible);
+#elif UNIX
         ok = Check(ok, "and so is its window",
                    gtk_widget_get_visible((GtkWidget*)(void*)spare.Handle) == 0);
 #endif
@@ -516,8 +519,10 @@ public class CoreForm : Form
         _dialogModal = shown.IsModal;
 #if WINDOWS
         _mainBlocked = IsWindowEnabled((HWND)(void*)Handle) == 0;
-#endif
-#if UNIX
+#elif MACOS && FORMS_APPKIT
+        var modal = NSApplication.SharedApplication.ModalWindow;
+        _mainBlocked = modal != null && (NSWindow)modal == ((AppKitWindowPeer)shown.WindowPeer).Window;
+#elif UNIX
         _mainBlocked = gtk_window_get_modal((GtkWidget*)(void*)shown.Handle) != 0
             && (nuint)(void*)gtk_window_get_transient_for((GtkWidget*)(void*)shown.Handle)
                == Handle;

@@ -147,9 +147,13 @@ and scroll bars -- and the lists: list boxes, check lists, combo boxes, headers,
 trees and details lists. Each is a native control; the five on a table are
 `NSTableView`, as GTK's are `GtkTreeView`. A tab control is an `NSTabView`; a
 toolbar is a row of native buttons and a status bar a row of labels, since
-`NSToolbar` belongs to a window's title bar and AppKit has no status bar. It
-refuses the rest -- menus, dialogs, the clipboard -- by name. Once it
-runs the IDE it becomes the default and `FORMS_GTK` selects GTK.
+`NSToolbar` belongs to a window's title bar and AppKit has no status bar.
+Menus are `NSMenu`s: a form's bar goes across the top of the screen while the
+form is key, behind an application menu whose Quit closes each window as its
+close button would. The dialogs are AppKit's panels, run modally, and the
+clipboard is the general pasteboard, watched by polling its change count since
+AppKit reports none. Once it runs the IDE it becomes the default and
+`FORMS_GTK` selects GTK.
 
 `STAINLESS_FORMS_SHOT=dir` writes each form's content to `dir/<title>.png`
 after every `DoEvents` and as the program closes it. It is how a Mac reached

@@ -1,0 +1,8 @@
+bar: File, Edit
+File: Open, -, Exit
+application menu ends with Quit
+chose &Open
+Edit: Ticked & done, ticked yes, Exit enabled no
+the popup returned
+colour: 255 0
+open: canceled

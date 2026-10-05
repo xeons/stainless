@@ -93,6 +93,8 @@ public objc class FormsWindowDelegate : NSObject, NSWindowDelegate
 
     public void WindowDidBecomeKey(NSNotification notification)
     {
+        if (FindPeer() is AppKitWindowPeer peer)
+            peer.InstallMenu();
         IWindowNotify? owner = Owner;
         if (owner != null)
             ((IWindowNotify)owner).OnPlatformActivatedWindow();
@@ -114,12 +116,14 @@ public class AppKitWindowPeer : AppKitContainerPeer, IWindowPeer
     weak IWindowNotify? _owner;
     bool _isModal;
     bool _shown;
+    AppKitMenuPeer? _menu;
 
     public AppKitWindowPeer(IWindowNotify owner, WindowBorder border)
     {
         _owner = owner;
         _isModal = false;
         _shown = false;
+        _menu = null;
         _window = NSWindow.Alloc().InitWithContentRectStyleMaskBackingDefer(
             MakeNSRect(0.0, 0.0, 320.0, 240.0), FindStyle(border), NSBackingStoreType.Buffered, false);
         _window.ReleasedWhenClosed = false;
@@ -220,7 +224,29 @@ public class AppKitWindowPeer : AppKitContainerPeer, IWindowPeer
     /// A Mac application's icon is its bundle's, and a title bar has none.
     public bool SetIconResource(int id) => false;
 
-    public void SetMenu(IMenuPeer? menu) { }
+    /// Keeps the bar, and shows it now when this is the key window or no
+    /// window is: a program whose windows never become key -- one started over
+    /// ssh, say -- still has its menus.
+    public void SetMenu(IMenuPeer? menu)
+    {
+        _menu = menu == null ? null : (AppKitMenuPeer)menu;
+        var key = NSApplication.SharedApplication.KeyWindow;
+        if (key == null || (NSWindow)key == _window)
+            InstallMenu();
+    }
+
+    /// This window's bar across the top of the screen; a window with none
+    /// leaves whatever was there.
+    ///
+    /// Not again when it is there already: AppKit adds its own items to an
+    /// Edit menu each time a bar becomes the main menu.
+    public void InstallMenu()
+    {
+        var application = NSApplication.SharedApplication;
+        var shown = application.MainMenu;
+        if (_menu is AppKitMenuPeer bar && (shown == null || (NSMenu)shown != bar.Menu))
+            application.MainMenu = bar.Menu;
+    }
 
     public void SetBorder(WindowBorder border) => _window.StyleMask = FindStyle(border);
 

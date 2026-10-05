@@ -39,15 +39,7 @@ import MacOS.CoreFoundation;
 import MacOS.CoreGraphics;
 import MacOS.Foundation;
 import MacOS.AppKit;
-
-[DoesNotReturn]
-extern "C" void sl_fail(byte* message);
-
-/// What a later phase of this backend adds, refused by name meanwhile.
-T RefuseAppKitControl<T>(String what)
-{
-    sl_fail(("the AppKit backend has no " + what + " yet; build with FORMS_GTK to use GTK").ToPointer());
-}
+import MacOS.UniformTypeIdentifiers;
 
 /// The directory `STAINLESS_FORMS_SHOT` names, or null for none.
 public String? FindScreenshotDirectory() => Standard.Env.GetEnvironmentVariable("STAINLESS_FORMS_SHOT");
@@ -149,16 +141,21 @@ public class AppKitWidgetSet : IWidgetSet
     Forms.Drawing.Font? _defaultFont;
     bool _quitting;
     String? _shots;
+    /// The bar a program with no menu of its own has: the application menu
+    /// alone, so that it can still be hidden and quit.
+    AppKitMenuPeer _plainMenu;
 
     public AppKitWidgetSet()
     {
         _application = NSApplication.SharedApplication;
-        _application.SetActivationPolicy(NSApplicationActivationPolicy.Regular);
-        _application.FinishLaunching();
         _waker = FormsWaker.Alloc().Init()!;
         _defaultFont = null;
         _quitting = false;
         _shots = FindScreenshotDirectory();
+        _plainMenu = new AppKitMenuPeer(true);
+        _application.SetActivationPolicy(NSApplicationActivationPolicy.Regular);
+        _application.MainMenu = _plainMenu.Menu;
+        _application.FinishLaunching();
     }
 
     /// Each visible form, as `WriteWindowScreenshot` writes one, after every
@@ -215,35 +212,49 @@ public class AppKitWidgetSet : IWidgetSet
         Adopt(parent, new AppKitTreePeer(owner));
     public IListViewPeer CreateListView(IControlNotify owner, IContainerPeer parent) =>
         Adopt(parent, new AppKitListViewPeer(owner));
-    public IMenuPeer CreateMenu() => RefuseAppKitControl<IMenuPeer>("menu");
-    public IMenuPeer CreateMenuBar() => RefuseAppKitControl<IMenuPeer>("menu bar");
+    public IMenuPeer CreateMenu() => new AppKitMenuPeer(false);
+    public IMenuPeer CreateMenuBar() => new AppKitMenuPeer(true);
 
     public ITimerPeer CreateTimer(ITimerNotify owner) => new AppKitTimerPeer(owner);
 
     // ------------------------------------------------------------ clipboard
 
-    public void SetClipboard(ClipboardContent content) { }
-    public String GetClipboardText() => "";
-    public String GetClipboardHtml() => "";
-    public ClipboardImage? GetClipboardImage() => null;
-    public String[] GetClipboardFiles() => new String[0u];
-    public byte[] GetClipboardFormat(String name) => new byte[0u];
-    public bool ContainsClipboardKind(ClipboardKind kind) => false;
-    public bool ContainsClipboardFormat(String name) => false;
-    public String[] GetClipboardFormatNames() => new String[0u];
-    public IClipboardWatchPeer CreateClipboardWatch(IClipboardNotify owner) =>
-        RefuseAppKitControl<IClipboardWatchPeer>("clipboard watch");
+    public void SetClipboard(ClipboardContent content) => WriteClipboard(content);
+    public String GetClipboardText() => ReadClipboardString(NSPasteboardTypeString!);
+    public String GetClipboardHtml() => ReadClipboardString(NSPasteboardTypeHTML!);
+    public ClipboardImage? GetClipboardImage() => ReadClipboardImage();
+    public String[] GetClipboardFiles() => ReadClipboardFiles();
+    public byte[] GetClipboardFormat(String name) => ReadData(FindPasteboard().DataForType(FindPasteboardType(name)));
+
+    public bool ContainsClipboardKind(ClipboardKind kind)
+    {
+        switch (kind)
+        {
+            case ClipboardKind.Text: return OffersPasteboardType(NSPasteboardTypeString!);
+            case ClipboardKind.Html: return OffersPasteboardType(NSPasteboardTypeHTML!);
+            case ClipboardKind.Image:
+                return OffersPasteboardType(NSPasteboardTypePNG!) || OffersPasteboardType(NSPasteboardTypeTIFF!);
+            default: return OffersPasteboardType(NSPasteboardTypeFileURL!);
+        }
+    }
+
+    public bool ContainsClipboardFormat(String name) => OffersPasteboardType(FindPasteboardType(name));
+    public String[] GetClipboardFormatNames() => ReadClipboardTypes();
+    public IClipboardWatchPeer CreateClipboardWatch(IClipboardNotify owner) => new AppKitClipboardWatchPeer(owner);
 
     // ------------------------------------------------------------ dialogs
 
+    /// Each runs modally for the application rather than as a sheet on
+    /// `owner`, so it returns with the answer as the seam asks.
     public Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title, String start, String[] filters) =>
-        Fail(DialogOutcome.Failed);
+        ShowOpenPanel(title, start, filters, false);
     public Result<String, DialogOutcome> ChooseFileToSave(IWindowPeer? owner, String title, String start, String[] filters) =>
-        Fail(DialogOutcome.Failed);
-    public Result<String, DialogOutcome> ChooseFolder(IWindowPeer? owner, String title) => Fail(DialogOutcome.Failed);
-    public Result<Color, DialogOutcome> ChooseColor(IWindowPeer? owner, Color start) => Fail(DialogOutcome.Failed);
+        ShowSavePanel(title, start, filters);
+    public Result<String, DialogOutcome> ChooseFolder(IWindowPeer? owner, String title) =>
+        ShowOpenPanel(title, "", new String[0u], true);
+    public Result<Color, DialogOutcome> ChooseColor(IWindowPeer? owner, Color start) => ShowColorPanel(start);
     public Result<Forms.Drawing.Font, DialogOutcome> ChooseFont(IWindowPeer? owner, Forms.Drawing.Font start) =>
-        Fail(DialogOutcome.Failed);
+        ShowFontPanel(start);
 
     // ------------------------------------------------------------ drawing
 
