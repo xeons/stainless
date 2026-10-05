@@ -695,7 +695,8 @@ internal static class Program
         string consumer = Path.Combine(
             caseWork, name + "-consumer" + Toolchain.ExecutableExtension);
         List<string> arguments =
-            [.. Toolchain.TargetArgumentsFor(target, Binding.TargetPlatform.Host), .. natives, "-I", caseWork];
+            [.. Toolchain.TargetArgumentsFor(target, Binding.TargetPlatform.Host, Toolchain.DarwinSdkRoot),
+             .. natives, "-I", caseWork];
 
         // On Windows the linker wants the import library beside the DLL.
         string importLibrary = Path.ChangeExtension(libraryPath, ".lib");

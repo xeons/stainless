@@ -76,11 +76,13 @@ public sealed class Toolchain
     /// Darwin always names one. Its triple carries the deployment version, and
     /// the program and the runtime MUST agree on it.
     ///
-    /// A Darwin build on a Mac with <c>SDKROOT</c> set names that SDK too.
-    /// Apple's clang reads it on its own; Homebrew's has the Command Line
-    /// Tools' SDK in its configuration file, which only an explicit
-    /// <c>-isysroot</c> overrides. The headers and the linker MUST come from
-    /// one release: a newer SDK's clang emits stubs an older ld cannot make.
+    /// A Darwin build on a Mac names its SDK too: <see cref="DarwinSdkRoot"/>.
+    /// Homebrew's clang otherwise takes one from a configuration file chosen
+    /// by the triple's version, which for <c>macosx15</c> is the Command Line
+    /// Tools' 15 SDK however new the default is -- and only an explicit
+    /// <c>-isysroot</c> overrides it. The headers and the linker MUST come
+    /// from one release: a newer SDK's clang emits stubs an older ld cannot
+    /// make.
     /// </summary>
     public static IReadOnlyList<string> TargetArgumentsFor(
         Binding.TargetPlatform target, Binding.TargetPlatform host, string? sdkRoot = null)
@@ -102,8 +104,43 @@ public sealed class Toolchain
         target.IsDarwin || target.Architecture != host.Architecture || target.Os != host.Os;
 
     private static IReadOnlyList<string> TargetArguments =>
-        TargetArgumentsFor(Binding.TargetPlatform.Current, Binding.TargetPlatform.Host,
-                           Environment.GetEnvironmentVariable("SDKROOT"));
+        TargetArgumentsFor(Binding.TargetPlatform.Current, Binding.TargetPlatform.Host, DarwinSdkRoot);
+
+    /// <summary>
+    /// The macOS SDK a build on a Mac uses: <c>SDKROOT</c> when it is set,
+    /// else the one <c>xcrun</c> names, which is Apple's clang's own default.
+    /// Null anywhere else, or when neither answers.
+    /// </summary>
+    public static string? DarwinSdkRoot => s_darwinSdkRoot.Value;
+
+    private static readonly Lazy<string?> s_darwinSdkRoot = new(FindDarwinSdkRoot);
+
+    private static string? FindDarwinSdkRoot()
+    {
+        if (!Binding.TargetPlatform.Host.IsDarwin)
+            return null;
+        string? named = Environment.GetEnvironmentVariable("SDKROOT");
+        if (!string.IsNullOrWhiteSpace(named))
+            return named;
+        try
+        {
+            using var xcrun = Process.Start(new ProcessStartInfo("xcrun", "--show-sdk-path")
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+            });
+            if (xcrun is null)
+                return null;
+            string path = xcrun.StandardOutput.ReadToEnd().Trim();
+            xcrun.WaitForExit();
+            return xcrun.ExitCode == 0 && Directory.Exists(path) ? path : null;
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return null;
+        }
+    }
 
     /// <summary>
     /// The triple this build actually uses: the one named on the command line

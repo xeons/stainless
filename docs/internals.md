@@ -184,9 +184,11 @@ its `(x86)` sibling on Windows, or `/usr/bin/clang` and `/usr/local/bin/clang`
 elsewhere. On a Mac, Homebrew's LLVM (`/opt/homebrew/opt/llvm/bin`, then
 `/usr/local/opt/llvm/bin`) comes before `PATH`, because `PATH` always holds
 Apple's clang; `xcrun -f clang` is the last resort, and a clang older than
-LLVM 16 is passed over. Homebrew's clang finds the SDK through its own
-configuration file, which names the Command Line Tools'; `SDKROOT`, when set,
-is passed as `-isysroot` over it, so the headers and the linker come from one
+LLVM 16 is passed over. A Mac build always passes `-isysroot`: `SDKROOT`'s
+SDK when it is set, else the one `xcrun --show-sdk-path` names. Homebrew's
+clang would otherwise take the SDK its configuration file names for the
+triple's version, which for `macosx15` is the Command Line Tools' 15 SDK
+however new the default is, and the headers and the linker MUST come from one
 Xcode.
 
 What the toolchain produces follows the target and not the host: the

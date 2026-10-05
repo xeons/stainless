@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Stainless.Binding;
+using Stainless.Driver;
 
 namespace Stainless.Tests;
 
@@ -150,22 +151,15 @@ internal static class CaseSelection
     /// binary is translated by, and it is absent until someone installs it.
     /// </summary>
     /// <summary>
-    /// The version of the macOS SDK clang builds against here -- SDKROOT's when
-    /// that is set, as it is for Homebrew's clang, else xcrun's -- or null.
+    /// The version of the macOS SDK the compiler builds against here, which is
+    /// <see cref="Toolchain.DarwinSdkRoot"/>, or null.
     /// </summary>
     public static string? MacSdkVersion()
     {
         try
         {
-            string? sdk = Environment.GetEnvironmentVariable("SDKROOT");
-            if (string.IsNullOrEmpty(sdk))
-            {
-                using var xcrun = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
-                    "xcrun", "--show-sdk-path") { RedirectStandardOutput = true, UseShellExecute = false });
-                if (xcrun is null) return null;
-                sdk = xcrun.StandardOutput.ReadToEnd().Trim();
-                xcrun.WaitForExit();
-            }
+            string? sdk = Toolchain.DarwinSdkRoot;
+            if (sdk is null) return null;
 
             using var settings = System.Text.Json.JsonDocument.Parse(
                 File.ReadAllText(Path.Combine(sdk, "SDKSettings.json")));
