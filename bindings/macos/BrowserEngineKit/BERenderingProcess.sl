@@ -39,7 +39,6 @@ public objc closure void BERenderingProcessRenderingProcessWithBundleIDInterrupt
 
 public objc closure void BERenderingProcessRenderingProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock(BERenderingProcess? arg0, NSError? arg1);
 
-/// macOS 14.3 and later.
 public extern objc class BERenderingProcess : NSObject
 {
     [Selector("renderingProcessWithInterruptionHandler:completion:")] public static void RenderingProcessWithInterruptionHandlerCompletion(BERenderingProcessRenderingProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BERenderingProcessRenderingProcessWithInterruptionHandlerCompletionCompletionBlock completion);
@@ -48,7 +47,6 @@ public extern objc class BERenderingProcess : NSObject
     [Selector("makeLibXPCConnectionError:")] public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
 }
 
-/// macOS 14.3 and later.
 /// BEExtensionProcessConformance, a category of BERenderingProcess.
 public extern objc class BERenderingProcess : BEExtensionProcess { }
 

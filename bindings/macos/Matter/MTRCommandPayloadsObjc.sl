@@ -48,7 +48,6 @@ public extern objc class MTRIdentifyClusterTriggerEffectParams : NSObject, NSCop
 
 public extern objc class MTRGroupsClusterAddGroupParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("groupID", "setGroupID:")] public NSNumber GroupID { get; set; }
     [Selector("groupName", "setGroupName:")] public NSString GroupName { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -65,11 +64,9 @@ public extern objc class MTRGroupsClusterAddGroupParams
 public extern objc class MTRGroupsClusterAddGroupResponseParams : NSObject, NSCopying
 {
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 13.3 and later.
     [Selector("groupID", "setGroupID:")] public NSNumber GroupID { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -82,7 +79,6 @@ public extern objc class MTRGroupsClusterAddGroupResponseParams
 
 public extern objc class MTRGroupsClusterViewGroupParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("groupID", "setGroupID:")] public NSNumber GroupID { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -98,12 +94,10 @@ public extern objc class MTRGroupsClusterViewGroupParams
 public extern objc class MTRGroupsClusterViewGroupResponseParams : NSObject, NSCopying
 {
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 13.3 and later.
     [Selector("groupID", "setGroupID:")] public NSNumber GroupID { get; set; }
     [Selector("groupName", "setGroupName:")] public NSString GroupName { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -127,13 +121,11 @@ public extern objc class MTRGroupsClusterGetGroupMembershipResponseParams : NSOb
     [Selector("groupList", "setGroupList:")] public NSArray GroupList { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
 public extern objc class MTRGroupsClusterRemoveGroupParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("groupID", "setGroupID:")] public NSNumber GroupID { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -149,11 +141,9 @@ public extern objc class MTRGroupsClusterRemoveGroupParams
 public extern objc class MTRGroupsClusterRemoveGroupResponseParams : NSObject, NSCopying
 {
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 13.3 and later.
     [Selector("groupID", "setGroupID:")] public NSNumber GroupID { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -172,7 +162,6 @@ public extern objc class MTRGroupsClusterRemoveAllGroupsParams : NSObject, NSCop
 
 public extern objc class MTRGroupsClusterAddGroupIfIdentifyingParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("groupID", "setGroupID:")] public NSNumber GroupID { get; set; }
     [Selector("groupName", "setGroupName:")] public NSString GroupName { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -206,7 +195,6 @@ public extern objc class MTROnOffClusterToggleParams : NSObject, NSCopying
 
 public extern objc class MTROnOffClusterOffWithEffectParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("effectIdentifier", "setEffectIdentifier:")] public NSNumber EffectIdentifier { get; set; }
     [Selector("effectVariant", "setEffectVariant:")] public NSNumber EffectVariant { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -446,24 +434,15 @@ public extern objc class MTRBasicClusterMfgSpecificPingParams : NSObject, NSCopy
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateProviderClusterQueryImageParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("vendorID", "setVendorID:")] public NSNumber VendorID { get; set; }
-    /// macOS 13.3 and later.
     [Selector("productID", "setProductID:")] public NSNumber ProductID { get; set; }
-    /// macOS 13.3 and later.
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
-    /// macOS 13.3 and later.
     [Selector("protocolsSupported", "setProtocolsSupported:")] public NSArray ProtocolsSupported { get; set; }
-    /// macOS 13.3 and later.
     [Selector("hardwareVersion", "setHardwareVersion:")] public NSNumber? HardwareVersion { get; set; }
-    /// macOS 13.3 and later.
     [Selector("location", "setLocation:")] public NSString? Location { get; set; }
-    /// macOS 13.3 and later.
     [Selector("requestorCanConsent", "setRequestorCanConsent:")] public NSNumber? RequestorCanConsent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("metadataForProvider", "setMetadataForProvider:")] public NSData? MetadataForProvider { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -491,36 +470,24 @@ public extern objc class MTROtaSoftwareUpdateProviderClusterQueryImageParams : M
 /// Deprecated, a category of MTROTASoftwareUpdateProviderClusterQueryImageParams.
 public extern objc class MTROTASoftwareUpdateProviderClusterQueryImageParams
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("vendorId", "setVendorId:")] public NSNumber VendorId { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("productId", "setProductId:")] public NSNumber ProductId { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateProviderClusterQueryImageResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 13.3 and later.
     [Selector("delayedActionTime", "setDelayedActionTime:")] public NSNumber? DelayedActionTime { get; set; }
-    /// macOS 13.3 and later.
     [Selector("imageURI", "setImageURI:")] public NSString? ImageURI { get; set; }
-    /// macOS 13.3 and later.
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber? SoftwareVersion { get; set; }
-    /// macOS 13.3 and later.
     [Selector("softwareVersionString", "setSoftwareVersionString:")] public NSString? SoftwareVersionString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("updateToken", "setUpdateToken:")] public NSData? UpdateToken { get; set; }
-    /// macOS 13.3 and later.
     [Selector("userConsentNeeded", "setUserConsentNeeded:")] public NSNumber? UserConsentNeeded { get; set; }
-    /// macOS 13.3 and later.
     [Selector("metadataForRequestor", "setMetadataForRequestor:")] public NSData? MetadataForRequestor { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -547,12 +514,9 @@ public extern objc class MTROtaSoftwareUpdateProviderClusterQueryImageResponsePa
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("updateToken", "setUpdateToken:")] public NSData UpdateToken { get; set; }
-    /// macOS 13.3 and later.
     [Selector("getNewVersion", "setNewVersion:")] public NSNumber NewVersion { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -569,16 +533,12 @@ public extern objc class MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestPa
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("action", "setAction:")] public NSNumber Action { get; set; }
-    /// macOS 13.3 and later.
     [Selector("delayedActionTime", "setDelayedActionTime:")] public NSNumber DelayedActionTime { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -593,12 +553,9 @@ public extern objc class MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseP
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("updateToken", "setUpdateToken:")] public NSData UpdateToken { get; set; }
-    /// macOS 13.3 and later.
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -615,18 +572,12 @@ public extern objc class MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedP
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("providerNodeID", "setProviderNodeID:")] public NSNumber ProviderNodeID { get; set; }
-    /// macOS 13.3 and later.
     [Selector("vendorID", "setVendorID:")] public NSNumber VendorID { get; set; }
-    /// macOS 13.3 and later.
     [Selector("announcementReason", "setAnnouncementReason:")] public NSNumber AnnouncementReason { get; set; }
-    /// macOS 13.3 and later.
     [Selector("metadataForNode", "setMetadataForNode:")] public NSData? MetadataForNode { get; set; }
-    /// macOS 13.3 and later.
     [Selector("endpoint", "setEndpoint:")] public NSNumber Endpoint { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -648,10 +599,8 @@ public extern objc class MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProvider
 /// Deprecated, a category of MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams.
 public extern objc class MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("providerNodeId", "setProviderNodeId:")] public NSNumber ProviderNodeId { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("vendorId", "setVendorId:")] public NSNumber VendorId { get; set; }
 }
@@ -670,7 +619,6 @@ public extern objc class MTRGeneralCommissioningClusterArmFailSafeResponseParams
     [Selector("debugText", "setDebugText:")] public NSString DebugText { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -689,7 +637,6 @@ public extern objc class MTRGeneralCommissioningClusterSetRegulatoryConfigRespon
     [Selector("debugText", "setDebugText:")] public NSString DebugText { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -705,7 +652,6 @@ public extern objc class MTRGeneralCommissioningClusterCommissioningCompleteResp
     [Selector("debugText", "setDebugText:")] public NSString DebugText { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -725,7 +671,6 @@ public extern objc class MTRNetworkCommissioningClusterScanNetworksResponseParam
     [Selector("threadScanResults", "setThreadScanResults:")] public NSArray? ThreadScanResults { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -761,7 +706,6 @@ public extern objc class MTRNetworkCommissioningClusterNetworkConfigResponsePara
     [Selector("networkIndex", "setNetworkIndex:")] public NSNumber? NetworkIndex { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -780,7 +724,6 @@ public extern objc class MTRNetworkCommissioningClusterConnectNetworkResponsePar
     [Selector("errorValue", "setErrorValue:")] public NSNumber? ErrorValue { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -797,7 +740,6 @@ public extern objc class MTRDiagnosticLogsClusterRetrieveLogsRequestParams : NSO
 {
     [Selector("intent", "setIntent:")] public NSNumber Intent { get; set; }
     [Selector("requestedProtocol", "setRequestedProtocol:")] public NSNumber RequestedProtocol { get; set; }
-    /// macOS 13.4 and later.
     [Selector("transferFileDesignator", "setTransferFileDesignator:")] public NSString? TransferFileDesignator { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -806,14 +748,11 @@ public extern objc class MTRDiagnosticLogsClusterRetrieveLogsRequestParams : NSO
 public extern objc class MTRDiagnosticLogsClusterRetrieveLogsResponseParams : NSObject, NSCopying
 {
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 13.3 and later.
     [Selector("logContent", "setLogContent:")] public NSData LogContent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("utcTimeStamp", "setUtcTimeStamp:")] public NSNumber? UtcTimeStamp { get; set; }
     [Selector("timeSinceBoot", "setTimeSinceBoot:")] public NSNumber? TimeSinceBoot { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -898,14 +837,10 @@ public extern objc class MTREthernetNetworkDiagnosticsClusterResetCountsParams :
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.2 and later.
 public extern objc class MTRTimeSynchronizationClusterSetUTCTimeParams : NSObject, NSCopying
 {
-    /// macOS 14.2 and later.
     [Selector("utcTime", "setUtcTime:")] public NSNumber UtcTime { get; set; }
-    /// macOS 14.2 and later.
     [Selector("granularity", "setGranularity:")] public NSNumber Granularity { get; set; }
-    /// macOS 14.2 and later.
     [Selector("timeSource", "setTimeSource:")] public NSNumber? TimeSource { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -979,7 +914,6 @@ public extern objc class MTRBridgedDeviceBasicInformationClusterKeepActiveParams
 public extern objc class MTRAdministratorCommissioningClusterOpenCommissioningWindowParams : NSObject, NSCopying
 {
     [Selector("commissioningTimeout", "setCommissioningTimeout:")] public NSNumber CommissioningTimeout { get; set; }
-    /// macOS 13.3 and later.
     [Selector("pakePasscodeVerifier", "setPakePasscodeVerifier:")] public NSData PakePasscodeVerifier { get; set; }
     [Selector("discriminator", "setDiscriminator:")] public NSNumber Discriminator { get; set; }
     [Selector("iterations", "setIterations:")] public NSNumber Iterations { get; set; }
@@ -1018,11 +952,9 @@ public extern objc class MTROperationalCredentialsClusterAttestationRequestParam
 public extern objc class MTROperationalCredentialsClusterAttestationResponseParams : NSObject, NSCopying
 {
     [Selector("attestationElements", "setAttestationElements:")] public NSData AttestationElements { get; set; }
-    /// macOS 13.3 and later.
     [Selector("attestationSignature", "setAttestationSignature:")] public NSData AttestationSignature { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1045,7 +977,6 @@ public extern objc class MTROperationalCredentialsClusterCertificateChainRespons
     [Selector("certificate", "setCertificate:")] public NSData Certificate { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1063,7 +994,6 @@ public extern objc class MTROperationalCredentialsClusterCSRResponseParams : NSO
     [Selector("attestationSignature", "setAttestationSignature:")] public NSData AttestationSignature { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1093,7 +1023,6 @@ public extern objc class MTROperationalCredentialsClusterNOCResponseParams : NSO
     [Selector("debugText", "setDebugText:")] public NSString? DebugText { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1113,7 +1042,6 @@ public extern objc class MTROperationalCredentialsClusterRemoveFabricParams : NS
 
 public extern objc class MTROperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("rootCACertificate", "setRootCACertificate:")] public NSData RootCACertificate { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -1145,7 +1073,6 @@ public extern objc class MTRGroupKeyManagementClusterKeySetReadResponseParams : 
     [Selector("groupKeySet", "setGroupKeySet:")] public MTRGroupKeyManagementClusterGroupKeySetStruct GroupKeySet { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1167,7 +1094,6 @@ public extern objc class MTRGroupKeyManagementClusterKeySetReadAllIndicesRespons
     [Selector("groupKeySetIDs", "setGroupKeySetIDs:")] public NSArray GroupKeySetIDs { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1316,43 +1242,31 @@ public extern objc class MTRRefrigeratorAndTemperatureControlledCabinetModeClust
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCRunModeClusterChangeToModeParams : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("getNewMode", "setNewMode:")] public NSNumber NewMode { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCRunModeClusterChangeToModeResponseParams : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 14.4 and later.
     [Selector("statusText", "setStatusText:")] public NSString? StatusText { get; set; }
-    /// macOS 14.4 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCCleanModeClusterChangeToModeParams : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("getNewMode", "setNewMode:")] public NSNumber NewMode { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCCleanModeClusterChangeToModeResponseParams : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 14.4 and later.
     [Selector("statusText", "setStatusText:")] public NSString? StatusText { get; set; }
-    /// macOS 14.4 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1387,7 +1301,6 @@ public extern objc class MTRDishwasherModeClusterChangeToModeResponseParams : NS
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterSelfTestRequestParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -1436,63 +1349,51 @@ public extern objc class MTRMicrowaveOvenControlClusterAddMoreTimeParams : NSObj
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterPauseParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterStopParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterStartParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterResumeParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterOperationalCommandResponseParams : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("commandResponseState", "setCommandResponseState:")] public MTROperationalStateClusterErrorStateStruct CommandResponseState { get; set; }
-    /// macOS 14.4 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCOperationalStateClusterPauseParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCOperationalStateClusterResumeParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCOperationalStateClusterOperationalCommandResponseParams : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("commandResponseState", "setCommandResponseState:")] public MTRRVCOperationalStateClusterErrorStateStruct CommandResponseState { get; set; }
-    /// macOS 14.4 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1503,50 +1404,40 @@ public extern objc class MTRRVCOperationalStateClusterGoHomeParams : NSObject, N
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRHEPAFilterMonitoringClusterResetConditionParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRActivatedCarbonFilterMonitoringClusterResetConditionParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRBooleanStateConfigurationClusterSuppressAlarmParams : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmsToSuppress", "setAlarmsToSuppress:")] public NSNumber AlarmsToSuppress { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRBooleanStateConfigurationClusterEnableDisableAlarmParams : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmsToEnableDisable", "setAlarmsToEnableDisable:")] public NSNumber AlarmsToEnableDisable { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRValveConfigurationAndControlClusterOpenParams : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("openDuration", "setOpenDuration:")] public NSNumber? OpenDuration { get; set; }
-    /// macOS 14.6 and later.
     [Selector("targetLevel", "setTargetLevel:")] public NSNumber? TargetLevel { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRValveConfigurationAndControlClusterCloseParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -1853,7 +1744,6 @@ public extern objc class MTRDoorLockClusterGetWeekDayScheduleResponseParams : NS
     [Selector("endMinute", "setEndMinute:")] public NSNumber? EndMinute { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1892,7 +1782,6 @@ public extern objc class MTRDoorLockClusterGetYearDayScheduleResponseParams : NS
     [Selector("localEndTime", "setLocalEndTime:")] public NSNumber? LocalEndTime { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1930,7 +1819,6 @@ public extern objc class MTRDoorLockClusterGetHolidayScheduleResponseParams : NS
     [Selector("operatingMode", "setOperatingMode:")] public NSNumber? OperatingMode { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -1946,7 +1834,6 @@ public extern objc class MTRDoorLockClusterSetUserParams : NSObject, NSCopying
     [Selector("operationType", "setOperationType:")] public NSNumber OperationType { get; set; }
     [Selector("userIndex", "setUserIndex:")] public NSNumber UserIndex { get; set; }
     [Selector("userName", "setUserName:")] public NSString? UserName { get; set; }
-    /// macOS 13.3 and later.
     [Selector("userUniqueID", "setUserUniqueID:")] public NSNumber? UserUniqueID { get; set; }
     [Selector("userStatus", "setUserStatus:")] public NSNumber? UserStatus { get; set; }
     [Selector("userType", "setUserType:")] public NSNumber? UserType { get; set; }
@@ -1973,7 +1860,6 @@ public extern objc class MTRDoorLockClusterGetUserResponseParams : NSObject, NSC
 {
     [Selector("userIndex", "setUserIndex:")] public NSNumber UserIndex { get; set; }
     [Selector("userName", "setUserName:")] public NSString? UserName { get; set; }
-    /// macOS 13.3 and later.
     [Selector("userUniqueID", "setUserUniqueID:")] public NSNumber? UserUniqueID { get; set; }
     [Selector("userStatus", "setUserStatus:")] public NSNumber? UserStatus { get; set; }
     [Selector("userType", "setUserType:")] public NSNumber? UserType { get; set; }
@@ -1984,7 +1870,6 @@ public extern objc class MTRDoorLockClusterGetUserResponseParams : NSObject, NSC
     [Selector("nextUserIndex", "setNextUserIndex:")] public NSNumber? NextUserIndex { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2021,7 +1906,6 @@ public extern objc class MTRDoorLockClusterSetCredentialResponseParams : NSObjec
     [Selector("nextCredentialIndex", "setNextCredentialIndex:")] public NSNumber? NextCredentialIndex { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2043,7 +1927,6 @@ public extern objc class MTRDoorLockClusterGetCredentialStatusResponseParams : N
     [Selector("credentialData", "setCredentialData:")] public NSData? CredentialData { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2187,7 +2070,6 @@ public extern objc class MTRThermostatClusterGetWeeklyScheduleResponseParams : N
     [Selector("transitions", "setTransitions:")] public NSArray Transitions { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2259,14 +2141,10 @@ public extern objc class MTRThermostatClusterAtomicRequestParams : NSObject, NSC
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRFanControlClusterStepParams : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("direction", "setDirection:")] public NSNumber Direction { get; set; }
-    /// macOS 14.6 and later.
     [Selector("wrap", "setWrap:")] public NSNumber? Wrap { get; set; }
-    /// macOS 14.6 and later.
     [Selector("lowestOff", "setLowestOff:")] public NSNumber? LowestOff { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -2380,7 +2258,6 @@ public extern objc class MTRColorControlClusterStepColorParams : NSObject, NSCop
 
 public extern objc class MTRColorControlClusterMoveToColorTemperatureParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("colorTemperatureMireds", "setColorTemperatureMireds:")] public NSNumber ColorTemperatureMireds { get; set; }
     [Selector("transitionTime", "setTransitionTime:")] public NSNumber TransitionTime { get; set; }
     [Selector("optionsMask", "setOptionsMask:")] public NSNumber OptionsMask { get; set; }
@@ -2593,7 +2470,6 @@ public extern objc class MTRChannelClusterChangeChannelResponseParams : NSObject
     [Selector("data", "setData:")] public NSString? Data { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2682,7 +2558,6 @@ public extern objc class MTRTargetNavigatorClusterNavigateTargetResponseParams :
     [Selector("data", "setData:")] public NSString? Data { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2698,7 +2573,6 @@ public extern objc class MTRMediaPlaybackClusterPauseParams : NSObject, NSCopyin
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRMediaPlaybackClusterStopParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -2766,7 +2640,6 @@ public extern objc class MTRMediaPlaybackClusterPlaybackResponseParams : NSObjec
     [Selector("data", "setData:")] public NSString? Data { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2849,7 +2722,6 @@ public extern objc class MTRKeypadInputClusterSendKeyResponseParams : NSObject, 
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2873,16 +2745,12 @@ public extern objc class MTRContentLauncherClusterLaunchURLParams : NSObject, NS
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRContentLauncherClusterLauncherResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("status", "setStatus:")] public NSNumber Status { get; set; }
-    /// macOS 13.3 and later.
     [Selector("data", "setData:")] public NSString? Data { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2940,7 +2808,6 @@ public extern objc class MTRApplicationLauncherClusterLauncherResponseParams : N
     [Selector("data", "setData:")] public NSData? Data { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -2956,7 +2823,6 @@ public extern objc class MTRAccountLoginClusterGetSetupPINResponseParams : NSObj
     [Selector("setupPIN", "setSetupPIN:")] public NSString SetupPIN { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3045,7 +2911,6 @@ public extern objc class MTRCommissionerControlClusterReverseOpenCommissioningWi
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -3059,14 +2924,11 @@ public extern objc class MTRTestClusterClusterTestParams : MTRUnitTestingCluster
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestSpecificResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("returnValue", "setReturnValue:")] public NSNumber ReturnValue { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3079,7 +2941,6 @@ public extern objc class MTRTestClusterClusterTestSpecificResponseParams : MTRUn
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestNotHandledParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -3093,14 +2954,11 @@ public extern objc class MTRTestClusterClusterTestNotHandledParams : MTRUnitTest
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestAddArgumentsResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("returnValue", "setReturnValue:")] public NSNumber ReturnValue { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3113,7 +2971,6 @@ public extern objc class MTRTestClusterClusterTestAddArgumentsResponseParams : M
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestSpecificParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -3127,14 +2984,11 @@ public extern objc class MTRTestClusterClusterTestSpecificParams : MTRUnitTestin
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestSimpleArgumentResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("returnValue", "setReturnValue:")] public NSNumber ReturnValue { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3147,7 +3001,6 @@ public extern objc class MTRTestClusterClusterTestSimpleArgumentResponseParams :
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestUnknownCommandParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -3161,24 +3014,16 @@ public extern objc class MTRTestClusterClusterTestUnknownCommandParams : MTRUnit
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestStructArrayArgumentResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSArray Arg1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg2", "setArg2:")] public NSArray Arg2 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg3", "setArg3:")] public NSArray Arg3 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg4", "setArg4:")] public NSArray Arg4 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg5", "setArg5:")] public NSNumber Arg5 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg6", "setArg6:")] public NSNumber Arg6 { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3201,12 +3046,9 @@ public extern objc class MTRTestClusterClusterTestStructArrayArgumentResponsePar
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestAddArgumentsParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber Arg1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg2", "setArg2:")] public NSNumber Arg2 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3223,14 +3065,11 @@ public extern objc class MTRTestClusterClusterTestAddArgumentsParams : MTRUnitTe
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestListInt8UReverseResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSArray Arg1 { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3243,10 +3082,8 @@ public extern objc class MTRTestClusterClusterTestListInt8UReverseResponseParams
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestSimpleArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3261,16 +3098,12 @@ public extern objc class MTRTestClusterClusterTestSimpleArgumentRequestParams : 
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestEnumsResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber Arg1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg2", "setArg2:")] public NSNumber Arg2 { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3285,20 +3118,13 @@ public extern objc class MTRTestClusterClusterTestEnumsResponseParams : MTRUnitT
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestStructArrayArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSArray Arg1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg2", "setArg2:")] public NSArray Arg2 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg3", "setArg3:")] public NSArray Arg3 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg4", "setArg4:")] public NSArray Arg4 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg5", "setArg5:")] public NSNumber Arg5 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg6", "setArg6:")] public NSNumber Arg6 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3323,20 +3149,14 @@ public extern objc class MTRTestClusterClusterTestStructArrayArgumentRequestPara
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestNullableOptionalResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("wasPresent", "setWasPresent:")] public NSNumber WasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("wasNull", "setWasNull:")] public NSNumber? WasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("value", "setValue:")] public NSNumber? Value { get; set; }
-    /// macOS 13.3 and later.
     [Selector("originalValue", "setOriginalValue:")] public NSNumber? OriginalValue { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3355,10 +3175,8 @@ public extern objc class MTRTestClusterClusterTestNullableOptionalResponseParams
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestStructArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public MTRUnitTestingClusterSimpleStruct Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3373,68 +3191,38 @@ public extern objc class MTRTestClusterClusterTestStructArgumentRequestParams : 
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestComplexNullableOptionalResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("nullableIntWasNull", "setNullableIntWasNull:")] public NSNumber NullableIntWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableIntValue", "setNullableIntValue:")] public NSNumber? NullableIntValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalIntWasPresent", "setOptionalIntWasPresent:")] public NSNumber OptionalIntWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalIntValue", "setOptionalIntValue:")] public NSNumber? OptionalIntValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalIntWasPresent", "setNullableOptionalIntWasPresent:")] public NSNumber NullableOptionalIntWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalIntWasNull", "setNullableOptionalIntWasNull:")] public NSNumber? NullableOptionalIntWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalIntValue", "setNullableOptionalIntValue:")] public NSNumber? NullableOptionalIntValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableStringWasNull", "setNullableStringWasNull:")] public NSNumber NullableStringWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableStringValue", "setNullableStringValue:")] public NSString? NullableStringValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalStringWasPresent", "setOptionalStringWasPresent:")] public NSNumber OptionalStringWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalStringValue", "setOptionalStringValue:")] public NSString? OptionalStringValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStringWasPresent", "setNullableOptionalStringWasPresent:")] public NSNumber NullableOptionalStringWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStringWasNull", "setNullableOptionalStringWasNull:")] public NSNumber? NullableOptionalStringWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStringValue", "setNullableOptionalStringValue:")] public NSString? NullableOptionalStringValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableStructWasNull", "setNullableStructWasNull:")] public NSNumber NullableStructWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableStructValue", "setNullableStructValue:")] public MTRUnitTestingClusterSimpleStruct? NullableStructValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalStructWasPresent", "setOptionalStructWasPresent:")] public NSNumber OptionalStructWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalStructValue", "setOptionalStructValue:")] public MTRUnitTestingClusterSimpleStruct? OptionalStructValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStructWasPresent", "setNullableOptionalStructWasPresent:")] public NSNumber NullableOptionalStructWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStructWasNull", "setNullableOptionalStructWasNull:")] public NSNumber? NullableOptionalStructWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStructValue", "setNullableOptionalStructValue:")] public MTRUnitTestingClusterSimpleStruct? NullableOptionalStructValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableListWasNull", "setNullableListWasNull:")] public NSNumber NullableListWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableListValue", "setNullableListValue:")] public NSArray? NullableListValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalListWasPresent", "setOptionalListWasPresent:")] public NSNumber OptionalListWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalListValue", "setOptionalListValue:")] public NSArray? OptionalListValue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalListWasPresent", "setNullableOptionalListWasPresent:")] public NSNumber NullableOptionalListWasPresent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalListWasNull", "setNullableOptionalListWasNull:")] public NSNumber? NullableOptionalListWasNull { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalListValue", "setNullableOptionalListValue:")] public NSArray? NullableOptionalListValue { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3501,10 +3289,8 @@ public extern objc class MTRTestClusterClusterTestComplexNullableOptionalRespons
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestNestedStructArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public MTRUnitTestingClusterNestedStruct Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3519,14 +3305,11 @@ public extern objc class MTRTestClusterClusterTestNestedStructArgumentRequestPar
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterBooleanResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("value", "setValue:")] public NSNumber Value { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3539,10 +3322,8 @@ public extern objc class MTRTestClusterClusterBooleanResponseParams : MTRUnitTes
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestListStructArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSArray Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3557,14 +3338,11 @@ public extern objc class MTRTestClusterClusterTestListStructArgumentRequestParam
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterSimpleStructResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public MTRUnitTestingClusterSimpleStruct Arg1 { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3577,10 +3355,8 @@ public extern objc class MTRTestClusterClusterSimpleStructResponseParams : MTRUn
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestListInt8UArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSArray Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3595,14 +3371,11 @@ public extern objc class MTRTestClusterClusterTestListInt8UArgumentRequestParams
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestEmitTestEventResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("value", "setValue:")] public NSNumber Value { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3615,10 +3388,8 @@ public extern objc class MTRTestClusterClusterTestEmitTestEventResponseParams : 
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestNestedStructListArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public MTRUnitTestingClusterNestedStructList Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3633,14 +3404,11 @@ public extern objc class MTRTestClusterClusterTestNestedStructListArgumentReques
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("value", "setValue:")] public NSNumber Value { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
@@ -3653,10 +3421,8 @@ public extern objc class MTRTestClusterClusterTestEmitTestFabricScopedEventRespo
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSArray Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3671,10 +3437,8 @@ public extern objc class MTRTestClusterClusterTestListNestedStructListArgumentRe
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestListInt8UReverseRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSArray Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3689,12 +3453,9 @@ public extern objc class MTRTestClusterClusterTestListInt8UReverseRequestParams 
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestEnumsRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber Arg1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg2", "setArg2:")] public NSNumber Arg2 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3711,10 +3472,8 @@ public extern objc class MTRTestClusterClusterTestEnumsRequestParams : MTRUnitTe
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestNullableOptionalRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber? Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3729,32 +3488,19 @@ public extern objc class MTRTestClusterClusterTestNullableOptionalRequestParams 
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestComplexNullableOptionalRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("nullableInt", "setNullableInt:")] public NSNumber? NullableInt { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalInt", "setOptionalInt:")] public NSNumber? OptionalInt { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalInt", "setNullableOptionalInt:")] public NSNumber? NullableOptionalInt { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableString", "setNullableString:")] public NSString? NullableString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalString", "setOptionalString:")] public NSString? OptionalString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalString", "setNullableOptionalString:")] public NSString? NullableOptionalString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableStruct", "setNullableStruct:")] public MTRUnitTestingClusterSimpleStruct? NullableStruct { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalStruct", "setOptionalStruct:")] public MTRUnitTestingClusterSimpleStruct? OptionalStruct { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStruct", "setNullableOptionalStruct:")] public MTRUnitTestingClusterSimpleStruct? NullableOptionalStruct { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableList", "setNullableList:")] public NSArray? NullableList { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalList", "setOptionalList:")] public NSArray? OptionalList { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalList", "setNullableOptionalList:")] public NSArray? NullableOptionalList { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3791,10 +3537,8 @@ public extern objc class MTRTestClusterClusterTestComplexNullableOptionalRequest
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterSimpleStructEchoRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public MTRUnitTestingClusterSimpleStruct Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3809,7 +3553,6 @@ public extern objc class MTRTestClusterClusterSimpleStructEchoRequestParams : MT
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTimedInvokeRequestParams : NSObject, NSCopying
 {
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
@@ -3823,10 +3566,8 @@ public extern objc class MTRTestClusterClusterTimedInvokeRequestParams : MTRUnit
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber? Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3841,14 +3582,10 @@ public extern objc class MTRTestClusterClusterTestSimpleOptionalArgumentRequestP
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestEmitTestEventRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber Arg1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg2", "setArg2:")] public NSNumber Arg2 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg3", "setArg3:")] public NSNumber Arg3 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
@@ -3867,10 +3604,8 @@ public extern objc class MTRTestClusterClusterTestEmitTestEventRequestParams : M
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber Arg1 { get; set; }
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
     [Selector("serverSideProcessingTimeout", "setServerSideProcessingTimeout:")] public NSNumber? ServerSideProcessingTimeout { get; set; }

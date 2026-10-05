@@ -75,7 +75,6 @@ public extern objc class NSResponder : NSObject, NSCoding
     [Selector("touchesCancelledWithEvent:")] public void TouchesCancelledWithEvent(NSEvent event);
     [Selector("quickLookWithEvent:")] public void QuickLookWithEvent(NSEvent event);
     [Selector("pressureChangeWithEvent:")] public void PressureChangeWithEvent(NSEvent event);
-    /// macOS 15.0 and later.
     [Selector("contextMenuKeyDown:")] public void ContextMenuKeyDown(NSEvent event);
     [Selector("noResponderFor:")] public void NoResponderFor(Selector eventSelector);
     [Selector("becomeFirstResponder")] public bool BecomeFirstResponder();
@@ -187,7 +186,6 @@ public objc interface NSStandardKeyBindingResponding : NSObjectProtocol
     [Optional] [Selector("makeTextWritingDirectionLeftToRight:")] void MakeTextWritingDirectionLeftToRight(AnyObject? sender);
     [Optional] [Selector("makeTextWritingDirectionRightToLeft:")] void MakeTextWritingDirectionRightToLeft(AnyObject? sender);
     [Optional] [Selector("quickLookPreviewItems:")] void QuickLookPreviewItems(AnyObject? sender);
-    /// macOS 15.0 and later.
     [Optional] [Selector("showContextMenuForSelection:")] void ShowContextMenuForSelection(AnyObject? sender);
 }
 

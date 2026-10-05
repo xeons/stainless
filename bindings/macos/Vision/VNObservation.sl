@@ -102,7 +102,6 @@ public extern objc class VNRectangleObservation : VNDetectedObjectObservation
     [Selector("bottomRight")] public CGPoint BottomRight { get; }
     /// Deprecated in macOS 14.0.
     [Selector("rectangleObservationWithRequestRevision:topLeft:bottomLeft:bottomRight:topRight:")] public static Self RectangleObservationWithRequestRevisionTopLeftBottomLeftBottomRightTopRight(NSUInteger requestRevision, CGPoint topLeft, CGPoint bottomLeft, CGPoint bottomRight, CGPoint topRight);
-    /// macOS 14.0 and later.
     [Selector("rectangleObservationWithRequestRevision:topLeft:topRight:bottomRight:bottomLeft:")] public static Self RectangleObservationWithRequestRevisionTopLeftTopRightBottomRightBottomLeft(NSUInteger requestRevision, CGPoint topLeft, CGPoint topRight, CGPoint bottomRight, CGPoint bottomLeft);
 }
 
@@ -136,17 +135,11 @@ public extern objc class VNBarcodeObservation : VNRectangleObservation
     [Selector("symbology")] public VNBarcodeSymbology Symbology { get; }
     [Selector("barcodeDescriptor")] public CIBarcodeDescriptor? BarcodeDescriptor { get; }
     [Selector("payloadStringValue")] public NSString? PayloadStringValue { get; }
-    /// macOS 14.0 and later.
     [Selector("payloadData")] public NSData? PayloadData { get; }
-    /// macOS 14.0 and later.
     [Selector("isGS1DataCarrier")] public bool IsGS1DataCarrier { get; }
-    /// macOS 14.0 and later.
     [Selector("isColorInverted")] public bool IsColorInverted { get; }
-    /// macOS 14.0 and later.
     [Selector("supplementalCompositeType")] public VNBarcodeCompositeType SupplementalCompositeType { get; }
-    /// macOS 14.0 and later.
     [Selector("supplementalPayloadString")] public NSString? SupplementalPayloadString { get; }
-    /// macOS 14.0 and later.
     [Selector("supplementalPayloadData")] public NSData? SupplementalPayloadData { get; }
 }
 
@@ -208,7 +201,6 @@ public extern objc class VNHumanObservation : VNDetectedObjectObservation
     [Selector("upperBodyOnly")] public bool UpperBodyOnly { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class VNInstanceMaskObservation : VNObservation
 {
     [Selector("instanceMask")] public CVPixelBufferRef? InstanceMask { get; }
@@ -218,7 +210,6 @@ public extern objc class VNInstanceMaskObservation : VNObservation
     [ReturnsRetained] [Selector("generateScaledMaskForImageForInstances:fromRequestHandler:error:")] public CVPixelBufferRef? GenerateScaledMaskForImageForInstancesFromRequestHandlerError(NSIndexSet instances, VNImageRequestHandler requestHandler, out NSError? error);
 }
 
-/// macOS 14.0 and later.
 public extern objc class VNAnimalBodyPoseObservation : VNRecognizedPointsObservation
 {
     [Selector("availableJointNames")] public NSArray AvailableJointNames { get; }
@@ -243,7 +234,6 @@ public enum VNHumanBodyPose3DObservationHeightEstimation : long
     Measured = 1,
 }
 
-/// macOS 14.0 and later.
 public extern objc class VNHumanBodyPose3DObservation : VNRecognizedPoints3DObservation
 {
     [Selector("heightEstimation")] public VNHumanBodyPose3DObservationHeightEstimation HeightEstimation { get; }
@@ -258,7 +248,6 @@ public extern objc class VNHumanBodyPose3DObservation : VNRecognizedPoints3DObse
     [Selector("getCameraRelativePosition:forJointName:error:")] public bool GetCameraRelativePositionForJointNameError(simd_float4x4* modelPositionOut, VNHumanBodyPose3DObservationJointName jointName, out NSError? error);
 }
 
-/// macOS 15.0 and later.
 public extern objc class VNImageAestheticsScoresObservation : VNObservation
 {
     [Selector("isUtility")] public bool IsUtility { get; }

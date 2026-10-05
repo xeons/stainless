@@ -59,7 +59,6 @@ public extern objc class CKShare : CKRecord, NSSecureCoding, NSCopying
     [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder aDecoder);
     [Selector("addParticipant:")] public void AddParticipant(CKShareParticipant participant);
     [Selector("removeParticipant:")] public void RemoveParticipant(CKShareParticipant participant);
-    /// macOS 15.0 and later.
     [Selector("oneTimeURLForParticipantID:")] public NSURL? OneTimeURLForParticipantID(NSString participantID);
     /// macOS 26.0 and later.
     [Selector("denyRequesters:")] public void DenyRequesters(NSArray requesters);

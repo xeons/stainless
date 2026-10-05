@@ -32,28 +32,20 @@ import Standard.ObjC;
 
 public using AXTechnology = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologyVoiceOver;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologySwitchControl;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologyVoiceControl;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologyFullKeyboardAccess;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologySpeakScreen;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologyAutomation;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologyHoverText;
 
-/// macOS 15.0 and later.
 public extern "C" AXTechnology? AXTechnologyZoom;
 
 #endif

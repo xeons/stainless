@@ -33,13 +33,10 @@ import Standard.ObjC;
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialAssertionRequest : ASAuthorizationRequest, ASAuthorizationPublicKeyCredentialAssertionRequest
 {
     [Selector("allowedCredentials", "setAllowedCredentials:")] public NSArray AllowedCredentials { get; set; }
-    /// macOS 14.0 and later.
     [Selector("largeBlob", "setLargeBlob:")] public ASAuthorizationPublicKeyCredentialLargeBlobAssertionInput? LargeBlob { get; set; }
-    /// macOS 15.0 and later.
     [Selector("prf", "setPrf:")] public ASAuthorizationPublicKeyCredentialPRFAssertionInput? Prf { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialAssertionRequest : ASAuthorizationWebBrowserExternallyAuthenticatableRequest { }
 
 #endif

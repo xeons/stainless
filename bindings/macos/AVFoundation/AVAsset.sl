@@ -162,7 +162,6 @@ public extern objc class AVAsset
 
 public extern "C" NSString AVURLAssetPreferPreciseDurationAndTimingKey;
 
-/// macOS 14.0 and later.
 public extern "C" NSString AVURLAssetOverrideMIMETypeKey;
 
 public extern "C" NSString? AVURLAssetReferenceRestrictionsKey;
@@ -231,7 +230,6 @@ public extern objc class AVURLAsset
 /// AVURLAssetNSItemProvider, a category of AVURLAsset.
 public extern objc class AVURLAsset : NSItemProviderReading, NSItemProviderWriting { }
 
-/// macOS 15.0 and later.
 public extern objc class AVMediaExtensionProperties : NSObject, NSCopying
 {
     [Selector("extensionIdentifier")] public NSString ExtensionIdentifier { get; }
@@ -241,7 +239,6 @@ public extern objc class AVMediaExtensionProperties : NSObject, NSCopying
     [Selector("containingBundleURL")] public NSURL ContainingBundleURL { get; }
 }
 
-/// macOS 15.0 and later.
 /// AVMediaExtension, a category of AVURLAsset.
 public extern objc class AVURLAsset
 {

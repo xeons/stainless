@@ -43,15 +43,12 @@ public objc closure void NEAppProxyUDPFlowWriteDatagramsSentByEndpointsCompletio
 
 public extern objc class NEAppProxyUDPFlow : NEAppProxyFlow
 {
-    /// macOS 15.0 and later.
     [Selector("localFlowEndpoint")] public nw_endpoint_t? LocalFlowEndpoint { get; }
     /// Deprecated in macOS 15.0.
     [Selector("localEndpoint")] public NWEndpoint? LocalEndpoint { get; }
-    /// macOS 15.0 and later.
     [Selector("readDatagramsAndFlowEndpointsWithCompletionHandler:")] public void ReadDatagramsAndFlowEndpointsWithCompletionHandler(NEAppProxyUDPFlowReadDatagramsAndFlowEndpointsWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
     [Selector("readDatagramsWithCompletionHandler:")] public void ReadDatagramsWithCompletionHandler(NEAppProxyUDPFlowReadDatagramsWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 15.0 and later.
     [Selector("writeDatagrams:sentByFlowEndpoints:completionHandler:")] public void WriteDatagramsSentByFlowEndpointsCompletionHandler(NSArray datagrams, NWEndpointArray remoteEndpoints, NEAppProxyUDPFlowWriteDatagramsSentByFlowEndpointsCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
     [Selector("writeDatagrams:sentByEndpoints:completionHandler:")] public void WriteDatagramsSentByEndpointsCompletionHandler(NSArray datagrams, NSArray remoteEndpoints, NEAppProxyUDPFlowWriteDatagramsSentByEndpointsCompletionHandlerCompletionHandlerBlock completionHandler);

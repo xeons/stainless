@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMIDI")
 
-/// macOS 15.0 and later.
 public extern objc class MIDIUMPMutableEndpoint : MIDIUMPEndpoint
 {
     [Selector("mutableFunctionBlocks", "setMutableFunctionBlocks:")] public NSArray MutableFunctionBlocks { get; set; }

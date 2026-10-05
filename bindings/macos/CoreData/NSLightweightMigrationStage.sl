@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreData")
 
-/// macOS 14.0 and later.
 public extern objc class NSLightweightMigrationStage : NSMigrationStage
 {
     [Selector("versionChecksums")] public NSArray VersionChecksums { get; }

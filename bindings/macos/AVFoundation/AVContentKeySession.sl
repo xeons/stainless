@@ -104,9 +104,7 @@ public objc interface AVContentKeySessionDelegate : NSObjectProtocol
     [Optional] [Selector("contentKeySession:contentKeyRequestDidSucceed:")] void ContentKeySessionContentKeyRequestDidSucceed(AVContentKeySession session, AVContentKeyRequest keyRequest);
     [Optional] [Selector("contentKeySessionContentProtectionSessionIdentifierDidChange:")] void ContentKeySessionContentProtectionSessionIdentifierDidChange(AVContentKeySession session);
     [Optional] [Selector("contentKeySessionDidGenerateExpiredSessionReport:")] void ContentKeySessionDidGenerateExpiredSessionReport(AVContentKeySession session);
-    /// macOS 14.4 and later.
     [Optional] [Selector("contentKeySession:externalProtectionStatusDidChangeForContentKey:")] void ContentKeySessionExternalProtectionStatusDidChangeForContentKey(AVContentKeySession session, AVContentKey contentKey);
-    /// macOS 14.4 and later.
     [Optional] [Selector("contentKeySession:didProvideContentKeyRequests:forInitializationData:")] void ContentKeySessionDidProvideContentKeyRequestsForInitializationData(AVContentKeySession session, NSArray keyRequests, NSData? initializationData);
 }
 
@@ -183,7 +181,6 @@ public extern objc class AVContentKeySpecifier : NSObject
     [Selector("initForKeySystem:identifier:options:")] public Self InitForKeySystemIdentifierOptions(AVContentKeySystem keySystem, AnyObject contentKeyIdentifier, NSDictionary options);
 }
 
-/// macOS 14.4 and later.
 public enum AVExternalContentProtectionStatus : long
 {
     Pending = 0,
@@ -194,9 +191,7 @@ public enum AVExternalContentProtectionStatus : long
 public extern objc class AVContentKey : NSObject
 {
     [Selector("contentKeySpecifier")] public AVContentKeySpecifier ContentKeySpecifier { get; }
-    /// macOS 14.4 and later.
     [Selector("externalContentProtectionStatus")] public AVExternalContentProtectionStatus ExternalContentProtectionStatus { get; }
-    /// macOS 14.4 and later.
     [Selector("revoke")] public void Revoke();
 }
 

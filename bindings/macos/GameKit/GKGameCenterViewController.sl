@@ -52,10 +52,8 @@ public extern objc class GKGameCenterViewController
     [Selector("initWithState:")] public Self InitWithState(GKGameCenterViewControllerState state);
     [Selector("initWithLeaderboardID:playerScope:timeScope:")] public Self InitWithLeaderboardIDPlayerScopeTimeScope(NSString leaderboardID, GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope);
     [Selector("initWithLeaderboard:playerScope:")] public Self InitWithLeaderboardPlayerScope(GKLeaderboard leaderboard, GKLeaderboardPlayerScope playerScope);
-    /// macOS 15.0 and later.
     [Selector("initWithLeaderboardSetID:")] public Self InitWithLeaderboardSetID(NSString leaderboardSetID);
     [Selector("initWithAchievementID:")] public Self InitWithAchievementID(NSString achievementID);
-    /// macOS 15.0 and later.
     [Selector("initWithPlayer:")] public Self InitWithPlayer(GKPlayer player);
 }
 

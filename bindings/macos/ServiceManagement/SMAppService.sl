@@ -39,7 +39,6 @@ public enum SMAppServiceStatus : long
     NotFound = 3,
 }
 
-/// macOS 15.0 and later.
 public extern "C" NSString SMAppServiceErrorDomain;
 
 public objc closure void SMAppServiceUnregisterWithCompletionHandlerHandlerBlock(NSError? arg0);

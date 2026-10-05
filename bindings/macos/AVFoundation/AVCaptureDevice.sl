@@ -61,7 +61,6 @@ public extern objc class AVCaptureDevice : NSObject
     [Selector("isFollowingExternalSyncDevice")] public bool FollowingExternalSyncDevice { get; }
     /// macOS 26.0 and later.
     [Selector("minSupportedExternalSyncFrameDuration")] public CMTime MinSupportedExternalSyncFrameDuration { get; }
-    /// macOS 15.0 and later.
     [Selector("isAutoVideoFrameRateEnabled", "setAutoVideoFrameRateEnabled:")] public bool AutoVideoFrameRateEnabled { get; set; }
     [Selector("inputSources")] public NSArray InputSources { get; }
     [Selector("activeInputSource", "setActiveInputSource:")] public AVCaptureDeviceInputSource? ActiveInputSource { get; set; }
@@ -92,15 +91,12 @@ public extern objc class AVCaptureDevice
 
 public using AVCaptureDeviceType = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureDeviceType? AVCaptureDeviceTypeExternal;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureDeviceType? AVCaptureDeviceTypeMicrophone;
 
 public extern "C" AVCaptureDeviceType? AVCaptureDeviceTypeBuiltInWideAngleCamera;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureDeviceType? AVCaptureDeviceTypeContinuityCamera;
 
 public extern "C" AVCaptureDeviceType? AVCaptureDeviceTypeDeskViewCamera;
@@ -293,7 +289,6 @@ public extern objc class AVCaptureDevice { }
 /// AVCaptureDeviceVideoZoom, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    /// macOS 14.0 and later.
     [Selector("displayVideoZoomFactorMultiplier")] public CGFloat DisplayVideoZoomFactorMultiplier { get; }
 }
 
@@ -361,7 +356,6 @@ public extern objc class AVCaptureDevice
     [Selector("centerStageControlMode", "setCenterStageControlMode:")] public static AVCaptureCenterStageControlMode CenterStageControlMode { get; set; }
     [Selector("isCenterStageEnabled", "setCenterStageEnabled:")] public static bool CenterStageEnabled { get; set; }
     [Selector("isCenterStageActive")] public bool CenterStageActive { get; }
-    /// macOS 13.3 and later.
     [Selector("centerStageRectOfInterest", "setCenterStageRectOfInterest:")] public CGRect CenterStageRectOfInterest { get; set; }
 }
 
@@ -379,31 +373,21 @@ public extern objc class AVCaptureDevice
     [Selector("isPortraitEffectActive")] public bool PortraitEffectActive { get; }
 }
 
-/// macOS 14.0 and later.
 /// AVCaptureDeviceReactionEffects, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    /// macOS 14.0 and later.
     [Selector("reactionEffectsEnabled")] public static bool ReactionEffectsEnabled { get; }
-    /// macOS 14.0 and later.
     [Selector("reactionEffectGesturesEnabled")] public static bool ReactionEffectGesturesEnabled { get; }
-    /// macOS 14.0 and later.
     [Selector("canPerformReactionEffects")] public bool CanPerformReactionEffects { get; }
-    /// macOS 14.0 and later.
     [Selector("availableReactionTypes")] public NSSet? AvailableReactionTypes { get; }
-    /// macOS 14.0 and later.
     [Selector("reactionEffectsInProgress")] public NSArray? ReactionEffectsInProgress { get; }
-    /// macOS 14.0 and later.
     [Selector("performEffectForReaction:")] public void PerformEffectForReaction(AVCaptureReactionType reactionType);
 }
 
-/// macOS 15.0 and later.
 /// AVCaptureDeviceBackgroundReplacement, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    /// macOS 15.0 and later.
     [Selector("isBackgroundReplacementEnabled")] public static bool BackgroundReplacementEnabled { get; }
-    /// macOS 15.0 and later.
     [Selector("isBackgroundReplacementActive")] public bool BackgroundReplacementActive { get; }
 }
 
@@ -445,19 +429,15 @@ public enum AVCaptureSystemUserInterface : long
     MicrophoneModes = 2,
 }
 
-/// macOS 15.0 and later.
 public using AVSpatialCaptureDiscomfortReason = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" AVSpatialCaptureDiscomfortReason? AVSpatialCaptureDiscomfortReasonNotEnoughLight;
 
-/// macOS 15.0 and later.
 public extern "C" AVSpatialCaptureDiscomfortReason? AVSpatialCaptureDiscomfortReasonSubjectTooClose;
 
 /// AVCaptureDeviceSpatialCapture, a category of AVCaptureDevice.
 public extern objc class AVCaptureDevice
 {
-    /// macOS 15.0 and later.
     [Selector("spatialCaptureDiscomfortReasons")] public NSSet? SpatialCaptureDiscomfortReasons { get; }
 }
 
@@ -483,7 +463,6 @@ public extern objc class AVCaptureDeviceDiscoverySession : NSObject
     [Selector("discoverySessionWithDeviceTypes:mediaType:position:")] public static Self DiscoverySessionWithDeviceTypesMediaTypePosition(NSArray deviceTypes, AVMediaType? mediaType, AVCaptureDevicePosition position);
 }
 
-/// macOS 14.0 and later.
 public extern objc class AVCaptureDeviceRotationCoordinator : NSObject
 {
     [Selector("device")] public AVCaptureDevice? Device { get; }
@@ -493,7 +472,6 @@ public extern objc class AVCaptureDeviceRotationCoordinator : NSObject
     [Selector("initWithDevice:previewLayer:")] public Self InitWithDevicePreviewLayer(AVCaptureDevice device, CALayer? previewLayer);
 }
 
-/// macOS 15.0 and later.
 public extern objc class AVExposureBiasRange : NSObject
 {
     [Selector("minExposureBias")] public float MinExposureBias { get; }
@@ -509,7 +487,6 @@ public extern objc class AVFrameRateRange : NSObject
     [Selector("minFrameDuration")] public CMTime MinFrameDuration { get; }
 }
 
-/// macOS 14.2 and later.
 public extern objc class AVZoomRange : NSObject
 {
     [Selector("minZoomFactor")] public CGFloat MinZoomFactor { get; }
@@ -529,20 +506,15 @@ public extern objc class AVCaptureDeviceFormat : NSObject
     [Selector("mediaType")] public AVMediaType MediaType { get; }
     [Selector("formatDescription")] public CMFormatDescriptionRef FormatDescription { get; }
     [Selector("videoSupportedFrameRateRanges")] public NSArray VideoSupportedFrameRateRanges { get; }
-    /// macOS 15.0 and later.
     [Selector("systemRecommendedVideoZoomRange")] public AVZoomRange? SystemRecommendedVideoZoomRange { get; }
-    /// macOS 15.0 and later.
     [Selector("systemRecommendedExposureBiasRange")] public AVExposureBiasRange? SystemRecommendedExposureBiasRange { get; }
     [Selector("isHighPhotoQualitySupported")] public bool HighPhotoQualitySupported { get; }
     [Selector("autoFocusSystem")] public AVCaptureAutoFocusSystem AutoFocusSystem { get; }
     [Selector("supportedColorSpaces")] public NSArray? SupportedColorSpaces { get; }
-    /// macOS 14.2 and later.
     [Selector("supportedVideoZoomRangesForDepthDataDelivery")] public NSArray? SupportedVideoZoomRangesForDepthDataDelivery { get; }
-    /// macOS 14.2 and later.
     [Selector("zoomFactorsOutsideOfVideoZoomRangesForDepthDeliverySupported")] public bool ZoomFactorsOutsideOfVideoZoomRangesForDepthDeliverySupported { get; }
     [Selector("supportedMaxPhotoDimensions")] public NSArray? SupportedMaxPhotoDimensions { get; }
     [Selector("secondaryNativeResolutionZoomFactors")] public NSArray? SecondaryNativeResolutionZoomFactors { get; }
-    /// macOS 15.0 and later.
     [Selector("isAutoVideoFrameRateSupported")] public bool AutoVideoFrameRateSupported { get; }
 }
 
@@ -552,7 +524,6 @@ public extern objc class AVCaptureDeviceFormat { }
 /// AVCaptureDeviceFormatMultiCamAdditions, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat { }
 
-/// macOS 15.0 and later.
 /// AVCaptureDeviceFormatSpatialVideoCapture, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
@@ -592,23 +563,17 @@ public extern objc class AVCaptureDeviceFormat
     [Selector("videoFrameRateRangeForStudioLight")] public AVFrameRateRange? VideoFrameRateRangeForStudioLight { get; }
 }
 
-/// macOS 14.0 and later.
 /// AVCaptureDeviceFormatReactionEffects, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    /// macOS 14.0 and later.
     [Selector("reactionEffectsSupported")] public bool ReactionEffectsSupported { get; }
-    /// macOS 14.0 and later.
     [Selector("videoFrameRateRangeForReactionEffectsInProgress")] public AVFrameRateRange? VideoFrameRateRangeForReactionEffectsInProgress { get; }
 }
 
-/// macOS 15.0 and later.
 /// AVCaptureDeviceFormatBackgroundReplacement, a category of AVCaptureDeviceFormat.
 public extern objc class AVCaptureDeviceFormat
 {
-    /// macOS 15.0 and later.
     [Selector("isBackgroundReplacementSupported")] public bool BackgroundReplacementSupported { get; }
-    /// macOS 15.0 and later.
     [Selector("videoFrameRateRangeForBackgroundReplacement")] public AVFrameRateRange? VideoFrameRateRangeForBackgroundReplacement { get; }
 }
 

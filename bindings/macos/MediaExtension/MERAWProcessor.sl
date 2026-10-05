@@ -33,21 +33,18 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaExtension")
 
-/// macOS 15.0 and later.
 public objc interface MERAWProcessorExtension : NSObjectProtocol
 {
     [Selector("init")] Self Init();
     [Selector("processorWithFormatDescription:extensionPixelBufferManager:error:")] MERAWProcessor? ProcessorWithFormatDescriptionExtensionPixelBufferManagerError(CMVideoFormatDescriptionRef formatDescription, MERAWProcessorPixelBufferManager extensionPixelBufferManager, out NSError? error);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessorPixelBufferManager : NSObject
 {
     [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")] public NSDictionary? PixelBufferAttributes { get; set; }
     [ReturnsRetained] [Selector("createPixelBufferAndReturnError:")] public CVPixelBufferRef? CreatePixelBufferAndReturnError(out NSError? error);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessingParameter : NSObject
 {
     [Selector("name")] public NSString Name { get; }
@@ -56,14 +53,12 @@ public extern objc class MERAWProcessingParameter : NSObject
     [Selector("enabled", "setEnabled:")] public bool Enabled { get; set; }
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessingListElementParameter : MERAWProcessingParameter
 {
     [Selector("listElementID")] public NSInteger ListElementID { get; }
     [Selector("initWithName:description:elementID:")] public Self InitWithNameDescriptionElementID(NSString name, NSString description, NSInteger elementID);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessingBooleanParameter : MERAWProcessingParameter
 {
     [Selector("initialValue")] public bool InitialValue { get; }
@@ -76,7 +71,6 @@ public extern objc class MERAWProcessingBooleanParameter : MERAWProcessingParame
     [Selector("hasCameraValue:")] public bool HasCameraValue(bool* outCameraValue);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessingIntegerParameter : MERAWProcessingParameter
 {
     [Selector("maximumValue")] public NSInteger MaximumValue { get; }
@@ -91,7 +85,6 @@ public extern objc class MERAWProcessingIntegerParameter : MERAWProcessingParame
     [Selector("hasCameraValue:")] public bool HasCameraValue(NSInteger* outCameraValue);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessingFloatParameter : MERAWProcessingParameter
 {
     [Selector("maximumValue")] public float MaximumValue { get; }
@@ -106,7 +99,6 @@ public extern objc class MERAWProcessingFloatParameter : MERAWProcessingParamete
     [Selector("hasCameraValue:")] public bool HasCameraValue(float* outCameraValue);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessingListParameter : MERAWProcessingParameter
 {
     [Selector("listElements")] public NSArray ListElements { get; }
@@ -120,22 +112,18 @@ public extern objc class MERAWProcessingListParameter : MERAWProcessingParameter
     [Selector("hasCameraValue:")] public bool HasCameraValue(NSInteger* outCameraValue);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MERAWProcessingSubGroupParameter : MERAWProcessingParameter
 {
     [Selector("subGroupParameters")] public NSArray SubGroupParameters { get; }
     [Selector("initWithName:description:parameters:")] public Self InitWithNameDescriptionParameters(NSString name, NSString description, NSArray parameters);
 }
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MERAWProcessorValuesDidChangeNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MERAWProcessorReadyForMoreMediaDataDidChangeNotification;
 
 public objc closure void MERAWProcessorProcessFrameFromImageBufferCompletionHandlerCompletionHandlerBlock(CVPixelBufferRef? arg0, NSError? arg1);
 
-/// macOS 15.0 and later.
 public objc interface MERAWProcessor : NSObjectProtocol
 {
     [Optional] [Selector("metalDeviceRegistryID", "setMetalDeviceRegistryID:")] ulong MetalDeviceRegistryID { get; set; }

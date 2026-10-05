@@ -248,9 +248,9 @@ public sealed partial class Writer(Translation translation, IReadOnlySet<string>
         return lines.ToString();
     }
 
-    /// <summary>Whether a version is later than macOS 13.0, the oldest the compiler builds for.</summary>
+    /// <summary>Whether a version is later than macOS 15.0, the oldest the compiler builds for.</summary>
     private static bool IsAfterDeploymentTarget(string version) =>
-        Version.TryParse(version.Contains('.') ? version : version + ".0", out var parsed) && parsed > new Version(13, 0);
+        Version.TryParse(version.Contains('.') ? version : version + ".0", out var parsed) && parsed > new Version(15, 0);
 
     private string? WriteFunction(CFunctionDecl function, Context context)
     {

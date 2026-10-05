@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "VideoToolbox")
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingPropertyKey_MetalDeviceRegistryID;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingPropertyKey_OutputColorAttachments;
 
 /// macOS 26.0 and later.

@@ -61,7 +61,6 @@ public extern objc class CMIOExtensionProvider : NSObject
     [Selector("connectedClients")] public NSArray ConnectedClients { get; }
     [Selector("devices")] public NSArray Devices { get; }
     [Selector("startServiceWithProvider:")] public static void StartServiceWithProvider(CMIOExtensionProvider provider);
-    /// macOS 14.4 and later.
     [Selector("stopServiceWithProvider:")] public static void StopServiceWithProvider(CMIOExtensionProvider provider);
     [Selector("providerWithSource:clientQueue:")] public static Self ProviderWithSourceClientQueue(CMIOExtensionProviderSource source, dispatch_queue_t? clientQueue);
     [Selector("initWithSource:clientQueue:")] public Self InitWithSourceClientQueue(CMIOExtensionProviderSource source, dispatch_queue_t? clientQueue);
@@ -70,7 +69,6 @@ public extern objc class CMIOExtensionProvider : NSObject
     [Selector("notifyPropertiesChanged:")] public void NotifyPropertiesChanged(NSDictionary propertyStates);
 }
 
-/// macOS 14.0 and later.
 /// SignalHandling, a category of CMIOExtensionProvider.
 public extern objc class CMIOExtensionProvider
 {

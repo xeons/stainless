@@ -44,7 +44,6 @@ public extern objc class GKAchievementDescription : NSObject, NSCoding, NSSecure
     [Selector("maximumPoints")] public NSInteger MaximumPoints { get; }
     [Selector("isHidden")] public bool Hidden { get; }
     [Selector("isReplayable")] public bool Replayable { get; }
-    /// macOS 14.0 and later.
     [Selector("rarityPercent")] public NSNumber? RarityPercent { get; }
     /// macOS 15.4 and later.
     [Selector("releaseState")] public GKReleaseState ReleaseState { get; }

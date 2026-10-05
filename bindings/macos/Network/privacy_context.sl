@@ -44,10 +44,8 @@ public extern "C" void nw_privacy_context_disable_logging(nw_privacy_context_t p
 
 public extern "C" void nw_privacy_context_require_encrypted_name_resolution(nw_privacy_context_t privacy_context, bool require_encrypted_name_resolution, nw_resolver_config_t? fallback_resolver_config);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_privacy_context_add_proxy(nw_privacy_context_t privacy_context, nw_proxy_config_t proxy_config);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_privacy_context_clear_proxies(nw_privacy_context_t privacy_context);
 
 #endif

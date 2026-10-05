@@ -116,10 +116,8 @@ public extern "C" byte* vmnet_enable_checksum_offload_key;
 /// macOS 15.4 and later.
 public extern "C" byte* vmnet_enable_virtio_header_key;
 
-/// macOS 15.0 and later.
 public extern "C" byte* vmnet_read_max_packets_key;
 
-/// macOS 15.0 and later.
 public extern "C" byte* vmnet_write_max_packets_key;
 
 public objc closure void vmnet_start_interface_completion_handler_t(vmnet_return_t arg0, xpc_object_t? arg1);

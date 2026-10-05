@@ -291,7 +291,6 @@ public extern objc class AVPlayerItemErrorLogEvent : NSObject, NSCopying
     [Selector("errorStatusCode")] public NSInteger ErrorStatusCode { get; }
     [Selector("errorDomain")] public NSString ErrorDomain { get; }
     [Selector("errorComment")] public NSString? ErrorComment { get; }
-    /// macOS 14.5 and later.
     [Selector("allHTTPResponseHeaderFields")] public NSDictionary? AllHTTPResponseHeaderFields { get; }
 }
 

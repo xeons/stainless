@@ -94,7 +94,6 @@ public extern "C" CIContextOption? kCIContextName;
 /// macOS 26.0 and later.
 public extern "C" CIContextOption? kCIContextCVMetalTextureCache;
 
-/// macOS 14.0 and later.
 public extern "C" CIContextOption? kCIContextMemoryLimit;
 
 /// createCGImage, a category of CIContext.
@@ -140,14 +139,12 @@ public extern objc class CIContext
     [Selector("HEIFRepresentationOfImage:format:colorSpace:options:")] public NSData? HEIFRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
     [Selector("HEIF10RepresentationOfImage:colorSpace:options:error:")] public NSData? HEIF10RepresentationOfImageColorSpaceOptionsError(CIImage image, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
     [Selector("PNGRepresentationOfImage:format:colorSpace:options:")] public NSData? PNGRepresentationOfImageFormatColorSpaceOptions(CIImage image, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options);
-    /// macOS 14.0 and later.
     [Selector("OpenEXRRepresentationOfImage:options:error:")] public NSData? OpenEXRRepresentationOfImageOptionsError(CIImage image, NSDictionary options, out NSError? errorPtr);
     [Selector("writeTIFFRepresentationOfImage:toURL:format:colorSpace:options:error:")] public bool WriteTIFFRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
     [Selector("writePNGRepresentationOfImage:toURL:format:colorSpace:options:error:")] public bool WritePNGRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
     [Selector("writeJPEGRepresentationOfImage:toURL:colorSpace:options:error:")] public bool WriteJPEGRepresentationOfImageToURLColorSpaceOptionsError(CIImage image, NSURL url, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
     [Selector("writeHEIFRepresentationOfImage:toURL:format:colorSpace:options:error:")] public bool WriteHEIFRepresentationOfImageToURLFormatColorSpaceOptionsError(CIImage image, NSURL url, CIFormat format, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
     [Selector("writeHEIF10RepresentationOfImage:toURL:colorSpace:options:error:")] public bool WriteHEIF10RepresentationOfImageToURLColorSpaceOptionsError(CIImage image, NSURL url, CGColorSpaceRef colorSpace, NSDictionary options, out NSError? errorPtr);
-    /// macOS 14.0 and later.
     [Selector("writeOpenEXRRepresentationOfImage:toURL:options:error:")] public bool WriteOpenEXRRepresentationOfImageToURLOptionsError(CIImage image, NSURL url, NSDictionary options, out NSError? errorPtr);
 }
 
@@ -173,12 +170,10 @@ public extern "C" CIImageRepresentationOption? kCIImageRepresentationSemanticSeg
 
 public extern "C" CIImageRepresentationOption? kCIImageRepresentationSemanticSegmentationSkyMatteImage;
 
-/// macOS 15.0 and later.
 public extern "C" CIImageRepresentationOption? kCIImageRepresentationHDRImage;
 
 public extern "C" CIImageRepresentationOption? kCIImageRepresentationHDRGainMapImage;
 
-/// macOS 15.0 and later.
 public extern "C" CIImageRepresentationOption? kCIImageRepresentationHDRGainMapAsRGB;
 
 /// CIDepthBlurEffect, a category of CIContext.

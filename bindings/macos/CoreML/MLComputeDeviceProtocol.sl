@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.0 and later.
 public objc interface MLComputeDeviceProtocol : NSObjectProtocol { }
 
 #endif

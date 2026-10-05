@@ -33,13 +33,9 @@ import Standard.ObjC;
 
 public extern objc class AEAssessmentConfiguration : NSObject, NSCopying
 {
-    /// macOS 15.0 and later.
     [Selector("autocorrectMode", "setAutocorrectMode:")] public AEAutocorrectMode AutocorrectMode { get; set; }
-    /// macOS 15.0 and later.
     [Selector("allowsSpellCheck", "setAllowsSpellCheck:")] public bool AllowsSpellCheck { get; set; }
-    /// macOS 15.0 and later.
     [Selector("allowsPredictiveKeyboard", "setAllowsPredictiveKeyboard:")] public bool AllowsPredictiveKeyboard { get; set; }
-    /// macOS 15.0 and later.
     [Selector("allowsKeyboardShortcuts", "setAllowsKeyboardShortcuts:")] public bool AllowsKeyboardShortcuts { get; set; }
     /// macOS 26.1 and later.
     [Selector("allowsAccessibilityKeyboard", "setAllowsAccessibilityKeyboard:")] public bool AllowsAccessibilityKeyboard { get; set; }

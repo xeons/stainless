@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public objc closure void CMHeadphoneDeviceMotionHandler(CMDeviceMotion? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class CMHeadphoneMotionManager : NSObject
 {
     [Selector("delegate", "setDelegate:")] public CMHeadphoneMotionManagerDelegate? Delegate { get; set; }

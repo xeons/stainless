@@ -35,105 +35,73 @@ import Standard.ObjC;
 
 public struct OpaqueVTRAWProcessingSession;
 
-/// macOS 15.0 and later.
 [CFType("VTRAWProcessingSessionGetTypeID")]
 public extern objc class VTRAWProcessingSessionRef : CFTypeRef { }
 
-/// macOS 15.0 and later.
 public objc closure void VTRAWProcessingParameterChangeHandler(CFArrayRef? arg0);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTRAWProcessingSessionCreate(CFAllocatorRef? allocator, CMVideoFormatDescriptionRef formatDescription, CFDictionaryRef? outputPixelBufferAttributes, CFDictionaryRef? processingSessionOptions, OpaqueVTRAWProcessingSession** processingSessionOut);
 
-/// macOS 15.0 and later.
 public extern "C" void VTRAWProcessingSessionInvalidate(VTRAWProcessingSessionRef session);
 
-/// macOS 15.0 and later.
 public extern "C" CFTypeID VTRAWProcessingSessionGetTypeID();
 
 /// macOS 26.0 and later.
 public extern "C" OSStatus VTRAWProcessingSessionSetParameterChangedHandler(VTRAWProcessingSessionRef session, VTRAWProcessingParameterChangeHandler? parameterChangeHandler);
 
-/// macOS 15.0 and later.
 /// Deprecated in macOS 26.0.
 public extern "C" OSStatus VTRAWProcessingSessionSetParameterChangedHander(VTRAWProcessingSessionRef session, VTRAWProcessingParameterChangeHandler? parameterChangeHandler);
 
-/// macOS 15.0 and later.
 public objc closure void VTRAWProcessingOutputHandler(OSStatus arg0, CVPixelBufferRef? arg1);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTRAWProcessingSessionProcessFrame(VTRAWProcessingSessionRef session, CVPixelBufferRef inputPixelBuffer, CFDictionaryRef? frameOptions, VTRAWProcessingOutputHandler outputHandler);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTRAWProcessingSessionCompleteFrames(VTRAWProcessingSessionRef session);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTRAWProcessingSessionCopyProcessingParameters(VTRAWProcessingSessionRef session, __CFArray** outParameterArray);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTRAWProcessingSessionSetProcessingParameters(VTRAWProcessingSessionRef session, CFDictionaryRef processingParameters);
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_Key;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_Name;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_Description;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_Enabled;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_ValueType;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterValueType_Boolean;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterValueType_Integer;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterValueType_Float;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterValueType_List;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterValueType_SubGroup;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_ListArray;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterListElement_Label;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterListElement_Description;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameterListElement_ListElementID;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_SubGroup;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_MaximumValue;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_MinimumValue;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_InitialValue;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_NeutralValue;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_CameraValue;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTRAWProcessingParameter_CurrentValue;
 
 #endif

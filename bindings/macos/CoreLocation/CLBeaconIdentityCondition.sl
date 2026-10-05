@@ -34,7 +34,6 @@ public using CLBeaconMajorValue = ushort;
 
 public using CLBeaconMinorValue = ushort;
 
-/// macOS 14.0 and later.
 public extern objc class CLBeaconIdentityCondition : CLCondition, NSCopying, NSSecureCoding
 {
     [Selector("UUID")] public NSUUID UUID { get; }

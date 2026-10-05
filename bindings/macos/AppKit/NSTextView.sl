@@ -193,11 +193,8 @@ public extern objc class NSTextView
     [Selector("usesFontPanel", "setUsesFontPanel:")] public bool UsesFontPanel { get; set; }
     [Selector("isRulerVisible", "setRulerVisible:")] public bool RulerVisible { get; set; }
     [Selector("allowedInputSourceLocales", "setAllowedInputSourceLocales:")] public NSArray? AllowedInputSourceLocales { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isWritingToolsActive")] public bool WritingToolsActive { get; }
-    /// macOS 15.0 and later.
     [Selector("writingToolsBehavior", "setWritingToolsBehavior:")] public NSWritingToolsBehavior WritingToolsBehavior { get; set; }
-    /// macOS 15.0 and later.
     [Selector("allowedWritingToolsResultOptions", "setAllowedWritingToolsResultOptions:")] public NSWritingToolsResultOptions AllowedWritingToolsResultOptions { get; set; }
     [Selector("setSelectedRanges:affinity:stillSelecting:")] public void SetSelectedRangesAffinityStillSelecting(NSArray ranges, NSSelectionAffinity affinity, bool stillSelectingFlag);
     [Selector("setSelectedRange:affinity:stillSelecting:")] public void SetSelectedRangeAffinityStillSelecting(NSRange charRange, NSSelectionAffinity affinity, bool stillSelectingFlag);
@@ -227,9 +224,7 @@ public extern objc class NSTextView
     [Selector("usesFindPanel", "setUsesFindPanel:")] public bool UsesFindPanel { get; set; }
     [Selector("usesFindBar", "setUsesFindBar:")] public bool UsesFindBar { get; set; }
     [Selector("isIncrementalSearchingEnabled", "setIncrementalSearchingEnabled:")] public bool IncrementalSearchingEnabled { get; set; }
-    /// macOS 14.0 and later.
     [Selector("inlinePredictionType", "setInlinePredictionType:")] public NSTextInputTraitType InlinePredictionType { get; set; }
-    /// macOS 15.0 and later.
     [Selector("mathExpressionCompletionType", "setMathExpressionCompletionType:")] public NSTextInputTraitType MathExpressionCompletionType { get; set; }
     [Selector("smartDeleteRangeForProposedRange:")] public NSRange SmartDeleteRangeForProposedRange(NSRange proposedCharRange);
     [Selector("toggleSmartInsertDelete:")] public void ToggleSmartInsertDelete(AnyObject? sender);
@@ -287,11 +282,8 @@ public extern objc class NSTextView
 /// NSTextView_TextHighlight, a category of NSTextView.
 public extern objc class NSTextView
 {
-    /// macOS 15.0 and later.
     [Selector("textHighlightAttributes", "setTextHighlightAttributes:")] public NSDictionary? TextHighlightAttributes { get; set; }
-    /// macOS 15.0 and later.
     [Selector("drawTextHighlightBackgroundForTextRange:origin:")] public void DrawTextHighlightBackgroundForTextRangeOrigin(NSTextRange textRange, NSPoint origin);
-    /// macOS 15.0 and later.
     [Selector("highlight:")] public void Highlight(AnyObject? sender);
 }
 
@@ -331,11 +323,8 @@ public objc interface NSTextViewDelegate : NSTextDelegate
     [Optional] [Selector("textView:candidatesForSelectedRange:")] NSArray? TextViewCandidatesForSelectedRange(NSTextView textView, NSRange selectedRange);
     [Optional] [Selector("textView:candidates:forSelectedRange:")] NSArray TextViewCandidatesForSelectedRange(NSTextView textView, NSArray candidates, NSRange selectedRange);
     [Optional] [Selector("textView:shouldSelectCandidateAtIndex:")] bool TextViewShouldSelectCandidateAtIndex(NSTextView textView, NSUInteger index);
-    /// macOS 15.0 and later.
     [Optional] [Selector("textViewWritingToolsWillBegin:")] void TextViewWritingToolsWillBegin(NSTextView textView);
-    /// macOS 15.0 and later.
     [Optional] [Selector("textViewWritingToolsDidEnd:")] void TextViewWritingToolsDidEnd(NSTextView textView);
-    /// macOS 15.0 and later.
     [Optional] [Selector("textView:writingToolsIgnoredRangesInEnclosingRange:")] NSArray TextViewWritingToolsIgnoredRangesInEnclosingRange(NSTextView textView, NSRange enclosingRange);
     /// Deprecated in macOS 10.6.
     [Optional] [Selector("textView:clickedOnLink:")] bool TextViewClickedOnLink(NSTextView textView, AnyObject? link);

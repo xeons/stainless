@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 15.0 and later.
 public extern objc class INMessageReaction : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("reactionType")] public INMessageReactionType ReactionType { get; }

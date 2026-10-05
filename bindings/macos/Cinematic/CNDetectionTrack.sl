@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Cinematic")
 
-/// macOS 14.0 and later.
 public extern objc class CNDetectionTrack : NSObject, NSCopying
 {
     [Selector("detectionType")] public CNDetectionType DetectionType { get; }
@@ -45,7 +44,6 @@ public extern objc class CNDetectionTrack : NSObject, NSCopying
     [Selector("detectionsInTimeRange:")] public NSArray DetectionsInTimeRange(CMTimeRange timeRange);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNFixedDetectionTrack : CNDetectionTrack
 {
     [Selector("focusDisparity")] public float FocusDisparity { get; }
@@ -54,7 +52,6 @@ public extern objc class CNFixedDetectionTrack : CNDetectionTrack
     [Selector("initWithOriginalDetection:")] public Self InitWithOriginalDetection(CNDetection originalDetection);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNCustomDetectionTrack : CNDetectionTrack
 {
     [Selector("allDetections")] public NSArray AllDetections { get; }

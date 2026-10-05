@@ -30,25 +30,20 @@ import Standard.ObjC;
 
 #pragma comment(framework, "GameController")
 
-/// macOS 14.3 and later.
 public struct GCPoint2
 {
     public float x;
     public float y;
 }
 
-/// macOS 14.3 and later.
 public extern "C" GCPoint2 GCPoint2Zero;
 
-/// macOS 14.3 and later.
 public extern "C" NSString NSStringFromGCPoint2(GCPoint2 point);
 
 /// GCTypes, a category of NSValue.
 public extern objc class NSValue
 {
-    /// macOS 14.3 and later.
     [Selector("GCPoint2Value")] public GCPoint2 GCPoint2Value { get; }
-    /// macOS 14.3 and later.
     [Selector("valueWithGCPoint2:")] public static Self ValueWithGCPoint2(GCPoint2 point);
 }
 

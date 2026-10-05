@@ -35,7 +35,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaExtension")
 
-/// macOS 14.0 and later.
 public enum MEFileInfoFragmentsStatus : long
 {
     CouldNotContainFragments = 0,
@@ -43,7 +42,6 @@ public enum MEFileInfoFragmentsStatus : long
     CouldContainButDoesNotContainFragments = 2,
 }
 
-/// macOS 14.0 and later.
 [Flags]
 public enum MEFormatReaderParseAdditionalFragmentsStatus : ulong
 {
@@ -52,13 +50,11 @@ public enum MEFormatReaderParseAdditionalFragmentsStatus : ulong
     FragmentsComplete = 4,
 }
 
-/// macOS 14.0 and later.
 public extern objc class MEFormatReaderInstantiationOptions : NSObject, NSCopying
 {
     [Selector("allowIncrementalFragmentParsing")] public bool AllowIncrementalFragmentParsing { get; }
 }
 
-/// macOS 14.0 and later.
 public objc interface MEFormatReaderExtension : NSObjectProtocol
 {
     [Selector("init")] Self Init();
@@ -73,7 +69,6 @@ public objc closure void MEFormatReaderLoadTrackReadersWithCompletionHandlerComp
 
 public objc closure void MEFormatReaderParseAdditionalFragmentsWithCompletionHandlerCompletionHandlerBlock(MEFormatReaderParseAdditionalFragmentsStatus arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public objc interface MEFormatReader : NSObjectProtocol
 {
     [Selector("loadFileInfoWithCompletionHandler:")] void LoadFileInfoWithCompletionHandler(MEFormatReaderLoadFileInfoWithCompletionHandlerCompletionHandlerBlock completionHandler);
@@ -82,7 +77,6 @@ public objc interface MEFormatReader : NSObjectProtocol
     [Optional] [Selector("parseAdditionalFragmentsWithCompletionHandler:")] void ParseAdditionalFragmentsWithCompletionHandler(MEFormatReaderParseAdditionalFragmentsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MEFileInfo : NSObject, NSCopying
 {
     [Selector("duration", "setDuration:")] public CMTime Duration { get; set; }
@@ -107,7 +101,6 @@ public objc closure void METrackReaderLoadEstimatedDataRateWithCompletionHandler
 
 public objc closure void METrackReaderLoadMetadataWithCompletionHandlerCompletionHandlerBlock(NSArray? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public objc interface METrackReader : NSObjectProtocol
 {
     [Selector("loadTrackInfoWithCompletionHandler:")] void LoadTrackInfoWithCompletionHandler(METrackReaderLoadTrackInfoWithCompletionHandlerCompletionHandlerBlock completionHandler);
@@ -120,7 +113,6 @@ public objc interface METrackReader : NSObjectProtocol
     [Optional] [Selector("loadMetadataWithCompletionHandler:")] void LoadMetadataWithCompletionHandler(METrackReaderLoadMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
-/// macOS 14.0 and later.
 public extern objc class METrackInfo : NSObject, NSCopying
 {
     [Selector("mediaType")] public CMMediaType MediaType { get; }
@@ -130,7 +122,6 @@ public extern objc class METrackInfo : NSObject, NSCopying
     [Selector("initWithMediaType:trackID:formatDescriptions:")] public Self InitWithMediaTypeTrackIDFormatDescriptions(CMMediaType mediaType, CMPersistentTrackID trackID, NSArray formatDescriptions);
 }
 
-/// macOS 14.0 and later.
 /// OptionalProperties, a category of METrackInfo.
 public extern objc class METrackInfo
 {
@@ -138,14 +129,12 @@ public extern objc class METrackInfo
     [Selector("trackEdits", "setTrackEdits:")] public NSArray? TrackEdits { get; set; }
 }
 
-/// macOS 14.0 and later.
 /// LanguageTagOptionalProperties, a category of METrackInfo.
 public extern objc class METrackInfo
 {
     [Selector("extendedLanguageTag", "setExtendedLanguageTag:")] public NSString? ExtendedLanguageTag { get; set; }
 }
 
-/// macOS 14.0 and later.
 /// VideoSpecificOptionalProperties, a category of METrackInfo.
 public extern objc class METrackInfo
 {
@@ -167,7 +156,6 @@ public objc closure void MESampleCursorLoadSampleBufferContainingSamplesToEndCur
 
 public objc closure void MESampleCursorLoadPostDecodeProcessingMetadataWithCompletionHandlerCompletionHandlerBlock(NSDictionary? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public objc interface MESampleCursor : NSObjectProtocol, NSCopying
 {
     [Selector("presentationTimeStamp")] CMTime PresentationTimeStamp { get; }
@@ -192,7 +180,6 @@ public objc interface MESampleCursor : NSObjectProtocol, NSCopying
     [Optional] [Selector("loadPostDecodeProcessingMetadataWithCompletionHandler:")] void LoadPostDecodeProcessingMetadataWithCompletionHandler(MESampleCursorLoadPostDecodeProcessingMetadataWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MESampleCursorChunk : NSObject, NSCopying
 {
     [Selector("byteSource")] public MEByteSource ByteSource { get; }
@@ -202,7 +189,6 @@ public extern objc class MESampleCursorChunk : NSObject, NSCopying
     [Selector("initWithByteSource:chunkStorageRange:chunkInfo:sampleIndexWithinChunk:")] public Self InitWithByteSourceChunkStorageRangeChunkInfoSampleIndexWithinChunk(MEByteSource byteSource, AVSampleCursorStorageRange chunkStorageRange, AVSampleCursorChunkInfo chunkInfo, CFIndex sampleIndexWithinChunk);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MESampleLocation : NSObject, NSCopying
 {
     [Selector("sampleLocation")] public AVSampleCursorStorageRange SampleLocation { get; }
@@ -210,7 +196,6 @@ public extern objc class MESampleLocation : NSObject, NSCopying
     [Selector("initWithByteSource:sampleLocation:")] public Self InitWithByteSourceSampleLocation(MEByteSource byteSource, AVSampleCursorStorageRange sampleLocation);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MEEstimatedSampleLocation : NSObject, NSCopying
 {
     [Selector("estimatedSampleLocation")] public AVSampleCursorStorageRange EstimatedSampleLocation { get; }
@@ -219,7 +204,6 @@ public extern objc class MEEstimatedSampleLocation : NSObject, NSCopying
     [Selector("initWithByteSource:estimatedSampleLocation:refinementDataLocation:")] public Self InitWithByteSourceEstimatedSampleLocationRefinementDataLocation(MEByteSource byteSource, AVSampleCursorStorageRange estimatedSampleLocation, AVSampleCursorStorageRange refinementDataLocation);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MEHEVCDependencyInfo : NSObject, NSCopying
 {
     [Selector("hasTemporalSubLayerAccess", "setTemporalSubLayerAccess:")] public bool TemporalSubLayerAccess { get; set; }
@@ -227,7 +211,6 @@ public extern objc class MEHEVCDependencyInfo : NSObject, NSCopying
     [Selector("syncSampleNALUnitType", "setSyncSampleNALUnitType:")] public short SyncSampleNALUnitType { get; set; }
 }
 
-/// macOS 14.0 and later.
 /// HEVCTemporalLevelInfo, a category of MEHEVCDependencyInfo.
 public extern objc class MEHEVCDependencyInfo
 {
@@ -244,7 +227,6 @@ public objc closure void MEByteSourceReadDataOfLengthFromOffsetToDestinationComp
 
 public objc closure void MEByteSourceReadDataOfLengthFromOffsetCompletionHandlerCompletionHandlerBlock(NSData? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class MEByteSource : NSObject
 {
     [Selector("fileName")] public NSString FileName { get; }

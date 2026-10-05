@@ -51,7 +51,6 @@ public enum SCFrameStatus : long
     Stopped = 5,
 }
 
-/// macOS 14.0 and later.
 public enum SCPresenterOverlayAlertSetting : long
 {
     System = 0,
@@ -59,7 +58,6 @@ public enum SCPresenterOverlayAlertSetting : long
     Always = 2,
 }
 
-/// macOS 14.0 and later.
 /// Deprecated in macOS 15.0.
 public enum SCStreamType : long
 {
@@ -74,7 +72,6 @@ public enum SCCaptureResolutionType : long
     Nominal = 2,
 }
 
-/// macOS 15.0 and later.
 public enum SCCaptureDynamicRange : long
 {
     SDR = 0,
@@ -84,16 +81,11 @@ public enum SCCaptureDynamicRange : long
 
 public extern objc class SCContentFilter : NSObject
 {
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 14.2.
     [Selector("streamType")] public SCStreamType StreamType { get; }
-    /// macOS 14.0 and later.
     [Selector("style")] public SCShareableContentStyle Style { get; }
-    /// macOS 14.0 and later.
     [Selector("pointPixelScale")] public float PointPixelScale { get; }
-    /// macOS 14.0 and later.
     [Selector("contentRect")] public CGRect ContentRect { get; }
-    /// macOS 14.2 and later.
     [Selector("includeMenuBar", "setIncludeMenuBar:")] public bool IncludeMenuBar { get; set; }
     /// macOS 15.2 and later.
     [Selector("includedDisplays")] public NSArray? IncludedDisplays { get; }
@@ -115,12 +107,9 @@ public extern objc class SCStreamConfiguration : NSObject
     [Selector("minimumFrameInterval", "setMinimumFrameInterval:")] public CMTime MinimumFrameInterval { get; set; }
     [Selector("pixelFormat", "setPixelFormat:")] public OSType PixelFormat { get; set; }
     [Selector("scalesToFit", "setScalesToFit:")] public bool ScalesToFit { get; set; }
-    /// macOS 14.0 and later.
     [Selector("preservesAspectRatio", "setPreservesAspectRatio:")] public bool PreservesAspectRatio { get; set; }
-    /// macOS 14.0 and later.
     [Selector("streamName", "setStreamName:")] public NSString? StreamName { get; set; }
     [Selector("showsCursor", "setShowsCursor:")] public bool ShowsCursor { get; set; }
-    /// macOS 15.0 and later.
     [Selector("showMouseClicks", "setShowMouseClicks:")] public bool ShowMouseClicks { get; set; }
     [Selector("backgroundColor", "setBackgroundColor:")] public CGColorRef BackgroundColor { get; set; }
     [Selector("sourceRect", "setSourceRect:")] public CGRect SourceRect { get; set; }
@@ -132,35 +121,21 @@ public extern objc class SCStreamConfiguration : NSObject
     [Selector("sampleRate", "setSampleRate:")] public NSInteger SampleRate { get; set; }
     [Selector("channelCount", "setChannelCount:")] public NSInteger ChannelCount { get; set; }
     [Selector("excludesCurrentProcessAudio", "setExcludesCurrentProcessAudio:")] public bool ExcludesCurrentProcessAudio { get; set; }
-    /// macOS 14.0 and later.
     [Selector("ignoreShadowsDisplay", "setIgnoreShadowsDisplay:")] public bool IgnoreShadowsDisplay { get; set; }
-    /// macOS 14.0 and later.
     [Selector("ignoreShadowsSingleWindow", "setIgnoreShadowsSingleWindow:")] public bool IgnoreShadowsSingleWindow { get; set; }
-    /// macOS 14.0 and later.
     [Selector("captureResolution", "setCaptureResolution:")] public SCCaptureResolutionType CaptureResolution { get; set; }
-    /// macOS 14.0 and later.
     [Selector("capturesShadowsOnly", "setCapturesShadowsOnly:")] public bool CapturesShadowsOnly { get; set; }
-    /// macOS 14.0 and later.
     [Selector("shouldBeOpaque", "setShouldBeOpaque:")] public bool ShouldBeOpaque { get; set; }
-    /// macOS 14.0 and later.
     [Selector("ignoreGlobalClipDisplay", "setIgnoreGlobalClipDisplay:")] public bool IgnoreGlobalClipDisplay { get; set; }
-    /// macOS 14.0 and later.
     [Selector("ignoreGlobalClipSingleWindow", "setIgnoreGlobalClipSingleWindow:")] public bool IgnoreGlobalClipSingleWindow { get; set; }
-    /// macOS 14.0 and later.
     [Selector("presenterOverlayPrivacyAlertSetting", "setPresenterOverlayPrivacyAlertSetting:")] public SCPresenterOverlayAlertSetting PresenterOverlayPrivacyAlertSetting { get; set; }
-    /// macOS 14.2 and later.
     [Selector("includeChildWindows", "setIncludeChildWindows:")] public bool IncludeChildWindows { get; set; }
-    /// macOS 15.0 and later.
     [Selector("captureMicrophone", "setCaptureMicrophone:")] public bool CaptureMicrophone { get; set; }
-    /// macOS 15.0 and later.
     [Selector("microphoneCaptureDeviceID", "setMicrophoneCaptureDeviceID:")] public NSString? MicrophoneCaptureDeviceID { get; set; }
-    /// macOS 15.0 and later.
     [Selector("captureDynamicRange", "setCaptureDynamicRange:")] public SCCaptureDynamicRange CaptureDynamicRange { get; set; }
-    /// macOS 15.0 and later.
     [Selector("streamConfigurationWithPreset:")] public static Self StreamConfigurationWithPreset(SCStreamConfigurationPreset preset);
 }
 
-/// macOS 15.0 and later.
 public enum SCStreamConfigurationPreset : long
 {
     StreamLocalDisplay = 0,
@@ -184,13 +159,10 @@ public extern "C" SCStreamFrameInfo SCStreamFrameInfoContentRect;
 
 public extern "C" SCStreamFrameInfo SCStreamFrameInfoDirtyRects;
 
-/// macOS 13.1 and later.
 public extern "C" SCStreamFrameInfo SCStreamFrameInfoScreenRect;
 
-/// macOS 14.0 and later.
 public extern "C" SCStreamFrameInfo SCStreamFrameInfoBoundingRect;
 
-/// macOS 14.2 and later.
 public extern "C" SCStreamFrameInfo SCStreamFrameInfoPresenterOverlayContentRect;
 
 public objc closure void SCStreamUpdateContentFilterCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -211,9 +183,7 @@ public extern objc class SCStream : NSObject
     [Selector("updateConfiguration:completionHandler:")] public void UpdateConfigurationCompletionHandler(SCStreamConfiguration streamConfig, SCStreamUpdateConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("startCaptureWithCompletionHandler:")] public void StartCaptureWithCompletionHandler(SCStreamStartCaptureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("stopCaptureWithCompletionHandler:")] public void StopCaptureWithCompletionHandler(SCStreamStopCaptureWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    /// macOS 15.0 and later.
     [Selector("addRecordingOutput:error:")] public bool AddRecordingOutputError(SCRecordingOutput recordingOutput, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("removeRecordingOutput:error:")] public bool RemoveRecordingOutputError(SCRecordingOutput recordingOutput, out NSError? error);
 }
 
@@ -225,9 +195,7 @@ public objc interface SCStreamOutput : NSObjectProtocol
 public objc interface SCStreamDelegate : NSObjectProtocol
 {
     [Optional] [Selector("stream:didStopWithError:")] void StreamDidStopWithError(SCStream stream, NSError error);
-    /// macOS 14.0 and later.
     [Optional] [Selector("outputVideoEffectDidStartForStream:")] void OutputVideoEffectDidStartForStream(SCStream stream);
-    /// macOS 14.0 and later.
     [Optional] [Selector("outputVideoEffectDidStopForStream:")] void OutputVideoEffectDidStopForStream(SCStream stream);
     /// macOS 15.2 and later.
     [Optional] [Selector("streamDidBecomeActive:")] void StreamDidBecomeActive(SCStream stream);

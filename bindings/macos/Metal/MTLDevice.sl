@@ -167,7 +167,6 @@ public extern objc class MTLArgumentDescriptor : NSObject, NSCopying
     [Selector("argumentDescriptor")] public static MTLArgumentDescriptor ArgumentDescriptor();
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTLArchitecture : NSObject, NSCopying
 {
     [Selector("name")] public NSString Name { get; }
@@ -179,7 +178,6 @@ public objc interface MTLDevice : NSObjectProtocol
 {
     [Selector("name")] NSString Name { get; }
     [Selector("registryID")] ulong RegistryID { get; }
-    /// macOS 14.0 and later.
     [Selector("architecture")] MTLArchitecture Architecture { get; }
     [Selector("maxThreadsPerThreadgroup")] MTLSize MaxThreadsPerThreadgroup { get; }
     [Selector("isLowPower")] bool LowPower { get; }
@@ -219,15 +217,11 @@ public objc interface MTLDevice : NSObjectProtocol
     [Selector("supportsFunctionPointersFromRender")] bool SupportsFunctionPointersFromRender { get; }
     [Selector("supportsRaytracingFromRender")] bool SupportsRaytracingFromRender { get; }
     [Selector("supportsPrimitiveMotionBlur")] bool SupportsPrimitiveMotionBlur { get; }
-    /// macOS 13.3 and later.
     [Selector("shouldMaximizeConcurrentCompilation", "setShouldMaximizeConcurrentCompilation:")] bool ShouldMaximizeConcurrentCompilation { get; set; }
-    /// macOS 13.3 and later.
     [Selector("maximumConcurrentCompilationTaskCount")] NSUInteger MaximumConcurrentCompilationTaskCount { get; }
-    /// macOS 15.0 and later.
     [Selector("newLogStateWithDescriptor:error:")] MTLLogState? NewLogStateWithDescriptorError(MTLLogStateDescriptor descriptor, out NSError? error);
     [Selector("newCommandQueue")] MTLCommandQueue? NewCommandQueue();
     [Selector("newCommandQueueWithMaxCommandBufferCount:")] MTLCommandQueue? NewCommandQueueWithMaxCommandBufferCount(NSUInteger maxCommandBufferCount);
-    /// macOS 15.0 and later.
     [Selector("newCommandQueueWithDescriptor:")] MTLCommandQueue? NewCommandQueueWithDescriptor(MTLCommandQueueDescriptor descriptor);
     [Selector("heapTextureSizeAndAlignWithDescriptor:")] MTLSizeAndAlign HeapTextureSizeAndAlignWithDescriptor(MTLTextureDescriptor desc);
     [Selector("heapBufferSizeAndAlignWithLength:options:")] MTLSizeAndAlign HeapBufferSizeAndAlignWithLengthOptions(NSUInteger length, MTLResourceOptions options);
@@ -285,9 +279,7 @@ public objc interface MTLDevice : NSObjectProtocol
     [Selector("newIOCommandQueueWithDescriptor:error:")] MTLIOCommandQueue? NewIOCommandQueueWithDescriptorError(MTLIOCommandQueueDescriptor descriptor, out NSError? error);
     /// Deprecated in macOS 14.0.
     [Selector("newIOHandleWithURL:compressionMethod:error:")] MTLIOFileHandle? NewIOHandleWithURLCompressionMethodError(NSURL url, MTLIOCompressionMethod compressionMethod, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("newIOFileHandleWithURL:error:")] MTLIOFileHandle? NewIOFileHandleWithURLError(NSURL url, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("newIOFileHandleWithURL:compressionMethod:error:")] MTLIOFileHandle? NewIOFileHandleWithURLCompressionMethodError(NSURL url, MTLIOCompressionMethod compressionMethod, out NSError? error);
     [Selector("sparseTileSizeWithTextureType:pixelFormat:sampleCount:")] MTLSize SparseTileSizeWithTextureTypePixelFormatSampleCount(MTLTextureType textureType, MTLPixelFormat pixelFormat, NSUInteger sampleCount);
     [Optional] [Selector("convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:")] void ConvertSparsePixelRegionsToTileRegionsWithTileSizeAlignmentModeNumRegions(MTLRegion* pixelRegions, MTLRegion* tileRegions, MTLSize tileSize, MTLSparseTextureRegionAlignmentMode mode, NSUInteger numRegions);
@@ -307,7 +299,6 @@ public objc interface MTLDevice : NSObjectProtocol
     [Selector("newAccelerationStructureWithDescriptor:")] MTLAccelerationStructure? NewAccelerationStructureWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
     [Selector("heapAccelerationStructureSizeAndAlignWithSize:")] MTLSizeAndAlign HeapAccelerationStructureSizeAndAlignWithSize(NSUInteger size);
     [Selector("heapAccelerationStructureSizeAndAlignWithDescriptor:")] MTLSizeAndAlign HeapAccelerationStructureSizeAndAlignWithDescriptor(MTLAccelerationStructureDescriptor descriptor);
-    /// macOS 15.0 and later.
     [Selector("newResidencySetWithDescriptor:error:")] MTLResidencySet? NewResidencySetWithDescriptorError(MTLResidencySetDescriptor desc, out NSError? error);
     /// macOS 26.0 and later.
     [Selector("tensorSizeAndAlignWithDescriptor:")] MTLSizeAndAlign TensorSizeAndAlignWithDescriptor(MTLTensorDescriptor descriptor);

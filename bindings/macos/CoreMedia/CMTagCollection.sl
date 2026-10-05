@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMedia")
 
-/// macOS 14.0 and later.
 public enum CMTagCollectionError : int
 {
     ParamErr = -15740,
@@ -48,123 +47,84 @@ public enum CMTagCollectionError : int
 
 public struct OpaqueCMTagCollection;
 
-/// macOS 14.0 and later.
 [CFType("CMTagCollectionGetTypeID")]
 public extern objc class CMTagCollectionRef : CFTypeRef { }
 
-/// macOS 14.0 and later.
 [CFType]
 public extern objc class CMMutableTagCollectionRef : CMTagCollectionRef { }
 
-/// macOS 14.0 and later.
 public extern "C" CFTypeID CMTagCollectionGetTypeID();
 
-/// macOS 14.0 and later.
 public delegate void CMTagCollectionApplierFunction(CMTag arg0, void* arg1);
 
-/// macOS 14.0 and later.
 public delegate Boolean CMTagCollectionTagFilterFunction(CMTag arg0, void* arg1);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreate(CFAllocatorRef? allocator, CMTag* tags, CMItemCount tagCount, OpaqueCMTagCollection** newCollectionOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateMutable(CFAllocatorRef? allocator, CFIndex capacity, OpaqueCMTagCollection** newMutableCollectionOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateCopy(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator, OpaqueCMTagCollection** newCollectionCopyOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateMutableCopy(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator, OpaqueCMTagCollection** newMutableCollectionCopyOut);
 
-/// macOS 14.0 and later.
 [ReturnsRetained] public extern "C" CFStringRef? CMTagCollectionCopyDescription(CFAllocatorRef? allocator, CMTagCollectionRef? tagCollection);
 
-/// macOS 14.0 and later.
 public extern "C" CMItemCount CMTagCollectionGetCount(CMTagCollectionRef tagCollection);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagCollectionContainsTag(CMTagCollectionRef tagCollection, CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagCollectionContainsTagsOfCollection(CMTagCollectionRef tagCollection, CMTagCollectionRef containedTagCollection);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagCollectionContainsSpecifiedTags(CMTagCollectionRef tagCollection, CMTag* containedTags, CMItemCount containedTagCount);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagCollectionContainsCategory(CMTagCollectionRef tagCollection, CMTagCategory category);
 
-/// macOS 14.0 and later.
 public extern "C" CMItemCount CMTagCollectionGetCountOfCategory(CMTagCollectionRef tagCollection, CMTagCategory category);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionGetTags(CMTagCollectionRef tagCollection, CMTag* tagBuffer, CMItemCount tagBufferCount, CMItemCount* numberOfTagsCopied);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionGetTagsWithCategory(CMTagCollectionRef tagCollection, CMTagCategory category, CMTag* tagBuffer, CMItemCount tagBufferCount, CMItemCount* numberOfTagsCopied);
 
-/// macOS 14.0 and later.
 public extern "C" CMItemCount CMTagCollectionCountTagsWithFilterFunction(CMTagCollectionRef tagCollection, CMTagCollectionTagFilterFunction filterApplier, void* context);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionGetTagsWithFilterFunction(CMTagCollectionRef tagCollection, CMTag* tagBuffer, CMItemCount tagBufferCount, CMItemCount* numberOfTagsCopied, CMTagCollectionTagFilterFunction filter, void* context);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCopyTagsOfCategories(CFAllocatorRef? allocator, CMTagCollectionRef tagCollection, CMTagCategory* categories, CMItemCount categoriesCount, OpaqueCMTagCollection** collectionWithTagsOfCategories);
 
-/// macOS 14.0 and later.
 public extern "C" void CMTagCollectionApply(CMTagCollectionRef tagCollection, CMTagCollectionApplierFunction applier, void* context);
 
-/// macOS 14.0 and later.
 public extern "C" CMTag CMTagCollectionApplyUntil(CMTagCollectionRef tagCollection, CMTagCollectionTagFilterFunction applier, void* context);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagCollectionIsEmpty(CMTagCollectionRef tagCollection);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateIntersection(CMTagCollectionRef? tagCollection1, CMTagCollectionRef? tagCollection2, OpaqueCMTagCollection** tagCollectionOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateUnion(CMTagCollectionRef? tagCollection1, CMTagCollectionRef? tagCollection2, OpaqueCMTagCollection** tagCollectionOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateDifference(CMTagCollectionRef? tagCollectionMinuend, CMTagCollectionRef? tagCollectionSubtrahend, OpaqueCMTagCollection** tagCollectionOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateExclusiveOr(CMTagCollectionRef? tagCollection1, CMTagCollectionRef? tagCollection2, OpaqueCMTagCollection** tagCollectionOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionAddTag(CMMutableTagCollectionRef tagCollection, CMTag tagToAdd);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionRemoveTag(CMMutableTagCollectionRef tagCollection, CMTag tagToRemove);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionRemoveAllTags(CMMutableTagCollectionRef tagCollection);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionRemoveAllTagsOfCategory(CMMutableTagCollectionRef tagCollection, CMTagCategory category);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionAddTagsFromCollection(CMMutableTagCollectionRef tagCollection, CMTagCollectionRef collectionWithTagsToAdd);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionAddTagsFromArray(CMMutableTagCollectionRef tagCollection, CMTag* tags, CMItemCount tagCount);
 
-/// macOS 14.0 and later.
 [ReturnsRetained] public extern "C" CFDictionaryRef? CMTagCollectionCopyAsDictionary(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateFromDictionary(CFDictionaryRef dict, CFAllocatorRef? allocator, OpaqueCMTagCollection** newCollectionOut);
 
-/// macOS 14.0 and later.
 [ReturnsRetained] public extern "C" CFDataRef? CMTagCollectionCopyAsData(CMTagCollectionRef tagCollection, CFAllocatorRef? allocator);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTagCollectionCreateFromData(CFDataRef data, CFAllocatorRef? allocator, OpaqueCMTagCollection** newCollectionOut);
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kCMTagCollectionTagsArrayKey;
 
 #endif

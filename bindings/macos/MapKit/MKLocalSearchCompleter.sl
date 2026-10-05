@@ -51,13 +51,11 @@ public extern objc class MKLocalSearchCompleter : NSObject
 {
     [Selector("queryFragment", "setQueryFragment:")] public NSString QueryFragment { get; set; }
     [Selector("region", "setRegion:")] public MKCoordinateRegion Region { get; set; }
-    /// macOS 15.0 and later.
     [Selector("regionPriority", "setRegionPriority:")] public MKLocalSearchRegionPriority RegionPriority { get; set; }
     /// Deprecated in macOS 10.15.
     [Selector("filterType", "setFilterType:")] public MKSearchCompletionFilterType FilterType { get; set; }
     [Selector("resultTypes", "setResultTypes:")] public MKLocalSearchCompleterResultType ResultTypes { get; set; }
     [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    /// macOS 15.0 and later.
     [Selector("addressFilter", "setAddressFilter:")] public MKAddressFilter? AddressFilter { get; set; }
     [Selector("delegate", "setDelegate:")] public MKLocalSearchCompleterDelegate? Delegate { get; set; }
     [Selector("results")] public NSArray Results { get; }

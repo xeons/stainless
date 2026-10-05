@@ -56,13 +56,11 @@ public extern objc class CIImage : NSObject, NSSecureCoding, NSCopying
     [Selector("definition")] public CIFilterShape? Definition { get; }
     [Selector("url")] public NSURL? Url { get; }
     [Selector("colorSpace")] public CGColorSpaceRef? ColorSpace { get; }
-    /// macOS 15.0 and later.
     [Selector("contentHeadroom")] public float ContentHeadroom { get; }
     /// macOS 26.0 and later.
     [Selector("contentAverageLightLevel")] public float ContentAverageLightLevel { get; }
     [Selector("pixelBuffer")] public CVPixelBufferRef? PixelBuffer { get; }
     [Selector("CGImage")] public CGImageRef? CGImage { get; }
-    /// macOS 15.0 and later.
     [Selector("metalTexture")] public MTLTexture? MetalTexture { get; }
     [Selector("imageWithCGImage:")] public static CIImage ImageWithCGImage(CGImageRef image);
     [Selector("imageWithCGImage:options:")] public static CIImage ImageWithCGImageOptions(CGImageRef image, NSDictionary? options);
@@ -140,9 +138,7 @@ public extern objc class CIImage : NSObject, NSSecureCoding, NSCopying
     [Selector("imageByInsertingIntermediate:")] public CIImage ImageByInsertingIntermediate(bool cache);
     /// macOS 26.0 and later.
     [Selector("imageByInsertingTiledIntermediate")] public CIImage ImageByInsertingTiledIntermediate();
-    /// macOS 15.0 and later.
     [Selector("imageByApplyingGainMap:")] public CIImage ImageByApplyingGainMap(CIImage gainmap);
-    /// macOS 15.0 and later.
     [Selector("imageByApplyingGainMap:headroom:")] public CIImage ImageByApplyingGainMapHeadroom(CIImage gainmap, float headroom);
     /// macOS 26.0 and later.
     [Selector("imageBySettingContentHeadroom:")] public CIImage ImageBySettingContentHeadroom(float headroom);
@@ -171,13 +167,10 @@ public extern "C" CIFormat kCIFormatRGBAf;
 
 public extern "C" CIFormat kCIFormatRGBX16;
 
-/// macOS 14.0 and later.
 public extern "C" CIFormat kCIFormatRGBXh;
 
-/// macOS 14.0 and later.
 public extern "C" CIFormat kCIFormatRGBXf;
 
-/// macOS 14.0 and later.
 public extern "C" CIFormat kCIFormatRGB10;
 
 public extern "C" CIFormat kCIFormatA8;
@@ -229,10 +222,8 @@ public extern "C" CIImageOption? kCIImageApplyCleanAperture;
 
 public extern "C" CIImageOption? kCIImageToneMapHDRtoSDR;
 
-/// macOS 14.0 and later.
 public extern "C" CIImageOption? kCIImageExpandToHDR;
 
-/// macOS 15.0 and later.
 public extern "C" CIImageOption? kCIImageContentHeadroom;
 
 /// macOS 26.0 and later.

@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "LocalAuthentication")
 
-/// macOS 15.0 and later.
 public extern objc class LAEnvironmentMechanismCompanion : LAEnvironmentMechanism
 {
     [Selector("type")] public LACompanionType Type { get; }

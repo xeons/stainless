@@ -296,7 +296,6 @@ public extern "C" AVMetadataIdentifier? AVMetadataIdentifierQuickTimeMetadataAcc
 
 public extern "C" AVMetadataIdentifier? AVMetadataIdentifierQuickTimeMetadataIsMontage;
 
-/// macOS 15.0 and later.
 public extern "C" AVMetadataIdentifier? AVMetadataIdentifierQuickTimeMetadataFullFrameRatePlaybackIntent;
 
 /// macOS 26.0 and later.

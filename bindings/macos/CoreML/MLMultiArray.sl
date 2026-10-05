@@ -60,7 +60,6 @@ public objc closure void MLMultiArrayInitWithDataPointerShapeDataTypeStridesDeal
 public extern objc class MLMultiArray
 {
     [Selector("initWithShape:dataType:error:")] public Self? InitWithShapeDataTypeError(NSArray shape, MLMultiArrayDataType dataType, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("initWithShape:dataType:strides:")] public Self InitWithShapeDataTypeStrides(NSArray shape, MLMultiArrayDataType dataType, NSArray strides);
     [Selector("initWithDataPointer:shape:dataType:strides:deallocator:error:")] public Self? InitWithDataPointerShapeDataTypeStridesDeallocatorError(void* dataPointer, NSArray shape, MLMultiArrayDataType dataType, NSArray strides, MLMultiArrayInitWithDataPointerShapeDataTypeStridesDeallocatorErrorDeallocatorBlock? deallocator, out NSError? error);
     [Selector("initWithPixelBuffer:shape:")] public Self InitWithPixelBufferShape(CVPixelBufferRef pixelBuffer, NSArray shape);
@@ -95,7 +94,6 @@ public extern objc class MLMultiArray
 /// Transferring, a category of MLMultiArray.
 public extern objc class MLMultiArray
 {
-    /// macOS 15.0 and later.
     [Selector("transferToMultiArray:")] public void TransferToMultiArray(MLMultiArray destinationMultiArray);
 }
 

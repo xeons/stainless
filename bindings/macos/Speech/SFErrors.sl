@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Speech")
 
-/// macOS 14 and later.
 public extern "C" NSErrorDomain SFSpeechErrorDomain;
 
-/// macOS 14 and later.
 public enum SFSpeechErrorCode : long
 {
     InternalServiceError = 1,

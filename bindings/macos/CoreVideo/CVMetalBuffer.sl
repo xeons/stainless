@@ -33,10 +33,8 @@ import Standard.ObjC;
 
 public using CVMetalBufferRef = CVBufferRef;
 
-/// macOS 15.0 and later.
 public extern "C" CFTypeID CVMetalBufferGetTypeID();
 
-/// macOS 15.0 and later.
 public extern "C" MTLBuffer? CVMetalBufferGetBuffer(CVMetalBufferRef buffer);
 
 #endif

@@ -43,7 +43,6 @@ public extern objc class NSProgressIndicator : NSView, NSAccessibilityProgressIn
     [Selector("doubleValue", "setDoubleValue:")] public double DoubleValue { get; set; }
     [Selector("minValue", "setMinValue:")] public double MinValue { get; set; }
     [Selector("maxValue", "setMaxValue:")] public double MaxValue { get; set; }
-    /// macOS 14.0 and later.
     [Selector("observedProgress", "setObservedProgress:")] public NSProgress? ObservedProgress { get; set; }
     [Selector("usesThreadedAnimation", "setUsesThreadedAnimation:")] public bool UsesThreadedAnimation { get; set; }
     [Selector("style", "setStyle:")] public NSProgressIndicatorStyle Style { get; set; }

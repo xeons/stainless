@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CloudKit")
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineState : NSObject
 {
     [Selector("pendingRecordZoneChanges")] public NSArray PendingRecordZoneChanges { get; }
@@ -44,7 +43,6 @@ public extern objc class CKSyncEngineState : NSObject
     [Selector("removePendingDatabaseChanges:")] public void RemovePendingDatabaseChanges(NSArray changes);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineStateSerialization : NSObject, NSSecureCoding { }
 
 public enum CKSyncEnginePendingRecordZoneChangeType : long
@@ -53,7 +51,6 @@ public enum CKSyncEnginePendingRecordZoneChangeType : long
     DeleteRecord = 1,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEnginePendingRecordZoneChange : NSObject
 {
     [Selector("recordID")] public CKRecordID RecordID { get; }
@@ -67,21 +64,18 @@ public enum CKSyncEnginePendingDatabaseChangeType : long
     DeleteZone = 1,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEnginePendingDatabaseChange : NSObject
 {
     [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
     [Selector("type")] public CKSyncEnginePendingDatabaseChangeType Type { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEnginePendingZoneSave : CKSyncEnginePendingDatabaseChange
 {
     [Selector("zone")] public CKRecordZone Zone { get; }
     [Selector("initWithZone:")] public Self InitWithZone(CKRecordZone zone);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEnginePendingZoneDelete : CKSyncEnginePendingDatabaseChange
 {
     [Selector("initWithZoneID:")] public Self InitWithZoneID(CKRecordZoneID zoneID);

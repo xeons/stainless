@@ -43,7 +43,6 @@ public objc interface GCLinearInput : NSObjectProtocol
     [Selector("lastValueLatency")] NSTimeInterval LastValueLatency { get; }
     /// macOS 26.2 and later.
     [Selector("physicalExtents")] GCPhysicalInputExtents? PhysicalExtents { get; }
-    /// macOS 14.0 and later.
     [Selector("sources")] NSSet Sources { get; }
 }
 

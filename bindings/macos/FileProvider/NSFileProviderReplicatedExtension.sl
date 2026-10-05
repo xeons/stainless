@@ -143,7 +143,6 @@ public objc interface NSFileProviderPartialContentFetching : NSObjectProtocol
 
 public objc closure void NSFileProviderExternalVolumeHandlingShouldConnectExternalDomainWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
 
-/// macOS 15.0 and later.
 public objc interface NSFileProviderExternalVolumeHandling : NSObjectProtocol
 {
     [Selector("shouldConnectExternalDomainWithCompletionHandler:")] void ShouldConnectExternalDomainWithCompletionHandler(NSFileProviderExternalVolumeHandlingShouldConnectExternalDomainWithCompletionHandlerCompletionHandlerBlock completionHandler);

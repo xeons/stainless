@@ -51,15 +51,11 @@ public extern objc class MTRDataTypeLocationDescriptorStruct : NSObject, NSCopyi
     [Selector("areaType", "setAreaType:")] public NSNumber? AreaType { get; set; }
 }
 
-/// macOS 13.1 and later.
 public extern objc class MTRDescriptorClusterDeviceTypeStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("deviceType", "setDeviceType:")] public NSNumber DeviceType { get; set; }
-    /// macOS 13.1 and later.
     /// Deprecated in macOS 13.3.
     [Selector("type", "setType:")] public NSNumber Type { get; set; }
-    /// macOS 13.1 and later.
     [Selector("revision", "setRevision:")] public NSNumber Revision { get; set; }
 }
 
@@ -112,14 +108,10 @@ public extern objc class MTRAccessControlClusterAccessRestrictionEntryStruct : N
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRAccessControlClusterAccessControlTargetStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("cluster", "setCluster:")] public NSNumber? Cluster { get; set; }
-    /// macOS 14.0 and later.
     [Selector("endpoint", "setEndpoint:")] public NSNumber? Endpoint { get; set; }
-    /// macOS 14.0 and later.
     [Selector("deviceType", "setDeviceType:")] public NSNumber? DeviceType { get; set; }
 }
 
@@ -134,18 +126,12 @@ public extern objc class MTRAccessControlClusterTarget : MTRAccessControlCluster
     [Selector("deviceType", "setDeviceType:")] public NSNumber? DeviceType { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRAccessControlClusterAccessControlEntryStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("privilege", "setPrivilege:")] public NSNumber Privilege { get; set; }
-    /// macOS 13.3 and later.
     [Selector("authMode", "setAuthMode:")] public NSNumber AuthMode { get; set; }
-    /// macOS 13.3 and later.
     [Selector("subjects", "setSubjects:")] public NSArray? Subjects { get; set; }
-    /// macOS 13.3 and later.
     [Selector("targets", "setTargets:")] public NSArray? Targets { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
@@ -164,12 +150,9 @@ public extern objc class MTRAccessControlClusterAccessControlEntry : MTRAccessCo
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRAccessControlClusterAccessControlExtensionStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("data", "setData:")] public NSData Data { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
@@ -244,12 +227,9 @@ public extern objc class MTRActionsClusterActionFailedEvent : NSObject, NSCopyin
     [Selector("error", "setError:")] public NSNumber Error { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBasicInformationClusterCapabilityMinimaStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("caseSessionsPerFabric", "setCaseSessionsPerFabric:")] public NSNumber CaseSessionsPerFabric { get; set; }
-    /// macOS 13.3 and later.
     [Selector("subscriptionsPerFabric", "setSubscriptionsPerFabric:")] public NSNumber SubscriptionsPerFabric { get; set; }
 }
 
@@ -262,19 +242,14 @@ public extern objc class MTRBasicClusterCapabilityMinimaStruct : MTRBasicInforma
     [Selector("subscriptionsPerFabric", "setSubscriptionsPerFabric:")] public NSNumber SubscriptionsPerFabric { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRBasicInformationClusterProductAppearanceStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("finish", "setFinish:")] public NSNumber Finish { get; set; }
-    /// macOS 14.0 and later.
     [Selector("primaryColor", "setPrimaryColor:")] public NSNumber? PrimaryColor { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBasicInformationClusterStartUpEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
 }
 
@@ -285,16 +260,13 @@ public extern objc class MTRBasicClusterStartUpEvent : MTRBasicInformationCluste
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBasicInformationClusterShutDownEvent : NSObject, NSCopying { }
 
 /// Deprecated in macOS 13.3.
 public extern objc class MTRBasicClusterShutDownEvent : MTRBasicInformationClusterShutDownEvent { }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBasicInformationClusterLeaveEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
@@ -305,10 +277,8 @@ public extern objc class MTRBasicClusterLeaveEvent : MTRBasicInformationClusterL
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBasicInformationClusterReachableChangedEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("reachableNewValue", "setReachableNewValue:")] public NSNumber ReachableNewValue { get; set; }
 }
 
@@ -319,14 +289,10 @@ public extern objc class MTRBasicClusterReachableChangedEvent : MTRBasicInformat
     [Selector("reachableNewValue", "setReachableNewValue:")] public NSNumber ReachableNewValue { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateRequestorClusterProviderLocation : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("providerNodeID", "setProviderNodeID:")] public NSNumber ProviderNodeID { get; set; }
-    /// macOS 13.3 and later.
     [Selector("endpoint", "setEndpoint:")] public NSNumber Endpoint { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
@@ -341,16 +307,11 @@ public extern objc class MTROtaSoftwareUpdateRequestorClusterProviderLocation : 
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateRequestorClusterStateTransitionEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("previousState", "setPreviousState:")] public NSNumber PreviousState { get; set; }
-    /// macOS 13.3 and later.
     [Selector("getNewState", "setNewState:")] public NSNumber NewState { get; set; }
-    /// macOS 13.3 and later.
     [Selector("reason", "setReason:")] public NSNumber Reason { get; set; }
-    /// macOS 13.3 and later.
     [Selector("targetSoftwareVersion", "setTargetSoftwareVersion:")] public NSNumber? TargetSoftwareVersion { get; set; }
 }
 
@@ -367,12 +328,9 @@ public extern objc class MTROtaSoftwareUpdateRequestorClusterStateTransitionEven
     [Selector("targetSoftwareVersion", "setTargetSoftwareVersion:")] public NSNumber? TargetSoftwareVersion { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
-    /// macOS 13.3 and later.
     [Selector("productID", "setProductID:")] public NSNumber ProductID { get; set; }
 }
 
@@ -385,16 +343,11 @@ public extern objc class MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent
     [Selector("productID", "setProductID:")] public NSNumber ProductID { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
-    /// macOS 13.3 and later.
     [Selector("bytesDownloaded", "setBytesDownloaded:")] public NSNumber BytesDownloaded { get; set; }
-    /// macOS 13.3 and later.
     [Selector("progressPercent", "setProgressPercent:")] public NSNumber? ProgressPercent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("platformCode", "setPlatformCode:")] public NSNumber? PlatformCode { get; set; }
 }
 
@@ -438,30 +391,21 @@ public extern objc class MTRPowerSourceClusterWiredFaultChangeType : NSObject, N
     [Selector("previous", "setPrevious:")] public NSArray Previous { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRPowerSourceClusterWiredFaultChangeEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("current", "setCurrent:")] public NSArray Current { get; set; }
-    /// macOS 13.3 and later.
     [Selector("previous", "setPrevious:")] public NSArray Previous { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRPowerSourceClusterBatFaultChangeEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("current", "setCurrent:")] public NSArray Current { get; set; }
-    /// macOS 13.3 and later.
     [Selector("previous", "setPrevious:")] public NSArray Previous { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRPowerSourceClusterBatChargeFaultChangeEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("current", "setCurrent:")] public NSArray Current { get; set; }
-    /// macOS 13.3 and later.
     [Selector("previous", "setPrevious:")] public NSArray Previous { get; set; }
 }
 
@@ -471,12 +415,9 @@ public extern objc class MTRGeneralCommissioningClusterBasicCommissioningInfo : 
     [Selector("maxCumulativeFailsafeSeconds", "setMaxCumulativeFailsafeSeconds:")] public NSNumber MaxCumulativeFailsafeSeconds { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRNetworkCommissioningClusterNetworkInfoStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("networkID", "setNetworkID:")] public NSData NetworkID { get; set; }
-    /// macOS 14.0 and later.
     [Selector("connected", "setConnected:")] public NSNumber Connected { get; set; }
 }
 
@@ -489,24 +430,15 @@ public extern objc class MTRNetworkCommissioningClusterNetworkInfo : MTRNetworkC
     [Selector("connected", "setConnected:")] public NSNumber Connected { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("panId", "setPanId:")] public NSNumber PanId { get; set; }
-    /// macOS 14.0 and later.
     [Selector("extendedPanId", "setExtendedPanId:")] public NSNumber ExtendedPanId { get; set; }
-    /// macOS 14.0 and later.
     [Selector("networkName", "setNetworkName:")] public NSString NetworkName { get; set; }
-    /// macOS 14.0 and later.
     [Selector("channel", "setChannel:")] public NSNumber Channel { get; set; }
-    /// macOS 14.0 and later.
     [Selector("version", "setVersion:")] public NSNumber Version { get; set; }
-    /// macOS 14.0 and later.
     [Selector("extendedAddress", "setExtendedAddress:")] public NSData ExtendedAddress { get; set; }
-    /// macOS 14.0 and later.
     [Selector("rssi", "setRssi:")] public NSNumber Rssi { get; set; }
-    /// macOS 14.0 and later.
     [Selector("lqi", "setLqi:")] public NSNumber Lqi { get; set; }
 }
 
@@ -531,20 +463,13 @@ public extern objc class MTRNetworkCommissioningClusterThreadInterfaceScanResult
     [Selector("lqi", "setLqi:")] public NSNumber Lqi { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("security", "setSecurity:")] public NSNumber Security { get; set; }
-    /// macOS 14.0 and later.
     [Selector("ssid", "setSsid:")] public NSData Ssid { get; set; }
-    /// macOS 14.0 and later.
     [Selector("bssid", "setBssid:")] public NSData Bssid { get; set; }
-    /// macOS 14.0 and later.
     [Selector("channel", "setChannel:")] public NSNumber Channel { get; set; }
-    /// macOS 14.0 and later.
     [Selector("wiFiBand", "setWiFiBand:")] public NSNumber WiFiBand { get; set; }
-    /// macOS 14.0 and later.
     [Selector("rssi", "setRssi:")] public NSNumber Rssi { get; set; }
 }
 
@@ -565,24 +490,15 @@ public extern objc class MTRNetworkCommissioningClusterWiFiInterfaceScanResult :
     [Selector("rssi", "setRssi:")] public NSNumber Rssi { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRGeneralDiagnosticsClusterNetworkInterface : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("name", "setName:")] public NSString Name { get; set; }
-    /// macOS 13.3 and later.
     [Selector("isOperational", "setIsOperational:")] public NSNumber IsOperational { get; set; }
-    /// macOS 13.3 and later.
     [Selector("offPremiseServicesReachableIPv4", "setOffPremiseServicesReachableIPv4:")] public NSNumber? OffPremiseServicesReachableIPv4 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("offPremiseServicesReachableIPv6", "setOffPremiseServicesReachableIPv6:")] public NSNumber? OffPremiseServicesReachableIPv6 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("hardwareAddress", "setHardwareAddress:")] public NSData HardwareAddress { get; set; }
-    /// macOS 13.3 and later.
     [Selector("iPv4Addresses", "setIPv4Addresses:")] public NSArray IPv4Addresses { get; set; }
-    /// macOS 13.3 and later.
     [Selector("iPv6Addresses", "setIPv6Addresses:")] public NSArray IPv6Addresses { get; set; }
-    /// macOS 13.3 and later.
     [Selector("type", "setType:")] public NSNumber Type { get; set; }
 }
 
@@ -630,18 +546,12 @@ public extern objc class MTRGeneralDiagnosticsClusterBootReasonEvent : NSObject,
     [Selector("bootReason", "setBootReason:")] public NSNumber BootReason { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRSoftwareDiagnosticsClusterThreadMetricsStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("id", "setId:")] public NSNumber Id { get; set; }
-    /// macOS 13.3 and later.
     [Selector("name", "setName:")] public NSString? Name { get; set; }
-    /// macOS 13.3 and later.
     [Selector("stackFreeCurrent", "setStackFreeCurrent:")] public NSNumber? StackFreeCurrent { get; set; }
-    /// macOS 13.3 and later.
     [Selector("stackFreeMinimum", "setStackFreeMinimum:")] public NSNumber? StackFreeMinimum { get; set; }
-    /// macOS 13.3 and later.
     [Selector("stackSize", "setStackSize:")] public NSNumber? StackSize { get; set; }
 }
 
@@ -667,36 +577,21 @@ public extern objc class MTRSoftwareDiagnosticsClusterSoftwareFaultEvent : NSObj
     [Selector("faultRecording", "setFaultRecording:")] public NSData? FaultRecording { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRThreadNetworkDiagnosticsClusterNeighborTableStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("extAddress", "setExtAddress:")] public NSNumber ExtAddress { get; set; }
-    /// macOS 14.0 and later.
     [Selector("age", "setAge:")] public NSNumber Age { get; set; }
-    /// macOS 14.0 and later.
     [Selector("rloc16", "setRloc16:")] public NSNumber Rloc16 { get; set; }
-    /// macOS 14.0 and later.
     [Selector("linkFrameCounter", "setLinkFrameCounter:")] public NSNumber LinkFrameCounter { get; set; }
-    /// macOS 14.0 and later.
     [Selector("mleFrameCounter", "setMleFrameCounter:")] public NSNumber MleFrameCounter { get; set; }
-    /// macOS 14.0 and later.
     [Selector("lqi", "setLqi:")] public NSNumber Lqi { get; set; }
-    /// macOS 14.0 and later.
     [Selector("averageRssi", "setAverageRssi:")] public NSNumber? AverageRssi { get; set; }
-    /// macOS 14.0 and later.
     [Selector("lastRssi", "setLastRssi:")] public NSNumber? LastRssi { get; set; }
-    /// macOS 14.0 and later.
     [Selector("frameErrorRate", "setFrameErrorRate:")] public NSNumber FrameErrorRate { get; set; }
-    /// macOS 14.0 and later.
     [Selector("messageErrorRate", "setMessageErrorRate:")] public NSNumber MessageErrorRate { get; set; }
-    /// macOS 14.0 and later.
     [Selector("rxOnWhenIdle", "setRxOnWhenIdle:")] public NSNumber RxOnWhenIdle { get; set; }
-    /// macOS 14.0 and later.
     [Selector("fullThreadDevice", "setFullThreadDevice:")] public NSNumber FullThreadDevice { get; set; }
-    /// macOS 14.0 and later.
     [Selector("fullNetworkData", "setFullNetworkData:")] public NSNumber FullNetworkData { get; set; }
-    /// macOS 14.0 and later.
     [Selector("isChild", "setIsChild:")] public NSNumber IsChild { get; set; }
 }
 
@@ -749,28 +644,17 @@ public extern objc class MTRThreadNetworkDiagnosticsClusterOperationalDatasetCom
     [Selector("channelMaskPresent", "setChannelMaskPresent:")] public NSNumber ChannelMaskPresent { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRThreadNetworkDiagnosticsClusterRouteTableStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("extAddress", "setExtAddress:")] public NSNumber ExtAddress { get; set; }
-    /// macOS 14.0 and later.
     [Selector("rloc16", "setRloc16:")] public NSNumber Rloc16 { get; set; }
-    /// macOS 14.0 and later.
     [Selector("routerId", "setRouterId:")] public NSNumber RouterId { get; set; }
-    /// macOS 14.0 and later.
     [Selector("nextHop", "setNextHop:")] public NSNumber NextHop { get; set; }
-    /// macOS 14.0 and later.
     [Selector("pathCost", "setPathCost:")] public NSNumber PathCost { get; set; }
-    /// macOS 14.0 and later.
     [Selector("lqiIn", "setLqiIn:")] public NSNumber LqiIn { get; set; }
-    /// macOS 14.0 and later.
     [Selector("lqiOut", "setLqiOut:")] public NSNumber LqiOut { get; set; }
-    /// macOS 14.0 and later.
     [Selector("age", "setAge:")] public NSNumber Age { get; set; }
-    /// macOS 14.0 and later.
     [Selector("allocated", "setAllocated:")] public NSNumber Allocated { get; set; }
-    /// macOS 14.0 and later.
     [Selector("linkEstablished", "setLinkEstablished:")] public NSNumber LinkEstablished { get; set; }
 }
 
@@ -823,7 +707,6 @@ public extern objc class MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent : NS
 
 public extern objc class MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("associationFailureCause", "setAssociationFailureCause:")] public NSNumber AssociationFailureCause { get; set; }
     /// Deprecated in macOS 14.4.
     [Selector("associationFailure", "setAssociationFailure:")] public NSNumber AssociationFailure { get; set; }
@@ -835,14 +718,10 @@ public extern objc class MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent :
     [Selector("connectionStatus", "setConnectionStatus:")] public NSNumber ConnectionStatus { get; set; }
 }
 
-/// macOS 13.4 and later.
 public extern objc class MTRTimeSynchronizationClusterDSTOffsetStruct : NSObject, NSCopying
 {
-    /// macOS 13.4 and later.
     [Selector("offset", "setOffset:")] public NSNumber Offset { get; set; }
-    /// macOS 13.4 and later.
     [Selector("validStarting", "setValidStarting:")] public NSNumber ValidStarting { get; set; }
-    /// macOS 13.4 and later.
     [Selector("validUntil", "setValidUntil:")] public NSNumber? ValidUntil { get; set; }
 }
 
@@ -866,14 +745,10 @@ public extern objc class MTRTimeSynchronizationClusterFabricScopedTrustedTimeSou
     [Selector("endpoint", "setEndpoint:")] public NSNumber Endpoint { get; set; }
 }
 
-/// macOS 13.4 and later.
 public extern objc class MTRTimeSynchronizationClusterTimeZoneStruct : NSObject, NSCopying
 {
-    /// macOS 13.4 and later.
     [Selector("offset", "setOffset:")] public NSNumber Offset { get; set; }
-    /// macOS 13.4 and later.
     [Selector("validAt", "setValidAt:")] public NSNumber ValidAt { get; set; }
-    /// macOS 13.4 and later.
     [Selector("name", "setName:")] public NSString? Name { get; set; }
 }
 
@@ -924,19 +799,14 @@ public extern objc class MTRTimeSynchronizationClusterTimeFailureEvent : NSObjec
 /// macOS 15.4 and later.
 public extern objc class MTRTimeSynchronizationClusterMissingTrustedTimeSourceEvent : NSObject, NSCopying { }
 
-/// macOS 14.0 and later.
 public extern objc class MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("finish", "setFinish:")] public NSNumber Finish { get; set; }
-    /// macOS 14.0 and later.
     [Selector("primaryColor", "setPrimaryColor:")] public NSNumber? PrimaryColor { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBridgedDeviceBasicInformationClusterStartUpEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
 }
 
@@ -947,22 +817,18 @@ public extern objc class MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDe
     [Selector("softwareVersion", "setSoftwareVersion:")] public NSNumber SoftwareVersion { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBridgedDeviceBasicInformationClusterShutDownEvent : NSObject, NSCopying { }
 
 /// Deprecated in macOS 14.0.
 public extern objc class MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent { }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBridgedDeviceBasicInformationClusterLeaveEvent : NSObject, NSCopying { }
 
 /// Deprecated in macOS 14.0.
 public extern objc class MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent { }
 
-/// macOS 13.3 and later.
 public extern objc class MTRBridgedDeviceBasicInformationClusterReachableChangedEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("reachableNewValue", "setReachableNewValue:")] public NSNumber ReachableNewValue { get; set; }
 }
 
@@ -1013,36 +879,25 @@ public extern objc class MTRSwitchClusterMultiPressOngoingEvent : NSObject, NSCo
 
 public extern objc class MTRSwitchClusterMultiPressCompleteEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("previousPosition", "setPreviousPosition:")] public NSNumber PreviousPosition { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("getNewPosition", "setNewPosition:")] public NSNumber NewPosition { get; set; }
     [Selector("totalNumberOfPressesCounted", "setTotalNumberOfPressesCounted:")] public NSNumber TotalNumberOfPressesCounted { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTROperationalCredentialsClusterFabricDescriptorStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("rootPublicKey", "setRootPublicKey:")] public NSData RootPublicKey { get; set; }
-    /// macOS 13.3 and later.
     [Selector("vendorID", "setVendorID:")] public NSNumber VendorID { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("vendorId", "setVendorId:")] public NSNumber VendorId { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricID", "setFabricID:")] public NSNumber FabricID { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("fabricId", "setFabricId:")] public NSNumber FabricId { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nodeID", "setNodeID:")] public NSNumber NodeID { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("nodeId", "setNodeId:")] public NSNumber NodeId { get; set; }
-    /// macOS 13.3 and later.
     [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
@@ -1179,12 +1034,9 @@ public extern objc class MTROvenModeClusterModeOptionStruct : NSObject, NSCopyin
     [Selector("modeTags", "setModeTags:")] public NSArray ModeTags { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRModeSelectClusterSemanticTagStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("mfgCode", "setMfgCode:")] public NSNumber MfgCode { get; set; }
-    /// macOS 13.3 and later.
     [Selector("value", "setValue:")] public NSNumber Value { get; set; }
 }
 
@@ -1244,43 +1096,29 @@ public extern objc class MTRRefrigeratorAndTemperatureControlledCabinetModeClust
     [Selector("modeTags", "setModeTags:")] public NSArray ModeTags { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCRunModeClusterModeTagStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("mfgCode", "setMfgCode:")] public NSNumber? MfgCode { get; set; }
-    /// macOS 14.4 and later.
     [Selector("value", "setValue:")] public NSNumber Value { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCRunModeClusterModeOptionStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    /// macOS 14.4 and later.
     [Selector("mode", "setMode:")] public NSNumber Mode { get; set; }
-    /// macOS 14.4 and later.
     [Selector("modeTags", "setModeTags:")] public NSArray ModeTags { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCCleanModeClusterModeTagStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("mfgCode", "setMfgCode:")] public NSNumber? MfgCode { get; set; }
-    /// macOS 14.4 and later.
     [Selector("value", "setValue:")] public NSNumber Value { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCCleanModeClusterModeOptionStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("label", "setLabel:")] public NSString Label { get; set; }
-    /// macOS 14.4 and later.
     [Selector("mode", "setMode:")] public NSNumber Mode { get; set; }
-    /// macOS 14.4 and later.
     [Selector("modeTags", "setModeTags:")] public NSArray ModeTags { get; set; }
 }
 
@@ -1317,57 +1155,41 @@ public extern objc class MTRDishwasherModeClusterModeOptionStruct : NSObject, NS
     [Selector("modeTags", "setModeTags:")] public NSArray ModeTags { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmSeverityLevel", "setAlarmSeverityLevel:")] public NSNumber AlarmSeverityLevel { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterCOAlarmEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmSeverityLevel", "setAlarmSeverityLevel:")] public NSNumber AlarmSeverityLevel { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterLowBatteryEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmSeverityLevel", "setAlarmSeverityLevel:")] public NSNumber AlarmSeverityLevel { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterHardwareFaultEvent : NSObject, NSCopying { }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterEndOfServiceEvent : NSObject, NSCopying { }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterSelfTestCompleteEvent : NSObject, NSCopying { }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterAlarmMutedEvent : NSObject, NSCopying { }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterMuteEndedEvent : NSObject, NSCopying { }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmSeverityLevel", "setAlarmSeverityLevel:")] public NSNumber AlarmSeverityLevel { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmSeverityLevel", "setAlarmSeverityLevel:")] public NSNumber AlarmSeverityLevel { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSmokeCOAlarmClusterAllClearEvent : NSObject, NSCopying { }
 
 /// macOS 15.4 and later.
@@ -1403,208 +1225,134 @@ public extern objc class MTRMicrowaveOvenModeClusterModeOptionStruct : NSObject,
     [Selector("modeTags", "setModeTags:")] public NSArray ModeTags { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterErrorStateStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("errorStateID", "setErrorStateID:")] public NSNumber ErrorStateID { get; set; }
-    /// macOS 14.4 and later.
     [Selector("errorStateLabel", "setErrorStateLabel:")] public NSString? ErrorStateLabel { get; set; }
-    /// macOS 14.4 and later.
     [Selector("errorStateDetails", "setErrorStateDetails:")] public NSString? ErrorStateDetails { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterOperationalStateStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("operationalStateID", "setOperationalStateID:")] public NSNumber OperationalStateID { get; set; }
-    /// macOS 14.4 and later.
     [Selector("operationalStateLabel", "setOperationalStateLabel:")] public NSString? OperationalStateLabel { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterOperationalErrorEvent : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("errorState", "setErrorState:")] public MTROperationalStateClusterErrorStateStruct ErrorState { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTROperationalStateClusterOperationCompletionEvent : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("completionErrorCode", "setCompletionErrorCode:")] public NSNumber CompletionErrorCode { get; set; }
-    /// macOS 14.4 and later.
     [Selector("totalOperationalTime", "setTotalOperationalTime:")] public NSNumber? TotalOperationalTime { get; set; }
-    /// macOS 14.4 and later.
     [Selector("pausedTime", "setPausedTime:")] public NSNumber? PausedTime { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCOperationalStateClusterErrorStateStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("errorStateID", "setErrorStateID:")] public NSNumber ErrorStateID { get; set; }
-    /// macOS 14.4 and later.
     [Selector("errorStateLabel", "setErrorStateLabel:")] public NSString? ErrorStateLabel { get; set; }
-    /// macOS 14.4 and later.
     [Selector("errorStateDetails", "setErrorStateDetails:")] public NSString? ErrorStateDetails { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCOperationalStateClusterOperationalStateStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("operationalStateID", "setOperationalStateID:")] public NSNumber OperationalStateID { get; set; }
-    /// macOS 14.4 and later.
     [Selector("operationalStateLabel", "setOperationalStateLabel:")] public NSString? OperationalStateLabel { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCOperationalStateClusterOperationalErrorEvent : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("errorState", "setErrorState:")] public MTRRVCOperationalStateClusterErrorStateStruct ErrorState { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRRVCOperationalStateClusterOperationCompletionEvent : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("completionErrorCode", "setCompletionErrorCode:")] public NSNumber CompletionErrorCode { get; set; }
-    /// macOS 14.4 and later.
     [Selector("totalOperationalTime", "setTotalOperationalTime:")] public NSNumber? TotalOperationalTime { get; set; }
-    /// macOS 14.4 and later.
     [Selector("pausedTime", "setPausedTime:")] public NSNumber? PausedTime { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRHEPAFilterMonitoringClusterReplacementProductStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("productIdentifierType", "setProductIdentifierType:")] public NSNumber ProductIdentifierType { get; set; }
-    /// macOS 14.6 and later.
     [Selector("productIdentifierValue", "setProductIdentifierValue:")] public NSString ProductIdentifierValue { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("productIdentifierType", "setProductIdentifierType:")] public NSNumber ProductIdentifierType { get; set; }
-    /// macOS 14.6 and later.
     [Selector("productIdentifierValue", "setProductIdentifierValue:")] public NSString ProductIdentifierValue { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("alarmsActive", "setAlarmsActive:")] public NSNumber AlarmsActive { get; set; }
-    /// macOS 14.6 and later.
     [Selector("alarmsSuppressed", "setAlarmsSuppressed:")] public NSNumber? AlarmsSuppressed { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRBooleanStateConfigurationClusterSensorFaultEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("sensorFault", "setSensorFault:")] public NSNumber SensorFault { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRValveConfigurationAndControlClusterValveStateChangedEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("valveState", "setValveState:")] public NSNumber ValveState { get; set; }
-    /// macOS 14.6 and later.
     [Selector("valveLevel", "setValveLevel:")] public NSNumber? ValveLevel { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRValveConfigurationAndControlClusterValveFaultEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("valveFault", "setValveFault:")] public NSNumber ValveFault { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("rangeMin", "setRangeMin:")] public NSNumber RangeMin { get; set; }
-    /// macOS 14.6 and later.
     [Selector("rangeMax", "setRangeMax:")] public NSNumber RangeMax { get; set; }
-    /// macOS 14.6 and later.
     [Selector("percentMax", "setPercentMax:")] public NSNumber? PercentMax { get; set; }
-    /// macOS 14.6 and later.
     [Selector("percentMin", "setPercentMin:")] public NSNumber? PercentMin { get; set; }
-    /// macOS 14.6 and later.
     [Selector("percentTypical", "setPercentTypical:")] public NSNumber? PercentTypical { get; set; }
-    /// macOS 14.6 and later.
     [Selector("fixedMax", "setFixedMax:")] public NSNumber? FixedMax { get; set; }
-    /// macOS 14.6 and later.
     [Selector("fixedMin", "setFixedMin:")] public NSNumber? FixedMin { get; set; }
-    /// macOS 14.6 and later.
     [Selector("fixedTypical", "setFixedTypical:")] public NSNumber? FixedTypical { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("measurementType", "setMeasurementType:")] public NSNumber MeasurementType { get; set; }
-    /// macOS 14.6 and later.
     [Selector("measured", "setMeasured:")] public NSNumber Measured { get; set; }
-    /// macOS 14.6 and later.
     [Selector("minMeasuredValue", "setMinMeasuredValue:")] public NSNumber MinMeasuredValue { get; set; }
-    /// macOS 14.6 and later.
     [Selector("maxMeasuredValue", "setMaxMeasuredValue:")] public NSNumber MaxMeasuredValue { get; set; }
-    /// macOS 14.6 and later.
     [Selector("accuracyRanges", "setAccuracyRanges:")] public NSArray AccuracyRanges { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("order", "setOrder:")] public NSNumber Order { get; set; }
-    /// macOS 14.6 and later.
     [Selector("measurement", "setMeasurement:")] public NSNumber? Measurement { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalPowerMeasurementClusterMeasurementRangeStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("measurementType", "setMeasurementType:")] public NSNumber MeasurementType { get; set; }
-    /// macOS 14.6 and later.
     [Selector("min", "setMin:")] public NSNumber Min { get; set; }
-    /// macOS 14.6 and later.
     [Selector("max", "setMax:")] public NSNumber Max { get; set; }
-    /// macOS 14.6 and later.
     [Selector("startTimestamp", "setStartTimestamp:")] public NSNumber? StartTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("endTimestamp", "setEndTimestamp:")] public NSNumber? EndTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("minTimestamp", "setMinTimestamp:")] public NSNumber? MinTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("maxTimestamp", "setMaxTimestamp:")] public NSNumber? MaxTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("startSystime", "setStartSystime:")] public NSNumber? StartSystime { get; set; }
-    /// macOS 14.6 and later.
     [Selector("endSystime", "setEndSystime:")] public NSNumber? EndSystime { get; set; }
-    /// macOS 14.6 and later.
     [Selector("minSystime", "setMinSystime:")] public NSNumber? MinSystime { get; set; }
-    /// macOS 14.6 and later.
     [Selector("maxSystime", "setMaxSystime:")] public NSNumber? MaxSystime { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("ranges", "setRanges:")] public NSArray Ranges { get; set; }
 }
 
@@ -1629,64 +1377,41 @@ public extern objc class MTRElectricalEnergyMeasurementClusterMeasurementAccurac
     [Selector("fixedTypical", "setFixedTypical:")] public NSNumber? FixedTypical { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("measurementType", "setMeasurementType:")] public NSNumber MeasurementType { get; set; }
-    /// macOS 14.6 and later.
     [Selector("measured", "setMeasured:")] public NSNumber Measured { get; set; }
-    /// macOS 14.6 and later.
     [Selector("minMeasuredValue", "setMinMeasuredValue:")] public NSNumber MinMeasuredValue { get; set; }
-    /// macOS 14.6 and later.
     [Selector("maxMeasuredValue", "setMaxMeasuredValue:")] public NSNumber MaxMeasuredValue { get; set; }
-    /// macOS 14.6 and later.
     [Selector("accuracyRanges", "setAccuracyRanges:")] public NSArray AccuracyRanges { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("importedResetTimestamp", "setImportedResetTimestamp:")] public NSNumber? ImportedResetTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("exportedResetTimestamp", "setExportedResetTimestamp:")] public NSNumber? ExportedResetTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("importedResetSystime", "setImportedResetSystime:")] public NSNumber? ImportedResetSystime { get; set; }
-    /// macOS 14.6 and later.
     [Selector("exportedResetSystime", "setExportedResetSystime:")] public NSNumber? ExportedResetSystime { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("energy", "setEnergy:")] public NSNumber Energy { get; set; }
-    /// macOS 14.6 and later.
     [Selector("startTimestamp", "setStartTimestamp:")] public NSNumber? StartTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("endTimestamp", "setEndTimestamp:")] public NSNumber? EndTimestamp { get; set; }
-    /// macOS 14.6 and later.
     [Selector("startSystime", "setStartSystime:")] public NSNumber? StartSystime { get; set; }
-    /// macOS 14.6 and later.
     [Selector("endSystime", "setEndSystime:")] public NSNumber? EndSystime { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("energyImported", "setEnergyImported:")] public MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct? EnergyImported { get; set; }
-    /// macOS 14.6 and later.
     [Selector("energyExported", "setEnergyExported:")] public MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct? EnergyExported { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent : NSObject, NSCopying
 {
-    /// macOS 14.6 and later.
     [Selector("energyImported", "setEnergyImported:")] public MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct? EnergyImported { get; set; }
-    /// macOS 14.6 and later.
     [Selector("energyExported", "setEnergyExported:")] public MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct? EnergyExported { get; set; }
 }
 
@@ -2065,12 +1790,9 @@ public extern objc class MTRDeviceEnergyManagementModeClusterModeOptionStruct : 
     [Selector("modeTags", "setModeTags:")] public NSArray ModeTags { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRDoorLockClusterCredentialStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("credentialType", "setCredentialType:")] public NSNumber CredentialType { get; set; }
-    /// macOS 13.3 and later.
     [Selector("credentialIndex", "setCredentialIndex:")] public NSNumber CredentialIndex { get; set; }
 }
 
@@ -2281,14 +2003,10 @@ public extern objc class MTRThermostatClusterScheduleTypeStruct : NSObject, NSCo
     [Selector("scheduleTypeFeatures", "setScheduleTypeFeatures:")] public NSNumber ScheduleTypeFeatures { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRThermostatClusterWeeklyScheduleTransitionStruct : NSObject, NSCopying
 {
-    /// macOS 14.4 and later.
     [Selector("transitionTime", "setTransitionTime:")] public NSNumber TransitionTime { get; set; }
-    /// macOS 14.4 and later.
     [Selector("heatSetpoint", "setHeatSetpoint:")] public NSNumber? HeatSetpoint { get; set; }
-    /// macOS 14.4 and later.
     [Selector("coolSetpoint", "setCoolSetpoint:")] public NSNumber? CoolSetpoint { get; set; }
 }
 
@@ -2361,18 +2079,12 @@ public extern objc class MTRChannelClusterSeriesInfoStruct : NSObject, NSCopying
     [Selector("episode", "setEpisode:")] public NSString Episode { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRChannelClusterChannelInfoStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("majorNumber", "setMajorNumber:")] public NSNumber MajorNumber { get; set; }
-    /// macOS 13.3 and later.
     [Selector("minorNumber", "setMinorNumber:")] public NSNumber MinorNumber { get; set; }
-    /// macOS 13.3 and later.
     [Selector("name", "setName:")] public NSString? Name { get; set; }
-    /// macOS 13.3 and later.
     [Selector("callSign", "setCallSign:")] public NSString? CallSign { get; set; }
-    /// macOS 13.3 and later.
     [Selector("affiliateCallSign", "setAffiliateCallSign:")] public NSString? AffiliateCallSign { get; set; }
     /// macOS 15.4 and later.
     [Selector("identifier", "setIdentifier:")] public NSString? Identifier { get; set; }
@@ -2450,16 +2162,11 @@ public extern objc class MTRChannelClusterChannelPagingStruct : NSObject, NSCopy
     [Selector("nextToken", "setNextToken:")] public MTRChannelClusterPageTokenStruct? NextToken { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRChannelClusterLineupInfoStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("operatorName", "setOperatorName:")] public NSString OperatorName { get; set; }
-    /// macOS 13.3 and later.
     [Selector("lineupName", "setLineupName:")] public NSString? LineupName { get; set; }
-    /// macOS 13.3 and later.
     [Selector("postalCode", "setPostalCode:")] public NSString? PostalCode { get; set; }
-    /// macOS 13.3 and later.
     [Selector("lineupInfoType", "setLineupInfoType:")] public NSNumber LineupInfoType { get; set; }
 }
 
@@ -2476,12 +2183,9 @@ public extern objc class MTRChannelClusterLineupInfo : MTRChannelClusterLineupIn
     [Selector("lineupInfoType", "setLineupInfoType:")] public NSNumber LineupInfoType { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRTargetNavigatorClusterTargetInfoStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("identifier", "setIdentifier:")] public NSNumber Identifier { get; set; }
-    /// macOS 13.3 and later.
     [Selector("name", "setName:")] public NSString Name { get; set; }
 }
 
@@ -2505,12 +2209,9 @@ public extern objc class MTRTargetNavigatorClusterTargetUpdatedEvent : NSObject,
     [Selector("data", "setData:")] public NSData Data { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRMediaPlaybackClusterPlaybackPositionStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("updatedAt", "setUpdatedAt:")] public NSNumber UpdatedAt { get; set; }
-    /// macOS 13.3 and later.
     [Selector("position", "setPosition:")] public NSNumber? Position { get; set; }
 }
 
@@ -2546,16 +2247,11 @@ public extern objc class MTRMediaPlaybackClusterStateChangedEvent : NSObject, NS
     [Selector("audioAdvanceUnmuted", "setAudioAdvanceUnmuted:")] public NSNumber AudioAdvanceUnmuted { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRMediaInputClusterInputInfoStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("index", "setIndex:")] public NSNumber Index { get; set; }
-    /// macOS 13.3 and later.
     [Selector("inputType", "setInputType:")] public NSNumber InputType { get; set; }
-    /// macOS 13.3 and later.
     [Selector("name", "setName:")] public NSString Name { get; set; }
-    /// macOS 13.3 and later.
     [Selector("descriptionString", "setDescriptionString:")] public NSString DescriptionString { get; set; }
 }
 
@@ -2572,14 +2268,10 @@ public extern objc class MTRMediaInputClusterInputInfo : MTRMediaInputClusterInp
     [Selector("descriptionString", "setDescriptionString:")] public NSString DescriptionString { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRContentLauncherClusterDimensionStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("width", "setWidth:")] public NSNumber Width { get; set; }
-    /// macOS 13.3 and later.
     [Selector("height", "setHeight:")] public NSNumber Height { get; set; }
-    /// macOS 13.3 and later.
     [Selector("metric", "setMetric:")] public NSNumber Metric { get; set; }
 }
 
@@ -2594,12 +2286,9 @@ public extern objc class MTRContentLauncherClusterDimension : MTRContentLauncher
     [Selector("metric", "setMetric:")] public NSNumber Metric { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRContentLauncherClusterAdditionalInfoStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("name", "setName:")] public NSString Name { get; set; }
-    /// macOS 13.3 and later.
     [Selector("value", "setValue:")] public NSString Value { get; set; }
 }
 
@@ -2612,14 +2301,10 @@ public extern objc class MTRContentLauncherClusterAdditionalInfo : MTRContentLau
     [Selector("value", "setValue:")] public NSString Value { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRContentLauncherClusterParameterStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("type", "setType:")] public NSNumber Type { get; set; }
-    /// macOS 13.3 and later.
     [Selector("value", "setValue:")] public NSString Value { get; set; }
-    /// macOS 13.3 and later.
     [Selector("externalIDList", "setExternalIDList:")] public NSArray? ExternalIDList { get; set; }
 }
 
@@ -2634,10 +2319,8 @@ public extern objc class MTRContentLauncherClusterParameter : MTRContentLauncher
     [Selector("externalIDList", "setExternalIDList:")] public NSArray? ExternalIDList { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRContentLauncherClusterContentSearchStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("parameterList", "setParameterList:")] public NSArray ParameterList { get; set; }
 }
 
@@ -2648,17 +2331,12 @@ public extern objc class MTRContentLauncherClusterContentSearch : MTRContentLaun
     [Selector("parameterList", "setParameterList:")] public NSArray ParameterList { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRContentLauncherClusterStyleInformationStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("imageURL", "setImageURL:")] public NSString? ImageURL { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("imageUrl", "setImageUrl:")] public NSString? ImageUrl { get; set; }
-    /// macOS 13.3 and later.
     [Selector("color", "setColor:")] public NSString? Color { get; set; }
-    /// macOS 13.3 and later.
     [Selector("size", "setSize:")] public MTRContentLauncherClusterDimensionStruct? Size { get; set; }
 }
 
@@ -2671,20 +2349,13 @@ public extern objc class MTRContentLauncherClusterStyleInformation : MTRContentL
     [Selector("size", "setSize:")] public MTRContentLauncherClusterDimensionStruct? Size { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRContentLauncherClusterBrandingInformationStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("providerName", "setProviderName:")] public NSString ProviderName { get; set; }
-    /// macOS 13.3 and later.
     [Selector("background", "setBackground:")] public MTRContentLauncherClusterStyleInformationStruct? Background { get; set; }
-    /// macOS 13.3 and later.
     [Selector("logo", "setLogo:")] public MTRContentLauncherClusterStyleInformationStruct? Logo { get; set; }
-    /// macOS 13.3 and later.
     [Selector("progressBar", "setProgressBar:")] public MTRContentLauncherClusterStyleInformationStruct? ProgressBar { get; set; }
-    /// macOS 13.3 and later.
     [Selector("splash", "setSplash:")] public MTRContentLauncherClusterStyleInformationStruct? Splash { get; set; }
-    /// macOS 13.3 and later.
     [Selector("waterMark", "setWaterMark:")] public MTRContentLauncherClusterStyleInformationStruct? WaterMark { get; set; }
 }
 
@@ -2705,14 +2376,10 @@ public extern objc class MTRContentLauncherClusterBrandingInformation : MTRConte
     [Selector("waterMark", "setWaterMark:")] public MTRContentLauncherClusterStyleInformationStruct? WaterMark { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRAudioOutputClusterOutputInfoStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("index", "setIndex:")] public NSNumber Index { get; set; }
-    /// macOS 13.3 and later.
     [Selector("outputType", "setOutputType:")] public NSNumber OutputType { get; set; }
-    /// macOS 13.3 and later.
     [Selector("name", "setName:")] public NSString Name { get; set; }
 }
 
@@ -2727,17 +2394,12 @@ public extern objc class MTRAudioOutputClusterOutputInfo : MTRAudioOutputCluster
     [Selector("name", "setName:")] public NSString Name { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRApplicationLauncherClusterApplicationStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("catalogVendorID", "setCatalogVendorID:")] public NSNumber CatalogVendorID { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("catalogVendorId", "setCatalogVendorId:")] public NSNumber CatalogVendorId { get; set; }
-    /// macOS 13.3 and later.
     [Selector("applicationID", "setApplicationID:")] public NSString ApplicationID { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("applicationId", "setApplicationId:")] public NSString ApplicationId { get; set; }
 }
@@ -2745,12 +2407,9 @@ public extern objc class MTRApplicationLauncherClusterApplicationStruct : NSObje
 /// Deprecated in macOS 13.3.
 public extern objc class MTRApplicationLauncherClusterApplication : MTRApplicationLauncherClusterApplicationStruct { }
 
-/// macOS 13.3 and later.
 public extern objc class MTRApplicationLauncherClusterApplicationEPStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("application", "setApplication:")] public MTRApplicationLauncherClusterApplicationStruct Application { get; set; }
-    /// macOS 13.3 and later.
     [Selector("endpoint", "setEndpoint:")] public NSNumber? Endpoint { get; set; }
 }
 
@@ -2763,17 +2422,12 @@ public extern objc class MTRApplicationLauncherClusterApplicationEP : MTRApplica
     [Selector("endpoint", "setEndpoint:")] public NSNumber? Endpoint { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRApplicationBasicClusterApplicationStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("catalogVendorID", "setCatalogVendorID:")] public NSNumber CatalogVendorID { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("catalogVendorId", "setCatalogVendorId:")] public NSNumber CatalogVendorId { get; set; }
-    /// macOS 13.3 and later.
     [Selector("applicationID", "setApplicationID:")] public NSString ApplicationID { get; set; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 13.3.
     [Selector("applicationId", "setApplicationId:")] public NSString ApplicationId { get; set; }
 }
@@ -2801,24 +2455,15 @@ public extern objc class MTRCommissionerControlClusterCommissioningRequestResult
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterSimpleStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("a", "setA:")] public NSNumber A { get; set; }
-    /// macOS 13.3 and later.
     [Selector("b", "setB:")] public NSNumber B { get; set; }
-    /// macOS 13.3 and later.
     [Selector("c", "setC:")] public NSNumber C { get; set; }
-    /// macOS 13.3 and later.
     [Selector("d", "setD:")] public NSData D { get; set; }
-    /// macOS 13.3 and later.
     [Selector("e", "setE:")] public NSString E { get; set; }
-    /// macOS 13.3 and later.
     [Selector("f", "setF:")] public NSNumber F { get; set; }
-    /// macOS 13.3 and later.
     [Selector("g", "setG:")] public NSNumber G { get; set; }
-    /// macOS 13.3 and later.
     [Selector("h", "setH:")] public NSNumber H { get; set; }
 }
 
@@ -2843,24 +2488,15 @@ public extern objc class MTRTestClusterClusterSimpleStruct : MTRUnitTestingClust
     [Selector("h", "setH:")] public NSNumber H { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestFabricScoped : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("fabricSensitiveInt8u", "setFabricSensitiveInt8u:")] public NSNumber FabricSensitiveInt8u { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalFabricSensitiveInt8u", "setOptionalFabricSensitiveInt8u:")] public NSNumber? OptionalFabricSensitiveInt8u { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableFabricSensitiveInt8u", "setNullableFabricSensitiveInt8u:")] public NSNumber? NullableFabricSensitiveInt8u { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalFabricSensitiveInt8u", "setNullableOptionalFabricSensitiveInt8u:")] public NSNumber? NullableOptionalFabricSensitiveInt8u { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricSensitiveCharString", "setFabricSensitiveCharString:")] public NSString FabricSensitiveCharString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricSensitiveStruct", "setFabricSensitiveStruct:")] public MTRUnitTestingClusterSimpleStruct FabricSensitiveStruct { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricSensitiveInt8uList", "setFabricSensitiveInt8uList:")] public NSArray FabricSensitiveInt8uList { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
@@ -2885,32 +2521,19 @@ public extern objc class MTRTestClusterClusterTestFabricScoped : MTRUnitTestingC
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterNullablesAndOptionalsStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("nullableInt", "setNullableInt:")] public NSNumber? NullableInt { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalInt", "setOptionalInt:")] public NSNumber? OptionalInt { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalInt", "setNullableOptionalInt:")] public NSNumber? NullableOptionalInt { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableString", "setNullableString:")] public NSString? NullableString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalString", "setOptionalString:")] public NSString? OptionalString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalString", "setNullableOptionalString:")] public NSString? NullableOptionalString { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableStruct", "setNullableStruct:")] public MTRUnitTestingClusterSimpleStruct? NullableStruct { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalStruct", "setOptionalStruct:")] public MTRUnitTestingClusterSimpleStruct? OptionalStruct { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalStruct", "setNullableOptionalStruct:")] public MTRUnitTestingClusterSimpleStruct? NullableOptionalStruct { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableList", "setNullableList:")] public NSArray? NullableList { get; set; }
-    /// macOS 13.3 and later.
     [Selector("optionalList", "setOptionalList:")] public NSArray? OptionalList { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nullableOptionalList", "setNullableOptionalList:")] public NSArray? NullableOptionalList { get; set; }
 }
 
@@ -2943,14 +2566,10 @@ public extern objc class MTRTestClusterClusterNullablesAndOptionalsStruct : MTRU
     [Selector("nullableOptionalList", "setNullableOptionalList:")] public NSArray? NullableOptionalList { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterNestedStruct : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("a", "setA:")] public NSNumber A { get; set; }
-    /// macOS 13.3 and later.
     [Selector("b", "setB:")] public NSNumber B { get; set; }
-    /// macOS 13.3 and later.
     [Selector("c", "setC:")] public MTRUnitTestingClusterSimpleStruct C { get; set; }
 }
 
@@ -2965,22 +2584,14 @@ public extern objc class MTRTestClusterClusterNestedStruct : MTRUnitTestingClust
     [Selector("c", "setC:")] public MTRTestClusterClusterSimpleStruct C { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterNestedStructList : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("a", "setA:")] public NSNumber A { get; set; }
-    /// macOS 13.3 and later.
     [Selector("b", "setB:")] public NSNumber B { get; set; }
-    /// macOS 13.3 and later.
     [Selector("c", "setC:")] public MTRUnitTestingClusterSimpleStruct C { get; set; }
-    /// macOS 13.3 and later.
     [Selector("d", "setD:")] public NSArray D { get; set; }
-    /// macOS 13.3 and later.
     [Selector("e", "setE:")] public NSArray E { get; set; }
-    /// macOS 13.3 and later.
     [Selector("f", "setF:")] public NSArray F { get; set; }
-    /// macOS 13.3 and later.
     [Selector("g", "setG:")] public NSArray G { get; set; }
 }
 
@@ -3003,10 +2614,8 @@ public extern objc class MTRTestClusterClusterNestedStructList : MTRUnitTestingC
     [Selector("g", "setG:")] public NSArray G { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterDoubleNestedStructList : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("a", "setA:")] public NSArray A { get; set; }
 }
 
@@ -3017,12 +2626,9 @@ public extern objc class MTRTestClusterClusterDoubleNestedStructList : MTRUnitTe
     [Selector("a", "setA:")] public NSArray A { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestListStructOctet : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("member1", "setMember1:")] public NSNumber Member1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("member2", "setMember2:")] public NSData Member2 { get; set; }
 }
 
@@ -3035,20 +2641,13 @@ public extern objc class MTRTestClusterClusterTestListStructOctet : MTRUnitTesti
     [Selector("member2", "setMember2:")] public NSData Member2 { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestEventEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("arg1", "setArg1:")] public NSNumber Arg1 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg2", "setArg2:")] public NSNumber Arg2 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg3", "setArg3:")] public NSNumber Arg3 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg4", "setArg4:")] public MTRUnitTestingClusterSimpleStruct Arg4 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg5", "setArg5:")] public NSArray Arg5 { get; set; }
-    /// macOS 13.3 and later.
     [Selector("arg6", "setArg6:")] public NSArray Arg6 { get; set; }
 }
 
@@ -3069,10 +2668,8 @@ public extern objc class MTRTestClusterClusterTestEventEvent : MTRUnitTestingClu
     [Selector("arg6", "setArg6:")] public NSArray Arg6 { get; set; }
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRUnitTestingClusterTestFabricScopedEventEvent : NSObject, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("fabricIndex", "setFabricIndex:")] public NSNumber FabricIndex { get; set; }
 }
 

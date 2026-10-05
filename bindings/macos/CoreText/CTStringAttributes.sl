@@ -103,7 +103,6 @@ public const int kCTWritingDirectionOverride = 2;
 
 public extern "C" CFStringRef kCTRubyAnnotationAttributeName;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCTAdaptiveImageProviderAttributeName;
 
 #endif

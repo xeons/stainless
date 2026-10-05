@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Accessibility")
 
-/// macOS 15.0 and later.
 public extern objc class AXRequest : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("currentRequest")] public static AXRequest? CurrentRequest { get; }

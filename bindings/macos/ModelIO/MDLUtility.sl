@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "ModelIO")
 
-/// macOS 15.0 and later.
 public extern objc class MDLUtility : NSObject
 {
     [Selector("convertToUSDZ:writeToURL:")] public static void ConvertToUSDZWriteToURL(NSURL inputURL, NSURL outputURL);

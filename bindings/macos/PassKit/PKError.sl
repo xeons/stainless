@@ -59,10 +59,8 @@ public extern "C" PKPaymentErrorKey PKPaymentErrorContactFieldUserInfoKey;
 
 public extern "C" PKPaymentErrorKey PKPaymentErrorPostalAddressUserInfoKey;
 
-/// macOS 15.0 and later.
 public extern "C" NSString PKDisbursementErrorDomain;
 
-/// macOS 15.0 and later.
 public enum PKDisbursementErrorCode : long
 {
     UnknownError = -1,
@@ -72,7 +70,6 @@ public enum PKDisbursementErrorCode : long
 
 public using PKDisbursementErrorKey = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" PKDisbursementErrorKey PKDisbursementErrorContactFieldUserInfoKey;
 
 public enum PKAddPaymentPassError : long

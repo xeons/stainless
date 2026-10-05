@@ -56,7 +56,6 @@ public objc interface NSFilePresenter : NSObjectProtocol
     [Optional] [Selector("relinquishPresentedItemToWriter:")] void RelinquishPresentedItemToWriter(NSFilePresenterRelinquishPresentedItemToWriterWriterBlock writer);
     [Optional] [Selector("savePresentedItemChangesWithCompletionHandler:")] void SavePresentedItemChangesWithCompletionHandler(NSFilePresenterSavePresentedItemChangesWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Optional] [Selector("accommodatePresentedItemDeletionWithCompletionHandler:")] void AccommodatePresentedItemDeletionWithCompletionHandler(NSFilePresenterAccommodatePresentedItemDeletionWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.4 and later.
     [Optional] [Selector("accommodatePresentedItemEvictionWithCompletionHandler:")] void AccommodatePresentedItemEvictionWithCompletionHandler(NSFilePresenterAccommodatePresentedItemEvictionWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Optional] [Selector("presentedItemDidMoveToURL:")] void PresentedItemDidMoveToURL(NSURL newURL);
     [Optional] [Selector("presentedItemDidChange")] void PresentedItemDidChange();

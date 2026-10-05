@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 13.1 and later.
 public enum INAnswerCallIntentResponseCode : long
 {
     Unspecified = 0,
@@ -42,7 +41,6 @@ public enum INAnswerCallIntentResponseCode : long
     FailureRequiringAppLaunch = 6,
 }
 
-/// macOS 13.1 and later.
 public extern objc class INAnswerCallIntentResponse : INIntentResponse
 {
     [Selector("code")] public INAnswerCallIntentResponseCode Code { get; }

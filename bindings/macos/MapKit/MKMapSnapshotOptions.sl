@@ -34,7 +34,6 @@ import Standard.ObjC;
 
 public extern objc class MKMapSnapshotOptions : NSObject, NSCopying
 {
-    /// macOS 14.0 and later.
     [Selector("preferredConfiguration", "setPreferredConfiguration:")] public MKMapConfiguration PreferredConfiguration { get; set; }
     [Selector("camera", "setCamera:")] public MKMapCamera Camera { get; set; }
     [Selector("mapRect", "setMapRect:")] public MKMapRect MapRect { get; set; }

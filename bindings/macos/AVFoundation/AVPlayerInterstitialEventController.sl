@@ -49,7 +49,6 @@ public extern "C" AVPlayerInterstitialEventCue AVPlayerInterstitialEventJoinCue;
 
 public extern "C" AVPlayerInterstitialEventCue AVPlayerInterstitialEventLeaveCue;
 
-/// macOS 15.0 and later.
 public enum AVPlayerInterstitialEventTimelineOccupancy : long
 {
     SinglePoint = 0,
@@ -71,13 +70,9 @@ public extern objc class AVPlayerInterstitialEvent : NSObject, NSCopying
     [Selector("cue")] public AVPlayerInterstitialEventCue Cue { get; }
     [Selector("willPlayOnce")] public bool WillPlayOnce { get; }
     [Selector("userDefinedAttributes")] public NSDictionary UserDefinedAttributes { get; }
-    /// macOS 13.3 and later.
     [Selector("assetListResponse")] public NSDictionary? AssetListResponse { get; }
-    /// macOS 15.0 and later.
     [Selector("timelineOccupancy")] public AVPlayerInterstitialEventTimelineOccupancy TimelineOccupancy { get; }
-    /// macOS 15.0 and later.
     [Selector("supplementsPrimaryContent")] public bool SupplementsPrimaryContent { get; }
-    /// macOS 15.0 and later.
     [Selector("contentMayVary")] public bool ContentMayVary { get; }
     /// macOS 26.0 and later.
     [Selector("skipControlTimeRange")] public CMTimeRange SkipControlTimeRange { get; }
@@ -91,7 +86,6 @@ public extern objc class AVPlayerInterstitialEvent : NSObject, NSCopying
     [Selector("interstitialEventWithPrimaryItem:date:")] public static Self InterstitialEventWithPrimaryItemDate(AVPlayerItem primaryItem, NSDate date);
 }
 
-/// macOS 13.3 and later.
 public enum AVPlayerInterstitialEventAssetListResponseStatus : long
 {
     Available = 0,
@@ -111,7 +105,6 @@ public enum AVPlayerInterstitialEventSkippableEventState : long
 /// MutableEvents, a category of AVPlayerInterstitialEvent.
 public extern objc class AVPlayerInterstitialEvent
 {
-    /// macOS 15.0 and later.
     [Selector("plannedDuration", "setPlannedDuration:")] public CMTime PlannedDuration { get; set; }
 }
 
@@ -133,16 +126,12 @@ public extern "C" NSNotificationName AVPlayerInterstitialEventMonitorEventsDidCh
 
 public extern "C" NSNotificationName AVPlayerInterstitialEventMonitorCurrentEventDidChangeNotification;
 
-/// macOS 13.3 and later.
 public extern "C" NSNotificationName AVPlayerInterstitialEventMonitorAssetListResponseStatusDidChangeNotification;
 
-/// macOS 13.3 and later.
 public extern "C" NSString AVPlayerInterstitialEventMonitorAssetListResponseStatusDidChangeEventKey;
 
-/// macOS 13.3 and later.
 public extern "C" NSString AVPlayerInterstitialEventMonitorAssetListResponseStatusDidChangeStatusKey;
 
-/// macOS 13.3 and later.
 public extern "C" NSString AVPlayerInterstitialEventMonitorAssetListResponseStatusDidChangeErrorKey;
 
 /// macOS 26.0 and later.

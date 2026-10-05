@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MetalPerformanceShadersGraph")
 
-/// macOS 14.0 and later.
 public extern objc class MPSGraphImToColOpDescriptor : MPSGraphObject, NSCopying
 {
     [Selector("kernelWidth", "setKernelWidth:")] public NSUInteger KernelWidth { get; set; }

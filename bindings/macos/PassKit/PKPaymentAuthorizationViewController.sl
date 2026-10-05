@@ -38,13 +38,9 @@ public extern objc class PKPaymentAuthorizationViewController : NSViewController
     [Selector("canMakePaymentsUsingNetworks:")] public static bool CanMakePaymentsUsingNetworks(NSArray supportedNetworks);
     [Selector("canMakePaymentsUsingNetworks:capabilities:")] public static bool CanMakePaymentsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
     [Selector("initWithPaymentRequest:")] public Self? InitWithPaymentRequest(PKPaymentRequest request);
-    /// macOS 15.0 and later.
     [Selector("supportsDisbursements")] public static bool SupportsDisbursements();
-    /// macOS 15.0 and later.
     [Selector("supportsDisbursementsUsingNetworks:")] public static bool SupportsDisbursementsUsingNetworks(NSArray supportedNetworks);
-    /// macOS 15.0 and later.
     [Selector("supportsDisbursementsUsingNetworks:capabilities:")] public static bool SupportsDisbursementsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilities);
-    /// macOS 15.0 and later.
     [Selector("initWithDisbursementRequest:")] public Self InitWithDisbursementRequest(PKDisbursementRequest request);
 }
 

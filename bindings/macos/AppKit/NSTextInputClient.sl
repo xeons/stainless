@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 14.0 and later.
 public enum NSTextCursorAccessoryPlacement : long
 {
     Unspecified = 0,
@@ -48,11 +47,8 @@ public enum NSTextCursorAccessoryPlacement : long
 
 public objc interface NSTextInputClient
 {
-    /// macOS 14.0 and later.
     [Optional] [Selector("unionRectInVisibleSelectedRange")] NSRect UnionRectInVisibleSelectedRange { get; }
-    /// macOS 14.0 and later.
     [Optional] [Selector("documentVisibleRect")] NSRect DocumentVisibleRect { get; }
-    /// macOS 15.0 and later.
     [Optional] [Selector("supportsAdaptiveImageGlyph")] bool SupportsAdaptiveImageGlyph { get; }
     [Selector("insertText:replacementRange:")] void InsertTextReplacementRange(AnyObject string, NSRange replacementRange);
     [Selector("doCommandBySelector:")] void DoCommandBySelector(Selector selector);
@@ -71,7 +67,6 @@ public objc interface NSTextInputClient
     [Optional] [Selector("windowLevel")] NSInteger WindowLevel();
     [Optional] [Selector("drawsVerticallyForCharacterAtIndex:")] bool DrawsVerticallyForCharacterAtIndex(NSUInteger charIndex);
     [Optional] [Selector("preferredTextAccessoryPlacement")] NSTextCursorAccessoryPlacement PreferredTextAccessoryPlacement();
-    /// macOS 15.0 and later.
     [Optional] [Selector("insertAdaptiveImageGlyph:replacementRange:")] void InsertAdaptiveImageGlyphReplacementRange(NSAdaptiveImageGlyph adaptiveImageGlyph, NSRange replacementRange);
 }
 

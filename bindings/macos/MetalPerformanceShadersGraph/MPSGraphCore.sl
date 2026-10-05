@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MetalPerformanceShadersGraph")
 
-/// macOS 14.0 and later.
 public extern objc class MPSGraphObject : NSObject { }
 
 public extern objc class MPSGraphType : MPSGraphObject, NSCopying { }

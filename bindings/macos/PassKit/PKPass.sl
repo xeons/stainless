@@ -45,7 +45,6 @@ public extern objc class PKPass : PKObject
     [Selector("organizationName")] public NSString OrganizationName { get; }
     /// Deprecated in macOS 15.0.
     [Selector("relevantDate")] public NSDate? RelevantDate { get; }
-    /// macOS 15.0 and later.
     [Selector("relevantDates")] public NSArray RelevantDates { get; }
     [Selector("userInfo")] public NSDictionary? UserInfo { get; }
     [Selector("passURL")] public NSURL? PassURL { get; }

@@ -57,7 +57,6 @@ public extern objc class NSSplitViewController : NSViewController, NSSplitViewDe
 public extern objc class NSSplitViewController
 {
     [Selector("toggleSidebar:")] public void ToggleSidebar(AnyObject? sender);
-    /// macOS 14.0 and later.
     [Selector("toggleInspector:")] public void ToggleInspector(AnyObject? sender);
 }
 

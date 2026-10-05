@@ -107,14 +107,10 @@ public extern objc class CASpringAnimation : CABasicAnimation
     [Selector("stiffness", "setStiffness:")] public CGFloat Stiffness { get; set; }
     [Selector("damping", "setDamping:")] public CGFloat Damping { get; set; }
     [Selector("initialVelocity", "setInitialVelocity:")] public CGFloat InitialVelocity { get; set; }
-    /// macOS 14.0 and later.
     [Selector("allowsOverdamping", "setAllowsOverdamping:")] public bool AllowsOverdamping { get; set; }
     [Selector("settlingDuration")] public CFTimeInterval SettlingDuration { get; }
-    /// macOS 14.0 and later.
     [Selector("perceptualDuration")] public CFTimeInterval PerceptualDuration { get; }
-    /// macOS 14.0 and later.
     [Selector("bounce")] public CGFloat Bounce { get; }
-    /// macOS 14.0 and later.
     [Selector("initWithPerceptualDuration:bounce:")] public Self InitWithPerceptualDurationBounce(CFTimeInterval perceptualDuration, CGFloat bounce);
 }
 

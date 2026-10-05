@@ -42,7 +42,6 @@ public objc interface GCSwitchPositionInput : NSObjectProtocol
     [Selector("canWrap")] bool CanWrap { get; }
     [Selector("lastPositionTimestamp")] NSTimeInterval LastPositionTimestamp { get; }
     [Selector("lastPositionLatency")] NSTimeInterval LastPositionLatency { get; }
-    /// macOS 14.0 and later.
     [Selector("sources")] NSSet Sources { get; }
 }
 

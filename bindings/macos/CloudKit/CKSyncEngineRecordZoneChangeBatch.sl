@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public objc closure CKRecord? CKSyncEngineRecordZoneChangeBatchInitWithPendingChangesRecordProviderRecordProviderBlock(CKRecordID arg0);
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineRecordZoneChangeBatch : NSObject
 {
     [Selector("recordsToSave")] public NSArray RecordsToSave { get; }

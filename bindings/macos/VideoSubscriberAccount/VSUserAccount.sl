@@ -31,21 +31,18 @@ import Standard.ObjC;
 
 #pragma comment(framework, "VideoSubscriberAccount")
 
-/// macOS 13.3 and later.
 public enum VSUserAccountType : long
 {
     Free = 0,
     Paid = 1,
 }
 
-/// macOS 13.3 and later.
 public enum VSOriginatingDeviceCategory : long
 {
     Mobile = 0,
     Other = 1,
 }
 
-/// macOS 13.3 and later.
 public extern objc class VSUserAccount : NSObject
 {
     [Selector("updateURL", "setUpdateURL:")] public NSURL? UpdateURL { get; set; }
@@ -60,7 +57,6 @@ public extern objc class VSUserAccount : NSObject
     [Selector("authenticationData", "setAuthenticationData:")] public NSString? AuthenticationData { get; set; }
     [Selector("isFromCurrentDevice")] public bool FromCurrentDevice { get; }
     [Selector("deviceCategory")] public VSOriginatingDeviceCategory DeviceCategory { get; }
-    /// macOS 14.4 and later.
     [Selector("appleSubscription", "setAppleSubscription:")] public VSAppleSubscription? AppleSubscription { get; set; }
     [Selector("initWithAccountType:updateURL:")] public Self InitWithAccountTypeUpdateURL(VSUserAccountType accountType, NSURL? url);
 }

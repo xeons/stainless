@@ -105,25 +105,19 @@ public extern "C" nuint CGImageSourceGetPrimaryImageIndex(CGImageSourceRef isrc)
 
 [ReturnsRetained] public extern "C" CFDictionaryRef? CGImageSourceCopyAuxiliaryDataInfoAtIndex(CGImageSourceRef isrc, nuint index, CFStringRef auxiliaryImageDataType);
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCGImageSourceDecodeRequest;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCGImageSourceDecodeToHDR;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCGImageSourceDecodeToSDR;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGImageSourceGenerateImageSpecificLumaScaling;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCGImageSourceDecodeRequestOptions;
 
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kCGComputeHDRStats;
 
-/// macOS 14.2 and later.
 public extern "C" OSStatus CGImageSourceSetAllowableTypes(CFArrayRef allowableTypes);
 
 #endif

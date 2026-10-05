@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 14.6 and later.
 public extern objc class MTRDeviceStorageBehaviorConfiguration : NSObject, NSCopying
 {
     [Selector("disableStorageBehaviorOptimization", "setDisableStorageBehaviorOptimization:")] public bool DisableStorageBehaviorOptimization { get; set; }

@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaAccessibility")
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MAMusicHapticsManagerActiveStatusDidChangeNotification;
 
 public objc closure void MAMusicHapticsManagerCheckHapticTrackAvailabilityForMediaMatchingCodeCompletionHandlerCompletionHandlerBlock(bool arg0);
 
 public objc closure void MAMusicHapticsManagerAddStatusObserverStatusHandlerBlock(NSString arg0, bool arg1);
 
-/// macOS 15.0 and later.
 public extern objc class MAMusicHapticsManager : NSObject
 {
     [Selector("sharedManager")] public static MAMusicHapticsManager SharedManager { get; }

@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public extern objc class MTROperationalCertificateChain : NSObject
 {
     [Selector("operationalCertificate", "setOperationalCertificate:")] public MTRCertificateDERBytes OperationalCertificate { get; set; }
@@ -43,7 +42,6 @@ public extern objc class MTROperationalCertificateChain : NSObject
 
 public objc closure void MTROperationalCertificateIssuerIssueOperationalCertificateForRequestAttestationInfoControllerCompletionCompletionBlock(MTROperationalCertificateChain? arg0, NSError? arg1);
 
-/// macOS 13.3 and later.
 public objc interface MTROperationalCertificateIssuer
 {
     [Selector("shouldSkipAttestationCertificateValidation")] bool ShouldSkipAttestationCertificateValidation { get; }

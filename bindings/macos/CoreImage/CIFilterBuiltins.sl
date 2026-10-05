@@ -598,7 +598,6 @@ public objc interface CIPalettize : CIFilterProtocol
 public objc interface CIPhotoEffect : CIFilterProtocol
 {
     [Selector("inputImage", "setInputImage:")] CIImage? InputImage { get; set; }
-    /// macOS 14.0 and later.
     [Selector("extrapolate", "setExtrapolate:")] bool Extrapolate { get; set; }
 }
 
@@ -1434,7 +1433,6 @@ public extern objc class CIFilter
     [Selector("keystoneCorrectionHorizontalFilter")] public static CIFilter KeystoneCorrectionHorizontalFilter();
     [Selector("keystoneCorrectionVerticalFilter")] public static CIFilter KeystoneCorrectionVerticalFilter();
     [Selector("lanczosScaleTransformFilter")] public static CIFilter LanczosScaleTransformFilter();
-    /// macOS 15.0 and later.
     [Selector("maximumScaleTransformFilter")] public static CIFilter MaximumScaleTransformFilter();
     [Selector("perspectiveCorrectionFilter")] public static CIFilter PerspectiveCorrectionFilter();
     [Selector("perspectiveRotateFilter")] public static CIFilter PerspectiveRotateFilter();
@@ -1500,7 +1498,6 @@ public extern objc class CIFilter
     [Selector("systemToneMapFilter")] public static CIFilter SystemToneMapFilter();
     [Selector("temperatureAndTintFilter")] public static CIFilter TemperatureAndTintFilter();
     [Selector("toneCurveFilter")] public static CIFilter ToneCurveFilter();
-    /// macOS 15.0 and later.
     [Selector("toneMapHeadroomFilter")] public static CIFilter ToneMapHeadroomFilter();
     [Selector("vibranceFilter")] public static CIFilter VibranceFilter();
     [Selector("whitePointAdjustFilter")] public static CIFilter WhitePointAdjustFilter();
@@ -1573,7 +1570,6 @@ public extern objc class CIFilter
     [Selector("attributedTextImageGeneratorFilter")] public static CIFilter AttributedTextImageGeneratorFilter();
     [Selector("aztecCodeGeneratorFilter")] public static CIFilter AztecCodeGeneratorFilter();
     [Selector("barcodeGeneratorFilter")] public static CIFilter BarcodeGeneratorFilter();
-    /// macOS 14.0 and later.
     [Selector("blurredRectangleGeneratorFilter")] public static CIFilter BlurredRectangleGeneratorFilter();
     /// macOS 26.0 and later.
     [Selector("blurredRoundedRectangleGeneratorFilter")] public static CIFilter BlurredRoundedRectangleGeneratorFilter();
@@ -1587,7 +1583,6 @@ public extern objc class CIFilter
     /// macOS 26.0 and later.
     [Selector("roundedQRCodeGeneratorFilter")] public static CIFilter RoundedQRCodeGeneratorFilter();
     [Selector("roundedRectangleGeneratorFilter")] public static CIFilter RoundedRectangleGeneratorFilter();
-    /// macOS 14.0 and later.
     [Selector("roundedRectangleStrokeGeneratorFilter")] public static CIFilter RoundedRectangleStrokeGeneratorFilter();
     [Selector("starShineGeneratorFilter")] public static CIFilter StarShineGeneratorFilter();
     [Selector("stripesGeneratorFilter")] public static CIFilter StripesGeneratorFilter();
@@ -1598,7 +1593,6 @@ public extern objc class CIFilter
     [Selector("blendWithMaskFilter")] public static CIFilter BlendWithMaskFilter();
     [Selector("blendWithRedMaskFilter")] public static CIFilter BlendWithRedMaskFilter();
     [Selector("bloomFilter")] public static CIFilter BloomFilter();
-    /// macOS 14.0 and later.
     [Selector("cannyEdgeDetectorFilter")] public static CIFilter CannyEdgeDetectorFilter();
     [Selector("comicEffectFilter")] public static CIFilter ComicEffectFilter();
     [Selector("convolution3X3Filter")] public static CIFilter Convolution3X3Filter();
@@ -1628,7 +1622,6 @@ public extern objc class CIFilter
     [Selector("pointillizeFilter")] public static CIFilter PointillizeFilter();
     [Selector("saliencyMapFilter")] public static CIFilter SaliencyMapFilter();
     [Selector("shadedMaterialFilter")] public static CIFilter ShadedMaterialFilter();
-    /// macOS 14.0 and later.
     [Selector("sobelGradientsFilter")] public static CIFilter SobelGradientsFilter();
     [Selector("spotColorFilter")] public static CIFilter SpotColorFilter();
     [Selector("spotLightFilter")] public static CIFilter SpotLightFilter();
@@ -1646,12 +1639,10 @@ public extern objc class CIFilter
     [Selector("motionBlurFilter")] public static CIFilter MotionBlurFilter();
     [Selector("noiseReductionFilter")] public static CIFilter NoiseReductionFilter();
     [Selector("zoomBlurFilter")] public static CIFilter ZoomBlurFilter();
-    /// macOS 15.0 and later.
     [Selector("areaAlphaWeightedHistogramFilter")] public static CIFilter AreaAlphaWeightedHistogramFilter();
     [Selector("areaAverageFilter")] public static CIFilter AreaAverageFilter();
     /// macOS 26.0 and later.
     [Selector("areaAverageMaximumRedFilter")] public static CIFilter AreaAverageMaximumRedFilter();
-    /// macOS 15.0 and later.
     [Selector("areaBoundsRedFilter")] public static CIFilter AreaBoundsRedFilter();
     [Selector("areaHistogramFilter")] public static CIFilter AreaHistogramFilter();
     [Selector("areaLogarithmicHistogramFilter")] public static CIFilter AreaLogarithmicHistogramFilter();

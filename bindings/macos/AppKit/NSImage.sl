@@ -96,7 +96,6 @@ public extern objc class NSImage : NSObject
     [Selector("capInsets", "setCapInsets:")] public NSEdgeInsets CapInsets { get; set; }
     [Selector("resizingMode", "setResizingMode:")] public NSImageResizingMode ResizingMode { get; set; }
     [Selector("symbolConfiguration")] public NSImageSymbolConfiguration? SymbolConfiguration { get; }
-    /// macOS 14.0 and later.
     [Selector("locale")] public NSLocale? Locale { get; }
     [Selector("imageNamed:")] public static NSImage? ImageNamed(NSImageName name);
     [Selector("imageWithSystemSymbolName:accessibilityDescription:")] public static Self? ImageWithSystemSymbolNameAccessibilityDescription(NSString name, NSString? description);
@@ -133,7 +132,6 @@ public extern objc class NSImage : NSObject
     [Selector("recommendedLayerContentsScale:")] public CGFloat RecommendedLayerContentsScale(CGFloat preferredContentsScale);
     [Selector("layerContentsForContentsScale:")] public AnyObject LayerContentsForContentsScale(CGFloat layerContentsScale);
     [Selector("imageWithSymbolConfiguration:")] public NSImage? ImageWithSymbolConfiguration(NSImageSymbolConfiguration configuration);
-    /// macOS 14.0 and later.
     [Selector("imageWithLocale:")] public NSImage ImageWithLocale(NSLocale? locale);
 }
 

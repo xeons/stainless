@@ -31,7 +31,7 @@ namespace Stainless.Bindgen;
 internal static class Program
 {
     private static readonly (string Triple, string Name)[] Targets =
-        [("arm64-apple-macosx13.0", "arm64"), ("x86_64-apple-macosx13.0", "x64")];
+        [("arm64-apple-macosx15.0", "arm64"), ("x86_64-apple-macosx15.0", "x64")];
 
     private static int Main(string[] args)
     {

@@ -27,7 +27,6 @@ module MacOS.CoreML;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.4 and later.
 public enum MLReshapeFrequencyHint : long
 {
     Frequent = 0,

@@ -31,27 +31,22 @@ import Standard.ObjC;
 #pragma comment(framework, "Hypervisor")
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_gic_config_t hv_gic_config_create();
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_config_set_distributor_base(hv_gic_config_t config, hv_ipa_t distributor_base_address);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_config_set_redistributor_base(hv_gic_config_t config, hv_ipa_t redistributor_base_address);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_config_set_msi_region_base(hv_gic_config_t config, hv_ipa_t msi_region_base_address);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_config_set_msi_interrupt_range(hv_gic_config_t config, uint msi_intid_base, uint msi_intid_count);
 #endif
 

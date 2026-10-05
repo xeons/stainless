@@ -73,7 +73,6 @@ public extern "C" ICDeviceTransport ICTransportTypeMassStorage;
 
 public extern "C" ICDeviceTransport ICTransportTypeTCPIP;
 
-/// macOS 14.0 and later.
 public extern "C" ICDeviceTransport ICTransportTypeProximity;
 
 public using ICDeviceStatus = NSString;

@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMedia")
 
-/// macOS 14.0 and later.
 public enum CMTagError : int
 {
     ParamErr = -15730,
     AllocationFailed = -15731,
 }
 
-/// macOS 14.0 and later.
 public enum CMTagCategory : uint
 {
     Undefined = 0,
@@ -54,7 +52,6 @@ public enum CMTagCategory : uint
     StereoViewInterpretation = 1702455664,
 }
 
-/// macOS 14.0 and later.
 public enum CMTagDataType : uint
 {
     Invalid = 0,
@@ -64,10 +61,8 @@ public enum CMTagDataType : uint
     Flags = 7,
 }
 
-/// macOS 14.0 and later.
 public using CMTagValue = ulong;
 
-/// macOS 14.0 and later.
 public struct CMTag
 {
     public CMTagCategory category;
@@ -75,25 +70,18 @@ public struct CMTag
     public CMTagValue value;
 }
 
-/// macOS 14.0 and later.
 public extern "C" CMTagDataType CMTagGetValueDataType(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagInvalid;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagMediaTypeVideo;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagMediaSubTypeMebx;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagMediaTypeAudio;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagMediaTypeMetadata;
 
-/// macOS 14.0 and later.
 [Flags]
 public enum CMStereoViewComponents : ulong
 {
@@ -102,19 +90,14 @@ public enum CMStereoViewComponents : ulong
     RightEye = 2,
 }
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagStereoLeftEye;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagStereoRightEye;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagStereoLeftAndRightEye;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagStereoNone;
 
-/// macOS 14.0 and later.
 [Flags]
 public enum CMStereoViewInterpretationOptions : ulong
 {
@@ -123,10 +106,8 @@ public enum CMStereoViewInterpretationOptions : ulong
     AdditionalViews = 2,
 }
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagStereoInterpretationOrderReversed;
 
-/// macOS 14.0 and later.
 public enum CMProjectionType : ulong
 {
     Rectangular = 1919247220,
@@ -136,22 +117,17 @@ public enum CMProjectionType : ulong
     ParametricImmersive = 1886546285,
 }
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagProjectionTypeRectangular;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagProjectionTypeEquirectangular;
 
-/// macOS 15.0 and later.
 public extern "C" CMTag kCMTagProjectionTypeHalfEquirectangular;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagProjectionTypeFisheye;
 
 /// macOS 26.0 and later.
 public extern "C" CMTag kCMTagProjectionTypeParametricImmersive;
 
-/// macOS 14.0 and later.
 public enum CMPackingType : ulong
 {
     None = 1852796517,
@@ -159,76 +135,52 @@ public enum CMPackingType : ulong
     OverUnder = 1870030194,
 }
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagPackingTypeNone;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagPackingTypeSideBySide;
 
-/// macOS 14.0 and later.
 public extern "C" CMTag kCMTagPackingTypeOverUnder;
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagHasSInt64Value(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" long CMTagGetSInt64Value(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagHasFloat64Value(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" Float64 CMTagGetFloat64Value(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagHasOSTypeValue(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" OSType CMTagGetOSTypeValue(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagHasFlagsValue(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" ulong CMTagGetFlagsValue(CMTag tag);
 
-/// macOS 14.0 and later.
 public extern "C" CMTag CMTagMakeWithSInt64Value(CMTagCategory category, long value);
 
-/// macOS 14.0 and later.
 public extern "C" CMTag CMTagMakeWithFloat64Value(CMTagCategory category, Float64 value);
 
-/// macOS 14.0 and later.
 public extern "C" CMTag CMTagMakeWithOSTypeValue(CMTagCategory category, OSType value);
 
-/// macOS 14.0 and later.
 public extern "C" CMTag CMTagMakeWithFlagsValue(CMTagCategory category, ulong flagsForTag);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTagEqualToTag(CMTag tag1, CMTag tag2);
 
-/// macOS 14.0 and later.
 public extern "C" CFComparisonResult CMTagCompare(CMTag tag1, CMTag tag2);
 
-/// macOS 14.0 and later.
 public extern "C" CFHashCode CMTagHash(CMTag tag);
 
-/// macOS 14.0 and later.
 [ReturnsRetained] public extern "C" CFStringRef? CMTagCopyDescription(CFAllocatorRef? allocator, CMTag tag);
 
-/// macOS 14.0 and later.
 [ReturnsRetained] public extern "C" CFDictionaryRef? CMTagCopyAsDictionary(CMTag tag, CFAllocatorRef? allocator);
 
-/// macOS 14.0 and later.
 public extern "C" CMTag CMTagMakeFromDictionary(CFDictionaryRef dict);
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kCMTagValueKey;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kCMTagCategoryKey;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kCMTagDataTypeKey;
 
 #endif

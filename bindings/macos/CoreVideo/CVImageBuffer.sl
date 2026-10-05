@@ -166,10 +166,8 @@ public extern "C" CFStringRef? kCVImageBufferAlphaChannelMode_StraightAlpha;
 
 public extern "C" CFStringRef? kCVImageBufferAlphaChannelMode_PremultipliedAlpha;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kCVImageBufferPostDecodeProcessingSequenceMetadataKey;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kCVImageBufferPostDecodeProcessingFrameMetadataKey;
 
 public extern "C" int CVYCbCrMatrixGetIntegerCodePointForString(CFStringRef? yCbCrMatrixString);
@@ -204,15 +202,12 @@ public extern "C" CFStringRef? kCVImageBufferContentLightLevelInfoKey;
 
 public extern "C" CFStringRef kCVImageBufferAmbientViewingEnvironmentKey;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCVImageBufferSceneIlluminationKey;
 
 public extern "C" CFStringRef kCVImageBufferRegionOfInterestKey;
 
-/// macOS 14.2 and later.
 public extern "C" CFStringRef kCVImageBufferLogTransferFunctionKey;
 
-/// macOS 14.2 and later.
 public extern "C" CFStringRef kCVImageBufferLogTransferFunction_AppleLog;
 
 /// macOS 26.0 and later.

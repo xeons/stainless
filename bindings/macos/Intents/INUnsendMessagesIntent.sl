@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 14.0 and later.
 public extern objc class INUnsendMessagesIntent : INIntent
 {
     [Selector("messageIdentifiers")] public NSArray? MessageIdentifiers { get; }
@@ -42,7 +41,6 @@ public objc closure void INUnsendMessagesIntentHandlingHandleUnsendMessagesCompl
 
 public objc closure void INUnsendMessagesIntentHandlingConfirmUnsendMessagesCompletionCompletionBlock(INUnsendMessagesIntentResponse arg0);
 
-/// macOS 14.0 and later.
 public objc interface INUnsendMessagesIntentHandling : NSObjectProtocol
 {
     [Selector("handleUnsendMessages:completion:")] void HandleUnsendMessagesCompletion(INUnsendMessagesIntent intent, INUnsendMessagesIntentHandlingHandleUnsendMessagesCompletionCompletionBlock completion);

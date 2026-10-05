@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 public extern objc class SHCustomCatalog : SHCatalog
 {
-    /// macOS 15.0 and later.
     [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
     [Selector("addReferenceSignature:representingMediaItems:error:")] public bool AddReferenceSignatureRepresentingMediaItemsError(SHSignature signature, NSArray mediaItems, out NSError? error);
     [Selector("addCustomCatalogFromURL:error:")] public bool AddCustomCatalogFromURLError(NSURL customCatalogURL, out NSError? error);
@@ -40,7 +39,6 @@ public extern objc class SHCustomCatalog : SHCatalog
     [Selector("writeToURL:error:")] public bool WriteToURLError(NSURL destinationURL, out NSError? error);
     [Selector("new")] public static Self New();
     [Selector("init")] public Self Init();
-    /// macOS 15.0 and later.
     [Selector("initWithDataRepresentation:error:")] public Self? InitWithDataRepresentationError(NSData dataRepresentation, out NSError? error);
 }
 

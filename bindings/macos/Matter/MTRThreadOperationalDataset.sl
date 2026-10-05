@@ -37,10 +37,8 @@ public extern objc class MTRThreadOperationalDataset : NSObject
     [Selector("extendedPANID")] public NSData ExtendedPANID { get; }
     [Selector("masterKey")] public NSData MasterKey { get; }
     [Selector("PSKc")] public NSData PSKc { get; }
-    /// macOS 13.3 and later.
     [Selector("channelNumber")] public NSNumber ChannelNumber { get; }
     [Selector("panID")] public NSData PanID { get; }
-    /// macOS 13.3 and later.
     [Selector("initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID:")] public Self? InitWithNetworkNameExtendedPANIDMasterKeyPSKcChannelNumberPanID(NSString networkName, NSData extendedPANID, NSData masterKey, NSData PSKc, NSNumber channelNumber, NSData panID);
     [Selector("initWithData:")] public Self? InitWithData(NSData data);
     [Selector("data")] public NSData Data();
@@ -51,14 +49,12 @@ public extern "C" nuint MTRSizeThreadNetworkName;
 /// Deprecated in macOS 13.3.
 public extern "C" nuint MTRSizeThreadExtendedPanId;
 
-/// macOS 13.3 and later.
 public extern "C" nuint MTRSizeThreadExtendedPANID;
 
 public extern "C" nuint MTRSizeThreadMasterKey;
 
 public extern "C" nuint MTRSizeThreadPSKc;
 
-/// macOS 13.3 and later.
 public extern "C" nuint MTRSizeThreadPANID;
 
 /// Deprecated, a category of MTRThreadOperationalDataset.

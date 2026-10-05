@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.4 and later.
 public extern objc class MLComputePlanCost : NSObject
 {
     [Selector("weight")] public double Weight { get; }

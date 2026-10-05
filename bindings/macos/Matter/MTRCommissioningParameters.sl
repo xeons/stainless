@@ -33,18 +33,14 @@ import Standard.ObjC;
 
 public extern objc class MTRCommissioningParameters : NSObject
 {
-    /// macOS 13.3 and later.
     [Selector("csrNonce", "setCsrNonce:")] public NSData? CsrNonce { get; set; }
     [Selector("attestationNonce", "setAttestationNonce:")] public NSData? AttestationNonce { get; set; }
     [Selector("wifiSSID", "setWifiSSID:")] public NSData? WifiSSID { get; set; }
     [Selector("wifiCredentials", "setWifiCredentials:")] public NSData? WifiCredentials { get; set; }
     [Selector("threadOperationalDataset", "setThreadOperationalDataset:")] public NSData? ThreadOperationalDataset { get; set; }
     [Selector("deviceAttestationDelegate", "setDeviceAttestationDelegate:")] public MTRDeviceAttestationDelegate? DeviceAttestationDelegate { get; set; }
-    /// macOS 13.3 and later.
     [Selector("failSafeTimeout", "setFailSafeTimeout:")] public NSNumber? FailSafeTimeout { get; set; }
-    /// macOS 14.0 and later.
     [Selector("skipCommissioningComplete", "setSkipCommissioningComplete:")] public bool SkipCommissioningComplete { get; set; }
-    /// macOS 14.0 and later.
     [Selector("countryCode", "setCountryCode:")] public NSString? CountryCode { get; set; }
     /// macOS 15.4 and later.
     [Selector("readEndpointInformation", "setReadEndpointInformation:")] public bool ReadEndpointInformation { get; set; }

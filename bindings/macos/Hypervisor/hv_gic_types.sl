@@ -47,7 +47,6 @@ public using hv_gic_state_t = NSObject;
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public enum hv_gic_intid_t : ushort
 {
     PERFORMANCE_MONITOR = 23,
@@ -59,7 +58,6 @@ public enum hv_gic_intid_t : ushort
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public enum hv_gic_distributor_reg_t : ushort
 {
     CTLR = 0,
@@ -1625,7 +1623,6 @@ public enum hv_gic_redistributor_reg_t : uint
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public enum hv_gic_icc_reg_t : ushort
 {
     PMR_EL1 = 49712,
@@ -1643,7 +1640,6 @@ public enum hv_gic_icc_reg_t : ushort
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public enum hv_gic_ich_reg_t : ushort
 {
     AP0R0_EL2 = 58944,
@@ -1674,7 +1670,6 @@ public enum hv_gic_ich_reg_t : ushort
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public enum hv_gic_icv_reg_t : ushort
 {
     PMR_EL1 = 49712,

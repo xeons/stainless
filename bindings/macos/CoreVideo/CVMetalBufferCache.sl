@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreVideo")
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kCVMetalBufferCacheMaximumBufferAgeKey;
 
 public struct __CVMetalBufferCache;
@@ -39,16 +38,12 @@ public struct __CVMetalBufferCache;
 [CFType("CVMetalBufferCacheGetTypeID")]
 public extern objc class CVMetalBufferCacheRef : CFTypeRef { }
 
-/// macOS 15.0 and later.
 public extern "C" CFTypeID CVMetalBufferCacheGetTypeID();
 
-/// macOS 15.0 and later.
 public extern "C" CVReturn CVMetalBufferCacheCreate(CFAllocatorRef? allocator, CFDictionaryRef? cacheAttributes, MTLDevice metalDevice, __CVMetalBufferCache** cacheOut);
 
-/// macOS 15.0 and later.
 public extern "C" CVReturn CVMetalBufferCacheCreateBufferFromImage(CFAllocatorRef? allocator, CVMetalBufferCacheRef bufferCache, CVImageBufferRef imageBuffer, void** bufferOut);
 
-/// macOS 15.0 and later.
 public extern "C" void CVMetalBufferCacheFlush(CVMetalBufferCacheRef bufferCache, CVOptionFlags options);
 
 #endif

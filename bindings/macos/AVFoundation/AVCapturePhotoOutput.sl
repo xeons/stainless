@@ -40,30 +40,20 @@ public extern objc class AVCapturePhotoOutput : AVCaptureOutput
     [Selector("availablePhotoCodecTypes")] public NSArray AvailablePhotoCodecTypes { get; }
     [Selector("availablePhotoFileTypes")] public NSArray? AvailablePhotoFileTypes { get; }
     [Selector("maxPhotoQualityPrioritization", "setMaxPhotoQualityPrioritization:")] public AVCapturePhotoQualityPrioritization MaxPhotoQualityPrioritization { get; set; }
-    /// macOS 14.0 and later.
     [Selector("isFastCapturePrioritizationSupported", "setFastCapturePrioritizationSupported:")] public bool FastCapturePrioritizationSupported { get; set; }
-    /// macOS 14.0 and later.
     [Selector("isFastCapturePrioritizationEnabled", "setFastCapturePrioritizationEnabled:")] public bool FastCapturePrioritizationEnabled { get; set; }
     [Selector("supportedFlashModes")] public NSArray SupportedFlashModes { get; }
     /// Deprecated in macOS 13.0.
     [Selector("isHighResolutionCaptureEnabled", "setHighResolutionCaptureEnabled:")] public bool HighResolutionCaptureEnabled { get; set; }
     [Selector("maxPhotoDimensions", "setMaxPhotoDimensions:")] public CMVideoDimensions MaxPhotoDimensions { get; set; }
     [Selector("preservesLivePhotoCaptureSuspendedOnSessionStop", "setPreservesLivePhotoCaptureSuspendedOnSessionStop:")] public bool PreservesLivePhotoCaptureSuspendedOnSessionStop { get; set; }
-    /// macOS 14.0 and later.
     [Selector("isZeroShutterLagSupported")] public bool ZeroShutterLagSupported { get; }
-    /// macOS 14.0 and later.
     [Selector("isZeroShutterLagEnabled", "setZeroShutterLagEnabled:")] public bool ZeroShutterLagEnabled { get; set; }
-    /// macOS 14.0 and later.
     [Selector("isResponsiveCaptureSupported")] public bool ResponsiveCaptureSupported { get; }
-    /// macOS 14.0 and later.
     [Selector("isResponsiveCaptureEnabled", "setResponsiveCaptureEnabled:")] public bool ResponsiveCaptureEnabled { get; set; }
-    /// macOS 14.0 and later.
     [Selector("captureReadiness")] public AVCapturePhotoOutputCaptureReadiness CaptureReadiness { get; }
-    /// macOS 15.0 and later.
     [Selector("isConstantColorSupported")] public bool ConstantColorSupported { get; }
-    /// macOS 15.0 and later.
     [Selector("isConstantColorEnabled", "setConstantColorEnabled:")] public bool ConstantColorEnabled { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isShutterSoundSuppressionSupported")] public bool ShutterSoundSuppressionSupported { get; }
     [Selector("init")] public Self Init();
     [Selector("new")] public static Self New();
@@ -79,7 +69,6 @@ public enum AVCapturePhotoQualityPrioritization : long
     Quality = 3,
 }
 
-/// macOS 14.0 and later.
 public enum AVCapturePhotoOutputCaptureReadiness : long
 {
     SessionNotRunning = 0,
@@ -89,7 +78,6 @@ public enum AVCapturePhotoOutputCaptureReadiness : long
     NotReadyWaitingForProcessing = 4,
 }
 
-/// macOS 14.0 and later.
 public extern objc class AVCapturePhotoOutputReadinessCoordinator : NSObject
 {
     [Selector("delegate", "setDelegate:")] public AVCapturePhotoOutputReadinessCoordinatorDelegate? Delegate { get; set; }
@@ -99,7 +87,6 @@ public extern objc class AVCapturePhotoOutputReadinessCoordinator : NSObject
     [Selector("stopTrackingCaptureRequestUsingPhotoSettingsUniqueID:")] public void StopTrackingCaptureRequestUsingPhotoSettingsUniqueID(long settingsUniqueID);
 }
 
-/// macOS 14.0 and later.
 public objc interface AVCapturePhotoOutputReadinessCoordinatorDelegate : NSObjectProtocol
 {
     [Optional] [Selector("readinessCoordinator:captureReadinessDidChange:")] void ReadinessCoordinatorCaptureReadinessDidChange(AVCapturePhotoOutputReadinessCoordinator coordinator, AVCapturePhotoOutputCaptureReadiness captureReadiness);
@@ -127,11 +114,8 @@ public extern objc class AVCapturePhotoSettings : NSObject, NSCopying
     /// Deprecated in macOS 13.0.
     [Selector("isHighResolutionPhotoEnabled", "setHighResolutionPhotoEnabled:")] public bool HighResolutionPhotoEnabled { get; set; }
     [Selector("maxPhotoDimensions", "setMaxPhotoDimensions:")] public CMVideoDimensions MaxPhotoDimensions { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isConstantColorEnabled", "setConstantColorEnabled:")] public bool ConstantColorEnabled { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isConstantColorFallbackPhotoDeliveryEnabled", "setConstantColorFallbackPhotoDeliveryEnabled:")] public bool ConstantColorFallbackPhotoDeliveryEnabled { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isShutterSoundSuppressionEnabled", "setShutterSoundSuppressionEnabled:")] public bool ShutterSoundSuppressionEnabled { get; set; }
     [Selector("photoSettings")] public static Self PhotoSettings();
     [Selector("photoSettingsWithFormat:")] public static Self PhotoSettingsWithFormat(NSDictionary? format);
@@ -143,7 +127,6 @@ public extern objc class AVCaptureResolvedPhotoSettings : NSObject
     [Selector("uniqueID")] public long UniqueID { get; }
     [Selector("photoDimensions")] public CMVideoDimensions PhotoDimensions { get; }
     [Selector("expectedPhotoCount")] public NSUInteger ExpectedPhotoCount { get; }
-    /// macOS 14.0 and later.
     [Selector("isFastCapturePrioritizationEnabled")] public bool FastCapturePrioritizationEnabled { get; }
 }
 
@@ -153,11 +136,8 @@ public extern objc class AVCapturePhoto : NSObject
     [Selector("pixelBuffer")] public CVPixelBufferRef? PixelBuffer { get; }
     [Selector("resolvedSettings")] public AVCaptureResolvedPhotoSettings ResolvedSettings { get; }
     [Selector("photoCount")] public NSInteger PhotoCount { get; }
-    /// macOS 15.0 and later.
     [Selector("constantColorConfidenceMap")] public CVPixelBufferRef? ConstantColorConfidenceMap { get; }
-    /// macOS 15.0 and later.
     [Selector("constantColorCenterWeightedMeanConfidenceLevel")] public float ConstantColorCenterWeightedMeanConfidenceLevel { get; }
-    /// macOS 15.0 and later.
     [Selector("isConstantColorFallbackPhoto")] public bool ConstantColorFallbackPhoto { get; }
 }
 

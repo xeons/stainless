@@ -49,7 +49,6 @@ public extern objc class PHASESoundEvent : NSObject
     [Selector("metaParameters")] public NSDictionary MetaParameters { get; }
     [Selector("mixers")] public NSDictionary Mixers { get; }
     [Selector("pushStreamNodes")] public NSDictionary PushStreamNodes { get; }
-    /// macOS 15.0 and later.
     [Selector("pullStreamNodes")] public NSDictionary? PullStreamNodes { get; }
     [Selector("isIndefinite")] public bool Indefinite { get; }
     [Selector("initWithEngine:assetIdentifier:mixerParameters:error:")] public Self? InitWithEngineAssetIdentifierMixerParametersError(PHASEEngine engine, NSString assetIdentifier, PHASEMixerParameters mixerParameters, out NSError? error);

@@ -244,17 +244,14 @@ public extern "C" void CGContextSetCMYKStrokeColor(CGContextRef? c, CGFloat cyan
 
 public extern "C" void CGContextSetRenderingIntent(CGContextRef? c, CGColorRenderingIntent intent);
 
-/// macOS 15.0 and later.
 public extern "C" bool CGContextSetEDRTargetHeadroom(CGContextRef c, float headroom);
 
-/// macOS 15.0 and later.
 public extern "C" float CGContextGetEDRTargetHeadroom(CGContextRef c);
 
 public extern "C" void CGContextDrawImage(CGContextRef? c, CGRect rect, CGImageRef? image);
 
 public extern "C" void CGContextDrawTiledImage(CGContextRef? c, CGRect rect, CGImageRef? image);
 
-/// macOS 15.0 and later.
 public extern "C" bool CGContextDrawImageApplyingToneMapping(CGContextRef c, CGRect r, CGImageRef image, CGToneMapping method, CFDictionaryRef? options);
 
 /// macOS 26.0 and later.
@@ -275,7 +272,6 @@ public extern "C" void CGContextDrawLinearGradient(CGContextRef? c, CGGradientRe
 
 public extern "C" void CGContextDrawRadialGradient(CGContextRef? c, CGGradientRef? gradient, CGPoint startCenter, CGFloat startRadius, CGPoint endCenter, CGFloat endRadius, CGGradientDrawingOptions options);
 
-/// macOS 14.0 and later.
 public extern "C" void CGContextDrawConicGradient(CGContextRef c, CGGradientRef? gradient, CGPoint center, CGFloat angle);
 
 public extern "C" void CGContextDrawShading(CGContextRef? c, CGShadingRef? shading);

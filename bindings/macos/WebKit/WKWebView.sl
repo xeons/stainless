@@ -106,9 +106,7 @@ public extern objc class WKWebView : NSView
     [Selector("fullscreenState")] public WKFullscreenState FullscreenState { get; }
     [Selector("minimumViewportInset")] public NSEdgeInsets MinimumViewportInset { get; }
     [Selector("maximumViewportInset")] public NSEdgeInsets MaximumViewportInset { get; }
-    /// macOS 13.3 and later.
     [Selector("isInspectable", "setInspectable:")] public bool Inspectable { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isWritingToolsActive")] public bool WritingToolsActive { get; }
     /// macOS 26.0 and later.
     [Selector("obscuredContentInsets", "setObscuredContentInsets:")] public NSEdgeInsets ObscuredContentInsets { get; set; }

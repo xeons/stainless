@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Vision")
 
-/// macOS 14.0 and later.
 public extern objc class VNHumanBodyRecognizedPoint3D : VNRecognizedPoint3D
 {
     [Selector("localPosition")] public simd_float4x4 LocalPosition { get; }

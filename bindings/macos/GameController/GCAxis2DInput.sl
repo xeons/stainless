@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public objc closure void GCAxis2DInputValueDidChangeHandlerBlock(GCPhysicalInputElement arg0, GCAxis2DInput arg1, GCPoint2 arg2);
 
-/// macOS 14.3 and later.
 public objc interface GCAxis2DInput : NSObjectProtocol
 {
     [Selector("valueDidChangeHandler", "setValueDidChangeHandler:")] GCAxis2DInputValueDidChangeHandlerBlock? ValueDidChangeHandler { get; set; }

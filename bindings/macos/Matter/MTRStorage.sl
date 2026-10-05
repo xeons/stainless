@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public objc interface MTRStorage : NSObjectProtocol
 {
     [Selector("storageDataForKey:")] NSData? StorageDataForKey(NSString key);

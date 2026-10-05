@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 14.0 and later.
 public extern objc class AVExternalStorageDevice : NSObject
 {
     [Selector("displayName")] public NSString? DisplayName { get; }
@@ -45,7 +44,6 @@ public extern objc class AVExternalStorageDevice : NSObject
 
 public objc closure void AVExternalStorageDeviceRequestAccessWithCompletionHandlerHandlerBlock(bool arg0);
 
-/// macOS 14.0 and later.
 /// AVExternalStorageDeviceAuthorization, a category of AVExternalStorageDevice.
 public extern objc class AVExternalStorageDevice
 {
@@ -53,7 +51,6 @@ public extern objc class AVExternalStorageDevice
     [Selector("requestAccessWithCompletionHandler:")] public static void RequestAccessWithCompletionHandler(AVExternalStorageDeviceRequestAccessWithCompletionHandlerHandlerBlock handler);
 }
 
-/// macOS 14.0 and later.
 public extern objc class AVExternalStorageDeviceDiscoverySession : NSObject
 {
     [Selector("sharedSession")] public static AVExternalStorageDeviceDiscoverySession? SharedSession { get; }

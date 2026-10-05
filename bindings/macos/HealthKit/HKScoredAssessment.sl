@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "HealthKit")
 
-/// macOS 15.0 and later.
 public extern objc class HKScoredAssessment : HKSample, NSSecureCoding, NSCopying
 {
     [Selector("score")] public NSInteger Score { get; }

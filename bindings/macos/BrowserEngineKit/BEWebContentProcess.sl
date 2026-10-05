@@ -39,7 +39,6 @@ public objc closure void BEWebContentProcessWebContentProcessWithBundleIDInterru
 
 public objc closure void BEWebContentProcessWebContentProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock(BEWebContentProcess? arg0, NSError? arg1);
 
-/// macOS 14.3 and later.
 public extern objc class BEWebContentProcess : NSObject
 {
     [Selector("webContentProcessWithInterruptionHandler:completion:")] public static void WebContentProcessWithInterruptionHandlerCompletion(BEWebContentProcessWebContentProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BEWebContentProcessWebContentProcessWithInterruptionHandlerCompletionCompletionBlock completion);
@@ -48,7 +47,6 @@ public extern objc class BEWebContentProcess : NSObject
     [Selector("makeLibXPCConnectionError:")] public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
 }
 
-/// macOS 14.3 and later.
 /// BEExtensionProcessConformance, a category of BEWebContentProcess.
 public extern objc class BEWebContentProcess : BEExtensionProcess { }
 

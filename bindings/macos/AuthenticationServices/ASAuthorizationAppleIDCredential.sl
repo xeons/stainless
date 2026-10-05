@@ -38,7 +38,6 @@ public enum ASUserDetectionStatus : long
     LikelyReal = 2,
 }
 
-/// macOS 14.0 and later.
 public enum ASUserAgeRange : long
 {
     Unknown = 0,
@@ -56,7 +55,6 @@ public extern objc class ASAuthorizationAppleIDCredential : NSObject, ASAuthoriz
     [Selector("email")] public NSString? Email { get; }
     [Selector("fullName")] public NSPersonNameComponents? FullName { get; }
     [Selector("realUserStatus")] public ASUserDetectionStatus RealUserStatus { get; }
-    /// macOS 14.0 and later.
     [Selector("userAgeRange")] public ASUserAgeRange UserAgeRange { get; }
 }
 

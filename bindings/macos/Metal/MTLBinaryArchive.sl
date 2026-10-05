@@ -54,9 +54,7 @@ public objc interface MTLBinaryArchive : NSObjectProtocol
     [Selector("addComputePipelineFunctionsWithDescriptor:error:")] bool AddComputePipelineFunctionsWithDescriptorError(MTLComputePipelineDescriptor descriptor, out NSError? error);
     [Selector("addRenderPipelineFunctionsWithDescriptor:error:")] bool AddRenderPipelineFunctionsWithDescriptorError(MTLRenderPipelineDescriptor descriptor, out NSError? error);
     [Selector("addTileRenderPipelineFunctionsWithDescriptor:error:")] bool AddTileRenderPipelineFunctionsWithDescriptorError(MTLTileRenderPipelineDescriptor descriptor, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("addMeshRenderPipelineFunctionsWithDescriptor:error:")] bool AddMeshRenderPipelineFunctionsWithDescriptorError(MTLMeshRenderPipelineDescriptor descriptor, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("addLibraryWithDescriptor:error:")] bool AddLibraryWithDescriptorError(MTLStitchedLibraryDescriptor descriptor, out NSError? error);
     [Selector("serializeToURL:error:")] bool SerializeToURLError(NSURL url, out NSError? error);
     [Selector("addFunctionWithDescriptor:library:error:")] bool AddFunctionWithDescriptorLibraryError(MTLFunctionDescriptor descriptor, MTLLibrary library, out NSError? error);

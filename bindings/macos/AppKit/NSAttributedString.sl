@@ -69,13 +69,10 @@ public extern "C" NSAttributedStringKey NSStrikethroughColorAttributeName;
 
 public extern "C" NSAttributedStringKey NSWritingDirectionAttributeName;
 
-/// macOS 15.0 and later.
 public extern "C" NSAttributedStringKey NSTextHighlightStyleAttributeName;
 
-/// macOS 15.0 and later.
 public extern "C" NSAttributedStringKey NSTextHighlightColorSchemeAttributeName;
 
-/// macOS 15.0 and later.
 public extern "C" NSAttributedStringKey NSAdaptiveImageGlyphAttributeName;
 
 /// macOS 15.2 and later.
@@ -106,31 +103,22 @@ public using NSTextEffectStyle = NSString;
 
 public extern "C" NSTextEffectStyle NSTextEffectLetterpressStyle;
 
-/// macOS 15.0 and later.
 public using NSTextHighlightStyle = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" NSTextHighlightStyle NSTextHighlightStyleDefault;
 
-/// macOS 15.0 and later.
 public using NSTextHighlightColorScheme = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" NSTextHighlightColorScheme NSTextHighlightColorSchemeDefault;
 
-/// macOS 15.0 and later.
 public extern "C" NSTextHighlightColorScheme NSTextHighlightColorSchemePurple;
 
-/// macOS 15.0 and later.
 public extern "C" NSTextHighlightColorScheme NSTextHighlightColorSchemePink;
 
-/// macOS 15.0 and later.
 public extern "C" NSTextHighlightColorScheme NSTextHighlightColorSchemeOrange;
 
-/// macOS 15.0 and later.
 public extern "C" NSTextHighlightColorScheme NSTextHighlightColorSchemeMint;
 
-/// macOS 15.0 and later.
 public extern "C" NSTextHighlightColorScheme NSTextHighlightColorSchemeBlue;
 
 /// NSAttributedStringAttributeFixing, a category of NSMutableAttributedString.
@@ -177,7 +165,6 @@ public extern "C" NSAttributedStringDocumentAttributeKey NSViewZoomDocumentAttri
 
 public extern "C" NSAttributedStringDocumentAttributeKey NSViewModeDocumentAttribute;
 
-/// macOS 14.0 and later.
 public extern "C" NSAttributedStringDocumentAttributeKey NSDefaultFontExcludedDocumentAttribute;
 
 public extern "C" NSAttributedStringDocumentAttributeKey NSReadOnlyDocumentAttribute;
@@ -208,7 +195,6 @@ public extern "C" NSAttributedStringDocumentReadingOptionKey NSTargetTextScaling
 
 public extern "C" NSAttributedStringDocumentReadingOptionKey NSSourceTextScalingDocumentOption;
 
-/// macOS 15.0 and later.
 public extern "C" NSAttributedStringDocumentReadingOptionKey NSTextKit1ListMarkerFormatDocumentOption;
 
 /// NSAttributedStringDocumentFormats, a category of NSAttributedString.
@@ -231,7 +217,6 @@ public extern objc class NSMutableAttributedString
 public extern objc class NSAttributedString
 {
     [Selector("containsAttachmentsInRange:")] public bool ContainsAttachmentsInRange(NSRange range);
-    /// macOS 15.0 and later.
     [Selector("prefersRTFDInRange:")] public bool PrefersRTFDInRange(NSRange range);
 }
 

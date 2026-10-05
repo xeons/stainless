@@ -31,12 +31,9 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 15.0 and later.
 public extern objc class MLStateConstraint : NSObject, NSSecureCoding
 {
-    /// macOS 15.0 and later.
     [Selector("bufferShape")] public NSArray? BufferShape { get; }
-    /// macOS 15.0 and later.
     [Selector("dataType")] public MLMultiArrayDataType DataType { get; }
 }
 

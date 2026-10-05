@@ -104,11 +104,9 @@ public extern objc class VNDetectHumanHandPoseRequest : VNImageBasedRequest
     [Selector("results")] public NSArray? Results { get; }
     /// Deprecated in macOS 14.0.
     [Selector("supportedJointNamesForRevision:error:")] public static NSArray? SupportedJointNamesForRevisionError(NSUInteger revision, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("supportedJointNamesAndReturnError:")] public NSArray? SupportedJointNamesAndReturnError(out NSError? error);
     /// Deprecated in macOS 14.0.
     [Selector("supportedJointsGroupNamesForRevision:error:")] public static NSArray? SupportedJointsGroupNamesForRevisionError(NSUInteger revision, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("supportedJointsGroupNamesAndReturnError:")] public NSArray? SupportedJointsGroupNamesAndReturnError(out NSError? error);
 }
 

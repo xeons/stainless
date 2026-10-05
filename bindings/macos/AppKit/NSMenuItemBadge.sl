@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 14.0 and later.
 public enum NSMenuItemBadgeType : long
 {
     None = 0,
@@ -40,7 +39,6 @@ public enum NSMenuItemBadgeType : long
     Alerts = 3,
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSMenuItemBadge : NSObject, NSCopying
 {
     [Selector("itemCount")] public NSInteger ItemCount { get; }

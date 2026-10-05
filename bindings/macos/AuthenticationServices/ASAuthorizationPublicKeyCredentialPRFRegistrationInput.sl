@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 15.0 and later.
 public extern objc class ASAuthorizationPublicKeyCredentialPRFRegistrationInput : NSObject
 {
     [Selector("shouldCheckForSupport")] public bool ShouldCheckForSupport { get; }

@@ -31,11 +31,9 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.4 and later.
 public extern objc class MLOptimizationHints : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("reshapeFrequency", "setReshapeFrequency:")] public MLReshapeFrequencyHint ReshapeFrequency { get; set; }
-    /// macOS 15.0 and later.
     [Selector("specializationStrategy", "setSpecializationStrategy:")] public MLSpecializationStrategy SpecializationStrategy { get; set; }
 }
 

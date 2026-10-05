@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 13.3 and later.
 public objc interface ASAuthorizationWebBrowserExternallyAuthenticatableRequest : NSObjectProtocol
 {
     [Selector("authenticatedContext", "setAuthenticatedContext:")] LAContext? AuthenticatedContext { get; set; }

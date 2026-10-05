@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "BrowserEngineKit")
 
-/// macOS 14.3 and later.
 public objc interface BEProcessCapabilityGrant : NSObjectProtocol
 {
     [Selector("isValid")] bool Valid { get; }
     [Selector("invalidate")] bool Invalidate();
 }
 
-/// macOS 14.3 and later.
 public extern objc class BEProcessCapability : NSObject
 {
     [Selector("background")] public static Self Background();
@@ -47,21 +45,18 @@ public extern objc class BEProcessCapability : NSObject
     [Selector("requestWithError:")] public BEProcessCapabilityGrant RequestWithError(out NSError? error);
 }
 
-/// macOS 14.3 and later.
 /// Capability, a category of BEWebContentProcess.
 public extern objc class BEWebContentProcess
 {
     [Selector("grantCapability:error:")] public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
 }
 
-/// macOS 14.3 and later.
 /// Capability, a category of BERenderingProcess.
 public extern objc class BERenderingProcess
 {
     [Selector("grantCapability:error:")] public BEProcessCapabilityGrant? GrantCapabilityError(BEProcessCapability capability, out NSError? error);
 }
 
-/// macOS 14.3 and later.
 /// Capability, a category of BENetworkingProcess.
 public extern objc class BENetworkingProcess
 {

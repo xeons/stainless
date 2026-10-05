@@ -51,7 +51,6 @@ public extern objc class VNRequest : NSObject, NSCopying
     [Selector("cancel")] public void Cancel();
 }
 
-/// macOS 14.0 and later.
 public extern objc class VNRequest
 {
     [Selector("supportedComputeStageDevicesAndReturnError:")] public NSDictionary? SupportedComputeStageDevicesAndReturnError(out NSError? error);

@@ -37,7 +37,6 @@ public extern objc class CAEDRMetadata : NSObject, NSCopying, NSSecureCoding
     [Selector("isAvailable")] public static bool Available { get; }
     [Selector("HDR10MetadataWithDisplayInfo:contentInfo:opticalOutputScale:")] public static CAEDRMetadata HDR10MetadataWithDisplayInfoContentInfoOpticalOutputScale(NSData? displayData, NSData? contentData, float scale);
     [Selector("HDR10MetadataWithMinLuminance:maxLuminance:opticalOutputScale:")] public static CAEDRMetadata HDR10MetadataWithMinLuminanceMaxLuminanceOpticalOutputScale(float minNits, float maxNits, float scale);
-    /// macOS 14.0 and later.
     [Selector("HLGMetadataWithAmbientViewingEnvironment:")] public static CAEDRMetadata HLGMetadataWithAmbientViewingEnvironment(NSData data);
 }
 

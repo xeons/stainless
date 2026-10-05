@@ -58,35 +58,26 @@ public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierAppleStandTim
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierBasalEnergyBurned;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierCrossCountrySkiingSpeed;
 
-/// macOS 14.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierCyclingCadence;
 
-/// macOS 14.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierCyclingFunctionalThresholdPower;
 
-/// macOS 14.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierCyclingPower;
 
-/// macOS 14.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierCyclingSpeed;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceCrossCountrySkiing;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceCycling;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceDownhillSnowSports;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistancePaddleSports;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceRowing;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceSkatingSports;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceSwimming;
@@ -95,22 +86,18 @@ public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceWalki
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierDistanceWheelchair;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierEstimatedWorkoutEffortScore;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierFlightsClimbed;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierNikeFuel;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierPaddleSportsSpeed;
 
-/// macOS 14.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierPhysicalEffort;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierPushCount;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierRowingSpeed;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierRunningPower;
@@ -123,7 +110,6 @@ public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierSwimmingStrok
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierUnderwaterDepth;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierWorkoutEffortScore;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierEnvironmentalAudioExposure;
@@ -260,7 +246,6 @@ public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierNumberOfAlcoh
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierNumberOfTimesFallen;
 
-/// macOS 14.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierTimeInDaylight;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierUVExposure;
@@ -269,7 +254,6 @@ public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierWaterTemperat
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierBasalBodyTemperature;
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierAppleSleepingBreathingDisturbances;
 
 public extern "C" HKQuantityTypeIdentifier HKQuantityTypeIdentifierForcedExpiratoryVolume1;
@@ -315,10 +299,8 @@ public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierHandwashingEv
 
 public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierToothbrushingEvent;
 
-/// macOS 15.0 and later.
 public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierBleedingAfterPregnancy;
 
-/// macOS 15.0 and later.
 public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierBleedingDuringPregnancy;
 
 public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierCervicalMucusQuality;
@@ -349,7 +331,6 @@ public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierProlongedMens
 
 public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierSexualActivity;
 
-/// macOS 15.0 and later.
 public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierSleepApneaEvent;
 
 public extern "C" HKCategoryTypeIdentifier HKCategoryTypeIdentifierSleepAnalysis;
@@ -458,10 +439,8 @@ public extern "C" HKDocumentTypeIdentifier HKDocumentTypeIdentifierCDA;
 
 public using HKScoredAssessmentTypeIdentifier = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" HKScoredAssessmentTypeIdentifier HKScoredAssessmentTypeIdentifierGAD7;
 
-/// macOS 14.0 and later.
 public extern "C" HKScoredAssessmentTypeIdentifier HKScoredAssessmentTypeIdentifierPHQ9;
 
 public extern "C" NSString HKWorkoutTypeIdentifier;
@@ -472,7 +451,6 @@ public extern "C" NSString HKDataTypeIdentifierHeartbeatSeries;
 
 public extern "C" NSString HKVisionPrescriptionTypeIdentifier;
 
-/// macOS 14.0 and later.
 public extern "C" NSString HKDataTypeIdentifierStateOfMind;
 
 /// macOS 26.0 and later.

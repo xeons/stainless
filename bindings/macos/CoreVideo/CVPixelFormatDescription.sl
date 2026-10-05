@@ -65,7 +65,6 @@ public extern "C" CFStringRef? kCVPixelFormatBlockHeight;
 
 public extern "C" CFStringRef? kCVPixelFormatBitsPerBlock;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCVPixelFormatBitsPerComponent;
 
 public extern "C" CFStringRef? kCVPixelFormatBlockHorizontalAlignment;

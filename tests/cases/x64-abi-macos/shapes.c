@@ -5,7 +5,7 @@
  * consumer to link. It is here because ir.txt's expectations came from it.
  * Regenerate with any clang; assembling Darwin IR needs no SDK:
  *
- *   clang --target=x86_64-apple-macosx13.0 -ffreestanding -S -emit-llvm -O0 shapes.c -o -
+ *   clang --target=x86_64-apple-macosx15.0 -ffreestanding -S -emit-llvm -O0 shapes.c -o -
  *
  * An empty struct is zero bytes in C and one in Stainless, as in C++. Darwin
  * leaves both out, and clang++ writes the same declarations for it.

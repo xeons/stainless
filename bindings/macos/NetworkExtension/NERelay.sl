@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "NetworkExtension")
 
-/// macOS 14.0 and later.
 public extern objc class NERelay : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("HTTP3RelayURL", "setHTTP3RelayURL:")] public NSURL? HTTP3RelayURL { get; set; }

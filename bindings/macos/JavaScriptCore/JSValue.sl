@@ -46,7 +46,6 @@ public extern objc class JSValue : NSObject
     [Selector("isArray")] public bool IsArray { get; }
     [Selector("isDate")] public bool IsDate { get; }
     [Selector("isSymbol")] public bool IsSymbol { get; }
-    /// macOS 15.0 and later.
     [Selector("isBigInt")] public bool IsBigInt { get; }
     [Selector("valueWithObject:inContext:")] public static JSValue? ValueWithObjectInContext(AnyObject? value, JSContext? context);
     [Selector("valueWithBool:inContext:")] public static JSValue? ValueWithBoolInContext(bool value, JSContext? context);
@@ -61,13 +60,9 @@ public extern objc class JSValue : NSObject
     [Selector("valueWithNewPromiseResolvedWithResult:inContext:")] public static JSValue? ValueWithNewPromiseResolvedWithResultInContext(AnyObject? result, JSContext? context);
     [Selector("valueWithNewPromiseRejectedWithReason:inContext:")] public static JSValue? ValueWithNewPromiseRejectedWithReasonInContext(AnyObject? reason, JSContext? context);
     [Selector("valueWithNewSymbolFromDescription:inContext:")] public static JSValue? ValueWithNewSymbolFromDescriptionInContext(NSString? description, JSContext? context);
-    /// macOS 15.0 and later.
     [Selector("valueWithNewBigIntFromString:inContext:")] public static JSValue? ValueWithNewBigIntFromStringInContext(NSString string, JSContext context);
-    /// macOS 15.0 and later.
     [Selector("valueWithNewBigIntFromInt64:inContext:")] public static JSValue? ValueWithNewBigIntFromInt64InContext(long int64, JSContext context);
-    /// macOS 15.0 and later.
     [Selector("valueWithNewBigIntFromUInt64:inContext:")] public static JSValue? ValueWithNewBigIntFromUInt64InContext(ulong uint64, JSContext context);
-    /// macOS 15.0 and later.
     [Selector("valueWithNewBigIntFromDouble:inContext:")] public static JSValue? ValueWithNewBigIntFromDoubleInContext(double value, JSContext context);
     [Selector("valueWithNullInContext:")] public static JSValue? ValueWithNullInContext(JSContext? context);
     [Selector("valueWithUndefinedInContext:")] public static JSValue? ValueWithUndefinedInContext(JSContext? context);
@@ -77,9 +72,7 @@ public extern objc class JSValue : NSObject
     [Selector("toDouble")] public double ToDouble();
     [Selector("toInt32")] public int ToInt32();
     [Selector("toUInt32")] public uint ToUInt32();
-    /// macOS 15.0 and later.
     [Selector("toInt64")] public long ToInt64();
-    /// macOS 15.0 and later.
     [Selector("toUInt64")] public ulong ToUInt64();
     [Selector("toNumber")] public NSNumber? ToNumber();
     [Selector("toString")] public NSString? ToString();
@@ -89,13 +82,9 @@ public extern objc class JSValue : NSObject
     [Selector("isInstanceOf:")] public bool IsInstanceOf(AnyObject? value);
     [Selector("isEqualToObject:")] public bool IsEqualToObject(AnyObject? value);
     [Selector("isEqualWithTypeCoercionToObject:")] public bool IsEqualWithTypeCoercionToObject(AnyObject? value);
-    /// macOS 15.0 and later.
     [Selector("compareJSValue:")] public JSRelationCondition CompareJSValue(JSValue other);
-    /// macOS 15.0 and later.
     [Selector("compareInt64:")] public JSRelationCondition CompareInt64(long other);
-    /// macOS 15.0 and later.
     [Selector("compareUInt64:")] public JSRelationCondition CompareUInt64(ulong other);
-    /// macOS 15.0 and later.
     [Selector("compareDouble:")] public JSRelationCondition CompareDouble(double other);
     [Selector("callWithArguments:")] public JSValue? CallWithArguments(NSArray? arguments);
     [Selector("constructWithArguments:")] public JSValue? ConstructWithArguments(NSArray? arguments);

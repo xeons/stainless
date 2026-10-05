@@ -478,7 +478,6 @@ public enum AUVoiceIOSpeechActivityEvent : uint
 
 public objc closure void AUVoiceIOMutedSpeechActivityEventListener(AUVoiceIOSpeechActivityEvent arg0);
 
-/// macOS 14.0 and later.
 public const uint kAUVoiceIOProperty_MutedSpeechActivityEventListener = 2106;
 
 public enum AUVoiceIOOtherAudioDuckingLevel : uint
@@ -495,7 +494,6 @@ public struct AUVoiceIOOtherAudioDuckingConfiguration
     public AUVoiceIOOtherAudioDuckingLevel mDuckingLevel;
 }
 
-/// macOS 14.0 and later.
 public const uint kAUVoiceIOProperty_OtherAudioDuckingConfiguration = 2108;
 
 /// Deprecated in macOS 10.9.

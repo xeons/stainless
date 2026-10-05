@@ -31,16 +31,13 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 13.3 and later.
 public extern objc class ASAuthorizationWebBrowserPlatformPublicKeyCredential : NSObject
 {
     [Selector("name")] public NSString Name { get; }
-    /// macOS 14.0 and later.
     [Selector("customTitle")] public NSString? CustomTitle { get; }
     [Selector("relyingParty")] public NSString RelyingParty { get; }
     [Selector("credentialID")] public NSData CredentialID { get; }
     [Selector("userHandle")] public NSData UserHandle { get; }
-    /// macOS 14.0 and later.
     [Selector("providerName")] public NSString ProviderName { get; }
 }
 

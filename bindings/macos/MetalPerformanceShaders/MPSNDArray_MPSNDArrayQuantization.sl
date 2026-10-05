@@ -39,14 +39,12 @@ public enum MPSNDArrayQuantizationScheme : ulong
     LUT = 2,
 }
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayQuantizationDescriptor : NSObject, NSCopying
 {
     [Selector("quantizationDataType")] public MPSDataType QuantizationDataType { get; }
     [Selector("quantizationScheme")] public MPSNDArrayQuantizationScheme QuantizationScheme { get; }
 }
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayAffineQuantizationDescriptor : MPSNDArrayQuantizationDescriptor
 {
     [Selector("hasZeroPoint", "setHasZeroPoint:")] public bool HasZeroPoint { get; set; }
@@ -56,7 +54,6 @@ public extern objc class MPSNDArrayAffineQuantizationDescriptor : MPSNDArrayQuan
     [Selector("initWithDataType:hasZeroPoint:hasMinValue:")] public Self InitWithDataTypeHasZeroPointHasMinValue(MPSDataType quantizationDataType, bool hasZeroPoint, bool hasMinValue);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayLUTQuantizationDescriptor : MPSNDArrayQuantizationDescriptor
 {
     [Selector("initWithDataType:")] public Self InitWithDataType(MPSDataType quantizationDataType);

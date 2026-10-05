@@ -34,7 +34,6 @@ public using NSAttributedStringKey = NSString;
 
 public using NSAttributedStringFormattingContextKey = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" NSAttributedStringFormattingContextKey NSInflectionConceptsKey;
 
 public extern objc class NSAttributedString : NSObject, NSCopying, NSMutableCopying, NSSecureCoding
@@ -170,13 +169,9 @@ public extern objc class NSAttributedString
     [Selector("initWithFormat:options:locale:arguments:")] public Self InitWithFormatOptionsLocaleArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, VaList arguments);
     [Selector("localizedAttributedStringWithFormat:")] public static Self LocalizedAttributedStringWithFormat(NSAttributedString format, ...);
     [Selector("localizedAttributedStringWithFormat:options:")] public static Self LocalizedAttributedStringWithFormatOptions(NSAttributedString format, NSAttributedStringFormattingOptions options, ...);
-    /// macOS 14.0 and later.
     [Selector("initWithFormat:options:locale:context:")] public Self InitWithFormatOptionsLocaleContext(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, ...);
-    /// macOS 14.0 and later.
     [Selector("initWithFormat:options:locale:context:arguments:")] public Self InitWithFormatOptionsLocaleContextArguments(NSAttributedString format, NSAttributedStringFormattingOptions options, NSLocale? locale, NSDictionary context, VaList arguments);
-    /// macOS 14.0 and later.
     [Selector("localizedAttributedStringWithFormat:context:")] public static Self LocalizedAttributedStringWithFormatContext(NSAttributedString format, NSDictionary context, ...);
-    /// macOS 14.0 and later.
     [Selector("localizedAttributedStringWithFormat:options:context:")] public static Self LocalizedAttributedStringWithFormatOptionsContext(NSAttributedString format, NSAttributedStringFormattingOptions options, NSDictionary context, ...);
 }
 
@@ -198,18 +193,14 @@ public extern "C" NSAttributedStringKey? NSMorphologyAttributeName;
 
 public extern "C" NSAttributedStringKey? NSInflectionRuleAttributeName;
 
-/// macOS 14.0 and later.
 public extern "C" NSAttributedStringKey? NSInflectionAgreementArgumentAttributeName;
 
-/// macOS 14.0 and later.
 public extern "C" NSAttributedStringKey? NSInflectionAgreementConceptAttributeName;
 
-/// macOS 14.0 and later.
 public extern "C" NSAttributedStringKey? NSInflectionReferentConceptAttributeName;
 
 public extern "C" NSAttributedStringKey? NSInflectionAlternativeAttributeName;
 
-/// macOS 15.0 and later.
 public extern "C" NSAttributedStringKey? NSLocalizedNumberFormatAttributeName;
 
 /// macOS 26.0 and later.

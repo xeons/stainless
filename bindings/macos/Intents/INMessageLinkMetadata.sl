@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 14.0 and later.
 public extern objc class INMessageLinkMetadata : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("siteName", "setSiteName:")] public NSString? SiteName { get; set; }

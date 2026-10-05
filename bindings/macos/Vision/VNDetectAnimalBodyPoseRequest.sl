@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Vision")
 
-/// macOS 14.0 and later.
 public extern objc class VNDetectAnimalBodyPoseRequest : VNImageBasedRequest
 {
     [Selector("results")] public NSArray? Results { get; }

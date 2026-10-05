@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 14.6 and later.
 public extern "C" NSString? MTRClusterNameForID(MTRClusterIDType clusterID);
 
-/// macOS 14.6 and later.
 public extern "C" NSString? MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID);
 
 /// macOS 15.2 and later.

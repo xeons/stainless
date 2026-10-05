@@ -37,7 +37,6 @@ public enum NSTextInputTraitType : long
     Yes = 2,
 }
 
-/// macOS 15.0 and later.
 public enum NSWritingToolsBehavior : long
 {
     None = -1,
@@ -46,7 +45,6 @@ public enum NSWritingToolsBehavior : long
     Limited = 2,
 }
 
-/// macOS 15.0 and later.
 [Flags]
 public enum NSWritingToolsResultOptions : ulong
 {
@@ -70,13 +68,9 @@ public objc interface NSTextInputTraits
     [Optional] [Selector("dataDetectionType", "setDataDetectionType:")] NSTextInputTraitType DataDetectionType { get; set; }
     [Optional] [Selector("linkDetectionType", "setLinkDetectionType:")] NSTextInputTraitType LinkDetectionType { get; set; }
     [Optional] [Selector("textCompletionType", "setTextCompletionType:")] NSTextInputTraitType TextCompletionType { get; set; }
-    /// macOS 14.0 and later.
     [Optional] [Selector("inlinePredictionType", "setInlinePredictionType:")] NSTextInputTraitType InlinePredictionType { get; set; }
-    /// macOS 15.0 and later.
     [Optional] [Selector("mathExpressionCompletionType", "setMathExpressionCompletionType:")] NSTextInputTraitType MathExpressionCompletionType { get; set; }
-    /// macOS 15.0 and later.
     [Optional] [Selector("writingToolsBehavior", "setWritingToolsBehavior:")] NSWritingToolsBehavior WritingToolsBehavior { get; set; }
-    /// macOS 15.0 and later.
     [Optional] [Selector("allowedWritingToolsResultOptions", "setAllowedWritingToolsResultOptions:")] NSWritingToolsResultOptions AllowedWritingToolsResultOptions { get; set; }
 }
 

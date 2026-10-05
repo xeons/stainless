@@ -72,7 +72,6 @@ public extern "C" MTKTextureLoaderOrigin? MTKTextureLoaderOriginBottomLeft;
 
 public extern "C" MTKTextureLoaderOrigin? MTKTextureLoaderOriginFlippedVertically;
 
-/// macOS 14.0 and later.
 public extern "C" MTKTextureLoaderOption? MTKTextureLoaderOptionLoadAsArray;
 
 public objc closure void MTKTextureLoaderCallback(MTLTexture? arg0, NSError? arg1);

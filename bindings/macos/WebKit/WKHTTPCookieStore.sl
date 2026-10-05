@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "WebKit")
 
-/// macOS 14.0 and later.
 public enum WKCookiePolicy : long
 {
     Allow = 0,
@@ -64,9 +63,7 @@ public extern objc class WKHTTPCookieStore : NSObject
     [Selector("deleteCookie:completionHandler:")] public void DeleteCookieCompletionHandler(NSHTTPCookie cookie, WKHTTPCookieStoreDeleteCookieCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("addObserver:")] public void AddObserver(WKHTTPCookieStoreObserver observer);
     [Selector("removeObserver:")] public void RemoveObserver(WKHTTPCookieStoreObserver observer);
-    /// macOS 14.0 and later.
     [Selector("setCookiePolicy:completionHandler:")] public void SetCookiePolicyCompletionHandler(WKCookiePolicy policy, WKHTTPCookieStoreSetCookiePolicyCompletionHandlerCompletionHandlerBlock? completionHandler);
-    /// macOS 14.0 and later.
     [Selector("getCookiePolicy:")] public void GetCookiePolicy(WKHTTPCookieStoreGetCookiePolicyCompletionHandlerBlock completionHandler);
 }
 

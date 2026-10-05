@@ -27,7 +27,6 @@ module MacOS.LocalAuthentication;
 
 #pragma comment(framework, "LocalAuthentication")
 
-/// macOS 15.0 and later.
 public enum LACompanionType : long
 {
     LACompanionTypeWatch = 1,

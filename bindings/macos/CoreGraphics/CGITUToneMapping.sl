@@ -30,13 +30,10 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreGraphics")
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGUse100nitsHLGOOTF;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGUseBT1886ForCoreVideoGamma;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGSkipBoostToHDR;
 
 /// macOS 15.1 and later.

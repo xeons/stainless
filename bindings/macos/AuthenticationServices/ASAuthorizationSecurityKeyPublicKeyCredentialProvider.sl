@@ -39,7 +39,6 @@ public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialProvider :
     [Selector("createCredentialAssertionRequestWithChallenge:")] public ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithChallenge(NSData challenge);
 }
 
-/// macOS 14.4 and later.
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialProvider : ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialProvider { }
 
 #endif

@@ -33,14 +33,11 @@ import Standard.ObjC;
 
 public objc closure void MKMapItemRequestGetMapItemWithCompletionHandlerCompletionHandlerBlock(MKMapItem? arg0, NSError? arg1);
 
-/// macOS 15.0 and later.
 public extern objc class MKMapItemRequest : NSObject
 {
-    /// macOS 15.0 and later.
     [Selector("mapItemIdentifier")] public MKMapItemIdentifier? MapItemIdentifier { get; }
     [Selector("isCancelled")] public bool Cancelled { get; }
     [Selector("isLoading")] public bool Loading { get; }
-    /// macOS 15.0 and later.
     [Selector("initWithMapItemIdentifier:")] public Self InitWithMapItemIdentifier(MKMapItemIdentifier identifier);
     [Selector("getMapItemWithCompletionHandler:")] public void GetMapItemWithCompletionHandler(MKMapItemRequestGetMapItemWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("cancel")] public void Cancel();

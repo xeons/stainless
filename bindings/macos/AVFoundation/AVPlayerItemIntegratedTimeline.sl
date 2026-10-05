@@ -32,14 +32,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 15.0 and later.
 public enum AVPlayerItemSegmentType : long
 {
     Primary = 0,
     Interstitial = 1,
 }
 
-/// macOS 15.0 and later.
 public extern objc class AVPlayerItemSegment : NSObject
 {
     [Selector("segmentType")] public AVPlayerItemSegmentType SegmentType { get; }
@@ -49,7 +47,6 @@ public extern objc class AVPlayerItemSegment : NSObject
     [Selector("interstitialEvent")] public AVPlayerInterstitialEvent? InterstitialEvent { get; }
 }
 
-/// macOS 15.0 and later.
 public extern objc class AVPlayerItemIntegratedTimelineSnapshot : NSObject
 {
     [Selector("duration")] public CMTime Duration { get; }
@@ -60,7 +57,6 @@ public extern objc class AVPlayerItemIntegratedTimelineSnapshot : NSObject
     [Selector("mapTime:toSegment:atSegmentOffset:")] public void MapTimeToSegmentAtSegmentOffset(CMTime time, out AVPlayerItemSegment? timeSegmentOut, CMTime* segmentOffsetOut);
 }
 
-/// macOS 15.0 and later.
 public extern objc class AVPlayerItemIntegratedTimeline : NSObject
 {
     [Selector("currentSnapshot")] public AVPlayerItemIntegratedTimelineSnapshot CurrentSnapshot { get; }
@@ -72,7 +68,6 @@ public objc closure void AVPlayerItemIntegratedTimelineSeekToTimeToleranceBefore
 
 public objc closure void AVPlayerItemIntegratedTimelineSeekToDateCompletionHandlerCompletionHandlerBlock(bool arg0);
 
-/// macOS 15.0 and later.
 /// AVPlayerItemIntegratedTimelineControl, a category of AVPlayerItemIntegratedTimeline.
 public extern objc class AVPlayerItemIntegratedTimeline
 {
@@ -86,7 +81,6 @@ public objc closure void AVPlayerItemIntegratedTimelineAddPeriodicTimeObserverFo
 
 public objc closure void AVPlayerItemIntegratedTimelineAddBoundaryTimeObserverForSegmentOffsetsIntoSegmentQueueUsingBlockBlock(bool arg0);
 
-/// macOS 15.0 and later.
 /// AVPlayerItemIntegratedTimelineObserver, a category of AVPlayerItemIntegratedTimeline.
 public extern objc class AVPlayerItemIntegratedTimeline
 {
@@ -95,27 +89,21 @@ public extern objc class AVPlayerItemIntegratedTimeline
     [Selector("removeTimeObserver:")] public void RemoveTimeObserver(AVPlayerItemIntegratedTimelineObserver observer);
 }
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName AVPlayerIntegratedTimelineSnapshotsOutOfSyncNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSString AVPlayerIntegratedTimelineSnapshotsOutOfSyncReasonKey;
 
 public using AVPlayerIntegratedTimelineSnapshotsOutOfSyncReason = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" AVPlayerIntegratedTimelineSnapshotsOutOfSyncReason AVPlayerIntegratedTimelineSnapshotsOutOfSyncReasonSegmentsChanged;
 
-/// macOS 15.0 and later.
 public extern "C" AVPlayerIntegratedTimelineSnapshotsOutOfSyncReason AVPlayerIntegratedTimelineSnapshotsOutOfSyncReasonCurrentSegmentChanged;
 
-/// macOS 15.0 and later.
 public extern "C" AVPlayerIntegratedTimelineSnapshotsOutOfSyncReason AVPlayerIntegratedTimelineSnapshotsOutOfSyncReasonLoadedTimeRangesChanged;
 
 /// AVPlayerItemIntegratedTimelineSupport, a category of AVPlayerItem.
 public extern objc class AVPlayerItem
 {
-    /// macOS 15.0 and later.
     [Selector("integratedTimeline")] public AVPlayerItemIntegratedTimeline IntegratedTimeline { get; }
 }
 

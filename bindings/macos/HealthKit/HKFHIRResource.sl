@@ -39,10 +39,8 @@ public extern "C" HKFHIRResourceType? HKFHIRResourceTypeCondition;
 
 public extern "C" HKFHIRResourceType? HKFHIRResourceTypeCoverage;
 
-/// macOS 13.3 and later.
 public extern "C" HKFHIRResourceType? HKFHIRResourceTypeDiagnosticReport;
 
-/// macOS 13.3 and later.
 public extern "C" HKFHIRResourceType? HKFHIRResourceTypeDocumentReference;
 
 public extern "C" HKFHIRResourceType? HKFHIRResourceTypeImmunization;

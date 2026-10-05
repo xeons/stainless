@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "HealthKit")
 
-/// macOS 15.0 and later.
 public enum HKStateOfMindValenceClassification : long
 {
     VeryUnpleasant = 1,
@@ -44,7 +43,6 @@ public enum HKStateOfMindValenceClassification : long
 
 public extern "C" NSNumber? HKStateOfMindValenceClassificationForValence(double valence);
 
-/// macOS 15.0 and later.
 public enum HKStateOfMindLabel : long
 {
     Amazed = 1,
@@ -87,7 +85,6 @@ public enum HKStateOfMindLabel : long
     Satisfied = 38,
 }
 
-/// macOS 15.0 and later.
 public enum HKStateOfMindAssociation : long
 {
     Community = 1,
@@ -110,14 +107,12 @@ public enum HKStateOfMindAssociation : long
     Weather = 18,
 }
 
-/// macOS 15.0 and later.
 public enum HKStateOfMindKind : long
 {
     MomentaryEmotion = 1,
     DailyMood = 2,
 }
 
-/// macOS 15.0 and later.
 public extern objc class HKStateOfMind : HKSample, NSSecureCoding, NSCopying
 {
     [Selector("kind")] public HKStateOfMindKind Kind { get; }

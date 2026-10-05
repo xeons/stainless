@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "ScreenCaptureKit")
 
-/// macOS 14.0 and later.
 [Flags]
 public enum SCContentSharingPickerMode : ulong
 {
@@ -42,7 +41,6 @@ public enum SCContentSharingPickerMode : ulong
     SingleDisplay = 16,
 }
 
-/// macOS 14.0 and later.
 public extern objc class SCContentSharingPickerConfiguration : NSObject
 {
     [Selector("allowedPickerModes", "setAllowedPickerModes:")] public SCContentSharingPickerMode AllowedPickerModes { get; set; }
@@ -51,7 +49,6 @@ public extern objc class SCContentSharingPickerConfiguration : NSObject
     [Selector("allowsChangingSelectedContent", "setAllowsChangingSelectedContent:")] public bool AllowsChangingSelectedContent { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class SCContentSharingPicker : NSObject
 {
     [Selector("sharedPicker")] public static SCContentSharingPicker SharedPicker { get; }
@@ -67,7 +64,6 @@ public extern objc class SCContentSharingPicker : NSObject
     [Selector("presentPickerForStream:usingContentStyle:")] public void PresentPickerForStreamUsingContentStyle(SCStream stream, SCShareableContentStyle contentStyle);
 }
 
-/// macOS 14.0 and later.
 public objc interface SCContentSharingPickerObserver : NSObjectProtocol
 {
     [Selector("contentSharingPicker:didCancelForStream:")] void ContentSharingPickerDidCancelForStream(SCContentSharingPicker picker, SCStream? stream);

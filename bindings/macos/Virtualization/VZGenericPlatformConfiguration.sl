@@ -32,9 +32,7 @@ import Standard.ObjC;
 public extern objc class VZGenericPlatformConfiguration : VZPlatformConfiguration
 {
     [Selector("machineIdentifier", "setMachineIdentifier:")] public VZGenericMachineIdentifier? MachineIdentifier { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isNestedVirtualizationSupported")] public static bool NestedVirtualizationSupported { get; }
-    /// macOS 15.0 and later.
     [Selector("isNestedVirtualizationEnabled", "setNestedVirtualizationEnabled:")] public bool NestedVirtualizationEnabled { get; set; }
     [Selector("init")] public Self Init();
 }

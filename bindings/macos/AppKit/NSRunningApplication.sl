@@ -64,7 +64,6 @@ public extern objc class NSRunningApplication : NSObject
     [Selector("currentApplication")] public static NSRunningApplication CurrentApplication { get; }
     [Selector("hide")] public bool Hide();
     [Selector("unhide")] public bool Unhide();
-    /// macOS 14.0 and later.
     [Selector("activateFromApplication:options:")] public bool ActivateFromApplicationOptions(NSRunningApplication application, NSApplicationActivationOptions options);
     [Selector("activateWithOptions:")] public bool ActivateWithOptions(NSApplicationActivationOptions options);
     [Selector("terminate")] public bool Terminate();

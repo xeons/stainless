@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobAssertionOutput : NSObject
 {
     [Selector("readData")] public NSData? ReadData { get; }

@@ -50,7 +50,6 @@ public extern "C" CMIOExtensionProperty CMIOExtensionPropertyDeviceCanBeDefaultI
 
 public extern "C" CMIOExtensionProperty CMIOExtensionPropertyDeviceCanBeDefaultOutputDevice;
 
-/// macOS 14.4 and later.
 public extern "C" CMIOExtensionProperty CMIOExtensionPropertyDeviceLatency;
 
 public extern "C" CMIOExtensionProperty CMIOExtensionPropertyStreamActiveFormatIndex;
@@ -67,7 +66,6 @@ public extern "C" CMIOExtensionProperty CMIOExtensionPropertyStreamSinkBufferUnd
 
 public extern "C" CMIOExtensionProperty CMIOExtensionPropertyStreamSinkEndOfData;
 
-/// macOS 14.4 and later.
 public extern "C" CMIOExtensionProperty CMIOExtensionPropertyStreamLatency;
 
 public extern objc class CMIOExtensionPropertyAttributes : NSObject, NSCopying, NSSecureCoding

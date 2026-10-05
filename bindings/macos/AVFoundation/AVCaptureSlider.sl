@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public objc closure void AVCaptureSliderSetActionQueueActionActionBlock(float arg0);
 
-/// macOS 15.0 and later.
 public extern objc class AVCaptureSlider : AVCaptureControl
 {
     [Selector("value", "setValue:")] public float Value { get; set; }

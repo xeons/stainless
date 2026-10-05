@@ -35,7 +35,6 @@ public extern objc class VNDetectBarcodesRequest : VNImageBasedRequest
     /// Deprecated in macOS 12.0.
     [Selector("supportedSymbologies")] public static NSArray SupportedSymbologies { get; }
     [Selector("symbologies", "setSymbologies:")] public NSArray Symbologies { get; set; }
-    /// macOS 14.0 and later.
     [Selector("coalesceCompositeSymbologies", "setCoalesceCompositeSymbologies:")] public bool CoalesceCompositeSymbologies { get; set; }
     [Selector("results")] public NSArray? Results { get; }
     [Selector("supportedSymbologiesAndReturnError:")] public NSArray? SupportedSymbologiesAndReturnError(out NSError? error);

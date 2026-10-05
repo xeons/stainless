@@ -40,7 +40,6 @@ public objc interface GCRelativeInput : NSObjectProtocol
     [Selector("isAnalog")] bool Analog { get; }
     [Selector("lastDeltaTimestamp")] NSTimeInterval LastDeltaTimestamp { get; }
     [Selector("lastDeltaLatency")] NSTimeInterval LastDeltaLatency { get; }
-    /// macOS 14.0 and later.
     [Selector("sources")] NSSet Sources { get; }
 }
 

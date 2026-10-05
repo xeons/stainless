@@ -41,7 +41,6 @@ public extern objc class NEAppProxyProvider : NETunnelProvider
     [Selector("stopProxyWithReason:completionHandler:")] public void StopProxyWithReasonCompletionHandler(NEProviderStopReason reason, NEAppProxyProviderStopProxyWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("cancelProxyWithError:")] public void CancelProxyWithError(NSError? error);
     [Selector("handleNewFlow:")] public bool HandleNewFlow(NEAppProxyFlow flow);
-    /// macOS 15.0 and later.
     [Selector("handleNewUDPFlow:initialRemoteFlowEndpoint:")] public bool HandleNewUDPFlowInitialRemoteFlowEndpoint(NEAppProxyUDPFlow flow, nw_endpoint_t remoteEndpoint);
     /// Deprecated in macOS 15.0.
     [Selector("handleNewUDPFlow:initialRemoteEndpoint:")] public bool HandleNewUDPFlowInitialRemoteEndpoint(NEAppProxyUDPFlow flow, NWEndpoint remoteEndpoint);

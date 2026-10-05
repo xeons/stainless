@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaExtension")
 
-/// macOS 14.0 and later.
 public extern "C" NSErrorDomain? MediaExtensionErrorDomain;
 
-/// macOS 14.0 and later.
 public enum MEError : long
 {
     UnsupportedFeature = -19320,

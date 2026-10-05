@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreData")
 
-/// macOS 14.0 and later.
 public extern objc class NSMigrationStage : NSObject
 {
     [Selector("label", "setLabel:")] public NSString? Label { get; set; }

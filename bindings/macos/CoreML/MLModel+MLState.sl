@@ -32,17 +32,12 @@ import Standard.ObjC;
 
 public objc closure void MLModelPredictionFromFeaturesUsingStateOptionsCompletionHandlerCompletionHandlerBlock(MLFeatureProvider? arg0, NSError? arg1);
 
-/// macOS 15.0 and later.
 /// MLState, a category of MLModel.
 public extern objc class MLModel
 {
-    /// macOS 15.0 and later.
     [Selector("newState")] public MLState NewState();
-    /// macOS 15.0 and later.
     [Selector("predictionFromFeatures:usingState:error:")] public MLFeatureProvider? PredictionFromFeaturesUsingStateError(MLFeatureProvider inputFeatures, MLState state, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("predictionFromFeatures:usingState:options:error:")] public MLFeatureProvider? PredictionFromFeaturesUsingStateOptionsError(MLFeatureProvider inputFeatures, MLState state, MLPredictionOptions options, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("predictionFromFeatures:usingState:options:completionHandler:")] public void PredictionFromFeaturesUsingStateOptionsCompletionHandler(MLFeatureProvider inputFeatures, MLState state, MLPredictionOptions options, MLModelPredictionFromFeaturesUsingStateOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 

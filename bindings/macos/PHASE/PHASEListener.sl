@@ -32,7 +32,6 @@ import Standard.ObjC;
 public extern objc class PHASEListener : PHASEObject
 {
     [Selector("gain", "setGain:")] public double Gain { get; set; }
-    /// macOS 15.0 and later.
     [Selector("automaticHeadTrackingFlags", "setAutomaticHeadTrackingFlags:")] public PHASEAutomaticHeadTrackingFlags AutomaticHeadTrackingFlags { get; set; }
     [Selector("initWithEngine:")] public Self InitWithEngine(PHASEEngine engine);
 }

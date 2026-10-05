@@ -29,7 +29,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 15.0 and later.
 public enum ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle : long
 {
     Standard = 0,
@@ -38,15 +37,11 @@ public enum ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle :
 
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest : ASAuthorizationRequest, ASAuthorizationPublicKeyCredentialRegistrationRequest
 {
-    /// macOS 14.0 and later.
     [Selector("largeBlob", "setLargeBlob:")] public ASAuthorizationPublicKeyCredentialLargeBlobRegistrationInput? LargeBlob { get; set; }
-    /// macOS 15.0 and later.
     [Selector("prf", "setPrf:")] public ASAuthorizationPublicKeyCredentialPRFRegistrationInput? Prf { get; set; }
-    /// macOS 15.0 and later.
     [Selector("requestStyle", "setRequestStyle:")] public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle RequestStyle { get; set; }
 }
 
-/// macOS 13.5 and later.
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest : ASAuthorizationWebBrowserPlatformPublicKeyCredentialRegistrationRequest { }
 
 #endif

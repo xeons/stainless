@@ -48,13 +48,9 @@ public extern objc class NSCursor : NSObject, NSSecureCoding
     [Selector("openHandCursor")] public static NSCursor OpenHandCursor { get; }
     [Selector("IBeamCursor")] public static NSCursor IBeamCursor { get; }
     [Selector("IBeamCursorForVerticalLayout")] public static NSCursor? IBeamCursorForVerticalLayout { get; }
-    /// macOS 15.0 and later.
     [Selector("zoomInCursor")] public static NSCursor? ZoomInCursor { get; }
-    /// macOS 15.0 and later.
     [Selector("zoomOutCursor")] public static NSCursor? ZoomOutCursor { get; }
-    /// macOS 15.0 and later.
     [Selector("columnResizeCursor")] public static NSCursor? ColumnResizeCursor { get; }
-    /// macOS 15.0 and later.
     [Selector("rowResizeCursor")] public static NSCursor? RowResizeCursor { get; }
     [Selector("initWithImage:hotSpot:")] public Self InitWithImageHotSpot(NSImage newImage, NSPoint point);
     [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);
@@ -65,15 +61,11 @@ public extern objc class NSCursor : NSObject, NSSecureCoding
     [Selector("pop")] public void PopMethod();
     [Selector("push")] public void Push();
     [Selector("set")] public void Set();
-    /// macOS 15.0 and later.
     [Selector("columnResizeCursorInDirections:")] public static NSCursor ColumnResizeCursorInDirections(NSHorizontalDirections directions);
-    /// macOS 15.0 and later.
     [Selector("rowResizeCursorInDirections:")] public static NSCursor RowResizeCursorInDirections(NSVerticalDirections directions);
-    /// macOS 15.0 and later.
     [Selector("frameResizeCursorFromPosition:inDirections:")] public static NSCursor FrameResizeCursorFromPositionInDirections(NSCursorFrameResizePosition position, NSCursorFrameResizeDirections directions);
 }
 
-/// macOS 15.0 and later.
 public enum NSCursorFrameResizePosition : ulong
 {
     Top = 1,
@@ -86,7 +78,6 @@ public enum NSCursorFrameResizePosition : ulong
     BottomRight = 12,
 }
 
-/// macOS 15.0 and later.
 [Flags]
 public enum NSCursorFrameResizeDirections : ulong
 {

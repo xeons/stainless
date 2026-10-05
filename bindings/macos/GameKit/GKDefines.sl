@@ -29,7 +29,6 @@ import MacOS.Foundation;
 
 #pragma comment(framework, "GameKit")
 
-/// macOS 14.2 and later.
 public using GKMatchProperties = NSDictionary;
 
 #endif

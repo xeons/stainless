@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreAudio")
 
-/// macOS 14.2 and later.
 public extern "C" OSStatus AudioHardwareCreateProcessTap(CATapDescription? inDescription, AudioObjectID* outTapID);
 
-/// macOS 14.2 and later.
 public extern "C" OSStatus AudioHardwareDestroyProcessTap(AudioObjectID inTapID);
 
 #endif

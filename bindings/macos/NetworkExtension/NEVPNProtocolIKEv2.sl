@@ -106,7 +106,6 @@ public extern objc class NEVPNIKEv2SecurityAssociationParameters : NSObject, NSS
     [Selector("lifetimeMinutes", "setLifetimeMinutes:")] public int LifetimeMinutes { get; set; }
 }
 
-/// macOS 15.0 and later.
 public extern objc class NEVPNIKEv2PPKConfiguration : NSObject, NSCopying
 {
     [Selector("identifier")] public NSString Identifier { get; }
@@ -134,7 +133,6 @@ public extern objc class NEVPNProtocolIKEv2 : NEVPNProtocolIPSec
     [Selector("minimumTLSVersion", "setMinimumTLSVersion:")] public NEVPNIKEv2TLSVersion MinimumTLSVersion { get; set; }
     [Selector("maximumTLSVersion", "setMaximumTLSVersion:")] public NEVPNIKEv2TLSVersion MaximumTLSVersion { get; set; }
     [Selector("mtu", "setMtu:")] public NSUInteger Mtu { get; set; }
-    /// macOS 15.0 and later.
     [Selector("ppkConfiguration", "setPpkConfiguration:")] public NEVPNIKEv2PPKConfiguration? PpkConfiguration { get; set; }
 }
 

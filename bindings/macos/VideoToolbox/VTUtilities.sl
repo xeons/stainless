@@ -38,31 +38,22 @@ public extern "C" OSStatus VTCreateCGImageFromCVPixelBuffer(CVPixelBufferRef pix
 
 public extern "C" void VTRegisterSupplementalVideoDecoderIfAvailable(CMVideoCodecType codecType);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTCopyVideoDecoderExtensionProperties(CMFormatDescriptionRef formatDesc, __CFDictionary** mediaExtensionPropertiesOut);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTCopyRAWProcessorExtensionProperties(CMFormatDescriptionRef formatDesc, __CFDictionary** mediaExtensionPropertiesOut);
 
-/// macOS 15.0 and later.
 public using VTExtensionPropertiesKey = CFStringRef;
 
-/// macOS 15.0 and later.
 public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ExtensionIdentifierKey;
 
-/// macOS 15.0 and later.
 public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ExtensionNameKey;
 
-/// macOS 15.0 and later.
 public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ContainingBundleNameKey;
 
-/// macOS 15.0 and later.
 public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ExtensionURLKey;
 
-/// macOS 15.0 and later.
 public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_ContainingBundleURLKey;
 
-/// macOS 15.0 and later.
 public extern "C" VTExtensionPropertiesKey? kVTExtensionProperties_CodecNameKey;
 
 #endif

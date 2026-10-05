@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreLocation")
 
-/// macOS 14.0 and later.
 public extern objc class CLCircularGeographicCondition : CLCondition, NSSecureCoding
 {
     [Selector("center")] public CLLocationCoordinate2D Center { get; }

@@ -43,12 +43,10 @@ public extern objc class NEFilterFlow : NSObject, NSSecureCoding, NSCopying
 
 public extern objc class NEFilterSocketFlow : NEFilterFlow, NSSecureCoding, NSCopying
 {
-    /// macOS 15.0 and later.
     [Selector("remoteFlowEndpoint")] public nw_endpoint_t? RemoteFlowEndpoint { get; }
     /// Deprecated in macOS 15.0.
     [Selector("remoteEndpoint")] public NWEndpoint? RemoteEndpoint { get; }
     [Selector("remoteHostname")] public NSString? RemoteHostname { get; }
-    /// macOS 15.0 and later.
     [Selector("localFlowEndpoint")] public nw_endpoint_t? LocalFlowEndpoint { get; }
     /// Deprecated in macOS 15.0.
     [Selector("localEndpoint")] public NWEndpoint? LocalEndpoint { get; }

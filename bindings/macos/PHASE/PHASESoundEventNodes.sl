@@ -111,7 +111,6 @@ public extern objc class PHASERandomNodeDefinition : PHASESoundEventNodeDefiniti
     [Selector("addSubtree:weight:")] public void AddSubtreeWeight(PHASESoundEventNodeDefinition subtree, NSNumber weight);
 }
 
-/// macOS 15.0 and later.
 public extern objc class PHASEStreamNode : NSObject
 {
     [Selector("gainMetaParameter")] public PHASENumberMetaParameter? GainMetaParameter { get; }
@@ -146,7 +145,6 @@ public extern objc class PHASEPushStreamNode : PHASEStreamNode
 
 public objc closure OSStatus PHASEPullStreamRenderBlock(bool* arg0, AudioTimeStamp* arg1, AVAudioFrameCount arg2, AudioBufferList* arg3);
 
-/// macOS 15.0 and later.
 public extern objc class PHASEPullStreamNodeDefinition : PHASEGeneratorNodeDefinition
 {
     [Selector("format")] public AVAudioFormat Format { get; }
@@ -155,7 +153,6 @@ public extern objc class PHASEPullStreamNodeDefinition : PHASEGeneratorNodeDefin
     [Selector("initWithMixerDefinition:format:")] public Self InitWithMixerDefinitionFormat(PHASEMixerDefinition mixerDefinition, AVAudioFormat format);
 }
 
-/// macOS 15.0 and later.
 public extern objc class PHASEPullStreamNode : PHASEStreamNode
 {
     [Selector("renderBlock", "setRenderBlock:")] public PHASEPullStreamRenderBlock? RenderBlock { get; set; }

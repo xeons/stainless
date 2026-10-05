@@ -42,13 +42,10 @@ public extern "C" AVAssetImageGeneratorApertureMode? AVAssetImageGeneratorApertu
 
 public extern "C" AVAssetImageGeneratorApertureMode? AVAssetImageGeneratorApertureModeEncodedPixels;
 
-/// macOS 15.0 and later.
 public using AVAssetImageGeneratorDynamicRangePolicy = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" AVAssetImageGeneratorDynamicRangePolicy? AVAssetImageGeneratorDynamicRangePolicyForceSDR;
 
-/// macOS 15.0 and later.
 public extern "C" AVAssetImageGeneratorDynamicRangePolicy? AVAssetImageGeneratorDynamicRangePolicyMatchSource;
 
 public enum AVAssetImageGeneratorResult : long
@@ -66,7 +63,6 @@ public extern objc class AVAssetImageGenerator : NSObject
     [Selector("appliesPreferredTrackTransform", "setAppliesPreferredTrackTransform:")] public bool AppliesPreferredTrackTransform { get; set; }
     [Selector("maximumSize", "setMaximumSize:")] public CGSize MaximumSize { get; set; }
     [Selector("apertureMode", "setApertureMode:")] public AVAssetImageGeneratorApertureMode? ApertureMode { get; set; }
-    /// macOS 15.0 and later.
     [Selector("dynamicRangePolicy", "setDynamicRangePolicy:")] public AVAssetImageGeneratorDynamicRangePolicy? DynamicRangePolicy { get; set; }
     [Selector("videoComposition", "setVideoComposition:")] public AVVideoComposition? VideoComposition { get; set; }
     [Selector("customVideoCompositor")] public AVVideoCompositing? CustomVideoCompositor { get; }

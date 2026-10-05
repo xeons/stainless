@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Foundation")
 
-/// macOS 14.0 and later.
 public extern objc class NSTermOfAddress : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("languageIdentifier")] public NSString? LanguageIdentifier { get; }
@@ -38,7 +37,6 @@ public extern objc class NSTermOfAddress : NSObject, NSCopying, NSSecureCoding
     [Selector("neutral")] public static Self Neutral();
     [Selector("feminine")] public static Self Feminine();
     [Selector("masculine")] public static Self Masculine();
-    /// macOS 15.0 and later.
     [Selector("currentUser")] public static Self CurrentUser();
     [Selector("localizedForLanguageIdentifier:withPronouns:")] public static Self LocalizedForLanguageIdentifierWithPronouns(NSString language, NSArray pronouns);
 }

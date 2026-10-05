@@ -32,44 +32,30 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 14.0 and later.
 public using AVCaptureReactionType = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeThumbsUp;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeThumbsDown;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeBalloons;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeHeart;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeFireworks;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeRain;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeConfetti;
 
-/// macOS 14.0 and later.
 public extern "C" AVCaptureReactionType? AVCaptureReactionTypeLasers;
 
-/// macOS 14.0 and later.
 public extern "C" NSString AVCaptureReactionSystemImageNameForType(AVCaptureReactionType reactionType);
 
-/// macOS 14.0 and later.
 public extern objc class AVCaptureReactionEffectState : NSObject
 {
-    /// macOS 14.0 and later.
     [Selector("reactionType")] public AVCaptureReactionType? ReactionType { get; }
-    /// macOS 14.0 and later.
     [Selector("startTime")] public CMTime StartTime { get; }
-    /// macOS 14.0 and later.
     [Selector("endTime")] public CMTime EndTime { get; }
 }
 

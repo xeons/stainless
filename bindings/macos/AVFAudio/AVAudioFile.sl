@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public extern objc class AVAudioFile : NSObject
 {
-    /// macOS 15.0 and later.
     [Selector("isOpen")] public bool IsOpen { get; }
     [Selector("url")] public NSURL Url { get; }
     [Selector("fileFormat")] public AVAudioFormat FileFormat { get; }
@@ -46,7 +45,6 @@ public extern objc class AVAudioFile : NSObject
     [Selector("initForReading:commonFormat:interleaved:error:")] public Self? InitForReadingCommonFormatInterleavedError(NSURL fileURL, AVAudioCommonFormat format, bool interleaved, out NSError? outError);
     [Selector("initForWriting:settings:error:")] public Self? InitForWritingSettingsError(NSURL fileURL, NSDictionary settings, out NSError? outError);
     [Selector("initForWriting:settings:commonFormat:interleaved:error:")] public Self? InitForWritingSettingsCommonFormatInterleavedError(NSURL fileURL, NSDictionary settings, AVAudioCommonFormat format, bool interleaved, out NSError? outError);
-    /// macOS 15.0 and later.
     [Selector("close")] public void Close();
     [Selector("readIntoBuffer:error:")] public bool ReadIntoBufferError(AVAudioPCMBuffer buffer, out NSError? outError);
     [Selector("readIntoBuffer:frameCount:error:")] public bool ReadIntoBufferFrameCountError(AVAudioPCMBuffer buffer, AVAudioFrameCount frames, out NSError? outError);

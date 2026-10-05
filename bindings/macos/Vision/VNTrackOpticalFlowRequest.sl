@@ -39,7 +39,6 @@ public enum VNTrackOpticalFlowRequestComputationAccuracy : ulong
     VeryHigh = 3,
 }
 
-/// macOS 14.0 and later.
 public extern objc class VNTrackOpticalFlowRequest : VNStatefulRequest
 {
     [Selector("computationAccuracy", "setComputationAccuracy:")] public VNTrackOpticalFlowRequestComputationAccuracy ComputationAccuracy { get; set; }

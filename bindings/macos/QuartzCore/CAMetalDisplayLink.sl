@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "QuartzCore")
 
-/// macOS 14.0 and later.
 public extern objc class CAMetalDisplayLinkUpdate : NSObject
 {
     [Selector("drawable")] public CAMetalDrawable Drawable { get; }
@@ -40,13 +39,11 @@ public extern objc class CAMetalDisplayLinkUpdate : NSObject
     [Selector("targetPresentationTimestamp")] public CFTimeInterval TargetPresentationTimestamp { get; }
 }
 
-/// macOS 14.0 and later.
 public objc interface CAMetalDisplayLinkDelegate
 {
     [Selector("metalDisplayLink:needsUpdate:")] void MetalDisplayLinkNeedsUpdate(CAMetalDisplayLink link, CAMetalDisplayLinkUpdate update);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CAMetalDisplayLink : NSObject
 {
     [Selector("delegate", "setDelegate:")] public CAMetalDisplayLinkDelegate? Delegate { get; set; }

@@ -31,12 +31,10 @@ import Standard.ObjC;
 
 #pragma comment(framework, "LocalAuthentication")
 
-/// macOS 15.0 and later.
 public extern objc class LAEnvironmentState : NSObject, NSCopying
 {
     [Selector("biometry")] public LAEnvironmentMechanismBiometry? Biometry { get; }
     [Selector("userPassword")] public LAEnvironmentMechanismUserPassword? UserPassword { get; }
-    /// macOS 15.0 and later.
     [Selector("companions")] public NSArray Companions { get; }
     [Selector("allMechanisms")] public NSArray AllMechanisms { get; }
 }

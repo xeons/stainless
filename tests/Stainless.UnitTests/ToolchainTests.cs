@@ -63,9 +63,9 @@ public class ToolchainTests
     [Fact]
     public void DarwinNamesItsTripleEvenOnAMac()
     {
-        Assert.Contains("--target=arm64-apple-macosx13.0",
+        Assert.Contains("--target=arm64-apple-macosx15.0",
             Toolchain.TargetArgumentsFor(TargetPlatform.Arm64MacOS, Mac));
-        Assert.Contains("--target=arm64-apple-macosx13.0",
+        Assert.Contains("--target=arm64-apple-macosx15.0",
             Toolchain.TargetArgumentsFor(TargetPlatform.Arm64MacOS, Windows));
     }
 
@@ -97,7 +97,7 @@ public class ToolchainTests
     {
         var arguments = LinkFor(TargetPlatform.Arm64MacOS);
 
-        Assert.Contains("--target=arm64-apple-macosx13.0", arguments);
+        Assert.Contains("--target=arm64-apple-macosx15.0", arguments);
         Assert.Contains("-Wl,-dead_strip", arguments);
         Assert.DoesNotContain("-Wl,--gc-sections", arguments);
         Assert.DoesNotContain("-fuse-ld=lld", arguments);
@@ -179,7 +179,7 @@ public class ToolchainTests
         var arguments = Under(TargetPlatform.Arm64MacOS, () =>
             Tools.SharedRuntimeLinkArguments(["arc.o"], "obj/libstainless-rt.dylib", debug: false));
 
-        Assert.Contains("--target=arm64-apple-macosx13.0", arguments);
+        Assert.Contains("--target=arm64-apple-macosx15.0", arguments);
         Assert.Contains("-dynamiclib", arguments);
         Assert.Contains("-Wl,-install_name,@rpath/libstainless-rt.dylib", arguments);
         Assert.DoesNotContain("-Wl,--no-undefined", arguments);

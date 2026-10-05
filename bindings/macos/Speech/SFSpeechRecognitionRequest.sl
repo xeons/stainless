@@ -42,7 +42,6 @@ public extern objc class SFSpeechRecognitionRequest : NSObject
     [Selector("interactionIdentifier", "setInteractionIdentifier:")] public NSString? InteractionIdentifier { get; set; }
     [Selector("requiresOnDeviceRecognition", "setRequiresOnDeviceRecognition:")] public bool RequiresOnDeviceRecognition { get; set; }
     [Selector("addsPunctuation", "setAddsPunctuation:")] public bool AddsPunctuation { get; set; }
-    /// macOS 14 and later.
     [Selector("customizedLanguageModel", "setCustomizedLanguageModel:")] public SFSpeechLanguageModelConfiguration? CustomizedLanguageModel { get; set; }
 }
 

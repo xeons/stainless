@@ -48,9 +48,7 @@ public extern objc class MLModel : NSObject
     [Selector("loadContentsOfURL:configuration:completionHandler:")] public static void LoadContentsOfURLConfigurationCompletionHandler(NSURL url, MLModelConfiguration configuration, MLModelLoadContentsOfURLConfigurationCompletionHandlerHandlerBlock handler);
     [Selector("predictionFromFeatures:error:")] public MLFeatureProvider? PredictionFromFeaturesError(MLFeatureProvider input, out NSError? error);
     [Selector("predictionFromFeatures:options:error:")] public MLFeatureProvider? PredictionFromFeaturesOptionsError(MLFeatureProvider input, MLPredictionOptions options, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("predictionFromFeatures:completionHandler:")] public void PredictionFromFeaturesCompletionHandler(MLFeatureProvider input, MLModelPredictionFromFeaturesCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Selector("predictionFromFeatures:options:completionHandler:")] public void PredictionFromFeaturesOptionsCompletionHandler(MLFeatureProvider input, MLPredictionOptions options, MLModelPredictionFromFeaturesOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("predictionsFromBatch:error:")] public MLBatchProvider? PredictionsFromBatchError(MLBatchProvider inputBatch, out NSError? error);
     [Selector("predictionsFromBatch:options:error:")] public MLBatchProvider? PredictionsFromBatchOptionsError(MLBatchProvider inputBatch, MLPredictionOptions options, out NSError? error);

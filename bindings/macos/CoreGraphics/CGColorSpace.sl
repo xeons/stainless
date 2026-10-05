@@ -138,7 +138,6 @@ public extern "C" CFStringRef kCGColorSpaceLinearGray;
 
 public extern "C" CFStringRef kCGColorSpaceExtendedLinearGray;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGColorSpaceCoreMedia709;
 
 [ReturnsRetained] public extern "C" CGColorSpaceRef? CGColorSpaceCreateDeviceGray();
@@ -179,7 +178,6 @@ public extern "C" CGColorSpaceModel CGColorSpaceGetModel(CGColorSpaceRef? space)
 
 public extern "C" CGColorSpaceRef? CGColorSpaceGetBaseColorSpace(CGColorSpaceRef? space);
 
-/// macOS 15.0 and later.
 [ReturnsRetained] public extern "C" CGColorSpaceRef CGColorSpaceCopyBaseColorSpace(CGColorSpaceRef space);
 
 public extern "C" nuint CGColorSpaceGetColorTableCount(CGColorSpaceRef? space);

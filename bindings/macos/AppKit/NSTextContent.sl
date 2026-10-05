@@ -38,124 +38,84 @@ public extern "C" NSTextContentType NSTextContentTypePassword;
 
 public extern "C" NSTextContentType NSTextContentTypeOneTimeCode;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeNewPassword;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeNamePrefix;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeGivenName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeMiddleName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeFamilyName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeNameSuffix;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeNickname;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeJobTitle;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeOrganizationName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeLocation;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeFullStreetAddress;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeStreetAddressLine1;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeStreetAddressLine2;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeAddressCity;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeAddressState;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeAddressCityAndState;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeSublocality;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCountryName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypePostalCode;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeTelephoneNumber;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeEmailAddress;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeURL;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardNumber;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardGivenName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardMiddleName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardFamilyName;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardSecurityCode;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardExpiration;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardExpirationMonth;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardExpirationYear;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeCreditCardType;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeShipmentTrackingNumber;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeFlightNumber;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeDateTime;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeBirthdate;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeBirthdateDay;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeBirthdateMonth;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextContentType NSTextContentTypeBirthdateYear;
 
 public objc interface NSTextContent

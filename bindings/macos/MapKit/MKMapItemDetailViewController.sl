@@ -31,13 +31,11 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MapKit")
 
-/// macOS 15.0 and later.
 public objc interface MKMapItemDetailViewControllerDelegate : NSObjectProtocol
 {
     [Selector("mapItemDetailViewControllerDidFinish:")] void MapItemDetailViewControllerDidFinish(MKMapItemDetailViewController detailViewController);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MKMapItemDetailViewController : NSViewController
 {
     [Selector("mapItem", "setMapItem:")] public MKMapItem? MapItem { get; set; }

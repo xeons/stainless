@@ -193,7 +193,6 @@ public extern objc class NSWindow : NSResponder, NSAnimatablePropertyContainer, 
     [Selector("delegate", "setDelegate:")] public NSWindowDelegate? Delegate { get; set; }
     [Selector("windowNumber")] public NSInteger WindowNumber { get; }
     [Selector("styleMask", "setStyleMask:")] public NSWindowStyleMask StyleMask { get; set; }
-    /// macOS 15.0 and later.
     [Selector("cascadingReferenceFrame")] public NSRect CascadingReferenceFrame { get; }
     [Selector("frame")] public NSRect Frame { get; }
     [Selector("inLiveResize")] public bool InLiveResize { get; }
@@ -277,7 +276,6 @@ public extern objc class NSWindow : NSResponder, NSAnimatablePropertyContainer, 
     [Selector("tabbedWindows")] public NSArray? TabbedWindows { get; }
     [Selector("tab")] public NSWindowTab? Tab { get; }
     [Selector("tabGroup")] public NSWindowTabGroup? TabGroup { get; }
-    /// macOS 13.3 and later.
     [Selector("hasActiveWindowSharingSession")] public bool HasActiveWindowSharingSession { get; }
     [Selector("windowTitlebarLayoutDirection")] public NSUserInterfaceLayoutDirection WindowTitlebarLayoutDirection { get; }
     [Selector("frameRectForContentRect:styleMask:")] public static NSRect FrameRectForContentRectStyleMask(NSRect cRect, NSWindowStyleMask style);
@@ -381,11 +379,8 @@ public extern objc class NSWindow : NSResponder, NSAnimatablePropertyContainer, 
     [Selector("toggleTabBar:")] public void ToggleTabBar(AnyObject? sender);
     [Selector("toggleTabOverview:")] public void ToggleTabOverview(AnyObject? sender);
     [Selector("addTabbedWindow:ordered:")] public void AddTabbedWindowOrdered(NSWindow window, NSWindowOrderingMode ordered);
-    /// macOS 13.3 and later.
     [Selector("transferWindowSharingToWindow:completionHandler:")] public void TransferWindowSharingToWindowCompletionHandler(NSWindow window, NSWindowTransferWindowSharingToWindowCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 15.0 and later.
     [Selector("requestSharingOfWindow:completionHandler:")] public void RequestSharingOfWindowCompletionHandler(NSWindow window, NSWindowRequestSharingOfWindowCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 15.0 and later.
     [Selector("requestSharingOfWindowUsingPreview:title:completionHandler:")] public void RequestSharingOfWindowUsingPreviewTitleCompletionHandler(NSImage image, NSString title, NSWindowRequestSharingOfWindowUsingPreviewTitleCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
@@ -420,7 +415,6 @@ public extern objc class NSWindow
 /// NSDrag, a category of NSWindow.
 public extern objc class NSWindow
 {
-    /// macOS 15.0 and later.
     [Selector("beginDraggingSessionWithItems:event:source:")] public NSDraggingSession BeginDraggingSessionWithItemsEventSource(NSArray items, NSEvent event, NSDraggingSource source);
     /// Deprecated in macOS 100000.
     [Selector("dragImage:at:offset:event:pasteboard:source:slideBack:")] public void DragImageAtOffsetEventPasteboardSourceSlideBack(NSImage image, NSPoint baseLocation, NSSize initialOffset, NSEvent event, NSPasteboard pboard, AnyObject sourceObj, bool slideFlag);
@@ -428,7 +422,6 @@ public extern objc class NSWindow
     [Selector("unregisterDraggedTypes")] public void UnregisterDraggedTypes();
 }
 
-/// macOS 14.0 and later.
 /// NSDisplayLink, a category of NSWindow.
 public extern objc class NSWindow
 {
@@ -459,9 +452,7 @@ public objc interface NSWindowDelegate : NSObjectProtocol
     [Optional] [Selector("window:willResizeForVersionBrowserWithMaxPreferredSize:maxAllowedSize:")] NSSize WindowWillResizeForVersionBrowserWithMaxPreferredSizeMaxAllowedSize(NSWindow window, NSSize maxPreferredFrameSize, NSSize maxAllowedFrameSize);
     [Optional] [Selector("window:willEncodeRestorableState:")] void WindowWillEncodeRestorableState(NSWindow window, NSCoder state);
     [Optional] [Selector("window:didDecodeRestorableState:")] void WindowDidDecodeRestorableState(NSWindow window, NSCoder state);
-    /// macOS 13.2 and later.
     [Optional] [Selector("previewRepresentableActivityItemsForWindow:")] NSArray? PreviewRepresentableActivityItemsForWindow(NSWindow window);
-    /// macOS 15.0 and later.
     [Optional] [Selector("windowForSharingRequestFromWindow:")] NSWindow? WindowForSharingRequestFromWindow(NSWindow window);
     [Optional] [Selector("windowDidResize:")] void WindowDidResize(NSNotification notification);
     [Optional] [Selector("windowDidExpose:")] void WindowDidExpose(NSNotification notification);

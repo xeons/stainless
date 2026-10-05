@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.4 and later.
 public extern objc class ASWebAuthenticationSessionCallback : NSObject
 {
     [Selector("callbackWithCustomScheme:")] public static Self CallbackWithCustomScheme(NSString customScheme);

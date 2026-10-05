@@ -67,7 +67,6 @@ public extern objc class PHImageRequestOptions : NSObject, NSCopying
     [Selector("isNetworkAccessAllowed", "setNetworkAccessAllowed:")] public bool NetworkAccessAllowed { get; set; }
     [Selector("isSynchronous", "setSynchronous:")] public bool Synchronous { get; set; }
     [Selector("progressHandler", "setProgressHandler:")] public PHAssetImageProgressHandler? ProgressHandler { get; set; }
-    /// macOS 14 and later.
     [Selector("allowSecondaryDegradedImage", "setAllowSecondaryDegradedImage:")] public bool AllowSecondaryDegradedImage { get; set; }
 }
 

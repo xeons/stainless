@@ -1342,7 +1342,7 @@ executable, and `__DATA,__bss` holds no bytes. The comma is Mach-O's alone; on
 the other formats it is refused with the rest (SL0709).
 
 ```
-error[SL0830]: '.rodata' cannot name a section on arm64-apple-macosx13.0: a
+error[SL0830]: '.rodata' cannot name a section on arm64-apple-macosx15.0: a
 Mach-O section is named 'segment,section', with exactly one comma
 ```
 

@@ -102,25 +102,18 @@ public extern "C" bool CGImageDestinationCopyImageSource(CGImageDestinationRef i
 
 public extern "C" void CGImageDestinationAddAuxiliaryDataInfo(CGImageDestinationRef idst, CFStringRef auxiliaryImageDataType, CFDictionaryRef auxiliaryDataInfoDictionary);
 
-/// macOS 15 and later.
 public extern "C" CFStringRef kCGImageDestinationEncodeRequest;
 
-/// macOS 15 and later.
 public extern "C" CFStringRef kCGImageDestinationEncodeToSDR;
 
-/// macOS 15 and later.
 public extern "C" CFStringRef kCGImageDestinationEncodeToISOHDR;
 
-/// macOS 15 and later.
 public extern "C" CFStringRef kCGImageDestinationEncodeToISOGainmap;
 
-/// macOS 15 and later.
 public extern "C" CFStringRef kCGImageDestinationEncodeRequestOptions;
 
-/// macOS 15 and later.
 public extern "C" CFStringRef kCGImageDestinationEncodeBaseIsSDR;
 
-/// macOS 15 and later.
 public extern "C" CFStringRef kCGImageDestinationEncodeTonemapMode;
 
 /// macOS 26.0 and later.

@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public enum MTRCommissioningStatus : long
 {
     Unknown = 0,
@@ -40,21 +39,16 @@ public enum MTRCommissioningStatus : long
     DiscoveringMoreDevices = 3,
 }
 
-/// macOS 13.3 and later.
 public objc interface MTRDeviceControllerDelegate : NSObjectProtocol
 {
     [Optional] [Selector("controller:statusUpdate:")] void ControllerStatusUpdate(MTRDeviceController controller, MTRCommissioningStatus status);
     [Optional] [Selector("controller:commissioningSessionEstablishmentDone:")] void ControllerCommissioningSessionEstablishmentDone(MTRDeviceController controller, NSError? error);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 14.0.
     [Optional] [Selector("controller:commissioningComplete:")] void ControllerCommissioningComplete(MTRDeviceController controller, NSError? error);
-    /// macOS 14.0 and later.
     [Optional] [Selector("controller:commissioningComplete:nodeID:")] void ControllerCommissioningCompleteNodeID(MTRDeviceController controller, NSError? error, NSNumber? nodeID);
-    /// macOS 14.6 and later.
     [Optional] [Selector("controller:commissioningComplete:nodeID:metrics:")] void ControllerCommissioningCompleteNodeIDMetrics(MTRDeviceController controller, NSError? error, NSNumber? nodeID, MTRMetrics metrics);
     /// macOS 15.4 and later.
     [Optional] [Selector("controller:readCommissioneeInfo:")] void ControllerReadCommissioneeInfo(MTRDeviceController controller, MTRCommissioneeInfo info);
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 15.4.
     [Optional] [Selector("controller:readCommissioningInfo:")] void ControllerReadCommissioningInfo(MTRDeviceController controller, MTRProductIdentity info);
     /// macOS 15.2 and later.

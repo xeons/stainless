@@ -104,7 +104,6 @@ public extern "C" CFStringRef? kVTDecompressionPropertyKey_SupportedPixelFormats
 
 public extern "C" CFStringRef? kVTDecompressionPropertyKey_PixelFormatsWithReducedResolutionSupport;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTDecompressionPropertyKey_AllowBitstreamToChangeFrameDimensions;
 
 public extern "C" CFStringRef? kVTDecompressionPropertyKey_PixelTransferProperties;
@@ -117,16 +116,12 @@ public extern "C" CFStringRef? kVTDecompressionPropertyKey_UsingGPURegistryID;
 
 public extern "C" CFStringRef? kVTDecompressionPropertyKey_PropagatePerFrameHDRDisplayMetadata;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kVTDecompressionPropertyKey_GeneratePerFrameHDRDisplayMetadata;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTDecompressionPropertyKey_DecoderProducesRAWOutput;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTDecompressionPropertyKey_RequestRAWOutput;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTDecompressionPropertyKey_RequestedMVHEVCVideoLayerIDs;
 
 /// macOS 26.0 and later.

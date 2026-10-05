@@ -61,7 +61,6 @@ public extern objc class MPSNDArrayMultiaryKernel : MPSNDArrayMultiaryBase
     [Selector("encodeToCommandBuffer:sourceArrays:destinationArray:")] public void EncodeToCommandBufferSourceArraysDestinationArray(MTLCommandBuffer cmdBuf, NSArray sourceArrays, MPSNDArray destination);
     [Selector("encodeToCommandBuffer:sourceArrays:resultState:outputStateIsTemporary:")] public MPSNDArray EncodeToCommandBufferSourceArraysResultStateOutputStateIsTemporary(MTLCommandBuffer cmdBuf, NSArray sourceArrays, out MPSState? outGradientState, bool outputStateIsTemporary);
     [Selector("encodeToCommandBuffer:sourceArrays:resultState:destinationArray:")] public void EncodeToCommandBufferSourceArraysResultStateDestinationArray(MTLCommandBuffer cmdBuf, NSArray sourceArrays, MPSState? outGradientState, MPSNDArray destination);
-    /// macOS 15.0 and later.
     [Selector("encodeToCommandEncoder:commandBuffer:sourceArrays:destinationArray:")] public void EncodeToCommandEncoderCommandBufferSourceArraysDestinationArray(MTLComputeCommandEncoder? encoder, MTLCommandBuffer commandBuffer, NSArray sourceArrays, MPSNDArray destination);
 }
 

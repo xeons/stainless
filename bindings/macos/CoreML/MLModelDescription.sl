@@ -35,7 +35,6 @@ public extern objc class MLModelDescription : NSObject, NSSecureCoding
 {
     [Selector("inputDescriptionsByName")] public NSDictionary InputDescriptionsByName { get; }
     [Selector("outputDescriptionsByName")] public NSDictionary OutputDescriptionsByName { get; }
-    /// macOS 15.0 and later.
     [Selector("stateDescriptionsByName")] public NSDictionary StateDescriptionsByName { get; }
     [Selector("predictedFeatureName")] public NSString? PredictedFeatureName { get; }
     [Selector("predictedProbabilitiesName")] public NSString? PredictedProbabilitiesName { get; }

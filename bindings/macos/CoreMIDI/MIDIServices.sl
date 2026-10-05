@@ -296,13 +296,10 @@ public extern "C" CFStringRef kMIDIPropertyDisplayName;
 
 public extern "C" CFStringRef kMIDIPropertyProtocolID;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kMIDIPropertyUMPActiveGroupBitmap;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kMIDIPropertyUMPCanTransmitGroupless;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kMIDIPropertyAssociatedEndpoint;
 
 public extern "C" OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void* notifyRefCon, MIDIClientRef* outClient);
@@ -403,13 +400,10 @@ public extern "C" OSStatus MIDISend(MIDIPortRef port, MIDIEndpointRef dest, MIDI
 
 public extern "C" OSStatus MIDISendSysex(MIDISysexSendRequest* request);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus MIDISendUMPSysex(MIDISysexSendRequestUMP* umpRequest);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus MIDISendUMPSysex8(MIDISysexSendRequestUMP* umpRequest);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus MIDIEventPacketSysexBytesForGroup(MIDIEventPacket* pkt, UInt8 groupIndex, __CFData** outData);
 
 public extern "C" OSStatus MIDIReceivedEventList(MIDIEndpointRef src, MIDIEventList* evtlist);

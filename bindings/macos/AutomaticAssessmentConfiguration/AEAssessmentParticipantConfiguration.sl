@@ -36,7 +36,6 @@ public extern objc class AEAssessmentParticipantConfiguration : NSObject, NSCopy
     [Selector("allowsNetworkAccess", "setAllowsNetworkAccess:")] public bool AllowsNetworkAccess { get; set; }
     /// macOS 26.0 and later.
     [Selector("isRequired", "setRequired:")] public bool Required { get; set; }
-    /// macOS 15.0 and later.
     [Selector("configurationInfo", "setConfigurationInfo:")] public NSDictionary ConfigurationInfo { get; set; }
     [Selector("init")] public Self Init();
     [Selector("new")] public static Self New();

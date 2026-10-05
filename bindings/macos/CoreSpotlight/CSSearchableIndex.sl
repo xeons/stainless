@@ -77,7 +77,6 @@ public objc closure void CSSearchableIndexFetchLastClientStateWithCompletionHand
 public extern objc class CSSearchableIndex
 {
     [Selector("beginIndexBatch")] public void BeginIndexBatch();
-    /// macOS 15.0 and later.
     [Selector("endIndexBatchWithExpectedClientState:newClientState:completionHandler:")] public void EndIndexBatchWithExpectedClientStateNewClientStateCompletionHandler(NSData? expectedClientState, NSData newClientState, CSSearchableIndexEndIndexBatchWithExpectedClientStateNewClientStateCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("endIndexBatchWithClientState:completionHandler:")] public void EndIndexBatchWithClientStateCompletionHandler(NSData clientState, CSSearchableIndexEndIndexBatchWithClientStateCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("fetchLastClientStateWithCompletionHandler:")] public void FetchLastClientStateWithCompletionHandler(CSSearchableIndexFetchLastClientStateWithCompletionHandlerCompletionHandlerBlock completionHandler);

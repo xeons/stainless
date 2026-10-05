@@ -30,14 +30,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public enum ASAuthorizationPublicKeyCredentialLargeBlobSupportRequirement : long
 {
     Required = 0,
     Preferred = 1,
 }
 
-/// macOS 14.0 and later.
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobRegistrationInput : NSObject
 {
     [Selector("supportRequirement", "setSupportRequirement:")] public ASAuthorizationPublicKeyCredentialLargeBlobSupportRequirement SupportRequirement { get; set; }

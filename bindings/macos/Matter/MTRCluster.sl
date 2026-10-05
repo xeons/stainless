@@ -46,14 +46,11 @@ public objc closure void MTRSubscriptionEstablishedHandler();
 
 public extern objc class MTRCluster : NSObject
 {
-    /// macOS 14.4 and later.
     [Selector("endpointID")] public NSNumber? EndpointID { get; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class MTRGenericBaseCluster : MTRCluster { }
 
-/// macOS 14.4 and later.
 public extern objc class MTRGenericCluster : MTRCluster
 {
     [Selector("device")] public MTRDevice Device { get; }
@@ -67,25 +64,17 @@ public extern objc class MTRWriteParams : NSObject, NSCopying, NSSecureCoding
 
 public extern objc class MTRReadParams : NSObject, NSCopying, NSSecureCoding
 {
-    /// macOS 13.3 and later.
     [Selector("shouldFilterByFabric", "setFilterByFabric:")] public bool FilterByFabric { get; set; }
-    /// macOS 13.3 and later.
     [Selector("minEventNumber", "setMinEventNumber:")] public NSNumber? MinEventNumber { get; set; }
-    /// macOS 14.6 and later.
     [Selector("shouldAssumeUnknownAttributesReportable", "setAssumeUnknownAttributesReportable:")] public bool AssumeUnknownAttributesReportable { get; set; }
 }
 
 public extern objc class MTRSubscribeParams : MTRReadParams, NSCopying, NSSecureCoding
 {
-    /// macOS 13.3 and later.
     [Selector("shouldReplaceExistingSubscriptions", "setReplaceExistingSubscriptions:")] public bool ReplaceExistingSubscriptions { get; set; }
-    /// macOS 13.3 and later.
     [Selector("shouldResubscribeAutomatically", "setResubscribeAutomatically:")] public bool ResubscribeAutomatically { get; set; }
-    /// macOS 13.3 and later.
     [Selector("minInterval", "setMinInterval:")] public NSNumber MinInterval { get; set; }
-    /// macOS 13.3 and later.
     [Selector("maxInterval", "setMaxInterval:")] public NSNumber MaxInterval { get; set; }
-    /// macOS 13.3 and later.
     [Selector("shouldReportEventsUrgently", "setReportEventsUrgently:")] public bool ReportEventsUrgently { get; set; }
     [Selector("initWithMinInterval:maxInterval:")] public Self InitWithMinIntervalMaxInterval(NSNumber minInterval, NSNumber maxInterval);
 }

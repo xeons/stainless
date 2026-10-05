@@ -170,7 +170,6 @@ public objc interface NSSharingServicePickerDelegate : NSObjectProtocol
     [Optional] [Selector("sharingServicePicker:sharingServicesForItems:proposedSharingServices:")] NSArray SharingServicePickerSharingServicesForItemsProposedSharingServices(NSSharingServicePicker sharingServicePicker, NSArray items, NSArray proposedServices);
     [Optional] [Selector("sharingServicePicker:delegateForSharingService:")] NSSharingServiceDelegate? SharingServicePickerDelegateForSharingService(NSSharingServicePicker sharingServicePicker, NSSharingService sharingService);
     [Optional] [Selector("sharingServicePicker:didChooseSharingService:")] void SharingServicePickerDidChooseSharingService(NSSharingServicePicker sharingServicePicker, NSSharingService? service);
-    /// macOS 15.0 and later.
     [Optional] [Selector("sharingServicePickerCollaborationModeRestrictions:")] NSArray? SharingServicePickerCollaborationModeRestrictions(NSSharingServicePicker sharingServicePicker);
 }
 

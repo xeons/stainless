@@ -62,7 +62,6 @@ public extern objc class HKQuery
     [Selector("predicateForObjectsWithNoCorrelation")] public static NSPredicate PredicateForObjectsWithNoCorrelation();
     [Selector("predicateForObjectsFromWorkout:")] public static NSPredicate PredicateForObjectsFromWorkout(HKWorkout workout);
     [Selector("predicateForObjectsAssociatedWithElectrocardiogram:")] public static NSPredicate PredicateForObjectsAssociatedWithElectrocardiogram(HKElectrocardiogram electrocardiogram);
-    /// macOS 15.0 and later.
     [Selector("predicateForWorkoutEffortSamplesRelatedToWorkout:activity:")] public static NSPredicate PredicateForWorkoutEffortSamplesRelatedToWorkoutActivity(HKWorkout workout, HKWorkoutActivity? activity);
 }
 

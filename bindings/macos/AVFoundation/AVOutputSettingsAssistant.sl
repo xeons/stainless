@@ -57,10 +57,8 @@ public extern "C" AVOutputSettingsPreset AVOutputSettingsPresetHEVC4320x2160;
 
 public extern "C" AVOutputSettingsPreset AVOutputSettingsPresetHEVC7680x4320;
 
-/// macOS 14.0 and later.
 public extern "C" AVOutputSettingsPreset? AVOutputSettingsPresetMVHEVC960x960;
 
-/// macOS 14.0 and later.
 public extern "C" AVOutputSettingsPreset? AVOutputSettingsPresetMVHEVC1440x1440;
 
 /// macOS 26.0 and later.

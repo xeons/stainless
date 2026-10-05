@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MapKit")
 
-/// macOS 15.0 and later.
 public extern objc class MKMapItemIdentifier : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("identifierString")] public NSString? IdentifierString { get; }

@@ -51,10 +51,8 @@ public extern "C" JSStringRef JSGlobalContextCopyName(JSGlobalContextRef ctx);
 
 public extern "C" void JSGlobalContextSetName(JSGlobalContextRef ctx, JSStringRef name);
 
-/// macOS 13.3 and later.
 public extern "C" bool JSGlobalContextIsInspectable(JSGlobalContextRef ctx);
 
-/// macOS 13.3 and later.
 public extern "C" void JSGlobalContextSetInspectable(JSGlobalContextRef ctx, bool inspectable);
 
 #endif

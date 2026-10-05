@@ -43,7 +43,6 @@ public extern "C" NSString? GCProductCategoryHID;
 /// macOS 26.0 and later.
 public extern "C" NSString? GCProductCategorySpatialController;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? GCProductCategoryArcadeStick;
 
 public extern "C" NSString? GCProductCategorySiriRemote1stGen;

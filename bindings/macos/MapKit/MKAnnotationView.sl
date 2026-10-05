@@ -60,7 +60,6 @@ public extern objc class MKAnnotationView : NSView
     [Selector("annotation", "setAnnotation:")] public MKAnnotation? Annotation { get; set; }
     [Selector("image", "setImage:")] public NSImage? Image { get; set; }
     [Selector("centerOffset", "setCenterOffset:")] public CGPoint CenterOffset { get; set; }
-    /// macOS 15.0 and later.
     [Selector("accessoryOffset", "setAccessoryOffset:")] public CGPoint AccessoryOffset { get; set; }
     [Selector("calloutOffset", "setCalloutOffset:")] public CGPoint CalloutOffset { get; set; }
     [Selector("leftCalloutOffset", "setLeftCalloutOffset:")] public CGPoint LeftCalloutOffset { get; set; }

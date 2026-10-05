@@ -68,7 +68,6 @@ public enum NSGrammaticalNumber : long
     PluralMany = 6,
 }
 
-/// macOS 14.0 and later.
 public enum NSGrammaticalCase : long
 {
     NotSet = 0,
@@ -88,7 +87,6 @@ public enum NSGrammaticalCase : long
     Translative = 14,
 }
 
-/// macOS 14.0 and later.
 public enum NSGrammaticalPronounType : long
 {
     NotSet = 0,
@@ -97,7 +95,6 @@ public enum NSGrammaticalPronounType : long
     Possessive = 3,
 }
 
-/// macOS 14.0 and later.
 public enum NSGrammaticalPerson : long
 {
     NotSet = 0,
@@ -106,7 +103,6 @@ public enum NSGrammaticalPerson : long
     Third = 3,
 }
 
-/// macOS 14.0 and later.
 public enum NSGrammaticalDetermination : long
 {
     NotSet = 0,
@@ -114,7 +110,6 @@ public enum NSGrammaticalDetermination : long
     Dependent = 2,
 }
 
-/// macOS 14.0 and later.
 public enum NSGrammaticalDefiniteness : long
 {
     NotSet = 0,
@@ -127,19 +122,13 @@ public extern objc class NSMorphology : NSObject, NSCopying, NSSecureCoding
     [Selector("grammaticalGender", "setGrammaticalGender:")] public NSGrammaticalGender GrammaticalGender { get; set; }
     [Selector("partOfSpeech", "setPartOfSpeech:")] public NSGrammaticalPartOfSpeech PartOfSpeech { get; set; }
     [Selector("number", "setNumber:")] public NSGrammaticalNumber Number { get; set; }
-    /// macOS 14.0 and later.
     [Selector("grammaticalCase", "setGrammaticalCase:")] public NSGrammaticalCase GrammaticalCase { get; set; }
-    /// macOS 14.0 and later.
     [Selector("determination", "setDetermination:")] public NSGrammaticalDetermination Determination { get; set; }
-    /// macOS 14.0 and later.
     [Selector("grammaticalPerson", "setGrammaticalPerson:")] public NSGrammaticalPerson GrammaticalPerson { get; set; }
-    /// macOS 14.0 and later.
     [Selector("pronounType", "setPronounType:")] public NSGrammaticalPronounType PronounType { get; set; }
-    /// macOS 14.0 and later.
     [Selector("definiteness", "setDefiniteness:")] public NSGrammaticalDefiniteness Definiteness { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSMorphologyPronoun : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("pronoun")] public NSString Pronoun { get; }

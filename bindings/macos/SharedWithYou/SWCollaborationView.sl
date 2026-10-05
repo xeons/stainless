@@ -49,7 +49,6 @@ public extern objc class SWCollaborationView : NSView
     [Selector("headerTitle", "setHeaderTitle:")] public NSString HeaderTitle { get; set; }
     [Selector("headerSubtitle", "setHeaderSubtitle:")] public NSString HeaderSubtitle { get; set; }
     [Selector("headerImage", "setHeaderImage:")] public NSImage HeaderImage { get; set; }
-    /// macOS 13.1 and later.
     [Selector("menuFormRepresentation")] public NSMenuItem? MenuFormRepresentation { get; }
     [Selector("cloudSharingServiceDelegate", "setCloudSharingServiceDelegate:")] public NSCloudSharingServiceDelegate? CloudSharingServiceDelegate { get; set; }
     [Selector("manageButtonTitle", "setManageButtonTitle:")] public NSString ManageButtonTitle { get; set; }

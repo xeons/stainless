@@ -31,92 +31,74 @@ import Standard.ObjC;
 #pragma comment(framework, "Hypervisor")
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_create(hv_gic_config_t gic_config);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_spi(uint intid, bool level);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_send_msi(hv_ipa_t address, uint intid);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_distributor_reg(hv_gic_distributor_reg_t reg, ulong* value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_distributor_reg(hv_gic_distributor_reg_t reg, ulong value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_redistributor_base(hv_vcpu_t vcpu, hv_ipa_t* redistributor_base_address);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_redistributor_reg(hv_vcpu_t vcpu, hv_gic_redistributor_reg_t reg, ulong* value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_redistributor_reg(hv_vcpu_t vcpu, hv_gic_redistributor_reg_t reg, ulong value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_icc_reg(hv_vcpu_t vcpu, hv_gic_icc_reg_t reg, ulong* value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_icc_reg(hv_vcpu_t vcpu, hv_gic_icc_reg_t reg, ulong value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_ich_reg(hv_vcpu_t vcpu, hv_gic_ich_reg_t reg, ulong* value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_ich_reg(hv_vcpu_t vcpu, hv_gic_ich_reg_t reg, ulong value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_icv_reg(hv_vcpu_t vcpu, hv_gic_icv_reg_t reg, ulong* value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_icv_reg(hv_vcpu_t vcpu, hv_gic_icv_reg_t reg, ulong value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_msi_reg(hv_gic_msi_reg_t reg, ulong* value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_msi_reg(hv_gic_msi_reg_t reg, ulong value);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_set_state(void* gic_state_data, nuint gic_state_size);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_reset();
 #endif
 

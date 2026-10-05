@@ -74,10 +74,8 @@ public extern "C" CFStringRef kCMMetadataIdentifier_QuickTimeMetadataLivePhotoSt
 
 public extern "C" CFStringRef kCMMetadataIdentifier_QuickTimeMetadataLivePhotoStillImageTransformReferenceDimensions;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMMetadataIdentifier_QuickTimeMetadataSegmentIdentifier;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMMetadataIdentifier_QuickTimeMetadataSceneIlluminance;
 
 /// macOS 26.0 and later.
@@ -163,10 +161,8 @@ public extern "C" CFStringRef kCMMetadataDataType_QuickTimeMetadataLocation_ISO6
 
 public extern "C" CFStringRef kCMMetadataDataType_QuickTimeMetadataDirection;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMMetadataDataType_QuickTimeMetadataUUID;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMMetadataDataType_QuickTimeMetadataMilliLux;
 
 public extern "C" OSStatus CMMetadataDataTypeRegistryRegisterDataType(CFStringRef dataType, CFStringRef description, CFArrayRef conformingDataTypes);

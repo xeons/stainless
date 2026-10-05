@@ -37,7 +37,6 @@ public enum CMMotionActivityConfidence : long
     High = 2,
 }
 
-/// macOS 15.0 and later.
 public extern objc class CMMotionActivity : CMLogItem
 {
     [Selector("confidence")] public CMMotionActivityConfidence Confidence { get; }

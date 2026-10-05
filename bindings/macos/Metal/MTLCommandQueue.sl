@@ -40,17 +40,12 @@ public objc interface MTLCommandQueue : NSObjectProtocol
     [Selector("commandBufferWithUnretainedReferences")] MTLCommandBuffer? CommandBufferWithUnretainedReferences();
     /// Deprecated in macOS 10.13.
     [Selector("insertDebugCaptureBoundary")] void InsertDebugCaptureBoundary();
-    /// macOS 15.0 and later.
     [Selector("addResidencySet:")] void AddResidencySet(MTLResidencySet residencySet);
-    /// macOS 15.0 and later.
     [Selector("addResidencySets:count:")] void AddResidencySetsCount(void** residencySets, NSUInteger count);
-    /// macOS 15.0 and later.
     [Selector("removeResidencySet:")] void RemoveResidencySet(MTLResidencySet residencySet);
-    /// macOS 15.0 and later.
     [Selector("removeResidencySets:count:")] void RemoveResidencySetsCount(void** residencySets, NSUInteger count);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MTLCommandQueueDescriptor : NSObject, NSCopying
 {
     [Selector("maxCommandBufferCount", "setMaxCommandBufferCount:")] public NSUInteger MaxCommandBufferCount { get; set; }

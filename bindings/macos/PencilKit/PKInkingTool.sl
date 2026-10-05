@@ -40,7 +40,6 @@ public extern objc class PKInkingTool : PKTool
     /// macOS 26.0 and later.
     [Selector("azimuth")] public CGFloat Azimuth { get; }
     [Selector("ink")] public PKInk? Ink { get; }
-    /// macOS 14.0 and later.
     [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
     [Selector("initWithInkType:color:width:")] public Self InitWithInkTypeColorWidth(PKInkType type, NSColor color, CGFloat width);
     /// macOS 26.0 and later.

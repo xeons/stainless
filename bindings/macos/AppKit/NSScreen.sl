@@ -68,7 +68,6 @@ public extern objc class NSScreen
     [Selector("maximumReferenceExtendedDynamicRangeColorComponentValue")] public CGFloat MaximumReferenceExtendedDynamicRangeColorComponentValue { get; }
 }
 
-/// macOS 14.0 and later.
 /// NSDisplayLink, a category of NSScreen.
 public extern objc class NSScreen
 {

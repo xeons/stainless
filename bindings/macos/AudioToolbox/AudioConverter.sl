@@ -117,14 +117,12 @@ public const int kAudioConverterErr_OutputSampleRateOutOfRange = 560952178;
 
 public objc closure void AudioConverterPrepareInCompletionBlock(OSStatus arg0);
 
-/// macOS 15.0 and later.
 public extern "C" void AudioConverterPrepare(UInt32 inFlags, void* ioReserved, AudioConverterPrepareInCompletionBlock? inCompletionBlock);
 
 public extern "C" OSStatus AudioConverterNew(AudioStreamBasicDescription* inSourceFormat, AudioStreamBasicDescription* inDestinationFormat, AudioConverterRef* outAudioConverter);
 
 public extern "C" OSStatus AudioConverterNewSpecific(AudioStreamBasicDescription* inSourceFormat, AudioStreamBasicDescription* inDestinationFormat, UInt32 inNumberClassDescriptions, AudioClassDescription* inClassDescriptions, AudioConverterRef* outAudioConverter);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus AudioConverterNewWithOptions(AudioStreamBasicDescription* inSourceFormat, AudioStreamBasicDescription* inDestinationFormat, AudioConverterOptions inOptions, AudioConverterRef* outAudioConverter);
 
 public extern "C" OSStatus AudioConverterDispose(AudioConverterRef inAudioConverter);

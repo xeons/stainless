@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "LocalAuthentication")
 
-/// macOS 15.0 and later.
 public extern objc class LADomainStateBiometry : NSObject
 {
     [Selector("biometryType")] public LABiometryType BiometryType { get; }
     [Selector("stateHash")] public NSData? StateHash { get; }
 }
 
-/// macOS 15.0 and later.
 public extern objc class LADomainStateCompanion : NSObject
 {
     [Selector("availableCompanionTypes")] public NSSet? AvailableCompanionTypes { get; }
@@ -46,11 +44,9 @@ public extern objc class LADomainStateCompanion : NSObject
     [Selector("stateHashForCompanionType:")] public NSData? StateHashForCompanionType(LACompanionType companionType);
 }
 
-/// macOS 15.0 and later.
 public extern objc class LADomainState : NSObject
 {
     [Selector("biometry")] public LADomainStateBiometry Biometry { get; }
-    /// macOS 15.0 and later.
     [Selector("companion")] public LADomainStateCompanion Companion { get; }
     [Selector("stateHash")] public NSData? StateHash { get; }
 }

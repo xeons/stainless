@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaAccessibility")
 
-/// macOS 13.3 and later.
 public extern "C" bool MADimFlashingLightsEnabled();
 
-/// macOS 13.3 and later.
 public extern "C" CFStringRef? kMADimFlashingLightsChangedNotification;
 
 #endif

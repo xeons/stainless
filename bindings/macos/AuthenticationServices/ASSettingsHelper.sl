@@ -37,12 +37,10 @@ public objc closure void ASSettingsHelperOpenVerificationCodeAppSettingsWithComp
 
 public objc closure void ASSettingsHelperRequestToTurnOnCredentialProviderExtensionWithCompletionHandlerCompletionHandlerBlock(bool arg0);
 
-/// macOS 14.0 and later.
 public extern objc class ASSettingsHelper : NSObject
 {
     [Selector("openCredentialProviderAppSettingsWithCompletionHandler:")] public static void OpenCredentialProviderAppSettingsWithCompletionHandler(ASSettingsHelperOpenCredentialProviderAppSettingsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("openVerificationCodeAppSettingsWithCompletionHandler:")] public static void OpenVerificationCodeAppSettingsWithCompletionHandler(ASSettingsHelperOpenVerificationCodeAppSettingsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    /// macOS 15.0 and later.
     [Selector("requestToTurnOnCredentialProviderExtensionWithCompletionHandler:")] public static void RequestToTurnOnCredentialProviderExtensionWithCompletionHandler(ASSettingsHelperRequestToTurnOnCredentialProviderExtensionWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 

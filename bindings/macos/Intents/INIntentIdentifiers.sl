@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 13.1 and later.
 public extern "C" NSString? INAnswerCallIntentIdentifier;
 
-/// macOS 13.1 and later.
 public extern "C" NSString? INHangUpCallIntentIdentifier;
 
 #endif

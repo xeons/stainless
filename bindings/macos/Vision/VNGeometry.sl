@@ -47,7 +47,6 @@ public extern objc class VNPoint : NSObject, NSCopying, NSSecureCoding
     [Selector("initWithLocation:")] public Self InitWithLocation(CGPoint location);
 }
 
-/// macOS 14.0 and later.
 public extern objc class VNPoint3D : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("position")] public simd_float4x4 Position { get; }

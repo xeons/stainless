@@ -33,46 +33,36 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 14.2 and later.
 public extern objc class AVPlayerVideoOutput : NSObject
 {
     [Selector("initWithSpecification:")] public Self InitWithSpecification(AVVideoOutputSpecification specification);
     [Selector("copyTaggedBufferGroupForHostTime:presentationTimeStamp:activeConfiguration:")] public CMTaggedBufferGroupRef? CopyTaggedBufferGroupForHostTimePresentationTimeStampActiveConfiguration(CMTime hostTime, CMTime* presentationTimeStampOut, out AVPlayerVideoOutputConfiguration? activeConfigurationOut);
 }
 
-/// macOS 14.2 and later.
 public enum CMTagCollectionVideoOutputPreset : uint
 {
     Monoscopic = 0,
     Stereoscopic = 1,
 }
 
-/// macOS 14.2 and later.
 public extern "C" OSStatus CMTagCollectionCreateWithVideoOutputPreset(CFAllocatorRef? allocator, CMTagCollectionVideoOutputPreset preset, OpaqueCMTagCollection** newCollectionOut);
 
-/// macOS 14.2 and later.
 public extern objc class AVVideoOutputSpecification : NSObject, NSCopying
 {
     [Selector("preferredTagCollections")] public NSArray? PreferredTagCollections { get; }
-    /// macOS 14.2 and later.
     /// Deprecated in macOS 100000.
     [Selector("defaultPixelBufferAttributes", "setDefaultPixelBufferAttributes:")] public NSDictionary? DefaultPixelBufferAttributes { get; set; }
-    /// macOS 15.0 and later.
     [Selector("defaultOutputSettings", "setDefaultOutputSettings:")] public NSDictionary? DefaultOutputSettings { get; set; }
     [Selector("initWithTagCollections:")] public Self InitWithTagCollections(NSArray tagCollections);
-    /// macOS 14.2 and later.
     /// Deprecated in macOS 100000.
     [Selector("setOutputPixelBufferAttributes:forTagCollection:")] public void SetOutputPixelBufferAttributesForTagCollection(NSDictionary? pixelBufferAttributes, CMTagCollectionRef tagCollection);
-    /// macOS 15.0 and later.
     [Selector("setOutputSettings:forTagCollection:")] public void SetOutputSettingsForTagCollection(NSDictionary? outputSettings, CMTagCollectionRef tagCollection);
 }
 
-/// macOS 14.2 and later.
 public extern objc class AVPlayerVideoOutputConfiguration : NSObject
 {
     [Selector("sourcePlayerItem")] public AVPlayerItem? SourcePlayerItem { get; }
     [Selector("dataChannelDescriptions")] public NSArray? DataChannelDescriptions { get; }
-    /// macOS 15.0 and later.
     [Selector("preferredTransform")] public CGAffineTransform PreferredTransform { get; }
     [Selector("activationTime")] public CMTime ActivationTime { get; }
 }

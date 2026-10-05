@@ -43,11 +43,9 @@ public extern objc class MKLocalSearchRequest : NSObject, NSCopying
 {
     [Selector("naturalLanguageQuery", "setNaturalLanguageQuery:")] public NSString? NaturalLanguageQuery { get; set; }
     [Selector("region", "setRegion:")] public MKCoordinateRegion Region { get; set; }
-    /// macOS 15.0 and later.
     [Selector("regionPriority", "setRegionPriority:")] public MKLocalSearchRegionPriority RegionPriority { get; set; }
     [Selector("resultTypes", "setResultTypes:")] public MKLocalSearchResultType ResultTypes { get; set; }
     [Selector("pointOfInterestFilter", "setPointOfInterestFilter:")] public MKPointOfInterestFilter? PointOfInterestFilter { get; set; }
-    /// macOS 15.0 and later.
     [Selector("addressFilter", "setAddressFilter:")] public MKAddressFilter? AddressFilter { get; set; }
     [Selector("init")] public Self Init();
     [Selector("initWithNaturalLanguageQuery:")] public Self InitWithNaturalLanguageQuery(NSString naturalLanguageQuery);

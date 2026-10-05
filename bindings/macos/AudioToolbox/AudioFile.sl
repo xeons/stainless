@@ -244,12 +244,10 @@ public extern "C" OSStatus AudioFileCountUserData(AudioFileID inAudioFile, UInt3
 
 public extern "C" OSStatus AudioFileGetUserDataSize(AudioFileID inAudioFile, UInt32 inUserDataID, UInt32 inIndex, UInt32* outUserDataSize);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus AudioFileGetUserDataSize64(AudioFileID inAudioFile, UInt32 inUserDataID, UInt32 inIndex, UInt64* outUserDataSize);
 
 public extern "C" OSStatus AudioFileGetUserData(AudioFileID inAudioFile, UInt32 inUserDataID, UInt32 inIndex, UInt32* ioUserDataSize, void* outUserData);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus AudioFileGetUserDataAtOffset(AudioFileID inAudioFile, UInt32 inUserDataID, UInt32 inIndex, SInt64 inOffset, UInt32* ioUserDataSize, void* outUserData);
 
 public extern "C" OSStatus AudioFileSetUserData(AudioFileID inAudioFile, UInt32 inUserDataID, UInt32 inIndex, UInt32 inUserDataSize, void* inUserData);

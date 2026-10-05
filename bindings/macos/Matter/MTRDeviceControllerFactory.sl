@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public extern objc class MTRDeviceControllerFactoryParams : NSObject
 {
     [Selector("storage")] public MTRStorage Storage { get; }
@@ -43,7 +42,6 @@ public extern objc class MTRDeviceControllerFactoryParams : NSObject
     [Selector("initWithStorage:")] public Self InitWithStorage(MTRStorage storage);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRDeviceControllerFactory : NSObject
 {
     [Selector("isRunning")] public bool Running { get; }
@@ -53,11 +51,9 @@ public extern objc class MTRDeviceControllerFactory : NSObject
     [Selector("stopControllerFactory")] public void StopControllerFactory();
     [Selector("createControllerOnExistingFabric:error:")] public MTRDeviceController? CreateControllerOnExistingFabricError(MTRDeviceControllerStartupParams startupParams, out NSError? error);
     [Selector("createControllerOnNewFabric:error:")] public MTRDeviceController? CreateControllerOnNewFabricError(MTRDeviceControllerStartupParams startupParams, out NSError? error);
-    /// macOS 14.6 and later.
     [Selector("preWarmCommissioningSession")] public void PreWarmCommissioningSession();
 }
 
-/// macOS 14.6 and later.
 public extern "C" void MTRSetMessageReliabilityParameters(NSNumber? idleRetransmitMs, NSNumber? activeRetransmitMs, NSNumber? activeThresholdMs, NSNumber? additionalRetransmitDelayMs);
 
 /// Deprecated in macOS 13.3.

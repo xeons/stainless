@@ -31,17 +31,14 @@ import Standard.ObjC;
 #pragma comment(framework, "Hypervisor")
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_gic_state_t hv_gic_state_create();
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_state_get_size(hv_gic_state_t state, nuint* gic_state_size);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_state_get_data(hv_gic_state_t state, void* gic_state_data);
 #endif
 

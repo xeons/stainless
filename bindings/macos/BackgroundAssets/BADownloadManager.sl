@@ -53,7 +53,6 @@ public extern objc class BADownloadManager : NSObject
 {
     [Selector("sharedManager")] public static BADownloadManager? SharedManager { get; }
     [Selector("delegate", "setDelegate:")] public BADownloadManagerDelegate? Delegate { get; set; }
-    /// macOS 13.3 and later.
     [Selector("fetchCurrentDownloads:")] public NSArray? FetchCurrentDownloads(out NSError? error);
     [Selector("fetchCurrentDownloadsWithCompletionHandler:")] public void FetchCurrentDownloadsWithCompletionHandler(BADownloadManagerFetchCurrentDownloadsWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("scheduleDownload:error:")] public bool ScheduleDownloadError(BADownload download, out NSError? error);

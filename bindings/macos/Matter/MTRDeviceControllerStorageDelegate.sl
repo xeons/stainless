@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 14.6 and later.
 public enum MTRStorageSecurityLevel : ulong
 {
     Secure = 0,
     NotSecure = 1,
 }
 
-/// macOS 14.6 and later.
 public enum MTRStorageSharingType : ulong
 {
     NotShared = 0,
@@ -47,7 +45,6 @@ public enum MTRStorageSharingType : ulong
     SameFabric = 3,
 }
 
-/// macOS 14.6 and later.
 public objc interface MTRDeviceControllerStorageDelegate : NSObjectProtocol
 {
     [Selector("controller:valueForKey:securityLevel:sharingType:")] NSSecureCoding? ControllerValueForKeySecurityLevelSharingType(MTRDeviceController controller, NSString key, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
@@ -57,7 +54,6 @@ public objc interface MTRDeviceControllerStorageDelegate : NSObjectProtocol
     [Optional] [Selector("controller:storeValues:securityLevel:sharingType:")] bool ControllerStoreValuesSecurityLevelSharingType(MTRDeviceController controller, NSDictionary values, MTRStorageSecurityLevel securityLevel, MTRStorageSharingType sharingType);
 }
 
-/// macOS 14.6 and later.
 public extern "C" NSSet MTRDeviceControllerStorageClasses();
 
 #endif

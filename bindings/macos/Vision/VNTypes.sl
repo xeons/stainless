@@ -45,13 +45,10 @@ public enum VNImageCropAndScaleOption : ulong
     ScaleFillRotate90CCW = 258,
 }
 
-/// macOS 14.0 and later.
 public using VNComputeStage = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" VNComputeStage? VNComputeStageMain;
 
-/// macOS 14.0 and later.
 public extern "C" VNComputeStage? VNComputeStagePostProcessing;
 
 public using VNBarcodeSymbology = NSString;
@@ -102,7 +99,6 @@ public extern "C" VNBarcodeSymbology? VNBarcodeSymbologyMicroPDF417;
 
 public extern "C" VNBarcodeSymbology? VNBarcodeSymbologyMicroQR;
 
-/// macOS 14.0 and later.
 public extern "C" VNBarcodeSymbology? VNBarcodeSymbologyMSIPlessey;
 
 public enum VNElementType : ulong
@@ -148,181 +144,122 @@ public using VNRecognizedPointKey = NSString;
 
 public using VNRecognizedPointGroupKey = NSString;
 
-/// macOS 14.0 and later.
 public using VNAnimalBodyPoseObservationJointName = VNRecognizedPointKey;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftEarTop;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightEarTop;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftEarMiddle;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightEarMiddle;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftEarBottom;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightEarBottom;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftEye;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightEye;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameNose;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameNeck;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftFrontElbow;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightFrontElbow;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftFrontKnee;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightFrontKnee;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftFrontPaw;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightFrontPaw;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftBackElbow;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightBackElbow;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftBackKnee;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightBackKnee;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameLeftBackPaw;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameRightBackPaw;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameTailTop;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameTailMiddle;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointName? VNAnimalBodyPoseObservationJointNameTailBottom;
 
-/// macOS 14.0 and later.
 public using VNAnimalBodyPoseObservationJointsGroupName = VNRecognizedPointGroupKey;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointsGroupName? VNAnimalBodyPoseObservationJointsGroupNameHead;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointsGroupName? VNAnimalBodyPoseObservationJointsGroupNameTrunk;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointsGroupName? VNAnimalBodyPoseObservationJointsGroupNameForelegs;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointsGroupName? VNAnimalBodyPoseObservationJointsGroupNameHindlegs;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointsGroupName? VNAnimalBodyPoseObservationJointsGroupNameTail;
 
-/// macOS 14.0 and later.
 public extern "C" VNAnimalBodyPoseObservationJointsGroupName? VNAnimalBodyPoseObservationJointsGroupNameAll;
 
-/// macOS 14.0 and later.
 public using VNHumanBodyPose3DObservationJointName = VNRecognizedPointKey;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameRoot;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameRightHip;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameRightKnee;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameRightAnkle;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameLeftHip;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameLeftKnee;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameLeftAnkle;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameSpine;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameCenterShoulder;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameCenterHead;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameTopHead;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameLeftShoulder;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameLeftElbow;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameLeftWrist;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameRightShoulder;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameRightElbow;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointName? VNHumanBodyPose3DObservationJointNameRightWrist;
 
-/// macOS 14.0 and later.
 public using VNHumanBodyPose3DObservationJointsGroupName = VNRecognizedPointGroupKey;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointsGroupName? VNHumanBodyPose3DObservationJointsGroupNameHead;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointsGroupName? VNHumanBodyPose3DObservationJointsGroupNameTorso;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointsGroupName? VNHumanBodyPose3DObservationJointsGroupNameLeftArm;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointsGroupName? VNHumanBodyPose3DObservationJointsGroupNameRightArm;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointsGroupName? VNHumanBodyPose3DObservationJointsGroupNameLeftLeg;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointsGroupName? VNHumanBodyPose3DObservationJointsGroupNameRightLeg;
 
-/// macOS 14.0 and later.
 public extern "C" VNHumanBodyPose3DObservationJointsGroupName? VNHumanBodyPose3DObservationJointsGroupNameAll;
 
 #endif

@@ -273,7 +273,6 @@ public extern objc class NSObject
 
 public objc interface NSViewContentSelectionInfo : NSObjectProtocol
 {
-    /// macOS 15.0 and later.
     [Optional] [Selector("selectionAnchorRect")] NSRect SelectionAnchorRect { get; }
 }
 
@@ -418,7 +417,6 @@ public extern objc class NSView
     [Selector("removeTrackingRect:")] public void RemoveTrackingRect(NSTrackingRectTag tag);
 }
 
-/// macOS 14.0 and later.
 /// NSDisplayLink, a category of NSView.
 public extern objc class NSView
 {

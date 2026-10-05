@@ -36,12 +36,9 @@ public extern objc class PHContentEditingOutput : NSObject
 {
     [Selector("adjustmentData", "setAdjustmentData:")] public PHAdjustmentData? AdjustmentData { get; set; }
     [Selector("renderedContentURL")] public NSURL RenderedContentURL { get; }
-    /// macOS 14 and later.
     [Selector("defaultRenderedContentType")] public UTType? DefaultRenderedContentType { get; }
-    /// macOS 14 and later.
     [Selector("supportedRenderedContentTypes")] public NSArray SupportedRenderedContentTypes { get; }
     [Selector("initWithContentEditingInput:")] public Self InitWithContentEditingInput(PHContentEditingInput contentEditingInput);
-    /// macOS 14 and later.
     [Selector("renderedContentURLForType:error:")] public NSURL? RenderedContentURLForTypeError(UTType type, out NSError? error);
 }
 

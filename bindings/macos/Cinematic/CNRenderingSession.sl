@@ -36,7 +36,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Cinematic")
 
-/// macOS 14.0 and later.
 public enum CNRenderingQuality : long
 {
     Thumbnail = 0,
@@ -47,14 +46,12 @@ public enum CNRenderingQuality : long
 
 public objc closure void CNRenderingSessionAttributesLoadFromAssetCompletionHandlerCompletionHandlerBlock(CNRenderingSessionAttributes? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class CNRenderingSessionAttributes : NSObject
 {
     [Selector("renderingVersion")] public NSInteger RenderingVersion { get; }
     [Selector("loadFromAsset:completionHandler:")] public static void LoadFromAssetCompletionHandler(AVAsset asset, CNRenderingSessionAttributesLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNRenderingSessionFrameAttributes : NSObject, NSCopying, NSMutableCopying
 {
     [Selector("focusDisparity", "setFocusDisparity:")] public float FocusDisparity { get; set; }
@@ -63,7 +60,6 @@ public extern objc class CNRenderingSessionFrameAttributes : NSObject, NSCopying
     [Selector("initWithTimedMetadataGroup:sessionAttributes:")] public Self? InitWithTimedMetadataGroupSessionAttributes(AVTimedMetadataGroup metadataGroup, CNRenderingSessionAttributes sessionAttributes);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNRenderingSession : NSObject
 {
     [Selector("commandQueue")] public MTLCommandQueue CommandQueue { get; }

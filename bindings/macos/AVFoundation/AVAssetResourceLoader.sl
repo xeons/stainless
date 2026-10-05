@@ -93,7 +93,6 @@ public extern objc class AVAssetResourceLoader
     [Selector("preloadsEligibleContentKeys", "setPreloadsEligibleContentKeys:")] public bool PreloadsEligibleContentKeys { get; set; }
 }
 
-/// macOS 15.0 and later.
 /// AVAssetResourceLoaderCommonMediaClientDataSupport, a category of AVAssetResourceLoader.
 public extern objc class AVAssetResourceLoader
 {

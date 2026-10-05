@@ -27,7 +27,6 @@ module MacOS.Intents;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 15.0 and later.
 public enum INMessageReactionType : long
 {
     Unknown = 0,

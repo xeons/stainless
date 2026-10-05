@@ -38,9 +38,7 @@ public objc closure void MKMapItemOpenMapsWithItemsLaunchOptionsCompletionHandle
 
 public extern objc class MKMapItem : NSObject
 {
-    /// macOS 15.0 and later.
     [Selector("identifier")] public MKMapItemIdentifier? Identifier { get; }
-    /// macOS 15.0 and later.
     [Selector("alternateIdentifiers")] public NSSet AlternateIdentifiers { get; }
     /// Deprecated in macOS 26.0.
     [Selector("placemark")] public MKPlacemark Placemark { get; }
@@ -63,9 +61,7 @@ public extern objc class MKMapItem : NSObject
     [Selector("initWithLocation:address:")] public Self InitWithLocationAddress(CLLocation location, MKAddress? address);
     [Selector("openInMapsWithLaunchOptions:")] public bool OpenInMapsWithLaunchOptions(NSDictionary? launchOptions);
     [Selector("openMapsWithItems:launchOptions:")] public static bool OpenMapsWithItemsLaunchOptions(NSArray mapItems, NSDictionary? launchOptions);
-    /// macOS 14.4 and later.
     [Selector("openInMapsWithLaunchOptions:completionHandler:")] public void OpenInMapsWithLaunchOptionsCompletionHandler(NSDictionary? launchOptions, MKMapItemOpenInMapsWithLaunchOptionsCompletionHandlerCompletionBlock? completion);
-    /// macOS 14.4 and later.
     [Selector("openMapsWithItems:launchOptions:completionHandler:")] public static void OpenMapsWithItemsLaunchOptionsCompletionHandler(NSArray mapItems, NSDictionary? launchOptions, MKMapItemOpenMapsWithItemsLaunchOptionsCompletionHandlerCompletionBlock? completion);
 }
 

@@ -67,7 +67,6 @@ public extern objc class CKShareParticipant : NSObject, NSSecureCoding, NSCopyin
     [Selector("isApprovedRequester")] public bool IsApprovedRequester { get; }
     /// macOS 26.0 and later.
     [Selector("dateAddedToShare")] public NSDate? DateAddedToShare { get; }
-    /// macOS 15.0 and later.
     [Selector("oneTimeURLParticipant")] public static Self OneTimeURLParticipant();
 }
 

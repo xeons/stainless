@@ -152,13 +152,9 @@ public objc interface MTLRenderCommandEncoder : MTLCommandEncoder
     [Selector("setVertexBuffer:offset:atIndex:")] void SetVertexBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
     [Selector("setVertexBufferOffset:atIndex:")] void SetVertexBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
     [Selector("setVertexBuffers:offsets:withRange:")] void SetVertexBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    /// macOS 14.0 and later.
     [Selector("setVertexBuffer:offset:attributeStride:atIndex:")] void SetVertexBufferOffsetAttributeStrideAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
-    /// macOS 14.0 and later.
     [Selector("setVertexBuffers:offsets:attributeStrides:withRange:")] void SetVertexBuffersOffsetsAttributeStridesWithRange(void** buffers, NSUInteger* offsets, NSUInteger* strides, NSRange range);
-    /// macOS 14.0 and later.
     [Selector("setVertexBufferOffset:attributeStride:atIndex:")] void SetVertexBufferOffsetAttributeStrideAtIndex(NSUInteger offset, NSUInteger stride, NSUInteger index);
-    /// macOS 14.0 and later.
     [Selector("setVertexBytes:length:attributeStride:atIndex:")] void SetVertexBytesLengthAttributeStrideAtIndex(void* bytes, NSUInteger length, NSUInteger stride, NSUInteger index);
     [Selector("setVertexTexture:atIndex:")] void SetVertexTextureAtIndex(MTLTexture? texture, NSUInteger index);
     [Selector("setVertexTextures:withRange:")] void SetVertexTexturesWithRange(void** textures, NSRange range);

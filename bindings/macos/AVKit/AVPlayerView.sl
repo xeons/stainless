@@ -47,7 +47,6 @@ public extern objc class AVPlayerView : NSView
     [Selector("speeds", "setSpeeds:")] public NSArray? Speeds { get; set; }
     [Selector("selectedSpeed")] public AVPlaybackSpeed? SelectedSpeed { get; }
     [Selector("allowsVideoFrameAnalysis", "setAllowsVideoFrameAnalysis:")] public bool AllowsVideoFrameAnalysis { get; set; }
-    /// macOS 14.0 and later.
     [Selector("videoFrameAnalysisTypes", "setVideoFrameAnalysisTypes:")] public AVVideoFrameAnalysisType VideoFrameAnalysisTypes { get; set; }
     [Selector("allowsMagnification", "setAllowsMagnification:")] public bool AllowsMagnification { get; set; }
     [Selector("magnification", "setMagnification:")] public CGFloat Magnification { get; set; }

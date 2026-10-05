@@ -57,12 +57,10 @@ public extern objc class NSPopover : NSResponder, NSAppearanceCustomization, NSA
     [Selector("isShown")] public bool Shown { get; }
     [Selector("isDetached")] public bool Detached { get; }
     [Selector("positioningRect", "setPositioningRect:")] public NSRect PositioningRect { get; set; }
-    /// macOS 14.0 and later.
     [Selector("hasFullSizeContent", "setHasFullSizeContent:")] public bool HasFullSizeContent { get; set; }
     [Selector("init")] public Self Init();
     [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
     [Selector("showRelativeToRect:ofView:preferredEdge:")] public void ShowRelativeToRectOfViewPreferredEdge(NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge);
-    /// macOS 14.0 and later.
     [Selector("showRelativeToToolbarItem:")] public void ShowRelativeToToolbarItem(NSToolbarItem toolbarItem);
     [Selector("performClose:")] public void PerformClose(AnyObject? sender);
     [Selector("close")] public void Close();

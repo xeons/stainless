@@ -47,7 +47,6 @@ public extern "C" vImage_Error vImageConvolveWithBias_Planar16F(vImage_Buffer* s
 
 public extern "C" vImage_Error vImageConvolveWithBias_ARGB8888(vImage_Buffer* src, vImage_Buffer* dest, void* tempBuffer, vImagePixelCount srcOffsetToROI_X, vImagePixelCount srcOffsetToROI_Y, short* kernel, uint kernel_height, uint kernel_width, int divisor, int bias, byte* backgroundColor, vImage_Flags flags);
 
-/// macOS 14.0 and later.
 public extern "C" vImage_Error vImageConvolveFloatKernel_ARGB8888(vImage_Buffer* src, vImage_Buffer* dest, void* tempBuffer, vImagePixelCount srcOffsetToROI_X, vImagePixelCount srcOffsetToROI_Y, float* kernel, uint kernelHeight, uint kernelWidth, float bias, byte* backgroundColor, vImage_Flags flags);
 
 public extern "C" vImage_Error vImageConvolveWithBias_ARGBFFFF(vImage_Buffer* src, vImage_Buffer* dest, void* tempBuffer, vImagePixelCount srcOffsetToROI_X, vImagePixelCount srcOffsetToROI_Y, float* kernel, uint kernel_height, uint kernel_width, float bias, float* backgroundColor, vImage_Flags flags);
@@ -84,7 +83,6 @@ public extern "C" vImage_Error vImageSepConvolve_Planar16U(vImage_Buffer* src, v
 
 public extern "C" vImage_Error vImageSepConvolve_Planar8to16U(vImage_Buffer* src, vImage_Buffer* dest, void* tempBuffer, vImagePixelCount srcOffsetToROI_X, vImagePixelCount srcOffsetToROI_Y, float* kernelX, uint kernelX_width, float* kernelY, uint kernelY_width, float scale, float bias, Pixel_8 backgroundColor, vImage_Flags flags);
 
-/// macOS 14.0 and later.
 public extern "C" vImage_Error vImageSepConvolve_ARGB8888(vImage_Buffer* src, vImage_Buffer* dest, void* tempBuffer, vImagePixelCount srcOffsetToROI_X, vImagePixelCount srcOffsetToROI_Y, float* kernelX, uint kernelX_width, float* kernelY, uint kernelY_width, float bias, byte* backgroundColor, vImage_Flags flags);
 
 #endif

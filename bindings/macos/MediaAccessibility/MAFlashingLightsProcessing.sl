@@ -34,7 +34,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaAccessibility")
 
-/// macOS 14.0 and later.
 public extern objc class MAFlashingLightsProcessorResult : NSObject
 {
     [Selector("surfaceProcessed")] public bool SurfaceProcessed { get; }
@@ -44,7 +43,6 @@ public extern objc class MAFlashingLightsProcessorResult : NSObject
 
 public using MAFlashingLightsProcessorOptionKey = NSString;
 
-/// macOS 14.0 and later.
 public extern objc class MAFlashingLightsProcessor : NSObject
 {
     [Selector("canProcessSurface:")] public bool CanProcessSurface(IOSurfaceRef surface);

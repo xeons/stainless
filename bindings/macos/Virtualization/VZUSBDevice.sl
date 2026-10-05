@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 15.0 and later.
 public objc interface VZUSBDevice : NSObjectProtocol
 {
     [Selector("usbController")] VZUSBController? UsbController { get; }

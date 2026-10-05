@@ -38,11 +38,8 @@ public extern objc class MXMetaData : NSObject, NSSecureCoding
     [Selector("deviceType")] public NSString DeviceType { get; }
     [Selector("applicationBuildVersion")] public NSString ApplicationBuildVersion { get; }
     [Selector("platformArchitecture")] public NSString PlatformArchitecture { get; }
-    /// macOS 14.0 and later.
     [Selector("lowPowerModeEnabled")] public bool LowPowerModeEnabled { get; }
-    /// macOS 14.0 and later.
     [Selector("isTestFlightApp")] public bool IsTestFlightApp { get; }
-    /// macOS 14.0 and later.
     [Selector("pid")] public pid_t Pid { get; }
     /// macOS 26.0 and later.
     [Selector("bundleIdentifier")] public NSString BundleIdentifier { get; }

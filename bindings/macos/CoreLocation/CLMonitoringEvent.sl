@@ -39,32 +39,21 @@ public enum CLMonitoringState : ulong
     Unmonitored = 3,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CLMonitoringEvent : NSObject, NSSecureCoding
 {
     [Selector("identifier")] public NSString Identifier { get; }
     [Selector("refinement")] public CLCondition? Refinement { get; }
     [Selector("state")] public CLMonitoringState State { get; }
     [Selector("date")] public NSDate Date { get; }
-    /// macOS 15.0 and later.
     [Selector("authorizationDenied")] public bool AuthorizationDenied { get; }
-    /// macOS 15.0 and later.
     [Selector("authorizationDeniedGlobally")] public bool AuthorizationDeniedGlobally { get; }
-    /// macOS 15.0 and later.
     [Selector("authorizationRestricted")] public bool AuthorizationRestricted { get; }
-    /// macOS 15.0 and later.
     [Selector("insufficientlyInUse")] public bool InsufficientlyInUse { get; }
-    /// macOS 15.0 and later.
     [Selector("accuracyLimited")] public bool AccuracyLimited { get; }
-    /// macOS 15.0 and later.
     [Selector("conditionUnsupported")] public bool ConditionUnsupported { get; }
-    /// macOS 15.0 and later.
     [Selector("conditionLimitExceeded")] public bool ConditionLimitExceeded { get; }
-    /// macOS 15.0 and later.
     [Selector("persistenceUnavailable")] public bool PersistenceUnavailable { get; }
-    /// macOS 15.0 and later.
     [Selector("serviceSessionRequired")] public bool ServiceSessionRequired { get; }
-    /// macOS 15.0 and later.
     [Selector("authorizationRequestInProgress")] public bool AuthorizationRequestInProgress { get; }
 }
 

@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CloudKit")
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineConfiguration : NSObject
 {
     [Selector("database", "setDatabase:")] public CKDatabase Database { get; set; }

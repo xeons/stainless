@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 14.0 and later.
 public objc interface MTRCommissionableBrowserDelegate : NSObjectProtocol
 {
     [Selector("controller:didFindCommissionableDevice:")] void ControllerDidFindCommissionableDevice(MTRDeviceController controller, MTRCommissionableBrowserResult device);

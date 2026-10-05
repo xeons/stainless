@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 public objc closure void AVCaptureSystemExposureBiasSliderInitWithDeviceActionActionBlock(float arg0);
 
-/// macOS 15.0 and later.
 public extern objc class AVCaptureSystemExposureBiasSlider : AVCaptureControl
 {
     [Selector("initWithDevice:")] public Self InitWithDevice(AVCaptureDevice device);

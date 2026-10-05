@@ -62,11 +62,8 @@ public extern objc class SCNMaterialProperty : NSObject, SCNAnimatable, NSSecure
     [Selector("textureComponents", "setTextureComponents:")] public SCNColorMask TextureComponents { get; set; }
     [Selector("maxAnisotropy", "setMaxAnisotropy:")] public CGFloat MaxAnisotropy { get; set; }
     [Selector("materialPropertyWithContents:")] public static Self MaterialPropertyWithContents(AnyObject contents);
-    /// macOS 14.0 and later.
     [Selector("precomputedLightingEnvironmentContentsWithURL:error:")] public static AnyObject? PrecomputedLightingEnvironmentContentsWithURLError(NSURL url, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("precomputedLightingEnvironmentContentsWithData:error:")] public static AnyObject? PrecomputedLightingEnvironmentContentsWithDataError(NSData data, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("precomputedLightingEnvironmentDataForContents:device:error:")] public static NSData? PrecomputedLightingEnvironmentDataForContentsDeviceError(AnyObject contents, MTLDevice? device, out NSError? error);
 }
 

@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMIDI")
 
-/// macOS 15.0 and later.
 public extern objc class MIDI2DeviceInfo : NSObject
 {
     [Selector("manufacturerID")] public MIDI2DeviceManufacturer ManufacturerID { get; }
@@ -48,7 +47,6 @@ public enum MIDIUMPProtocolOptions : byte
     MIDI2 = 2,
 }
 
-/// macOS 15.0 and later.
 public extern objc class MIDIUMPEndpoint : NSObject
 {
     [Selector("name")] public NSString Name { get; }

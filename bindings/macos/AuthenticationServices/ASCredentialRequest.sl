@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public enum ASCredentialRequestType : long
 {
     Password = 0,
@@ -40,7 +39,6 @@ public enum ASCredentialRequestType : long
     OneTimeCode = 3,
 }
 
-/// macOS 14.0 and later.
 public objc interface ASCredentialRequest : NSObjectProtocol, NSSecureCoding, NSCopying
 {
     [Selector("type")] ASCredentialRequestType Type { get; }

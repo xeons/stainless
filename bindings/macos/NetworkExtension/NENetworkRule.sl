@@ -48,27 +48,22 @@ public enum NETrafficDirection : long
 
 public extern objc class NENetworkRule : NSObject, NSSecureCoding, NSCopying
 {
-    /// macOS 15.0 and later.
     [Selector("matchRemoteHostOrNetworkEndpoint")] public nw_endpoint_t? MatchRemoteHostOrNetworkEndpoint { get; }
     /// Deprecated in macOS 15.0.
     [Selector("matchRemoteEndpoint")] public NWHostEndpoint? MatchRemoteEndpoint { get; }
     [Selector("matchRemotePrefix")] public NSUInteger MatchRemotePrefix { get; }
-    /// macOS 15.0 and later.
     [Selector("matchLocalNetworkEndpoint")] public nw_endpoint_t? MatchLocalNetworkEndpoint { get; }
     /// Deprecated in macOS 15.0.
     [Selector("matchLocalNetwork")] public NWHostEndpoint? MatchLocalNetwork { get; }
     [Selector("matchLocalPrefix")] public NSUInteger MatchLocalPrefix { get; }
     [Selector("matchProtocol")] public NENetworkRuleProtocol MatchProtocol { get; }
     [Selector("matchDirection")] public NETrafficDirection MatchDirection { get; }
-    /// macOS 15.0 and later.
     [Selector("initWithDestinationNetworkEndpoint:prefix:protocol:")] public Self InitWithDestinationNetworkEndpointPrefixProtocol(nw_endpoint_t networkEndpoint, NSUInteger destinationPrefix, NENetworkRuleProtocol protocol);
     /// Deprecated in macOS 15.0.
     [Selector("initWithDestinationNetwork:prefix:protocol:")] public Self InitWithDestinationNetworkPrefixProtocol(NWHostEndpoint networkEndpoint, NSUInteger destinationPrefix, NENetworkRuleProtocol protocol);
-    /// macOS 15.0 and later.
     [Selector("initWithDestinationHostEndpoint:protocol:")] public Self InitWithDestinationHostEndpointProtocol(nw_endpoint_t hostEndpoint, NENetworkRuleProtocol protocol);
     /// Deprecated in macOS 15.0.
     [Selector("initWithDestinationHost:protocol:")] public Self InitWithDestinationHostProtocol(NWHostEndpoint hostEndpoint, NENetworkRuleProtocol protocol);
-    /// macOS 15.0 and later.
     [Selector("initWithRemoteNetworkEndpoint:remotePrefix:localNetworkEndpoint:localPrefix:protocol:direction:")] public Self InitWithRemoteNetworkEndpointRemotePrefixLocalNetworkEndpointLocalPrefixProtocolDirection(nw_endpoint_t? remoteNetwork, NSUInteger remotePrefix, nw_endpoint_t? localNetwork, NSUInteger localPrefix, NENetworkRuleProtocol protocol, NETrafficDirection direction);
     /// Deprecated in macOS 15.0.
     [Selector("initWithRemoteNetwork:remotePrefix:localNetwork:localPrefix:protocol:direction:")] public Self InitWithRemoteNetworkRemotePrefixLocalNetworkLocalPrefixProtocolDirection(NWHostEndpoint? remoteNetwork, NSUInteger remotePrefix, NWHostEndpoint? localNetwork, NSUInteger localPrefix, NENetworkRuleProtocol protocol, NETrafficDirection direction);

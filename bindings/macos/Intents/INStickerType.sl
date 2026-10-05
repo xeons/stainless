@@ -27,7 +27,6 @@ module MacOS.Intents;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 15.0 and later.
 public enum INStickerType : long
 {
     Unknown = 0,

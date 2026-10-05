@@ -38,7 +38,6 @@ public enum MTLMutability : ulong
     Immutable = 2,
 }
 
-/// macOS 15.0 and later.
 public enum MTLShaderValidation : long
 {
     Default = 0,

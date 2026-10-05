@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "FileProvider")
 
-/// macOS 15.0 and later.
 public extern objc class NSFileProviderKnownFolderLocation : NSObject
 {
     [Selector("initWithParentItemIdentifier:filename:")] public Self InitWithParentItemIdentifierFilename(NSFileProviderItemIdentifier parentItemIdentifier, NSString filename);
     [Selector("initWithExistingItemIdentifier:")] public Self InitWithExistingItemIdentifier(NSFileProviderItemIdentifier existingItemIdentifier);
 }
 
-/// macOS 15.0 and later.
 public extern objc class NSFileProviderKnownFolderLocations : NSObject
 {
     [Selector("shouldCreateBinaryCompatibilitySymlink", "setShouldCreateBinaryCompatibilitySymlink:")] public bool ShouldCreateBinaryCompatibilitySymlink { get; set; }
@@ -54,15 +52,12 @@ public objc closure void NSFileProviderManagerReleaseKnownFoldersLocalizedReason
 /// KnownFolders, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    /// macOS 15.0 and later.
     [Selector("claimKnownFolders:localizedReason:completionHandler:")] public void ClaimKnownFoldersLocalizedReasonCompletionHandler(NSFileProviderKnownFolderLocations knownFolders, NSString localizedReason, NSFileProviderManagerClaimKnownFoldersLocalizedReasonCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 15.0 and later.
     [Selector("releaseKnownFolders:localizedReason:completionHandler:")] public void ReleaseKnownFoldersLocalizedReasonCompletionHandler(NSFileProviderKnownFolders knownFolders, NSString localizedReason, NSFileProviderManagerReleaseKnownFoldersLocalizedReasonCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
 public objc closure void NSFileProviderKnownFolderSupportingGetKnownFolderLocationsCompletionHandlerCompletionHandlerBlock(NSFileProviderKnownFolderLocations? arg0, NSError? arg1);
 
-/// macOS 15.0 and later.
 public objc interface NSFileProviderKnownFolderSupporting : NSObjectProtocol
 {
     [Selector("getKnownFolderLocations:completionHandler:")] void GetKnownFolderLocationsCompletionHandler(NSFileProviderKnownFolders knownFolders, NSFileProviderKnownFolderSupportingGetKnownFolderLocationsCompletionHandlerCompletionHandlerBlock completionHandler);

@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Cinematic")
 
-/// macOS 14.0 and later.
 public extern objc class CNDecision : NSObject, NSCopying
 {
     [Selector("time")] public CMTime Time { get; }

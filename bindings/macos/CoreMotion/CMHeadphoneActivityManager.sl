@@ -41,7 +41,6 @@ public objc closure void CMHeadphoneActivityStatusHandler(CMHeadphoneActivitySta
 
 public objc closure void CMHeadphoneActivityHandler(CMMotionActivity? arg0, NSError? arg1);
 
-/// macOS 15.0 and later.
 public extern objc class CMHeadphoneActivityManager : NSObject
 {
     [Selector("isActivityAvailable")] public bool ActivityAvailable { get; }

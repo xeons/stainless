@@ -51,7 +51,6 @@ public extern objc class PHLivePhotoView : NSView
     [Selector("delegate", "setDelegate:")] public PHLivePhotoViewDelegate? Delegate { get; set; }
     [Selector("livePhoto", "setLivePhoto:")] public PHLivePhoto? LivePhoto { get; set; }
     [Selector("contentMode", "setContentMode:")] public PHLivePhotoViewContentMode ContentMode { get; set; }
-    /// macOS 14 and later.
     [Selector("contentsRect", "setContentsRect:")] public CGRect ContentsRect { get; set; }
     [Selector("audioVolume", "setAudioVolume:")] public float AudioVolume { get; set; }
     [Selector("isMuted", "setMuted:")] public bool Muted { get; set; }

@@ -46,7 +46,6 @@ public extern objc class MLFeatureDescription
     [Selector("imageConstraint")] public MLImageConstraint? ImageConstraint { get; }
     [Selector("dictionaryConstraint")] public MLDictionaryConstraint? DictionaryConstraint { get; }
     [Selector("sequenceConstraint")] public MLSequenceConstraint? SequenceConstraint { get; }
-    /// macOS 15.0 and later.
     [Selector("stateConstraint")] public MLStateConstraint? StateConstraint { get; }
 }
 

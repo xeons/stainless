@@ -50,7 +50,6 @@ public extern objc class AVCaptureVideoDataOutput : AVCaptureOutput
     [Selector("recommendedVideoSettingsForAssetWriterWithOutputFileType:")] public NSDictionary? RecommendedVideoSettingsForAssetWriterWithOutputFileType(AVFileType outputFileType);
     [Selector("availableVideoCodecTypesForAssetWriterWithOutputFileType:")] public NSArray AvailableVideoCodecTypesForAssetWriterWithOutputFileType(AVFileType outputFileType);
     [Selector("recommendedVideoSettingsForVideoCodecType:assetWriterOutputFileType:")] public NSDictionary? RecommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileType(AVVideoCodecType videoCodecType, AVFileType outputFileType);
-    /// macOS 14.0 and later.
     [Selector("recommendedVideoSettingsForVideoCodecType:assetWriterOutputFileType:outputFileURL:")] public NSDictionary? RecommendedVideoSettingsForVideoCodecTypeAssetWriterOutputFileTypeOutputFileURL(AVVideoCodecType videoCodecType, AVFileType outputFileType, NSURL? outputFileURL);
     /// macOS 26.0 and later.
     [Selector("recommendedMovieMetadataForVideoCodecType:assetWriterOutputFileType:")] public NSArray? RecommendedMovieMetadataForVideoCodecTypeAssetWriterOutputFileType(AVVideoCodecType videoCodecType, AVFileType outputFileType);

@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 15.0 and later.
 public extern objc class ASAuthorizationPublicKeyCredentialPRFAssertionInputValues : NSObject
 {
     [Selector("saltInput1")] public NSData SaltInput1 { get; }
@@ -39,7 +38,6 @@ public extern objc class ASAuthorizationPublicKeyCredentialPRFAssertionInputValu
     [Selector("initWithSaltInput1:saltInput2:")] public Self InitWithSaltInput1SaltInput2(NSData saltInput1, NSData? saltInput2);
 }
 
-/// macOS 15.0 and later.
 public extern objc class ASAuthorizationPublicKeyCredentialPRFAssertionInput : NSObject
 {
     [Selector("inputValues")] public ASAuthorizationPublicKeyCredentialPRFAssertionInputValues? InputValues { get; }

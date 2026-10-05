@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Speech")
 
-/// macOS 14 and later.
 public extern objc class SFSpeechLanguageModelConfiguration : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("languageModel")] public NSURL LanguageModel { get; }
@@ -52,13 +51,10 @@ public objc closure void SFSpeechLanguageModelPrepareCustomLanguageModelForUrlCo
 
 public objc closure void SFSpeechLanguageModelPrepareCustomLanguageModelForUrlConfigurationIgnoresCacheCompletionCompletionBlock(NSError? arg0);
 
-/// macOS 14 and later.
 public extern objc class SFSpeechLanguageModel : NSObject
 {
-    /// macOS 14 and later.
     /// Deprecated in macOS 26.0.
     [Selector("prepareCustomLanguageModelForUrl:clientIdentifier:configuration:completion:")] public static void PrepareCustomLanguageModelForUrlClientIdentifierConfigurationCompletion(NSURL asset, NSString clientIdentifier, SFSpeechLanguageModelConfiguration configuration, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlClientIdentifierConfigurationCompletionCompletionBlock completion);
-    /// macOS 14 and later.
     /// Deprecated in macOS 26.0.
     [Selector("prepareCustomLanguageModelForUrl:clientIdentifier:configuration:ignoresCache:completion:")] public static void PrepareCustomLanguageModelForUrlClientIdentifierConfigurationIgnoresCacheCompletion(NSURL asset, NSString clientIdentifier, SFSpeechLanguageModelConfiguration configuration, bool ignoresCache, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlClientIdentifierConfigurationIgnoresCacheCompletionCompletionBlock completion);
     [Selector("prepareCustomLanguageModelForUrl:configuration:completion:")] public static void PrepareCustomLanguageModelForUrlConfigurationCompletion(NSURL asset, SFSpeechLanguageModelConfiguration configuration, SFSpeechLanguageModelPrepareCustomLanguageModelForUrlConfigurationCompletionCompletionBlock completion);

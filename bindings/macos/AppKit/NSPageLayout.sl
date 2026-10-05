@@ -46,7 +46,6 @@ public extern objc class NSPageLayout : NSObject
     [Selector("pageLayout")] public static NSPageLayout PageLayout();
     [Selector("addAccessoryController:")] public void AddAccessoryController(NSViewController accessoryController);
     [Selector("removeAccessoryController:")] public void RemoveAccessoryController(NSViewController accessoryController);
-    /// macOS 14.0 and later.
     [Selector("beginSheetUsingPrintInfo:onWindow:completionHandler:")] public void BeginSheetUsingPrintInfoOnWindowCompletionHandler(NSPrintInfo printInfo, NSWindow parentWindow, NSPageLayoutBeginSheetUsingPrintInfoOnWindowCompletionHandlerHandlerBlock? handler);
     /// Deprecated in macOS 100000.
     [Selector("beginSheetWithPrintInfo:modalForWindow:delegate:didEndSelector:contextInfo:")] public void BeginSheetWithPrintInfoModalForWindowDelegateDidEndSelectorContextInfo(NSPrintInfo printInfo, NSWindow docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);

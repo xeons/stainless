@@ -56,13 +56,9 @@ public objc interface MTLComputeCommandEncoder : MTLCommandEncoder
     [Selector("setBuffer:offset:atIndex:")] void SetBufferOffsetAtIndex(MTLBuffer? buffer, NSUInteger offset, NSUInteger index);
     [Selector("setBufferOffset:atIndex:")] void SetBufferOffsetAtIndex(NSUInteger offset, NSUInteger index);
     [Selector("setBuffers:offsets:withRange:")] void SetBuffersOffsetsWithRange(void** buffers, NSUInteger* offsets, NSRange range);
-    /// macOS 14.0 and later.
     [Selector("setBuffer:offset:attributeStride:atIndex:")] void SetBufferOffsetAttributeStrideAtIndex(MTLBuffer buffer, NSUInteger offset, NSUInteger stride, NSUInteger index);
-    /// macOS 14.0 and later.
     [Selector("setBuffers:offsets:attributeStrides:withRange:")] void SetBuffersOffsetsAttributeStridesWithRange(void** buffers, NSUInteger* offsets, NSUInteger* strides, NSRange range);
-    /// macOS 14.0 and later.
     [Selector("setBufferOffset:attributeStride:atIndex:")] void SetBufferOffsetAttributeStrideAtIndex(NSUInteger offset, NSUInteger stride, NSUInteger index);
-    /// macOS 14.0 and later.
     [Selector("setBytes:length:attributeStride:atIndex:")] void SetBytesLengthAttributeStrideAtIndex(void* bytes, NSUInteger length, NSUInteger stride, NSUInteger index);
     [Selector("setVisibleFunctionTable:atBufferIndex:")] void SetVisibleFunctionTableAtBufferIndex(MTLVisibleFunctionTable? visibleFunctionTable, NSUInteger bufferIndex);
     [Selector("setVisibleFunctionTables:withBufferRange:")] void SetVisibleFunctionTablesWithBufferRange(void** visibleFunctionTables, NSRange range);

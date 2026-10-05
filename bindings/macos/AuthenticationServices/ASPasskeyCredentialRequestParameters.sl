@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public extern objc class ASPasskeyCredentialRequestParameters : NSObject, NSSecureCoding, NSCopying
 {
     [Selector("relyingPartyIdentifier")] public NSString RelyingPartyIdentifier { get; }
     [Selector("clientDataHash")] public NSData ClientDataHash { get; }
     [Selector("userVerificationPreference")] public ASAuthorizationPublicKeyCredentialUserVerificationPreference UserVerificationPreference { get; }
     [Selector("allowedCredentials")] public NSArray AllowedCredentials { get; }
-    /// macOS 15.0 and later.
     [Selector("extensionInput")] public ASPasskeyAssertionCredentialExtensionInput? ExtensionInput { get; }
 }
 

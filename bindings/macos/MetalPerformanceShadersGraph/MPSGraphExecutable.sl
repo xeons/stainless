@@ -53,7 +53,6 @@ public enum MPSGraphDeploymentPlatform : ulong
     VisionOS = 3,
 }
 
-/// macOS 14.0 and later.
 public extern objc class MPSGraphExecutableSerializationDescriptor : MPSGraphObject
 {
     [Selector("append", "setAppend:")] public bool Append { get; set; }
@@ -67,16 +66,12 @@ public extern objc class MPSGraphExecutable : MPSGraphObject
     [Selector("feedTensors")] public NSArray? FeedTensors { get; }
     [Selector("targetTensors")] public NSArray? TargetTensors { get; }
     [Selector("specializeWithDevice:inputTypes:compilationDescriptor:")] public void SpecializeWithDeviceInputTypesCompilationDescriptor(MPSGraphDevice? device, NSArray inputTypes, MPSGraphCompilationDescriptor? compilationDescriptor);
-    /// macOS 13.2 and later.
     [Selector("getOutputTypesWithDevice:inputTypes:compilationDescriptor:")] public NSArray? GetOutputTypesWithDeviceInputTypesCompilationDescriptor(MPSGraphDevice? device, NSArray inputTypes, MPSGraphCompilationDescriptor? compilationDescriptor);
     [Selector("runWithMTLCommandQueue:inputsArray:resultsArray:executionDescriptor:")] public NSArray RunWithMTLCommandQueueInputsArrayResultsArrayExecutionDescriptor(MTLCommandQueue commandQueue, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
     [Selector("runAsyncWithMTLCommandQueue:inputsArray:resultsArray:executionDescriptor:")] public NSArray RunAsyncWithMTLCommandQueueInputsArrayResultsArrayExecutionDescriptor(MTLCommandQueue commandQueue, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
     [Selector("encodeToCommandBuffer:inputsArray:resultsArray:executionDescriptor:")] public NSArray EncodeToCommandBufferInputsArrayResultsArrayExecutionDescriptor(MPSCommandBuffer commandBuffer, NSArray inputsArray, NSArray? resultsArray, MPSGraphExecutableExecutionDescriptor? executionDescriptor);
-    /// macOS 14.0 and later.
     [Selector("serializeToMPSGraphPackageAtURL:descriptor:")] public void SerializeToMPSGraphPackageAtURLDescriptor(NSURL url, MPSGraphExecutableSerializationDescriptor? descriptor);
-    /// macOS 14.0 and later.
     [Selector("initWithMPSGraphPackageAtURL:compilationDescriptor:")] public Self InitWithMPSGraphPackageAtURLCompilationDescriptor(NSURL mpsgraphPackageURL, MPSGraphCompilationDescriptor? compilationDescriptor);
-    /// macOS 15.0 and later.
     [Selector("initWithCoreMLPackageAtURL:compilationDescriptor:")] public Self InitWithCoreMLPackageAtURLCompilationDescriptor(NSURL coreMLPackageURL, MPSGraphCompilationDescriptor? compilationDescriptor);
 }
 

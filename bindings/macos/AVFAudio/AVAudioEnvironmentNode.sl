@@ -73,7 +73,6 @@ public extern objc class AVAudioEnvironmentNode : AVAudioNode, AVAudioMixing
     [Selector("distanceAttenuationParameters")] public AVAudioEnvironmentDistanceAttenuationParameters DistanceAttenuationParameters { get; }
     [Selector("reverbParameters")] public AVAudioEnvironmentReverbParameters ReverbParameters { get; }
     [Selector("applicableRenderingAlgorithms")] public NSArray ApplicableRenderingAlgorithms { get; }
-    /// macOS 15.0 and later.
     [Selector("isListenerHeadTrackingEnabled", "setListenerHeadTrackingEnabled:")] public bool ListenerHeadTrackingEnabled { get; set; }
     [Selector("init")] public Self Init();
 }

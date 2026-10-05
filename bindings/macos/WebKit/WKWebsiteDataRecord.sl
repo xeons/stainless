@@ -54,13 +54,10 @@ public extern "C" NSString WKWebsiteDataTypeServiceWorkerRegistrations;
 
 public extern "C" NSString WKWebsiteDataTypeFileSystem;
 
-/// macOS 14.0 and later.
 public extern "C" NSString WKWebsiteDataTypeSearchFieldRecentSearches;
 
-/// macOS 14.0 and later.
 public extern "C" NSString WKWebsiteDataTypeMediaKeys;
 
-/// macOS 14.0 and later.
 public extern "C" NSString WKWebsiteDataTypeHashSalt;
 
 /// macOS 26.0 and later.

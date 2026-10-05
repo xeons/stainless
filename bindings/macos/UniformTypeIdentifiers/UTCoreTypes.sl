@@ -83,7 +83,6 @@ public extern "C" UTType? UTTypeXML;
 
 public extern "C" UTType? UTTypeYAML;
 
-/// macOS 15.0 and later.
 public extern "C" UTType? UTTypeCSS;
 
 public extern "C" UTType? UTTypeSourceCode;
@@ -168,15 +167,12 @@ public extern "C" UTType? UTTypeHEIF;
 
 public extern "C" UTType? UTTypeHEIC;
 
-/// macOS 15.0 and later.
 public extern "C" UTType? UTTypeHEICS;
 
 public extern "C" UTType? UTTypeWebP;
 
-/// macOS 15.0 and later.
 public extern "C" UTType? UTTypeEXR;
 
-/// macOS 15.0 and later.
 public extern "C" UTType? UTTypeDNG;
 
 /// macOS 15.2 and later.
@@ -272,7 +268,6 @@ public extern "C" UTType? UTTypeZIP;
 
 public extern "C" UTType? UTTypeAppleArchive;
 
-/// macOS 15.0 and later.
 public extern "C" UTType? UTTypeTarArchive;
 
 public extern "C" UTType? UTTypeSpreadsheet;
@@ -309,13 +304,10 @@ public extern "C" UTType? UTTypeEPUB;
 
 public extern "C" UTType? UTTypeLog;
 
-/// macOS 14.0 and later.
 public extern "C" UTType? UTTypeAHAP;
 
-/// macOS 15.0 and later.
 public extern "C" UTType? UTTypeGeoJSON;
 
-/// macOS 15.0 and later.
 public extern "C" UTType? UTTypeLinkPresentationMetadata;
 
 #endif

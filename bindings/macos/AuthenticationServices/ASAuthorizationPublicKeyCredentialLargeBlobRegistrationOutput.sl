@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobRegistrationOutput : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("isSupported")] public bool IsSupported { get; }

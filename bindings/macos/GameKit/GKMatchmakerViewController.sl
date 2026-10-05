@@ -71,7 +71,6 @@ public objc interface GKMatchmakerViewControllerDelegate : NSObjectProtocol
     [Optional] [Selector("matchmakerViewController:didFindMatch:")] void MatchmakerViewControllerDidFindMatch(GKMatchmakerViewController viewController, GKMatch match);
     [Optional] [Selector("matchmakerViewController:didFindHostedPlayers:")] void MatchmakerViewControllerDidFindHostedPlayers(GKMatchmakerViewController viewController, NSArray players);
     [Optional] [Selector("matchmakerViewController:hostedPlayerDidAccept:")] void MatchmakerViewControllerHostedPlayerDidAccept(GKMatchmakerViewController viewController, GKPlayer player);
-    /// macOS 14.2 and later.
     [Optional] [Selector("matchmakerViewController:getMatchPropertiesForRecipient:withCompletionHandler:")] void MatchmakerViewControllerGetMatchPropertiesForRecipientWithCompletionHandler(GKMatchmakerViewController viewController, GKPlayer recipient, GKMatchmakerViewControllerDelegateMatchmakerViewControllerGetMatchPropertiesForRecipientWithCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 10.10.
     [Optional] [Selector("matchmakerViewController:didFindPlayers:")] void MatchmakerViewControllerDidFindPlayers(GKMatchmakerViewController viewController, NSArray playerIDs);

@@ -59,7 +59,6 @@ public enum MKFeatureVisibility : long
     Visible = 2,
 }
 
-/// macOS 15.0 and later.
 public enum MKLocalSearchRegionPriority : long
 {
     Default = 0,

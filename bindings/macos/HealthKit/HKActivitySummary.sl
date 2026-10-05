@@ -34,7 +34,6 @@ import Standard.ObjC;
 public extern objc class HKActivitySummary : NSObject, NSSecureCoding, NSCopying
 {
     [Selector("activityMoveMode", "setActivityMoveMode:")] public HKActivityMoveMode ActivityMoveMode { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isPaused", "setPaused:")] public bool Paused { get; set; }
     [Selector("activeEnergyBurned", "setActiveEnergyBurned:")] public HKQuantity ActiveEnergyBurned { get; set; }
     [Selector("appleMoveTime", "setAppleMoveTime:")] public HKQuantity AppleMoveTime { get; set; }

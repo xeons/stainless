@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "HealthKit")
 
-/// macOS 15.0 and later.
 public enum HKPHQ9AssessmentRisk : long
 {
     NoneToMinimal = 1,
@@ -40,7 +39,6 @@ public enum HKPHQ9AssessmentRisk : long
     Severe = 5,
 }
 
-/// macOS 15.0 and later.
 public enum HKPHQ9AssessmentAnswer : long
 {
     NotAtAll = 0,
@@ -50,7 +48,6 @@ public enum HKPHQ9AssessmentAnswer : long
     PreferNotToAnswer = 4,
 }
 
-/// macOS 15.0 and later.
 public extern objc class HKPHQ9Assessment : HKScoredAssessment
 {
     [Selector("answers")] public NSArray? Answers { get; }

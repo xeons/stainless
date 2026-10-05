@@ -40,7 +40,6 @@ public enum NSNumberFormatterBehavior : ulong
 public extern objc class NSNumberFormatter : NSFormatter
 {
     [Selector("formattingContext", "setFormattingContext:")] public NSFormattingContext FormattingContext { get; set; }
-    /// macOS 15.0 and later.
     [Selector("minimumGroupingDigits", "setMinimumGroupingDigits:")] public NSInteger MinimumGroupingDigits { get; set; }
     [Selector("numberStyle", "setNumberStyle:")] public NSNumberFormatterStyle NumberStyle { get; set; }
     [Selector("locale", "setLocale:")] public NSLocale? Locale { get; set; }

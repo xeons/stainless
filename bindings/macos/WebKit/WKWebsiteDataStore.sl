@@ -49,9 +49,7 @@ public extern objc class WKWebsiteDataStore : NSObject, NSSecureCoding
 {
     [Selector("isPersistent")] public bool Persistent { get; }
     [Selector("httpCookieStore")] public WKHTTPCookieStore HttpCookieStore { get; }
-    /// macOS 14.0 and later.
     [Selector("identifier")] public NSUUID? Identifier { get; }
-    /// macOS 14.0 and later.
     [Selector("proxyConfigurations", "setProxyConfigurations:")] public NSArray? ProxyConfigurations { get; set; }
     [Selector("defaultDataStore")] public static WKWebsiteDataStore DefaultDataStore();
     [Selector("nonPersistentDataStore")] public static WKWebsiteDataStore NonPersistentDataStore();
@@ -63,11 +61,8 @@ public extern objc class WKWebsiteDataStore : NSObject, NSSecureCoding
     [Selector("fetchDataOfTypes:completionHandler:")] public void FetchDataOfTypesCompletionHandler(NSSet dataTypes, WKWebsiteDataStoreFetchDataOfTypesCompletionHandlerCompletionHandlerBlock completionHandler);
     /// macOS 26.0 and later.
     [Selector("restoreData:completionHandler:")] public void RestoreDataCompletionHandler(NSData data, WKWebsiteDataStoreRestoreDataCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Selector("dataStoreForIdentifier:")] public static WKWebsiteDataStore DataStoreForIdentifier(NSUUID identifier);
-    /// macOS 14.0 and later.
     [Selector("removeDataStoreForIdentifier:completionHandler:")] public static void RemoveDataStoreForIdentifierCompletionHandler(NSUUID identifier, WKWebsiteDataStoreRemoveDataStoreForIdentifierCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Selector("fetchAllDataStoreIdentifiers:")] public static void FetchAllDataStoreIdentifiers(WKWebsiteDataStoreFetchAllDataStoreIdentifiersCompletionHandlerBlock completionHandler);
 }
 

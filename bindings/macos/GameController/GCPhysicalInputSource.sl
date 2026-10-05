@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "GameController")
 
-/// macOS 14.0 and later.
 [Flags]
 public enum GCPhysicalInputSourceDirection : ulong
 {
@@ -42,7 +41,6 @@ public enum GCPhysicalInputSourceDirection : ulong
     Left = 8,
 }
 
-/// macOS 14.0 and later.
 public objc interface GCPhysicalInputSource : NSObjectProtocol
 {
     [Selector("elementAliases")] NSSet ElementAliases { get; }

@@ -52,13 +52,9 @@ public extern objc class MPSGraph
     /// macOS 15.2 and later.
     [Selector("sliceGradientTensor:fwdInShapeTensor:startTensor:sizeTensor:squeezeMask:name:")] public MPSGraphTensor SliceGradientTensorFwdInShapeTensorStartTensorSizeTensorSqueezeMaskName(MPSGraphTensor inputGradientTensor, MPSGraphTensor fwdInShapeTensor, MPSGraphTensor startTensor, MPSGraphTensor sizeTensor, uint squeezeMask, NSString? name);
     [Selector("sliceGradientTensor:fwdInShapeTensor:starts:ends:strides:startMask:endMask:squeezeMask:name:")] public MPSGraphTensor SliceGradientTensorFwdInShapeTensorStartsEndsStridesStartMaskEndMaskSqueezeMaskName(MPSGraphTensor inputGradientTensor, MPSGraphTensor fwdInShapeTensor, NSArray starts, NSArray ends, NSArray strides, uint startMask, uint endMask, uint squeezeMask, NSString? name);
-    /// macOS 14.4 and later.
     [Selector("sliceUpdateDataTensor:updateTensor:startsTensor:endsTensor:stridesTensor:startMask:endMask:squeezeMask:name:")] public MPSGraphTensor SliceUpdateDataTensorUpdateTensorStartsTensorEndsTensorStridesTensorStartMaskEndMaskSqueezeMaskName(MPSGraphTensor dataTensor, MPSGraphTensor updateTensor, MPSGraphTensor startsTensor, MPSGraphTensor endsTensor, MPSGraphTensor stridesTensor, uint startMask, uint endMask, uint squeezeMask, NSString? name);
-    /// macOS 14.4 and later.
     [Selector("sliceUpdateDataTensor:updateTensor:starts:ends:strides:startMask:endMask:squeezeMask:name:")] public MPSGraphTensor SliceUpdateDataTensorUpdateTensorStartsEndsStridesStartMaskEndMaskSqueezeMaskName(MPSGraphTensor dataTensor, MPSGraphTensor updateTensor, NSArray starts, NSArray ends, NSArray strides, uint startMask, uint endMask, uint squeezeMask, NSString? name);
-    /// macOS 15.0 and later.
     [Selector("sliceUpdateDataTensor:updateTensor:startsTensor:endsTensor:stridesTensor:name:")] public MPSGraphTensor SliceUpdateDataTensorUpdateTensorStartsTensorEndsTensorStridesTensorName(MPSGraphTensor dataTensor, MPSGraphTensor updateTensor, MPSGraphTensor startsTensor, MPSGraphTensor endsTensor, MPSGraphTensor stridesTensor, NSString? name);
-    /// macOS 15.0 and later.
     [Selector("sliceUpdateDataTensor:updateTensor:starts:ends:strides:name:")] public MPSGraphTensor SliceUpdateDataTensorUpdateTensorStartsEndsStridesName(MPSGraphTensor dataTensor, MPSGraphTensor updateTensor, NSArray starts, NSArray ends, NSArray strides, NSString? name);
     [Selector("concatTensor:withTensor:dimension:name:")] public MPSGraphTensor ConcatTensorWithTensorDimensionName(MPSGraphTensor tensor, MPSGraphTensor tensor2, NSInteger dimensionIndex, NSString? name);
     [Selector("concatTensors:dimension:name:")] public MPSGraphTensor ConcatTensorsDimensionName(NSArray tensors, NSInteger dimensionIndex, NSString? name);
@@ -84,7 +80,6 @@ public extern objc class MPSGraph
     [Selector("broadcastTensor:toShapeTensor:name:")] public MPSGraphTensor BroadcastTensorToShapeTensorName(MPSGraphTensor tensor, MPSGraphTensor shapeTensor, NSString? name);
     [Selector("shapeOfTensor:name:")] public MPSGraphTensor ShapeOfTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("castTensor:toType:name:")] public MPSGraphTensor CastTensorToTypeName(MPSGraphTensor tensor, MPSDataType type, NSString? name);
-    /// macOS 13.2 and later.
     [Selector("reinterpretCastTensor:toType:name:")] public MPSGraphTensor ReinterpretCastTensorToTypeName(MPSGraphTensor tensor, MPSDataType type, NSString? name);
     [Selector("stackTensors:axis:name:")] public MPSGraphTensor StackTensorsAxisName(NSArray inputTensors, NSInteger axis, NSString? name);
     [Selector("splitTensor:splitSizes:axis:name:")] public NSArray SplitTensorSplitSizesAxisName(MPSGraphTensor tensor, NSArray splitSizes, NSInteger axis, NSString? name);

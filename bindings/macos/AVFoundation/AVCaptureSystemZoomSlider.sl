@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 public objc closure void AVCaptureSystemZoomSliderInitWithDeviceActionActionBlock(CGFloat arg0);
 
-/// macOS 15.0 and later.
 public extern objc class AVCaptureSystemZoomSlider : AVCaptureControl
 {
     [Selector("initWithDevice:")] public Self InitWithDevice(AVCaptureDevice device);

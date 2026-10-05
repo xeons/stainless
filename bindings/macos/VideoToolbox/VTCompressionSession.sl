@@ -60,13 +60,10 @@ public extern "C" OSStatus VTCompressionSessionEncodeFrameWithOutputHandler(VTCo
 
 public extern "C" OSStatus VTCompressionSessionCompleteFrames(VTCompressionSessionRef session, CMTime completeUntilPresentationTimeStamp);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean VTIsStereoMVHEVCEncodeSupported();
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus VTCompressionSessionEncodeMultiImageFrame(VTCompressionSessionRef session, CMTaggedBufferGroupRef taggedBufferGroup, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef? frameProperties, void* sourceFrameRefcon, VTEncodeInfoFlags* infoFlagsOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus VTCompressionSessionEncodeMultiImageFrameWithOutputHandler(VTCompressionSessionRef session, CMTaggedBufferGroupRef taggedBufferGroup, CMTime presentationTimeStamp, CMTime duration, CFDictionaryRef? frameProperties, VTEncodeInfoFlags* infoFlagsOut, VTCompressionOutputHandler outputHandler);
 
 [Flags]

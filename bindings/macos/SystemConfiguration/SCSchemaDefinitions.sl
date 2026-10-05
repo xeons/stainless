@@ -492,7 +492,6 @@ public extern "C" CFStringRef? kSCPropNetProxiesFTPPort;
 
 public extern "C" CFStringRef? kSCPropNetProxiesFTPProxy;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kSCPropNetProxiesFTPUser;
 
 public extern "C" CFStringRef? kSCPropNetProxiesGopherEnable;
@@ -501,7 +500,6 @@ public extern "C" CFStringRef? kSCPropNetProxiesGopherPort;
 
 public extern "C" CFStringRef? kSCPropNetProxiesGopherProxy;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kSCPropNetProxiesGopherUser;
 
 public extern "C" CFStringRef? kSCPropNetProxiesHTTPEnable;
@@ -510,7 +508,6 @@ public extern "C" CFStringRef? kSCPropNetProxiesHTTPPort;
 
 public extern "C" CFStringRef? kSCPropNetProxiesHTTPProxy;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kSCPropNetProxiesHTTPUser;
 
 public extern "C" CFStringRef? kSCPropNetProxiesHTTPSEnable;
@@ -519,7 +516,6 @@ public extern "C" CFStringRef? kSCPropNetProxiesHTTPSPort;
 
 public extern "C" CFStringRef? kSCPropNetProxiesHTTPSProxy;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kSCPropNetProxiesHTTPSUser;
 
 public extern "C" CFStringRef? kSCPropNetProxiesRTSPEnable;
@@ -528,7 +524,6 @@ public extern "C" CFStringRef? kSCPropNetProxiesRTSPPort;
 
 public extern "C" CFStringRef? kSCPropNetProxiesRTSPProxy;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kSCPropNetProxiesRTSPUser;
 
 public extern "C" CFStringRef? kSCPropNetProxiesSOCKSEnable;
@@ -537,7 +532,6 @@ public extern "C" CFStringRef? kSCPropNetProxiesSOCKSPort;
 
 public extern "C" CFStringRef? kSCPropNetProxiesSOCKSProxy;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kSCPropNetProxiesSOCKSUser;
 
 public extern "C" CFStringRef? kSCPropNetProxiesProxyAutoConfigEnable;

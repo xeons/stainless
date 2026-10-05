@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "SensitiveContentAnalysis")
 
-/// macOS 14.0 and later.
 public extern objc class SCSensitivityAnalysis : NSObject
 {
     [Selector("isSensitive")] public bool Sensitive { get; }

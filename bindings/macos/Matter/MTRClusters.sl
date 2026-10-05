@@ -33,9 +33,7 @@ import Standard.ObjC;
 
 public extern objc class MTRClusterIdentify : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("identifyWithParams:expectedValues:expectedValueInterval:completion:")] public void IdentifyWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRIdentifyClusterIdentifyParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("triggerEffectWithParams:expectedValues:expectedValueInterval:completion:")] public void TriggerEffectWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRIdentifyClusterTriggerEffectParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeIdentifyTimeWithParams:")] public NSDictionary? ReadAttributeIdentifyTimeWithParams(MTRReadParams? params);
     [Selector("writeAttributeIdentifyTimeWithValue:expectedValueInterval:")] public void WriteAttributeIdentifyTimeWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
@@ -51,7 +49,6 @@ public extern objc class MTRClusterIdentify : MTRGenericCluster
 /// Availability, a category of MTRClusterIdentify.
 public extern objc class MTRClusterIdentify
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -65,19 +62,12 @@ public objc closure void MTRClusterGroupsRemoveGroupWithParamsExpectedValuesExpe
 
 public extern objc class MTRClusterGroups : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("addGroupWithParams:expectedValues:expectedValueInterval:completion:")] public void AddGroupWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupsClusterAddGroupParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGroupsAddGroupWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("viewGroupWithParams:expectedValues:expectedValueInterval:completion:")] public void ViewGroupWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupsClusterViewGroupParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGroupsViewGroupWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("getGroupMembershipWithParams:expectedValues:expectedValueInterval:completion:")] public void GetGroupMembershipWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupsClusterGetGroupMembershipParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGroupsGetGroupMembershipWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("removeGroupWithParams:expectedValues:expectedValueInterval:completion:")] public void RemoveGroupWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupsClusterRemoveGroupParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGroupsRemoveGroupWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("removeAllGroupsWithParams:expectedValues:expectedValueInterval:completion:")] public void RemoveAllGroupsWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupsClusterRemoveAllGroupsParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("removeAllGroupsWithExpectedValues:expectedValueInterval:completion:")] public void RemoveAllGroupsWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("addGroupIfIdentifyingWithParams:expectedValues:expectedValueInterval:completion:")] public void AddGroupIfIdentifyingWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupsClusterAddGroupIfIdentifyingParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeNameSupportWithParams:")] public NSDictionary? ReadAttributeNameSupportWithParams(MTRReadParams? params);
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
@@ -90,31 +80,20 @@ public extern objc class MTRClusterGroups : MTRGenericCluster
 /// Availability, a category of MTRClusterGroups.
 public extern objc class MTRClusterGroups
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterOnOff : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("offWithParams:expectedValues:expectedValueInterval:completion:")] public void OffWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROnOffClusterOffParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("offWithExpectedValues:expectedValueInterval:completion:")] public void OffWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("onWithParams:expectedValues:expectedValueInterval:completion:")] public void OnWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROnOffClusterOnParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("onWithExpectedValues:expectedValueInterval:completion:")] public void OnWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("toggleWithParams:expectedValues:expectedValueInterval:completion:")] public void ToggleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROnOffClusterToggleParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("toggleWithExpectedValues:expectedValueInterval:completion:")] public void ToggleWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("offWithEffectWithParams:expectedValues:expectedValueInterval:completion:")] public void OffWithEffectWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROnOffClusterOffWithEffectParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("onWithRecallGlobalSceneWithParams:expectedValues:expectedValueInterval:completion:")] public void OnWithRecallGlobalSceneWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROnOffClusterOnWithRecallGlobalSceneParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("onWithRecallGlobalSceneWithExpectedValues:expectedValueInterval:completion:")] public void OnWithRecallGlobalSceneWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("onWithTimedOffWithParams:expectedValues:expectedValueInterval:completion:")] public void OnWithTimedOffWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROnOffClusterOnWithTimedOffParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeOnOffWithParams:")] public NSDictionary? ReadAttributeOnOffWithParams(MTRReadParams? params);
     [Selector("readAttributeGlobalSceneControlWithParams:")] public NSDictionary? ReadAttributeGlobalSceneControlWithParams(MTRReadParams? params);
@@ -137,29 +116,19 @@ public extern objc class MTRClusterOnOff : MTRGenericCluster
 /// Availability, a category of MTRClusterOnOff.
 public extern objc class MTRClusterOnOff
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterLevelControl : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("moveToLevelWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToLevelWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterMoveToLevelParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterMoveParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stepWithParams:expectedValues:expectedValueInterval:completion:")] public void StepWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterStepParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stopWithParams:expectedValues:expectedValueInterval:completion:")] public void StopWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterStopParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveToLevelWithOnOffWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToLevelWithOnOffWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterMoveToLevelWithOnOffParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveWithOnOffWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveWithOnOffWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterMoveWithOnOffParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stepWithOnOffWithParams:expectedValues:expectedValueInterval:completion:")] public void StepWithOnOffWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterStepWithOnOffParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stopWithOnOffWithParams:expectedValues:expectedValueInterval:completion:")] public void StopWithOnOffWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterStopWithOnOffParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveToClosestFrequencyWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToClosestFrequencyWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLevelControlClusterMoveToClosestFrequencyParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeCurrentLevelWithParams:")] public NSDictionary? ReadAttributeCurrentLevelWithParams(MTRReadParams? params);
     [Selector("readAttributeRemainingTimeWithParams:")] public NSDictionary? ReadAttributeRemainingTimeWithParams(MTRReadParams? params);
@@ -199,13 +168,11 @@ public extern objc class MTRClusterLevelControl : MTRGenericCluster
 /// Availability, a category of MTRClusterLevelControl.
 public extern objc class MTRClusterLevelControl
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterDescriptor : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("readAttributeDeviceTypeListWithParams:")] public NSDictionary? ReadAttributeDeviceTypeListWithParams(MTRReadParams? params);
     [Selector("readAttributeServerListWithParams:")] public NSDictionary? ReadAttributeServerListWithParams(MTRReadParams? params);
     [Selector("readAttributeClientListWithParams:")] public NSDictionary? ReadAttributeClientListWithParams(MTRReadParams? params);
@@ -220,7 +187,6 @@ public extern objc class MTRClusterDescriptor : MTRGenericCluster
 /// Availability, a category of MTRClusterDescriptor.
 public extern objc class MTRClusterDescriptor
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -239,7 +205,6 @@ public extern objc class MTRClusterBinding : MTRGenericCluster
 /// Availability, a category of MTRClusterBinding.
 public extern objc class MTRClusterBinding
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -249,11 +214,8 @@ public extern objc class MTRClusterAccessControl : MTRGenericCluster
 {
     /// macOS 15.4 and later.
     [Selector("reviewFabricRestrictionsWithParams:expectedValues:expectedValueInterval:completion:")] public void ReviewFabricRestrictionsWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAccessControlClusterReviewFabricRestrictionsParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterAccessControlReviewFabricRestrictionsWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("readAttributeACLWithParams:")] public NSDictionary? ReadAttributeACLWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeACLWithValue:expectedValueInterval:")] public void WriteAttributeACLWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeACLWithValue:expectedValueInterval:params:")] public void WriteAttributeACLWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
     [Selector("readAttributeExtensionWithParams:")] public NSDictionary? ReadAttributeExtensionWithParams(MTRReadParams? params);
     [Selector("writeAttributeExtensionWithValue:expectedValueInterval:")] public void WriteAttributeExtensionWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
@@ -275,35 +237,22 @@ public extern objc class MTRClusterAccessControl : MTRGenericCluster
 /// Availability, a category of MTRClusterAccessControl.
 public extern objc class MTRClusterAccessControl
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterActions : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("instantActionWithParams:expectedValues:expectedValueInterval:completion:")] public void InstantActionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterInstantActionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("instantActionWithTransitionWithParams:expectedValues:expectedValueInterval:completion:")] public void InstantActionWithTransitionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterInstantActionWithTransitionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("startActionWithParams:expectedValues:expectedValueInterval:completion:")] public void StartActionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterStartActionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("startActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:")] public void StartActionWithDurationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterStartActionWithDurationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stopActionWithParams:expectedValues:expectedValueInterval:completion:")] public void StopActionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterStopActionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("pauseActionWithParams:expectedValues:expectedValueInterval:completion:")] public void PauseActionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterPauseActionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("pauseActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:")] public void PauseActionWithDurationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterPauseActionWithDurationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("resumeActionWithParams:expectedValues:expectedValueInterval:completion:")] public void ResumeActionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterResumeActionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("enableActionWithParams:expectedValues:expectedValueInterval:completion:")] public void EnableActionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterEnableActionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("enableActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:")] public void EnableActionWithDurationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterEnableActionWithDurationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("disableActionWithParams:expectedValues:expectedValueInterval:completion:")] public void DisableActionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterDisableActionParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("disableActionWithDurationWithParams:expectedValues:expectedValueInterval:completion:")] public void DisableActionWithDurationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActionsClusterDisableActionWithDurationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeActionListWithParams:")] public NSDictionary? ReadAttributeActionListWithParams(MTRReadParams? params);
     [Selector("readAttributeEndpointListsWithParams:")] public NSDictionary? ReadAttributeEndpointListsWithParams(MTRReadParams? params);
@@ -318,87 +267,52 @@ public extern objc class MTRClusterActions : MTRGenericCluster
 /// Availability, a category of MTRClusterActions.
 public extern objc class MTRClusterActions
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterBasicInformation : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("readAttributeDataModelRevisionWithParams:")] public NSDictionary? ReadAttributeDataModelRevisionWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeVendorNameWithParams:")] public NSDictionary? ReadAttributeVendorNameWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeVendorIDWithParams:")] public NSDictionary? ReadAttributeVendorIDWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeProductNameWithParams:")] public NSDictionary? ReadAttributeProductNameWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeProductIDWithParams:")] public NSDictionary? ReadAttributeProductIDWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNodeLabelWithParams:")] public NSDictionary? ReadAttributeNodeLabelWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNodeLabelWithValue:expectedValueInterval:")] public void WriteAttributeNodeLabelWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNodeLabelWithValue:expectedValueInterval:params:")] public void WriteAttributeNodeLabelWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeLocationWithParams:")] public NSDictionary? ReadAttributeLocationWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLocationWithValue:expectedValueInterval:")] public void WriteAttributeLocationWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLocationWithValue:expectedValueInterval:params:")] public void WriteAttributeLocationWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeHardwareVersionWithParams:")] public NSDictionary? ReadAttributeHardwareVersionWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeHardwareVersionStringWithParams:")] public NSDictionary? ReadAttributeHardwareVersionStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeSoftwareVersionWithParams:")] public NSDictionary? ReadAttributeSoftwareVersionWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeSoftwareVersionStringWithParams:")] public NSDictionary? ReadAttributeSoftwareVersionStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeManufacturingDateWithParams:")] public NSDictionary? ReadAttributeManufacturingDateWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributePartNumberWithParams:")] public NSDictionary? ReadAttributePartNumberWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeProductURLWithParams:")] public NSDictionary? ReadAttributeProductURLWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeProductLabelWithParams:")] public NSDictionary? ReadAttributeProductLabelWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeSerialNumberWithParams:")] public NSDictionary? ReadAttributeSerialNumberWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeLocalConfigDisabledWithParams:")] public NSDictionary? ReadAttributeLocalConfigDisabledWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLocalConfigDisabledWithValue:expectedValueInterval:")] public void WriteAttributeLocalConfigDisabledWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLocalConfigDisabledWithValue:expectedValueInterval:params:")] public void WriteAttributeLocalConfigDisabledWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeReachableWithParams:")] public NSDictionary? ReadAttributeReachableWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeUniqueIDWithParams:")] public NSDictionary? ReadAttributeUniqueIDWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeCapabilityMinimaWithParams:")] public NSDictionary? ReadAttributeCapabilityMinimaWithParams(MTRReadParams? params);
-    /// macOS 14.0 and later.
     [Selector("readAttributeProductAppearanceWithParams:")] public NSDictionary? ReadAttributeProductAppearanceWithParams(MTRReadParams? params);
     /// macOS 15.4 and later.
     [Selector("readAttributeSpecificationVersionWithParams:")] public NSDictionary? ReadAttributeSpecificationVersionWithParams(MTRReadParams? params);
     /// macOS 15.4 and later.
     [Selector("readAttributeMaxPathsPerInvokeWithParams:")] public NSDictionary? ReadAttributeMaxPathsPerInvokeWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterBasicInformation.
 public extern objc class MTRClusterBasicInformation
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -406,67 +320,43 @@ public objc closure void MTRClusterOTASoftwareUpdateProviderQueryImageWithParams
 
 public objc closure void MTRClusterOTASoftwareUpdateProviderApplyUpdateRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams? arg0, NSError? arg1);
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterOTASoftwareUpdateProvider : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("queryImageWithParams:expectedValues:expectedValueInterval:completion:")] public void QueryImageWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROTASoftwareUpdateProviderClusterQueryImageParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOTASoftwareUpdateProviderQueryImageWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("applyUpdateRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void ApplyUpdateRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOTASoftwareUpdateProviderApplyUpdateRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("notifyUpdateAppliedWithParams:expectedValues:expectedValueInterval:completion:")] public void NotifyUpdateAppliedWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterOTASoftwareUpdateProvider.
 public extern objc class MTRClusterOTASoftwareUpdateProvider
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterOTASoftwareUpdateRequestor : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("announceOTAProviderWithParams:expectedValues:expectedValueInterval:completion:")] public void AnnounceOTAProviderWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("readAttributeDefaultOTAProvidersWithParams:")] public NSDictionary? ReadAttributeDefaultOTAProvidersWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeDefaultOTAProvidersWithValue:expectedValueInterval:")] public void WriteAttributeDefaultOTAProvidersWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeDefaultOTAProvidersWithValue:expectedValueInterval:params:")] public void WriteAttributeDefaultOTAProvidersWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeUpdatePossibleWithParams:")] public NSDictionary? ReadAttributeUpdatePossibleWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeUpdateStateWithParams:")] public NSDictionary? ReadAttributeUpdateStateWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeUpdateStateProgressWithParams:")] public NSDictionary? ReadAttributeUpdateStateProgressWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterOTASoftwareUpdateRequestor.
 public extern objc class MTRClusterOTASoftwareUpdateRequestor
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -486,7 +376,6 @@ public extern objc class MTRClusterLocalizationConfiguration : MTRGenericCluster
 /// Availability, a category of MTRClusterLocalizationConfiguration.
 public extern objc class MTRClusterLocalizationConfiguration
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -509,7 +398,6 @@ public extern objc class MTRClusterTimeFormatLocalization : MTRGenericCluster
 /// Availability, a category of MTRClusterTimeFormatLocalization.
 public extern objc class MTRClusterTimeFormatLocalization
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -528,7 +416,6 @@ public extern objc class MTRClusterUnitLocalization : MTRGenericCluster
 /// Availability, a category of MTRClusterUnitLocalization.
 public extern objc class MTRClusterUnitLocalization
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -545,7 +432,6 @@ public extern objc class MTRClusterPowerSourceConfiguration : MTRGenericCluster
 /// Availability, a category of MTRClusterPowerSourceConfiguration.
 public extern objc class MTRClusterPowerSourceConfiguration
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -582,7 +468,6 @@ public extern objc class MTRClusterPowerSource : MTRGenericCluster
     [Selector("readAttributeBatFunctionalWhileChargingWithParams:")] public NSDictionary? ReadAttributeBatFunctionalWhileChargingWithParams(MTRReadParams? params);
     [Selector("readAttributeBatChargingCurrentWithParams:")] public NSDictionary? ReadAttributeBatChargingCurrentWithParams(MTRReadParams? params);
     [Selector("readAttributeActiveBatChargeFaultsWithParams:")] public NSDictionary? ReadAttributeActiveBatChargeFaultsWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeEndpointListWithParams:")] public NSDictionary? ReadAttributeEndpointListWithParams(MTRReadParams? params);
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
@@ -594,7 +479,6 @@ public extern objc class MTRClusterPowerSource : MTRGenericCluster
 /// Availability, a category of MTRClusterPowerSource.
 public extern objc class MTRClusterPowerSource
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -608,13 +492,9 @@ public objc closure void MTRClusterGeneralCommissioningCommissioningCompleteWith
 
 public extern objc class MTRClusterGeneralCommissioning : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("armFailSafeWithParams:expectedValues:expectedValueInterval:completion:")] public void ArmFailSafeWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGeneralCommissioningClusterArmFailSafeParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGeneralCommissioningArmFailSafeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("setRegulatoryConfigWithParams:expectedValues:expectedValueInterval:completion:")] public void SetRegulatoryConfigWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGeneralCommissioningClusterSetRegulatoryConfigParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGeneralCommissioningSetRegulatoryConfigWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("commissioningCompleteWithParams:expectedValues:expectedValueInterval:completion:")] public void CommissioningCompleteWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGeneralCommissioningClusterCommissioningCompleteParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGeneralCommissioningCommissioningCompleteWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("commissioningCompleteWithExpectedValues:expectedValueInterval:completion:")] public void CommissioningCompleteWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterGeneralCommissioningCommissioningCompleteWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeBreadcrumbWithParams:")] public NSDictionary? ReadAttributeBreadcrumbWithParams(MTRReadParams? params);
     [Selector("writeAttributeBreadcrumbWithValue:expectedValueInterval:")] public void WriteAttributeBreadcrumbWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
@@ -633,7 +513,6 @@ public extern objc class MTRClusterGeneralCommissioning : MTRGenericCluster
 /// Availability, a category of MTRClusterGeneralCommissioning.
 public extern objc class MTRClusterGeneralCommissioning
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -653,19 +532,12 @@ public objc closure void MTRClusterNetworkCommissioningReorderNetworkWithParamsE
 
 public extern objc class MTRClusterNetworkCommissioning : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("scanNetworksWithParams:expectedValues:expectedValueInterval:completion:")] public void ScanNetworksWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRNetworkCommissioningClusterScanNetworksParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterNetworkCommissioningScanNetworksWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("scanNetworksWithExpectedValues:expectedValueInterval:completion:")] public void ScanNetworksWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterNetworkCommissioningScanNetworksWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("addOrUpdateWiFiNetworkWithParams:expectedValues:expectedValueInterval:completion:")] public void AddOrUpdateWiFiNetworkWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterNetworkCommissioningAddOrUpdateWiFiNetworkWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("addOrUpdateThreadNetworkWithParams:expectedValues:expectedValueInterval:completion:")] public void AddOrUpdateThreadNetworkWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterNetworkCommissioningAddOrUpdateThreadNetworkWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("removeNetworkWithParams:expectedValues:expectedValueInterval:completion:")] public void RemoveNetworkWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRNetworkCommissioningClusterRemoveNetworkParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterNetworkCommissioningRemoveNetworkWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("connectNetworkWithParams:expectedValues:expectedValueInterval:completion:")] public void ConnectNetworkWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRNetworkCommissioningClusterConnectNetworkParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterNetworkCommissioningConnectNetworkWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("reorderNetworkWithParams:expectedValues:expectedValueInterval:completion:")] public void ReorderNetworkWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRNetworkCommissioningClusterReorderNetworkParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterNetworkCommissioningReorderNetworkWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeMaxNetworksWithParams:")] public NSDictionary? ReadAttributeMaxNetworksWithParams(MTRReadParams? params);
     [Selector("readAttributeNetworksWithParams:")] public NSDictionary? ReadAttributeNetworksWithParams(MTRReadParams? params);
@@ -693,7 +565,6 @@ public extern objc class MTRClusterNetworkCommissioning : MTRGenericCluster
 /// Availability, a category of MTRClusterNetworkCommissioning.
 public extern objc class MTRClusterNetworkCommissioning
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -701,7 +572,6 @@ public objc closure void MTRClusterDiagnosticLogsRetrieveLogsRequestWithParamsEx
 
 public extern objc class MTRClusterDiagnosticLogs : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("retrieveLogsRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void RetrieveLogsRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDiagnosticLogsClusterRetrieveLogsRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterDiagnosticLogsRetrieveLogsRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
@@ -713,7 +583,6 @@ public extern objc class MTRClusterDiagnosticLogs : MTRGenericCluster
 /// Availability, a category of MTRClusterDiagnosticLogs.
 public extern objc class MTRClusterDiagnosticLogs
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -725,7 +594,6 @@ public objc closure void MTRClusterGeneralDiagnosticsPayloadTestRequestWithParam
 
 public extern objc class MTRClusterGeneralDiagnostics : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("testEventTriggerWithParams:expectedValues:expectedValueInterval:completion:")] public void TestEventTriggerWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGeneralDiagnosticsClusterTestEventTriggerParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     /// macOS 15.4 and later.
     [Selector("timeSnapshotWithParams:expectedValues:expectedValueInterval:completion:")] public void TimeSnapshotWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGeneralDiagnosticsClusterTimeSnapshotParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGeneralDiagnosticsTimeSnapshotWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
@@ -737,7 +605,6 @@ public extern objc class MTRClusterGeneralDiagnostics : MTRGenericCluster
     [Selector("readAttributeRebootCountWithParams:")] public NSDictionary? ReadAttributeRebootCountWithParams(MTRReadParams? params);
     [Selector("readAttributeUpTimeWithParams:")] public NSDictionary? ReadAttributeUpTimeWithParams(MTRReadParams? params);
     [Selector("readAttributeTotalOperationalHoursWithParams:")] public NSDictionary? ReadAttributeTotalOperationalHoursWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeBootReasonWithParams:")] public NSDictionary? ReadAttributeBootReasonWithParams(MTRReadParams? params);
     [Selector("readAttributeActiveHardwareFaultsWithParams:")] public NSDictionary? ReadAttributeActiveHardwareFaultsWithParams(MTRReadParams? params);
     [Selector("readAttributeActiveRadioFaultsWithParams:")] public NSDictionary? ReadAttributeActiveRadioFaultsWithParams(MTRReadParams? params);
@@ -753,15 +620,12 @@ public extern objc class MTRClusterGeneralDiagnostics : MTRGenericCluster
 /// Availability, a category of MTRClusterGeneralDiagnostics.
 public extern objc class MTRClusterGeneralDiagnostics
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterSoftwareDiagnostics : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("resetWatermarksWithParams:expectedValues:expectedValueInterval:completion:")] public void ResetWatermarksWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRSoftwareDiagnosticsClusterResetWatermarksParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("resetWatermarksWithExpectedValues:expectedValueInterval:completion:")] public void ResetWatermarksWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeThreadMetricsWithParams:")] public NSDictionary? ReadAttributeThreadMetricsWithParams(MTRReadParams? params);
     [Selector("readAttributeCurrentHeapFreeWithParams:")] public NSDictionary? ReadAttributeCurrentHeapFreeWithParams(MTRReadParams? params);
@@ -777,15 +641,12 @@ public extern objc class MTRClusterSoftwareDiagnostics : MTRGenericCluster
 /// Availability, a category of MTRClusterSoftwareDiagnostics.
 public extern objc class MTRClusterSoftwareDiagnostics
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterThreadNetworkDiagnostics : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("resetCountsWithParams:expectedValues:expectedValueInterval:completion:")] public void ResetCountsWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRThreadNetworkDiagnosticsClusterResetCountsParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("resetCountsWithExpectedValues:expectedValueInterval:completion:")] public void ResetCountsWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeChannelWithParams:")] public NSDictionary? ReadAttributeChannelWithParams(MTRReadParams? params);
     [Selector("readAttributeRoutingRoleWithParams:")] public NSDictionary? ReadAttributeRoutingRoleWithParams(MTRReadParams? params);
@@ -794,9 +655,7 @@ public extern objc class MTRClusterThreadNetworkDiagnostics : MTRGenericCluster
     [Selector("readAttributeExtendedPanIdWithParams:")] public NSDictionary? ReadAttributeExtendedPanIdWithParams(MTRReadParams? params);
     [Selector("readAttributeMeshLocalPrefixWithParams:")] public NSDictionary? ReadAttributeMeshLocalPrefixWithParams(MTRReadParams? params);
     [Selector("readAttributeOverrunCountWithParams:")] public NSDictionary? ReadAttributeOverrunCountWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNeighborTableWithParams:")] public NSDictionary? ReadAttributeNeighborTableWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeRouteTableWithParams:")] public NSDictionary? ReadAttributeRouteTableWithParams(MTRReadParams? params);
     [Selector("readAttributePartitionIdWithParams:")] public NSDictionary? ReadAttributePartitionIdWithParams(MTRReadParams? params);
     [Selector("readAttributeWeightingWithParams:")] public NSDictionary? ReadAttributeWeightingWithParams(MTRReadParams? params);
@@ -862,22 +721,17 @@ public extern objc class MTRClusterThreadNetworkDiagnostics : MTRGenericCluster
 /// Availability, a category of MTRClusterThreadNetworkDiagnostics.
 public extern objc class MTRClusterThreadNetworkDiagnostics
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterWiFiNetworkDiagnostics : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("resetCountsWithParams:expectedValues:expectedValueInterval:completion:")] public void ResetCountsWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWiFiNetworkDiagnosticsClusterResetCountsParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("resetCountsWithExpectedValues:expectedValueInterval:completion:")] public void ResetCountsWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("readAttributeBSSIDWithParams:")] public NSDictionary? ReadAttributeBSSIDWithParams(MTRReadParams? params);
     [Selector("readAttributeSecurityTypeWithParams:")] public NSDictionary? ReadAttributeSecurityTypeWithParams(MTRReadParams? params);
     [Selector("readAttributeWiFiVersionWithParams:")] public NSDictionary? ReadAttributeWiFiVersionWithParams(MTRReadParams? params);
     [Selector("readAttributeChannelNumberWithParams:")] public NSDictionary? ReadAttributeChannelNumberWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeRSSIWithParams:")] public NSDictionary? ReadAttributeRSSIWithParams(MTRReadParams? params);
     [Selector("readAttributeBeaconLostCountWithParams:")] public NSDictionary? ReadAttributeBeaconLostCountWithParams(MTRReadParams? params);
     [Selector("readAttributeBeaconRxCountWithParams:")] public NSDictionary? ReadAttributeBeaconRxCountWithParams(MTRReadParams? params);
@@ -897,15 +751,12 @@ public extern objc class MTRClusterWiFiNetworkDiagnostics : MTRGenericCluster
 /// Availability, a category of MTRClusterWiFiNetworkDiagnostics.
 public extern objc class MTRClusterWiFiNetworkDiagnostics
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterEthernetNetworkDiagnostics : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("resetCountsWithParams:expectedValues:expectedValueInterval:completion:")] public void ResetCountsWithParamsExpectedValuesExpectedValueIntervalCompletion(MTREthernetNetworkDiagnosticsClusterResetCountsParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("resetCountsWithExpectedValues:expectedValueInterval:completion:")] public void ResetCountsWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributePHYRateWithParams:")] public NSDictionary? ReadAttributePHYRateWithParams(MTRReadParams? params);
     [Selector("readAttributeFullDuplexWithParams:")] public NSDictionary? ReadAttributeFullDuplexWithParams(MTRReadParams? params);
@@ -926,7 +777,6 @@ public extern objc class MTRClusterEthernetNetworkDiagnostics : MTRGenericCluste
 /// Availability, a category of MTRClusterEthernetNetworkDiagnostics.
 public extern objc class MTRClusterEthernetNetworkDiagnostics
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -990,65 +840,40 @@ public extern objc class MTRClusterTimeSynchronization
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterBridgedDeviceBasicInformation : MTRGenericCluster
 {
     /// macOS 15.4 and later.
     [Selector("keepActiveWithParams:expectedValues:expectedValueInterval:completion:")] public void KeepActiveWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRBridgedDeviceBasicInformationClusterKeepActiveParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("readAttributeVendorNameWithParams:")] public NSDictionary? ReadAttributeVendorNameWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeVendorIDWithParams:")] public NSDictionary? ReadAttributeVendorIDWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeProductNameWithParams:")] public NSDictionary? ReadAttributeProductNameWithParams(MTRReadParams? params);
     /// macOS 15.4 and later.
     [Selector("readAttributeProductIDWithParams:")] public NSDictionary? ReadAttributeProductIDWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNodeLabelWithParams:")] public NSDictionary? ReadAttributeNodeLabelWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNodeLabelWithValue:expectedValueInterval:")] public void WriteAttributeNodeLabelWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNodeLabelWithValue:expectedValueInterval:params:")] public void WriteAttributeNodeLabelWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeHardwareVersionWithParams:")] public NSDictionary? ReadAttributeHardwareVersionWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeHardwareVersionStringWithParams:")] public NSDictionary? ReadAttributeHardwareVersionStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeSoftwareVersionWithParams:")] public NSDictionary? ReadAttributeSoftwareVersionWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeSoftwareVersionStringWithParams:")] public NSDictionary? ReadAttributeSoftwareVersionStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeManufacturingDateWithParams:")] public NSDictionary? ReadAttributeManufacturingDateWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributePartNumberWithParams:")] public NSDictionary? ReadAttributePartNumberWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeProductURLWithParams:")] public NSDictionary? ReadAttributeProductURLWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeProductLabelWithParams:")] public NSDictionary? ReadAttributeProductLabelWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeSerialNumberWithParams:")] public NSDictionary? ReadAttributeSerialNumberWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeReachableWithParams:")] public NSDictionary? ReadAttributeReachableWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeUniqueIDWithParams:")] public NSDictionary? ReadAttributeUniqueIDWithParams(MTRReadParams? params);
-    /// macOS 14.0 and later.
     [Selector("readAttributeProductAppearanceWithParams:")] public NSDictionary? ReadAttributeProductAppearanceWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterBridgedDeviceBasicInformation.
 public extern objc class MTRClusterBridgedDeviceBasicInformation
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1067,19 +892,14 @@ public extern objc class MTRClusterSwitch : MTRGenericCluster
 /// Availability, a category of MTRClusterSwitch.
 public extern objc class MTRClusterSwitch
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterAdministratorCommissioning : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("openCommissioningWindowWithParams:expectedValues:expectedValueInterval:completion:")] public void OpenCommissioningWindowWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("openBasicCommissioningWindowWithParams:expectedValues:expectedValueInterval:completion:")] public void OpenBasicCommissioningWindowWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("revokeCommissioningWithParams:expectedValues:expectedValueInterval:completion:")] public void RevokeCommissioningWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAdministratorCommissioningClusterRevokeCommissioningParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("revokeCommissioningWithExpectedValues:expectedValueInterval:completion:")] public void RevokeCommissioningWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeWindowStatusWithParams:")] public NSDictionary? ReadAttributeWindowStatusWithParams(MTRReadParams? params);
     [Selector("readAttributeAdminFabricIndexWithParams:")] public NSDictionary? ReadAttributeAdminFabricIndexWithParams(MTRReadParams? params);
@@ -1094,7 +914,6 @@ public extern objc class MTRClusterAdministratorCommissioning : MTRGenericCluste
 /// Availability, a category of MTRClusterAdministratorCommissioning.
 public extern objc class MTRClusterAdministratorCommissioning
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1114,21 +933,13 @@ public objc closure void MTRClusterOperationalCredentialsRemoveFabricWithParamsE
 
 public extern objc class MTRClusterOperationalCredentials : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("attestationRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void AttestationRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterAttestationRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalCredentialsAttestationRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("certificateChainRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void CertificateChainRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterCertificateChainRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalCredentialsCertificateChainRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("CSRRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void CSRRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterCSRRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalCredentialsCSRRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("addNOCWithParams:expectedValues:expectedValueInterval:completion:")] public void AddNOCWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterAddNOCParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalCredentialsAddNOCWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("updateNOCWithParams:expectedValues:expectedValueInterval:completion:")] public void UpdateNOCWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterUpdateNOCParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalCredentialsUpdateNOCWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("updateFabricLabelWithParams:expectedValues:expectedValueInterval:completion:")] public void UpdateFabricLabelWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterUpdateFabricLabelParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalCredentialsUpdateFabricLabelWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("removeFabricWithParams:expectedValues:expectedValueInterval:completion:")] public void RemoveFabricWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterRemoveFabricParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalCredentialsRemoveFabricWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("addTrustedRootCertificateWithParams:expectedValues:expectedValueInterval:completion:")] public void AddTrustedRootCertificateWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalCredentialsClusterAddTrustedRootCertificateParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeNOCsWithParams:")] public NSDictionary? ReadAttributeNOCsWithParams(MTRReadParams? params);
     [Selector("readAttributeFabricsWithParams:")] public NSDictionary? ReadAttributeFabricsWithParams(MTRReadParams? params);
@@ -1146,7 +957,6 @@ public extern objc class MTRClusterOperationalCredentials : MTRGenericCluster
 /// Availability, a category of MTRClusterOperationalCredentials.
 public extern objc class MTRClusterOperationalCredentials
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1158,15 +968,10 @@ public objc closure void MTRClusterGroupKeyManagementKeySetReadAllIndicesWithExp
 
 public extern objc class MTRClusterGroupKeyManagement : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("keySetWriteWithParams:expectedValues:expectedValueInterval:completion:")] public void KeySetWriteWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupKeyManagementClusterKeySetWriteParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("keySetReadWithParams:expectedValues:expectedValueInterval:completion:")] public void KeySetReadWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupKeyManagementClusterKeySetReadParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGroupKeyManagementKeySetReadWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("keySetRemoveWithParams:expectedValues:expectedValueInterval:completion:")] public void KeySetRemoveWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupKeyManagementClusterKeySetRemoveParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("keySetReadAllIndicesWithParams:expectedValues:expectedValueInterval:completion:")] public void KeySetReadAllIndicesWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterGroupKeyManagementKeySetReadAllIndicesWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.0 and later.
     [Selector("keySetReadAllIndicesWithExpectedValues:expectedValueInterval:completion:")] public void KeySetReadAllIndicesWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterGroupKeyManagementKeySetReadAllIndicesWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeGroupKeyMapWithParams:")] public NSDictionary? ReadAttributeGroupKeyMapWithParams(MTRReadParams? params);
     [Selector("writeAttributeGroupKeyMapWithValue:expectedValueInterval:")] public void WriteAttributeGroupKeyMapWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
@@ -1184,7 +989,6 @@ public extern objc class MTRClusterGroupKeyManagement : MTRGenericCluster
 /// Availability, a category of MTRClusterGroupKeyManagement.
 public extern objc class MTRClusterGroupKeyManagement
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1201,7 +1005,6 @@ public extern objc class MTRClusterFixedLabel : MTRGenericCluster
 /// Availability, a category of MTRClusterFixedLabel.
 public extern objc class MTRClusterFixedLabel
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1220,7 +1023,6 @@ public extern objc class MTRClusterUserLabel : MTRGenericCluster
 /// Availability, a category of MTRClusterUserLabel.
 public extern objc class MTRClusterUserLabel
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1237,7 +1039,6 @@ public extern objc class MTRClusterBooleanState : MTRGenericCluster
 /// Availability, a category of MTRClusterBooleanState.
 public extern objc class MTRClusterBooleanState
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1405,7 +1206,6 @@ public extern objc class MTRClusterLaundryDryerControls
 
 public extern objc class MTRClusterModeSelect : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("changeToModeWithParams:expectedValues:expectedValueInterval:completion:")] public void ChangeToModeWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRModeSelectClusterChangeToModeParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeDescriptionWithParams:")] public NSDictionary? ReadAttributeDescriptionWithParams(MTRReadParams? params);
     [Selector("readAttributeStandardNamespaceWithParams:")] public NSDictionary? ReadAttributeStandardNamespaceWithParams(MTRReadParams? params);
@@ -1427,7 +1227,6 @@ public extern objc class MTRClusterModeSelect : MTRGenericCluster
 /// Availability, a category of MTRClusterModeSelect.
 public extern objc class MTRClusterModeSelect
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1531,61 +1330,41 @@ public extern objc class MTRClusterLaundryWasherControls
 
 public objc closure void MTRClusterRVCRunModeChangeToModeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock(MTRRVCRunModeClusterChangeToModeResponseParams? arg0, NSError? arg1);
 
-/// macOS 14.4 and later.
 public extern objc class MTRClusterRVCRunMode : MTRGenericCluster
 {
-    /// macOS 14.4 and later.
     [Selector("changeToModeWithParams:expectedValues:expectedValueInterval:completion:")] public void ChangeToModeWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRRVCRunModeClusterChangeToModeParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterRVCRunModeChangeToModeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("readAttributeSupportedModesWithParams:")] public NSDictionary? ReadAttributeSupportedModesWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeCurrentModeWithParams:")] public NSDictionary? ReadAttributeCurrentModeWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterRVCRunMode.
 public extern objc class MTRClusterRVCRunMode
 {
-    /// macOS 14.4 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public objc closure void MTRClusterRVCCleanModeChangeToModeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock(MTRRVCCleanModeClusterChangeToModeResponseParams? arg0, NSError? arg1);
 
-/// macOS 14.4 and later.
 public extern objc class MTRClusterRVCCleanMode : MTRGenericCluster
 {
-    /// macOS 14.4 and later.
     [Selector("changeToModeWithParams:expectedValues:expectedValueInterval:completion:")] public void ChangeToModeWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRRVCCleanModeClusterChangeToModeParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterRVCCleanModeChangeToModeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("readAttributeSupportedModesWithParams:")] public NSDictionary? ReadAttributeSupportedModesWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeCurrentModeWithParams:")] public NSDictionary? ReadAttributeCurrentModeWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterRVCCleanMode.
 public extern objc class MTRClusterRVCCleanMode
 {
-    /// macOS 14.4 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1685,83 +1464,51 @@ public extern objc class MTRClusterDishwasherMode
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterAirQuality : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeAirQualityWithParams:")] public NSDictionary? ReadAttributeAirQualityWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterAirQuality.
 public extern objc class MTRClusterAirQuality
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterSmokeCOAlarm : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("selfTestRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void SelfTestRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRSmokeCOAlarmClusterSelfTestRequestParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("selfTestRequestWithExpectedValues:expectedValueInterval:completion:")] public void SelfTestRequestWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("readAttributeExpressedStateWithParams:")] public NSDictionary? ReadAttributeExpressedStateWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeSmokeStateWithParams:")] public NSDictionary? ReadAttributeSmokeStateWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeCOStateWithParams:")] public NSDictionary? ReadAttributeCOStateWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeBatteryAlertWithParams:")] public NSDictionary? ReadAttributeBatteryAlertWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeDeviceMutedWithParams:")] public NSDictionary? ReadAttributeDeviceMutedWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeTestInProgressWithParams:")] public NSDictionary? ReadAttributeTestInProgressWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeHardwareFaultAlertWithParams:")] public NSDictionary? ReadAttributeHardwareFaultAlertWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeEndOfServiceAlertWithParams:")] public NSDictionary? ReadAttributeEndOfServiceAlertWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeInterconnectSmokeAlarmWithParams:")] public NSDictionary? ReadAttributeInterconnectSmokeAlarmWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeInterconnectCOAlarmWithParams:")] public NSDictionary? ReadAttributeInterconnectCOAlarmWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeContaminationStateWithParams:")] public NSDictionary? ReadAttributeContaminationStateWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeSmokeSensitivityLevelWithParams:")] public NSDictionary? ReadAttributeSmokeSensitivityLevelWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeSmokeSensitivityLevelWithValue:expectedValueInterval:")] public void WriteAttributeSmokeSensitivityLevelWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeSmokeSensitivityLevelWithValue:expectedValueInterval:params:")] public void WriteAttributeSmokeSensitivityLevelWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeExpiryDateWithParams:")] public NSDictionary? ReadAttributeExpiryDateWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterSmokeCOAlarm.
 public extern objc class MTRClusterSmokeCOAlarm
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1883,53 +1630,32 @@ public objc closure void MTRClusterOperationalStateResumeWithParamsExpectedValue
 
 public objc closure void MTRClusterOperationalStateResumeWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock(MTROperationalStateClusterOperationalCommandResponseParams? arg0, NSError? arg1);
 
-/// macOS 14.4 and later.
 public extern objc class MTRClusterOperationalState : MTRGenericCluster
 {
-    /// macOS 14.4 and later.
     [Selector("pauseWithParams:expectedValues:expectedValueInterval:completion:")] public void PauseWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalStateClusterPauseParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStatePauseWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("pauseWithExpectedValues:expectedValueInterval:completion:")] public void PauseWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStatePauseWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("stopWithParams:expectedValues:expectedValueInterval:completion:")] public void StopWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalStateClusterStopParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStateStopWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("stopWithExpectedValues:expectedValueInterval:completion:")] public void StopWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStateStopWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("startWithParams:expectedValues:expectedValueInterval:completion:")] public void StartWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalStateClusterStartParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStateStartWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("startWithExpectedValues:expectedValueInterval:completion:")] public void StartWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStateStartWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("resumeWithParams:expectedValues:expectedValueInterval:completion:")] public void ResumeWithParamsExpectedValuesExpectedValueIntervalCompletion(MTROperationalStateClusterResumeParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStateResumeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("resumeWithExpectedValues:expectedValueInterval:completion:")] public void ResumeWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterOperationalStateResumeWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("readAttributePhaseListWithParams:")] public NSDictionary? ReadAttributePhaseListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeCurrentPhaseWithParams:")] public NSDictionary? ReadAttributeCurrentPhaseWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeCountdownTimeWithParams:")] public NSDictionary? ReadAttributeCountdownTimeWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeOperationalStateListWithParams:")] public NSDictionary? ReadAttributeOperationalStateListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeOperationalStateWithParams:")] public NSDictionary? ReadAttributeOperationalStateWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeOperationalErrorWithParams:")] public NSDictionary? ReadAttributeOperationalErrorWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterOperationalState.
 public extern objc class MTRClusterOperationalState
 {
-    /// macOS 14.4 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -1945,333 +1671,198 @@ public objc closure void MTRClusterRVCOperationalStateGoHomeWithParamsExpectedVa
 
 public objc closure void MTRClusterRVCOperationalStateGoHomeWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock(MTRRVCOperationalStateClusterOperationalCommandResponseParams? arg0, NSError? arg1);
 
-/// macOS 14.4 and later.
 public extern objc class MTRClusterRVCOperationalState : MTRGenericCluster
 {
-    /// macOS 14.4 and later.
     [Selector("pauseWithParams:expectedValues:expectedValueInterval:completion:")] public void PauseWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRRVCOperationalStateClusterPauseParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterRVCOperationalStatePauseWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("pauseWithExpectedValues:expectedValueInterval:completion:")] public void PauseWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterRVCOperationalStatePauseWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("resumeWithParams:expectedValues:expectedValueInterval:completion:")] public void ResumeWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRRVCOperationalStateClusterResumeParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterRVCOperationalStateResumeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("resumeWithExpectedValues:expectedValueInterval:completion:")] public void ResumeWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterRVCOperationalStateResumeWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     /// macOS 15.4 and later.
     [Selector("goHomeWithParams:expectedValues:expectedValueInterval:completion:")] public void GoHomeWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRRVCOperationalStateClusterGoHomeParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterRVCOperationalStateGoHomeWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     /// macOS 15.4 and later.
     [Selector("goHomeWithExpectedValues:expectedValueInterval:completion:")] public void GoHomeWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterRVCOperationalStateGoHomeWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("readAttributePhaseListWithParams:")] public NSDictionary? ReadAttributePhaseListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeCurrentPhaseWithParams:")] public NSDictionary? ReadAttributeCurrentPhaseWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeCountdownTimeWithParams:")] public NSDictionary? ReadAttributeCountdownTimeWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeOperationalStateListWithParams:")] public NSDictionary? ReadAttributeOperationalStateListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeOperationalStateWithParams:")] public NSDictionary? ReadAttributeOperationalStateWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeOperationalErrorWithParams:")] public NSDictionary? ReadAttributeOperationalErrorWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.4 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterRVCOperationalState.
 public extern objc class MTRClusterRVCOperationalState
 {
-    /// macOS 14.4 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterHEPAFilterMonitoring : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("resetConditionWithParams:expectedValues:expectedValueInterval:completion:")] public void ResetConditionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRHEPAFilterMonitoringClusterResetConditionParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("resetConditionWithExpectedValues:expectedValueInterval:completion:")] public void ResetConditionWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("readAttributeConditionWithParams:")] public NSDictionary? ReadAttributeConditionWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeDegradationDirectionWithParams:")] public NSDictionary? ReadAttributeDegradationDirectionWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeChangeIndicationWithParams:")] public NSDictionary? ReadAttributeChangeIndicationWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeInPlaceIndicatorWithParams:")] public NSDictionary? ReadAttributeInPlaceIndicatorWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLastChangedTimeWithParams:")] public NSDictionary? ReadAttributeLastChangedTimeWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeLastChangedTimeWithValue:expectedValueInterval:")] public void WriteAttributeLastChangedTimeWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeLastChangedTimeWithValue:expectedValueInterval:params:")] public void WriteAttributeLastChangedTimeWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeReplacementProductListWithParams:")] public NSDictionary? ReadAttributeReplacementProductListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterHEPAFilterMonitoring.
 public extern objc class MTRClusterHEPAFilterMonitoring
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterActivatedCarbonFilterMonitoring : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("resetConditionWithParams:expectedValues:expectedValueInterval:completion:")] public void ResetConditionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRActivatedCarbonFilterMonitoringClusterResetConditionParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("resetConditionWithExpectedValues:expectedValueInterval:completion:")] public void ResetConditionWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("readAttributeConditionWithParams:")] public NSDictionary? ReadAttributeConditionWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeDegradationDirectionWithParams:")] public NSDictionary? ReadAttributeDegradationDirectionWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeChangeIndicationWithParams:")] public NSDictionary? ReadAttributeChangeIndicationWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeInPlaceIndicatorWithParams:")] public NSDictionary? ReadAttributeInPlaceIndicatorWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLastChangedTimeWithParams:")] public NSDictionary? ReadAttributeLastChangedTimeWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeLastChangedTimeWithValue:expectedValueInterval:")] public void WriteAttributeLastChangedTimeWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeLastChangedTimeWithValue:expectedValueInterval:params:")] public void WriteAttributeLastChangedTimeWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeReplacementProductListWithParams:")] public NSDictionary? ReadAttributeReplacementProductListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterActivatedCarbonFilterMonitoring.
 public extern objc class MTRClusterActivatedCarbonFilterMonitoring
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterBooleanStateConfiguration : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("suppressAlarmWithParams:expectedValues:expectedValueInterval:completion:")] public void SuppressAlarmWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRBooleanStateConfigurationClusterSuppressAlarmParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("enableDisableAlarmWithParams:expectedValues:expectedValueInterval:completion:")] public void EnableDisableAlarmWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRBooleanStateConfigurationClusterEnableDisableAlarmParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("readAttributeCurrentSensitivityLevelWithParams:")] public NSDictionary? ReadAttributeCurrentSensitivityLevelWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeCurrentSensitivityLevelWithValue:expectedValueInterval:")] public void WriteAttributeCurrentSensitivityLevelWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeCurrentSensitivityLevelWithValue:expectedValueInterval:params:")] public void WriteAttributeCurrentSensitivityLevelWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeSupportedSensitivityLevelsWithParams:")] public NSDictionary? ReadAttributeSupportedSensitivityLevelsWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeDefaultSensitivityLevelWithParams:")] public NSDictionary? ReadAttributeDefaultSensitivityLevelWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAlarmsActiveWithParams:")] public NSDictionary? ReadAttributeAlarmsActiveWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAlarmsSuppressedWithParams:")] public NSDictionary? ReadAttributeAlarmsSuppressedWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAlarmsEnabledWithParams:")] public NSDictionary? ReadAttributeAlarmsEnabledWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAlarmsSupportedWithParams:")] public NSDictionary? ReadAttributeAlarmsSupportedWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeSensorFaultWithParams:")] public NSDictionary? ReadAttributeSensorFaultWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterBooleanStateConfiguration.
 public extern objc class MTRClusterBooleanStateConfiguration
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterValveConfigurationAndControl : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("openWithParams:expectedValues:expectedValueInterval:completion:")] public void OpenWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRValveConfigurationAndControlClusterOpenParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("openWithExpectedValues:expectedValueInterval:completion:")] public void OpenWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("closeWithParams:expectedValues:expectedValueInterval:completion:")] public void CloseWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRValveConfigurationAndControlClusterCloseParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("closeWithExpectedValues:expectedValueInterval:completion:")] public void CloseWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.6 and later.
     [Selector("readAttributeOpenDurationWithParams:")] public NSDictionary? ReadAttributeOpenDurationWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeDefaultOpenDurationWithParams:")] public NSDictionary? ReadAttributeDefaultOpenDurationWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeDefaultOpenDurationWithValue:expectedValueInterval:")] public void WriteAttributeDefaultOpenDurationWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeDefaultOpenDurationWithValue:expectedValueInterval:params:")] public void WriteAttributeDefaultOpenDurationWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAutoCloseTimeWithParams:")] public NSDictionary? ReadAttributeAutoCloseTimeWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeRemainingDurationWithParams:")] public NSDictionary? ReadAttributeRemainingDurationWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeCurrentStateWithParams:")] public NSDictionary? ReadAttributeCurrentStateWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeTargetStateWithParams:")] public NSDictionary? ReadAttributeTargetStateWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeCurrentLevelWithParams:")] public NSDictionary? ReadAttributeCurrentLevelWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeTargetLevelWithParams:")] public NSDictionary? ReadAttributeTargetLevelWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeDefaultOpenLevelWithParams:")] public NSDictionary? ReadAttributeDefaultOpenLevelWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeDefaultOpenLevelWithValue:expectedValueInterval:")] public void WriteAttributeDefaultOpenLevelWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeDefaultOpenLevelWithValue:expectedValueInterval:params:")] public void WriteAttributeDefaultOpenLevelWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeValveFaultWithParams:")] public NSDictionary? ReadAttributeValveFaultWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelStepWithParams:")] public NSDictionary? ReadAttributeLevelStepWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterValveConfigurationAndControl.
 public extern objc class MTRClusterValveConfigurationAndControl
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterElectricalPowerMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributePowerModeWithParams:")] public NSDictionary? ReadAttributePowerModeWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeNumberOfMeasurementTypesWithParams:")] public NSDictionary? ReadAttributeNumberOfMeasurementTypesWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAccuracyWithParams:")] public NSDictionary? ReadAttributeAccuracyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeRangesWithParams:")] public NSDictionary? ReadAttributeRangesWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeVoltageWithParams:")] public NSDictionary? ReadAttributeVoltageWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeActiveCurrentWithParams:")] public NSDictionary? ReadAttributeActiveCurrentWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeReactiveCurrentWithParams:")] public NSDictionary? ReadAttributeReactiveCurrentWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeApparentCurrentWithParams:")] public NSDictionary? ReadAttributeApparentCurrentWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeActivePowerWithParams:")] public NSDictionary? ReadAttributeActivePowerWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeReactivePowerWithParams:")] public NSDictionary? ReadAttributeReactivePowerWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeApparentPowerWithParams:")] public NSDictionary? ReadAttributeApparentPowerWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeRMSVoltageWithParams:")] public NSDictionary? ReadAttributeRMSVoltageWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeRMSCurrentWithParams:")] public NSDictionary? ReadAttributeRMSCurrentWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeRMSPowerWithParams:")] public NSDictionary? ReadAttributeRMSPowerWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFrequencyWithParams:")] public NSDictionary? ReadAttributeFrequencyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeHarmonicCurrentsWithParams:")] public NSDictionary? ReadAttributeHarmonicCurrentsWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeHarmonicPhasesWithParams:")] public NSDictionary? ReadAttributeHarmonicPhasesWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePowerFactorWithParams:")] public NSDictionary? ReadAttributePowerFactorWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeNeutralCurrentWithParams:")] public NSDictionary? ReadAttributeNeutralCurrentWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterElectricalPowerMeasurement.
 public extern objc class MTRClusterElectricalPowerMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterElectricalEnergyMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeAccuracyWithParams:")] public NSDictionary? ReadAttributeAccuracyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeCumulativeEnergyImportedWithParams:")] public NSDictionary? ReadAttributeCumulativeEnergyImportedWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeCumulativeEnergyExportedWithParams:")] public NSDictionary? ReadAttributeCumulativeEnergyExportedWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeriodicEnergyImportedWithParams:")] public NSDictionary? ReadAttributePeriodicEnergyImportedWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeriodicEnergyExportedWithParams:")] public NSDictionary? ReadAttributePeriodicEnergyExportedWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeCumulativeEnergyResetWithParams:")] public NSDictionary? ReadAttributeCumulativeEnergyResetWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterElectricalEnergyMeasurement.
 public extern objc class MTRClusterElectricalEnergyMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -2627,45 +2218,25 @@ public objc closure void MTRClusterDoorLockGetCredentialStatusWithParamsExpected
 
 public extern objc class MTRClusterDoorLock : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("lockDoorWithParams:expectedValues:expectedValueInterval:completion:")] public void LockDoorWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterLockDoorParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.4 and later.
     [Selector("lockDoorWithExpectedValues:expectedValueInterval:completion:")] public void LockDoorWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("unlockDoorWithParams:expectedValues:expectedValueInterval:completion:")] public void UnlockDoorWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterUnlockDoorParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.4 and later.
     [Selector("unlockDoorWithExpectedValues:expectedValueInterval:completion:")] public void UnlockDoorWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("unlockWithTimeoutWithParams:expectedValues:expectedValueInterval:completion:")] public void UnlockWithTimeoutWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterUnlockWithTimeoutParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("setWeekDayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void SetWeekDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterSetWeekDayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("getWeekDayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void GetWeekDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterGetWeekDayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterDoorLockGetWeekDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("clearWeekDayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void ClearWeekDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterClearWeekDayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("setYearDayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void SetYearDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterSetYearDayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("getYearDayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void GetYearDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterGetYearDayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterDoorLockGetYearDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("clearYearDayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void ClearYearDayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterClearYearDayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("setHolidayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void SetHolidayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterSetHolidayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("getHolidayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void GetHolidayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterGetHolidayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterDoorLockGetHolidayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("clearHolidayScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void ClearHolidayScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterClearHolidayScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("setUserWithParams:expectedValues:expectedValueInterval:completion:")] public void SetUserWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterSetUserParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("getUserWithParams:expectedValues:expectedValueInterval:completion:")] public void GetUserWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterGetUserParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterDoorLockGetUserWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("clearUserWithParams:expectedValues:expectedValueInterval:completion:")] public void ClearUserWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterClearUserParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("setCredentialWithParams:expectedValues:expectedValueInterval:completion:")] public void SetCredentialWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterSetCredentialParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterDoorLockSetCredentialWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("getCredentialStatusWithParams:expectedValues:expectedValueInterval:completion:")] public void GetCredentialStatusWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterGetCredentialStatusParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterDoorLockGetCredentialStatusWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("clearCredentialWithParams:expectedValues:expectedValueInterval:completion:")] public void ClearCredentialWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterClearCredentialParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     /// macOS 15.4 and later.
     [Selector("unboltDoorWithParams:expectedValues:expectedValueInterval:completion:")] public void UnboltDoorWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRDoorLockClusterUnboltDoorParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
@@ -2777,31 +2348,20 @@ public extern objc class MTRClusterDoorLock : MTRGenericCluster
 /// Availability, a category of MTRClusterDoorLock.
 public extern objc class MTRClusterDoorLock
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterWindowCovering : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("upOrOpenWithParams:expectedValues:expectedValueInterval:completion:")] public void UpOrOpenWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWindowCoveringClusterUpOrOpenParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("upOrOpenWithExpectedValues:expectedValueInterval:completion:")] public void UpOrOpenWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("downOrCloseWithParams:expectedValues:expectedValueInterval:completion:")] public void DownOrCloseWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWindowCoveringClusterDownOrCloseParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("downOrCloseWithExpectedValues:expectedValueInterval:completion:")] public void DownOrCloseWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stopMotionWithParams:expectedValues:expectedValueInterval:completion:")] public void StopMotionWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWindowCoveringClusterStopMotionParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stopMotionWithExpectedValues:expectedValueInterval:completion:")] public void StopMotionWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("goToLiftValueWithParams:expectedValues:expectedValueInterval:completion:")] public void GoToLiftValueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWindowCoveringClusterGoToLiftValueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("goToLiftPercentageWithParams:expectedValues:expectedValueInterval:completion:")] public void GoToLiftPercentageWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWindowCoveringClusterGoToLiftPercentageParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("goToTiltValueWithParams:expectedValues:expectedValueInterval:completion:")] public void GoToTiltValueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWindowCoveringClusterGoToTiltValueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("goToTiltPercentageWithParams:expectedValues:expectedValueInterval:completion:")] public void GoToTiltPercentageWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRWindowCoveringClusterGoToTiltPercentageParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeTypeWithParams:")] public NSDictionary? ReadAttributeTypeWithParams(MTRReadParams? params);
     [Selector("readAttributePhysicalClosedLimitLiftWithParams:")] public NSDictionary? ReadAttributePhysicalClosedLimitLiftWithParams(MTRReadParams? params);
@@ -2837,7 +2397,6 @@ public extern objc class MTRClusterWindowCovering : MTRGenericCluster
 /// Availability, a category of MTRClusterWindowCovering.
 public extern objc class MTRClusterWindowCovering
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -2926,7 +2485,6 @@ public extern objc class MTRClusterPumpConfigurationAndControl : MTRGenericClust
 /// Availability, a category of MTRClusterPumpConfigurationAndControl.
 public extern objc class MTRClusterPumpConfigurationAndControl
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -2936,15 +2494,10 @@ public objc closure void MTRClusterThermostatAtomicRequestWithParamsExpectedValu
 
 public extern objc class MTRClusterThermostat : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("setpointRaiseLowerWithParams:expectedValues:expectedValueInterval:completion:")] public void SetpointRaiseLowerWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRThermostatClusterSetpointRaiseLowerParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("setWeeklyScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void SetWeeklyScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRThermostatClusterSetWeeklyScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("getWeeklyScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void GetWeeklyScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRThermostatClusterGetWeeklyScheduleParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterThermostatGetWeeklyScheduleWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("clearWeeklyScheduleWithParams:expectedValues:expectedValueInterval:completion:")] public void ClearWeeklyScheduleWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRThermostatClusterClearWeeklyScheduleParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("clearWeeklyScheduleWithExpectedValues:expectedValueInterval:completion:")] public void ClearWeeklyScheduleWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     /// macOS 15.4 and later.
     [Selector("setActiveScheduleRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void SetActiveScheduleRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRThermostatClusterSetActiveScheduleRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
@@ -3095,13 +2648,11 @@ public extern objc class MTRClusterThermostat : MTRGenericCluster
 /// Availability, a category of MTRClusterThermostat.
 public extern objc class MTRClusterThermostat
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterFanControl : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("stepWithParams:expectedValues:expectedValueInterval:completion:")] public void StepWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRFanControlClusterStepParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeFanModeWithParams:")] public NSDictionary? ReadAttributeFanModeWithParams(MTRReadParams? params);
     [Selector("writeAttributeFanModeWithValue:expectedValueInterval:")] public void WriteAttributeFanModeWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
@@ -3126,11 +2677,8 @@ public extern objc class MTRClusterFanControl : MTRGenericCluster
     [Selector("readAttributeWindSettingWithParams:")] public NSDictionary? ReadAttributeWindSettingWithParams(MTRReadParams? params);
     [Selector("writeAttributeWindSettingWithValue:expectedValueInterval:")] public void WriteAttributeWindSettingWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
     [Selector("writeAttributeWindSettingWithValue:expectedValueInterval:params:")] public void WriteAttributeWindSettingWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAirflowDirectionWithParams:")] public NSDictionary? ReadAttributeAirflowDirectionWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeAirflowDirectionWithValue:expectedValueInterval:")] public void WriteAttributeAirflowDirectionWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 14.6 and later.
     [Selector("writeAttributeAirflowDirectionWithValue:expectedValueInterval:params:")] public void WriteAttributeAirflowDirectionWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
@@ -3142,7 +2690,6 @@ public extern objc class MTRClusterFanControl : MTRGenericCluster
 /// Availability, a category of MTRClusterFanControl.
 public extern objc class MTRClusterFanControl
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3167,49 +2714,29 @@ public extern objc class MTRClusterThermostatUserInterfaceConfiguration : MTRGen
 /// Availability, a category of MTRClusterThermostatUserInterfaceConfiguration.
 public extern objc class MTRClusterThermostatUserInterfaceConfiguration
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterColorControl : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("moveToHueWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToHueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveToHueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveHueWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveHueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveHueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stepHueWithParams:expectedValues:expectedValueInterval:completion:")] public void StepHueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterStepHueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveToSaturationWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToSaturationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveToSaturationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveSaturationWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveSaturationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveSaturationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stepSaturationWithParams:expectedValues:expectedValueInterval:completion:")] public void StepSaturationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterStepSaturationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveToHueAndSaturationWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToHueAndSaturationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveToHueAndSaturationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveToColorWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToColorWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveToColorParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveColorWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveColorWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveColorParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stepColorWithParams:expectedValues:expectedValueInterval:completion:")] public void StepColorWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterStepColorParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveToColorTemperatureWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveToColorTemperatureWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveToColorTemperatureParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("enhancedMoveToHueWithParams:expectedValues:expectedValueInterval:completion:")] public void EnhancedMoveToHueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterEnhancedMoveToHueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("enhancedMoveHueWithParams:expectedValues:expectedValueInterval:completion:")] public void EnhancedMoveHueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterEnhancedMoveHueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("enhancedStepHueWithParams:expectedValues:expectedValueInterval:completion:")] public void EnhancedStepHueWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterEnhancedStepHueParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("enhancedMoveToHueAndSaturationWithParams:expectedValues:expectedValueInterval:completion:")] public void EnhancedMoveToHueAndSaturationWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("colorLoopSetWithParams:expectedValues:expectedValueInterval:completion:")] public void ColorLoopSetWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterColorLoopSetParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stopMoveStepWithParams:expectedValues:expectedValueInterval:completion:")] public void StopMoveStepWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterStopMoveStepParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("moveColorTemperatureWithParams:expectedValues:expectedValueInterval:completion:")] public void MoveColorTemperatureWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterMoveColorTemperatureParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("stepColorTemperatureWithParams:expectedValues:expectedValueInterval:completion:")] public void StepColorTemperatureWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRColorControlClusterStepColorTemperatureParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeCurrentHueWithParams:")] public NSDictionary? ReadAttributeCurrentHueWithParams(MTRReadParams? params);
     [Selector("readAttributeCurrentSaturationWithParams:")] public NSDictionary? ReadAttributeCurrentSaturationWithParams(MTRReadParams? params);
@@ -3277,7 +2804,6 @@ public extern objc class MTRClusterColorControl : MTRGenericCluster
 /// Availability, a category of MTRClusterColorControl.
 public extern objc class MTRClusterColorControl
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3292,11 +2818,8 @@ public extern objc class MTRClusterBallastConfiguration : MTRGenericCluster
     [Selector("readAttributeMaxLevelWithParams:")] public NSDictionary? ReadAttributeMaxLevelWithParams(MTRReadParams? params);
     [Selector("writeAttributeMaxLevelWithValue:expectedValueInterval:")] public void WriteAttributeMaxLevelWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
     [Selector("writeAttributeMaxLevelWithValue:expectedValueInterval:params:")] public void WriteAttributeMaxLevelWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeIntrinsicBallastFactorWithParams:")] public NSDictionary? ReadAttributeIntrinsicBallastFactorWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeIntrinsicBallastFactorWithValue:expectedValueInterval:")] public void WriteAttributeIntrinsicBallastFactorWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeIntrinsicBallastFactorWithValue:expectedValueInterval:params:")] public void WriteAttributeIntrinsicBallastFactorWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
     [Selector("readAttributeBallastFactorAdjustmentWithParams:")] public NSDictionary? ReadAttributeBallastFactorAdjustmentWithParams(MTRReadParams? params);
     [Selector("writeAttributeBallastFactorAdjustmentWithValue:expectedValueInterval:")] public void WriteAttributeBallastFactorAdjustmentWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
@@ -3330,7 +2853,6 @@ public extern objc class MTRClusterBallastConfiguration : MTRGenericCluster
 /// Availability, a category of MTRClusterBallastConfiguration.
 public extern objc class MTRClusterBallastConfiguration
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3351,7 +2873,6 @@ public extern objc class MTRClusterIlluminanceMeasurement : MTRGenericCluster
 /// Availability, a category of MTRClusterIlluminanceMeasurement.
 public extern objc class MTRClusterIlluminanceMeasurement
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3371,7 +2892,6 @@ public extern objc class MTRClusterTemperatureMeasurement : MTRGenericCluster
 /// Availability, a category of MTRClusterTemperatureMeasurement.
 public extern objc class MTRClusterTemperatureMeasurement
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3396,7 +2916,6 @@ public extern objc class MTRClusterPressureMeasurement : MTRGenericCluster
 /// Availability, a category of MTRClusterPressureMeasurement.
 public extern objc class MTRClusterPressureMeasurement
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3416,7 +2935,6 @@ public extern objc class MTRClusterFlowMeasurement : MTRGenericCluster
 /// Availability, a category of MTRClusterFlowMeasurement.
 public extern objc class MTRClusterFlowMeasurement
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3436,7 +2954,6 @@ public extern objc class MTRClusterRelativeHumidityMeasurement : MTRGenericClust
 /// Availability, a category of MTRClusterRelativeHumidityMeasurement.
 public extern objc class MTRClusterRelativeHumidityMeasurement
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -3453,23 +2970,14 @@ public extern objc class MTRClusterOccupancySensing : MTRGenericCluster
     [Selector("writeAttributeHoldTimeWithValue:expectedValueInterval:params:")] public void WriteAttributeHoldTimeWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
     /// macOS 15.4 and later.
     [Selector("readAttributeHoldTimeLimitsWithParams:")] public NSDictionary? ReadAttributeHoldTimeLimitsWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributePIROccupiedToUnoccupiedDelayWithParams:")] public NSDictionary? ReadAttributePIROccupiedToUnoccupiedDelayWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributePIROccupiedToUnoccupiedDelayWithValue:expectedValueInterval:")] public void WriteAttributePIROccupiedToUnoccupiedDelayWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributePIROccupiedToUnoccupiedDelayWithValue:expectedValueInterval:params:")] public void WriteAttributePIROccupiedToUnoccupiedDelayWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributePIRUnoccupiedToOccupiedDelayWithParams:")] public NSDictionary? ReadAttributePIRUnoccupiedToOccupiedDelayWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributePIRUnoccupiedToOccupiedDelayWithValue:expectedValueInterval:")] public void WriteAttributePIRUnoccupiedToOccupiedDelayWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributePIRUnoccupiedToOccupiedDelayWithValue:expectedValueInterval:params:")] public void WriteAttributePIRUnoccupiedToOccupiedDelayWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributePIRUnoccupiedToOccupiedThresholdWithParams:")] public NSDictionary? ReadAttributePIRUnoccupiedToOccupiedThresholdWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:expectedValueInterval:")] public void WriteAttributePIRUnoccupiedToOccupiedThresholdWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:expectedValueInterval:params:")] public void WriteAttributePIRUnoccupiedToOccupiedThresholdWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
     [Selector("readAttributeUltrasonicOccupiedToUnoccupiedDelayWithParams:")] public NSDictionary? ReadAttributeUltrasonicOccupiedToUnoccupiedDelayWithParams(MTRReadParams? params);
     [Selector("writeAttributeUltrasonicOccupiedToUnoccupiedDelayWithValue:expectedValueInterval:")] public void WriteAttributeUltrasonicOccupiedToUnoccupiedDelayWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
@@ -3499,447 +3007,266 @@ public extern objc class MTRClusterOccupancySensing : MTRGenericCluster
 /// Availability, a category of MTRClusterOccupancySensing.
 public extern objc class MTRClusterOccupancySensing
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterCarbonMonoxideConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterCarbonMonoxideConcentrationMeasurement.
 public extern objc class MTRClusterCarbonMonoxideConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterCarbonDioxideConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterCarbonDioxideConcentrationMeasurement.
 public extern objc class MTRClusterCarbonDioxideConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterNitrogenDioxideConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterNitrogenDioxideConcentrationMeasurement.
 public extern objc class MTRClusterNitrogenDioxideConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterOzoneConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterOzoneConcentrationMeasurement.
 public extern objc class MTRClusterOzoneConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterPM25ConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterPM25ConcentrationMeasurement.
 public extern objc class MTRClusterPM25ConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterFormaldehydeConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterFormaldehydeConcentrationMeasurement.
 public extern objc class MTRClusterFormaldehydeConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterPM1ConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterPM1ConcentrationMeasurement.
 public extern objc class MTRClusterPM1ConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterPM10ConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterPM10ConcentrationMeasurement.
 public extern objc class MTRClusterPM10ConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterTotalVolatileOrganicCompoundsConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterTotalVolatileOrganicCompoundsConcentrationMeasurement.
 public extern objc class MTRClusterTotalVolatileOrganicCompoundsConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRClusterRadonConcentrationMeasurement : MTRGenericCluster
 {
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMinMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMinMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMaxMeasuredValueWithParams:")] public NSDictionary? ReadAttributeMaxMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributePeakMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributePeakMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAverageMeasuredValueWindowWithParams:")] public NSDictionary? ReadAttributeAverageMeasuredValueWindowWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeUncertaintyWithParams:")] public NSDictionary? ReadAttributeUncertaintyWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementUnitWithParams:")] public NSDictionary? ReadAttributeMeasurementUnitWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeMeasurementMediumWithParams:")] public NSDictionary? ReadAttributeMeasurementMediumWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeLevelValueWithParams:")] public NSDictionary? ReadAttributeLevelValueWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 14.6 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterRadonConcentrationMeasurement.
 public extern objc class MTRClusterRadonConcentrationMeasurement
 {
-    /// macOS 14.6 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4071,29 +3398,21 @@ public extern objc class MTRClusterThreadNetworkDirectory
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterWakeOnLAN : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("readAttributeMACAddressWithParams:")] public NSDictionary? ReadAttributeMACAddressWithParams(MTRReadParams? params);
     /// macOS 15.4 and later.
     [Selector("readAttributeLinkLocalAddressWithParams:")] public NSDictionary? ReadAttributeLinkLocalAddressWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterWakeOnLAN.
 public extern objc class MTRClusterWakeOnLAN
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4105,11 +3424,8 @@ public objc closure void MTRClusterChannelGetProgramGuideWithExpectedValuesExpec
 
 public extern objc class MTRClusterChannel : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("changeChannelWithParams:expectedValues:expectedValueInterval:completion:")] public void ChangeChannelWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRChannelClusterChangeChannelParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterChannelChangeChannelWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("changeChannelByNumberWithParams:expectedValues:expectedValueInterval:completion:")] public void ChangeChannelByNumberWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRChannelClusterChangeChannelByNumberParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("skipChannelWithParams:expectedValues:expectedValueInterval:completion:")] public void SkipChannelWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRChannelClusterSkipChannelParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     /// macOS 15.4 and later.
     [Selector("getProgramGuideWithParams:expectedValues:expectedValueInterval:completion:")] public void GetProgramGuideWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRChannelClusterGetProgramGuideParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterChannelGetProgramGuideWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
@@ -4132,7 +3448,6 @@ public extern objc class MTRClusterChannel : MTRGenericCluster
 /// Availability, a category of MTRClusterChannel.
 public extern objc class MTRClusterChannel
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4140,7 +3455,6 @@ public objc closure void MTRClusterTargetNavigatorNavigateTargetWithParamsExpect
 
 public extern objc class MTRClusterTargetNavigator : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("navigateTargetWithParams:expectedValues:expectedValueInterval:completion:")] public void NavigateTargetWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRTargetNavigatorClusterNavigateTargetParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterTargetNavigatorNavigateTargetWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeTargetListWithParams:")] public NSDictionary? ReadAttributeTargetListWithParams(MTRReadParams? params);
     [Selector("readAttributeCurrentTargetWithParams:")] public NSDictionary? ReadAttributeCurrentTargetWithParams(MTRReadParams? params);
@@ -4154,7 +3468,6 @@ public extern objc class MTRClusterTargetNavigator : MTRGenericCluster
 /// Availability, a category of MTRClusterTargetNavigator.
 public extern objc class MTRClusterTargetNavigator
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4198,43 +3511,24 @@ public objc closure void MTRClusterMediaPlaybackSeekWithParamsExpectedValuesExpe
 
 public extern objc class MTRClusterMediaPlayback : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("playWithParams:expectedValues:expectedValueInterval:completion:")] public void PlayWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterPlayParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackPlayWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("playWithExpectedValues:expectedValueInterval:completion:")] public void PlayWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackPlayWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("pauseWithParams:expectedValues:expectedValueInterval:completion:")] public void PauseWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterPauseParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackPauseWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("pauseWithExpectedValues:expectedValueInterval:completion:")] public void PauseWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackPauseWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("stopWithParams:expectedValues:expectedValueInterval:completion:")] public void StopWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterStopParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackStopWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("stopWithExpectedValues:expectedValueInterval:completion:")] public void StopWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackStopWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("startOverWithParams:expectedValues:expectedValueInterval:completion:")] public void StartOverWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterStartOverParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackStartOverWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("startOverWithExpectedValues:expectedValueInterval:completion:")] public void StartOverWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackStartOverWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("previousWithParams:expectedValues:expectedValueInterval:completion:")] public void PreviousWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterPreviousParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackPreviousWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("previousWithExpectedValues:expectedValueInterval:completion:")] public void PreviousWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackPreviousWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("nextWithParams:expectedValues:expectedValueInterval:completion:")] public void NextWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterNextParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackNextWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("nextWithExpectedValues:expectedValueInterval:completion:")] public void NextWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackNextWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("rewindWithParams:expectedValues:expectedValueInterval:completion:")] public void RewindWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterRewindParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackRewindWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("rewindWithExpectedValues:expectedValueInterval:completion:")] public void RewindWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackRewindWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("fastForwardWithParams:expectedValues:expectedValueInterval:completion:")] public void FastForwardWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterFastForwardParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackFastForwardWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("fastForwardWithExpectedValues:expectedValueInterval:completion:")] public void FastForwardWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackFastForwardWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("skipForwardWithParams:expectedValues:expectedValueInterval:completion:")] public void SkipForwardWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterSkipForwardParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackSkipForwardWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("skipBackwardWithParams:expectedValues:expectedValueInterval:completion:")] public void SkipBackwardWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterSkipBackwardParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackSkipBackwardWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("seekWithParams:expectedValues:expectedValueInterval:completion:")] public void SeekWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterSeekParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterMediaPlaybackSeekWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     /// macOS 15.4 and later.
     [Selector("activateAudioTrackWithParams:expectedValues:expectedValueInterval:completion:")] public void ActivateAudioTrackWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaPlaybackClusterActivateAudioTrackParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
@@ -4261,23 +3555,16 @@ public extern objc class MTRClusterMediaPlayback : MTRGenericCluster
 /// Availability, a category of MTRClusterMediaPlayback.
 public extern objc class MTRClusterMediaPlayback
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterMediaInput : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("selectInputWithParams:expectedValues:expectedValueInterval:completion:")] public void SelectInputWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaInputClusterSelectInputParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("showInputStatusWithParams:expectedValues:expectedValueInterval:completion:")] public void ShowInputStatusWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaInputClusterShowInputStatusParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("showInputStatusWithExpectedValues:expectedValueInterval:completion:")] public void ShowInputStatusWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("hideInputStatusWithParams:expectedValues:expectedValueInterval:completion:")] public void HideInputStatusWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaInputClusterHideInputStatusParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("hideInputStatusWithExpectedValues:expectedValueInterval:completion:")] public void HideInputStatusWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("renameInputWithParams:expectedValues:expectedValueInterval:completion:")] public void RenameInputWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRMediaInputClusterRenameInputParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeInputListWithParams:")] public NSDictionary? ReadAttributeInputListWithParams(MTRReadParams? params);
     [Selector("readAttributeCurrentInputWithParams:")] public NSDictionary? ReadAttributeCurrentInputWithParams(MTRReadParams? params);
@@ -4291,15 +3578,12 @@ public extern objc class MTRClusterMediaInput : MTRGenericCluster
 /// Availability, a category of MTRClusterMediaInput.
 public extern objc class MTRClusterMediaInput
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterLowPower : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("sleepWithParams:expectedValues:expectedValueInterval:completion:")] public void SleepWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRLowPowerClusterSleepParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("sleepWithExpectedValues:expectedValueInterval:completion:")] public void SleepWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
@@ -4311,7 +3595,6 @@ public extern objc class MTRClusterLowPower : MTRGenericCluster
 /// Availability, a category of MTRClusterLowPower.
 public extern objc class MTRClusterLowPower
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4319,7 +3602,6 @@ public objc closure void MTRClusterKeypadInputSendKeyWithParamsExpectedValuesExp
 
 public extern objc class MTRClusterKeypadInput : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("sendKeyWithParams:expectedValues:expectedValueInterval:completion:")] public void SendKeyWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRKeypadInputClusterSendKeyParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterKeypadInputSendKeyWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
@@ -4331,7 +3613,6 @@ public extern objc class MTRClusterKeypadInput : MTRGenericCluster
 /// Availability, a category of MTRClusterKeypadInput.
 public extern objc class MTRClusterKeypadInput
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4341,9 +3622,7 @@ public objc closure void MTRClusterContentLauncherLaunchURLWithParamsExpectedVal
 
 public extern objc class MTRClusterContentLauncher : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("launchContentWithParams:expectedValues:expectedValueInterval:completion:")] public void LaunchContentWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRContentLauncherClusterLaunchContentParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterContentLauncherLaunchContentWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("launchURLWithParams:expectedValues:expectedValueInterval:completion:")] public void LaunchURLWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRContentLauncherClusterLaunchURLParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterContentLauncherLaunchURLWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeAcceptHeaderWithParams:")] public NSDictionary? ReadAttributeAcceptHeaderWithParams(MTRReadParams? params);
     [Selector("readAttributeSupportedStreamingProtocolsWithParams:")] public NSDictionary? ReadAttributeSupportedStreamingProtocolsWithParams(MTRReadParams? params);
@@ -4359,15 +3638,12 @@ public extern objc class MTRClusterContentLauncher : MTRGenericCluster
 /// Availability, a category of MTRClusterContentLauncher.
 public extern objc class MTRClusterContentLauncher
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
 public extern objc class MTRClusterAudioOutput : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("selectOutputWithParams:expectedValues:expectedValueInterval:completion:")] public void SelectOutputWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAudioOutputClusterSelectOutputParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("renameOutputWithParams:expectedValues:expectedValueInterval:completion:")] public void RenameOutputWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAudioOutputClusterRenameOutputParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeOutputListWithParams:")] public NSDictionary? ReadAttributeOutputListWithParams(MTRReadParams? params);
     [Selector("readAttributeCurrentOutputWithParams:")] public NSDictionary? ReadAttributeCurrentOutputWithParams(MTRReadParams? params);
@@ -4381,7 +3657,6 @@ public extern objc class MTRClusterAudioOutput : MTRGenericCluster
 /// Availability, a category of MTRClusterAudioOutput.
 public extern objc class MTRClusterAudioOutput
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4399,17 +3674,11 @@ public objc closure void MTRClusterApplicationLauncherHideAppWithExpectedValuesE
 
 public extern objc class MTRClusterApplicationLauncher : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("launchAppWithParams:expectedValues:expectedValueInterval:completion:")] public void LaunchAppWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRApplicationLauncherClusterLaunchAppParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterApplicationLauncherLaunchAppWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("launchAppWithExpectedValues:expectedValueInterval:completion:")] public void LaunchAppWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterApplicationLauncherLaunchAppWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("stopAppWithParams:expectedValues:expectedValueInterval:completion:")] public void StopAppWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRApplicationLauncherClusterStopAppParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterApplicationLauncherStopAppWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("stopAppWithExpectedValues:expectedValueInterval:completion:")] public void StopAppWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterApplicationLauncherStopAppWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("hideAppWithParams:expectedValues:expectedValueInterval:completion:")] public void HideAppWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRApplicationLauncherClusterHideAppParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterApplicationLauncherHideAppWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("hideAppWithExpectedValues:expectedValueInterval:completion:")] public void HideAppWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterApplicationLauncherHideAppWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
     [Selector("readAttributeCatalogListWithParams:")] public NSDictionary? ReadAttributeCatalogListWithParams(MTRReadParams? params);
     [Selector("readAttributeCurrentAppWithParams:")] public NSDictionary? ReadAttributeCurrentAppWithParams(MTRReadParams? params);
@@ -4425,7 +3694,6 @@ public extern objc class MTRClusterApplicationLauncher : MTRGenericCluster
 /// Availability, a category of MTRClusterApplicationLauncher.
 public extern objc class MTRClusterApplicationLauncher
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4449,7 +3717,6 @@ public extern objc class MTRClusterApplicationBasic : MTRGenericCluster
 /// Availability, a category of MTRClusterApplicationBasic.
 public extern objc class MTRClusterApplicationBasic
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4457,13 +3724,9 @@ public objc closure void MTRClusterAccountLoginGetSetupPINWithParamsExpectedValu
 
 public extern objc class MTRClusterAccountLogin : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("getSetupPINWithParams:expectedValues:expectedValueInterval:completion:")] public void GetSetupPINWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAccountLoginClusterGetSetupPINParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterAccountLoginGetSetupPINWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("loginWithParams:expectedValues:expectedValueInterval:completion:")] public void LoginWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAccountLoginClusterLoginParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("logoutWithParams:expectedValues:expectedValueInterval:completion:")] public void LogoutWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRAccountLoginClusterLogoutParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("logoutWithExpectedValues:expectedValueInterval:completion:")] public void LogoutWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
@@ -4475,7 +3738,6 @@ public extern objc class MTRClusterAccountLogin : MTRGenericCluster
 /// Availability, a category of MTRClusterAccountLogin.
 public extern objc class MTRClusterAccountLogin
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 
@@ -4573,575 +3835,293 @@ public objc closure void MTRClusterUnitTestingTestEmitTestEventRequestWithParams
 
 public objc closure void MTRClusterUnitTestingTestEmitTestFabricScopedEventRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock(MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams? arg0, NSError? arg1);
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterUnitTesting : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     [Selector("testWithParams:expectedValues:expectedValueInterval:completion:")] public void TestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testWithExpectedValues:expectedValueInterval:completion:")] public void TestWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testNotHandledWithParams:expectedValues:expectedValueInterval:completion:")] public void TestNotHandledWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestNotHandledParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testNotHandledWithExpectedValues:expectedValueInterval:completion:")] public void TestNotHandledWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testSpecificWithParams:expectedValues:expectedValueInterval:completion:")] public void TestSpecificWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestSpecificParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestSpecificWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testSpecificWithExpectedValues:expectedValueInterval:completion:")] public void TestSpecificWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestSpecificWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testUnknownCommandWithParams:expectedValues:expectedValueInterval:completion:")] public void TestUnknownCommandWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestUnknownCommandParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testUnknownCommandWithExpectedValues:expectedValueInterval:completion:")] public void TestUnknownCommandWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testAddArgumentsWithParams:expectedValues:expectedValueInterval:completion:")] public void TestAddArgumentsWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestAddArgumentsParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestAddArgumentsWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testSimpleArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestSimpleArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestSimpleArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestSimpleArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testStructArrayArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestStructArrayArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestStructArrayArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestStructArrayArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testStructArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestStructArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestStructArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestStructArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testNestedStructArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestNestedStructArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestNestedStructArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestNestedStructArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testListStructArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestListStructArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestListStructArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestListStructArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testListInt8UArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestListInt8UArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestListInt8UArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestListInt8UArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testNestedStructListArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestNestedStructListArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestNestedStructListArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestNestedStructListArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testListNestedStructListArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestListNestedStructListArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestListNestedStructListArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testListInt8UReverseRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestListInt8UReverseRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestListInt8UReverseRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestListInt8UReverseRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testEnumsRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestEnumsRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestEnumsRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestEnumsRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testNullableOptionalRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestNullableOptionalRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestNullableOptionalRequestParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestNullableOptionalRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("testNullableOptionalRequestWithExpectedValues:expectedValueInterval:completion:")] public void TestNullableOptionalRequestWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestNullableOptionalRequestWithExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testComplexNullableOptionalRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestComplexNullableOptionalRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestComplexNullableOptionalRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestComplexNullableOptionalRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("simpleStructEchoRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void SimpleStructEchoRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterSimpleStructEchoRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingSimpleStructEchoRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("timedInvokeRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TimedInvokeRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTimedInvokeRequestParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("timedInvokeRequestWithExpectedValues:expectedValueInterval:completion:")] public void TimedInvokeRequestWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testSimpleOptionalArgumentRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestSimpleOptionalArgumentRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 14.4 and later.
     [Selector("testSimpleOptionalArgumentRequestWithExpectedValues:expectedValueInterval:completion:")] public void TestSimpleOptionalArgumentRequestWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     [Selector("testEmitTestEventRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestEmitTestEventRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestEmitTestEventRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestEmitTestEventRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("testEmitTestFabricScopedEventRequestWithParams:expectedValues:expectedValueInterval:completion:")] public void TestEmitTestFabricScopedEventRequestWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRClusterUnitTestingTestEmitTestFabricScopedEventRequestWithParamsExpectedValuesExpectedValueIntervalCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     [Selector("readAttributeBooleanWithParams:")] public NSDictionary? ReadAttributeBooleanWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBooleanWithValue:expectedValueInterval:")] public void WriteAttributeBooleanWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBooleanWithValue:expectedValueInterval:params:")] public void WriteAttributeBooleanWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeBitmap8WithParams:")] public NSDictionary? ReadAttributeBitmap8WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap8WithValue:expectedValueInterval:")] public void WriteAttributeBitmap8WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap8WithValue:expectedValueInterval:params:")] public void WriteAttributeBitmap8WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeBitmap16WithParams:")] public NSDictionary? ReadAttributeBitmap16WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap16WithValue:expectedValueInterval:")] public void WriteAttributeBitmap16WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap16WithValue:expectedValueInterval:params:")] public void WriteAttributeBitmap16WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeBitmap32WithParams:")] public NSDictionary? ReadAttributeBitmap32WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap32WithValue:expectedValueInterval:")] public void WriteAttributeBitmap32WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap32WithValue:expectedValueInterval:params:")] public void WriteAttributeBitmap32WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeBitmap64WithParams:")] public NSDictionary? ReadAttributeBitmap64WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap64WithValue:expectedValueInterval:")] public void WriteAttributeBitmap64WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeBitmap64WithValue:expectedValueInterval:params:")] public void WriteAttributeBitmap64WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt8uWithParams:")] public NSDictionary? ReadAttributeInt8uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt8uWithValue:expectedValueInterval:")] public void WriteAttributeInt8uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt8uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt8uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt16uWithParams:")] public NSDictionary? ReadAttributeInt16uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt16uWithValue:expectedValueInterval:")] public void WriteAttributeInt16uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt16uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt16uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt24uWithParams:")] public NSDictionary? ReadAttributeInt24uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt24uWithValue:expectedValueInterval:")] public void WriteAttributeInt24uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt24uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt24uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt32uWithParams:")] public NSDictionary? ReadAttributeInt32uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt32uWithValue:expectedValueInterval:")] public void WriteAttributeInt32uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt32uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt32uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt40uWithParams:")] public NSDictionary? ReadAttributeInt40uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt40uWithValue:expectedValueInterval:")] public void WriteAttributeInt40uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt40uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt40uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt48uWithParams:")] public NSDictionary? ReadAttributeInt48uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt48uWithValue:expectedValueInterval:")] public void WriteAttributeInt48uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt48uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt48uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt56uWithParams:")] public NSDictionary? ReadAttributeInt56uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt56uWithValue:expectedValueInterval:")] public void WriteAttributeInt56uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt56uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt56uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt64uWithParams:")] public NSDictionary? ReadAttributeInt64uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt64uWithValue:expectedValueInterval:")] public void WriteAttributeInt64uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt64uWithValue:expectedValueInterval:params:")] public void WriteAttributeInt64uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt8sWithParams:")] public NSDictionary? ReadAttributeInt8sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt8sWithValue:expectedValueInterval:")] public void WriteAttributeInt8sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt8sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt8sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt16sWithParams:")] public NSDictionary? ReadAttributeInt16sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt16sWithValue:expectedValueInterval:")] public void WriteAttributeInt16sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt16sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt16sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt24sWithParams:")] public NSDictionary? ReadAttributeInt24sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt24sWithValue:expectedValueInterval:")] public void WriteAttributeInt24sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt24sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt24sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt32sWithParams:")] public NSDictionary? ReadAttributeInt32sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt32sWithValue:expectedValueInterval:")] public void WriteAttributeInt32sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt32sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt32sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt40sWithParams:")] public NSDictionary? ReadAttributeInt40sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt40sWithValue:expectedValueInterval:")] public void WriteAttributeInt40sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt40sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt40sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt48sWithParams:")] public NSDictionary? ReadAttributeInt48sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt48sWithValue:expectedValueInterval:")] public void WriteAttributeInt48sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt48sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt48sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt56sWithParams:")] public NSDictionary? ReadAttributeInt56sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt56sWithValue:expectedValueInterval:")] public void WriteAttributeInt56sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt56sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt56sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeInt64sWithParams:")] public NSDictionary? ReadAttributeInt64sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt64sWithValue:expectedValueInterval:")] public void WriteAttributeInt64sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeInt64sWithValue:expectedValueInterval:params:")] public void WriteAttributeInt64sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeEnum8WithParams:")] public NSDictionary? ReadAttributeEnum8WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEnum8WithValue:expectedValueInterval:")] public void WriteAttributeEnum8WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEnum8WithValue:expectedValueInterval:params:")] public void WriteAttributeEnum8WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeEnum16WithParams:")] public NSDictionary? ReadAttributeEnum16WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEnum16WithValue:expectedValueInterval:")] public void WriteAttributeEnum16WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEnum16WithValue:expectedValueInterval:params:")] public void WriteAttributeEnum16WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFloatSingleWithParams:")] public NSDictionary? ReadAttributeFloatSingleWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeFloatSingleWithValue:expectedValueInterval:")] public void WriteAttributeFloatSingleWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeFloatSingleWithValue:expectedValueInterval:params:")] public void WriteAttributeFloatSingleWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFloatDoubleWithParams:")] public NSDictionary? ReadAttributeFloatDoubleWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeFloatDoubleWithValue:expectedValueInterval:")] public void WriteAttributeFloatDoubleWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeFloatDoubleWithValue:expectedValueInterval:params:")] public void WriteAttributeFloatDoubleWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeOctetStringWithParams:")] public NSDictionary? ReadAttributeOctetStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeOctetStringWithValue:expectedValueInterval:")] public void WriteAttributeOctetStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeOctetStringWithValue:expectedValueInterval:params:")] public void WriteAttributeOctetStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeListInt8uWithParams:")] public NSDictionary? ReadAttributeListInt8uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListInt8uWithValue:expectedValueInterval:")] public void WriteAttributeListInt8uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListInt8uWithValue:expectedValueInterval:params:")] public void WriteAttributeListInt8uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeListOctetStringWithParams:")] public NSDictionary? ReadAttributeListOctetStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListOctetStringWithValue:expectedValueInterval:")] public void WriteAttributeListOctetStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListOctetStringWithValue:expectedValueInterval:params:")] public void WriteAttributeListOctetStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeListStructOctetStringWithParams:")] public NSDictionary? ReadAttributeListStructOctetStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListStructOctetStringWithValue:expectedValueInterval:")] public void WriteAttributeListStructOctetStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListStructOctetStringWithValue:expectedValueInterval:params:")] public void WriteAttributeListStructOctetStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeLongOctetStringWithParams:")] public NSDictionary? ReadAttributeLongOctetStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLongOctetStringWithValue:expectedValueInterval:")] public void WriteAttributeLongOctetStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLongOctetStringWithValue:expectedValueInterval:params:")] public void WriteAttributeLongOctetStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeCharStringWithParams:")] public NSDictionary? ReadAttributeCharStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeCharStringWithValue:expectedValueInterval:")] public void WriteAttributeCharStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeCharStringWithValue:expectedValueInterval:params:")] public void WriteAttributeCharStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeLongCharStringWithParams:")] public NSDictionary? ReadAttributeLongCharStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLongCharStringWithValue:expectedValueInterval:")] public void WriteAttributeLongCharStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeLongCharStringWithValue:expectedValueInterval:params:")] public void WriteAttributeLongCharStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeEpochUsWithParams:")] public NSDictionary? ReadAttributeEpochUsWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEpochUsWithValue:expectedValueInterval:")] public void WriteAttributeEpochUsWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEpochUsWithValue:expectedValueInterval:params:")] public void WriteAttributeEpochUsWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeEpochSWithParams:")] public NSDictionary? ReadAttributeEpochSWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEpochSWithValue:expectedValueInterval:")] public void WriteAttributeEpochSWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEpochSWithValue:expectedValueInterval:params:")] public void WriteAttributeEpochSWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeVendorIdWithParams:")] public NSDictionary? ReadAttributeVendorIdWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeVendorIdWithValue:expectedValueInterval:")] public void WriteAttributeVendorIdWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeVendorIdWithValue:expectedValueInterval:params:")] public void WriteAttributeVendorIdWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeListNullablesAndOptionalsStructWithParams:")] public NSDictionary? ReadAttributeListNullablesAndOptionalsStructWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListNullablesAndOptionalsStructWithValue:expectedValueInterval:")] public void WriteAttributeListNullablesAndOptionalsStructWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListNullablesAndOptionalsStructWithValue:expectedValueInterval:params:")] public void WriteAttributeListNullablesAndOptionalsStructWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeEnumAttrWithParams:")] public NSDictionary? ReadAttributeEnumAttrWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEnumAttrWithValue:expectedValueInterval:")] public void WriteAttributeEnumAttrWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeEnumAttrWithValue:expectedValueInterval:params:")] public void WriteAttributeEnumAttrWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeStructAttrWithParams:")] public NSDictionary? ReadAttributeStructAttrWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeStructAttrWithValue:expectedValueInterval:")] public void WriteAttributeStructAttrWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeStructAttrWithValue:expectedValueInterval:params:")] public void WriteAttributeStructAttrWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeRangeRestrictedInt8uWithParams:")] public NSDictionary? ReadAttributeRangeRestrictedInt8uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt8uWithValue:expectedValueInterval:")] public void WriteAttributeRangeRestrictedInt8uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt8uWithValue:expectedValueInterval:params:")] public void WriteAttributeRangeRestrictedInt8uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeRangeRestrictedInt8sWithParams:")] public NSDictionary? ReadAttributeRangeRestrictedInt8sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt8sWithValue:expectedValueInterval:")] public void WriteAttributeRangeRestrictedInt8sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt8sWithValue:expectedValueInterval:params:")] public void WriteAttributeRangeRestrictedInt8sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeRangeRestrictedInt16uWithParams:")] public NSDictionary? ReadAttributeRangeRestrictedInt16uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt16uWithValue:expectedValueInterval:")] public void WriteAttributeRangeRestrictedInt16uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt16uWithValue:expectedValueInterval:params:")] public void WriteAttributeRangeRestrictedInt16uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeRangeRestrictedInt16sWithParams:")] public NSDictionary? ReadAttributeRangeRestrictedInt16sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt16sWithValue:expectedValueInterval:")] public void WriteAttributeRangeRestrictedInt16sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeRangeRestrictedInt16sWithValue:expectedValueInterval:params:")] public void WriteAttributeRangeRestrictedInt16sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeListLongOctetStringWithParams:")] public NSDictionary? ReadAttributeListLongOctetStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListLongOctetStringWithValue:expectedValueInterval:")] public void WriteAttributeListLongOctetStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListLongOctetStringWithValue:expectedValueInterval:params:")] public void WriteAttributeListLongOctetStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeListFabricScopedWithParams:")] public NSDictionary? ReadAttributeListFabricScopedWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListFabricScopedWithValue:expectedValueInterval:")] public void WriteAttributeListFabricScopedWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeListFabricScopedWithValue:expectedValueInterval:params:")] public void WriteAttributeListFabricScopedWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeTimedWriteBooleanWithParams:")] public NSDictionary? ReadAttributeTimedWriteBooleanWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeTimedWriteBooleanWithValue:expectedValueInterval:")] public void WriteAttributeTimedWriteBooleanWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeTimedWriteBooleanWithValue:expectedValueInterval:params:")] public void WriteAttributeTimedWriteBooleanWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeGeneralErrorBooleanWithParams:")] public NSDictionary? ReadAttributeGeneralErrorBooleanWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeGeneralErrorBooleanWithValue:expectedValueInterval:")] public void WriteAttributeGeneralErrorBooleanWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeGeneralErrorBooleanWithValue:expectedValueInterval:params:")] public void WriteAttributeGeneralErrorBooleanWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeClusterErrorBooleanWithParams:")] public NSDictionary? ReadAttributeClusterErrorBooleanWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeClusterErrorBooleanWithValue:expectedValueInterval:")] public void WriteAttributeClusterErrorBooleanWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeClusterErrorBooleanWithValue:expectedValueInterval:params:")] public void WriteAttributeClusterErrorBooleanWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeUnsupportedWithParams:")] public NSDictionary? ReadAttributeUnsupportedWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeUnsupportedWithValue:expectedValueInterval:")] public void WriteAttributeUnsupportedWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeUnsupportedWithValue:expectedValueInterval:params:")] public void WriteAttributeUnsupportedWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableBooleanWithParams:")] public NSDictionary? ReadAttributeNullableBooleanWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBooleanWithValue:expectedValueInterval:")] public void WriteAttributeNullableBooleanWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBooleanWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableBooleanWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableBitmap8WithParams:")] public NSDictionary? ReadAttributeNullableBitmap8WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap8WithValue:expectedValueInterval:")] public void WriteAttributeNullableBitmap8WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap8WithValue:expectedValueInterval:params:")] public void WriteAttributeNullableBitmap8WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableBitmap16WithParams:")] public NSDictionary? ReadAttributeNullableBitmap16WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap16WithValue:expectedValueInterval:")] public void WriteAttributeNullableBitmap16WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap16WithValue:expectedValueInterval:params:")] public void WriteAttributeNullableBitmap16WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableBitmap32WithParams:")] public NSDictionary? ReadAttributeNullableBitmap32WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap32WithValue:expectedValueInterval:")] public void WriteAttributeNullableBitmap32WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap32WithValue:expectedValueInterval:params:")] public void WriteAttributeNullableBitmap32WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableBitmap64WithParams:")] public NSDictionary? ReadAttributeNullableBitmap64WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap64WithValue:expectedValueInterval:")] public void WriteAttributeNullableBitmap64WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableBitmap64WithValue:expectedValueInterval:params:")] public void WriteAttributeNullableBitmap64WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt8uWithParams:")] public NSDictionary? ReadAttributeNullableInt8uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt8uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt8uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt8uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt8uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt16uWithParams:")] public NSDictionary? ReadAttributeNullableInt16uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt16uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt16uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt16uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt16uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt24uWithParams:")] public NSDictionary? ReadAttributeNullableInt24uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt24uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt24uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt24uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt24uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt32uWithParams:")] public NSDictionary? ReadAttributeNullableInt32uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt32uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt32uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt32uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt32uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt40uWithParams:")] public NSDictionary? ReadAttributeNullableInt40uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt40uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt40uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt40uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt40uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt48uWithParams:")] public NSDictionary? ReadAttributeNullableInt48uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt48uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt48uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt48uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt48uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt56uWithParams:")] public NSDictionary? ReadAttributeNullableInt56uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt56uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt56uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt56uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt56uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt64uWithParams:")] public NSDictionary? ReadAttributeNullableInt64uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt64uWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt64uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt64uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt64uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt8sWithParams:")] public NSDictionary? ReadAttributeNullableInt8sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt8sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt8sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt8sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt8sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt16sWithParams:")] public NSDictionary? ReadAttributeNullableInt16sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt16sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt16sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt16sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt16sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt24sWithParams:")] public NSDictionary? ReadAttributeNullableInt24sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt24sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt24sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt24sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt24sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt32sWithParams:")] public NSDictionary? ReadAttributeNullableInt32sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt32sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt32sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt32sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt32sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt40sWithParams:")] public NSDictionary? ReadAttributeNullableInt40sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt40sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt40sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt40sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt40sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt48sWithParams:")] public NSDictionary? ReadAttributeNullableInt48sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt48sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt48sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt48sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt48sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt56sWithParams:")] public NSDictionary? ReadAttributeNullableInt56sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt56sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt56sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt56sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt56sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableInt64sWithParams:")] public NSDictionary? ReadAttributeNullableInt64sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt64sWithValue:expectedValueInterval:")] public void WriteAttributeNullableInt64sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableInt64sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableInt64sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableEnum8WithParams:")] public NSDictionary? ReadAttributeNullableEnum8WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableEnum8WithValue:expectedValueInterval:")] public void WriteAttributeNullableEnum8WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableEnum8WithValue:expectedValueInterval:params:")] public void WriteAttributeNullableEnum8WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableEnum16WithParams:")] public NSDictionary? ReadAttributeNullableEnum16WithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableEnum16WithValue:expectedValueInterval:")] public void WriteAttributeNullableEnum16WithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableEnum16WithValue:expectedValueInterval:params:")] public void WriteAttributeNullableEnum16WithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableFloatSingleWithParams:")] public NSDictionary? ReadAttributeNullableFloatSingleWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableFloatSingleWithValue:expectedValueInterval:")] public void WriteAttributeNullableFloatSingleWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableFloatSingleWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableFloatSingleWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableFloatDoubleWithParams:")] public NSDictionary? ReadAttributeNullableFloatDoubleWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableFloatDoubleWithValue:expectedValueInterval:")] public void WriteAttributeNullableFloatDoubleWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableFloatDoubleWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableFloatDoubleWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableOctetStringWithParams:")] public NSDictionary? ReadAttributeNullableOctetStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableOctetStringWithValue:expectedValueInterval:")] public void WriteAttributeNullableOctetStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableOctetStringWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableOctetStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableCharStringWithParams:")] public NSDictionary? ReadAttributeNullableCharStringWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableCharStringWithValue:expectedValueInterval:")] public void WriteAttributeNullableCharStringWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableCharStringWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableCharStringWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableEnumAttrWithParams:")] public NSDictionary? ReadAttributeNullableEnumAttrWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableEnumAttrWithValue:expectedValueInterval:")] public void WriteAttributeNullableEnumAttrWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableEnumAttrWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableEnumAttrWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableStructWithParams:")] public NSDictionary? ReadAttributeNullableStructWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableStructWithValue:expectedValueInterval:")] public void WriteAttributeNullableStructWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableStructWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableStructWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableRangeRestrictedInt8uWithParams:")] public NSDictionary? ReadAttributeNullableRangeRestrictedInt8uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt8uWithValue:expectedValueInterval:")] public void WriteAttributeNullableRangeRestrictedInt8uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt8uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableRangeRestrictedInt8uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableRangeRestrictedInt8sWithParams:")] public NSDictionary? ReadAttributeNullableRangeRestrictedInt8sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt8sWithValue:expectedValueInterval:")] public void WriteAttributeNullableRangeRestrictedInt8sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt8sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableRangeRestrictedInt8sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableRangeRestrictedInt16uWithParams:")] public NSDictionary? ReadAttributeNullableRangeRestrictedInt16uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt16uWithValue:expectedValueInterval:")] public void WriteAttributeNullableRangeRestrictedInt16uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt16uWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableRangeRestrictedInt16uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeNullableRangeRestrictedInt16sWithParams:")] public NSDictionary? ReadAttributeNullableRangeRestrictedInt16sWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt16sWithValue:expectedValueInterval:")] public void WriteAttributeNullableRangeRestrictedInt16sWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeNullableRangeRestrictedInt16sWithValue:expectedValueInterval:params:")] public void WriteAttributeNullableRangeRestrictedInt16sWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeWriteOnlyInt8uWithParams:")] public NSDictionary? ReadAttributeWriteOnlyInt8uWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeWriteOnlyInt8uWithValue:expectedValueInterval:")] public void WriteAttributeWriteOnlyInt8uWithValueExpectedValueInterval(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeWriteOnlyInt8uWithValue:expectedValueInterval:params:")] public void WriteAttributeWriteOnlyInt8uWithValueExpectedValueIntervalParams(NSDictionary dataValueDictionary, NSNumber expectedValueIntervalMs, MTRWriteParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeGeneratedCommandListWithParams:")] public NSDictionary? ReadAttributeGeneratedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAcceptedCommandListWithParams:")] public NSDictionary? ReadAttributeAcceptedCommandListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeAttributeListWithParams:")] public NSDictionary? ReadAttributeAttributeListWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeFeatureMapWithParams:")] public NSDictionary? ReadAttributeFeatureMapWithParams(MTRReadParams? params);
-    /// macOS 13.3 and later.
     [Selector("readAttributeClusterRevisionWithParams:")] public NSDictionary? ReadAttributeClusterRevisionWithParams(MTRReadParams? params);
 }
 
 /// Availability, a category of MTRClusterUnitTesting.
 public extern objc class MTRClusterUnitTesting
 {
-    /// macOS 13.3 and later.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
 

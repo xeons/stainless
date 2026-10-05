@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterStateCacheContainer : NSObject
 {
     [Selector("readAttributesWithEndpointID:clusterID:attributeID:queue:completion:")] public void ReadAttributesWithEndpointIDClusterIDAttributeIDQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, dispatch_queue_t queue, MTRDeviceResponseHandler completion);

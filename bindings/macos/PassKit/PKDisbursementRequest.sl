@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "PassKit")
 
-/// macOS 15.0 and later.
 public extern objc class PKDisbursementRequest : NSObject
 {
     [Selector("merchantIdentifier", "setMerchantIdentifier:")] public NSString MerchantIdentifier { get; set; }

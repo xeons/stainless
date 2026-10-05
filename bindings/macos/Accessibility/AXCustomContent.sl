@@ -51,7 +51,6 @@ public extern objc class AXCustomContent : NSObject, NSCopying, NSSecureCoding
 public objc interface AXCustomContentProvider : NSObjectProtocol
 {
     [Selector("accessibilityCustomContent", "setAccessibilityCustomContent:")] NSArray? AccessibilityCustomContent { get; set; }
-    /// macOS 14.0 and later.
     [Optional] [Selector("accessibilityCustomContentBlock", "setAccessibilityCustomContentBlock:")] AXCustomContentReturnBlock? AccessibilityCustomContentBlock { get; set; }
 }
 

@@ -35,7 +35,6 @@ public objc closure void VZUSBControllerAttachDeviceCompletionHandlerCompletionH
 
 public objc closure void VZUSBControllerDetachDeviceCompletionHandlerCompletionHandlerBlock(NSError? arg0);
 
-/// macOS 15.0 and later.
 public extern objc class VZUSBController : NSObject
 {
     [Selector("usbDevices")] public NSArray UsbDevices { get; }

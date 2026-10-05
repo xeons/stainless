@@ -61,7 +61,6 @@ public extern objc class GCController : NSObject, GCDevice
     [Selector("shouldMonitorBackgroundEvents", "setShouldMonitorBackgroundEvents:")] public static bool ShouldMonitorBackgroundEvents { get; set; }
     [Selector("isAttachedToDevice")] public bool AttachedToDevice { get; }
     [Selector("playerIndex", "setPlayerIndex:")] public GCControllerPlayerIndex PlayerIndex { get; set; }
-    /// macOS 14.0 and later.
     [Selector("input")] public GCControllerLiveInput Input { get; }
     [Selector("battery")] public GCDeviceBattery? Battery { get; }
     [Selector("physicalInputProfile")] public GCPhysicalInputProfile PhysicalInputProfile { get; }

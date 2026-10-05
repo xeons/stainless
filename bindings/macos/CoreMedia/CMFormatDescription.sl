@@ -356,7 +356,6 @@ public extern "C" CFStringRef kCMFormatDescriptionExtension_MasteringDisplayColo
 
 public extern "C" CFStringRef kCMFormatDescriptionExtension_ContentLightLevelInfo;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_ContentColorVolume;
 
 public extern "C" CFStringRef kCMFormatDescriptionExtension_AlternativeTransferCharacteristics;
@@ -375,46 +374,32 @@ public extern "C" CFStringRef kCMFormatDescriptionExtension_BitsPerComponent;
 
 public extern "C" CFStringRef kCMFormatDescriptionExtension_HorizontalFieldOfView;
 
-/// macOS 14.2 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_LogTransferFunction;
 
-/// macOS 14.2 and later.
 public extern "C" CFStringRef kCMFormatDescriptionLogTransferFunction_AppleLog;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_HeroEye;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionHeroEye_Left;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionHeroEye_Right;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_StereoCameraBaseline;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_HorizontalDisparityAdjustment;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_HasLeftStereoEyeView;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_HasRightStereoEyeView;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_HasAdditionalViews;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_ProjectionKind;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionProjectionKind_Rectilinear;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionProjectionKind_Equirectangular;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionProjectionKind_HalfEquirectangular;
 
 /// macOS 26.0 and later.
@@ -423,13 +408,10 @@ public extern "C" CFStringRef kCMFormatDescriptionProjectionKind_ParametricImmer
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionProjectionKind_AppleImmersiveVideo;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionExtension_ViewPackingKind;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionViewPackingKind_SideBySide;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCMFormatDescriptionViewPackingKind_OverUnder;
 
 /// macOS 26.0 and later.
@@ -517,14 +499,12 @@ public extern "C" CFArrayRef CMVideoFormatDescriptionGetExtensionKeysCommonWithI
 
 public extern "C" Boolean CMVideoFormatDescriptionMatchesImageBuffer(CMVideoFormatDescriptionRef desc, CVImageBufferRef imageBuffer);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMVideoFormatDescriptionCopyTagCollectionArray(CMVideoFormatDescriptionRef formatDescription, __CFArray** tagCollectionsOut);
 
 public using CMTaggedBufferGroupFormatDescriptionRef = CMFormatDescriptionRef;
 
 public using CMTaggedBufferGroupFormatType = FourCharCode;
 
-/// macOS 14.0 and later.
 public const uint kCMTaggedBufferGroupFormatType_TaggedBufferGroup = 1952606066;
 
 public using CMMuxedFormatDescriptionRef = CMFormatDescriptionRef;

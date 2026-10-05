@@ -34,14 +34,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MediaExtension")
 
-/// macOS 14.0 and later.
 public objc interface MEVideoDecoderExtension : NSObjectProtocol
 {
     [Selector("init")] Self Init();
     [Selector("videoDecoderWithCodecType:videoFormatDescription:videoDecoderSpecifications:extensionDecoderPixelBufferManager:error:")] MEVideoDecoder? VideoDecoderWithCodecTypeVideoFormatDescriptionVideoDecoderSpecificationsExtensionDecoderPixelBufferManagerError(CMVideoCodecType codecType, CMVideoFormatDescriptionRef videoFormatDescription, NSDictionary videoDecoderSpecifications, MEVideoDecoderPixelBufferManager extensionDecoderPixelBufferManager, out NSError? error);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MEVideoDecoderPixelBufferManager : NSObject
 {
     [Selector("pixelBufferAttributes", "setPixelBufferAttributes:")] public NSDictionary PixelBufferAttributes { get; set; }
@@ -49,17 +47,14 @@ public extern objc class MEVideoDecoderPixelBufferManager : NSObject
     [Selector("registerCustomPixelFormat:")] public void RegisterCustomPixelFormat(NSDictionary customPixelFormat);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MEDecodeFrameOptions : NSObject
 {
     [Selector("doNotOutputFrame", "setDoNotOutputFrame:")] public bool DoNotOutputFrame { get; set; }
     [Selector("realTimePlayback", "setRealTimePlayback:")] public bool RealTimePlayback { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName? MEVideoDecoderReadyForMoreMediaDataDidChangeNotification;
 
-/// macOS 14.0 and later.
 [Flags]
 public enum MEDecodeFrameStatus : ulong
 {
@@ -69,7 +64,6 @@ public enum MEDecodeFrameStatus : ulong
 
 public objc closure void MEVideoDecoderDecodeFrameFromSampleBufferOptionsCompletionHandlerCompletionHandlerBlock(CVImageBufferRef? arg0, MEDecodeFrameStatus arg1, NSError? arg2);
 
-/// macOS 14.0 and later.
 public objc interface MEVideoDecoder : NSObjectProtocol
 {
     [Optional] [Selector("producesRAWOutput")] bool ProducesRAWOutput { get; }

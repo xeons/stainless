@@ -52,14 +52,12 @@ public extern objc class NSViewController : NSResponder, NSEditor, NSSeguePerfor
     [Selector("representedObject", "setRepresentedObject:")] public AnyObject? RepresentedObject { get; set; }
     [Selector("title", "setTitle:")] public NSString? Title { get; set; }
     [Selector("view", "setView:")] public NSView View { get; set; }
-    /// macOS 14.0 and later.
     [Selector("viewIfLoaded")] public NSView? ViewIfLoaded { get; }
     [Selector("isViewLoaded")] public bool ViewLoaded { get; }
     [Selector("preferredContentSize", "setPreferredContentSize:")] public NSSize PreferredContentSize { get; set; }
     [Selector("initWithNibName:bundle:")] public Self InitWithNibNameBundle(NSNibName? nibNameOrNil, NSBundle? nibBundleOrNil);
     [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
     [Selector("loadView")] public void LoadView();
-    /// macOS 14.0 and later.
     [Selector("loadViewIfNeeded")] public void LoadViewIfNeeded();
     [Selector("commitEditingWithDelegate:didCommitSelector:contextInfo:")] public void CommitEditingWithDelegateDidCommitSelectorContextInfo(AnyObject? @delegate, Selector didCommitSelector, void* contextInfo);
     [Selector("commitEditing")] public bool CommitEditing();
@@ -92,7 +90,6 @@ public extern objc class NSViewController
     [Selector("presentViewControllerAsSheet:")] public void PresentViewControllerAsSheet(NSViewController viewController);
     [Selector("presentViewControllerAsModalWindow:")] public void PresentViewControllerAsModalWindow(NSViewController viewController);
     [Selector("presentViewController:asPopoverRelativeToRect:ofView:preferredEdge:behavior:")] public void PresentViewControllerAsPopoverRelativeToRectOfViewPreferredEdgeBehavior(NSViewController viewController, NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge, NSPopoverBehavior behavior);
-    /// macOS 14.0 and later.
     [Selector("presentViewController:asPopoverRelativeToRect:ofView:preferredEdge:behavior:hasFullSizeContent:")] public void PresentViewControllerAsPopoverRelativeToRectOfViewPreferredEdgeBehaviorHasFullSizeContent(NSViewController viewController, NSRect positioningRect, NSView positioningView, NSRectEdge preferredEdge, NSPopoverBehavior behavior, bool hasFullSizeContent);
     [Selector("transitionFromViewController:toViewController:options:completionHandler:")] public void TransitionFromViewControllerToViewControllerOptionsCompletionHandler(NSViewController fromViewController, NSViewController toViewController, NSViewControllerTransitionOptions options, NSViewControllerTransitionFromViewControllerToViewControllerOptionsCompletionHandlerCompletionBlock? completion);
 }

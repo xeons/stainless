@@ -43,7 +43,6 @@ public extern objc class CIImageProcessorKernel : NSObject
     [Selector("synchronizeInputs")] public static bool SynchronizeInputs { get; }
     [Selector("processWithInputs:arguments:output:error:")] public static bool ProcessWithInputsArgumentsOutputError(NSArray? inputs, NSDictionary? arguments, CIImageProcessorOutput output, out NSError? error);
     [Selector("roiForInput:arguments:outputRect:")] public static CGRect RoiForInputArgumentsOutputRect(int inputIndex, NSDictionary? arguments, CGRect outputRect);
-    /// macOS 14.0 and later.
     [Selector("roiTileArrayForInput:arguments:outputRect:")] public static NSArray RoiTileArrayForInputArgumentsOutputRect(int inputIndex, NSDictionary? arguments, CGRect outputRect);
     [Selector("formatForInputAtIndex:")] public static CIFormat FormatForInputAtIndex(int inputIndex);
     [Selector("applyWithExtent:inputs:arguments:error:")] public static CIImage? ApplyWithExtentInputsArgumentsError(CGRect extent, NSArray? inputs, NSDictionary? arguments, out NSError? error);
@@ -70,9 +69,7 @@ public objc interface CIImageProcessorInput
     [Selector("pixelBuffer")] CVPixelBufferRef? PixelBuffer { get; }
     [Selector("metalTexture")] MTLTexture? MetalTexture { get; }
     [Selector("digest")] ulong Digest { get; }
-    /// macOS 14.0 and later.
     [Selector("roiTileIndex")] NSUInteger RoiTileIndex { get; }
-    /// macOS 14.0 and later.
     [Selector("roiTileCount")] NSUInteger RoiTileCount { get; }
 }
 

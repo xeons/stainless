@@ -33,7 +33,6 @@ import Standard.ObjC;
 /// NonZeroOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    /// macOS 14.0 and later.
     [Selector("nonZeroIndicesOfTensor:name:")] public MPSGraphTensor NonZeroIndicesOfTensorName(MPSGraphTensor tensor, NSString? name);
 }
 

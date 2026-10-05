@@ -112,16 +112,12 @@ public extern "C" CFTypeID CGImageGetTypeID();
 
 [ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithColorSpace(CGImageRef? image, CGColorSpaceRef? space);
 
-/// macOS 15.0 and later.
 [ReturnsRetained] public extern "C" CGImageRef? CGImageCreateWithContentHeadroom(float headroom, nuint width, nuint height, nuint bitsPerComponent, nuint bitsPerPixel, nuint bytesPerRow, CGColorSpaceRef? space, CGBitmapInfo bitmapInfo, CGDataProviderRef? provider, CGFloat* decode, bool shouldInterpolate, CGColorRenderingIntent intent);
 
-/// macOS 15.0 and later.
 [ReturnsRetained] public extern "C" CGImageRef? CGImageCreateCopyWithContentHeadroom(float headroom, CGImageRef? image);
 
-/// macOS 15.0 and later.
 public extern "C" float kCGDefaultHDRImageContentHeadroom;
 
-/// macOS 15.0 and later.
 public extern "C" float CGImageGetContentHeadroom(CGImageRef? image);
 
 /// macOS 26.0 and later.
@@ -169,10 +165,8 @@ public extern "C" CGImageByteOrderInfo CGImageGetByteOrderInfo(CGImageRef? image
 
 public extern "C" CGImagePixelFormatInfo CGImageGetPixelFormatInfo(CGImageRef? image);
 
-/// macOS 15.0 and later.
 public extern "C" bool CGImageShouldToneMap(CGImageRef? image);
 
-/// macOS 15.0 and later.
 public extern "C" bool CGImageContainsImageSpecificToneMappingMetadata(CGImageRef? image);
 
 public extern "C" CFStringRef? CGImageGetUTType(CGImageRef? image);

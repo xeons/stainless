@@ -403,10 +403,8 @@ public extern "C" CFStringRef kCTBaselineReferenceFont;
 
 public extern "C" CFStringRef kCTBaselineOriginalFont;
 
-/// macOS 15.0 and later.
 public extern "C" CGRect CTFontGetTypographicBoundsForAdaptiveImageProvider(CTFontRef font, CTAdaptiveImageProviding? provider);
 
-/// macOS 15.0 and later.
 public extern "C" void CTFontDrawImageFromAdaptiveImageProviderAtPoint(CTFontRef font, CTAdaptiveImageProviding provider, CGPoint point, CGContextRef context);
 
 public const int ATSFONTREF_DEFINED = 1;

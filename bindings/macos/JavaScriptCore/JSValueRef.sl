@@ -56,7 +56,6 @@ public enum JSTypedArrayType : int
     BigUint64Array = 12,
 }
 
-/// macOS 15.0 and later.
 public enum JSRelationCondition : uint
 {
     Undefined = 0,
@@ -79,7 +78,6 @@ public extern "C" bool JSValueIsString(JSContextRef ctx, JSValueRef value);
 
 public extern "C" bool JSValueIsSymbol(JSContextRef ctx, JSValueRef value);
 
-/// macOS 15.0 and later.
 public extern "C" bool JSValueIsBigInt(JSContextRef ctx, JSValueRef value);
 
 public extern "C" bool JSValueIsObject(JSContextRef ctx, JSValueRef value);
@@ -98,16 +96,12 @@ public extern "C" bool JSValueIsStrictEqual(JSContextRef ctx, JSValueRef a, JSVa
 
 public extern "C" bool JSValueIsInstanceOfConstructor(JSContextRef ctx, JSValueRef value, JSObjectRef constructor, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" JSRelationCondition JSValueCompare(JSContextRef ctx, JSValueRef left, JSValueRef right, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" JSRelationCondition JSValueCompareInt64(JSContextRef ctx, JSValueRef left, long right, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" JSRelationCondition JSValueCompareUInt64(JSContextRef ctx, JSValueRef left, ulong right, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" JSRelationCondition JSValueCompareDouble(JSContextRef ctx, JSValueRef left, double right, JSValueRef* exception);
 
 public extern "C" JSValueRef JSValueMakeUndefined(JSContextRef ctx);
@@ -122,16 +116,12 @@ public extern "C" JSValueRef JSValueMakeString(JSContextRef ctx, JSStringRef str
 
 public extern "C" JSValueRef JSValueMakeSymbol(JSContextRef ctx, JSStringRef description);
 
-/// macOS 15.0 and later.
 public extern "C" JSValueRef JSBigIntCreateWithDouble(JSContextRef ctx, double value, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" JSValueRef JSBigIntCreateWithInt64(JSContextRef ctx, long integer, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" JSValueRef JSBigIntCreateWithUInt64(JSContextRef ctx, ulong integer, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" JSValueRef JSBigIntCreateWithString(JSContextRef ctx, JSStringRef string, JSValueRef* exception);
 
 public extern "C" JSValueRef JSValueMakeFromJSONString(JSContextRef ctx, JSStringRef string);
@@ -142,16 +132,12 @@ public extern "C" bool JSValueToBoolean(JSContextRef ctx, JSValueRef value);
 
 public extern "C" double JSValueToNumber(JSContextRef ctx, JSValueRef value, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" int JSValueToInt32(JSContextRef ctx, JSValueRef value, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" uint JSValueToUInt32(JSContextRef ctx, JSValueRef value, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" long JSValueToInt64(JSContextRef ctx, JSValueRef value, JSValueRef* exception);
 
-/// macOS 15.0 and later.
 public extern "C" ulong JSValueToUInt64(JSContextRef ctx, JSValueRef value, JSValueRef* exception);
 
 public extern "C" JSStringRef JSValueToStringCopy(JSContextRef ctx, JSValueRef value, JSValueRef* exception);

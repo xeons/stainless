@@ -38,19 +38,15 @@ public extern "C" PKInkType? PKInkTypePencil;
 
 public extern "C" PKInkType? PKInkTypeMarker;
 
-/// macOS 14.0 and later.
 public extern "C" PKInkType? PKInkTypeMonoline;
 
-/// macOS 14.0 and later.
 public extern "C" PKInkType? PKInkTypeFountainPen;
 
-/// macOS 14.0 and later.
 public extern "C" PKInkType? PKInkTypeWatercolor;
 
 /// macOS 26.0 and later.
 public extern "C" PKInkType? PKInkTypeReed;
 
-/// macOS 14.0 and later.
 public extern "C" PKInkType? PKInkTypeCrayon;
 
 #endif

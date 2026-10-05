@@ -116,7 +116,6 @@ public extern "C" CFStringRef? kCMIOSampleBufferAttachment_MouseAndKeyboardModif
 
 public extern "C" CFStringRef? kCMIOSampleBufferAttachment_MouseAndKeyboardModifiersKey_KeyboardModifiersEvent;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kCMIOSampleBufferAttachmentKey_PixelBufferOverlaidByStaticImage;
 
 public extern "C" CFStringRef? kCMIOSampleBufferAttachmentKey_NoDataMarker;

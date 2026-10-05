@@ -40,12 +40,10 @@ public extern "C" AVVideoCodecType? AVVideoCodecTypeH264;
 
 public extern "C" AVVideoCodecType? AVVideoCodecTypeJPEG;
 
-/// macOS 15.0 and later.
 public extern "C" AVVideoCodecType? AVVideoCodecTypeJPEGXL;
 
 public extern "C" AVVideoCodecType? AVVideoCodecTypeAppleProRes4444;
 
-/// macOS 15.0 and later.
 public extern "C" AVVideoCodecType? AVVideoCodecTypeAppleProRes4444XQ;
 
 public extern "C" AVVideoCodecType? AVVideoCodecTypeAppleProRes422;
@@ -135,7 +133,6 @@ public extern "C" NSString? AVVideoTransferFunction_ITU_R_2100_HLG;
 
 public extern "C" NSString? AVVideoTransferFunction_Linear;
 
-/// macOS 15.0 and later.
 public extern "C" NSString? AVVideoTransferFunction_IEC_sRGB;
 
 public extern "C" NSString? AVVideoYCbCrMatrixKey;

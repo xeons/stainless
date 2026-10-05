@@ -250,9 +250,7 @@ public objc interface NSTableViewDelegate : NSControlTextEditingDelegate
     [Optional] [Selector("tableView:sizeToFitWidthOfColumn:")] CGFloat TableViewSizeToFitWidthOfColumn(NSTableView tableView, NSInteger column);
     [Optional] [Selector("tableView:shouldReorderColumn:toColumn:")] bool TableViewShouldReorderColumnToColumn(NSTableView tableView, NSInteger columnIndex, NSInteger newColumnIndex);
     [Optional] [Selector("tableView:rowActionsForRow:edge:")] NSArray TableViewRowActionsForRowEdge(NSTableView tableView, NSInteger row, NSTableRowActionEdge edge);
-    /// macOS 14.0 and later.
     [Optional] [Selector("tableView:userCanChangeVisibilityOfTableColumn:")] bool TableViewUserCanChangeVisibilityOfTableColumn(NSTableView tableView, NSTableColumn column);
-    /// macOS 14.0 and later.
     [Optional] [Selector("tableView:userDidChangeVisibilityOfTableColumns:")] void TableViewUserDidChangeVisibilityOfTableColumns(NSTableView tableView, NSArray columns);
     [Optional] [Selector("tableViewSelectionDidChange:")] void TableViewSelectionDidChange(NSNotification notification);
     [Optional] [Selector("tableViewColumnDidMove:")] void TableViewColumnDidMove(NSNotification notification);

@@ -47,7 +47,6 @@ public extern objc class PKPaymentRequestUpdate : NSObject
     [Selector("multiTokenContexts", "setMultiTokenContexts:")] public NSArray? MultiTokenContexts { get; set; }
     [Selector("recurringPaymentRequest", "setRecurringPaymentRequest:")] public PKRecurringPaymentRequest? RecurringPaymentRequest { get; set; }
     [Selector("automaticReloadPaymentRequest", "setAutomaticReloadPaymentRequest:")] public PKAutomaticReloadPaymentRequest? AutomaticReloadPaymentRequest { get; set; }
-    /// macOS 13.3 and later.
     [Selector("deferredPaymentRequest", "setDeferredPaymentRequest:")] public PKDeferredPaymentRequest? DeferredPaymentRequest { get; set; }
     [Selector("initWithPaymentSummaryItems:")] public Self InitWithPaymentSummaryItems(NSArray paymentSummaryItems);
 }

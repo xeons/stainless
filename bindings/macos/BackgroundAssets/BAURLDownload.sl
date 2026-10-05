@@ -33,9 +33,7 @@ import Standard.ObjC;
 
 public extern objc class BAURLDownload : BADownload, NSCopying
 {
-    /// macOS 13.3 and later.
     [Selector("initWithIdentifier:request:fileSize:applicationGroupIdentifier:")] public Self InitWithIdentifierRequestFileSizeApplicationGroupIdentifier(NSString identifier, NSURLRequest request, NSUInteger fileSize, NSString applicationGroupIdentifier);
-    /// macOS 13.3 and later.
     [Selector("initWithIdentifier:request:essential:fileSize:applicationGroupIdentifier:priority:")] public Self InitWithIdentifierRequestEssentialFileSizeApplicationGroupIdentifierPriority(NSString identifier, NSURLRequest request, bool essential, NSUInteger fileSize, NSString applicationGroupIdentifier, BADownloaderPriority priority);
     /// Deprecated in macOS 13.3.
     [Selector("initWithIdentifier:request:applicationGroupIdentifier:")] public Self InitWithIdentifierRequestApplicationGroupIdentifier(NSString identifier, NSURLRequest request, NSString applicationGroupIdentifier);

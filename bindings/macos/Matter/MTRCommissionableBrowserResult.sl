@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 14.0 and later.
 public extern objc class MTRCommissionableBrowserResult : NSObject
 {
     [Selector("instanceName")] public NSString InstanceName { get; }

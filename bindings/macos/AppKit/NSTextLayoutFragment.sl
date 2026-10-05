@@ -68,9 +68,7 @@ public extern objc class NSTextLayoutFragment : NSObject, NSSecureCoding
     [Selector("textAttachmentViewProviders")] public NSArray TextAttachmentViewProviders { get; }
     [Selector("initWithTextElement:range:")] public Self InitWithTextElementRange(NSTextElement textElement, NSTextRange? rangeInElement);
     [Selector("initWithCoder:")] public Self? InitWithCoder(NSCoder coder);
-    /// macOS 14.0 and later.
     [Selector("textLineFragmentForVerticalOffset:requiresExactMatch:")] public NSTextLineFragment? TextLineFragmentForVerticalOffsetRequiresExactMatch(CGFloat verticalOffset, bool requiresExactMatch);
-    /// macOS 14.0 and later.
     [Selector("textLineFragmentForTextLocation:isUpstreamAffinity:")] public NSTextLineFragment? TextLineFragmentForTextLocationIsUpstreamAffinity(NSTextLocation textLocation, bool isUpstreamAffinity);
     [Selector("invalidateLayout")] public void InvalidateLayout();
     [Selector("drawAtPoint:inContext:")] public void DrawAtPointInContext(CGPoint point, CGContextRef context);

@@ -37,7 +37,6 @@ public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialRegistrati
     [Selector("residentKeyPreference", "setResidentKeyPreference:")] public ASAuthorizationPublicKeyCredentialResidentKeyPreference ResidentKeyPreference { get; set; }
 }
 
-/// macOS 14.4 and later.
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest : ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialRegistrationRequest { }
 
 #endif

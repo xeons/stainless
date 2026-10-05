@@ -31,26 +31,22 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MetalPerformanceShaders")
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayQuantizedMatrixMultiplication : MPSNDArrayMatrixMultiplication
 {
     [Selector("initWithDevice:leftQuantizationDescriptor:rightQuantizationDescriptor:")] public Self InitWithDeviceLeftQuantizationDescriptorRightQuantizationDescriptor(MTLDevice device, MPSNDArrayQuantizationDescriptor? leftQuantizationDescriptor, MPSNDArrayQuantizationDescriptor? rightQuantizationDescriptor);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayLUTDequantize : MPSNDArrayMultiaryKernel
 {
     [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayVectorLUTDequantize : MPSNDArrayMultiaryKernel
 {
     [Selector("vectorAxis", "setVectorAxis:")] public NSUInteger VectorAxis { get; set; }
     [Selector("initWithDevice:axis:")] public Self InitWithDeviceAxis(MTLDevice device, NSUInteger axis);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayAffineInt4Dequantize : MPSNDArrayMultiaryKernel
 {
     [Selector("initWithDevice:quantizationDescriptor:")] public Self InitWithDeviceQuantizationDescriptor(MTLDevice device, MPSNDArrayAffineQuantizationDescriptor quantizationDescriptor);

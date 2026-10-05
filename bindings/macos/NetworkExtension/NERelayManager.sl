@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "NetworkExtension")
 
-/// macOS 14.0 and later.
 public enum NERelayManagerError : long
 {
     Invalid = 1,
@@ -40,10 +39,8 @@ public enum NERelayManagerError : long
     CannotBeRemoved = 4,
 }
 
-/// macOS 14.0 and later.
 public extern "C" NSString? NERelayErrorDomain;
 
-/// macOS 15.0 and later.
 public enum NERelayManagerClientError : long
 {
     None = 1,
@@ -58,10 +55,8 @@ public enum NERelayManagerClientError : long
     Other = 10,
 }
 
-/// macOS 15.0 and later.
 public extern "C" NSString? NERelayClientErrorDomain;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? NERelayConfigurationDidChangeNotification;
 
 public objc closure void NERelayManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock(NSError? arg0);
@@ -74,7 +69,6 @@ public objc closure void NERelayManagerGetLastClientErrorsCompletionHandlerCompl
 
 public objc closure void NERelayManagerLoadAllManagersFromPreferencesWithCompletionHandlerCompletionHandlerBlock(NSArray arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class NERelayManager : NSObject
 {
     [Selector("localizedDescription", "setLocalizedDescription:")] public NSString? LocalizedDescription { get; set; }
@@ -92,7 +86,6 @@ public extern objc class NERelayManager : NSObject
     [Selector("loadFromPreferencesWithCompletionHandler:")] public void LoadFromPreferencesWithCompletionHandler(NERelayManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("removeFromPreferencesWithCompletionHandler:")] public void RemoveFromPreferencesWithCompletionHandler(NERelayManagerRemoveFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("saveToPreferencesWithCompletionHandler:")] public void SaveToPreferencesWithCompletionHandler(NERelayManagerSaveToPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 15.0 and later.
     [Selector("getLastClientErrors:completionHandler:")] public void GetLastClientErrorsCompletionHandler(NSTimeInterval seconds, NERelayManagerGetLastClientErrorsCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("loadAllManagersFromPreferencesWithCompletionHandler:")] public static void LoadAllManagersFromPreferencesWithCompletionHandler(NERelayManagerLoadAllManagersFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }

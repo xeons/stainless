@@ -40,7 +40,6 @@ public extern objc class JSContext : NSObject
     [Selector("exceptionHandler", "setExceptionHandler:")] public JSContextExceptionHandlerBlock? ExceptionHandler { get; set; }
     [Selector("virtualMachine")] public JSVirtualMachine? VirtualMachine { get; }
     [Selector("name", "setName:")] public NSString? Name { get; set; }
-    /// macOS 13.3 and later.
     [Selector("isInspectable", "setInspectable:")] public bool Inspectable { get; set; }
     [Selector("init")] public Self? Init();
     [Selector("initWithVirtualMachine:")] public Self? InitWithVirtualMachine(JSVirtualMachine? virtualMachine);

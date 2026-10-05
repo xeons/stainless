@@ -85,7 +85,6 @@ public extern "C" NSString HKMetadataKeyGroupFitness;
 /// macOS 15.2 and later.
 public extern "C" NSString HKMetadataKeyAppleFitnessPlusCatalogIdentifier;
 
-/// macOS 14.0 and later.
 public extern "C" NSString HKMetadataKeyAppleFitnessPlusSession;
 
 public extern "C" NSString HKMetadataKeyIndoorWorkout;
@@ -162,22 +161,16 @@ public extern "C" NSString HKMetadataKeyQuantityClampedToUpperBound;
 
 public extern "C" NSString HKMetadataKeyGlassesPrescriptionDescription;
 
-/// macOS 14.0 and later.
 public extern "C" NSString HKMetadataKeyWaterSalinity;
 
-/// macOS 13.3 and later.
 public extern "C" NSString HKMetadataKeyHeadphoneGain;
 
-/// macOS 14.0 and later.
 public extern "C" NSString HKMetadataKeyCyclingFunctionalThresholdPowerTestType;
 
-/// macOS 14.0 and later.
 public extern "C" NSString HKMetadataKeyActivityType;
 
-/// macOS 14.0 and later.
 public extern "C" NSString HKMetadataKeyPhysicalEffortEstimationType;
 
-/// macOS 14.0 and later.
 public extern "C" NSString HKMetadataKeyMaximumLightIntensity;
 
 #endif

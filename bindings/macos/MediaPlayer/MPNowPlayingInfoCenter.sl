@@ -96,10 +96,8 @@ public extern "C" NSString MPNowPlayingInfoPropertyAdTimeRanges;
 
 public extern "C" NSString MPNowPlayingInfoPropertyCreditsStartTime;
 
-/// macOS 15.0 and later.
 public extern "C" NSString MPNowPlayingInfoPropertyInternationalStandardRecordingCode;
 
-/// macOS 15.0 and later.
 public extern "C" NSString MPNowPlayingInfoPropertyExcludeFromSuggestions;
 
 /// macOS 26.0 and later.

@@ -1,5 +1,5 @@
 # Classes and messages the macOS SDK headers declare and the Objective-C runtime
-# does not answer on macOS 15.7, each with why. The runtime case does not ask
+# does not answer on macOS 15.7 or on CI's macOS 26, each with why. The runtime case does not ask
 # these; anything else it cannot find is a binding that names nothing.
 
 +[GKGameSession addEventListener:] -- declared, and answered by nothing on macOS 15.7
@@ -48,6 +48,8 @@
 -[GKAchievement percentComplete] -- declared, and answered by nothing on macOS 15.7
 -[GKAchievement setIdentifier:] -- declared, and answered by nothing on macOS 15.7
 -[GKAchievement setPercentComplete:] -- declared, and answered by nothing on macOS 15.7
+-[GKAchievementDescription activityIdentifier] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
+-[GKAchievementDescription activityProperties] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
 -[GKAchievementDescription groupIdentifier] -- declared, and answered by nothing on macOS 15.7
 -[GKAchievementDescription identifier] -- declared, and answered by nothing on macOS 15.7
 -[GKAchievementDescription isHidden] -- declared, and answered by nothing on macOS 15.7
@@ -63,12 +65,16 @@
 -[GKChallengesViewController setChallengeDelegate:] -- declared, and answered by nothing on macOS 15.7
 -[GKInvite playerAttributes] -- declared, and answered by nothing on macOS 15.7
 -[GKInvite playerGroup] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard activityIdentifier] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
+-[GKLeaderboard activityProperties] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
 -[GKLeaderboard baseLeaderboardID] -- declared, and answered by nothing on macOS 15.7
 -[GKLeaderboard category] -- declared, and answered by nothing on macOS 15.7
 -[GKLeaderboard groupIdentifier] -- declared, and answered by nothing on macOS 15.7
 -[GKLeaderboard identifier] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard leaderboardDescription] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
 -[GKLeaderboard maxRange] -- declared, and answered by nothing on macOS 15.7
 -[GKLeaderboard nextStartDate] -- declared, and answered by nothing on macOS 15.7
+-[GKLeaderboard releaseState] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
 -[GKLeaderboard setCategory:] -- declared, and answered by nothing on macOS 15.7
 -[GKLeaderboard setIdentifier:] -- declared, and answered by nothing on macOS 15.7
 -[GKLeaderboard startDate] -- declared, and answered by nothing on macOS 15.7
@@ -138,6 +144,10 @@
 -[NSATSTypesetter getGlyphsInRange:glyphs:characterIndexes:glyphInscriptions:elasticBits:] -- declared, and answered by nothing on macOS 15.7
 -[NSATSTypesetter willSetLineFragmentRect:forGlyphRange:usedRect:baselineOffset:] -- declared, and answered by nothing on macOS 15.7
 -[NSApplication application:printFiles:] -- declared, and answered by nothing on macOS 15.7
+-[NSButton borderShape] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
+-[NSButton setBorderShape:] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
+-[NSButton setTintProminence:] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
+-[NSButton tintProminence] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
 -[NSMenu submenuAction:] -- declared, and answered by nothing on macOS 15.7
 -[NSObject URL:resourceDataDidBecomeAvailable:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject URL:resourceDidFailLoadingWithReason:] -- an informal protocol: declared on NSObject for an object to implement
@@ -176,6 +186,7 @@
 -[NSObject panel:directoryDidChange:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject panel:shouldShowFilename:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject provideImageData:bytesPerRow:origin::size::userInfo:] -- an informal protocol: declared on NSObject for an object to implement
+-[NSObject provideImageToMTLTexture:commandBuffer:originx:originy:width:height:userInfo:] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
 -[NSObject quartzFilterManager:didAddFilter:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject quartzFilterManager:didModifyFilter:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSObject quartzFilterManager:didRemoveFilter:] -- an informal protocol: declared on NSObject for an object to implement
@@ -214,6 +225,8 @@
 -[NSObject workflowControllerWillStop:] -- an informal protocol: declared on NSObject for an object to implement
 -[NSResponder newWindowForTab:] -- declared, and answered by nothing on macOS 15.7
 -[NSSavePanel selectText:] -- declared, and answered by nothing on macOS 15.7
+-[NSSegmentedControl borderShape] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
+-[NSSegmentedControl setBorderShape:] -- declared for macOS 26.0, and answered by nothing on the macos-26 runner
 -[NSTypesetter willSetLineFragmentRect:forGlyphRange:usedRect:baselineOffset:] -- declared, and answered by nothing on macOS 15.7
 -[NSView additionalSafeAreaInsets] -- declared, and answered by nothing on macOS 15.7
 -[NSView safeAreaRect] -- declared, and answered by nothing on macOS 15.7

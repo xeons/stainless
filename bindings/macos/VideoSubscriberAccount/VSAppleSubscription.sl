@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "VideoSubscriberAccount")
 
-/// macOS 14.4 and later.
 public extern objc class VSAppleSubscription : NSObject
 {
     [Selector("customerID", "setCustomerID:")] public NSString CustomerID { get; set; }

@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 14.0 and later.
 public enum NSPrintPanelResult : long
 {
     Cancelled = 0,
@@ -85,7 +84,6 @@ public extern objc class NSPrintPanel : NSObject
     [Selector("removeAccessoryController:")] public void RemoveAccessoryController(NSViewController accessoryController);
     [Selector("setDefaultButtonTitle:")] public void SetDefaultButtonTitle(NSString? defaultButtonTitle);
     [Selector("defaultButtonTitle")] public NSString? DefaultButtonTitle();
-    /// macOS 14.0 and later.
     [Selector("beginSheetUsingPrintInfo:onWindow:completionHandler:")] public void BeginSheetUsingPrintInfoOnWindowCompletionHandler(NSPrintInfo printInfo, NSWindow parentWindow, NSPrintPanelBeginSheetUsingPrintInfoOnWindowCompletionHandlerHandlerBlock? handler);
     /// Deprecated in macOS 100000.
     [Selector("beginSheetWithPrintInfo:modalForWindow:delegate:didEndSelector:contextInfo:")] public void BeginSheetWithPrintInfoModalForWindowDelegateDidEndSelectorContextInfo(NSPrintInfo printInfo, NSWindow docWindow, AnyObject? @delegate, Selector didEndSelector, void* contextInfo);

@@ -91,7 +91,6 @@ public extern "C" void MACaptionAppearanceSetDisplayType(MACaptionAppearanceDoma
 
 [ReturnsRetained] public extern "C" CFArrayRef MACaptionAppearanceCopyPreferredCaptioningMediaCharacteristics(MACaptionAppearanceDomain domain);
 
-/// macOS 15.0 and later.
 public extern "C" bool MACaptionAppearanceIsCustomized(MACaptionAppearanceDomain domain);
 
 [ReturnsRetained] public extern "C" CGColorRef MACaptionAppearanceCopyForegroundColor(MACaptionAppearanceDomain domain, MACaptionAppearanceBehavior* behavior);

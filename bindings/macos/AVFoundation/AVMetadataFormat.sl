@@ -300,7 +300,6 @@ public extern "C" AVMetadataKey? AVMetadataQuickTimeMetadataKeyAccessibilityDesc
 
 public extern "C" AVMetadataKey? AVMetadataQuickTimeMetadataKeyIsMontage;
 
-/// macOS 15.0 and later.
 public extern "C" AVMetadataKey? AVMetadataQuickTimeMetadataKeyFullFrameRatePlaybackIntent;
 
 /// macOS 26.0 and later.

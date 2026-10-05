@@ -44,7 +44,6 @@ public objc closure void VZLinuxRosettaDirectoryShareInstallRosettaWithCompletio
 
 public extern objc class VZLinuxRosettaDirectoryShare : VZDirectoryShare
 {
-    /// macOS 14.0 and later.
     [Selector("options", "setOptions:")] public VZLinuxRosettaCachingOptions? Options { get; set; }
     [Selector("availability")] public static VZLinuxRosettaAvailability Availability { get; }
     [Selector("initWithError:")] public Self? InitWithError(out NSError? error);

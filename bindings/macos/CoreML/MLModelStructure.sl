@@ -35,7 +35,6 @@ public objc closure void MLModelStructureLoadContentsOfURLCompletionHandlerHandl
 
 public objc closure void MLModelStructureLoadModelAssetCompletionHandlerHandlerBlock(MLModelStructure? arg0, NSError? arg1);
 
-/// macOS 14.4 and later.
 public extern objc class MLModelStructure : NSObject
 {
     [Selector("neuralNetwork")] public MLModelStructureNeuralNetwork? NeuralNetwork { get; }

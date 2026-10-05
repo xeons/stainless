@@ -39,7 +39,6 @@ public objc interface GCTouchedStateInput : NSObjectProtocol
     [Selector("isTouched")] bool Touched { get; }
     [Selector("lastTouchedStateTimestamp")] NSTimeInterval LastTouchedStateTimestamp { get; }
     [Selector("lastTouchedStateLatency")] NSTimeInterval LastTouchedStateLatency { get; }
-    /// macOS 14.0 and later.
     [Selector("sources")] NSSet Sources { get; }
 }
 

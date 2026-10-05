@@ -38,7 +38,6 @@ public enum MPSGraphNonMaximumSuppressionCoordinateMode : ulong
     CentersWidthFirst = 3,
 }
 
-/// macOS 14.0 and later.
 /// MPSGraphNonMaximumSuppressionOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {

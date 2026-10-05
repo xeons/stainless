@@ -94,7 +94,6 @@ public extern objc class NSColor : NSObject, NSCopying, NSSecureCoding, NSPasteb
     [Selector("findHighlightColor")] public static NSColor? FindHighlightColor { get; }
     [Selector("textColor")] public static NSColor TextColor { get; }
     [Selector("textBackgroundColor")] public static NSColor TextBackgroundColor { get; }
-    /// macOS 14.0 and later.
     [Selector("textInsertionPointColor")] public static NSColor? TextInsertionPointColor { get; }
     [Selector("selectedTextColor")] public static NSColor SelectedTextColor { get; }
     [Selector("selectedTextBackgroundColor")] public static NSColor SelectedTextBackgroundColor { get; }
@@ -120,15 +119,10 @@ public extern objc class NSColor : NSObject, NSCopying, NSSecureCoding, NSPasteb
     [Selector("systemIndigoColor")] public static NSColor? SystemIndigoColor { get; }
     [Selector("systemMintColor")] public static NSColor? SystemMintColor { get; }
     [Selector("systemCyanColor")] public static NSColor? SystemCyanColor { get; }
-    /// macOS 14.0 and later.
     [Selector("systemFillColor")] public static NSColor? SystemFillColor { get; }
-    /// macOS 14.0 and later.
     [Selector("secondarySystemFillColor")] public static NSColor? SecondarySystemFillColor { get; }
-    /// macOS 14.0 and later.
     [Selector("tertiarySystemFillColor")] public static NSColor? TertiarySystemFillColor { get; }
-    /// macOS 14.0 and later.
     [Selector("quaternarySystemFillColor")] public static NSColor? QuaternarySystemFillColor { get; }
-    /// macOS 14.0 and later.
     [Selector("quinarySystemFillColor")] public static NSColor? QuinarySystemFillColor { get; }
     [Selector("controlAccentColor")] public static NSColor? ControlAccentColor { get; }
     [Selector("currentControlTint")] public static NSControlTint CurrentControlTint { get; }

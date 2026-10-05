@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.0 and later.
 public extern objc class MLGPUComputeDevice : NSObject, MLComputeDeviceProtocol
 {
     [Selector("metalDevice")] public MTLDevice? MetalDevice { get; }

@@ -125,7 +125,6 @@ public extern objc class AVAssetWriterInputPixelBufferAdaptor : NSObject
     [Selector("appendPixelBuffer:withPresentationTime:")] public bool AppendPixelBufferWithPresentationTime(CVPixelBufferRef pixelBuffer, CMTime presentationTime);
 }
 
-/// macOS 14.0 and later.
 public extern objc class AVAssetWriterInputTaggedPixelBufferGroupAdaptor : NSObject
 {
     [Selector("assetWriterInput")] public AVAssetWriterInput AssetWriterInput { get; }

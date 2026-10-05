@@ -1,6 +1,6 @@
 // The Objective-C and Core Foundation shapes the bindings generator has to
 // read, one of each, with nothing included. Dumped with
-//   clang -x objective-c -fobjc-arc -target arm64-apple-macosx13.0
+//   clang -x objective-c -fobjc-arc -target arm64-apple-macosx15.0
 //     -fsyntax-only -Xclang -ast-dump=json objc.h > objc.json
 typedef _Bool BOOL;
 typedef unsigned long CFTypeID;

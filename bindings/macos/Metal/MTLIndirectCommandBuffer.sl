@@ -70,16 +70,11 @@ public extern objc class MTLIndirectCommandBufferDescriptor : NSObject, NSCopyin
     [Selector("maxVertexBufferBindCount", "setMaxVertexBufferBindCount:")] public NSUInteger MaxVertexBufferBindCount { get; set; }
     [Selector("maxFragmentBufferBindCount", "setMaxFragmentBufferBindCount:")] public NSUInteger MaxFragmentBufferBindCount { get; set; }
     [Selector("maxKernelBufferBindCount", "setMaxKernelBufferBindCount:")] public NSUInteger MaxKernelBufferBindCount { get; set; }
-    /// macOS 14.0 and later.
     [Selector("maxKernelThreadgroupMemoryBindCount", "setMaxKernelThreadgroupMemoryBindCount:")] public NSUInteger MaxKernelThreadgroupMemoryBindCount { get; set; }
-    /// macOS 14.0 and later.
     [Selector("maxObjectBufferBindCount", "setMaxObjectBufferBindCount:")] public NSUInteger MaxObjectBufferBindCount { get; set; }
-    /// macOS 14.0 and later.
     [Selector("maxMeshBufferBindCount", "setMaxMeshBufferBindCount:")] public NSUInteger MaxMeshBufferBindCount { get; set; }
-    /// macOS 14.0 and later.
     [Selector("maxObjectThreadgroupMemoryBindCount", "setMaxObjectThreadgroupMemoryBindCount:")] public NSUInteger MaxObjectThreadgroupMemoryBindCount { get; set; }
     [Selector("supportRayTracing", "setSupportRayTracing:")] public bool SupportRayTracing { get; set; }
-    /// macOS 14.0 and later.
     [Selector("supportDynamicAttributeStride", "setSupportDynamicAttributeStride:")] public bool SupportDynamicAttributeStride { get; set; }
     /// macOS 26.0 and later.
     [Selector("supportColorAttachmentMapping", "setSupportColorAttachmentMapping:")] public bool SupportColorAttachmentMapping { get; set; }

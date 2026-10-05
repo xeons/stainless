@@ -74,7 +74,6 @@ public extern objc class AVAssetWriter : NSObject
 public extern objc class AVAssetWriter
 {
     [Selector("movieFragmentInterval", "setMovieFragmentInterval:")] public CMTime MovieFragmentInterval { get; set; }
-    /// macOS 14.0 and later.
     [Selector("initialMovieFragmentInterval", "setInitialMovieFragmentInterval:")] public CMTime InitialMovieFragmentInterval { get; set; }
     [Selector("initialMovieFragmentSequenceNumber", "setInitialMovieFragmentSequenceNumber:")] public NSInteger InitialMovieFragmentSequenceNumber { get; set; }
     [Selector("producesCombinableFragments", "setProducesCombinableFragments:")] public bool ProducesCombinableFragments { get; set; }

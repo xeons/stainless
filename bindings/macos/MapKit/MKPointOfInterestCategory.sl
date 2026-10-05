@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 public using MKPointOfInterestCategory = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryAnimalService;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryAirport;
@@ -43,25 +42,20 @@ public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryAquarium;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryATM;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryAutomotiveRepair;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBakery;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBank;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBaseball;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBasketball;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBeach;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBeauty;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBowling;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryBrewery;
@@ -72,73 +66,58 @@ public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryCampground
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryCarRental;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryCastle;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryConventionCenter;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryDistillery;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryEVCharger;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryFairground;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryFireStation;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryFishing;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryFitnessCenter;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryFoodMarket;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryFortress;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryGasStation;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryGolf;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryGoKart;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryHiking;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryHospital;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryHotel;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryKayaking;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryLandmark;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryLaundry;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryLibrary;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryMailbox;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryMarina;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryMiniGolf;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryMovieTheater;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryMuseum;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryMusicVenue;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryNationalMonument;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryNationalPark;
@@ -151,7 +130,6 @@ public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryParking;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryPharmacy;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryPlanetarium;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryPolice;
@@ -164,40 +142,30 @@ public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryRestaurant
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryRestroom;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryRockClimbing;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryRVPark;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySchool;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySkatePark;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySkating;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySkiing;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySoccer;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySpa;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryStadium;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryStore;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySurfing;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategorySwimming;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryTennis;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryTheater;
@@ -206,7 +174,6 @@ public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryUniversity
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryWinery;
 
-/// macOS 15.0 and later.
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryVolleyball;
 
 public extern "C" MKPointOfInterestCategory? MKPointOfInterestCategoryZoo;

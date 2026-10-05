@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Foundation")
 
-/// macOS 15.0 and later.
 public using NSUndoManagerUserInfoKey = NSString;
 
 public objc closure void NSUndoManagerRegisterUndoWithTargetHandlerUndoHandlerBlock(AnyObject arg0);
@@ -44,9 +43,7 @@ public extern objc class NSUndoManager : NSObject
     [Selector("runLoopModes", "setRunLoopModes:")] public NSArray RunLoopModes { get; set; }
     [Selector("canUndo")] public bool CanUndo { get; }
     [Selector("canRedo")] public bool CanRedo { get; }
-    /// macOS 14.4 and later.
     [Selector("undoCount")] public NSUInteger UndoCount { get; }
-    /// macOS 14.4 and later.
     [Selector("redoCount")] public NSUInteger RedoCount { get; }
     [Selector("isUndoing")] public bool Undoing { get; }
     [Selector("isRedoing")] public bool Redoing { get; }
@@ -70,11 +67,8 @@ public extern objc class NSUndoManager : NSObject
     [Selector("registerUndoWithTarget:handler:")] public void RegisterUndoWithTargetHandler(AnyObject target, NSUndoManagerRegisterUndoWithTargetHandlerUndoHandlerBlock undoHandler);
     [Selector("setActionIsDiscardable:")] public void SetActionIsDiscardable(bool discardable);
     [Selector("setActionName:")] public void SetActionName(NSString actionName);
-    /// macOS 15.0 and later.
     [Selector("undoActionUserInfoValueForKey:")] public AnyObject? UndoActionUserInfoValueForKey(NSUndoManagerUserInfoKey key);
-    /// macOS 15.0 and later.
     [Selector("redoActionUserInfoValueForKey:")] public AnyObject? RedoActionUserInfoValueForKey(NSUndoManagerUserInfoKey key);
-    /// macOS 15.0 and later.
     [Selector("setActionUserInfoValue:forKey:")] public void SetActionUserInfoValueForKey(AnyObject? info, NSUndoManagerUserInfoKey key);
     [Selector("undoMenuTitleForUndoActionName:")] public NSString UndoMenuTitleForUndoActionName(NSString actionName);
     [Selector("redoMenuTitleForUndoActionName:")] public NSString RedoMenuTitleForUndoActionName(NSString actionName);

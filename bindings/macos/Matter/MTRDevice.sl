@@ -45,15 +45,10 @@ public objc closure void MTRDeviceWaitForAttributeValuesTimeoutQueueCompletionCo
 public extern objc class MTRDevice : NSObject
 {
     [Selector("state")] public MTRDeviceState State { get; }
-    /// macOS 14.6 and later.
     [Selector("deviceCachePrimed")] public bool DeviceCachePrimed { get; }
-    /// macOS 13.4 and later.
     [Selector("estimatedStartTime")] public NSDate? EstimatedStartTime { get; }
-    /// macOS 14.4 and later.
     [Selector("deviceController")] public MTRDeviceController? DeviceController { get; }
-    /// macOS 14.4 and later.
     [Selector("nodeID")] public NSNumber? NodeID { get; }
-    /// macOS 14.6 and later.
     [Selector("estimatedSubscriptionLatency")] public NSNumber? EstimatedSubscriptionLatency { get; }
     /// macOS 15.3 and later.
     [Selector("vendorID")] public NSNumber? VendorID { get; }
@@ -61,15 +56,11 @@ public extern objc class MTRDevice : NSObject
     [Selector("productID")] public NSNumber? ProductID { get; }
     /// macOS 15.4 and later.
     [Selector("networkCommissioningFeatures")] public MTRNetworkCommissioningFeature NetworkCommissioningFeatures { get; }
-    /// macOS 13.3 and later.
     [Selector("deviceWithNodeID:controller:")] public static MTRDevice DeviceWithNodeIDController(NSNumber nodeID, MTRDeviceController controller);
     /// Deprecated in macOS 15.0.
     [Selector("setDelegate:queue:")] public void SetDelegateQueue(MTRDeviceDelegate @delegate, dispatch_queue_t queue);
-    /// macOS 15.0 and later.
     [Selector("addDelegate:queue:")] public void AddDelegateQueue(MTRDeviceDelegate @delegate, dispatch_queue_t queue);
-    /// macOS 15.0 and later.
     [Selector("addDelegate:queue:interestedPathsForAttributes:interestedPathsForEvents:")] public void AddDelegateQueueInterestedPathsForAttributesInterestedPathsForEvents(MTRDeviceDelegate @delegate, dispatch_queue_t queue, NSArray? interestedPathsForAttributes, NSArray? interestedPathsForEvents);
-    /// macOS 15.0 and later.
     [Selector("removeDelegate:")] public void RemoveDelegate(MTRDeviceDelegate @delegate);
     [Selector("readAttributeWithEndpointID:clusterID:attributeID:params:")] public NSDictionary? ReadAttributeWithEndpointIDClusterIDAttributeIDParams(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, MTRReadParams? params);
     [Selector("writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout:")] public void WriteAttributeWithEndpointIDClusterIDAttributeIDValueExpectedValueIntervalTimedWriteTimeout(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber expectedValueInterval, NSNumber? timeout);
@@ -77,26 +68,19 @@ public extern objc class MTRDevice : NSObject
     [Selector("readAttributePaths:")] public NSArray ReadAttributePaths(NSArray attributePaths);
     /// macOS 15.4 and later.
     [Selector("descriptorClusters")] public NSDictionary DescriptorClusters();
-    /// macOS 14.4 and later.
     [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:queue:completion:")] public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, NSDictionary? commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    /// macOS 13.3 and later.
     [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:queue:completion:")] public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsExpectedValuesExpectedValueIntervalTimedInvokeTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSArray? expectedValues, NSNumber? expectedValueInterval, NSNumber? timeout, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
     /// macOS 15.4 and later.
     [Selector("invokeCommands:queue:completion:")] public void InvokeCommandsQueueCompletion(NSArray commands, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    /// macOS 13.1 and later.
     [Selector("openCommissioningWindowWithSetupPasscode:discriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationQueueCompletion(NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    /// macOS 14.0 and later.
     [Selector("openCommissioningWindowWithDiscriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithDiscriminatorDurationQueueCompletion(NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    /// macOS 14.6 and later.
     [Selector("downloadLogOfType:timeout:queue:completion:")] public void DownloadLogOfTypeTimeoutQueueCompletion(MTRDiagnosticLogType type, NSTimeInterval timeout, dispatch_queue_t queue, MTRDeviceDownloadLogOfTypeTimeoutQueueCompletionCompletionBlock completion);
     /// macOS 15.3 and later.
     [Selector("waitForAttributeValues:timeout:queue:completion:")] public MTRAttributeValueWaiter WaitForAttributeValuesTimeoutQueueCompletion(NSDictionary values, NSTimeInterval timeout, dispatch_queue_t queue, MTRDeviceWaitForAttributeValuesTimeoutQueueCompletionCompletionBlock completion);
 }
 
-/// macOS 14.6 and later.
 public extern "C" NSString MTRPreviousDataKey;
 
-/// macOS 14.6 and later.
 public extern "C" NSString MTRDataVersionKey;
 
 public objc interface MTRDeviceDelegate : NSObjectProtocol
@@ -104,11 +88,8 @@ public objc interface MTRDeviceDelegate : NSObjectProtocol
     [Selector("device:stateChanged:")] void DeviceStateChanged(MTRDevice device, MTRDeviceState state);
     [Selector("device:receivedAttributeReport:")] void DeviceReceivedAttributeReport(MTRDevice device, NSArray attributeReport);
     [Selector("device:receivedEventReport:")] void DeviceReceivedEventReport(MTRDevice device, NSArray eventReport);
-    /// macOS 13.3 and later.
     [Optional] [Selector("deviceBecameActive:")] void DeviceBecameActive(MTRDevice device);
-    /// macOS 14.6 and later.
     [Optional] [Selector("deviceCachePrimed:")] void DeviceCachePrimed(MTRDevice device);
-    /// macOS 14.6 and later.
     [Optional] [Selector("deviceConfigurationChanged:")] void DeviceConfigurationChanged(MTRDevice device);
 }
 

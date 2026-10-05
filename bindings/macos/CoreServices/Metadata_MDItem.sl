@@ -190,7 +190,6 @@ public extern "C" CFStringRef? kMDItemGPSDateStamp;
 
 public extern "C" CFStringRef? kMDItemGPSDifferental;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kMDItemMediaExtensions;
 
 public extern "C" CFStringRef? kMDItemCodecs;

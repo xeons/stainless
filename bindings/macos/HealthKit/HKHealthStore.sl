@@ -134,9 +134,7 @@ public objc closure void HKHealthStoreUnrelateWorkoutEffortSampleFromWorkoutActi
 /// HKWorkoutRelationship, a category of HKHealthStore.
 public extern objc class HKHealthStore
 {
-    /// macOS 15.0 and later.
     [Selector("relateWorkoutEffortSample:withWorkout:activity:completion:")] public void RelateWorkoutEffortSampleWithWorkoutActivityCompletion(HKSample sample, HKWorkout workout, HKWorkoutActivity? activity, HKHealthStoreRelateWorkoutEffortSampleWithWorkoutActivityCompletionCompletionBlock completion);
-    /// macOS 15.0 and later.
     [Selector("unrelateWorkoutEffortSample:fromWorkout:activity:completion:")] public void UnrelateWorkoutEffortSampleFromWorkoutActivityCompletion(HKSample sample, HKWorkout workout, HKWorkoutActivity? activity, HKHealthStoreUnrelateWorkoutEffortSampleFromWorkoutActivityCompletionCompletionBlock completion);
 }
 

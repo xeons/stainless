@@ -31,13 +31,11 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MapKit")
 
-/// macOS 15.0 and later.
 public extern objc class MKSelectionAccessory : NSObject
 {
     [Selector("mapItemDetailWithPresentationStyle:")] public static MKSelectionAccessory MapItemDetailWithPresentationStyle(MKMapItemDetailSelectionAccessoryPresentationStyle presentationStyle);
 }
 
-/// macOS 15.0 and later.
 public enum MKMapItemDetailSelectionAccessoryCalloutStyle : long
 {
     Automatic = 0,
@@ -45,7 +43,6 @@ public enum MKMapItemDetailSelectionAccessoryCalloutStyle : long
     Compact = 2,
 }
 
-/// macOS 15.0 and later.
 public extern objc class MKMapItemDetailSelectionAccessoryPresentationStyle : NSObject
 {
     [Selector("callout")] public static MKMapItemDetailSelectionAccessoryPresentationStyle Callout { get; }

@@ -122,9 +122,7 @@ public objc interface NSOutlineViewDelegate : NSControlTextEditingDelegate
     [Optional] [Selector("outlineView:sizeToFitWidthOfColumn:")] CGFloat OutlineViewSizeToFitWidthOfColumn(NSOutlineView outlineView, NSInteger column);
     [Optional] [Selector("outlineView:shouldReorderColumn:toColumn:")] bool OutlineViewShouldReorderColumnToColumn(NSOutlineView outlineView, NSInteger columnIndex, NSInteger newColumnIndex);
     [Optional] [Selector("outlineView:shouldShowOutlineCellForItem:")] bool OutlineViewShouldShowOutlineCellForItem(NSOutlineView outlineView, AnyObject item);
-    /// macOS 14.0 and later.
     [Optional] [Selector("outlineView:userCanChangeVisibilityOfTableColumn:")] bool OutlineViewUserCanChangeVisibilityOfTableColumn(NSOutlineView outlineView, NSTableColumn column);
-    /// macOS 14.0 and later.
     [Optional] [Selector("outlineView:userDidChangeVisibilityOfTableColumns:")] void OutlineViewUserDidChangeVisibilityOfTableColumns(NSOutlineView outlineView, NSArray columns);
     [Optional] [Selector("outlineViewSelectionDidChange:")] void OutlineViewSelectionDidChange(NSNotification notification);
     [Optional] [Selector("outlineViewColumnDidMove:")] void OutlineViewColumnDidMove(NSNotification notification);

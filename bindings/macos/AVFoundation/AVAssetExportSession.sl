@@ -65,10 +65,8 @@ public extern "C" NSString AVAssetExportPresetHEVC4320x2160;
 
 public extern "C" NSString AVAssetExportPresetHEVC7680x4320;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? AVAssetExportPresetMVHEVC960x960;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? AVAssetExportPresetMVHEVC1440x1440;
 
 /// macOS 26.0 and later.
@@ -126,7 +124,6 @@ public extern objc class AVAssetExportSession : NSObject
     [Selector("outputFileType", "setOutputFileType:")] public AVFileType? OutputFileType { get; set; }
     [Selector("outputURL", "setOutputURL:")] public NSURL? OutputURL { get; set; }
     [Selector("shouldOptimizeForNetworkUse", "setShouldOptimizeForNetworkUse:")] public bool ShouldOptimizeForNetworkUse { get; set; }
-    /// macOS 14.0 and later.
     [Selector("allowsParallelizedExport", "setAllowsParallelizedExport:")] public bool AllowsParallelizedExport { get; set; }
     [Selector("status")] public AVAssetExportSessionStatus Status { get; }
     [Selector("error")] public NSError? Error { get; }

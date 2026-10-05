@@ -176,7 +176,6 @@ public enum PHASECalibrationMode : long
     AbsoluteSpl = 2,
 }
 
-/// macOS 15.0 and later.
 [Flags]
 public enum PHASEAutomaticHeadTrackingFlags : ulong
 {

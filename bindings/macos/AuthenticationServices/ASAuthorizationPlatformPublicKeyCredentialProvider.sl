@@ -36,12 +36,10 @@ public extern objc class ASAuthorizationPlatformPublicKeyCredentialProvider : NS
     [Selector("relyingPartyIdentifier")] public NSString RelyingPartyIdentifier { get; }
     [Selector("initWithRelyingPartyIdentifier:")] public Self InitWithRelyingPartyIdentifier(NSString relyingPartyIdentifier);
     [Selector("createCredentialRegistrationRequestWithChallenge:name:userID:")] public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeNameUserID(NSData challenge, NSString name, NSData userID);
-    /// macOS 15.0 and later.
     [Selector("createCredentialRegistrationRequestWithChallenge:name:userID:requestStyle:")] public ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithChallengeNameUserIDRequestStyle(NSData challenge, NSString name, NSData userID, ASAuthorizationPlatformPublicKeyCredentialRegistrationRequestStyle requestStyle);
     [Selector("createCredentialAssertionRequestWithChallenge:")] public ASAuthorizationPlatformPublicKeyCredentialAssertionRequest CreateCredentialAssertionRequestWithChallenge(NSData challenge);
 }
 
-/// macOS 13.5 and later.
 public extern objc class ASAuthorizationPlatformPublicKeyCredentialProvider : ASAuthorizationWebBrowserPlatformPublicKeyCredentialProvider { }
 
 #endif

@@ -67,10 +67,8 @@ public extern "C" AVMetadataObjectType? AVMetadataObjectTypeHumanBody;
 
 public extern objc class AVMetadataHumanBodyObject : AVMetadataBodyObject, NSCopying { }
 
-/// macOS 14.0 and later.
 public extern "C" AVMetadataObjectType? AVMetadataObjectTypeHumanFullBody;
 
-/// macOS 14.0 and later.
 public extern objc class AVMetadataHumanFullBodyObject : AVMetadataBodyObject, NSCopying { }
 
 /// macOS 26.0 and later.

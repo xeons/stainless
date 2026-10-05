@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Metal")
 
-/// macOS 15.0 and later.
 public objc interface MTLAllocation : NSObjectProtocol
 {
-    /// macOS 15.0 and later.
     [Selector("allocatedSize")] NSUInteger AllocatedSize { get; }
 }
 

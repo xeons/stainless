@@ -60,31 +60,22 @@ public enum ASAuthorizationProviderExtensionUserSecureEnclaveKeyBiometricPolicy 
     PasswordFallback = 8,
 }
 
-/// macOS 15.0 and later.
 public using ASAuthorizationProviderExtensionEncryptionAlgorithm = NSNumber;
 
-/// macOS 15.0 and later.
 public extern "C" ASAuthorizationProviderExtensionEncryptionAlgorithm? ASAuthorizationProviderExtensionEncryptionAlgorithmECDHE_A256GCM;
 
-/// macOS 15.0 and later.
 public extern "C" ASAuthorizationProviderExtensionEncryptionAlgorithm? ASAuthorizationProviderExtensionEncryptionAlgorithmHPKE_P256_SHA256_AES_GCM_256;
 
-/// macOS 15.0 and later.
 public extern "C" ASAuthorizationProviderExtensionEncryptionAlgorithm? ASAuthorizationProviderExtensionEncryptionAlgorithmHPKE_P384_SHA384_AES_GCM_256;
 
-/// macOS 15.0 and later.
 public extern "C" ASAuthorizationProviderExtensionEncryptionAlgorithm? ASAuthorizationProviderExtensionEncryptionAlgorithmHPKE_Curve25519_SHA256_ChachaPoly;
 
-/// macOS 15.0 and later.
 public using ASAuthorizationProviderExtensionSigningAlgorithm = NSNumber;
 
-/// macOS 15.0 and later.
 public extern "C" ASAuthorizationProviderExtensionSigningAlgorithm? ASAuthorizationProviderExtensionSigningAlgorithmES256;
 
-/// macOS 15.0 and later.
 public extern "C" ASAuthorizationProviderExtensionSigningAlgorithm? ASAuthorizationProviderExtensionSigningAlgorithmES384;
 
-/// macOS 15.0 and later.
 public extern "C" ASAuthorizationProviderExtensionSigningAlgorithm? ASAuthorizationProviderExtensionSigningAlgorithmEd25519;
 
 public objc closure void ASAuthorizationProviderExtensionLoginConfigurationConfigurationWithOpenIDConfigurationURLClientIDIssuerCompletionCompletionBlock(ASAuthorizationProviderExtensionLoginConfiguration? arg0, NSError? arg1);
@@ -98,70 +89,42 @@ public extern objc class ASAuthorizationProviderExtensionLoginConfiguration : NS
     [Selector("audience", "setAudience:")] public NSString Audience { get; set; }
     [Selector("tokenEndpointURL", "setTokenEndpointURL:")] public NSURL TokenEndpointURL { get; set; }
     [Selector("jwksEndpointURL", "setJwksEndpointURL:")] public NSURL JwksEndpointURL { get; set; }
-    /// macOS 14.0 and later.
     [Selector("jwksTrustedRootCertificates", "setJwksTrustedRootCertificates:")] public NSArray? JwksTrustedRootCertificates { get; set; }
-    /// macOS 14.0 and later.
     [Selector("deviceContext", "setDeviceContext:")] public NSData? DeviceContext { get; set; }
-    /// macOS 14.4 and later.
     [Selector("userSecureEnclaveKeyBiometricPolicy", "setUserSecureEnclaveKeyBiometricPolicy:")] public ASAuthorizationProviderExtensionUserSecureEnclaveKeyBiometricPolicy UserSecureEnclaveKeyBiometricPolicy { get; set; }
     [Selector("nonceEndpointURL", "setNonceEndpointURL:")] public NSURL NonceEndpointURL { get; set; }
     [Selector("nonceResponseKeypath", "setNonceResponseKeypath:")] public NSString NonceResponseKeypath { get; set; }
     [Selector("serverNonceClaimName", "setServerNonceClaimName:")] public NSString ServerNonceClaimName { get; set; }
     [Selector("customNonceRequestValues", "setCustomNonceRequestValues:")] public NSArray CustomNonceRequestValues { get; set; }
     [Selector("additionalScopes", "setAdditionalScopes:")] public NSString AdditionalScopes { get; set; }
-    /// macOS 14.0 and later.
     [Selector("additionalAuthorizationScopes", "setAdditionalAuthorizationScopes:")] public NSString? AdditionalAuthorizationScopes { get; set; }
     [Selector("includePreviousRefreshTokenInLoginRequest", "setIncludePreviousRefreshTokenInLoginRequest:")] public bool IncludePreviousRefreshTokenInLoginRequest { get; set; }
     [Selector("previousRefreshTokenClaimName", "setPreviousRefreshTokenClaimName:")] public NSString PreviousRefreshTokenClaimName { get; set; }
-    /// macOS 14.0 and later.
     [Selector("customRequestJWTParameterName", "setCustomRequestJWTParameterName:")] public NSString? CustomRequestJWTParameterName { get; set; }
     [Selector("customLoginRequestValues", "setCustomLoginRequestValues:")] public NSArray CustomLoginRequestValues { get; set; }
-    /// macOS 14.0 and later.
     [Selector("uniqueIdentifierClaimName", "setUniqueIdentifierClaimName:")] public NSString? UniqueIdentifierClaimName { get; set; }
-    /// macOS 14.0 and later.
     [Selector("groupRequestClaimName", "setGroupRequestClaimName:")] public NSString? GroupRequestClaimName { get; set; }
-    /// macOS 14.0 and later.
     [Selector("groupResponseClaimName", "setGroupResponseClaimName:")] public NSString? GroupResponseClaimName { get; set; }
     [Selector("kerberosTicketMappings", "setKerberosTicketMappings:")] public NSArray KerberosTicketMappings { get; set; }
-    /// macOS 14.0 and later.
     [Selector("refreshEndpointURL", "setRefreshEndpointURL:")] public NSURL? RefreshEndpointURL { get; set; }
-    /// macOS 14.0 and later.
     [Selector("customRefreshRequestValues", "setCustomRefreshRequestValues:")] public NSArray? CustomRefreshRequestValues { get; set; }
-    /// macOS 13.3 and later.
     [Selector("federationType", "setFederationType:")] public ASAuthorizationProviderExtensionFederationType FederationType { get; set; }
-    /// macOS 13.3 and later.
     [Selector("federationRequestURN", "setFederationRequestURN:")] public NSString? FederationRequestURN { get; set; }
-    /// macOS 13.3 and later.
     [Selector("federationMEXURL", "setFederationMEXURL:")] public NSURL? FederationMEXURL { get; set; }
-    /// macOS 13.3 and later.
     [Selector("federationUserPreauthenticationURL", "setFederationUserPreauthenticationURL:")] public NSURL? FederationUserPreauthenticationURL { get; set; }
-    /// macOS 13.3 and later.
     [Selector("federationMEXURLKeypath", "setFederationMEXURLKeypath:")] public NSString? FederationMEXURLKeypath { get; set; }
-    /// macOS 13.3 and later.
     [Selector("federationPredicate", "setFederationPredicate:")] public NSString? FederationPredicate { get; set; }
-    /// macOS 13.3 and later.
     [Selector("customFederationUserPreauthenticationRequestValues", "setCustomFederationUserPreauthenticationRequestValues:")] public NSArray? CustomFederationUserPreauthenticationRequestValues { get; set; }
-    /// macOS 14.0 and later.
     [Selector("loginRequestEncryptionPublicKey", "setLoginRequestEncryptionPublicKey:")] public SecKeyRef? LoginRequestEncryptionPublicKey { get; set; }
-    /// macOS 14.0 and later.
     [Selector("loginRequestEncryptionAPVPrefix", "setLoginRequestEncryptionAPVPrefix:")] public NSData? LoginRequestEncryptionAPVPrefix { get; set; }
-    /// macOS 15.0 and later.
     [Selector("loginRequestEncryptionAlgorithm", "setLoginRequestEncryptionAlgorithm:")] public ASAuthorizationProviderExtensionEncryptionAlgorithm? LoginRequestEncryptionAlgorithm { get; set; }
-    /// macOS 15.0 and later.
     [Selector("loginRequestHPKEPreSharedKey", "setLoginRequestHPKEPreSharedKey:")] public NSData? LoginRequestHPKEPreSharedKey { get; set; }
-    /// macOS 15.0 and later.
     [Selector("loginRequestHPKEPreSharedKeyID", "setLoginRequestHPKEPreSharedKeyID:")] public NSData? LoginRequestHPKEPreSharedKeyID { get; set; }
-    /// macOS 14.0 and later.
     [Selector("keyEndpointURL", "setKeyEndpointURL:")] public NSURL? KeyEndpointURL { get; set; }
-    /// macOS 14.0 and later.
     [Selector("customKeyExchangeRequestValues", "setCustomKeyExchangeRequestValues:")] public NSArray? CustomKeyExchangeRequestValues { get; set; }
-    /// macOS 14.0 and later.
     [Selector("customKeyRequestValues", "setCustomKeyRequestValues:")] public NSArray? CustomKeyRequestValues { get; set; }
-    /// macOS 15.0 and later.
     [Selector("hpkePreSharedKey", "setHpkePreSharedKey:")] public NSData? HpkePreSharedKey { get; set; }
-    /// macOS 15.0 and later.
     [Selector("hpkePreSharedKeyID", "setHpkePreSharedKeyID:")] public NSData? HpkePreSharedKeyID { get; set; }
-    /// macOS 15.0 and later.
     [Selector("hpkeAuthPublicKey", "setHpkeAuthPublicKey:")] public SecKeyRef? HpkeAuthPublicKey { get; set; }
     [Selector("initWithClientID:issuer:tokenEndpointURL:jwksEndpointURL:audience:")] public Self InitWithClientIDIssuerTokenEndpointURLJwksEndpointURLAudience(NSString clientID, NSString issuer, NSURL tokenEndpointURL, NSURL jwksEndpointURL, NSString? audience);
     [Selector("configurationWithOpenIDConfigurationURL:clientID:issuer:completion:")] public static void ConfigurationWithOpenIDConfigurationURLClientIDIssuerCompletion(NSURL openIDConfigurationURL, NSString clientID, NSString? issuer, ASAuthorizationProviderExtensionLoginConfigurationConfigurationWithOpenIDConfigurationURLClientIDIssuerCompletionCompletionBlock completion);
@@ -169,17 +132,11 @@ public extern objc class ASAuthorizationProviderExtensionLoginConfiguration : NS
     [Selector("setCustomAssertionRequestBodyClaims:returningError:")] public bool SetCustomAssertionRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
     [Selector("setCustomLoginRequestHeaderClaims:returningError:")] public bool SetCustomLoginRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
     [Selector("setCustomLoginRequestBodyClaims:returningError:")] public bool SetCustomLoginRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("setCustomRefreshRequestHeaderClaims:returningError:")] public bool SetCustomRefreshRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("setCustomRefreshRequestBodyClaims:returningError:")] public bool SetCustomRefreshRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("setCustomKeyExchangeRequestHeaderClaims:returningError:")] public bool SetCustomKeyExchangeRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("setCustomKeyExchangeRequestBodyClaims:returningError:")] public bool SetCustomKeyExchangeRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("setCustomKeyRequestHeaderClaims:returningError:")] public bool SetCustomKeyRequestHeaderClaimsReturningError(NSDictionary claims, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("setCustomKeyRequestBodyClaims:returningError:")] public bool SetCustomKeyRequestBodyClaimsReturningError(NSDictionary claims, out NSError? error);
 }
 

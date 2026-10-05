@@ -74,12 +74,10 @@ public extern objc class VZVirtualMachine : NSObject
     [Selector("canRequestStop")] public bool CanRequestStop { get; }
     [Selector("consoleDevices")] public NSArray? ConsoleDevices { get; }
     [Selector("directorySharingDevices")] public NSArray? DirectorySharingDevices { get; }
-    /// macOS 14.0 and later.
     [Selector("graphicsDevices")] public NSArray? GraphicsDevices { get; }
     [Selector("memoryBalloonDevices")] public NSArray MemoryBalloonDevices { get; }
     [Selector("networkDevices")] public NSArray? NetworkDevices { get; }
     [Selector("socketDevices")] public NSArray SocketDevices { get; }
-    /// macOS 15.0 and later.
     [Selector("usbControllers")] public NSArray? UsbControllers { get; }
     [Selector("initWithConfiguration:")] public Self InitWithConfiguration(VZVirtualMachineConfiguration configuration);
     [Selector("initWithConfiguration:queue:")] public Self InitWithConfigurationQueue(VZVirtualMachineConfiguration configuration, dispatch_queue_t queue);
@@ -88,9 +86,7 @@ public extern objc class VZVirtualMachine : NSObject
     [Selector("stopWithCompletionHandler:")] public void StopWithCompletionHandler(VZVirtualMachineStopWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("pauseWithCompletionHandler:")] public void PauseWithCompletionHandler(VZVirtualMachinePauseWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("resumeWithCompletionHandler:")] public void ResumeWithCompletionHandler(VZVirtualMachineResumeWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Selector("restoreMachineStateFromURL:completionHandler:")] public void RestoreMachineStateFromURLCompletionHandler(NSURL saveFileURL, VZVirtualMachineRestoreMachineStateFromURLCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Selector("saveMachineStateToURL:completionHandler:")] public void SaveMachineStateToURLCompletionHandler(NSURL saveFileURL, VZVirtualMachineSaveMachineStateToURLCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("requestStopWithError:")] public bool RequestStopWithError(out NSError? error);
 }
@@ -119,12 +115,10 @@ public extern objc class VZVirtualMachine : NSObject
     [Selector("canRequestStop")] public bool CanRequestStop { get; }
     [Selector("consoleDevices")] public NSArray? ConsoleDevices { get; }
     [Selector("directorySharingDevices")] public NSArray? DirectorySharingDevices { get; }
-    /// macOS 14.0 and later.
     [Selector("graphicsDevices")] public NSArray? GraphicsDevices { get; }
     [Selector("memoryBalloonDevices")] public NSArray MemoryBalloonDevices { get; }
     [Selector("networkDevices")] public NSArray? NetworkDevices { get; }
     [Selector("socketDevices")] public NSArray SocketDevices { get; }
-    /// macOS 15.0 and later.
     [Selector("usbControllers")] public NSArray? UsbControllers { get; }
     [Selector("initWithConfiguration:")] public Self InitWithConfiguration(VZVirtualMachineConfiguration configuration);
     [Selector("initWithConfiguration:queue:")] public Self InitWithConfigurationQueue(VZVirtualMachineConfiguration configuration, dispatch_queue_t queue);

@@ -91,7 +91,6 @@ public objc interface SCNSceneRenderer : NSObjectProtocol
     [Selector("debugOptions", "setDebugOptions:")] SCNDebugOptions DebugOptions { get; set; }
     [Selector("overlaySKScene", "setOverlaySKScene:")] SKScene? OverlaySKScene { get; set; }
     [Selector("renderingAPI")] SCNRenderingAPI RenderingAPI { get; }
-    /// macOS 14.0 and later.
     [Selector("workingColorSpace")] CGColorSpaceRef WorkingColorSpace { get; }
     [Selector("context")] void* Context { get; }
     [Selector("currentRenderCommandEncoder")] MTLRenderCommandEncoder? CurrentRenderCommandEncoder { get; }

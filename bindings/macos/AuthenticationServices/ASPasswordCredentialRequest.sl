@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public extern objc class ASPasswordCredentialRequest : NSObject, ASCredentialRequest
 {
     [Selector("initWithCredentialIdentity:")] public Self InitWithCredentialIdentity(ASPasswordCredentialIdentity credentialIdentity);

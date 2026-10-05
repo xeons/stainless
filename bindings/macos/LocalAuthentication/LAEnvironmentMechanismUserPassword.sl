@@ -29,7 +29,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "LocalAuthentication")
 
-/// macOS 15.0 and later.
 public extern objc class LAEnvironmentMechanismUserPassword : LAEnvironmentMechanism
 {
     [Selector("isSet")] public bool IsSet { get; }

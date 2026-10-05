@@ -51,17 +51,14 @@ public extern "C" hv_return_t hv_vm_config_get_ipa_size(hv_vm_config_t config, u
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_vm_config_get_el2_supported(bool* el2_supported);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_vm_config_get_el2_enabled(hv_vm_config_t config, bool* el2_enabled);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_vm_config_set_el2_enabled(hv_vm_config_t config, bool el2_enabled);
 #endif
 

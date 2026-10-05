@@ -36,7 +36,6 @@ public extern objc class PKInk : NSObject, NSCopying
 {
     [Selector("inkType")] public PKInkType InkType { get; }
     [Selector("color")] public NSColor Color { get; }
-    /// macOS 14.0 and later.
     [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
     [Selector("initWithInkType:color:")] public Self InitWithInkTypeColor(PKInkType type, NSColor color);
 }

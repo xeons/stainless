@@ -38,7 +38,6 @@ public using CNDetectionID = long;
 
 public using CNDetectionGroupID = long;
 
-/// macOS 14.0 and later.
 public enum CNDetectionType : long
 {
     Unknown = 0,
@@ -55,7 +54,6 @@ public enum CNDetectionType : long
     Custom = 102,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNDetection : NSObject, NSCopying
 {
     [Selector("time")] public CMTime Time { get; }

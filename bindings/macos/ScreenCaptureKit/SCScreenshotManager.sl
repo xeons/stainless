@@ -82,12 +82,9 @@ public objc closure void SCScreenshotManagerCaptureScreenshotWithFilterConfigura
 
 public objc closure void SCScreenshotManagerCaptureScreenshotWithRectConfigurationCompletionHandlerCompletionHandlerBlock(SCScreenshotOutput? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class SCScreenshotManager : NSObject
 {
-    /// macOS 14.0 and later.
     [Selector("captureSampleBufferWithFilter:configuration:completionHandler:")] public static void CaptureSampleBufferWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCStreamConfiguration config, SCScreenshotManagerCaptureSampleBufferWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
-    /// macOS 14.0 and later.
     [Selector("captureImageWithFilter:configuration:completionHandler:")] public static void CaptureImageWithFilterConfigurationCompletionHandler(SCContentFilter contentFilter, SCStreamConfiguration config, SCScreenshotManagerCaptureImageWithFilterConfigurationCompletionHandlerCompletionHandlerBlock? completionHandler);
     /// macOS 15.2 and later.
     [Selector("captureImageInRect:completionHandler:")] public static void CaptureImageInRectCompletionHandler(CGRect rect, SCScreenshotManagerCaptureImageInRectCompletionHandlerCompletionHandlerBlock? completionHandler);

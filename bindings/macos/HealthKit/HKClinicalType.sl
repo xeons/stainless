@@ -34,7 +34,6 @@ public using HKClinicalTypeIdentifier = NSString;
 
 public extern "C" HKClinicalTypeIdentifier HKClinicalTypeIdentifierAllergyRecord;
 
-/// macOS 13.3 and later.
 public extern "C" HKClinicalTypeIdentifier HKClinicalTypeIdentifierClinicalNoteRecord;
 
 public extern "C" HKClinicalTypeIdentifier HKClinicalTypeIdentifierConditionRecord;

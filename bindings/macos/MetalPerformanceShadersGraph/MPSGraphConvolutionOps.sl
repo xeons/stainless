@@ -51,7 +51,6 @@ public extern objc class MPSGraphConvolution2DOpDescriptor : MPSGraphObject, NSC
     [Selector("setExplicitPaddingWithPaddingLeft:paddingRight:paddingTop:paddingBottom:")] public void SetExplicitPaddingWithPaddingLeftPaddingRightPaddingTopPaddingBottom(NSUInteger paddingLeft, NSUInteger paddingRight, NSUInteger paddingTop, NSUInteger paddingBottom);
 }
 
-/// macOS 13.2 and later.
 public extern objc class MPSGraphConvolution3DOpDescriptor : MPSGraphObject, NSCopying
 {
     [Selector("strideInX", "setStrideInX:")] public NSUInteger StrideInX { get; set; }
@@ -83,15 +82,10 @@ public extern objc class MPSGraph
     [Selector("convolution2DDataGradientWithIncomingGradientTensor:weightsTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution2DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor weights, MPSGraphTensor outputShapeTensor, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
     [Selector("convolution2DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShape:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution2DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor source, MPSShape outputShape, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
     [Selector("convolution2DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution2DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor outputShapeTensor, MPSGraphConvolution2DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    /// macOS 13.2 and later.
     [Selector("convolution3DWithSourceTensor:weightsTensor:descriptor:name:")] public MPSGraphTensor Convolution3DWithSourceTensorWeightsTensorDescriptorName(MPSGraphTensor source, MPSGraphTensor weights, MPSGraphConvolution3DOpDescriptor descriptor, NSString? name);
-    /// macOS 13.2 and later.
     [Selector("convolution3DDataGradientWithIncomingGradientTensor:weightsTensor:outputShape:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor weights, MPSShape outputShape, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    /// macOS 13.2 and later.
     [Selector("convolution3DDataGradientWithIncomingGradientTensor:weightsTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DDataGradientWithIncomingGradientTensorWeightsTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor weights, MPSGraphTensor outputShapeTensor, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    /// macOS 13.2 and later.
     [Selector("convolution3DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShape:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeForwardConvolutionDescriptorName(MPSGraphTensor incomingGradient, MPSGraphTensor source, MPSShape outputShape, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
-    /// macOS 13.2 and later.
     [Selector("convolution3DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShapeTensor:forwardConvolutionDescriptor:name:")] public MPSGraphTensor Convolution3DWeightsGradientWithIncomingGradientTensorSourceTensorOutputShapeTensorForwardConvolutionDescriptorName(MPSGraphTensor gradient, MPSGraphTensor source, MPSGraphTensor outputShapeTensor, MPSGraphConvolution3DOpDescriptor forwardConvolutionDescriptor, NSString? name);
 }
 

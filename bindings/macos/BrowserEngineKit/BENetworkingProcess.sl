@@ -39,7 +39,6 @@ public objc closure void BENetworkingProcessNetworkProcessWithBundleIDInterrupti
 
 public objc closure void BENetworkingProcessNetworkProcessWithBundleIDInterruptionHandlerCompletionCompletionBlock(BENetworkingProcess? arg0, NSError? arg1);
 
-/// macOS 14.3 and later.
 public extern objc class BENetworkingProcess : NSObject
 {
     [Selector("networkProcessWithInterruptionHandler:completion:")] public static void NetworkProcessWithInterruptionHandlerCompletion(BENetworkingProcessNetworkProcessWithInterruptionHandlerCompletionInterruptionHandlerBlock interruptionHandler, BENetworkingProcessNetworkProcessWithInterruptionHandlerCompletionCompletionBlock completion);
@@ -48,7 +47,6 @@ public extern objc class BENetworkingProcess : NSObject
     [Selector("makeLibXPCConnectionError:")] public xpc_connection_t? MakeLibXPCConnectionError(out NSError? error);
 }
 
-/// macOS 14.3 and later.
 /// BEExtensionProcessConformance, a category of BENetworkingProcess.
 public extern objc class BENetworkingProcess : BEExtensionProcess { }
 

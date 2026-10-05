@@ -170,8 +170,8 @@ verified and lowered, with their signatures pinned against clang's. Building 32-
 multilib packages, which is what
 [tests/linux-x86.Dockerfile](../tests/linux-x86.Dockerfile) is for.
 
-macOS is `arm64-macos` (`arm64-apple-macosx13.0`) and `x64-macos`
-(`x86_64-apple-macosx13.0`), and a Mac host defaults to the one it is. Each
+macOS is `arm64-macos` (`arm64-apple-macosx15.0`) and `x64-macos`
+(`x86_64-apple-macosx15.0`), and a Mac host defaults to the one it is. Each
 target carries its operating system and object format (COFF, ELF or Mach-O)
 rather than having them read out of the triple, and the toolchain follows it.
 There is no 32-bit macOS target, and a bare `x86` on a Mac is refused. The
@@ -185,12 +185,14 @@ elsewhere. On a Mac, Homebrew's LLVM (`/opt/homebrew/opt/llvm/bin`, then
 `/usr/local/opt/llvm/bin`) comes before `PATH`, because `PATH` always holds
 Apple's clang; `xcrun -f clang` is the last resort, and a clang older than
 LLVM 16 is passed over. Homebrew's clang finds the SDK through its own
-configuration file, so no `-isysroot` is passed.
+configuration file, which names the Command Line Tools'; `SDKROOT`, when set,
+is passed as `-isysroot` over it, so the headers and the linker come from one
+Xcode.
 
 What the toolchain produces follows the target and not the host: the
 extension and `lib` prefix of a library, the import library, the rpath and the
 library's own name. A Darwin build always names its triple, because the triple
-carries the macOS 13 deployment floor and the program and the runtime MUST
+carries the macOS 15 deployment floor and the program and the runtime MUST
 agree on it; its libraries are `-dynamiclib` with an install name of
 `@rpath/<name>.dylib`, and a consumer looks in `@loader_path`. A `-g` build on
 Darwin gets a `.dSYM` from clang's own driver, which runs `dsymutil` after any

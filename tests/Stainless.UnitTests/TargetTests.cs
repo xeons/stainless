@@ -366,8 +366,8 @@ public class TargetTests
     [Fact]
     public void TheMacTargetsAreDarwin()
     {
-        Assert.Equal("arm64-apple-macosx13.0", TargetPlatform.Arm64MacOS.Triple);
-        Assert.Equal("x86_64-apple-macosx13.0", TargetPlatform.X64MacOS.Triple);
+        Assert.Equal("arm64-apple-macosx15.0", TargetPlatform.Arm64MacOS.Triple);
+        Assert.Equal("x86_64-apple-macosx15.0", TargetPlatform.X64MacOS.Triple);
 
         foreach (var mac in new[] { TargetPlatform.Arm64MacOS, TargetPlatform.X64MacOS })
         {

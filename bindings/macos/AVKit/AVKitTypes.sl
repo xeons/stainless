@@ -27,7 +27,6 @@ module MacOS.AVKit;
 
 #pragma comment(framework, "AVKit")
 
-/// macOS 14.0 and later.
 [Flags]
 public enum AVVideoFrameAnalysisType : ulong
 {

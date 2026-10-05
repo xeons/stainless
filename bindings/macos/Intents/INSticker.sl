@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 15.0 and later.
 public extern objc class INSticker : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("type")] public INStickerType Type { get; }

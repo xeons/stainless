@@ -63,11 +63,8 @@ public extern objc class AVCaptureDeviceInput : AVCaptureInput
     [Selector("activeExternalSyncVideoFrameDuration")] public CMTime ActiveExternalSyncVideoFrameDuration { get; }
     /// macOS 26.0 and later.
     [Selector("externalSyncDevice")] public AVExternalSyncDevice? ExternalSyncDevice { get; }
-    /// macOS 15.0 and later.
     [Selector("multichannelAudioMode", "setMultichannelAudioMode:")] public AVCaptureMultichannelAudioMode MultichannelAudioMode { get; set; }
-    /// macOS 15.0 and later.
     [Selector("isWindNoiseRemovalSupported")] public bool WindNoiseRemovalSupported { get; }
-    /// macOS 15.0 and later.
     [Selector("isWindNoiseRemovalEnabled", "setWindNoiseRemovalEnabled:")] public bool WindNoiseRemovalEnabled { get; set; }
     /// macOS 26.0 and later.
     [Selector("isCinematicVideoCaptureSupported")] public bool CinematicVideoCaptureSupported { get; }
@@ -81,11 +78,9 @@ public extern objc class AVCaptureDeviceInput : AVCaptureInput
     [Selector("followExternalSyncDevice:videoFrameDuration:delegate:")] public void FollowExternalSyncDeviceVideoFrameDurationDelegate(AVExternalSyncDevice externalSyncDevice, CMTime frameDuration, AVExternalSyncDeviceDelegate? @delegate);
     /// macOS 26.0 and later.
     [Selector("unfollowExternalSyncDevice")] public void UnfollowExternalSyncDevice();
-    /// macOS 15.0 and later.
     [Selector("isMultichannelAudioModeSupported:")] public bool IsMultichannelAudioModeSupported(AVCaptureMultichannelAudioMode multichannelAudioMode);
 }
 
-/// macOS 15.0 and later.
 public enum AVCaptureMultichannelAudioMode : long
 {
     None = 0,

@@ -42,10 +42,8 @@ public extern objc class NSMenuItem : NSObject, NSCopying, NSCoding, NSValidated
     [Selector("parentItem")] public NSMenuItem? ParentItem { get; }
     [Selector("title", "setTitle:")] public NSString Title { get; set; }
     [Selector("attributedTitle", "setAttributedTitle:")] public NSAttributedString? AttributedTitle { get; set; }
-    /// macOS 14.4 and later.
     [Selector("subtitle", "setSubtitle:")] public NSString? Subtitle { get; set; }
     [Selector("isSeparatorItem")] public bool SeparatorItem { get; }
-    /// macOS 14.0 and later.
     [Selector("isSectionHeader")] public bool SectionHeader { get; }
     [Selector("keyEquivalent", "setKeyEquivalent:")] public NSString KeyEquivalent { get; set; }
     [Selector("keyEquivalentModifierMask", "setKeyEquivalentModifierMask:")] public NSEventModifierFlags KeyEquivalentModifierMask { get; set; }
@@ -70,10 +68,8 @@ public extern objc class NSMenuItem : NSObject, NSCopying, NSCoding, NSValidated
     [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
     [Selector("isHiddenOrHasHiddenAncestor")] public bool HiddenOrHasHiddenAncestor { get; }
     [Selector("toolTip", "setToolTip:")] public NSString? ToolTip { get; set; }
-    /// macOS 14.0 and later.
     [Selector("badge", "setBadge:")] public NSMenuItemBadge? Badge { get; set; }
     [Selector("separatorItem")] public static NSMenuItem ClassSeparatorItem();
-    /// macOS 14.0 and later.
     [Selector("sectionHeaderWithTitle:")] public static Self SectionHeaderWithTitle(NSString title);
     [Selector("initWithTitle:action:keyEquivalent:")] public Self InitWithTitleActionKeyEquivalent(NSString string, Selector selector, NSString charCode);
     [Selector("initWithCoder:")] public Self InitWithCoder(NSCoder coder);

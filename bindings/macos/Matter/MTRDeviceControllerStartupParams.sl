@@ -34,26 +34,18 @@ import Standard.ObjC;
 public extern objc class MTRDeviceControllerStartupParams : NSObject
 {
     [Selector("nocSigner")] public MTRKeypair? NocSigner { get; }
-    /// macOS 13.3 and later.
     [Selector("fabricID")] public NSNumber FabricID { get; }
     [Selector("ipk")] public NSData Ipk { get; }
-    /// macOS 13.3 and later.
     [Selector("vendorID", "setVendorID:")] public NSNumber? VendorID { get; set; }
-    /// macOS 13.3 and later.
     [Selector("nodeID", "setNodeID:")] public NSNumber? NodeID { get; set; }
-    /// macOS 14.0 and later.
     [Selector("caseAuthenticatedTags", "setCaseAuthenticatedTags:")] public NSSet? CaseAuthenticatedTags { get; set; }
     [Selector("rootCertificate", "setRootCertificate:")] public MTRCertificateDERBytes? RootCertificate { get; set; }
     [Selector("intermediateCertificate", "setIntermediateCertificate:")] public MTRCertificateDERBytes? IntermediateCertificate { get; set; }
     [Selector("operationalCertificate")] public MTRCertificateDERBytes? OperationalCertificate { get; }
     [Selector("operationalKeypair", "setOperationalKeypair:")] public MTRKeypair? OperationalKeypair { get; set; }
-    /// macOS 13.3 and later.
     [Selector("operationalCertificateIssuer", "setOperationalCertificateIssuer:")] public MTROperationalCertificateIssuer? OperationalCertificateIssuer { get; set; }
-    /// macOS 13.3 and later.
     [Selector("operationalCertificateIssuerQueue", "setOperationalCertificateIssuerQueue:")] public dispatch_queue_t? OperationalCertificateIssuerQueue { get; set; }
-    /// macOS 13.3 and later.
     [Selector("initWithIPK:fabricID:nocSigner:")] public Self InitWithIPKFabricIDNocSigner(NSData ipk, NSNumber fabricID, MTRKeypair nocSigner);
-    /// macOS 13.3 and later.
     [Selector("initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:")] public Self InitWithIPKOperationalKeypairOperationalCertificateIntermediateCertificateRootCertificate(NSData ipk, MTRKeypair operationalKeypair, MTRCertificateDERBytes operationalCertificate, MTRCertificateDERBytes? intermediateCertificate, MTRCertificateDERBytes rootCertificate);
 }
 

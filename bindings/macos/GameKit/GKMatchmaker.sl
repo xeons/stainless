@@ -70,11 +70,8 @@ public extern objc class GKMatchRequest : NSObject
     [Selector("inviteeResponseHandler", "setInviteeResponseHandler:")] public GKMatchRequestInviteeResponseHandlerBlock? InviteeResponseHandler { get; set; }
     /// Deprecated in macOS 10.10.
     [Selector("playersToInvite", "setPlayersToInvite:")] public NSArray? PlayersToInvite { get; set; }
-    /// macOS 14.2 and later.
     [Selector("queueName", "setQueueName:")] public NSString? QueueName { get; set; }
-    /// macOS 14.2 and later.
     [Selector("properties", "setProperties:")] public GKMatchProperties? Properties { get; set; }
-    /// macOS 14.2 and later.
     [Selector("recipientProperties", "setRecipientProperties:")] public NSDictionary? RecipientProperties { get; set; }
     [Selector("maxPlayersAllowedForMatchOfType:")] public static NSUInteger MaxPlayersAllowedForMatchOfType(GKMatchType matchType);
 }
@@ -104,7 +101,6 @@ public objc interface GKInviteEventListener
     [Optional] [Selector("player:didRequestMatchWithPlayers:")] void PlayerDidRequestMatchWithPlayers(GKPlayer player, NSArray playerIDsToInvite);
 }
 
-/// macOS 14.2 and later.
 public extern objc class GKMatchedPlayers : NSObject
 {
     [Selector("properties")] public GKMatchProperties? Properties { get; }
@@ -138,7 +134,6 @@ public extern objc class GKMatchmaker : NSObject
     [Selector("matchForInvite:completionHandler:")] public void MatchForInviteCompletionHandler(GKInvite invite, GKMatchmakerMatchForInviteCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("findMatchForRequest:withCompletionHandler:")] public void FindMatchForRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindMatchForRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("findPlayersForHostedRequest:withCompletionHandler:")] public void FindPlayersForHostedRequestWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindPlayersForHostedRequestWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    /// macOS 14.2 and later.
     [Selector("findMatchedPlayers:withCompletionHandler:")] public void FindMatchedPlayersWithCompletionHandler(GKMatchRequest request, GKMatchmakerFindMatchedPlayersWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("addPlayersToMatch:matchRequest:completionHandler:")] public void AddPlayersToMatchMatchRequestCompletionHandler(GKMatch match, GKMatchRequest matchRequest, GKMatchmakerAddPlayersToMatchMatchRequestCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("cancel")] public void Cancel();
@@ -146,13 +141,10 @@ public extern objc class GKMatchmaker : NSObject
     [Selector("finishMatchmakingForMatch:")] public void FinishMatchmakingForMatch(GKMatch match);
     [Selector("queryPlayerGroupActivity:withCompletionHandler:")] public void QueryPlayerGroupActivityWithCompletionHandler(NSUInteger playerGroup, GKMatchmakerQueryPlayerGroupActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("queryActivityWithCompletionHandler:")] public void QueryActivityWithCompletionHandler(GKMatchmakerQueryActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
-    /// macOS 14.2 and later.
     [Selector("queryQueueActivity:withCompletionHandler:")] public void QueryQueueActivityWithCompletionHandler(NSString queueName, GKMatchmakerQueryQueueActivityWithCompletionHandlerCompletionHandlerBlock? completionHandler);
     [Selector("startBrowsingForNearbyPlayersWithHandler:")] public void StartBrowsingForNearbyPlayersWithHandler(GKMatchmakerStartBrowsingForNearbyPlayersWithHandlerReachableHandlerBlock? reachableHandler);
     [Selector("stopBrowsingForNearbyPlayers")] public void StopBrowsingForNearbyPlayers();
-    /// macOS 13.1 and later.
     [Selector("startGroupActivityWithPlayerHandler:")] public void StartGroupActivityWithPlayerHandler(GKMatchmakerStartGroupActivityWithPlayerHandlerHandlerBlock handler);
-    /// macOS 13.1 and later.
     [Selector("stopGroupActivity")] public void StopGroupActivity();
 }
 

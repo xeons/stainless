@@ -48,7 +48,6 @@ public extern objc class NSColorWell : NSControl
     [Selector("image", "setImage:")] public NSImage? Image { get; set; }
     [Selector("pulldownTarget", "setPulldownTarget:")] public AnyObject? PulldownTarget { get; set; }
     [Selector("pulldownAction", "setPulldownAction:")] public Selector PulldownAction { get; set; }
-    /// macOS 14.0 and later.
     [Selector("supportsAlpha", "setSupportsAlpha:")] public bool SupportsAlpha { get; set; }
     /// macOS 26.0 and later.
     [Selector("maximumLinearExposure", "setMaximumLinearExposure:")] public CGFloat MaximumLinearExposure { get; set; }

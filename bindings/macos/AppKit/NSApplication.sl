@@ -110,11 +110,8 @@ public extern objc class NSApplication : NSResponder, NSUserInterfaceValidations
     [Selector("deactivate")] public void Deactivate();
     /// Deprecated in macOS 100000.
     [Selector("activateIgnoringOtherApps:")] public void ActivateIgnoringOtherApps(bool ignoreOtherApps);
-    /// macOS 14.0 and later.
     [Selector("activate")] public void Activate();
-    /// macOS 14.0 and later.
     [Selector("yieldActivationToApplication:")] public void YieldActivationToApplication(NSRunningApplication application);
-    /// macOS 14.0 and later.
     [Selector("yieldActivationToApplicationWithBundleIdentifier:")] public void YieldActivationToApplicationWithBundleIdentifier(NSString bundleIdentifier);
     [Selector("hideOtherApplications:")] public void HideOtherApplications(AnyObject? sender);
     [Selector("unhideAllApplications:")] public void UnhideAllApplications(AnyObject? sender);

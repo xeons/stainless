@@ -82,7 +82,6 @@ public extern objc class MTLCommandBufferDescriptor : NSObject, NSCopying
 {
     [Selector("retainedReferences", "setRetainedReferences:")] public bool RetainedReferences { get; set; }
     [Selector("errorOptions", "setErrorOptions:")] public MTLCommandBufferErrorOption ErrorOptions { get; set; }
-    /// macOS 15.0 and later.
     [Selector("logState", "setLogState:")] public MTLLogState? LogState { get; set; }
 }
 
@@ -139,9 +138,7 @@ public objc interface MTLCommandBuffer : NSObjectProtocol
     [Selector("accelerationStructureCommandEncoderWithDescriptor:")] MTLAccelerationStructureCommandEncoder AccelerationStructureCommandEncoderWithDescriptor(MTLAccelerationStructurePassDescriptor descriptor);
     [Selector("pushDebugGroup:")] void PushDebugGroup(NSString string);
     [Selector("popDebugGroup")] void PopDebugGroup();
-    /// macOS 15.0 and later.
     [Selector("useResidencySet:")] void UseResidencySet(MTLResidencySet residencySet);
-    /// macOS 15.0 and later.
     [Selector("useResidencySets:count:")] void UseResidencySetsCount(void** residencySets, NSUInteger count);
 }
 

@@ -29,7 +29,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 14.0 and later.
 public enum NSTextInsertionIndicatorDisplayMode : long
 {
     Automatic = 0,
@@ -37,7 +36,6 @@ public enum NSTextInsertionIndicatorDisplayMode : long
     Visible = 2,
 }
 
-/// macOS 14.0 and later.
 [Flags]
 public enum NSTextInsertionIndicatorAutomaticModeOptions : long
 {
@@ -47,7 +45,6 @@ public enum NSTextInsertionIndicatorAutomaticModeOptions : long
 
 public objc closure void NSTextInsertionIndicatorEffectsViewInserterBlock(NSView arg0);
 
-/// macOS 14.0 and later.
 public extern objc class NSTextInsertionIndicator : NSView
 {
     [Selector("displayMode", "setDisplayMode:")] public NSTextInsertionIndicatorDisplayMode DisplayMode { get; set; }

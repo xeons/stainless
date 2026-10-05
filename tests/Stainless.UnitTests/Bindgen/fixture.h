@@ -1,5 +1,5 @@
 // The shapes the bindings generator has to read, one of each. Dumped with
-//   clang -x objective-c -target arm64-apple-macosx13.0 -fsyntax-only
+//   clang -x objective-c -target arm64-apple-macosx15.0 -fsyntax-only
 //     -Xclang -ast-dump=json fixture.h > fixture.json
 typedef long Index;
 typedef struct Range { Index location; Index length; } Range;

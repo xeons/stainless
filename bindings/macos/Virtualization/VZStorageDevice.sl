@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 15.0 and later.
 public extern objc class VZStorageDevice : NSObject { }
 
 #endif

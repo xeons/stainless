@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 14.4 and later.
 public extern objc class AVVideoPerformanceMetrics : NSObject
 {
     [Selector("totalNumberOfFrames")] public NSInteger TotalNumberOfFrames { get; }

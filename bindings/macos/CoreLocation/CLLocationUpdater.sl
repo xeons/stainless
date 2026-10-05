@@ -40,31 +40,19 @@ public enum CLLiveUpdateConfiguration : long
     Airborne = 4,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CLUpdate : NSObject
 {
-    /// macOS 15.0 and later.
     [Selector("authorizationDenied")] public bool AuthorizationDenied { get; }
-    /// macOS 15.0 and later.
     [Selector("authorizationDeniedGlobally")] public bool AuthorizationDeniedGlobally { get; }
-    /// macOS 15.0 and later.
     [Selector("authorizationRestricted")] public bool AuthorizationRestricted { get; }
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 14.0.
     [Selector("isStationary")] public bool IsStationary { get; }
-    /// macOS 15.0 and later.
     [Selector("stationary")] public bool Stationary { get; }
-    /// macOS 15.0 and later.
     [Selector("insufficientlyInUse")] public bool InsufficientlyInUse { get; }
-    /// macOS 15.0 and later.
     [Selector("locationUnavailable")] public bool LocationUnavailable { get; }
-    /// macOS 15.0 and later.
     [Selector("accuracyLimited")] public bool AccuracyLimited { get; }
-    /// macOS 15.0 and later.
     [Selector("serviceSessionRequired")] public bool ServiceSessionRequired { get; }
-    /// macOS 15.0 and later.
     [Selector("authorizationRequestInProgress")] public bool AuthorizationRequestInProgress { get; }
-    /// macOS 14.0 and later.
     [Selector("location")] public CLLocation? Location { get; }
 }
 
@@ -72,18 +60,12 @@ public objc closure void CLLocationUpdaterLiveUpdaterWithQueueHandlerHandlerBloc
 
 public objc closure void CLLocationUpdaterLiveUpdaterWithConfigurationQueueHandlerHandlerBlock(CLUpdate? arg0);
 
-/// macOS 14.0 and later.
 public extern objc class CLLocationUpdater : NSObject
 {
-    /// macOS 14.0 and later.
     [Selector("liveUpdaterWithQueue:handler:")] public static Self? LiveUpdaterWithQueueHandler(dispatch_queue_t queue, CLLocationUpdaterLiveUpdaterWithQueueHandlerHandlerBlock handler);
-    /// macOS 14.0 and later.
     [Selector("liveUpdaterWithConfiguration:queue:handler:")] public static Self? LiveUpdaterWithConfigurationQueueHandler(CLLiveUpdateConfiguration configuration, dispatch_queue_t queue, CLLocationUpdaterLiveUpdaterWithConfigurationQueueHandlerHandlerBlock handler);
-    /// macOS 14.0 and later.
     [Selector("resume")] public void Resume();
-    /// macOS 14.0 and later.
     [Selector("pause")] public void Pause();
-    /// macOS 14.0 and later.
     [Selector("invalidate")] public void Invalidate();
 }
 

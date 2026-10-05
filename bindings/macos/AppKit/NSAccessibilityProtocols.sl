@@ -209,9 +209,7 @@ public objc interface NSAccessibility : NSObjectProtocol
     [Selector("accessibilitySharedFocusElements", "setAccessibilitySharedFocusElements:")] NSArray? AccessibilitySharedFocusElements { get; set; }
     [Selector("isAccessibilityRequired", "setAccessibilityRequired:")] bool AccessibilityRequired { get; set; }
     [Selector("accessibilityCustomRotors", "setAccessibilityCustomRotors:")] NSArray? AccessibilityCustomRotors { get; set; }
-    /// macOS 14.0 and later.
     [Selector("accessibilityUserInputLabels", "setAccessibilityUserInputLabels:")] NSArray? AccessibilityUserInputLabels { get; set; }
-    /// macOS 14.0 and later.
     [Selector("accessibilityAttributedUserInputLabels", "setAccessibilityAttributedUserInputLabels:")] NSArray? AccessibilityAttributedUserInputLabels { get; set; }
     [Selector("accessibilityApplicationFocusedUIElement", "setAccessibilityApplicationFocusedUIElement:")] AnyObject? AccessibilityApplicationFocusedUIElement { get; set; }
     [Selector("accessibilityMainWindow", "setAccessibilityMainWindow:")] AnyObject? AccessibilityMainWindow { get; set; }

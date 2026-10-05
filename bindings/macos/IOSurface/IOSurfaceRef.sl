@@ -201,7 +201,6 @@ public extern "C" CFStringRef kIOSurfaceColorSpace;
 
 public extern "C" CFStringRef kIOSurfaceICCProfile;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIOSurfaceContentHeadroom;
 
 public extern "C" void IOSurfaceSetValue(IOSurfaceRef buffer, CFStringRef key, CFTypeRef value);
@@ -253,7 +252,6 @@ public enum IOSurfaceMemoryLedgerFlags : uint
     kIOSurfaceMemoryLedgerFlagNoFootprint = 1,
 }
 
-/// macOS 14.4 and later.
 public extern "C" kern_return_t IOSurfaceSetOwnershipIdentity(IOSurfaceRef buffer, task_id_token_t task_id_token, int newLedgerTag, uint newLedgerOptions);
 
 public const int IOSURFACE_REF_H = 1;

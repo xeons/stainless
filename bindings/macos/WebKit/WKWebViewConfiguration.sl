@@ -23,6 +23,7 @@
 // Do not edit; regenerate with tools/bindgen.sh.
 module MacOS.WebKit;
 
+import MacOS.AppKit;
 import MacOS.Foundation;
 import MacOS.System;
 import Standard.ObjC;
@@ -64,11 +65,10 @@ public extern objc class WKWebViewConfiguration : NSObject, NSSecureCoding, NSCo
     [Selector("mediaTypesRequiringUserActionForPlayback", "setMediaTypesRequiringUserActionForPlayback:")] public WKAudiovisualMediaTypes MediaTypesRequiringUserActionForPlayback { get; set; }
     [Selector("defaultWebpagePreferences", "setDefaultWebpagePreferences:")] public WKWebpagePreferences? DefaultWebpagePreferences { get; set; }
     [Selector("limitsNavigationsToAppBoundDomains", "setLimitsNavigationsToAppBoundDomains:")] public bool LimitsNavigationsToAppBoundDomains { get; set; }
-    /// macOS 14.0 and later.
     [Selector("allowsInlinePredictions", "setAllowsInlinePredictions:")] public bool AllowsInlinePredictions { get; set; }
     [Selector("userInterfaceDirectionPolicy", "setUserInterfaceDirectionPolicy:")] public WKUserInterfaceDirectionPolicy UserInterfaceDirectionPolicy { get; set; }
-    /// macOS 15.0 and later.
     [Selector("supportsAdaptiveImageGlyph", "setSupportsAdaptiveImageGlyph:")] public bool SupportsAdaptiveImageGlyph { get; set; }
+    [Selector("writingToolsBehavior", "setWritingToolsBehavior:")] public NSWritingToolsBehavior WritingToolsBehavior { get; set; }
     [Selector("setURLSchemeHandler:forURLScheme:")] public void SetURLSchemeHandlerForURLScheme(WKURLSchemeHandler? urlSchemeHandler, NSString urlScheme);
     [Selector("urlSchemeHandlerForURLScheme:")] public WKURLSchemeHandler? UrlSchemeHandlerForURLScheme(NSString urlScheme);
 }

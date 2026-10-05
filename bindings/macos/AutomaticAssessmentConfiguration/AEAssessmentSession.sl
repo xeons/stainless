@@ -32,9 +32,7 @@ import Standard.ObjC;
 
 public extern objc class AEAssessmentSession : NSObject
 {
-    /// macOS 14.5 and later.
     [Selector("supportsMultipleParticipants")] public static bool SupportsMultipleParticipants { get; }
-    /// macOS 14.5 and later.
     [Selector("supportsConfigurationUpdates")] public static bool SupportsConfigurationUpdates { get; }
     [Selector("delegate", "setDelegate:")] public AEAssessmentSessionDelegate? Delegate { get; set; }
     [Selector("configuration")] public AEAssessmentConfiguration Configuration { get; }

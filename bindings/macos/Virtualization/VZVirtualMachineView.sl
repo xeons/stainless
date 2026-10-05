@@ -34,7 +34,6 @@ public extern objc class VZVirtualMachineView : NSView
 {
     [Selector("virtualMachine", "setVirtualMachine:")] public VZVirtualMachine? VirtualMachine { get; set; }
     [Selector("capturesSystemKeys", "setCapturesSystemKeys:")] public bool CapturesSystemKeys { get; set; }
-    /// macOS 14.0 and later.
     [Selector("automaticallyReconfiguresDisplay", "setAutomaticallyReconfiguresDisplay:")] public bool AutomaticallyReconfiguresDisplay { get; set; }
 }
 

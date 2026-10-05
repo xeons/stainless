@@ -41,14 +41,12 @@ public extern "C" NSNotificationName? AVSampleBufferDisplayLayerRequiresFlushToR
 
 public extern "C" NSNotificationName AVSampleBufferDisplayLayerOutputObscuredDueToInsufficientExternalProtectionDidChangeNotification;
 
-/// macOS 14.4 and later.
 public extern "C" NSNotificationName? AVSampleBufferDisplayLayerReadyForDisplayDidChangeNotification;
 
 public extern objc class AVSampleBufferDisplayLayer : CALayer
 {
     [Selector("controlTimebase", "setControlTimebase:")] public CMTimebaseRef? ControlTimebase { get; set; }
     [Selector("videoGravity", "setVideoGravity:")] public AVLayerVideoGravity VideoGravity { get; set; }
-    /// macOS 14.4 and later.
     [Selector("isReadyForDisplay")] public bool ReadyForDisplay { get; }
 }
 
@@ -99,11 +97,9 @@ public extern objc class AVSampleBufferDisplayLayer
     [Selector("outputObscuredDueToInsufficientExternalProtection")] public bool OutputObscuredDueToInsufficientExternalProtection { get; }
 }
 
-/// macOS 14.0 and later.
 /// AVSampleBufferDisplayLayerRenderer, a category of AVSampleBufferDisplayLayer.
 public extern objc class AVSampleBufferDisplayLayer
 {
-    /// macOS 14.0 and later.
     [Selector("sampleBufferRenderer")] public AVSampleBufferVideoRenderer? SampleBufferRenderer { get; }
 }
 

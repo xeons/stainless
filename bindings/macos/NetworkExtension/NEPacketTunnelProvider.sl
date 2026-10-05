@@ -38,7 +38,6 @@ public objc closure void NEPacketTunnelProviderStopTunnelWithReasonCompletionHan
 public extern objc class NEPacketTunnelProvider : NETunnelProvider
 {
     [Selector("packetFlow")] public NEPacketTunnelFlow? PacketFlow { get; }
-    /// macOS 15.0 and later.
     [Selector("virtualInterface")] public nw_interface_t? VirtualInterface { get; }
     [Selector("startTunnelWithOptions:completionHandler:")] public void StartTunnelWithOptionsCompletionHandler(NSDictionary? options, NEPacketTunnelProviderStartTunnelWithOptionsCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("stopTunnelWithReason:completionHandler:")] public void StopTunnelWithReasonCompletionHandler(NEProviderStopReason reason, NEPacketTunnelProviderStopTunnelWithReasonCompletionHandlerCompletionHandlerBlock completionHandler);

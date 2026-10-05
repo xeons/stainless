@@ -42,13 +42,11 @@ public extern objc class MPSGraph
     [Selector("logarithmBase10WithTensor:name:")] public MPSGraphTensor LogarithmBase10WithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("squareWithTensor:name:")] public MPSGraphTensor SquareWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("squareRootWithTensor:name:")] public MPSGraphTensor SquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
-    /// macOS 15.0 and later.
     [Selector("reciprocalSquareRootWithTensor:name:")] public MPSGraphTensor ReciprocalSquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
     /// Deprecated in macOS 15.0.
     [Selector("reverseSquareRootWithTensor:name:")] public MPSGraphTensor ReverseSquareRootWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("reciprocalWithTensor:name:")] public MPSGraphTensor ReciprocalWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("absoluteWithTensor:name:")] public MPSGraphTensor AbsoluteWithTensorName(MPSGraphTensor tensor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("absoluteSquareWithTensor:name:")] public MPSGraphTensor AbsoluteSquareWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("negativeWithTensor:name:")] public MPSGraphTensor NegativeWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("signWithTensor:name:")] public MPSGraphTensor SignWithTensorName(MPSGraphTensor tensor, NSString? name);
@@ -77,7 +75,6 @@ public extern objc class MPSGraph
     [Selector("truncateWithTensor:name:")] public MPSGraphTensor TruncateWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("bitwiseNOTWithTensor:name:")] public MPSGraphTensor BitwiseNOTWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("bitwisePopulationCountWithTensor:name:")] public MPSGraphTensor BitwisePopulationCountWithTensorName(MPSGraphTensor tensor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("conjugateWithTensor:name:")] public MPSGraphTensor ConjugateWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("additionWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor AdditionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
     [Selector("subtractionWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor SubtractionWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
@@ -111,11 +108,8 @@ public extern objc class MPSGraph
     [Selector("clampWithTensor:minValueTensor:maxValueTensor:name:")] public MPSGraphTensor ClampWithTensorMinValueTensorMaxValueTensorName(MPSGraphTensor tensor, MPSGraphTensor minValueTensor, MPSGraphTensor maxValueTensor, NSString? name);
     [Selector("divisionNoNaNWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor DivisionNoNaNWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
     [Selector("floorModuloWithPrimaryTensor:secondaryTensor:name:")] public MPSGraphTensor FloorModuloWithPrimaryTensorSecondaryTensorName(MPSGraphTensor primaryTensor, MPSGraphTensor secondaryTensor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("realPartOfTensor:name:")] public MPSGraphTensor RealPartOfTensorName(MPSGraphTensor tensor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("imaginaryPartOfTensor:name:")] public MPSGraphTensor ImaginaryPartOfTensorName(MPSGraphTensor tensor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("complexTensorWithRealTensor:imaginaryTensor:name:")] public MPSGraphTensor ComplexTensorWithRealTensorImaginaryTensorName(MPSGraphTensor realTensor, MPSGraphTensor imaginaryTensor, NSString? name);
 }
 

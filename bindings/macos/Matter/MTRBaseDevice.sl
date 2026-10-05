@@ -39,7 +39,6 @@ public objc closure void MTRDeviceErrorHandler(NSError arg0);
 
 public objc closure void MTRDeviceResubscriptionScheduledHandler(NSError arg0, NSNumber arg1);
 
-/// macOS 13.1 and later.
 public objc closure void MTRDeviceOpenCommissioningWindowHandler(MTRSetupPayload? arg0, NSError? arg1);
 
 public extern "C" NSString MTRAttributePathKey;
@@ -78,25 +77,18 @@ public extern "C" NSString MTRStructureValueType;
 
 public extern "C" NSString MTRArrayValueType;
 
-/// macOS 13.4 and later.
 public extern "C" NSString MTREventNumberKey;
 
-/// macOS 13.4 and later.
 public extern "C" NSString MTREventPriorityKey;
 
-/// macOS 13.4 and later.
 public extern "C" NSString MTREventTimeTypeKey;
 
-/// macOS 13.4 and later.
 public extern "C" NSString MTREventSystemUpTimeKey;
 
-/// macOS 13.4 and later.
 public extern "C" NSString MTREventTimestampDateKey;
 
-/// macOS 14.3 and later.
 public extern "C" NSString MTREventIsHistoricalKey;
 
-/// macOS 13.3 and later.
 public enum MTRTransportType : byte
 {
     Undefined = 0,
@@ -105,29 +97,19 @@ public enum MTRTransportType : byte
     TCP = 3,
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTRAttributeRequestPath : NSObject, NSCopying, NSSecureCoding
 {
-    /// macOS 14.0 and later.
     [Selector("endpoint")] public NSNumber? Endpoint { get; }
-    /// macOS 14.0 and later.
     [Selector("cluster")] public NSNumber? Cluster { get; }
-    /// macOS 14.0 and later.
     [Selector("attribute")] public NSNumber? Attribute { get; }
-    /// macOS 14.0 and later.
     [Selector("requestPathWithEndpointID:clusterID:attributeID:")] public static MTRAttributeRequestPath RequestPathWithEndpointIDClusterIDAttributeID(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID);
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTREventRequestPath : NSObject, NSCopying, NSSecureCoding
 {
-    /// macOS 14.0 and later.
     [Selector("endpoint")] public NSNumber? Endpoint { get; }
-    /// macOS 14.0 and later.
     [Selector("cluster")] public NSNumber? Cluster { get; }
-    /// macOS 14.0 and later.
     [Selector("event")] public NSNumber? Event { get; }
-    /// macOS 14.0 and later.
     [Selector("requestPathWithEndpointID:clusterID:eventID:")] public static MTREventRequestPath RequestPathWithEndpointIDClusterIDEventID(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID);
 }
 
@@ -135,39 +117,23 @@ public objc closure void MTRBaseDeviceDownloadLogOfTypeTimeoutQueueCompletionCom
 
 public extern objc class MTRBaseDevice : NSObject
 {
-    /// macOS 13.3 and later.
     [Selector("sessionTransportType")] public MTRTransportType SessionTransportType { get; }
-    /// macOS 13.3 and later.
     [Selector("deviceWithNodeID:controller:")] public static MTRBaseDevice DeviceWithNodeIDController(NSNumber nodeID, MTRDeviceController controller);
-    /// macOS 13.3 and later.
     [Selector("subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:subscriptionEstablished:resubscriptionScheduled:")] public void SubscribeWithQueueParamsClusterStateCacheContainerAttributeReportHandlerEventReportHandlerErrorHandlerSubscriptionEstablishedResubscriptionScheduled(dispatch_queue_t queue, MTRSubscribeParams params, MTRClusterStateCacheContainer? clusterStateCacheContainer, MTRDeviceReportHandler? attributeReportHandler, MTRDeviceReportHandler? eventReportHandler, MTRDeviceErrorHandler errorHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduled);
-    /// macOS 13.3 and later.
     [Selector("readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:")] public void ReadAttributesWithEndpointIDClusterIDAttributeIDParamsQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    /// macOS 14.0 and later.
     [Selector("readAttributePaths:eventPaths:params:queue:completion:")] public void ReadAttributePathsEventPathsParamsQueueCompletion(NSArray? attributePaths, NSArray? eventPaths, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    /// macOS 13.3 and later.
     [Selector("writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:")] public void WriteAttributeWithEndpointIDClusterIDAttributeIDValueTimedWriteTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID, AnyObject value, NSNumber? timeoutMs, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    /// macOS 13.3 and later.
     [Selector("invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion:")] public void InvokeCommandWithEndpointIDClusterIDCommandIDCommandFieldsTimedInvokeTimeoutQueueCompletion(NSNumber endpointID, NSNumber clusterID, NSNumber commandID, AnyObject commandFields, NSNumber? timeoutMs, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    /// macOS 13.3 and later.
     [Selector("subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:reportHandler:subscriptionEstablished:")] public void SubscribeToAttributesWithEndpointIDClusterIDAttributeIDParamsQueueReportHandlerSubscriptionEstablished(NSNumber? endpointID, NSNumber? clusterID, NSNumber? attributeID, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished);
-    /// macOS 14.0 and later.
     [Selector("subscribeToAttributePaths:eventPaths:params:queue:reportHandler:subscriptionEstablished:resubscriptionScheduled:")] public void SubscribeToAttributePathsEventPathsParamsQueueReportHandlerSubscriptionEstablishedResubscriptionScheduled(NSArray? attributePaths, NSArray? eventPaths, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRDeviceResubscriptionScheduledHandler? resubscriptionScheduled);
-    /// macOS 13.3 and later.
     [Selector("deregisterReportHandlersWithQueue:completion:")] public void DeregisterReportHandlersWithQueueCompletion(dispatch_queue_t queue, dispatch_block_t completion);
-    /// macOS 13.1 and later.
     [Selector("openCommissioningWindowWithSetupPasscode:discriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithSetupPasscodeDiscriminatorDurationQueueCompletion(NSNumber setupPasscode, NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    /// macOS 14.0 and later.
     [Selector("openCommissioningWindowWithDiscriminator:duration:queue:completion:")] public void OpenCommissioningWindowWithDiscriminatorDurationQueueCompletion(NSNumber discriminator, NSNumber duration, dispatch_queue_t queue, MTRDeviceOpenCommissioningWindowHandler completion);
-    /// macOS 13.3 and later.
     [Selector("readEventsWithEndpointID:clusterID:eventID:params:queue:completion:")] public void ReadEventsWithEndpointIDClusterIDEventIDParamsQueueCompletion(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID, MTRReadParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler completion);
-    /// macOS 13.3 and later.
     [Selector("subscribeToEventsWithEndpointID:clusterID:eventID:params:queue:reportHandler:subscriptionEstablished:")] public void SubscribeToEventsWithEndpointIDClusterIDEventIDParamsQueueReportHandlerSubscriptionEstablished(NSNumber? endpointID, NSNumber? clusterID, NSNumber? eventID, MTRSubscribeParams? params, dispatch_queue_t queue, MTRDeviceResponseHandler reportHandler, MTRSubscriptionEstablishedHandler? subscriptionEstablished);
-    /// macOS 14.6 and later.
     [Selector("downloadLogOfType:timeout:queue:completion:")] public void DownloadLogOfTypeTimeoutQueueCompletion(MTRDiagnosticLogType type, NSTimeInterval timeout, dispatch_queue_t queue, MTRBaseDeviceDownloadLogOfTypeTimeoutQueueCompletionCompletionBlock completion);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRClusterPath : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("endpoint")] public NSNumber Endpoint { get; }
@@ -178,21 +144,18 @@ public extern objc class MTRClusterPath : NSObject, NSCopying, NSSecureCoding
 public extern objc class MTRAttributePath : MTRClusterPath, NSSecureCoding
 {
     [Selector("attribute")] public NSNumber Attribute { get; }
-    /// macOS 13.3 and later.
     [Selector("attributePathWithEndpointID:clusterID:attributeID:")] public static MTRAttributePath AttributePathWithEndpointIDClusterIDAttributeID(NSNumber endpointID, NSNumber clusterID, NSNumber attributeID);
 }
 
 public extern objc class MTREventPath : MTRClusterPath
 {
     [Selector("event")] public NSNumber Event { get; }
-    /// macOS 13.3 and later.
     [Selector("eventPathWithEndpointID:clusterID:eventID:")] public static MTREventPath EventPathWithEndpointIDClusterIDEventID(NSNumber endpointID, NSNumber clusterID, NSNumber eventID);
 }
 
 public extern objc class MTRCommandPath : MTRClusterPath
 {
     [Selector("command")] public NSNumber Command { get; }
-    /// macOS 13.3 and later.
     [Selector("commandPathWithEndpointID:clusterID:commandID:")] public static MTRCommandPath CommandPathWithEndpointIDClusterIDCommandID(NSNumber endpointID, NSNumber clusterID, NSNumber commandID);
 }
 
@@ -201,18 +164,15 @@ public extern objc class MTRAttributeReport : NSObject
     [Selector("path")] public MTRAttributePath Path { get; }
     [Selector("value")] public AnyObject? Value { get; }
     [Selector("error")] public NSError? Error { get; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 
-/// macOS 13.4 and later.
 public enum MTREventTimeType : ulong
 {
     SystemUpTime = 0,
     TimestampDate = 1,
 }
 
-/// macOS 13.4 and later.
 public enum MTREventPriority : ulong
 {
     Debug = 0,
@@ -225,15 +185,11 @@ public extern objc class MTREventReport : NSObject
     [Selector("path")] public MTREventPath Path { get; }
     [Selector("eventNumber")] public NSNumber EventNumber { get; }
     [Selector("priority")] public NSNumber Priority { get; }
-    /// macOS 13.4 and later.
     [Selector("eventTimeType")] public MTREventTimeType EventTimeType { get; }
-    /// macOS 13.4 and later.
     [Selector("systemUpTime")] public NSTimeInterval SystemUpTime { get; }
-    /// macOS 13.4 and later.
     [Selector("timestampDate")] public NSDate? TimestampDate { get; }
     [Selector("value")] public AnyObject? Value { get; }
     [Selector("error")] public NSError? Error { get; }
-    /// macOS 14.0 and later.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
 

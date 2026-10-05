@@ -41,7 +41,6 @@ public objc closure void CKSyncEngineSendChangesWithOptionsCompletionHandlerComp
 
 public objc closure void CKSyncEngineCancelOperationsWithCompletionHandlerCompletionHandlerBlock();
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngine : NSObject
 {
     [Selector("database")] public CKDatabase Database { get; }
@@ -54,7 +53,6 @@ public extern objc class CKSyncEngine : NSObject
     [Selector("cancelOperationsWithCompletionHandler:")] public void CancelOperationsWithCompletionHandler(CKSyncEngineCancelOperationsWithCompletionHandlerCompletionHandlerBlock? completionHandler);
 }
 
-/// macOS 14.0 and later.
 public objc interface CKSyncEngineDelegate : NSObjectProtocol
 {
     [Selector("syncEngine:handleEvent:")] void SyncEngineHandleEvent(CKSyncEngine syncEngine, CKSyncEngineEvent event);
@@ -62,7 +60,6 @@ public objc interface CKSyncEngineDelegate : NSObjectProtocol
     [Optional] [Selector("syncEngine:nextFetchChangesOptionsForContext:")] CKSyncEngineFetchChangesOptions SyncEngineNextFetchChangesOptionsForContext(CKSyncEngine syncEngine, CKSyncEngineFetchChangesContext context);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFetchChangesOptions : NSObject, NSCopying
 {
     [Selector("scope", "setScope:")] public CKSyncEngineFetchChangesScope Scope { get; set; }
@@ -71,18 +68,15 @@ public extern objc class CKSyncEngineFetchChangesOptions : NSObject, NSCopying
     [Selector("initWithScope:")] public Self InitWithScope(CKSyncEngineFetchChangesScope? scope);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFetchChangesScope : NSObject, NSCopying
 {
     [Selector("zoneIDs")] public NSSet? ZoneIDs { get; }
     [Selector("excludedZoneIDs")] public NSSet ExcludedZoneIDs { get; }
     [Selector("initWithZoneIDs:")] public Self InitWithZoneIDs(NSSet? zoneIDs);
     [Selector("initWithExcludedZoneIDs:")] public Self InitWithExcludedZoneIDs(NSSet zoneIDs);
-    /// macOS 14.2 and later.
     [Selector("containsZoneID:")] public bool ContainsZoneID(CKRecordZoneID zoneID);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineSendChangesOptions : NSObject, NSCopying
 {
     [Selector("scope", "setScope:")] public CKSyncEngineSendChangesScope Scope { get; set; }
@@ -90,7 +84,6 @@ public extern objc class CKSyncEngineSendChangesOptions : NSObject, NSCopying
     [Selector("initWithScope:")] public Self InitWithScope(CKSyncEngineSendChangesScope? scope);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineSendChangesScope : NSObject, NSCopying
 {
     [Selector("zoneIDs")] public NSSet? ZoneIDs { get; }
@@ -109,14 +102,12 @@ public enum CKSyncEngineSyncReason : long
     Manual = 1,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFetchChangesContext : NSObject
 {
     [Selector("reason")] public CKSyncEngineSyncReason Reason { get; }
     [Selector("options")] public CKSyncEngineFetchChangesOptions Options { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineSendChangesContext : NSObject
 {
     [Selector("reason")] public CKSyncEngineSyncReason Reason { get; }

@@ -31,25 +31,18 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Metal")
 
-/// macOS 15.0 and later.
 public using NSDeviceCertification = NSInteger;
 
-/// macOS 15.0 and later.
 public extern "C" NSDeviceCertification NSDeviceCertificationiPhonePerformanceGaming;
 
-/// macOS 15.0 and later.
 public using NSProcessPerformanceProfile = NSInteger;
 
-/// macOS 15.0 and later.
 public extern "C" NSProcessPerformanceProfile NSProcessPerformanceProfileDefault;
 
-/// macOS 15.0 and later.
 public extern "C" NSProcessPerformanceProfile NSProcessPerformanceProfileSustained;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? NSProcessInfoPerformanceProfileDidChangeNotification;
 
-/// macOS 15.0 and later.
 /// NSDeviceCertification, a category of NSProcessInfo.
 public extern objc class NSProcessInfo
 {

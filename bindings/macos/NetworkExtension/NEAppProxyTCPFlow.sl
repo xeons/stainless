@@ -37,7 +37,6 @@ public objc closure void NEAppProxyTCPFlowWriteDataWithCompletionHandlerCompleti
 
 public extern objc class NEAppProxyTCPFlow : NEAppProxyFlow
 {
-    /// macOS 15.0 and later.
     [Selector("remoteFlowEndpoint")] public nw_endpoint_t RemoteFlowEndpoint { get; }
     /// Deprecated in macOS 15.0.
     [Selector("remoteEndpoint")] public NWEndpoint RemoteEndpoint { get; }

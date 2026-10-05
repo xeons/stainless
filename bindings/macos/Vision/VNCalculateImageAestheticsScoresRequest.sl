@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Vision")
 
-/// macOS 15.0 and later.
 public extern objc class VNCalculateImageAestheticsScoresRequest : VNImageBasedRequest
 {
     [Selector("results")] public NSArray? Results { get; }

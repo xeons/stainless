@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Cinematic")
 
-/// macOS 14.0 and later.
 public extern "C" NSErrorDomain? CNCinematicErrorDomain;
 
-/// macOS 14.0 and later.
 public enum CNCinematicErrorCode : long
 {
     Unknown = 1,

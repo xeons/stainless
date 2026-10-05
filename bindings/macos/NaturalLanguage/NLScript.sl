@@ -32,97 +32,66 @@ import Standard.ObjC;
 
 public using NLScript = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptUndetermined;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptArabic;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptArmenian;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptBengali;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptCanadianAboriginalSyllabics;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptCherokee;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptCyrillic;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptDevanagari;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptEthiopic;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptGeorgian;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptGreek;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptGujarati;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptGurmukhi;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptHebrew;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptJapanese;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptKannada;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptKhmer;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptKorean;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptLao;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptLatin;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptMalayalam;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptMongolian;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptMyanmar;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptOriya;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptSimplifiedChinese;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptSinhala;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptTamil;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptTelugu;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptThai;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptTibetan;
 
-/// macOS 14.0 and later.
 public extern "C" NLScript? NLScriptTraditionalChinese;
 
 #endif

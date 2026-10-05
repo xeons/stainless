@@ -74,7 +74,6 @@ public objc closure void AVSpeechSynthesizerBufferCallback(AVAudioBuffer arg0);
 
 public objc closure void AVSpeechSynthesizerMarkerCallback(NSArray arg0);
 
-/// macOS 14.0 and later.
 public enum AVSpeechSynthesisPersonalVoiceAuthorizationStatus : ulong
 {
     NotDetermined = 0,
@@ -83,7 +82,6 @@ public enum AVSpeechSynthesisPersonalVoiceAuthorizationStatus : ulong
     Authorized = 3,
 }
 
-/// macOS 14.0 and later.
 [Flags]
 public enum AVSpeechSynthesisVoiceTraits : ulong
 {
@@ -92,7 +90,6 @@ public enum AVSpeechSynthesisVoiceTraits : ulong
     IsPersonalVoice = 2,
 }
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName AVSpeechSynthesisAvailableVoicesDidChangeNotification;
 
 public extern objc class AVSpeechSynthesisVoice : NSObject, NSSecureCoding
@@ -103,7 +100,6 @@ public extern objc class AVSpeechSynthesisVoice : NSObject, NSSecureCoding
     [Selector("quality")] public AVSpeechSynthesisVoiceQuality Quality { get; }
     [Selector("gender")] public AVSpeechSynthesisVoiceGender Gender { get; }
     [Selector("audioFileSettings")] public NSDictionary AudioFileSettings { get; }
-    /// macOS 14.0 and later.
     [Selector("voiceTraits")] public AVSpeechSynthesisVoiceTraits VoiceTraits { get; }
     [Selector("speechVoices")] public static NSArray SpeechVoices();
     [Selector("currentLanguageCode")] public static NSString CurrentLanguageCode();
@@ -137,7 +133,6 @@ public extern objc class AVSpeechSynthesizer : NSObject
     [Selector("delegate", "setDelegate:")] public AVSpeechSynthesizerDelegate? Delegate { get; set; }
     [Selector("isSpeaking")] public bool Speaking { get; }
     [Selector("isPaused")] public bool Paused { get; }
-    /// macOS 14.0 and later.
     [Selector("personalVoiceAuthorizationStatus")] public static AVSpeechSynthesisPersonalVoiceAuthorizationStatus PersonalVoiceAuthorizationStatus { get; }
     [Selector("speakUtterance:")] public void SpeakUtterance(AVSpeechUtterance utterance);
     [Selector("writeUtterance:toBufferCallback:")] public void WriteUtteranceToBufferCallback(AVSpeechUtterance utterance, AVSpeechSynthesizerBufferCallback bufferCallback);
@@ -145,7 +140,6 @@ public extern objc class AVSpeechSynthesizer : NSObject
     [Selector("stopSpeakingAtBoundary:")] public bool StopSpeakingAtBoundary(AVSpeechBoundary boundary);
     [Selector("pauseSpeakingAtBoundary:")] public bool PauseSpeakingAtBoundary(AVSpeechBoundary boundary);
     [Selector("continueSpeaking")] public bool ContinueSpeaking();
-    /// macOS 14.0 and later.
     [Selector("requestPersonalVoiceAuthorizationWithCompletionHandler:")] public static void RequestPersonalVoiceAuthorizationWithCompletionHandler(AVSpeechSynthesizerRequestPersonalVoiceAuthorizationWithCompletionHandlerHandlerBlock handler);
 }
 
@@ -157,7 +151,6 @@ public objc interface AVSpeechSynthesizerDelegate : NSObjectProtocol
     [Optional] [Selector("speechSynthesizer:didContinueSpeechUtterance:")] void SpeechSynthesizerDidContinueSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
     [Optional] [Selector("speechSynthesizer:didCancelSpeechUtterance:")] void SpeechSynthesizerDidCancelSpeechUtterance(AVSpeechSynthesizer synthesizer, AVSpeechUtterance utterance);
     [Optional] [Selector("speechSynthesizer:willSpeakRangeOfSpeechString:utterance:")] void SpeechSynthesizerWillSpeakRangeOfSpeechStringUtterance(AVSpeechSynthesizer synthesizer, NSRange characterRange, AVSpeechUtterance utterance);
-    /// macOS 14.0 and later.
     [Optional] [Selector("speechSynthesizer:willSpeakMarker:utterance:")] void SpeechSynthesizerWillSpeakMarkerUtterance(AVSpeechSynthesizer synthesizer, AVSpeechSynthesisMarker marker, AVSpeechUtterance utterance);
 }
 
@@ -166,20 +159,13 @@ public extern objc class AVSpeechSynthesisMarker : NSObject, NSSecureCoding, NSC
     [Selector("mark", "setMark:")] public AVSpeechSynthesisMarkerMark Mark { get; set; }
     [Selector("byteSampleOffset", "setByteSampleOffset:")] public NSUInteger ByteSampleOffset { get; set; }
     [Selector("textRange", "setTextRange:")] public NSRange TextRange { get; set; }
-    /// macOS 14.0 and later.
     [Selector("bookmarkName", "setBookmarkName:")] public NSString? BookmarkName { get; set; }
-    /// macOS 14.0 and later.
     [Selector("phoneme", "setPhoneme:")] public NSString? Phoneme { get; set; }
     [Selector("initWithMarkerType:forTextRange:atByteSampleOffset:")] public Self InitWithMarkerTypeForTextRangeAtByteSampleOffset(AVSpeechSynthesisMarkerMark type, NSRange range, NSUInteger byteSampleOffset);
-    /// macOS 14.0 and later.
     [Selector("initWithWordRange:atByteSampleOffset:")] public Self InitWithWordRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
-    /// macOS 14.0 and later.
     [Selector("initWithSentenceRange:atByteSampleOffset:")] public Self InitWithSentenceRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
-    /// macOS 14.0 and later.
     [Selector("initWithParagraphRange:atByteSampleOffset:")] public Self InitWithParagraphRangeAtByteSampleOffset(NSRange range, NSInteger byteSampleOffset);
-    /// macOS 14.0 and later.
     [Selector("initWithPhonemeString:atByteSampleOffset:")] public Self InitWithPhonemeStringAtByteSampleOffset(NSString phoneme, NSInteger byteSampleOffset);
-    /// macOS 14.0 and later.
     [Selector("initWithBookmarkName:atByteSampleOffset:")] public Self InitWithBookmarkNameAtByteSampleOffset(NSString mark, NSInteger byteSampleOffset);
 }
 

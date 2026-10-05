@@ -44,7 +44,6 @@ public extern objc class MLModelConfiguration : NSObject, NSCopying, NSSecureCod
 {
     [Selector("modelDisplayName", "setModelDisplayName:")] public NSString? ModelDisplayName { get; set; }
     [Selector("computeUnits", "setComputeUnits:")] public MLComputeUnits ComputeUnits { get; set; }
-    /// macOS 14.4 and later.
     [Selector("optimizationHints", "setOptimizationHints:")] public MLOptimizationHints? OptimizationHints { get; set; }
 }
 
@@ -61,11 +60,9 @@ public extern objc class MLModelConfiguration
     [Selector("parameters", "setParameters:")] public NSDictionary? Parameters { get; set; }
 }
 
-/// macOS 15.0 and later.
 /// MultiFunctions, a category of MLModelConfiguration.
 public extern objc class MLModelConfiguration
 {
-    /// macOS 15.0 and later.
     [Selector("functionName", "setFunctionName:")] public NSString? FunctionName { get; set; }
 }
 

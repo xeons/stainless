@@ -40,7 +40,6 @@ public enum AVPlayerLooperStatus : long
     Cancelled = 3,
 }
 
-/// macOS 14.0 and later.
 public enum AVPlayerLooperItemOrdering : long
 {
     PrecedeExistingItems = 0,
@@ -56,7 +55,6 @@ public extern objc class AVPlayerLooper : NSObject
     [Selector("playerLooperWithPlayer:templateItem:timeRange:")] public static Self PlayerLooperWithPlayerTemplateItemTimeRange(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange);
     [Selector("playerLooperWithPlayer:templateItem:")] public static Self PlayerLooperWithPlayerTemplateItem(AVQueuePlayer player, AVPlayerItem itemToLoop);
     [Selector("initWithPlayer:templateItem:timeRange:")] public Self InitWithPlayerTemplateItemTimeRange(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange);
-    /// macOS 14.0 and later.
     [Selector("initWithPlayer:templateItem:timeRange:existingItemsOrdering:")] public Self InitWithPlayerTemplateItemTimeRangeExistingItemsOrdering(AVQueuePlayer player, AVPlayerItem itemToLoop, CMTimeRange loopRange, AVPlayerLooperItemOrdering itemOrdering);
     [Selector("disableLooping")] public void DisableLooping();
 }

@@ -70,7 +70,6 @@ public extern objc class GKScoreChallenge : GKChallenge
 {
     /// Deprecated in macOS 14.4.
     [Selector("score")] public GKScore? Score { get; }
-    /// macOS 14.4 and later.
     [Selector("leaderboardEntry")] public GKLeaderboardEntry? LeaderboardEntry { get; }
 }
 
@@ -127,7 +126,6 @@ public extern objc class GKAchievement
 /// Deprecated in macOS 14.0.
 public objc closure void GKChallengeComposeCompletionBlock(NSViewController arg0, bool arg1, NSArray? arg2);
 
-/// macOS 14.0 and later.
 /// Deprecated in macOS 26.0.
 public objc closure void GKChallengeComposeHandler(NSViewController arg0, bool arg1, NSArray? arg2);
 
@@ -136,7 +134,6 @@ public extern objc class GKScore
 {
     /// Deprecated in macOS 14.0.
     [Selector("challengeComposeControllerWithMessage:players:completionHandler:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray? players, GKChallengeComposeCompletionBlock? completionHandler);
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 26.0.
     [Selector("challengeComposeControllerWithMessage:players:completion:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray? players, GKChallengeComposeHandler? completionHandler);
 }
@@ -146,7 +143,6 @@ public extern objc class GKLeaderboardEntry
 {
     /// Deprecated in macOS 14.0.
     [Selector("challengeComposeControllerWithMessage:players:completionHandler:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray? players, GKChallengeComposeCompletionBlock? completionHandler);
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 26.0.
     [Selector("challengeComposeControllerWithMessage:players:completion:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray? players, GKChallengeComposeHandler? completionHandler);
 }
@@ -156,7 +152,6 @@ public extern objc class GKAchievement
 {
     /// Deprecated in macOS 14.0.
     [Selector("challengeComposeControllerWithMessage:players:completionHandler:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletionHandler(NSString? message, NSArray players, GKChallengeComposeCompletionBlock? completionHandler);
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 26.0.
     [Selector("challengeComposeControllerWithMessage:players:completion:")] public NSViewController ChallengeComposeControllerWithMessagePlayersCompletion(NSString? message, NSArray players, GKChallengeComposeHandler? completionHandler);
 }

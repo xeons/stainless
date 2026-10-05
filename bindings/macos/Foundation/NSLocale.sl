@@ -45,11 +45,9 @@ public extern objc class NSLocale
 {
     [Selector("localeIdentifier")] public NSString LocaleIdentifier { get; }
     [Selector("languageCode")] public NSString LanguageCode { get; }
-    /// macOS 14.0 and later.
     [Selector("languageIdentifier")] public NSString LanguageIdentifier { get; }
     /// Deprecated in macOS 100000.
     [Selector("countryCode")] public NSString? CountryCode { get; }
-    /// macOS 14.0 and later.
     [Selector("regionCode")] public NSString? RegionCode { get; }
     [Selector("scriptCode")] public NSString? ScriptCode { get; }
     [Selector("variantCode")] public NSString? VariantCode { get; }

@@ -41,7 +41,6 @@ public extern objc class PKStrokePoint : NSObject, NSCopying
     [Selector("azimuth")] public CGFloat Azimuth { get; }
     [Selector("force")] public CGFloat Force { get; }
     [Selector("altitude")] public CGFloat Altitude { get; }
-    /// macOS 14.0 and later.
     [Selector("secondaryScale")] public CGFloat SecondaryScale { get; }
     /// macOS 26.0 and later.
     [Selector("threshold")] public CGFloat Threshold { get; }

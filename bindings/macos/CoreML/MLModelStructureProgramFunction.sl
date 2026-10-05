@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.4 and later.
 public extern objc class MLModelStructureProgramFunction : NSObject
 {
     [Selector("inputs")] public NSArray Inputs { get; }

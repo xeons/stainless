@@ -54,9 +54,7 @@ public extern objc class BADownload : NSObject, NSCoding, NSSecureCoding, NSCopy
     [Selector("identifier")] public NSString? Identifier { get; }
     [Selector("uniqueIdentifier")] public NSString? UniqueIdentifier { get; }
     [Selector("priority")] public BADownloaderPriority Priority { get; }
-    /// macOS 13.3 and later.
     [Selector("isEssential")] public bool IsEssential { get; }
-    /// macOS 13.3 and later.
     [Selector("copyAsNonEssential")] public Self CopyAsNonEssential();
 }
 

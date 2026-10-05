@@ -59,7 +59,6 @@ public extern objc class MTROTAHeader : NSObject
     [Selector("imageDigestType", "setImageDigestType:")] public MTROTAImageDigestType ImageDigestType { get; set; }
     [Selector("minApplicableVersion", "setMinApplicableVersion:")] public NSNumber? MinApplicableVersion { get; set; }
     [Selector("maxApplicableVersion", "setMaxApplicableVersion:")] public NSNumber? MaxApplicableVersion { get; set; }
-    /// macOS 13.3 and later.
     [Selector("initWithData:")] public Self InitWithData(NSData data);
 }
 

@@ -30,47 +30,38 @@ import MacOS.System;
 #pragma comment(framework, "Hypervisor")
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_distributor_size(nuint* distributor_size);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_distributor_base_alignment(nuint* distributor_base_alignment);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_redistributor_region_size(nuint* redistributor_region_size);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_redistributor_size(nuint* redistributor_size);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_redistributor_base_alignment(nuint* redistributor_base_alignment);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_msi_region_size(nuint* msi_region_size);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_msi_region_base_alignment(nuint* msi_region_base_alignment);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_spi_interrupt_range(uint* spi_intid_base, uint* spi_intid_count);
 #endif
 
 #if ARM64
-/// macOS 15.0 and later.
 public extern "C" hv_return_t hv_gic_get_intid(hv_gic_intid_t interrupt, uint* intid);
 #endif
 

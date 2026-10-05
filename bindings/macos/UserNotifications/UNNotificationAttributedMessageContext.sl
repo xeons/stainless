@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "UserNotifications")
 
-/// macOS 15.0 and later.
 public extern objc class UNNotificationAttributedMessageContext : NSObject, UNNotificationContentProviding
 {
     [Selector("contextWithSendMessageIntent:attributedContent:")] public static Self ContextWithSendMessageIntentAttributedContent(INSendMessageIntent sendMessageIntent, NSAttributedString attributedContent);

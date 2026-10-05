@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "LocalAuthentication")
 
-/// macOS 15.0 and later.
 public extern objc class LAEnvironment : NSObject
 {
     [Selector("currentUser")] public static LAEnvironment CurrentUser { get; }
@@ -39,7 +38,6 @@ public extern objc class LAEnvironment : NSObject
     [Selector("removeObserver:")] public void RemoveObserver(LAEnvironmentObserver observer);
 }
 
-/// macOS 15.0 and later.
 public objc interface LAEnvironmentObserver : NSObjectProtocol
 {
     [Optional] [Selector("environment:stateDidChangeFromOldState:")] void EnvironmentStateDidChangeFromOldState(LAEnvironment environment, LAEnvironmentState oldState);

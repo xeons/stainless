@@ -63,7 +63,6 @@ public extern objc class NEFilterManager : NSObject
     [Selector("providerConfiguration", "setProviderConfiguration:")] public NEFilterProviderConfiguration? ProviderConfiguration { get; set; }
     [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }
     [Selector("grade", "setGrade:")] public NEFilterManagerGrade Grade { get; set; }
-    /// macOS 15.0 and later.
     [Selector("disableEncryptedDNSSettings", "setDisableEncryptedDNSSettings:")] public bool DisableEncryptedDNSSettings { get; set; }
     [Selector("sharedManager")] public static NEFilterManager SharedManager();
     [Selector("loadFromPreferencesWithCompletionHandler:")] public void LoadFromPreferencesWithCompletionHandler(NEFilterManagerLoadFromPreferencesWithCompletionHandlerCompletionHandlerBlock completionHandler);

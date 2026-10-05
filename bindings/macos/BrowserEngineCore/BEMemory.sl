@@ -28,17 +28,14 @@ module MacOS.BrowserEngineCore;
 #pragma comment(framework, "BrowserEngineCore")
 
 #if ARM64
-/// macOS 14.3 and later.
 public extern "C" void be_memory_inline_jit_restrict_rwx_to_rw_with_witness_impl();
 #endif
 
 #if ARM64
-/// macOS 14.3 and later.
 public extern "C" void be_memory_inline_jit_restrict_rwx_to_rx_with_witness_impl();
 #endif
 
 #if ARM64
-/// macOS 14.3 and later.
 public extern "C" int be_memory_inline_jit_restrict_with_witness_supported();
 #endif
 

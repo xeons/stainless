@@ -136,16 +136,12 @@ public extern "C" CFAllocatorRef? CFAllocatorGetDefault();
 
 [ReturnsRetained] public extern "C" CFAllocatorRef? CFAllocatorCreate(CFAllocatorRef? allocator, CFAllocatorContext* context);
 
-/// macOS 15.0 and later.
 public extern "C" void* CFAllocatorAllocateTyped(CFAllocatorRef? allocator, CFIndex size, CFAllocatorTypeID descriptor, CFOptionFlags hint);
 
-/// macOS 15.0 and later.
 public extern "C" void* CFAllocatorReallocateTyped(CFAllocatorRef? allocator, void* ptr, CFIndex newsize, CFAllocatorTypeID descriptor, CFOptionFlags hint);
 
-/// macOS 15.0 and later.
 public extern "C" void* CFAllocatorAllocateBytes(CFAllocatorRef? allocator, CFIndex size, CFOptionFlags hint);
 
-/// macOS 15.0 and later.
 public extern "C" void* CFAllocatorReallocateBytes(CFAllocatorRef? allocator, void* ptr, CFIndex newsize, CFOptionFlags hint);
 
 public extern "C" void* CFAllocatorAllocate(CFAllocatorRef? allocator, CFIndex size, CFOptionFlags hint);

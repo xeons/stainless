@@ -45,7 +45,6 @@ public enum MTRFanControlWindSettingMask : byte
     NaturalWind = 2,
 }
 
-/// macOS 13.3 and later.
 /// Deprecated in macOS 14.2.
 public enum MTROTASoftwareUpdateProviderOTAApplyUpdateAction : byte
 {
@@ -54,7 +53,6 @@ public enum MTROTASoftwareUpdateProviderOTAApplyUpdateAction : byte
     Discontinue = 2,
 }
 
-/// macOS 13.3 and later.
 /// Deprecated in macOS 14.2.
 public enum MTROTASoftwareUpdateProviderOTADownloadProtocol : byte
 {
@@ -64,7 +62,6 @@ public enum MTROTASoftwareUpdateProviderOTADownloadProtocol : byte
     VendorSpecific = 3,
 }
 
-/// macOS 13.3 and later.
 /// Deprecated in macOS 14.2.
 public enum MTROTASoftwareUpdateProviderOTAQueryStatus : byte
 {
@@ -74,7 +71,6 @@ public enum MTROTASoftwareUpdateProviderOTAQueryStatus : byte
     DownloadProtocolNotSupported = 3,
 }
 
-/// macOS 13.3 and later.
 /// Deprecated in macOS 14.2.
 public enum MTROTASoftwareUpdateRequestorOTAAnnouncementReason : byte
 {
@@ -83,7 +79,6 @@ public enum MTROTASoftwareUpdateRequestorOTAAnnouncementReason : byte
     UrgentUpdateAvailable = 2,
 }
 
-/// macOS 13.3 and later.
 /// Deprecated in macOS 14.2.
 public enum MTROTASoftwareUpdateRequestorOTAChangeReason : byte
 {
@@ -94,7 +89,6 @@ public enum MTROTASoftwareUpdateRequestorOTAChangeReason : byte
     DelayByProvider = 4,
 }
 
-/// macOS 13.3 and later.
 /// Deprecated in macOS 14.2.
 public enum MTROTASoftwareUpdateRequestorOTAUpdateState : byte
 {
@@ -127,70 +121,48 @@ public enum MTRColorControlSaturationStepMode : byte
 /// AttributesNowReadonly, a category of MTRBaseClusterColorControl.
 public extern objc class MTRBaseClusterColorControl
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeWhitePointXWithValue:completion:")] public void WriteAttributeWhitePointXWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeWhitePointXWithValue:params:completion:")] public void WriteAttributeWhitePointXWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeWhitePointYWithValue:completion:")] public void WriteAttributeWhitePointYWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeWhitePointYWithValue:params:completion:")] public void WriteAttributeWhitePointYWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointRXWithValue:completion:")] public void WriteAttributeColorPointRXWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointRXWithValue:params:completion:")] public void WriteAttributeColorPointRXWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointRYWithValue:completion:")] public void WriteAttributeColorPointRYWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointRYWithValue:params:completion:")] public void WriteAttributeColorPointRYWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointRIntensityWithValue:completion:")] public void WriteAttributeColorPointRIntensityWithValueCompletion(NSNumber? value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointRIntensityWithValue:params:completion:")] public void WriteAttributeColorPointRIntensityWithValueParamsCompletion(NSNumber? value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointGXWithValue:completion:")] public void WriteAttributeColorPointGXWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointGXWithValue:params:completion:")] public void WriteAttributeColorPointGXWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointGYWithValue:completion:")] public void WriteAttributeColorPointGYWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointGYWithValue:params:completion:")] public void WriteAttributeColorPointGYWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointGIntensityWithValue:completion:")] public void WriteAttributeColorPointGIntensityWithValueCompletion(NSNumber? value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointGIntensityWithValue:params:completion:")] public void WriteAttributeColorPointGIntensityWithValueParamsCompletion(NSNumber? value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointBXWithValue:completion:")] public void WriteAttributeColorPointBXWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointBXWithValue:params:completion:")] public void WriteAttributeColorPointBXWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointBYWithValue:completion:")] public void WriteAttributeColorPointBYWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointBYWithValue:params:completion:")] public void WriteAttributeColorPointBYWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointBIntensityWithValue:completion:")] public void WriteAttributeColorPointBIntensityWithValueCompletion(NSNumber? value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 26.1.
     [Selector("writeAttributeColorPointBIntensityWithValue:params:completion:")] public void WriteAttributeColorPointBIntensityWithValueParamsCompletion(NSNumber? value, MTRWriteParams? params, MTRStatusCompletion completion);
     /// Deprecated in macOS 13.3.
@@ -333,73 +305,50 @@ public objc closure void MTRBaseClusterOnOffSwitchConfigurationReadAttributeClus
 /// Deprecated in macOS 15.2.
 public extern objc class MTRBaseClusterOnOffSwitchConfiguration : MTRGenericBaseCluster
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeSwitchTypeWithCompletion:")] public void ReadAttributeSwitchTypeWithCompletion(MTRBaseClusterOnOffSwitchConfigurationReadAttributeSwitchTypeWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeSwitchTypeWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeSwitchTypeWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterOnOffSwitchConfigurationSubscribeAttributeSwitchTypeWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeSwitchTypeWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeSwitchTypeWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterOnOffSwitchConfigurationReadAttributeSwitchTypeWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeSwitchActionsWithCompletion:")] public void ReadAttributeSwitchActionsWithCompletion(MTRBaseClusterOnOffSwitchConfigurationReadAttributeSwitchActionsWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeSwitchActionsWithValue:completion:")] public void WriteAttributeSwitchActionsWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeSwitchActionsWithValue:params:completion:")] public void WriteAttributeSwitchActionsWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeSwitchActionsWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeSwitchActionsWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterOnOffSwitchConfigurationSubscribeAttributeSwitchActionsWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeSwitchActionsWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeSwitchActionsWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterOnOffSwitchConfigurationReadAttributeSwitchActionsWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithCompletion:")] public void ReadAttributeGeneratedCommandListWithCompletion(MTRBaseClusterOnOffSwitchConfigurationReadAttributeGeneratedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeGeneratedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterOnOffSwitchConfigurationSubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterOnOffSwitchConfigurationReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithCompletion:")] public void ReadAttributeAcceptedCommandListWithCompletion(MTRBaseClusterOnOffSwitchConfigurationReadAttributeAcceptedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcceptedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterOnOffSwitchConfigurationSubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterOnOffSwitchConfigurationReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithCompletion:")] public void ReadAttributeAttributeListWithCompletion(MTRBaseClusterOnOffSwitchConfigurationReadAttributeAttributeListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAttributeListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterOnOffSwitchConfigurationSubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterOnOffSwitchConfigurationReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithCompletion:")] public void ReadAttributeFeatureMapWithCompletion(MTRBaseClusterOnOffSwitchConfigurationReadAttributeFeatureMapWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeFeatureMapWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterOnOffSwitchConfigurationSubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterOnOffSwitchConfigurationReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithCompletion:")] public void ReadAttributeClusterRevisionWithCompletion(MTRBaseClusterOnOffSwitchConfigurationReadAttributeClusterRevisionWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeClusterRevisionWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterOnOffSwitchConfigurationSubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterOnOffSwitchConfigurationReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
 }
@@ -407,7 +356,6 @@ public extern objc class MTRBaseClusterOnOffSwitchConfiguration : MTRGenericBase
 /// Availability, a category of MTRBaseClusterOnOffSwitchConfiguration.
 public extern objc class MTRBaseClusterOnOffSwitchConfiguration
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRBaseDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
@@ -533,7 +481,6 @@ public extern objc class MTRClusterOnOffSwitchConfiguration : MTRGenericCluster
 /// Availability, a category of MTRClusterOnOffSwitchConfiguration.
 public extern objc class MTRClusterOnOffSwitchConfiguration
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
@@ -632,166 +579,112 @@ public objc closure void MTRBaseClusterBinaryInputBasicReadAttributeClusterRevis
 /// Deprecated in macOS 15.2.
 public extern objc class MTRBaseClusterBinaryInputBasic : MTRGenericBaseCluster
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActiveTextWithCompletion:")] public void ReadAttributeActiveTextWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeActiveTextWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeActiveTextWithValue:completion:")] public void WriteAttributeActiveTextWithValueCompletion(NSString value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeActiveTextWithValue:params:completion:")] public void WriteAttributeActiveTextWithValueParamsCompletion(NSString value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActiveTextWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActiveTextWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeActiveTextWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActiveTextWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActiveTextWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeActiveTextWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDescriptionWithCompletion:")] public void ReadAttributeDescriptionWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeDescriptionWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeDescriptionWithValue:completion:")] public void WriteAttributeDescriptionWithValueCompletion(NSString value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeDescriptionWithValue:params:completion:")] public void WriteAttributeDescriptionWithValueParamsCompletion(NSString value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDescriptionWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDescriptionWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeDescriptionWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDescriptionWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDescriptionWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeDescriptionWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInactiveTextWithCompletion:")] public void ReadAttributeInactiveTextWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeInactiveTextWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeInactiveTextWithValue:completion:")] public void WriteAttributeInactiveTextWithValueCompletion(NSString value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeInactiveTextWithValue:params:completion:")] public void WriteAttributeInactiveTextWithValueParamsCompletion(NSString value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeInactiveTextWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeInactiveTextWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeInactiveTextWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInactiveTextWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeInactiveTextWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeInactiveTextWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeOutOfServiceWithCompletion:")] public void ReadAttributeOutOfServiceWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeOutOfServiceWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeOutOfServiceWithValue:completion:")] public void WriteAttributeOutOfServiceWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeOutOfServiceWithValue:params:completion:")] public void WriteAttributeOutOfServiceWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeOutOfServiceWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeOutOfServiceWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeOutOfServiceWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeOutOfServiceWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeOutOfServiceWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeOutOfServiceWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePolarityWithCompletion:")] public void ReadAttributePolarityWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributePolarityWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePolarityWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePolarityWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributePolarityWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePolarityWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePolarityWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributePolarityWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePresentValueWithCompletion:")] public void ReadAttributePresentValueWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributePresentValueWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributePresentValueWithValue:completion:")] public void WriteAttributePresentValueWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributePresentValueWithValue:params:completion:")] public void WriteAttributePresentValueWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePresentValueWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePresentValueWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributePresentValueWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePresentValueWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePresentValueWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributePresentValueWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReliabilityWithCompletion:")] public void ReadAttributeReliabilityWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeReliabilityWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeReliabilityWithValue:completion:")] public void WriteAttributeReliabilityWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeReliabilityWithValue:params:completion:")] public void WriteAttributeReliabilityWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeReliabilityWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeReliabilityWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeReliabilityWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReliabilityWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeReliabilityWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeReliabilityWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeStatusFlagsWithCompletion:")] public void ReadAttributeStatusFlagsWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeStatusFlagsWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeStatusFlagsWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeStatusFlagsWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeStatusFlagsWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeStatusFlagsWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeStatusFlagsWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeStatusFlagsWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApplicationTypeWithCompletion:")] public void ReadAttributeApplicationTypeWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeApplicationTypeWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeApplicationTypeWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeApplicationTypeWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeApplicationTypeWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApplicationTypeWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeApplicationTypeWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeApplicationTypeWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithCompletion:")] public void ReadAttributeGeneratedCommandListWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeGeneratedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeGeneratedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithCompletion:")] public void ReadAttributeAcceptedCommandListWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeAcceptedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcceptedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithCompletion:")] public void ReadAttributeAttributeListWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeAttributeListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAttributeListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithCompletion:")] public void ReadAttributeFeatureMapWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeFeatureMapWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeFeatureMapWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithCompletion:")] public void ReadAttributeClusterRevisionWithCompletion(MTRBaseClusterBinaryInputBasicReadAttributeClusterRevisionWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeClusterRevisionWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBinaryInputBasicSubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBinaryInputBasicReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
 }
@@ -799,7 +692,6 @@ public extern objc class MTRBaseClusterBinaryInputBasic : MTRGenericBaseCluster
 /// Availability, a category of MTRBaseClusterBinaryInputBasic.
 public extern objc class MTRBaseClusterBinaryInputBasic
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRBaseDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
@@ -1063,7 +955,6 @@ public extern objc class MTRClusterBinaryInputBasic : MTRGenericCluster
 /// Availability, a category of MTRClusterBinaryInputBasic.
 public extern objc class MTRClusterBinaryInputBasic
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
@@ -1184,184 +1075,124 @@ public objc closure void MTRBaseClusterBarrierControlReadAttributeClusterRevisio
 /// Deprecated in macOS 15.2.
 public extern objc class MTRBaseClusterBarrierControl : MTRGenericBaseCluster
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("barrierControlGoToPercentWithParams:completion:")] public void BarrierControlGoToPercentWithParamsCompletion(MTRBarrierControlClusterBarrierControlGoToPercentParams params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("barrierControlStopWithParams:completion:")] public void BarrierControlStopWithParamsCompletion(MTRBarrierControlClusterBarrierControlStopParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("barrierControlStopWithCompletion:")] public void BarrierControlStopWithCompletion(MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierMovingStateWithCompletion:")] public void ReadAttributeBarrierMovingStateWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierMovingStateWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierMovingStateWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierMovingStateWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierMovingStateWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierMovingStateWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierMovingStateWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierMovingStateWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierSafetyStatusWithCompletion:")] public void ReadAttributeBarrierSafetyStatusWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierSafetyStatusWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierSafetyStatusWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierSafetyStatusWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierSafetyStatusWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierSafetyStatusWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierSafetyStatusWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierSafetyStatusWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCapabilitiesWithCompletion:")] public void ReadAttributeBarrierCapabilitiesWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierCapabilitiesWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierCapabilitiesWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierCapabilitiesWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierCapabilitiesWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCapabilitiesWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierCapabilitiesWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierCapabilitiesWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierOpenEventsWithCompletion:")] public void ReadAttributeBarrierOpenEventsWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierOpenEventsWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierOpenEventsWithValue:completion:")] public void WriteAttributeBarrierOpenEventsWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierOpenEventsWithValue:params:completion:")] public void WriteAttributeBarrierOpenEventsWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierOpenEventsWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierOpenEventsWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierOpenEventsWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierOpenEventsWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierOpenEventsWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierOpenEventsWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCloseEventsWithCompletion:")] public void ReadAttributeBarrierCloseEventsWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierCloseEventsWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierCloseEventsWithValue:completion:")] public void WriteAttributeBarrierCloseEventsWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierCloseEventsWithValue:params:completion:")] public void WriteAttributeBarrierCloseEventsWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierCloseEventsWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierCloseEventsWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierCloseEventsWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCloseEventsWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierCloseEventsWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierCloseEventsWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCommandOpenEventsWithCompletion:")] public void ReadAttributeBarrierCommandOpenEventsWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierCommandOpenEventsWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierCommandOpenEventsWithValue:completion:")] public void WriteAttributeBarrierCommandOpenEventsWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierCommandOpenEventsWithValue:params:completion:")] public void WriteAttributeBarrierCommandOpenEventsWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierCommandOpenEventsWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierCommandOpenEventsWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierCommandOpenEventsWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCommandOpenEventsWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierCommandOpenEventsWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierCommandOpenEventsWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCommandCloseEventsWithCompletion:")] public void ReadAttributeBarrierCommandCloseEventsWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierCommandCloseEventsWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierCommandCloseEventsWithValue:completion:")] public void WriteAttributeBarrierCommandCloseEventsWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierCommandCloseEventsWithValue:params:completion:")] public void WriteAttributeBarrierCommandCloseEventsWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierCommandCloseEventsWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierCommandCloseEventsWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierCommandCloseEventsWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierCommandCloseEventsWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierCommandCloseEventsWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierCommandCloseEventsWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierOpenPeriodWithCompletion:")] public void ReadAttributeBarrierOpenPeriodWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierOpenPeriodWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierOpenPeriodWithValue:completion:")] public void WriteAttributeBarrierOpenPeriodWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierOpenPeriodWithValue:params:completion:")] public void WriteAttributeBarrierOpenPeriodWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierOpenPeriodWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierOpenPeriodWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierOpenPeriodWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierOpenPeriodWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierOpenPeriodWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierOpenPeriodWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierClosePeriodWithCompletion:")] public void ReadAttributeBarrierClosePeriodWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierClosePeriodWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierClosePeriodWithValue:completion:")] public void WriteAttributeBarrierClosePeriodWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeBarrierClosePeriodWithValue:params:completion:")] public void WriteAttributeBarrierClosePeriodWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierClosePeriodWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierClosePeriodWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierClosePeriodWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierClosePeriodWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierClosePeriodWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierClosePeriodWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierPositionWithCompletion:")] public void ReadAttributeBarrierPositionWithCompletion(MTRBaseClusterBarrierControlReadAttributeBarrierPositionWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeBarrierPositionWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeBarrierPositionWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeBarrierPositionWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeBarrierPositionWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeBarrierPositionWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeBarrierPositionWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithCompletion:")] public void ReadAttributeGeneratedCommandListWithCompletion(MTRBaseClusterBarrierControlReadAttributeGeneratedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeGeneratedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithCompletion:")] public void ReadAttributeAcceptedCommandListWithCompletion(MTRBaseClusterBarrierControlReadAttributeAcceptedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcceptedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithCompletion:")] public void ReadAttributeAttributeListWithCompletion(MTRBaseClusterBarrierControlReadAttributeAttributeListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAttributeListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithCompletion:")] public void ReadAttributeFeatureMapWithCompletion(MTRBaseClusterBarrierControlReadAttributeFeatureMapWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeFeatureMapWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithCompletion:")] public void ReadAttributeClusterRevisionWithCompletion(MTRBaseClusterBarrierControlReadAttributeClusterRevisionWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeClusterRevisionWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterBarrierControlSubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterBarrierControlReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
 }
@@ -1369,7 +1200,6 @@ public extern objc class MTRBaseClusterBarrierControl : MTRGenericBaseCluster
 /// Availability, a category of MTRBaseClusterBarrierControl.
 public extern objc class MTRBaseClusterBarrierControl
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRBaseDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
@@ -1594,13 +1424,10 @@ public extern objc class MTRBaseClusterBarrierControl
 /// Deprecated in macOS 15.2.
 public extern objc class MTRClusterBarrierControl : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("barrierControlGoToPercentWithParams:expectedValues:expectedValueInterval:completion:")] public void BarrierControlGoToPercentWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRBarrierControlClusterBarrierControlGoToPercentParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("barrierControlStopWithParams:expectedValues:expectedValueInterval:completion:")] public void BarrierControlStopWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRBarrierControlClusterBarrierControlStopParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("barrierControlStopWithExpectedValues:expectedValueInterval:completion:")] public void BarrierControlStopWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     /// Deprecated in macOS 15.2.
@@ -1662,7 +1489,6 @@ public extern objc class MTRClusterBarrierControl : MTRGenericCluster
 /// Availability, a category of MTRClusterBarrierControl.
 public extern objc class MTRClusterBarrierControl
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
@@ -1693,7 +1519,6 @@ public extern objc class MTRElectricalMeasurementClusterGetProfileInfoResponseCo
     [Selector("listOfAttributes", "setListOfAttributes:")] public NSArray ListOfAttributes { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
@@ -1722,7 +1547,6 @@ public extern objc class MTRElectricalMeasurementClusterGetMeasurementProfileRes
     [Selector("intervals", "setIntervals:")] public NSArray Intervals { get; set; }
     /// Deprecated in macOS 13.3.
     [Selector("timedInvokeTimeoutMs", "setTimedInvokeTimeoutMs:")] public NSNumber? TimedInvokeTimeoutMs { get; set; }
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithResponseValue:error:")] public Self? InitWithResponseValueError(NSDictionary responseValue, out NSError? error);
 }
@@ -2541,1258 +2365,840 @@ public objc closure void MTRBaseClusterElectricalMeasurementReadAttributeCluster
 /// Deprecated in macOS 15.2.
 public extern objc class MTRBaseClusterElectricalMeasurement : MTRGenericBaseCluster
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("getProfileInfoCommandWithParams:completion:")] public void GetProfileInfoCommandWithParamsCompletion(MTRElectricalMeasurementClusterGetProfileInfoCommandParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("getProfileInfoCommandWithCompletion:")] public void GetProfileInfoCommandWithCompletion(MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("getMeasurementProfileCommandWithParams:completion:")] public void GetMeasurementProfileCommandWithParamsCompletion(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasurementTypeWithCompletion:")] public void ReadAttributeMeasurementTypeWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasurementTypeWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasurementTypeWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasurementTypeWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasurementTypeWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasurementTypeWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasurementTypeWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasurementTypeWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageWithCompletion:")] public void ReadAttributeDcVoltageWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcVoltageWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcVoltageWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcVoltageWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcVoltageWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageMinWithCompletion:")] public void ReadAttributeDcVoltageMinWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageMinWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcVoltageMinWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcVoltageMinWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcVoltageMinWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageMinWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcVoltageMinWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageMinWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageMaxWithCompletion:")] public void ReadAttributeDcVoltageMaxWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageMaxWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcVoltageMaxWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcVoltageMaxWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcVoltageMaxWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageMaxWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcVoltageMaxWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageMaxWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentWithCompletion:")] public void ReadAttributeDcCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentMinWithCompletion:")] public void ReadAttributeDcCurrentMinWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentMinWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcCurrentMinWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcCurrentMinWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcCurrentMinWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentMinWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcCurrentMinWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentMinWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentMaxWithCompletion:")] public void ReadAttributeDcCurrentMaxWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentMaxWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcCurrentMaxWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcCurrentMaxWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcCurrentMaxWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentMaxWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcCurrentMaxWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentMaxWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerWithCompletion:")] public void ReadAttributeDcPowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcPowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcPowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcPowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcPowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcPowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcPowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerMinWithCompletion:")] public void ReadAttributeDcPowerMinWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcPowerMinWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcPowerMinWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcPowerMinWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcPowerMinWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerMinWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcPowerMinWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcPowerMinWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerMaxWithCompletion:")] public void ReadAttributeDcPowerMaxWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcPowerMaxWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcPowerMaxWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcPowerMaxWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcPowerMaxWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerMaxWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcPowerMaxWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcPowerMaxWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageMultiplierWithCompletion:")] public void ReadAttributeDcVoltageMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcVoltageMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcVoltageMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcVoltageMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcVoltageMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageDivisorWithCompletion:")] public void ReadAttributeDcVoltageDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcVoltageDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcVoltageDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcVoltageDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcVoltageDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcVoltageDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcVoltageDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentMultiplierWithCompletion:")] public void ReadAttributeDcCurrentMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcCurrentMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcCurrentMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcCurrentMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcCurrentMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentDivisorWithCompletion:")] public void ReadAttributeDcCurrentDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcCurrentDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcCurrentDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcCurrentDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcCurrentDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcCurrentDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcCurrentDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerMultiplierWithCompletion:")] public void ReadAttributeDcPowerMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcPowerMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcPowerMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcPowerMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcPowerMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcPowerMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcPowerMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerDivisorWithCompletion:")] public void ReadAttributeDcPowerDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeDcPowerDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeDcPowerDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeDcPowerDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeDcPowerDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeDcPowerDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeDcPowerDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeDcPowerDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyWithCompletion:")] public void ReadAttributeAcFrequencyWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcFrequencyWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcFrequencyWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcFrequencyWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcFrequencyWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyMinWithCompletion:")] public void ReadAttributeAcFrequencyMinWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyMinWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcFrequencyMinWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcFrequencyMinWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcFrequencyMinWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyMinWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcFrequencyMinWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyMinWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyMaxWithCompletion:")] public void ReadAttributeAcFrequencyMaxWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyMaxWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcFrequencyMaxWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcFrequencyMaxWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcFrequencyMaxWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyMaxWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcFrequencyMaxWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyMaxWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeNeutralCurrentWithCompletion:")] public void ReadAttributeNeutralCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeNeutralCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeNeutralCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeNeutralCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeNeutralCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeNeutralCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeNeutralCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeNeutralCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeTotalActivePowerWithCompletion:")] public void ReadAttributeTotalActivePowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeTotalActivePowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeTotalActivePowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeTotalActivePowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeTotalActivePowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeTotalActivePowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeTotalActivePowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeTotalActivePowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeTotalReactivePowerWithCompletion:")] public void ReadAttributeTotalReactivePowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeTotalReactivePowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeTotalReactivePowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeTotalReactivePowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeTotalReactivePowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeTotalReactivePowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeTotalReactivePowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeTotalReactivePowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeTotalApparentPowerWithCompletion:")] public void ReadAttributeTotalApparentPowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeTotalApparentPowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeTotalApparentPowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeTotalApparentPowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeTotalApparentPowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeTotalApparentPowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeTotalApparentPowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeTotalApparentPowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured1stHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasured1stHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasured1stHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasured1stHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasured1stHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasured1stHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured1stHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasured1stHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasured1stHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured3rdHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasured3rdHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasured3rdHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasured3rdHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasured3rdHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasured3rdHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured3rdHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasured3rdHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasured3rdHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured5thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasured5thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasured5thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasured5thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasured5thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasured5thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured5thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasured5thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasured5thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured7thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasured7thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasured7thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasured7thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasured7thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasured7thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured7thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasured7thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasured7thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured9thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasured9thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasured9thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasured9thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasured9thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasured9thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured9thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasured9thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasured9thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured11thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasured11thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasured11thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasured11thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasured11thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasured11thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasured11thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasured11thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasured11thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase1stHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasuredPhase1stHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase1stHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasuredPhase1stHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasuredPhase1stHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasuredPhase1stHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase1stHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasuredPhase1stHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase1stHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase3rdHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasuredPhase3rdHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase3rdHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasuredPhase3rdHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasuredPhase3rdHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasuredPhase3rdHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase3rdHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasuredPhase3rdHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase3rdHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase5thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasuredPhase5thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase5thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasuredPhase5thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasuredPhase5thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasuredPhase5thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase5thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasuredPhase5thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase5thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase7thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasuredPhase7thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase7thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasuredPhase7thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasuredPhase7thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasuredPhase7thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase7thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasuredPhase7thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase7thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase9thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasuredPhase9thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase9thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasuredPhase9thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasuredPhase9thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasuredPhase9thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase9thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasuredPhase9thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase9thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase11thHarmonicCurrentWithCompletion:")] public void ReadAttributeMeasuredPhase11thHarmonicCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase11thHarmonicCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeMeasuredPhase11thHarmonicCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeMeasuredPhase11thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeMeasuredPhase11thHarmonicCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeMeasuredPhase11thHarmonicCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeMeasuredPhase11thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeMeasuredPhase11thHarmonicCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyMultiplierWithCompletion:")] public void ReadAttributeAcFrequencyMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcFrequencyMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcFrequencyMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcFrequencyMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcFrequencyMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyDivisorWithCompletion:")] public void ReadAttributeAcFrequencyDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcFrequencyDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcFrequencyDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcFrequencyDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcFrequencyDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcFrequencyDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcFrequencyDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerMultiplierWithCompletion:")] public void ReadAttributePowerMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributePowerMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePowerMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePowerMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributePowerMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePowerMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributePowerMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerDivisorWithCompletion:")] public void ReadAttributePowerDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributePowerDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePowerDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePowerDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributePowerDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePowerDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributePowerDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeHarmonicCurrentMultiplierWithCompletion:")] public void ReadAttributeHarmonicCurrentMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeHarmonicCurrentMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeHarmonicCurrentMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeHarmonicCurrentMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeHarmonicCurrentMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeHarmonicCurrentMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeHarmonicCurrentMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeHarmonicCurrentMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePhaseHarmonicCurrentMultiplierWithCompletion:")] public void ReadAttributePhaseHarmonicCurrentMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributePhaseHarmonicCurrentMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePhaseHarmonicCurrentMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePhaseHarmonicCurrentMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributePhaseHarmonicCurrentMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePhaseHarmonicCurrentMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePhaseHarmonicCurrentMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributePhaseHarmonicCurrentMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousVoltageWithCompletion:")] public void ReadAttributeInstantaneousVoltageWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousVoltageWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeInstantaneousVoltageWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeInstantaneousVoltageWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeInstantaneousVoltageWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousVoltageWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeInstantaneousVoltageWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousVoltageWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousLineCurrentWithCompletion:")] public void ReadAttributeInstantaneousLineCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousLineCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeInstantaneousLineCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeInstantaneousLineCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeInstantaneousLineCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousLineCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeInstantaneousLineCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousLineCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousActiveCurrentWithCompletion:")] public void ReadAttributeInstantaneousActiveCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousActiveCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeInstantaneousActiveCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeInstantaneousActiveCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeInstantaneousActiveCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousActiveCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeInstantaneousActiveCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousActiveCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousReactiveCurrentWithCompletion:")] public void ReadAttributeInstantaneousReactiveCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousReactiveCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeInstantaneousReactiveCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeInstantaneousReactiveCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeInstantaneousReactiveCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousReactiveCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeInstantaneousReactiveCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousReactiveCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousPowerWithCompletion:")] public void ReadAttributeInstantaneousPowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousPowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeInstantaneousPowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeInstantaneousPowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeInstantaneousPowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeInstantaneousPowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeInstantaneousPowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeInstantaneousPowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageWithCompletion:")] public void ReadAttributeRmsVoltageWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMinWithCompletion:")] public void ReadAttributeRmsVoltageMinWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMinWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageMinWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageMinWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageMinWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMinWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageMinWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMinWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMaxWithCompletion:")] public void ReadAttributeRmsVoltageMaxWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMaxWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageMaxWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageMaxWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageMaxWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMaxWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageMaxWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMaxWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentWithCompletion:")] public void ReadAttributeRmsCurrentWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMinWithCompletion:")] public void ReadAttributeRmsCurrentMinWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMinWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentMinWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentMinWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentMinWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMinWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentMinWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMinWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMaxWithCompletion:")] public void ReadAttributeRmsCurrentMaxWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMaxWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentMaxWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentMaxWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentMaxWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMaxWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentMaxWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMaxWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerWithCompletion:")] public void ReadAttributeActivePowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMinWithCompletion:")] public void ReadAttributeActivePowerMinWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMinWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerMinWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerMinWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerMinWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMinWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerMinWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMinWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMaxWithCompletion:")] public void ReadAttributeActivePowerMaxWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMaxWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerMaxWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerMaxWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerMaxWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMaxWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerMaxWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMaxWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactivePowerWithCompletion:")] public void ReadAttributeReactivePowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeReactivePowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeReactivePowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeReactivePowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeReactivePowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactivePowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeReactivePowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeReactivePowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApparentPowerWithCompletion:")] public void ReadAttributeApparentPowerWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeApparentPowerWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeApparentPowerWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeApparentPowerWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeApparentPowerWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApparentPowerWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeApparentPowerWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeApparentPowerWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerFactorWithCompletion:")] public void ReadAttributePowerFactorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributePowerFactorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePowerFactorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePowerFactorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributePowerFactorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerFactorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePowerFactorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributePowerFactorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsVoltageMeasurementPeriodWithCompletion:")] public void ReadAttributeAverageRmsVoltageMeasurementPeriodWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsVoltageMeasurementPeriodWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:completion:")] public void WriteAttributeAverageRmsVoltageMeasurementPeriodWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:params:completion:")] public void WriteAttributeAverageRmsVoltageMeasurementPeriodWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsVoltageMeasurementPeriodWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsVoltageMeasurementPeriodWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsVoltageMeasurementPeriodWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsVoltageMeasurementPeriodWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsVoltageMeasurementPeriodWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsVoltageMeasurementPeriodWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageCounterWithCompletion:")] public void ReadAttributeAverageRmsUnderVoltageCounterWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageCounterWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeAverageRmsUnderVoltageCounterWithValue:completion:")] public void WriteAttributeAverageRmsUnderVoltageCounterWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeAverageRmsUnderVoltageCounterWithValue:params:completion:")] public void WriteAttributeAverageRmsUnderVoltageCounterWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsUnderVoltageCounterWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsUnderVoltageCounterWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsUnderVoltageCounterWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageCounterWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsUnderVoltageCounterWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageCounterWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltagePeriodWithCompletion:")] public void ReadAttributeRmsExtremeOverVoltagePeriodWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltagePeriodWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsExtremeOverVoltagePeriodWithValue:completion:")] public void WriteAttributeRmsExtremeOverVoltagePeriodWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsExtremeOverVoltagePeriodWithValue:params:completion:")] public void WriteAttributeRmsExtremeOverVoltagePeriodWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeOverVoltagePeriodWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeOverVoltagePeriodWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeOverVoltagePeriodWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltagePeriodWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeOverVoltagePeriodWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltagePeriodWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltagePeriodWithCompletion:")] public void ReadAttributeRmsExtremeUnderVoltagePeriodWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltagePeriodWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsExtremeUnderVoltagePeriodWithValue:completion:")] public void WriteAttributeRmsExtremeUnderVoltagePeriodWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsExtremeUnderVoltagePeriodWithValue:params:completion:")] public void WriteAttributeRmsExtremeUnderVoltagePeriodWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeUnderVoltagePeriodWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeUnderVoltagePeriodWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeUnderVoltagePeriodWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltagePeriodWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeUnderVoltagePeriodWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltagePeriodWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagPeriodWithCompletion:")] public void ReadAttributeRmsVoltageSagPeriodWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagPeriodWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsVoltageSagPeriodWithValue:completion:")] public void WriteAttributeRmsVoltageSagPeriodWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsVoltageSagPeriodWithValue:params:completion:")] public void WriteAttributeRmsVoltageSagPeriodWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSagPeriodWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSagPeriodWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSagPeriodWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagPeriodWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSagPeriodWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagPeriodWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellPeriodWithCompletion:")] public void ReadAttributeRmsVoltageSwellPeriodWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellPeriodWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsVoltageSwellPeriodWithValue:completion:")] public void WriteAttributeRmsVoltageSwellPeriodWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeRmsVoltageSwellPeriodWithValue:params:completion:")] public void WriteAttributeRmsVoltageSwellPeriodWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSwellPeriodWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSwellPeriodWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSwellPeriodWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellPeriodWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSwellPeriodWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellPeriodWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcVoltageMultiplierWithCompletion:")] public void ReadAttributeAcVoltageMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcVoltageMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcVoltageMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcVoltageMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcVoltageMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcVoltageMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcVoltageMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcVoltageMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcVoltageDivisorWithCompletion:")] public void ReadAttributeAcVoltageDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcVoltageDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcVoltageDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcVoltageDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcVoltageDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcVoltageDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcVoltageDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcVoltageDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcCurrentMultiplierWithCompletion:")] public void ReadAttributeAcCurrentMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcCurrentMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcCurrentMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcCurrentMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcCurrentMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcCurrentMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcCurrentMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcCurrentMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcCurrentDivisorWithCompletion:")] public void ReadAttributeAcCurrentDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcCurrentDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcCurrentDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcCurrentDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcCurrentDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcCurrentDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcCurrentDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcCurrentDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcPowerMultiplierWithCompletion:")] public void ReadAttributeAcPowerMultiplierWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcPowerMultiplierWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcPowerMultiplierWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcPowerMultiplierWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcPowerMultiplierWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcPowerMultiplierWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcPowerMultiplierWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcPowerMultiplierWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcPowerDivisorWithCompletion:")] public void ReadAttributeAcPowerDivisorWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcPowerDivisorWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcPowerDivisorWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcPowerDivisorWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcPowerDivisorWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcPowerDivisorWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcPowerDivisorWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcPowerDivisorWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeOverloadAlarmsMaskWithCompletion:")] public void ReadAttributeOverloadAlarmsMaskWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeOverloadAlarmsMaskWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeOverloadAlarmsMaskWithValue:completion:")] public void WriteAttributeOverloadAlarmsMaskWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeOverloadAlarmsMaskWithValue:params:completion:")] public void WriteAttributeOverloadAlarmsMaskWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeOverloadAlarmsMaskWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeOverloadAlarmsMaskWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeOverloadAlarmsMaskWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeOverloadAlarmsMaskWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeOverloadAlarmsMaskWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeOverloadAlarmsMaskWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeVoltageOverloadWithCompletion:")] public void ReadAttributeVoltageOverloadWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeVoltageOverloadWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeVoltageOverloadWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeVoltageOverloadWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeVoltageOverloadWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeVoltageOverloadWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeVoltageOverloadWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeVoltageOverloadWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeCurrentOverloadWithCompletion:")] public void ReadAttributeCurrentOverloadWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeCurrentOverloadWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeCurrentOverloadWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeCurrentOverloadWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeCurrentOverloadWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeCurrentOverloadWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeCurrentOverloadWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeCurrentOverloadWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcOverloadAlarmsMaskWithCompletion:")] public void ReadAttributeAcOverloadAlarmsMaskWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcOverloadAlarmsMaskWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeAcOverloadAlarmsMaskWithValue:completion:")] public void WriteAttributeAcOverloadAlarmsMaskWithValueCompletion(NSNumber value, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("writeAttributeAcOverloadAlarmsMaskWithValue:params:completion:")] public void WriteAttributeAcOverloadAlarmsMaskWithValueParamsCompletion(NSNumber value, MTRWriteParams? params, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcOverloadAlarmsMaskWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcOverloadAlarmsMaskWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcOverloadAlarmsMaskWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcOverloadAlarmsMaskWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcOverloadAlarmsMaskWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcOverloadAlarmsMaskWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcVoltageOverloadWithCompletion:")] public void ReadAttributeAcVoltageOverloadWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcVoltageOverloadWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcVoltageOverloadWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcVoltageOverloadWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcVoltageOverloadWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcVoltageOverloadWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcVoltageOverloadWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcVoltageOverloadWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcCurrentOverloadWithCompletion:")] public void ReadAttributeAcCurrentOverloadWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcCurrentOverloadWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcCurrentOverloadWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcCurrentOverloadWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcCurrentOverloadWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcCurrentOverloadWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcCurrentOverloadWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcCurrentOverloadWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcActivePowerOverloadWithCompletion:")] public void ReadAttributeAcActivePowerOverloadWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcActivePowerOverloadWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcActivePowerOverloadWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcActivePowerOverloadWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcActivePowerOverloadWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcActivePowerOverloadWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcActivePowerOverloadWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcActivePowerOverloadWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcReactivePowerOverloadWithCompletion:")] public void ReadAttributeAcReactivePowerOverloadWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcReactivePowerOverloadWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcReactivePowerOverloadWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcReactivePowerOverloadWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcReactivePowerOverloadWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcReactivePowerOverloadWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcReactivePowerOverloadWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcReactivePowerOverloadWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsOverVoltageWithCompletion:")] public void ReadAttributeAverageRmsOverVoltageWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsOverVoltageWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsOverVoltageWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsOverVoltageWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsOverVoltageWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsOverVoltageWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsOverVoltageWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsOverVoltageWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageWithCompletion:")] public void ReadAttributeAverageRmsUnderVoltageWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsUnderVoltageWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsUnderVoltageWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsUnderVoltageWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsUnderVoltageWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltageWithCompletion:")] public void ReadAttributeRmsExtremeOverVoltageWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltageWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeOverVoltageWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeOverVoltageWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeOverVoltageWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltageWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeOverVoltageWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltageWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltageWithCompletion:")] public void ReadAttributeRmsExtremeUnderVoltageWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltageWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeUnderVoltageWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeUnderVoltageWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeUnderVoltageWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltageWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeUnderVoltageWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltageWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagWithCompletion:")] public void ReadAttributeRmsVoltageSagWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSagWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSagWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSagWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSagWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellWithCompletion:")] public void ReadAttributeRmsVoltageSwellWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSwellWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSwellWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSwellWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSwellWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeLineCurrentPhaseBWithCompletion:")] public void ReadAttributeLineCurrentPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeLineCurrentPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeLineCurrentPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeLineCurrentPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeLineCurrentPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeLineCurrentPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeLineCurrentPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeLineCurrentPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActiveCurrentPhaseBWithCompletion:")] public void ReadAttributeActiveCurrentPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActiveCurrentPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActiveCurrentPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActiveCurrentPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActiveCurrentPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActiveCurrentPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActiveCurrentPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActiveCurrentPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactiveCurrentPhaseBWithCompletion:")] public void ReadAttributeReactiveCurrentPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeReactiveCurrentPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeReactiveCurrentPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeReactiveCurrentPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeReactiveCurrentPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactiveCurrentPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeReactiveCurrentPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeReactiveCurrentPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltagePhaseBWithCompletion:")] public void ReadAttributeRmsVoltagePhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltagePhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltagePhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltagePhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltagePhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltagePhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltagePhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltagePhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMinPhaseBWithCompletion:")] public void ReadAttributeRmsVoltageMinPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMinPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageMinPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageMinPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageMinPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMinPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageMinPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMinPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMaxPhaseBWithCompletion:")] public void ReadAttributeRmsVoltageMaxPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMaxPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageMaxPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageMaxPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageMaxPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMaxPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageMaxPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMaxPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentPhaseBWithCompletion:")] public void ReadAttributeRmsCurrentPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMinPhaseBWithCompletion:")] public void ReadAttributeRmsCurrentMinPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMinPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentMinPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentMinPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentMinPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMinPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentMinPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMinPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMaxPhaseBWithCompletion:")] public void ReadAttributeRmsCurrentMaxPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMaxPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentMaxPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentMaxPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentMaxPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMaxPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentMaxPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMaxPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerPhaseBWithCompletion:")] public void ReadAttributeActivePowerPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMinPhaseBWithCompletion:")] public void ReadAttributeActivePowerMinPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMinPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerMinPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerMinPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerMinPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMinPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerMinPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMinPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMaxPhaseBWithCompletion:")] public void ReadAttributeActivePowerMaxPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMaxPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerMaxPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerMaxPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerMaxPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMaxPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerMaxPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMaxPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactivePowerPhaseBWithCompletion:")] public void ReadAttributeReactivePowerPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeReactivePowerPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeReactivePowerPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeReactivePowerPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeReactivePowerPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactivePowerPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeReactivePowerPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeReactivePowerPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApparentPowerPhaseBWithCompletion:")] public void ReadAttributeApparentPowerPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeApparentPowerPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeApparentPowerPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeApparentPowerPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeApparentPowerPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApparentPowerPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeApparentPowerPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeApparentPowerPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerFactorPhaseBWithCompletion:")] public void ReadAttributePowerFactorPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributePowerFactorPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePowerFactorPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePowerFactorPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributePowerFactorPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerFactorPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePowerFactorPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributePowerFactorPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithCompletion:")] public void ReadAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsOverVoltageCounterPhaseBWithCompletion:")] public void ReadAttributeAverageRmsOverVoltageCounterPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsOverVoltageCounterPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsOverVoltageCounterPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsOverVoltageCounterPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsOverVoltageCounterPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsOverVoltageCounterPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsOverVoltageCounterPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsOverVoltageCounterPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageCounterPhaseBWithCompletion:")] public void ReadAttributeAverageRmsUnderVoltageCounterPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageCounterPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsUnderVoltageCounterPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsUnderVoltageCounterPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsUnderVoltageCounterPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageCounterPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsUnderVoltageCounterPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageCounterPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltagePeriodPhaseBWithCompletion:")] public void ReadAttributeRmsExtremeOverVoltagePeriodPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltagePeriodPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeOverVoltagePeriodPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeOverVoltagePeriodPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeOverVoltagePeriodPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltagePeriodPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeOverVoltagePeriodPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltagePeriodPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithCompletion:")] public void ReadAttributeRmsExtremeUnderVoltagePeriodPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltagePeriodPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeUnderVoltagePeriodPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltagePeriodPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagPeriodPhaseBWithCompletion:")] public void ReadAttributeRmsVoltageSagPeriodPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagPeriodPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSagPeriodPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSagPeriodPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSagPeriodPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagPeriodPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSagPeriodPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagPeriodPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellPeriodPhaseBWithCompletion:")] public void ReadAttributeRmsVoltageSwellPeriodPhaseBWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellPeriodPhaseBWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSwellPeriodPhaseBWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSwellPeriodPhaseBWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSwellPeriodPhaseBWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellPeriodPhaseBWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSwellPeriodPhaseBWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellPeriodPhaseBWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeLineCurrentPhaseCWithCompletion:")] public void ReadAttributeLineCurrentPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeLineCurrentPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeLineCurrentPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeLineCurrentPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeLineCurrentPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeLineCurrentPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeLineCurrentPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeLineCurrentPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActiveCurrentPhaseCWithCompletion:")] public void ReadAttributeActiveCurrentPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActiveCurrentPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActiveCurrentPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActiveCurrentPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActiveCurrentPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActiveCurrentPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActiveCurrentPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActiveCurrentPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactiveCurrentPhaseCWithCompletion:")] public void ReadAttributeReactiveCurrentPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeReactiveCurrentPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeReactiveCurrentPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeReactiveCurrentPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeReactiveCurrentPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactiveCurrentPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeReactiveCurrentPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeReactiveCurrentPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltagePhaseCWithCompletion:")] public void ReadAttributeRmsVoltagePhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltagePhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltagePhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltagePhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltagePhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltagePhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltagePhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltagePhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMinPhaseCWithCompletion:")] public void ReadAttributeRmsVoltageMinPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMinPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageMinPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageMinPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageMinPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMinPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageMinPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMinPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMaxPhaseCWithCompletion:")] public void ReadAttributeRmsVoltageMaxPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMaxPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageMaxPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageMaxPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageMaxPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageMaxPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageMaxPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageMaxPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentPhaseCWithCompletion:")] public void ReadAttributeRmsCurrentPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMinPhaseCWithCompletion:")] public void ReadAttributeRmsCurrentMinPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMinPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentMinPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentMinPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentMinPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMinPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentMinPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMinPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMaxPhaseCWithCompletion:")] public void ReadAttributeRmsCurrentMaxPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMaxPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsCurrentMaxPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsCurrentMaxPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsCurrentMaxPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsCurrentMaxPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsCurrentMaxPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsCurrentMaxPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerPhaseCWithCompletion:")] public void ReadAttributeActivePowerPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMinPhaseCWithCompletion:")] public void ReadAttributeActivePowerMinPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMinPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerMinPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerMinPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerMinPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMinPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerMinPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMinPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMaxPhaseCWithCompletion:")] public void ReadAttributeActivePowerMaxPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMaxPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeActivePowerMaxPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeActivePowerMaxPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeActivePowerMaxPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeActivePowerMaxPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeActivePowerMaxPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeActivePowerMaxPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactivePowerPhaseCWithCompletion:")] public void ReadAttributeReactivePowerPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeReactivePowerPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeReactivePowerPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeReactivePowerPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeReactivePowerPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeReactivePowerPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeReactivePowerPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeReactivePowerPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApparentPowerPhaseCWithCompletion:")] public void ReadAttributeApparentPowerPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeApparentPowerPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeApparentPowerPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeApparentPowerPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeApparentPowerPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeApparentPowerPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeApparentPowerPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeApparentPowerPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerFactorPhaseCWithCompletion:")] public void ReadAttributePowerFactorPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributePowerFactorPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributePowerFactorPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributePowerFactorPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributePowerFactorPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributePowerFactorPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributePowerFactorPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributePowerFactorPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithCompletion:")] public void ReadAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsOverVoltageCounterPhaseCWithCompletion:")] public void ReadAttributeAverageRmsOverVoltageCounterPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsOverVoltageCounterPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsOverVoltageCounterPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsOverVoltageCounterPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsOverVoltageCounterPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsOverVoltageCounterPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsOverVoltageCounterPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsOverVoltageCounterPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageCounterPhaseCWithCompletion:")] public void ReadAttributeAverageRmsUnderVoltageCounterPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageCounterPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAverageRmsUnderVoltageCounterPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAverageRmsUnderVoltageCounterPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAverageRmsUnderVoltageCounterPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAverageRmsUnderVoltageCounterPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAverageRmsUnderVoltageCounterPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAverageRmsUnderVoltageCounterPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltagePeriodPhaseCWithCompletion:")] public void ReadAttributeRmsExtremeOverVoltagePeriodPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltagePeriodPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeOverVoltagePeriodPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeOverVoltagePeriodPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeOverVoltagePeriodPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeOverVoltagePeriodPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeOverVoltagePeriodPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeOverVoltagePeriodPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithCompletion:")] public void ReadAttributeRmsExtremeUnderVoltagePeriodPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltagePeriodPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsExtremeUnderVoltagePeriodPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsExtremeUnderVoltagePeriodPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagPeriodPhaseCWithCompletion:")] public void ReadAttributeRmsVoltageSagPeriodPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagPeriodPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSagPeriodPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSagPeriodPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSagPeriodPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSagPeriodPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSagPeriodPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSagPeriodPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellPeriodPhaseCWithCompletion:")] public void ReadAttributeRmsVoltageSwellPeriodPhaseCWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellPeriodPhaseCWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeRmsVoltageSwellPeriodPhaseCWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeRmsVoltageSwellPeriodPhaseCWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeRmsVoltageSwellPeriodPhaseCWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeRmsVoltageSwellPeriodPhaseCWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeRmsVoltageSwellPeriodPhaseCWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeRmsVoltageSwellPeriodPhaseCWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithCompletion:")] public void ReadAttributeGeneratedCommandListWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeGeneratedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeGeneratedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeGeneratedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeGeneratedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeGeneratedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithCompletion:")] public void ReadAttributeAcceptedCommandListWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAcceptedCommandListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAcceptedCommandListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAcceptedCommandListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAcceptedCommandListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAcceptedCommandListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithCompletion:")] public void ReadAttributeAttributeListWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeAttributeListWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeAttributeListWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeAttributeListWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeAttributeListWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeAttributeListWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithCompletion:")] public void ReadAttributeFeatureMapWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeFeatureMapWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeFeatureMapWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeFeatureMapWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeFeatureMapWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeFeatureMapWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithCompletion:")] public void ReadAttributeClusterRevisionWithCompletion(MTRBaseClusterElectricalMeasurementReadAttributeClusterRevisionWithCompletionCompletionBlock completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("subscribeAttributeClusterRevisionWithParams:subscriptionEstablished:reportHandler:")] public void SubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandler(MTRSubscribeParams params, MTRSubscriptionEstablishedHandler? subscriptionEstablished, MTRBaseClusterElectricalMeasurementSubscribeAttributeClusterRevisionWithParamsSubscriptionEstablishedReportHandlerReportHandlerBlock reportHandler);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("readAttributeClusterRevisionWithClusterStateCache:endpoint:queue:completion:")] public static void ReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletion(MTRClusterStateCacheContainer clusterStateCacheContainer, NSNumber endpoint, dispatch_queue_t queue, MTRBaseClusterElectricalMeasurementReadAttributeClusterRevisionWithClusterStateCacheEndpointQueueCompletionCompletionBlock completion);
 }
@@ -3800,7 +3206,6 @@ public extern objc class MTRBaseClusterElectricalMeasurement : MTRGenericBaseClu
 /// Availability, a category of MTRBaseClusterElectricalMeasurement.
 public extern objc class MTRBaseClusterElectricalMeasurement
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRBaseDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }
@@ -5449,13 +4854,10 @@ public extern objc class MTRBaseClusterElectricalMeasurement
 /// Deprecated in macOS 15.2.
 public extern objc class MTRClusterElectricalMeasurement : MTRGenericCluster
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("getProfileInfoCommandWithParams:expectedValues:expectedValueInterval:completion:")] public void GetProfileInfoCommandWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRElectricalMeasurementClusterGetProfileInfoCommandParams? params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("getProfileInfoCommandWithExpectedValues:expectedValueInterval:completion:")] public void GetProfileInfoCommandWithExpectedValuesExpectedValueIntervalCompletion(NSArray? expectedValues, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("getMeasurementProfileCommandWithParams:expectedValues:expectedValueInterval:completion:")] public void GetMeasurementProfileCommandWithParamsExpectedValuesExpectedValueIntervalCompletion(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams params, NSArray? expectedDataValueDictionaries, NSNumber? expectedValueIntervalMs, MTRStatusCompletion completion);
     /// Deprecated in macOS 15.2.
@@ -5761,7 +5163,6 @@ public extern objc class MTRClusterElectricalMeasurement : MTRGenericCluster
 /// Availability, a category of MTRClusterElectricalMeasurement.
 public extern objc class MTRClusterElectricalMeasurement
 {
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 15.2.
     [Selector("initWithDevice:endpointID:queue:")] public Self? InitWithDeviceEndpointIDQueue(MTRDevice device, NSNumber endpointID, dispatch_queue_t queue);
 }

@@ -40,7 +40,6 @@ public objc closure void MTRValuesHandler(AnyObject? arg0, NSError? arg1);
 /// XPC, a category of MTRDeviceController.
 public extern objc class MTRDeviceController
 {
-    /// macOS 13.3 and later.
     [Selector("sharedControllerWithID:xpcConnectBlock:")] public static MTRDeviceController SharedControllerWithIDXpcConnectBlock(NSCopying? controllerID, MTRXPCConnectBlock xpcConnectBlock);
     [Selector("encodeXPCResponseValues:")] public static NSArray? EncodeXPCResponseValues(NSArray? values);
     [Selector("decodeXPCResponseValues:")] public static NSArray? DecodeXPCResponseValues(NSArray? values);
@@ -48,9 +47,7 @@ public extern objc class MTRDeviceController
     [Selector("decodeXPCReadParams:")] public static MTRReadParams? DecodeXPCReadParams(NSDictionary? params);
     [Selector("encodeXPCSubscribeParams:")] public static NSDictionary? EncodeXPCSubscribeParams(MTRSubscribeParams? params);
     [Selector("decodeXPCSubscribeParams:")] public static MTRSubscribeParams? DecodeXPCSubscribeParams(NSDictionary? params);
-    /// macOS 13.4 and later.
     [Selector("xpcInterfaceForServerProtocol")] public static NSXPCInterface XpcInterfaceForServerProtocol();
-    /// macOS 13.4 and later.
     [Selector("xpcInterfaceForClientProtocol")] public static NSXPCInterface XpcInterfaceForClientProtocol();
 }
 
@@ -68,7 +65,6 @@ public objc interface MTRDeviceControllerServerProtocol : NSObjectProtocol
     [Selector("readAttributeCacheWithController:nodeId:endpointId:clusterId:attributeId:completion:")] void ReadAttributeCacheWithControllerNodeIdEndpointIdClusterIdAttributeIdCompletion(AnyObject? controller, ulong nodeId, NSNumber? endpointId, NSNumber? clusterId, NSNumber? attributeId, MTRValuesHandler completion);
     /// Deprecated in macOS 13.3.
     [Optional] [Selector("getDeviceControllerWithFabricId:completion:")] void GetDeviceControllerWithFabricIdCompletion(ulong fabricId, MTRDeviceControllerGetterHandler completion);
-    /// macOS 14.6 and later.
     [Optional] [Selector("downloadLogWithController:nodeId:type:timeout:completion:")] void DownloadLogWithControllerNodeIdTypeTimeoutCompletion(AnyObject? controller, NSNumber nodeId, MTRDiagnosticLogType type, NSTimeInterval timeout, MTRDeviceControllerServerProtocolDownloadLogWithControllerNodeIdTypeTimeoutCompletionCompletionBlock completion);
 }
 

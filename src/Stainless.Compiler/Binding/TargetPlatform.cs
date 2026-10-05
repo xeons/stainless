@@ -283,7 +283,7 @@ public sealed record TargetPlatform
     };
 
     /// <summary>
-    /// Apple silicon. The deployment floor is macOS 13, and it is in the
+    /// Apple silicon. The deployment floor is macOS 15, and it is in the
     /// triple so that the program and the runtime agree on it.
     /// </summary>
     public static readonly TargetPlatform Arm64MacOS = new()
@@ -293,10 +293,10 @@ public sealed record TargetPlatform
         Format = ObjectFormat.MachO,
         PointerWidth = 8,
         Abi = CppAbi.Itanium,
-        Triple = "arm64-apple-macosx13.0",
+        Triple = "arm64-apple-macosx15.0",
     };
 
-    /// <summary>An Intel Mac, on the same macOS 13 floor.</summary>
+    /// <summary>An Intel Mac, on the same macOS 15 floor.</summary>
     public static readonly TargetPlatform X64MacOS = new()
     {
         Architecture = TargetArch.X64,
@@ -304,7 +304,7 @@ public sealed record TargetPlatform
         Format = ObjectFormat.MachO,
         PointerWidth = 8,
         Abi = CppAbi.Itanium,
-        Triple = "x86_64-apple-macosx13.0",
+        Triple = "x86_64-apple-macosx15.0",
     };
 
     /// <summary>

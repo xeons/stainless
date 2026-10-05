@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreGraphics")
 
-/// macOS 15.0 and later.
 public enum CGToneMapping : uint
 {
     Default = 0,

@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Metal")
 
-/// macOS 15.0 and later.
 public extern objc class MTLResidencySetDescriptor : NSObject, NSCopying
 {
     [Selector("label", "setLabel:")] public NSString? Label { get; set; }
     [Selector("initialCapacity", "setInitialCapacity:")] public NSUInteger InitialCapacity { get; set; }
 }
 
-/// macOS 15.0 and later.
 public objc interface MTLResidencySet : NSObjectProtocol
 {
     [Selector("device")] MTLDevice Device { get; }

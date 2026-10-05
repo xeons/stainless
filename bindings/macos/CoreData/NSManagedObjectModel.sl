@@ -40,7 +40,6 @@ public extern objc class NSManagedObjectModel : NSObject, NSCoding, NSCopying, N
     [Selector("fetchRequestTemplatesByName")] public NSDictionary FetchRequestTemplatesByName { get; }
     [Selector("versionIdentifiers", "setVersionIdentifiers:")] public NSSet VersionIdentifiers { get; set; }
     [Selector("entityVersionHashesByName")] public NSDictionary EntityVersionHashesByName { get; }
-    /// macOS 14.0 and later.
     [Selector("versionChecksum")] public NSString VersionChecksum { get; }
     [Selector("mergedModelFromBundles:")] public static NSManagedObjectModel? MergedModelFromBundles(NSArray? bundles);
     [Selector("modelByMergingModels:")] public static NSManagedObjectModel? ModelByMergingModels(NSArray? models);
@@ -54,7 +53,6 @@ public extern objc class NSManagedObjectModel : NSObject, NSCoding, NSCopying, N
     [Selector("mergedModelFromBundles:forStoreMetadata:")] public static NSManagedObjectModel? MergedModelFromBundlesForStoreMetadata(NSArray? bundles, NSDictionary metadata);
     [Selector("modelByMergingModels:forStoreMetadata:")] public static NSManagedObjectModel? ModelByMergingModelsForStoreMetadata(NSArray models, NSDictionary metadata);
     [Selector("isConfiguration:compatibleWithStoreMetadata:")] public bool IsConfigurationCompatibleWithStoreMetadata(NSString? configuration, NSDictionary metadata);
-    /// macOS 14.0 and later.
     [Selector("checksumsForVersionedModelAtURL:error:")] public static NSDictionary? ChecksumsForVersionedModelAtURLError(NSURL modelURL, out NSError? error);
 }
 

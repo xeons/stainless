@@ -38,7 +38,6 @@ public extern objc class MXCrashDiagnostic : MXDiagnostic
     [Selector("exceptionType")] public NSNumber? ExceptionType { get; }
     [Selector("exceptionCode")] public NSNumber? ExceptionCode { get; }
     [Selector("signal")] public NSNumber? Signal { get; }
-    /// macOS 14.0 and later.
     [Selector("exceptionReason")] public MXCrashDiagnosticObjectiveCExceptionReason? ExceptionReason { get; }
 }
 

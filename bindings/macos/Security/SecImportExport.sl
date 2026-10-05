@@ -114,7 +114,6 @@ public extern "C" CFStringRef kSecImportExportKeychain;
 
 public extern "C" CFStringRef kSecImportExportAccess;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kSecImportToMemoryOnly;
 
 public extern "C" CFStringRef kSecImportItemLabel;

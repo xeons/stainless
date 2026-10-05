@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "SensitiveContentAnalysis")
 
-/// macOS 14.0 and later.
 public enum SCSensitivityAnalysisPolicy : long
 {
     Disabled = 0,
@@ -46,7 +45,6 @@ public objc closure void SCSensitivityAnalyzerAnalyzeCGImageCompletionHandlerCom
 
 public objc closure void SCSensitivityAnalyzerAnalyzeVideoFileCompletionHandlerCompletionHandlerBlock(SCSensitivityAnalysis? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class SCSensitivityAnalyzer : NSObject
 {
     [Selector("analysisPolicy")] public SCSensitivityAnalysisPolicy AnalysisPolicy { get; }

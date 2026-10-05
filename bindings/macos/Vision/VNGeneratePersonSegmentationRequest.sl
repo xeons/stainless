@@ -46,7 +46,6 @@ public extern objc class VNGeneratePersonSegmentationRequest : VNStatefulRequest
     [Selector("new")] public static Self New();
     [Selector("init")] public Self Init();
     [Selector("initWithCompletionHandler:")] public Self InitWithCompletionHandler(VNRequestCompletionHandler? completionHandler);
-    /// macOS 15.0 and later.
     [Selector("supportedOutputPixelFormatsAndReturnError:")] public NSArray? SupportedOutputPixelFormatsAndReturnError(out NSError? error);
 }
 

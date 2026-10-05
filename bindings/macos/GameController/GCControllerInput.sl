@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "GameController")
 
-/// macOS 14.0 and later.
 public extern objc class GCControllerInputState : NSObject, GCDevicePhysicalInputState { }
 
-/// macOS 14.0 and later.
 public extern objc class GCControllerLiveInput : GCControllerInputState, GCDevicePhysicalInput
 {
     [Selector("unmappedInput")] public GCControllerLiveInput? UnmappedInput { get; }

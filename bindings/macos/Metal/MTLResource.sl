@@ -112,7 +112,6 @@ public objc interface MTLResource : MTLAllocation
     [Selector("setPurgeableState:")] MTLPurgeableState SetPurgeableState(MTLPurgeableState state);
     [Selector("makeAliasable")] void MakeAliasable();
     [Selector("isAliasable")] bool IsAliasable();
-    /// macOS 14.4 and later.
     [Selector("setOwnerWithIdentity:")] kern_return_t SetOwnerWithIdentity(task_id_token_t task_id_token);
 }
 

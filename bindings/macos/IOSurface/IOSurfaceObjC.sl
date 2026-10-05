@@ -88,7 +88,6 @@ public extern objc class IOSurface : NSObject, NSSecureCoding
     [Selector("bytesPerElement")] public NSInteger BytesPerElement { get; }
     [Selector("elementWidth")] public NSInteger ElementWidth { get; }
     [Selector("elementHeight")] public NSInteger ElementHeight { get; }
-    /// macOS 15.0 and later.
     [Selector("surfaceID")] public uint SurfaceID { get; }
     [Selector("seed")] public uint Seed { get; }
     [Selector("planeCount")] public NSUInteger PlaneCount { get; }

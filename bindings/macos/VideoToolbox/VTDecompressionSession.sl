@@ -69,25 +69,18 @@ public extern "C" OSStatus VTDecompressionSessionCopyBlackPixelBuffer(VTDecompre
 
 public extern "C" Boolean VTIsHardwareDecodeSupported(CMVideoCodecType codecType);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean VTIsStereoMVHEVCDecodeSupported();
 
-/// macOS 14.0 and later.
 public delegate void VTDecompressionOutputMultiImageCallback(void* arg0, void* arg1, OSStatus arg2, VTDecodeInfoFlags arg3, OpaqueCMTaggedBufferGroup* arg4, CMTime arg5, CMTime arg6);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus VTDecompressionSessionSetMultiImageCallback(VTDecompressionSessionRef decompressionSession, VTDecompressionOutputMultiImageCallback outputMultiImageCallback, void* outputMultiImageRefcon);
 
-/// macOS 14.0 and later.
 public objc closure void VTDecompressionMultiImageCapableOutputHandler(OSStatus arg0, VTDecodeInfoFlags arg1, CVImageBufferRef? arg2, CMTaggedBufferGroupRef? arg3, CMTime arg4, CMTime arg5);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithMultiImageCapableOutputHandler(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, VTDecodeInfoFlags* infoFlagsOut, VTDecompressionMultiImageCapableOutputHandler multiImageCapableOutputHandler);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithOptions(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, CFDictionaryRef? frameOptions, void* sourceFrameRefCon, VTDecodeInfoFlags* infoFlagsOut);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTDecompressionSessionDecodeFrameWithOptionsAndOutputHandler(VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer, VTDecodeFrameFlags decodeFlags, CFDictionaryRef? frameOptions, VTDecodeInfoFlags* infoFlagsOut, VTDecompressionOutputHandler outputHandler);
 
 #endif

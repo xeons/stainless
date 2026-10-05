@@ -110,13 +110,10 @@ public extern "C" CFStringRef kColorSyncBlackPointCompensation;
 
 public extern "C" CFStringRef kColorSyncExtendedRange;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kColorSyncHDRDerivative;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kColorSyncPQDerivative;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kColorSyncHLGDerivative;
 
 public extern "C" CFStringRef? kColorSyncPreferredCMM;
@@ -151,7 +148,6 @@ public extern "C" CFStringRef kColorSyncTransformParametricConversionData;
 
 public extern "C" CFStringRef kColorSyncTransformProfileSequnce;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kColorSyncTransformUseITU709OETF;
 
 public extern "C" CFStringRef kColorSyncConversionMatrix;

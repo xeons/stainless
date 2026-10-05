@@ -204,7 +204,6 @@ public extern "C" CFStringRef? kCFURLContentModificationDateKey;
 
 public extern "C" CFStringRef? kCFURLAttributeModificationDateKey;
 
-/// macOS 13.3 and later.
 public extern "C" CFStringRef? kCFURLFileIdentifierKey;
 
 public extern "C" CFStringRef? kCFURLFileContentIdentifierKey;
@@ -301,7 +300,6 @@ public extern "C" CFStringRef? kCFURLTotalFileAllocatedSizeKey;
 
 public extern "C" CFStringRef? kCFURLIsAliasFileKey;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kCFURLDirectoryEntryCountKey;
 
 public extern "C" CFStringRef? kCFURLVolumeLocalizedFormatDescriptionKey;
@@ -388,13 +386,10 @@ public extern "C" CFStringRef? kCFURLVolumeSupportsAccessPermissionsKey;
 
 public extern "C" CFStringRef? kCFURLVolumeSupportsFileProtectionKey;
 
-/// macOS 13.3 and later.
 public extern "C" CFStringRef? kCFURLVolumeTypeNameKey;
 
-/// macOS 13.3 and later.
 public extern "C" CFStringRef? kCFURLVolumeSubtypeKey;
 
-/// macOS 13.3 and later.
 public extern "C" CFStringRef? kCFURLVolumeMountFromLocationKey;
 
 public extern "C" CFStringRef? kCFURLIsUbiquitousItemKey;

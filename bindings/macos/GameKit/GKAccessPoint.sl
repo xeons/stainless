@@ -79,13 +79,9 @@ public extern objc class GKAccessPoint : NSObject
     [Selector("parentWindow", "setParentWindow:")] public NSWindow? ParentWindow { get; set; }
     [Selector("triggerAccessPointWithHandler:")] public void TriggerAccessPointWithHandler(GKAccessPointTriggerAccessPointWithHandlerHandlerBlock handler);
     [Selector("triggerAccessPointWithState:handler:")] public void TriggerAccessPointWithStateHandler(GKGameCenterViewControllerState state, GKAccessPointTriggerAccessPointWithStateHandlerHandlerBlock handler);
-    /// macOS 15.0 and later.
     [Selector("triggerAccessPointWithAchievementID:handler:")] public void TriggerAccessPointWithAchievementIDHandler(NSString achievementID, GKAccessPointTriggerAccessPointWithAchievementIDHandlerHandlerBlock? handler);
-    /// macOS 15.0 and later.
     [Selector("triggerAccessPointWithLeaderboardSetID:handler:")] public void TriggerAccessPointWithLeaderboardSetIDHandler(NSString leaderboardSetID, GKAccessPointTriggerAccessPointWithLeaderboardSetIDHandlerHandlerBlock? handler);
-    /// macOS 15.0 and later.
     [Selector("triggerAccessPointWithLeaderboardID:playerScope:timeScope:handler:")] public void TriggerAccessPointWithLeaderboardIDPlayerScopeTimeScopeHandler(NSString leaderboardID, GKLeaderboardPlayerScope playerScope, GKLeaderboardTimeScope timeScope, GKAccessPointTriggerAccessPointWithLeaderboardIDPlayerScopeTimeScopeHandlerHandlerBlock? handler);
-    /// macOS 15.0 and later.
     [Selector("triggerAccessPointWithPlayer:handler:")] public void TriggerAccessPointWithPlayerHandler(GKPlayer player, GKAccessPointTriggerAccessPointWithPlayerHandlerHandlerBlock? handler);
     /// macOS 26.0 and later.
     [Selector("triggerAccessPointForPlayTogetherWithHandler:")] public void TriggerAccessPointForPlayTogetherWithHandler(GKAccessPointTriggerAccessPointForPlayTogetherWithHandlerHandlerBlock? handler);

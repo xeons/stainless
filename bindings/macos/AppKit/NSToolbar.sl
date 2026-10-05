@@ -40,7 +40,6 @@ public using NSToolbarUserInfoKey = NSString;
 
 public extern "C" NSToolbarUserInfoKey? NSToolbarItemKey;
 
-/// macOS 15.0 and later.
 public extern "C" NSToolbarUserInfoKey? NSToolbarNewIndexKey;
 
 public enum NSToolbarDisplayMode : ulong
@@ -67,12 +66,10 @@ public extern objc class NSToolbar : NSObject
     [Selector("displayMode", "setDisplayMode:")] public NSToolbarDisplayMode DisplayMode { get; set; }
     [Selector("selectedItemIdentifier", "setSelectedItemIdentifier:")] public NSToolbarItemIdentifier? SelectedItemIdentifier { get; set; }
     [Selector("allowsUserCustomization", "setAllowsUserCustomization:")] public bool AllowsUserCustomization { get; set; }
-    /// macOS 15.0 and later.
     [Selector("allowsDisplayModeCustomization", "setAllowsDisplayModeCustomization:")] public bool AllowsDisplayModeCustomization { get; set; }
     [Selector("identifier")] public NSToolbarIdentifier Identifier { get; }
     [Selector("items")] public NSArray Items { get; }
     [Selector("visibleItems")] public NSArray? VisibleItems { get; }
-    /// macOS 15.0 and later.
     [Selector("itemIdentifiers", "setItemIdentifiers:")] public NSArray ItemIdentifiers { get; set; }
     [Selector("centeredItemIdentifiers", "setCenteredItemIdentifiers:")] public NSSet CenteredItemIdentifiers { get; set; }
     [Selector("autosavesConfiguration", "setAutosavesConfiguration:")] public bool AutosavesConfiguration { get; set; }
@@ -81,7 +78,6 @@ public extern objc class NSToolbar : NSObject
     [Selector("init")] public Self Init();
     [Selector("insertItemWithItemIdentifier:atIndex:")] public void InsertItemWithItemIdentifierAtIndex(NSToolbarItemIdentifier itemIdentifier, NSInteger index);
     [Selector("removeItemAtIndex:")] public void RemoveItemAtIndex(NSInteger index);
-    /// macOS 15.0 and later.
     [Selector("removeItemWithItemIdentifier:")] public void RemoveItemWithItemIdentifier(NSToolbarItemIdentifier itemIdentifier);
     [Selector("runCustomizationPalette:")] public void RunCustomizationPalette(AnyObject? sender);
     [Selector("validateVisibleItems")] public void ValidateVisibleItems();

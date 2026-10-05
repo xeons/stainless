@@ -39,51 +39,34 @@ public extern objc class MTRDeviceController : NSObject
     [Selector("isRunning")] public bool Running { get; }
     /// macOS 15.2 and later.
     [Selector("isSuspended")] public bool Suspended { get; }
-    /// macOS 14.6 and later.
     [Selector("uniqueIdentifier")] public NSUUID UniqueIdentifier { get; }
-    /// macOS 13.3 and later.
     [Selector("controllerNodeID")] public NSNumber? ControllerNodeID { get; }
     /// macOS 15.4 and later.
     [Selector("devices")] public NSArray Devices { get; }
     /// macOS 15.4 and later.
     [Selector("nodesWithStoredData")] public NSArray NodesWithStoredData { get; }
-    /// macOS 14.6 and later.
     [Selector("initWithParameters:error:")] public MTRDeviceController? InitWithParametersError(MTRDeviceControllerAbstractParameters parameters, out NSError? error);
-    /// macOS 13.1 and later.
     [Selector("setupCommissioningSessionWithPayload:newNodeID:error:")] public bool SetupCommissioningSessionWithPayloadNewNodeIDError(MTRSetupPayload payload, NSNumber newNodeID, out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("setupCommissioningSessionWithDiscoveredDevice:payload:newNodeID:error:")] public bool SetupCommissioningSessionWithDiscoveredDevicePayloadNewNodeIDError(MTRCommissionableBrowserResult discoveredDevice, MTRSetupPayload payload, NSNumber newNodeID, out NSError? error);
-    /// macOS 13.3 and later.
     [Selector("commissionNodeWithID:commissioningParams:error:")] public bool CommissionNodeWithIDCommissioningParamsError(NSNumber nodeID, MTRCommissioningParameters commissioningParams, out NSError? error);
     [Selector("continueCommissioningDevice:ignoreAttestationFailure:error:")] public bool ContinueCommissioningDeviceIgnoreAttestationFailureError(void* opaqueDeviceHandle, bool ignoreAttestationFailure, out NSError? error);
-    /// macOS 13.3 and later.
     [Selector("cancelCommissioningForNodeID:error:")] public bool CancelCommissioningForNodeIDError(NSNumber nodeID, out NSError? error);
-    /// macOS 13.3 and later.
     [Selector("deviceBeingCommissionedWithNodeID:error:")] public MTRBaseDevice? DeviceBeingCommissionedWithNodeIDError(NSNumber nodeID, out NSError? error);
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 14.6.
     [Selector("preWarmCommissioningSession")] public void PreWarmCommissioningSession();
-    /// macOS 13.3 and later.
     [Selector("setDeviceControllerDelegate:queue:")] public void SetDeviceControllerDelegateQueue(MTRDeviceControllerDelegate @delegate, dispatch_queue_t queue);
     /// macOS 15.2 and later.
     [Selector("addDeviceControllerDelegate:queue:")] public void AddDeviceControllerDelegateQueue(MTRDeviceControllerDelegate @delegate, dispatch_queue_t queue);
     /// macOS 15.2 and later.
     [Selector("removeDeviceControllerDelegate:")] public void RemoveDeviceControllerDelegate(MTRDeviceControllerDelegate @delegate);
-    /// macOS 14.0 and later.
     [Selector("startBrowseForCommissionables:queue:")] public bool StartBrowseForCommissionablesQueue(MTRCommissionableBrowserDelegate @delegate, dispatch_queue_t queue);
-    /// macOS 14.0 and later.
     [Selector("stopBrowseForCommissionables")] public bool StopBrowseForCommissionables();
-    /// macOS 13.3 and later.
     [Selector("attestationChallengeForDeviceID:")] public NSData? AttestationChallengeForDeviceID(NSNumber deviceID);
-    /// macOS 14.6 and later.
     [Selector("addServerEndpoint:")] public bool AddServerEndpoint(MTRServerEndpoint endpoint);
-    /// macOS 14.6 and later.
     [Selector("removeServerEndpoint:queue:completion:")] public void RemoveServerEndpointQueueCompletion(MTRServerEndpoint endpoint, dispatch_queue_t queue, dispatch_block_t completion);
-    /// macOS 14.6 and later.
     [Selector("removeServerEndpoint:")] public void RemoveServerEndpoint(MTRServerEndpoint endpoint);
     /// macOS 15.4 and later.
     [Selector("forgetDeviceWithNodeID:")] public void ForgetDeviceWithNodeID(NSNumber nodeID);
-    /// macOS 13.3 and later.
     [Selector("computePASEVerifierForSetupPasscode:iterations:salt:error:")] public static NSData? ComputePASEVerifierForSetupPasscodeIterationsSaltError(NSNumber setupPasscode, NSNumber iterations, NSData salt, out NSError? error);
     /// macOS 15.2 and later.
     [Selector("suspend")] public void Suspend();

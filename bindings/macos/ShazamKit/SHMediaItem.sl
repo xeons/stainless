@@ -61,7 +61,6 @@ public extern "C" SHMediaItemProperty? SHMediaItemTimeRanges;
 
 public extern "C" SHMediaItemProperty? SHMediaItemFrequencySkewRanges;
 
-/// macOS 14.0 and later.
 public extern "C" SHMediaItemProperty SHMediaItemCreationDate;
 
 public objc closure void SHMediaItemFetchMediaItemWithShazamIDCompletionHandlerCompletionHandlerBlock(SHMediaItem? arg0, NSError? arg1);
@@ -82,7 +81,6 @@ public extern objc class SHMediaItem : NSObject, NSSecureCoding, NSCopying
     [Selector("isrc")] public NSString? Isrc { get; }
     [Selector("timeRanges")] public NSArray? TimeRanges { get; }
     [Selector("frequencySkewRanges")] public NSArray? FrequencySkewRanges { get; }
-    /// macOS 14.0 and later.
     [Selector("creationDate")] public NSDate? CreationDate { get; }
     [Selector("mediaItemWithProperties:")] public static Self MediaItemWithProperties(NSDictionary properties);
     [Selector("fetchMediaItemWithShazamID:completionHandler:")] public static void FetchMediaItemWithShazamIDCompletionHandler(NSString shazamID, SHMediaItemFetchMediaItemWithShazamIDCompletionHandlerCompletionHandlerBlock completionHandler);

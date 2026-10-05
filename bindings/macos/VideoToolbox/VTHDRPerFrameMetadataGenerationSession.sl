@@ -32,28 +32,21 @@ import Standard.ObjC;
 
 #pragma comment(framework, "VideoToolbox")
 
-/// macOS 15.0 and later.
 public using VTHDRPerFrameMetadataGenerationHDRFormatType = CFStringRef;
 
-/// macOS 15.0 and later.
 public extern "C" VTHDRPerFrameMetadataGenerationHDRFormatType? kVTHDRPerFrameMetadataGenerationHDRFormatType_DolbyVision;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTHDRPerFrameMetadataGenerationOptionsKey_HDRFormats;
 
 public struct OpaqueVTHDRPerFrameMetadataGenerationSession;
 
-/// macOS 15.0 and later.
 [CFType("VTHDRPerFrameMetadataGenerationSessionGetTypeID")]
 public extern objc class VTHDRPerFrameMetadataGenerationSessionRef : CFTypeRef { }
 
-/// macOS 15.0 and later.
 public extern "C" CFTypeID VTHDRPerFrameMetadataGenerationSessionGetTypeID();
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTHDRPerFrameMetadataGenerationSessionCreate(CFAllocatorRef? allocator, float framesPerSecond, CFDictionaryRef? options, OpaqueVTHDRPerFrameMetadataGenerationSession** hdrPerFrameMetadataGenerationSessionOut);
 
-/// macOS 15.0 and later.
 public extern "C" OSStatus VTHDRPerFrameMetadataGenerationSessionAttachMetadata(VTHDRPerFrameMetadataGenerationSessionRef hdrPerFrameMetadataGenerationSession, CVPixelBufferRef pixelBuffer, Boolean sceneChange);
 
 #endif

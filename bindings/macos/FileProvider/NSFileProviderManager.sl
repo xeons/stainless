@@ -164,11 +164,9 @@ public extern objc class NSFileProviderManager
 /// StateDirectory, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    /// macOS 15.0 and later.
     [Selector("stateDirectoryURLWithError:")] public NSURL? StateDirectoryURLWithError(out NSError? error);
 }
 
-/// macOS 15.0 and later.
 [Flags]
 public enum NSFileProviderVolumeUnsupportedReason : ulong
 {
@@ -184,7 +182,6 @@ public enum NSFileProviderVolumeUnsupportedReason : ulong
 /// ExternalDomain, a category of NSFileProviderManager.
 public extern objc class NSFileProviderManager
 {
-    /// macOS 15.0 and later.
     [Selector("checkDomainsCanBeStored:onVolumeAtURL:unsupportedReason:error:")] public static bool CheckDomainsCanBeStoredOnVolumeAtURLUnsupportedReasonError(bool* eligible, NSURL url, NSFileProviderVolumeUnsupportedReason* unsupportedReason, out NSError? error);
 }
 

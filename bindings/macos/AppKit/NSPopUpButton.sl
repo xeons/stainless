@@ -37,9 +37,7 @@ public extern objc class NSPopUpButton : NSButton
     [Selector("pullsDown", "setPullsDown:")] public bool PullsDown { get; set; }
     [Selector("autoenablesItems", "setAutoenablesItems:")] public bool AutoenablesItems { get; set; }
     [Selector("preferredEdge", "setPreferredEdge:")] public NSRectEdge PreferredEdge { get; set; }
-    /// macOS 15.0 and later.
     [Selector("usesItemFromMenu", "setUsesItemFromMenu:")] public bool UsesItemFromMenu { get; set; }
-    /// macOS 15.0 and later.
     [Selector("altersStateOfSelectedItem", "setAltersStateOfSelectedItem:")] public bool AltersStateOfSelectedItem { get; set; }
     [Selector("itemArray")] public NSArray ItemArray { get; }
     [Selector("numberOfItems")] public NSInteger NumberOfItems { get; }
@@ -49,13 +47,9 @@ public extern objc class NSPopUpButton : NSButton
     [Selector("selectedTag")] public NSInteger SelectedTag { get; }
     [Selector("itemTitles")] public NSArray ItemTitles { get; }
     [Selector("titleOfSelectedItem")] public NSString? TitleOfSelectedItem { get; }
-    /// macOS 15.0 and later.
     [Selector("popUpButtonWithMenu:target:action:")] public static Self PopUpButtonWithMenuTargetAction(NSMenu menu, AnyObject? target, Selector action);
-    /// macOS 15.0 and later.
     [Selector("pullDownButtonWithTitle:menu:")] public static Self PullDownButtonWithTitleMenu(NSString title, NSMenu menu);
-    /// macOS 15.0 and later.
     [Selector("pullDownButtonWithImage:menu:")] public static Self PullDownButtonWithImageMenu(NSImage image, NSMenu menu);
-    /// macOS 15.0 and later.
     [Selector("pullDownButtonWithTitle:image:menu:")] public static Self PullDownButtonWithTitleImageMenu(NSString title, NSImage image, NSMenu menu);
     [Selector("initWithFrame:pullsDown:")] public Self InitWithFramePullsDown(NSRect buttonFrame, bool flag);
     [Selector("addItemWithTitle:")] public void AddItemWithTitle(NSString title);

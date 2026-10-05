@@ -64,7 +64,6 @@ public extern objc class NSToolbarItem : NSObject, NSCopying
     [Selector("isNavigational", "setNavigational:")] public bool Navigational { get; set; }
     [Selector("view", "setView:")] public NSView? View { get; set; }
     [Selector("isVisible")] public bool Visible { get; }
-    /// macOS 15.0 and later.
     [Selector("isHidden", "setHidden:")] public bool Hidden { get; set; }
     /// Deprecated in macOS 12.0.
     [Selector("minSize", "setMinSize:")] public NSSize MinSize { get; set; }
@@ -111,7 +110,6 @@ public extern "C" NSToolbarItemIdentifier? NSToolbarPrintItemIdentifier;
 
 public extern "C" NSToolbarItemIdentifier NSToolbarToggleSidebarItemIdentifier;
 
-/// macOS 14.0 and later.
 public extern "C" NSToolbarItemIdentifier NSToolbarToggleInspectorItemIdentifier;
 
 public extern "C" NSToolbarItemIdentifier? NSToolbarCloudSharingItemIdentifier;
@@ -121,7 +119,6 @@ public extern "C" NSToolbarItemIdentifier? NSToolbarWritingToolsItemIdentifier;
 
 public extern "C" NSToolbarItemIdentifier? NSToolbarSidebarTrackingSeparatorItemIdentifier;
 
-/// macOS 14.0 and later.
 public extern "C" NSToolbarItemIdentifier? NSToolbarInspectorTrackingSeparatorItemIdentifier;
 
 /// Deprecated in macOS 11.0.

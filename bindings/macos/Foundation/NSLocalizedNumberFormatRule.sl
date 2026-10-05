@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Foundation")
 
-/// macOS 15.0 and later.
 public extern objc class NSLocalizedNumberFormatRule : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("automatic")] public static NSLocalizedNumberFormatRule Automatic();

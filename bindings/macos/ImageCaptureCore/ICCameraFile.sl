@@ -74,9 +74,7 @@ public extern objc class ICCameraFile : ICCameraItem
     [Selector("requestMetadataDictionaryWithOptions:completion:")] public void RequestMetadataDictionaryWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestMetadataDictionaryWithOptionsCompletionCompletionBlock completion);
     [Selector("requestDownloadWithOptions:completion:")] public NSProgress? RequestDownloadWithOptionsCompletion(NSDictionary? options, ICCameraFileRequestDownloadWithOptionsCompletionCompletionBlock completion);
     [Selector("requestReadDataAtOffset:length:completion:")] public void RequestReadDataAtOffsetLengthCompletion(off_t offset, off_t length, ICCameraFileRequestReadDataAtOffsetLengthCompletionCompletionBlock completion);
-    /// macOS 14.0 and later.
     [Selector("requestSecurityScopedURLWithCompletion:")] public void RequestSecurityScopedURLWithCompletion(ICCameraFileRequestSecurityScopedURLWithCompletionCompletionBlock completion);
-    /// macOS 15.0 and later.
     [Selector("requestFingerprintWithCompletion:")] public void RequestFingerprintWithCompletion(ICCameraFileRequestFingerprintWithCompletionCompletionBlock completion);
 }
 

@@ -148,7 +148,6 @@ public enum HKCategoryValueSleepAnalysis : long
     AsleepREM = 5,
 }
 
-/// macOS 15.0 and later.
 public enum HKCategoryValueVaginalBleeding : long
 {
     Unspecified = 1,

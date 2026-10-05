@@ -29,7 +29,7 @@ module MacOS.AVFoundation;
 
 public const int AVF_DEPLOYING_TO_2022_RELEASES_AND_LATER = 1;
 
-public const int AVF_DEPLOYING_TO_2024_RELEASES_AND_LATER = 0;
+public const int AVF_DEPLOYING_TO_2024_RELEASES_AND_LATER = 1;
 
 public const int AVF_DEPLOYING_TO_2025_RELEASES_AND_LATER = 0;
 

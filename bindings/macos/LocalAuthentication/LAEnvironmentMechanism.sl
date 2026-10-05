@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "LocalAuthentication")
 
-/// macOS 15.0 and later.
 public extern objc class LAEnvironmentMechanism : NSObject
 {
     [Selector("isUsable")] public bool IsUsable { get; }

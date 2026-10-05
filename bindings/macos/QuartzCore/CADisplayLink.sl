@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "QuartzCore")
 
-/// macOS 14.0 and later.
 public extern objc class CADisplayLink : NSObject
 {
     [Selector("timestamp")] public CFTimeInterval Timestamp { get; }

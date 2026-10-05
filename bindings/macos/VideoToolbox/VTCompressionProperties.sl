@@ -223,7 +223,6 @@ public extern "C" CFStringRef? kVTCompressionPropertyKey_SourceFrameCount;
 
 public extern "C" CFStringRef? kVTCompressionPropertyKey_ExpectedFrameRate;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTCompressionPropertyKey_MaximumRealTimeFrameRate;
 
 public extern "C" CFStringRef? kVTCompressionPropertyKey_BaseLayerFrameRateFraction;
@@ -236,19 +235,14 @@ public extern "C" CFStringRef? kVTCompressionPropertyKey_BaseLayerFrameRate;
 
 public extern "C" CFStringRef? kVTCompressionPropertyKey_ReferenceBufferCount;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef? kVTCompressionPropertyKey_CalculateMeanSquaredError;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef? kVTSampleAttachmentKey_QualityMetrics;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef? kVTSampleAttachmentQualityMetricsKey_LumaMeanSquaredError;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef? kVTSampleAttachmentQualityMetricsKey_ChromaBlueMeanSquaredError;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef? kVTSampleAttachmentQualityMetricsKey_ChromaRedMeanSquaredError;
 
 public extern "C" CFStringRef? kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder;
@@ -307,13 +301,10 @@ public extern "C" CFStringRef? kVTCompressionPropertyKey_MultiPassStorage;
 
 public extern "C" CFStringRef? kVTCompressionPropertyKey_EncoderID;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kVTCompressionPropertyKey_RecommendedParallelizationLimit;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kVTCompressionPropertyKey_RecommendedParallelizedSubdivisionMinimumFrameCount;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef? kVTCompressionPropertyKey_RecommendedParallelizedSubdivisionMinimumDuration;
 
 public extern "C" CFStringRef? kVTCompressionPropertyKey_PreserveDynamicHDRMetadata;
@@ -332,16 +323,12 @@ public extern "C" CFStringRef? kVTEncodeFrameOptionKey_ForceLTRRefresh;
 
 public extern "C" CFStringRef? kVTSampleAttachmentKey_RequireLTRAcknowledgementToken;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_MVHEVCVideoLayerIDs;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_MVHEVCViewIDs;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_MVHEVCLeftAndRightViewIDs;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_HeroEye;
 
 /// macOS 26.0 and later.
@@ -350,22 +337,16 @@ public extern "C" CFStringRef kVTHeroEye_Left;
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kVTHeroEye_Right;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_StereoCameraBaseline;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_HorizontalDisparityAdjustment;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_HasLeftStereoEyeView;
 
-/// macOS 14.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_HasRightStereoEyeView;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_HorizontalFieldOfView;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_ProjectionKind;
 
 /// macOS 26.0 and later.
@@ -380,7 +361,6 @@ public extern "C" CFStringRef kVTProjectionKind_HalfEquirectangular;
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kVTProjectionKind_ParametricImmersive;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyKey_ViewPackingKind;
 
 /// macOS 26.0 and later.
@@ -449,10 +429,8 @@ public extern "C" CFStringRef kVTCameraCalibrationExtrinsicOriginSource_StereoCa
 /// macOS 26.0 and later.
 public extern "C" CFStringRef kVTCompressionPropertyCameraCalibrationKey_ExtrinsicOrientationQuaternion;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTCompressionPropertyKey_SuggestedLookAheadFrameCount;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kVTCompressionPropertyKey_SpatialAdaptiveQPLevel;
 
 public const int kVTQPModulationLevel_Default = -1;

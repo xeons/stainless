@@ -30,11 +30,9 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.0 and later.
 /// MLComputeDevice, a category of MLModel.
 public extern objc class MLModel
 {
-    /// macOS 14.0 and later.
     [Selector("availableComputeDevices")] public static NSArray? AvailableComputeDevices { get; }
 }
 

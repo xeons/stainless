@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public extern objc class MTRDeviceAttestationInfo : NSObject
 {
     [Selector("challenge")] public NSData Challenge { get; }

@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "BackgroundAssets")
 
-/// macOS 14.0 and later.
 public extern "C" NSString? BAErrorDomain;
 
-/// macOS 14.0 and later.
 public enum BAErrorCode : long
 {
     DownloadInvalid = 0,

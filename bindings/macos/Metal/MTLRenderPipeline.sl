@@ -185,7 +185,6 @@ public extern objc class MTLRenderPipelineDescriptor : NSObject, NSCopying
     [Selector("supportAddingFragmentBinaryFunctions", "setSupportAddingFragmentBinaryFunctions:")] public bool SupportAddingFragmentBinaryFunctions { get; set; }
     [Selector("maxVertexCallStackDepth", "setMaxVertexCallStackDepth:")] public NSUInteger MaxVertexCallStackDepth { get; set; }
     [Selector("maxFragmentCallStackDepth", "setMaxFragmentCallStackDepth:")] public NSUInteger MaxFragmentCallStackDepth { get; set; }
-    /// macOS 15.0 and later.
     [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
     [Selector("reset")] public void Reset();
 }
@@ -213,7 +212,6 @@ public objc interface MTLRenderPipelineState : MTLAllocation, NSObjectProtocol
     [Selector("meshThreadExecutionWidth")] NSUInteger MeshThreadExecutionWidth { get; }
     [Selector("maxTotalThreadgroupsPerMeshGrid")] NSUInteger MaxTotalThreadgroupsPerMeshGrid { get; }
     [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    /// macOS 15.0 and later.
     [Selector("shaderValidation")] MTLShaderValidation ShaderValidation { get; }
     /// macOS 26.0 and later.
     [Selector("requiredThreadsPerTileThreadgroup")] MTLSize RequiredThreadsPerTileThreadgroup { get; }
@@ -267,7 +265,6 @@ public extern objc class MTLTileRenderPipelineDescriptor : NSObject, NSCopying
     [Selector("linkedFunctions", "setLinkedFunctions:")] public MTLLinkedFunctions? LinkedFunctions { get; set; }
     [Selector("supportAddingBinaryFunctions", "setSupportAddingBinaryFunctions:")] public bool SupportAddingBinaryFunctions { get; set; }
     [Selector("maxCallStackDepth", "setMaxCallStackDepth:")] public NSUInteger MaxCallStackDepth { get; set; }
-    /// macOS 15.0 and later.
     [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
     /// macOS 26.0 and later.
     [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
@@ -297,17 +294,11 @@ public extern objc class MTLMeshRenderPipelineDescriptor : NSObject, NSCopying
     [Selector("colorAttachments")] public MTLRenderPipelineColorAttachmentDescriptorArray ColorAttachments { get; }
     [Selector("depthAttachmentPixelFormat", "setDepthAttachmentPixelFormat:")] public MTLPixelFormat DepthAttachmentPixelFormat { get; set; }
     [Selector("stencilAttachmentPixelFormat", "setStencilAttachmentPixelFormat:")] public MTLPixelFormat StencilAttachmentPixelFormat { get; set; }
-    /// macOS 14.0 and later.
     [Selector("supportIndirectCommandBuffers", "setSupportIndirectCommandBuffers:")] public bool SupportIndirectCommandBuffers { get; set; }
-    /// macOS 15.0 and later.
     [Selector("binaryArchives", "setBinaryArchives:")] public NSArray? BinaryArchives { get; set; }
-    /// macOS 14.0 and later.
     [Selector("objectLinkedFunctions", "setObjectLinkedFunctions:")] public MTLLinkedFunctions? ObjectLinkedFunctions { get; set; }
-    /// macOS 14.0 and later.
     [Selector("meshLinkedFunctions", "setMeshLinkedFunctions:")] public MTLLinkedFunctions? MeshLinkedFunctions { get; set; }
-    /// macOS 14.0 and later.
     [Selector("fragmentLinkedFunctions", "setFragmentLinkedFunctions:")] public MTLLinkedFunctions? FragmentLinkedFunctions { get; set; }
-    /// macOS 15.0 and later.
     [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
     /// macOS 26.0 and later.
     [Selector("requiredThreadsPerObjectThreadgroup", "setRequiredThreadsPerObjectThreadgroup:")] public MTLSize RequiredThreadsPerObjectThreadgroup { get; set; }

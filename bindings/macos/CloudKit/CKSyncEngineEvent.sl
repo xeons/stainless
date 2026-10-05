@@ -47,7 +47,6 @@ public enum CKSyncEngineEventType : long
     DidSendChanges = 11,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineEvent : NSObject
 {
     [Selector("type")] public CKSyncEngineEventType Type { get; }
@@ -65,7 +64,6 @@ public extern objc class CKSyncEngineEvent : NSObject
     [Selector("didSendChangesEvent")] public CKSyncEngineDidSendChangesEvent DidSendChangesEvent { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineStateUpdateEvent : CKSyncEngineEvent
 {
     [Selector("stateSerialization")] public CKSyncEngineStateSerialization StateSerialization { get; }
@@ -78,7 +76,6 @@ public enum CKSyncEngineAccountChangeType : long
     SwitchAccounts = 2,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineAccountChangeEvent : CKSyncEngineEvent
 {
     [Selector("changeType")] public CKSyncEngineAccountChangeType ChangeType { get; }
@@ -86,21 +83,18 @@ public extern objc class CKSyncEngineAccountChangeEvent : CKSyncEngineEvent
     [Selector("currentUser")] public CKRecordID? CurrentUser { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFetchedDatabaseChangesEvent : CKSyncEngineEvent
 {
     [Selector("modifications")] public NSArray Modifications { get; }
     [Selector("deletions")] public NSArray Deletions { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFetchedRecordZoneChangesEvent : CKSyncEngineEvent
 {
     [Selector("modifications")] public NSArray Modifications { get; }
     [Selector("deletions")] public NSArray Deletions { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineSentDatabaseChangesEvent : CKSyncEngineEvent
 {
     [Selector("savedZones")] public NSArray SavedZones { get; }
@@ -109,7 +103,6 @@ public extern objc class CKSyncEngineSentDatabaseChangesEvent : CKSyncEngineEven
     [Selector("failedZoneDeletes")] public NSDictionary FailedZoneDeletes { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineSentRecordZoneChangesEvent : CKSyncEngineEvent
 {
     [Selector("savedRecords")] public NSArray SavedRecords { get; }
@@ -118,46 +111,37 @@ public extern objc class CKSyncEngineSentRecordZoneChangesEvent : CKSyncEngineEv
     [Selector("failedRecordDeletes")] public NSDictionary FailedRecordDeletes { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineWillFetchChangesEvent : CKSyncEngineEvent
 {
-    /// macOS 14.2 and later.
     [Selector("context")] public CKSyncEngineFetchChangesContext Context { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineWillFetchRecordZoneChangesEvent : CKSyncEngineEvent
 {
     [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineDidFetchRecordZoneChangesEvent : CKSyncEngineEvent
 {
     [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
     [Selector("error")] public NSError? Error { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineDidFetchChangesEvent : CKSyncEngineEvent
 {
-    /// macOS 14.2 and later.
     [Selector("context")] public CKSyncEngineFetchChangesContext Context { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineWillSendChangesEvent : CKSyncEngineEvent
 {
     [Selector("context")] public CKSyncEngineSendChangesContext Context { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineDidSendChangesEvent : CKSyncEngineEvent
 {
     [Selector("context")] public CKSyncEngineSendChangesContext Context { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFetchedRecordDeletion : NSObject
 {
     [Selector("recordID")] public CKRecordID RecordID { get; }
@@ -171,21 +155,18 @@ public enum CKSyncEngineZoneDeletionReason : long
     EncryptedDataReset = 2,
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFetchedZoneDeletion : NSObject
 {
     [Selector("zoneID")] public CKRecordZoneID ZoneID { get; }
     [Selector("reason")] public CKSyncEngineZoneDeletionReason Reason { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFailedRecordSave : NSObject
 {
     [Selector("record")] public CKRecord Record { get; }
     [Selector("error")] public NSError Error { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CKSyncEngineFailedZoneSave : NSObject
 {
     [Selector("recordZone")] public CKRecordZone RecordZone { get; }

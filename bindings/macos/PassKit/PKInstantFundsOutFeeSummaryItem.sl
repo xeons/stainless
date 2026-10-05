@@ -29,7 +29,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "PassKit")
 
-/// macOS 15.0 and later.
 public extern objc class PKInstantFundsOutFeeSummaryItem : PKPaymentSummaryItem { }
 
 #endif

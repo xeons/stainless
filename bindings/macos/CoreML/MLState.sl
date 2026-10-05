@@ -33,10 +33,8 @@ import Standard.ObjC;
 
 public objc closure void MLStateGetMultiArrayForStateNamedHandlerHandlerBlock(MLMultiArray arg0);
 
-/// macOS 15.0 and later.
 public extern objc class MLState : NSObject
 {
-    /// macOS 15.0 and later.
     [Selector("getMultiArrayForStateNamed:handler:")] public void GetMultiArrayForStateNamedHandler(NSString stateName, MLStateGetMultiArrayForStateNamedHandlerHandlerBlock handler);
 }
 

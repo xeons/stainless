@@ -40,15 +40,10 @@ public objc closure void MLModelAssetFunctionNamesWithCompletionHandlerHandlerBl
 public extern objc class MLModelAsset : NSObject
 {
     [Selector("modelAssetWithSpecificationData:error:")] public static Self? ModelAssetWithSpecificationDataError(NSData specificationData, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("modelAssetWithSpecificationData:blobMapping:error:")] public static Self? ModelAssetWithSpecificationDataBlobMappingError(NSData specificationData, NSDictionary blobMapping, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("modelAssetWithURL:error:")] public static Self? ModelAssetWithURLError(NSURL compiledModelURL, out NSError? error);
-    /// macOS 15.0 and later.
     [Selector("modelDescriptionWithCompletionHandler:")] public void ModelDescriptionWithCompletionHandler(MLModelAssetModelDescriptionWithCompletionHandlerHandlerBlock handler);
-    /// macOS 15.0 and later.
     [Selector("modelDescriptionOfFunctionNamed:completionHandler:")] public void ModelDescriptionOfFunctionNamedCompletionHandler(NSString functionName, MLModelAssetModelDescriptionOfFunctionNamedCompletionHandlerHandlerBlock handler);
-    /// macOS 15.0 and later.
     [Selector("functionNamesWithCompletionHandler:")] public void FunctionNamesWithCompletionHandler(MLModelAssetFunctionNamesWithCompletionHandlerHandlerBlock handler);
 }
 

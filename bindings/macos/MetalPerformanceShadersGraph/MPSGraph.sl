@@ -78,7 +78,6 @@ public objc closure void MPSGraphScheduledHandler(MPSGraphTensorDataDictionary a
 
 public objc closure void MPSGraphCompilationCompletionHandler(MPSGraphExecutable arg0, NSError? arg1);
 
-/// macOS 14.1 and later.
 public using MPSGraphCallableMap = NSDictionary;
 
 public extern objc class MPSGraphCompilationDescriptor : MPSGraphObject, NSCopying
@@ -89,7 +88,6 @@ public extern objc class MPSGraphCompilationDescriptor : MPSGraphObject, NSCopyi
     [Selector("dispatchQueue", "setDispatchQueue:")] public dispatch_queue_t DispatchQueue { get; set; }
     /// Deprecated in macOS 14.0.
     [Selector("optimizationProfile", "setOptimizationProfile:")] public MPSGraphOptimizationProfile OptimizationProfile { get; set; }
-    /// macOS 14.1 and later.
     [Selector("callables", "setCallables:")] public MPSGraphCallableMap? Callables { get; set; }
     /// macOS 26.0 and later.
     [Selector("reducedPrecisionFastMath", "setReducedPrecisionFastMath:")] public MPSGraphReducedPrecisionFastMath ReducedPrecisionFastMath { get; set; }

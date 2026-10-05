@@ -29,7 +29,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.4 and later.
 public objc interface ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialRegistrationRequest
 {
     [Selector("clientData")] ASPublicKeyCredentialClientData? ClientData { get; }

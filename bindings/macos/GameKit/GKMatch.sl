@@ -53,9 +53,7 @@ public extern objc class GKMatch : NSObject
     [Selector("players")] public NSArray? Players { get; }
     [Selector("delegate", "setDelegate:")] public GKMatchDelegate? Delegate { get; set; }
     [Selector("expectedPlayerCount")] public NSUInteger ExpectedPlayerCount { get; }
-    /// macOS 14.2 and later.
     [Selector("properties")] public GKMatchProperties? Properties { get; }
-    /// macOS 14.2 and later.
     [Selector("playerProperties")] public NSDictionary? PlayerProperties { get; }
     [Selector("sendData:toPlayers:dataMode:error:")] public bool SendDataToPlayersDataModeError(NSData data, NSArray players, GKMatchSendDataMode mode, out NSError? error);
     [Selector("sendDataToAllPlayers:withDataMode:error:")] public bool SendDataToAllPlayersWithDataModeError(NSData data, GKMatchSendDataMode mode, out NSError? error);

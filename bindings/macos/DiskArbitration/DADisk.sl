@@ -107,7 +107,6 @@ public extern "C" CFStringRef? kDADiskDescriptionBusNameKey;
 
 public extern "C" CFStringRef? kDADiskDescriptionBusPathKey;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef? kDADiskDescriptionFSKitPrefix;
 
 /// macOS 26.0 and later.

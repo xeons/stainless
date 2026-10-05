@@ -32,16 +32,13 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 15 and later.
 public objc interface AVMetricEventStreamPublisher { }
 
-/// macOS 15 and later.
 public objc interface AVMetricEventStreamSubscriber
 {
     [Selector("publisher:didReceiveEvent:")] void PublisherDidReceiveEvent(AVMetricEventStreamPublisher publisher, AVMetricEvent event);
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricEventStream : NSObject
 {
     [Selector("eventStream")] public static Self EventStream();
@@ -52,7 +49,6 @@ public extern objc class AVMetricEventStream : NSObject
     [Selector("subscribeToAllMetricEvents")] public void SubscribeToAllMetricEvents();
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricEvent : NSObject, NSSecureCoding
 {
     [Selector("date")] public NSDate Date { get; }
@@ -60,14 +56,12 @@ public extern objc class AVMetricEvent : NSObject, NSSecureCoding
     [Selector("sessionID")] public NSString? SessionID { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricErrorEvent : AVMetricEvent
 {
     [Selector("didRecover")] public bool DidRecover { get; }
     [Selector("error")] public NSError Error { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricMediaResourceRequestEvent : AVMetricEvent
 {
     [Selector("url")] public NSURL? Url { get; }
@@ -82,7 +76,6 @@ public extern objc class AVMetricMediaResourceRequestEvent : AVMetricEvent
     [Selector("networkTransactionMetrics")] public NSURLSessionTaskMetrics? NetworkTransactionMetrics { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricHLSPlaylistRequestEvent : AVMetricEvent
 {
     [Selector("url")] public NSURL? Url { get; }
@@ -91,7 +84,6 @@ public extern objc class AVMetricHLSPlaylistRequestEvent : AVMetricEvent
     [Selector("mediaResourceRequestEvent")] public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricHLSMediaSegmentRequestEvent : AVMetricEvent
 {
     [Selector("url")] public NSURL? Url { get; }
@@ -103,7 +95,6 @@ public extern objc class AVMetricHLSMediaSegmentRequestEvent : AVMetricEvent
     [Selector("mediaResourceRequestEvent")] public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricContentKeyRequestEvent : AVMetricEvent
 {
     [Selector("contentKeySpecifier")] public AVContentKeySpecifier ContentKeySpecifier { get; }
@@ -112,7 +103,6 @@ public extern objc class AVMetricContentKeyRequestEvent : AVMetricEvent
     [Selector("mediaResourceRequestEvent")] public AVMetricMediaResourceRequestEvent? MediaResourceRequestEvent { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemLikelyToKeepUpEvent : AVMetricEvent
 {
     [Selector("variant")] public AVAssetVariant? Variant { get; }
@@ -120,7 +110,6 @@ public extern objc class AVMetricPlayerItemLikelyToKeepUpEvent : AVMetricEvent
     [Selector("loadedTimeRanges")] public NSArray? LoadedTimeRanges { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemInitialLikelyToKeepUpEvent : AVMetricPlayerItemLikelyToKeepUpEvent
 {
     [Selector("playlistRequestEvents")] public NSArray PlaylistRequestEvents { get; }
@@ -128,7 +117,6 @@ public extern objc class AVMetricPlayerItemInitialLikelyToKeepUpEvent : AVMetric
     [Selector("contentKeyRequestEvents")] public NSArray ContentKeyRequestEvents { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemRateChangeEvent : AVMetricEvent
 {
     [Selector("rate")] public double Rate { get; }
@@ -136,13 +124,10 @@ public extern objc class AVMetricPlayerItemRateChangeEvent : AVMetricEvent
     [Selector("variant")] public AVAssetVariant? Variant { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemStallEvent : AVMetricPlayerItemRateChangeEvent { }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemSeekEvent : AVMetricPlayerItemRateChangeEvent { }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemSeekDidCompleteEvent : AVMetricPlayerItemRateChangeEvent
 {
     [Selector("didSeekInBuffer")] public bool DidSeekInBuffer { get; }
@@ -155,7 +140,6 @@ public extern objc class AVMetricMediaRendition : NSObject, NSSecureCoding
     [Selector("URL")] public NSURL? URL { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemVariantSwitchEvent : AVMetricEvent
 {
     [Selector("fromVariant")] public AVAssetVariant? FromVariant { get; }
@@ -170,7 +154,6 @@ public extern objc class AVMetricPlayerItemVariantSwitchEvent : AVMetricEvent
     [Selector("didSucceed")] public bool DidSucceed { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemVariantSwitchStartEvent : AVMetricEvent
 {
     [Selector("fromVariant")] public AVAssetVariant? FromVariant { get; }
@@ -184,7 +167,6 @@ public extern objc class AVMetricPlayerItemVariantSwitchStartEvent : AVMetricEve
     [Selector("subtitleRendition")] public AVMetricMediaRendition SubtitleRendition { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricPlayerItemPlaybackSummaryEvent : AVMetricEvent
 {
     [Selector("errorEvent")] public AVMetricErrorEvent? ErrorEvent { get; }
@@ -199,7 +181,6 @@ public extern objc class AVMetricPlayerItemPlaybackSummaryEvent : AVMetricEvent
     [Selector("timeWeightedPeakBitrate")] public NSInteger TimeWeightedPeakBitrate { get; }
 }
 
-/// macOS 15 and later.
 public extern objc class AVMetricDownloadSummaryEvent : AVMetricEvent
 {
     [Selector("errorEvent")] public AVMetricErrorEvent? ErrorEvent { get; }

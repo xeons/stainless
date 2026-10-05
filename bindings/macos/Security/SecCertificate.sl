@@ -51,10 +51,8 @@ public extern "C" OSStatus SecCertificateCopyEmailAddresses(SecCertificateRef ce
 
 [ReturnsRetained] public extern "C" CFDataRef? SecCertificateCopySerialNumberData(SecCertificateRef certificate, __CFError** error);
 
-/// macOS 15.0 and later.
 [ReturnsRetained] public extern "C" CFDateRef? SecCertificateCopyNotValidBeforeDate(SecCertificateRef certificate);
 
-/// macOS 15.0 and later.
 [ReturnsRetained] public extern "C" CFDateRef? SecCertificateCopyNotValidAfterDate(SecCertificateRef certificate);
 
 public const int kSecSubjectItemAttr = 1937072746;

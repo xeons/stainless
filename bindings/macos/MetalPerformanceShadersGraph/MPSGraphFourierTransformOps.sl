@@ -37,7 +37,6 @@ public enum MPSGraphFFTScalingMode : ulong
     Unitary = 2,
 }
 
-/// macOS 14.0 and later.
 public extern objc class MPSGraphFFTDescriptor : MPSGraphObject, NSCopying
 {
     [Selector("inverse", "setInverse:")] public bool Inverse { get; set; }
@@ -46,21 +45,14 @@ public extern objc class MPSGraphFFTDescriptor : MPSGraphObject, NSCopying
     [Selector("descriptor")] public static Self? Descriptor();
 }
 
-/// macOS 14.0 and later.
 /// MPSGraphFourierTransformOps, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    /// macOS 14.0 and later.
     [Selector("fastFourierTransformWithTensor:axes:descriptor:name:")] public MPSGraphTensor FastFourierTransformWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("fastFourierTransformWithTensor:axesTensor:descriptor:name:")] public MPSGraphTensor FastFourierTransformWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("realToHermiteanFFTWithTensor:axes:descriptor:name:")] public MPSGraphTensor RealToHermiteanFFTWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("realToHermiteanFFTWithTensor:axesTensor:descriptor:name:")] public MPSGraphTensor RealToHermiteanFFTWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("HermiteanToRealFFTWithTensor:axes:descriptor:name:")] public MPSGraphTensor HermiteanToRealFFTWithTensorAxesDescriptorName(MPSGraphTensor tensor, NSArray axes, MPSGraphFFTDescriptor descriptor, NSString? name);
-    /// macOS 14.0 and later.
     [Selector("HermiteanToRealFFTWithTensor:axesTensor:descriptor:name:")] public MPSGraphTensor HermiteanToRealFFTWithTensorAxesTensorDescriptorName(MPSGraphTensor tensor, MPSGraphTensor axesTensor, MPSGraphFFTDescriptor descriptor, NSString? name);
 }
 

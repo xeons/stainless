@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public extern objc class ASPasskeyAssertionCredential : NSObject, ASAuthorizationCredential
 {
     [Selector("userHandle")] public NSData UserHandle { get; }
@@ -40,10 +39,8 @@ public extern objc class ASPasskeyAssertionCredential : NSObject, ASAuthorizatio
     [Selector("clientDataHash")] public NSData ClientDataHash { get; }
     [Selector("authenticatorData")] public NSData AuthenticatorData { get; }
     [Selector("credentialID")] public NSData CredentialID { get; }
-    /// macOS 15.0 and later.
     [Selector("extensionOutput", "setExtensionOutput:")] public ASPasskeyAssertionCredentialExtensionOutput? ExtensionOutput { get; set; }
     [Selector("initWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:")] public Self InitWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialID(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID);
-    /// macOS 15.0 and later.
     [Selector("initWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:extensionOutput:")] public Self InitWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialIDExtensionOutput(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID, ASPasskeyAssertionCredentialExtensionOutput? extensionOutput);
     [Selector("credentialWithUserHandle:relyingParty:signature:clientDataHash:authenticatorData:credentialID:")] public static Self CredentialWithUserHandleRelyingPartySignatureClientDataHashAuthenticatorDataCredentialID(NSData userHandle, NSString relyingParty, NSData signature, NSData clientDataHash, NSData authenticatorData, NSData credentialID);
 }

@@ -59,18 +59,14 @@ public enum MTROptionalQRCodeInfoType : ulong
 
 public extern objc class MTROptionalQRCodeInfo : NSObject
 {
-    /// macOS 13.3 and later.
     [Selector("type")] public MTROptionalQRCodeInfoType Type { get; }
     [Selector("tag")] public NSNumber Tag { get; }
     [Selector("integerValue")] public NSNumber? IntegerValue { get; }
     [Selector("stringValue")] public NSString? StringValue { get; }
-    /// macOS 14.6 and later.
     [Selector("initWithTag:stringValue:")] public Self InitWithTagStringValue(NSNumber tag, NSString value);
-    /// macOS 14.6 and later.
     [Selector("initWithTag:int32Value:")] public Self InitWithTagInt32Value(NSNumber tag, int value);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTROptionalQRCodeInfo : NSCopying { }
 
 public extern objc class MTRSetupPayload : NSObject, NSSecureCoding
@@ -83,37 +79,26 @@ public extern objc class MTRSetupPayload : NSObject, NSSecureCoding
     [Selector("vendorID", "setVendorID:")] public NSNumber VendorID { get; set; }
     [Selector("productID", "setProductID:")] public NSNumber ProductID { get; set; }
     [Selector("commissioningFlow", "setCommissioningFlow:")] public MTRCommissioningFlow CommissioningFlow { get; set; }
-    /// macOS 13.3 and later.
     [Selector("discoveryCapabilities", "setDiscoveryCapabilities:")] public MTRDiscoveryCapabilities DiscoveryCapabilities { get; set; }
     [Selector("discriminator", "setDiscriminator:")] public NSNumber Discriminator { get; set; }
     [Selector("hasShortDiscriminator", "setHasShortDiscriminator:")] public bool HasShortDiscriminator { get; set; }
-    /// macOS 13.3 and later.
     [Selector("setupPasscode", "setSetupPasscode:")] public NSNumber SetupPasscode { get; set; }
     [Selector("serialNumber", "setSerialNumber:")] public NSString? SerialNumber { get; set; }
-    /// macOS 14.6 and later.
     [Selector("vendorElements")] public NSArray VendorElements { get; }
-    /// macOS 14.6 and later.
     [Selector("initWithPayload:")] public Self? InitWithPayload(NSString payload);
-    /// macOS 14.6 and later.
     [Selector("vendorElementWithTag:")] public MTROptionalQRCodeInfo? VendorElementWithTag(NSNumber tag);
-    /// macOS 14.6 and later.
     [Selector("removeVendorElementWithTag:")] public void RemoveVendorElementWithTag(NSNumber tag);
-    /// macOS 14.6 and later.
     [Selector("addOrReplaceVendorElement:")] public void AddOrReplaceVendorElement(MTROptionalQRCodeInfo element);
     /// Deprecated in macOS 15.4.
     [Selector("generateRandomPIN")] public static NSUInteger GenerateRandomPIN();
-    /// macOS 13.1 and later.
     [Selector("generateRandomSetupPasscode")] public static NSNumber GenerateRandomSetupPasscode();
-    /// macOS 13.1 and later.
     [Selector("initWithSetupPasscode:discriminator:")] public Self InitWithSetupPasscodeDiscriminator(NSNumber setupPasscode, NSNumber discriminator);
     [Selector("manualEntryCode")] public NSString? ManualEntryCode();
-    /// macOS 14.6 and later.
     [Selector("qrCodeString")] public NSString? QrCodeString();
     /// macOS 15.4 and later.
     [Selector("isValidSetupPasscode:")] public static bool IsValidSetupPasscode(NSNumber setupPasscode);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRSetupPayload : NSCopying { }
 
 /// Deprecated, a category of MTROptionalQRCodeInfo.
@@ -144,10 +129,8 @@ public extern objc class MTRSetupPayload
     [Selector("init")] public Self Init();
     /// Deprecated in macOS 13.3.
     [Selector("new")] public static Self New();
-    /// macOS 13.1 and later.
     /// Deprecated in macOS 14.6.
     [Selector("setupPayloadWithOnboardingPayload:error:")] public static MTRSetupPayload? SetupPayloadWithOnboardingPayloadError(NSString onboardingPayload, out NSError? error);
-    /// macOS 13.1 and later.
     /// Deprecated in macOS 14.6.
     [Selector("qrCodeString:")] public NSString? QrCodeString(out NSError? error);
     /// Deprecated in macOS 14.6.

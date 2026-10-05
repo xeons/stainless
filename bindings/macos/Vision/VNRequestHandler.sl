@@ -49,7 +49,6 @@ public extern objc class VNImageRequestHandler : NSObject
 {
     [Selector("initWithCVPixelBuffer:options:")] public Self InitWithCVPixelBufferOptions(CVPixelBufferRef pixelBuffer, NSDictionary options);
     [Selector("initWithCVPixelBuffer:orientation:options:")] public Self InitWithCVPixelBufferOrientationOptions(CVPixelBufferRef pixelBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
-    /// macOS 14.0 and later.
     [Selector("initWithCVPixelBuffer:depthData:orientation:options:")] public Self InitWithCVPixelBufferDepthDataOrientationOptions(CVPixelBufferRef pixelBuffer, AVDepthData depthData, CGImagePropertyOrientation orientation, NSDictionary options);
     [Selector("initWithCGImage:options:")] public Self InitWithCGImageOptions(CGImageRef image, NSDictionary options);
     [Selector("initWithCGImage:orientation:options:")] public Self InitWithCGImageOrientationOptions(CGImageRef image, CGImagePropertyOrientation orientation, NSDictionary options);
@@ -61,7 +60,6 @@ public extern objc class VNImageRequestHandler : NSObject
     [Selector("initWithData:orientation:options:")] public Self InitWithDataOrientationOptions(NSData imageData, CGImagePropertyOrientation orientation, NSDictionary options);
     [Selector("initWithCMSampleBuffer:options:")] public Self InitWithCMSampleBufferOptions(CMSampleBufferRef sampleBuffer, NSDictionary options);
     [Selector("initWithCMSampleBuffer:orientation:options:")] public Self InitWithCMSampleBufferOrientationOptions(CMSampleBufferRef sampleBuffer, CGImagePropertyOrientation orientation, NSDictionary options);
-    /// macOS 14.0 and later.
     [Selector("initWithCMSampleBuffer:depthData:orientation:options:")] public Self InitWithCMSampleBufferDepthDataOrientationOptions(CMSampleBufferRef sampleBuffer, AVDepthData depthData, CGImagePropertyOrientation orientation, NSDictionary options);
     [Selector("performRequests:error:")] public bool PerformRequestsError(NSArray requests, out NSError? error);
 }

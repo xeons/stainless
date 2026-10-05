@@ -64,18 +64,13 @@ public extern objc class NSFileProviderDomain : NSObject
     [Selector("testingModes", "setTestingModes:")] public NSFileProviderDomainTestingModes TestingModes { get; set; }
     [Selector("backingStoreIdentity")] public NSData? BackingStoreIdentity { get; }
     [Selector("supportsSyncingTrash", "setSupportsSyncingTrash:")] public bool SupportsSyncingTrash { get; set; }
-    /// macOS 15.0 and later.
     [Selector("volumeUUID")] public NSUUID? VolumeUUID { get; }
-    /// macOS 15.0 and later.
     [Selector("userInfo", "setUserInfo:")] public NSDictionary? UserInfo { get; set; }
-    /// macOS 15.0 and later.
     [Selector("replicatedKnownFolders")] public NSFileProviderKnownFolders ReplicatedKnownFolders { get; }
-    /// macOS 15.0 and later.
     [Selector("supportedKnownFolders", "setSupportedKnownFolders:")] public NSFileProviderKnownFolders SupportedKnownFolders { get; set; }
     /// macOS 26.0 and later.
     [Selector("supportsStringSearchRequest", "setSupportsStringSearchRequest:")] public bool SupportsStringSearchRequest { get; set; }
     [Selector("initWithIdentifier:displayName:")] public Self InitWithIdentifierDisplayName(NSFileProviderDomainIdentifier identifier, NSString displayName);
-    /// macOS 15.0 and later.
     [Selector("initWithDisplayName:userInfo:volumeURL:")] public Self InitWithDisplayNameUserInfoVolumeURL(NSString displayName, NSDictionary userInfo, NSURL? volumeURL);
 }
 

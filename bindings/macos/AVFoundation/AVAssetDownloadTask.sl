@@ -89,7 +89,6 @@ public objc interface AVAssetDownloadDelegate : NSURLSessionTaskDelegate
     /// Deprecated in macOS 100000.
     [Optional] [Selector("URLSession:assetDownloadTask:didLoadTimeRange:totalTimeRangesLoaded:timeRangeExpectedToLoad:")] void URLSessionAssetDownloadTaskDidLoadTimeRangeTotalTimeRangesLoadedTimeRangeExpectedToLoad(NSURLSession session, AVAssetDownloadTask assetDownloadTask, CMTimeRange timeRange, NSArray loadedTimeRanges, CMTimeRange timeRangeExpectedToLoad);
     [Optional] [Selector("URLSession:assetDownloadTask:didResolveMediaSelection:")] void URLSessionAssetDownloadTaskDidResolveMediaSelection(NSURLSession session, AVAssetDownloadTask assetDownloadTask, AVMediaSelection resolvedMediaSelection);
-    /// macOS 14.0 and later.
     [Optional] [Selector("URLSession:assetDownloadTask:willDownloadToURL:")] void URLSessionAssetDownloadTaskWillDownloadToURL(NSURLSession session, AVAssetDownloadTask assetDownloadTask, NSURL location);
     /// Deprecated in macOS 100000.
     [Optional] [Selector("URLSession:aggregateAssetDownloadTask:willDownloadToURL:")] void URLSessionAggregateAssetDownloadTaskWillDownloadToURL(NSURLSession session, AVAggregateAssetDownloadTask aggregateAssetDownloadTask, NSURL location);

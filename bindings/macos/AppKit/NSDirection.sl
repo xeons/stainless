@@ -27,7 +27,6 @@ module MacOS.AppKit;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 15.0 and later.
 [Flags]
 public enum NSHorizontalDirections : ulong
 {
@@ -36,7 +35,6 @@ public enum NSHorizontalDirections : ulong
     All = 3,
 }
 
-/// macOS 15.0 and later.
 [Flags]
 public enum NSVerticalDirections : ulong
 {

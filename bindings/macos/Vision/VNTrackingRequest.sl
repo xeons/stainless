@@ -42,7 +42,6 @@ public extern objc class VNTrackingRequest : VNImageBasedRequest
     [Selector("inputObservation", "setInputObservation:")] public VNDetectedObjectObservation InputObservation { get; set; }
     [Selector("trackingLevel", "setTrackingLevel:")] public VNRequestTrackingLevel TrackingLevel { get; set; }
     [Selector("isLastFrame", "setLastFrame:")] public bool LastFrame { get; set; }
-    /// macOS 14.0 and later.
     [Selector("supportedNumberOfTrackersAndReturnError:")] public NSUInteger SupportedNumberOfTrackersAndReturnError(out NSError? error);
 }
 

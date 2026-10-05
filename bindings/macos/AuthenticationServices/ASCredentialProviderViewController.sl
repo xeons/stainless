@@ -35,22 +35,16 @@ public extern objc class ASCredentialProviderViewController : NSViewController
 {
     [Selector("extensionContext")] public ASCredentialProviderExtensionContext ExtensionContext { get; }
     [Selector("prepareCredentialListForServiceIdentifiers:")] public void PrepareCredentialListForServiceIdentifiers(NSArray serviceIdentifiers);
-    /// macOS 14.0 and later.
     [Selector("prepareCredentialListForServiceIdentifiers:requestParameters:")] public void PrepareCredentialListForServiceIdentifiersRequestParameters(NSArray serviceIdentifiers, ASPasskeyCredentialRequestParameters requestParameters);
-    /// macOS 15.0 and later.
     [Selector("prepareOneTimeCodeCredentialListForServiceIdentifiers:")] public void PrepareOneTimeCodeCredentialListForServiceIdentifiers(NSArray serviceIdentifiers);
     /// Deprecated in macOS 14.0.
     [Selector("provideCredentialWithoutUserInteractionForIdentity:")] public void ProvideCredentialWithoutUserInteractionForIdentity(ASPasswordCredentialIdentity credentialIdentity);
-    /// macOS 14.0 and later.
     [Selector("provideCredentialWithoutUserInteractionForRequest:")] public void ProvideCredentialWithoutUserInteractionForRequest(ASCredentialRequest credentialRequest);
     /// Deprecated in macOS 14.0.
     [Selector("prepareInterfaceToProvideCredentialForIdentity:")] public void PrepareInterfaceToProvideCredentialForIdentity(ASPasswordCredentialIdentity credentialIdentity);
-    /// macOS 14.0 and later.
     [Selector("prepareInterfaceToProvideCredentialForRequest:")] public void PrepareInterfaceToProvideCredentialForRequest(ASCredentialRequest credentialRequest);
     [Selector("prepareInterfaceForExtensionConfiguration")] public void PrepareInterfaceForExtensionConfiguration();
-    /// macOS 14.0 and later.
     [Selector("prepareInterfaceForPasskeyRegistration:")] public void PrepareInterfaceForPasskeyRegistration(ASCredentialRequest registrationRequest);
-    /// macOS 15.0 and later.
     [Selector("performPasskeyRegistrationWithoutUserInteractionIfPossible:")] public void PerformPasskeyRegistrationWithoutUserInteractionIfPossible(ASPasskeyCredentialRequest registrationRequest);
     [Selector("reportPublicKeyCredentialUpdateForRelyingParty:userHandle:newName:")] public void ReportPublicKeyCredentialUpdateForRelyingPartyUserHandleNewName(NSString relyingParty, NSData userHandle, NSString newName);
     [Selector("reportUnknownPublicKeyCredentialForRelyingParty:credentialID:")] public void ReportUnknownPublicKeyCredentialForRelyingPartyCredentialID(NSString relyingParty, NSData credentialID);

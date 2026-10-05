@@ -47,16 +47,12 @@ public extern objc class MTLFXTemporalScalerDescriptor : NSObject, NSCopying
     [Selector("isInputContentPropertiesEnabled", "setInputContentPropertiesEnabled:")] public bool InputContentPropertiesEnabled { get; set; }
     [Selector("inputContentMinScale", "setInputContentMinScale:")] public float InputContentMinScale { get; set; }
     [Selector("inputContentMaxScale", "setInputContentMaxScale:")] public float InputContentMaxScale { get; set; }
-    /// macOS 14.4 and later.
     [Selector("isReactiveMaskTextureEnabled", "setReactiveMaskTextureEnabled:")] public bool ReactiveMaskTextureEnabled { get; set; }
-    /// macOS 14.4 and later.
     [Selector("reactiveMaskTextureFormat", "setReactiveMaskTextureFormat:")] public MTLPixelFormat ReactiveMaskTextureFormat { get; set; }
     [Selector("newTemporalScalerWithDevice:")] public MTLFXTemporalScaler? NewTemporalScalerWithDevice(MTLDevice device);
     /// macOS 26.0 and later.
     [Selector("newTemporalScalerWithDevice:compiler:")] public MTL4FXTemporalScaler? NewTemporalScalerWithDeviceCompiler(MTLDevice device, MTL4Compiler compiler);
-    /// macOS 14.0 and later.
     [Selector("supportedInputContentMinScaleForDevice:")] public static float SupportedInputContentMinScaleForDevice(MTLDevice device);
-    /// macOS 14.0 and later.
     [Selector("supportedInputContentMaxScaleForDevice:")] public static float SupportedInputContentMaxScaleForDevice(MTLDevice device);
     [Selector("supportsDevice:")] public static bool SupportsDevice(MTLDevice device);
     /// macOS 26.0 and later.

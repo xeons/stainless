@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 14.0 and later.
 public extern objc class VZGraphicsDisplay : NSObject
 {
     [Selector("sizeInPixels")] public CGSize SizeInPixels { get; }
@@ -42,7 +41,6 @@ public extern objc class VZGraphicsDisplay : NSObject
     [Selector("removeObserver:")] public void RemoveObserver(VZGraphicsDisplayObserver observer);
 }
 
-/// macOS 14.0 and later.
 public objc interface VZGraphicsDisplayObserver : NSObjectProtocol
 {
     [Optional] [Selector("displayDidBeginReconfiguration:")] void DisplayDidBeginReconfiguration(VZGraphicsDisplay display);

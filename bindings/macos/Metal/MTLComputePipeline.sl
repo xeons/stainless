@@ -54,7 +54,6 @@ public extern objc class MTLComputePipelineDescriptor : NSObject, NSCopying
     [Selector("linkedFunctions", "setLinkedFunctions:")] public MTLLinkedFunctions? LinkedFunctions { get; set; }
     [Selector("supportAddingBinaryFunctions", "setSupportAddingBinaryFunctions:")] public bool SupportAddingBinaryFunctions { get; set; }
     [Selector("maxCallStackDepth", "setMaxCallStackDepth:")] public NSUInteger MaxCallStackDepth { get; set; }
-    /// macOS 15.0 and later.
     [Selector("shaderValidation", "setShaderValidation:")] public MTLShaderValidation ShaderValidation { get; set; }
     /// macOS 26.0 and later.
     [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
@@ -72,7 +71,6 @@ public objc interface MTLComputePipelineState : MTLAllocation, NSObjectProtocol
     [Selector("staticThreadgroupMemoryLength")] NSUInteger StaticThreadgroupMemoryLength { get; }
     [Selector("supportIndirectCommandBuffers")] bool SupportIndirectCommandBuffers { get; }
     [Selector("gpuResourceID")] MTLResourceID GpuResourceID { get; }
-    /// macOS 15.0 and later.
     [Selector("shaderValidation")] MTLShaderValidation ShaderValidation { get; }
     /// macOS 26.0 and later.
     [Selector("requiredThreadsPerThreadgroup")] MTLSize RequiredThreadsPerThreadgroup { get; }

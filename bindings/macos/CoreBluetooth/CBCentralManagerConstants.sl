@@ -54,7 +54,6 @@ public extern "C" NSString? CBCentralManagerRestoredStateScanOptionsKey;
 
 public using CBConnectionEventMatchingOption = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? CBConnectPeripheralOptionEnableAutoReconnect;
 
 #endif

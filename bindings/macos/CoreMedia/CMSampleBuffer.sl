@@ -296,7 +296,6 @@ public extern "C" CFStringRef kCMSampleAttachmentKey_CryptorSubsampleAuxiliaryDa
 
 public extern "C" CFStringRef kCMSampleAttachmentKey_HDR10PlusPerFrameData;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef? kCMSampleAttachmentKey_PostDecodeProcessingMetadata;
 
 public delegate OSStatus CMSampleBufferCallForEachSampleCallbackFunction(opaqueCMSampleBuffer* arg0, CMItemCount arg1, void* arg2);

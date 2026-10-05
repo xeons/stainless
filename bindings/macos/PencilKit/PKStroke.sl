@@ -42,7 +42,6 @@ public extern objc class PKStroke : NSObject, NSCopying
     [Selector("renderBounds")] public CGRect RenderBounds { get; }
     [Selector("maskedPathRanges")] public NSArray MaskedPathRanges { get; }
     [Selector("randomSeed")] public uint RandomSeed { get; }
-    /// macOS 14.0 and later.
     [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
     [Selector("initWithInk:strokePath:transform:mask:")] public Self InitWithInkStrokePathTransformMask(PKInk ink, PKStrokePath strokePath, CGAffineTransform transform, NSBezierPath? mask);
     [Selector("initWithInk:strokePath:transform:mask:randomSeed:")] public Self InitWithInkStrokePathTransformMaskRandomSeed(PKInk ink, PKStrokePath strokePath, CGAffineTransform transform, NSBezierPath? mask, uint randomSeed);

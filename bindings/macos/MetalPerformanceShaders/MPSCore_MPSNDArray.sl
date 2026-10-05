@@ -36,16 +36,13 @@ public extern objc class MPSNDArrayDescriptor : NSObject
 {
     [Selector("dataType", "setDataType:")] public MPSDataType DataType { get; set; }
     [Selector("numberOfDimensions", "setNumberOfDimensions:")] public NSUInteger NumberOfDimensions { get; set; }
-    /// macOS 15.0 and later.
     [Selector("preferPackedRows", "setPreferPackedRows:")] public bool PreferPackedRows { get; set; }
     [Selector("lengthOfDimension:")] public NSUInteger LengthOfDimension(NSUInteger dimensionIndex);
     [Selector("sliceRangeForDimension:")] public MPSDimensionSlice SliceRangeForDimension(NSUInteger dimensionIndex);
     [Selector("sliceDimension:withSubrange:")] public void SliceDimensionWithSubrange(NSUInteger dimensionIndex, MPSDimensionSlice subRange);
     [Selector("transposeDimension:withDimension:")] public void TransposeDimensionWithDimension(NSUInteger dimensionIndex, NSUInteger dimensionIndex2);
-    /// macOS 15.0 and later.
     [Selector("permuteWithDimensionOrder:")] public void PermuteWithDimensionOrder(NSUInteger* dimensionOrder);
     [Selector("dimensionOrder")] public vector_uchar16 DimensionOrder();
-    /// macOS 15.0 and later.
     [Selector("getShape")] public NSArray GetShape();
     [Selector("descriptorWithDataType:dimensionCount:dimensionSizes:")] public static Self DescriptorWithDataTypeDimensionCountDimensionSizes(MPSDataType dataType, NSUInteger numberOfDimensions, NSUInteger* dimensionSizes);
     [Selector("descriptorWithDataType:shape:")] public static Self DescriptorWithDataTypeShape(MPSDataType dataType, NSArray shape);
@@ -72,17 +69,12 @@ public extern objc class MPSNDArray : NSObject
     [Selector("descriptor")] public MPSNDArrayDescriptor Descriptor();
     [Selector("initWithDevice:descriptor:")] public Self InitWithDeviceDescriptor(MTLDevice device, MPSNDArrayDescriptor descriptor);
     [Selector("initWithDevice:scalar:")] public Self InitWithDeviceScalar(MTLDevice device, double value);
-    /// macOS 15.0 and later.
     [Selector("initWithBuffer:offset:descriptor:")] public Self InitWithBufferOffsetDescriptor(MTLBuffer buffer, NSUInteger offset, MPSNDArrayDescriptor descriptor);
-    /// macOS 15.0 and later.
     [Selector("userBuffer")] public MTLBuffer? UserBuffer();
     [Selector("resourceSize")] public NSUInteger ResourceSize();
     [Selector("arrayViewWithCommandBuffer:descriptor:aliasing:")] public MPSNDArray? ArrayViewWithCommandBufferDescriptorAliasing(MTLCommandBuffer cmdBuf, MPSNDArrayDescriptor descriptor, MPSAliasingStrategy aliasing);
-    /// macOS 15.0 and later.
     [Selector("arrayViewWithDescriptor:")] public MPSNDArray? ArrayViewWithDescriptor(MPSNDArrayDescriptor descriptor);
-    /// macOS 15.0 and later.
     [Selector("arrayViewWithShape:strides:")] public MPSNDArray? ArrayViewWithShapeStrides(MPSShape? shape, MPSShape strides);
-    /// macOS 15.0 and later.
     [Selector("arrayViewWithDimensionCount:dimensionSizes:strides:")] public MPSNDArray? ArrayViewWithDimensionCountDimensionSizesStrides(NSUInteger numberOfDimensions, NSUInteger* dimensionSizes, NSUInteger* dimStrides);
     [Selector("exportDataWithCommandBuffer:toBuffer:destinationDataType:offset:rowStrides:")] public void ExportDataWithCommandBufferToBufferDestinationDataTypeOffsetRowStrides(MTLCommandBuffer cmdBuf, MTLBuffer buffer, MPSDataType destinationDataType, NSUInteger offset, NSInteger* rowStrides);
     [Selector("importDataWithCommandBuffer:fromBuffer:sourceDataType:offset:rowStrides:")] public void ImportDataWithCommandBufferFromBufferSourceDataTypeOffsetRowStrides(MTLCommandBuffer cmdBuf, MTLBuffer buffer, MPSDataType sourceDataType, NSUInteger offset, NSInteger* rowStrides);

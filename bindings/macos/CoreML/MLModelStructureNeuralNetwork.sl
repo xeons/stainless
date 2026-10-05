@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 14.4 and later.
 public extern objc class MLModelStructureNeuralNetwork : NSObject
 {
     [Selector("layers")] public NSArray Layers { get; }

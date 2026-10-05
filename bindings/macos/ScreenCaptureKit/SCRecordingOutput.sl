@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "ScreenCaptureKit")
 
-/// macOS 15.0 and later.
 public extern objc class SCRecordingOutputConfiguration : NSObject
 {
     [Selector("outputURL", "setOutputURL:")] public NSURL OutputURL { get; set; }
@@ -43,7 +42,6 @@ public extern objc class SCRecordingOutputConfiguration : NSObject
     [Selector("availableOutputFileTypes")] public NSArray AvailableOutputFileTypes { get; }
 }
 
-/// macOS 15.0 and later.
 public objc interface SCRecordingOutputDelegate : NSObjectProtocol
 {
     [Optional] [Selector("recordingOutputDidStartRecording:")] void RecordingOutputDidStartRecording(SCRecordingOutput recordingOutput);
@@ -51,7 +49,6 @@ public objc interface SCRecordingOutputDelegate : NSObjectProtocol
     [Optional] [Selector("recordingOutputDidFinishRecording:")] void RecordingOutputDidFinishRecording(SCRecordingOutput recordingOutput);
 }
 
-/// macOS 15.0 and later.
 public extern objc class SCRecordingOutput : NSObject
 {
     [Selector("recordedDuration")] public CMTime RecordedDuration { get; }

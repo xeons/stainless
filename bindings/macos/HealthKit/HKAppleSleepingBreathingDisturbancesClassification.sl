@@ -30,17 +30,14 @@ import Standard.ObjC;
 
 #pragma comment(framework, "HealthKit")
 
-/// macOS 15.0 and later.
 public enum HKAppleSleepingBreathingDisturbancesClassification : long
 {
     NotElevated = 0,
     Elevated = 1,
 }
 
-/// macOS 15.0 and later.
 public extern "C" NSNumber? HKAppleSleepingBreathingDisturbancesClassificationForQuantity(HKQuantity value);
 
-/// macOS 15.0 and later.
 public extern "C" HKQuantity HKAppleSleepingBreathingDisturbancesMinimumQuantityForClassification(HKAppleSleepingBreathingDisturbancesClassification classification);
 
 #endif

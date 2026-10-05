@@ -31,14 +31,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public enum ASAuthorizationPublicKeyCredentialLargeBlobAssertionOperation : long
 {
     Read = 0,
     Write = 1,
 }
 
-/// macOS 14.0 and later.
 public extern objc class ASAuthorizationPublicKeyCredentialLargeBlobAssertionInput : NSObject
 {
     [Selector("operation")] public ASAuthorizationPublicKeyCredentialLargeBlobAssertionOperation Operation { get; }

@@ -55,7 +55,6 @@ public enum HKBodyTemperatureSensorLocation : long
     Forehead = 11,
 }
 
-/// macOS 14.0 and later.
 public enum HKCyclingFunctionalThresholdPowerTestType : long
 {
     MaxExercise60Minute = 1,
@@ -103,7 +102,6 @@ public enum HKInsulinDeliveryReason : long
     Bolus = 2,
 }
 
-/// macOS 14.0 and later.
 public enum HKPhysicalEffortEstimationType : long
 {
     ActivityLookup = 1,
@@ -136,7 +134,6 @@ public enum HKVO2MaxTestType : long
     PredictionStepTest = 4,
 }
 
-/// macOS 14.0 and later.
 public enum HKWaterSalinity : long
 {
     FreshWater = 1,

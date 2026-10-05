@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Network")
 
-/// macOS 14.0 and later.
 /// Network, a category of NSURLSessionConfiguration.
 public extern objc class NSURLSessionConfiguration
 {

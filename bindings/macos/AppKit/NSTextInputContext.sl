@@ -47,9 +47,7 @@ public extern objc class NSTextInputContext : NSObject
     [Selector("handleEvent:")] public bool HandleEvent(NSEvent event);
     [Selector("discardMarkedText")] public void DiscardMarkedText();
     [Selector("invalidateCharacterCoordinates")] public void InvalidateCharacterCoordinates();
-    /// macOS 14.0 and later.
     [Selector("textInputClientWillStartScrollingOrZooming")] public void TextInputClientWillStartScrollingOrZooming();
-    /// macOS 14.0 and later.
     [Selector("textInputClientDidEndScrollingOrZooming")] public void TextInputClientDidEndScrollingOrZooming();
     /// macOS 15.4 and later.
     [Selector("textInputClientDidUpdateSelection")] public void TextInputClientDidUpdateSelection();

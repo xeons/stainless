@@ -33,13 +33,9 @@ import Standard.ObjC;
 
 public extern objc class MTRDeviceAttestationDeviceInfo : NSObject
 {
-    /// macOS 13.3 and later.
     [Selector("vendorID")] public NSNumber? VendorID { get; }
-    /// macOS 13.3 and later.
     [Selector("productID")] public NSNumber? ProductID { get; }
-    /// macOS 13.5 and later.
     [Selector("basicInformationVendorID")] public NSNumber BasicInformationVendorID { get; }
-    /// macOS 13.5 and later.
     [Selector("basicInformationProductID")] public NSNumber BasicInformationProductID { get; }
     [Selector("dacCertificate")] public MTRCertificateDERBytes DacCertificate { get; }
     [Selector("dacPAICertificate")] public MTRCertificateDERBytes DacPAICertificate { get; }
@@ -59,9 +55,7 @@ public extern objc class MTRDeviceAttestationDeviceInfo : NSObject
 
 public objc interface MTRDeviceAttestationDelegate : NSObjectProtocol
 {
-    /// macOS 13.3 and later.
     [Optional] [Selector("deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:")] void DeviceAttestationCompletedForControllerOpaqueDeviceHandleAttestationDeviceInfoError(MTRDeviceController controller, void* opaqueDeviceHandle, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error);
-    /// macOS 13.3 and later.
     [Optional] [Selector("deviceAttestationFailedForController:opaqueDeviceHandle:error:")] void DeviceAttestationFailedForControllerOpaqueDeviceHandleError(MTRDeviceController controller, void* opaqueDeviceHandle, NSError error);
     /// Deprecated in macOS 13.3.
     [Optional] [Selector("deviceAttestation:completedForDevice:attestationDeviceInfo:error:")] void DeviceAttestationCompletedForDeviceAttestationDeviceInfoError(MTRDeviceController controller, void* device, MTRDeviceAttestationDeviceInfo attestationDeviceInfo, NSError? error);

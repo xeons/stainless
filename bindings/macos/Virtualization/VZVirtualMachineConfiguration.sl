@@ -49,7 +49,6 @@ public extern objc class VZVirtualMachineConfiguration : NSObject, NSCopying
     [Selector("keyboards", "setKeyboards:")] public NSArray? Keyboards { get; set; }
     [Selector("pointingDevices", "setPointingDevices:")] public NSArray? PointingDevices { get; set; }
     [Selector("graphicsDevices", "setGraphicsDevices:")] public NSArray? GraphicsDevices { get; set; }
-    /// macOS 15.0 and later.
     [Selector("usbControllers", "setUsbControllers:")] public NSArray? UsbControllers { get; set; }
 }
 
@@ -62,7 +61,6 @@ public extern objc class VZVirtualMachineConfiguration
     [Selector("minimumAllowedCPUCount")] public static NSUInteger MinimumAllowedCPUCount { get; }
     [Selector("maximumAllowedCPUCount")] public static NSUInteger MaximumAllowedCPUCount { get; }
     [Selector("validateWithError:")] public bool ValidateWithError(out NSError? error);
-    /// macOS 14.0 and later.
     [Selector("validateSaveRestoreSupportWithError:")] public bool ValidateSaveRestoreSupportWithError(out NSError? error);
 }
 #else

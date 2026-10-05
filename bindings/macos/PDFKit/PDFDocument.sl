@@ -101,10 +101,8 @@ public extern "C" PDFDocumentWriteOption? PDFDocumentBurnInAnnotationsOption;
 
 public extern "C" PDFDocumentWriteOption? PDFDocumentSaveTextFromOCROption;
 
-/// macOS 13.4 and later.
 public extern "C" PDFDocumentWriteOption? PDFDocumentSaveImagesAsJPEGOption;
 
-/// macOS 13.4 and later.
 public extern "C" PDFDocumentWriteOption? PDFDocumentOptimizeImagesForScreenOption;
 
 public enum PDFAccessPermissions : ulong
@@ -167,7 +165,6 @@ public extern objc class PDFDocument : NSObject, NSCopying
     [Selector("cancelFindString")] public void CancelFindString();
     [Selector("printOperationForPrintInfo:scalingMode:autoRotate:")] public NSPrintOperation? PrintOperationForPrintInfoScalingModeAutoRotate(NSPrintInfo? printInfo, PDFPrintScalingMode scaleMode, bool doRotate);
     [Selector("selectionFromPage:atPoint:toPage:atPoint:")] public PDFSelection? SelectionFromPageAtPointToPageAtPoint(PDFPage startPage, NSPoint startPoint, PDFPage endPage, NSPoint endPoint);
-    /// macOS 15.0 and later.
     [Selector("selectionFromPage:atPoint:toPage:atPoint:withGranularity:")] public PDFSelection? SelectionFromPageAtPointToPageAtPointWithGranularity(PDFPage startPage, NSPoint startPoint, PDFPage endPage, NSPoint endPoint, PDFSelectionGranularity granularity);
     [Selector("selectionFromPage:atCharacterIndex:toPage:atCharacterIndex:")] public PDFSelection? SelectionFromPageAtCharacterIndexToPageAtCharacterIndex(PDFPage startPage, NSUInteger startCharacter, PDFPage endPage, NSUInteger endCharacter);
 }

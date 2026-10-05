@@ -41,10 +41,8 @@ public enum PKMerchantCapability : ulong
     CapabilityInstantFundsOut = 128,
 }
 
-/// macOS 15.0 and later.
 public using PKMerchantCategoryCode = SInt16;
 
-/// macOS 15.0 and later.
 public extern "C" PKMerchantCategoryCode PKMerchantCategoryCodeNone;
 
 [Flags]
@@ -73,7 +71,6 @@ public enum PKShippingContactEditingMode : ulong
     Enabled = 1,
 }
 
-/// macOS 14.0 and later.
 public enum PKApplePayLaterAvailability : long
 {
     Available = 0,
@@ -90,7 +87,6 @@ public extern objc class PKPaymentRequest : NSObject
     [Selector("merchantCapabilities", "setMerchantCapabilities:")] public PKMerchantCapability MerchantCapabilities { get; set; }
     [Selector("supportsCouponCode", "setSupportsCouponCode:")] public bool SupportsCouponCode { get; set; }
     [Selector("couponCode", "setCouponCode:")] public NSString? CouponCode { get; set; }
-    /// macOS 15.0 and later.
     [Selector("merchantCategoryCode", "setMerchantCategoryCode:")] public PKMerchantCategoryCode MerchantCategoryCode { get; set; }
     [Selector("paymentSummaryItems", "setPaymentSummaryItems:")] public NSArray PaymentSummaryItems { get; set; }
     [Selector("currencyCode", "setCurrencyCode:")] public NSString CurrencyCode { get; set; }
@@ -108,9 +104,7 @@ public extern objc class PKPaymentRequest : NSObject
     [Selector("multiTokenContexts", "setMultiTokenContexts:")] public NSArray? MultiTokenContexts { get; set; }
     [Selector("recurringPaymentRequest", "setRecurringPaymentRequest:")] public PKRecurringPaymentRequest? RecurringPaymentRequest { get; set; }
     [Selector("automaticReloadPaymentRequest", "setAutomaticReloadPaymentRequest:")] public PKAutomaticReloadPaymentRequest? AutomaticReloadPaymentRequest { get; set; }
-    /// macOS 13.3 and later.
     [Selector("deferredPaymentRequest", "setDeferredPaymentRequest:")] public PKDeferredPaymentRequest? DeferredPaymentRequest { get; set; }
-    /// macOS 14.0 and later.
     [Selector("applePayLaterAvailability", "setApplePayLaterAvailability:")] public PKApplePayLaterAvailability ApplePayLaterAvailability { get; set; }
     [Selector("availableNetworks")] public static NSArray AvailableNetworks();
     [Selector("paymentContactInvalidErrorWithContactField:localizedDescription:")] public static NSError PaymentContactInvalidErrorWithContactFieldLocalizedDescription(PKContactField field, NSString? localizedDescription);

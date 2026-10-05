@@ -90,7 +90,6 @@ public extern "C" AVMediaCharacteristic? AVMediaCharacteristicTranscribesSpokenD
 
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicDescribesMusicAndSoundForAccessibility;
 
-/// macOS 14.0 and later.
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicEnhancesSpeechIntelligibility;
 
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicEasyToRead;
@@ -103,16 +102,12 @@ public extern "C" AVMediaCharacteristic? AVMediaCharacteristicDubbedTranslation;
 
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicVoiceOverTranslation;
 
-/// macOS 14.0 and later.
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicTactileMinimal;
 
-/// macOS 14.0 and later.
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicContainsStereoMultiviewVideo;
 
-/// macOS 14.0 and later.
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicCarriesVideoStereoMetadata;
 
-/// macOS 14.0 and later.
 public extern "C" AVMediaCharacteristic? AVMediaCharacteristicIndicatesHorizontalFieldOfView;
 
 /// macOS 26.0 and later.
@@ -172,7 +167,6 @@ public extern "C" AVFileType? AVFileTypeAppleiTT;
 
 public extern "C" AVFileType? AVFileTypeSCC;
 
-/// macOS 14.0 and later.
 public extern "C" AVFileType? AVFileTypeAHAP;
 
 /// macOS 26.0 and later.

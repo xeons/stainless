@@ -26,7 +26,7 @@ namespace Stainless.Emit;
 /// <b>One class for all three, which is not true of x86 or of x86-64.</b>
 /// Microsoft's ARM64 ABI, Apple's DarwinPCS and the ARM one agree about every
 /// struct below -- checked by compiling the same C for
-/// <c>aarch64-pc-windows-msvc</c>, <c>arm64-apple-macosx13.0</c> and
+/// <c>aarch64-pc-windows-msvc</c>, <c>arm64-apple-macosx15.0</c> and
 /// <c>aarch64-unknown-linux-gnu</c> and diffing the declarations. What differs
 /// is short enough to be flags:
 /// </para>

@@ -27,7 +27,6 @@ module MacOS.Virtualization;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 14.0 and later.
 public enum VZDiskSynchronizationMode : long
 {
     Full = 0,

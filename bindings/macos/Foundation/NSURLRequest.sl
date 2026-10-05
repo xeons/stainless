@@ -76,7 +76,6 @@ public extern objc class NSURLRequest : NSObject, NSSecureCoding, NSCopying, NSM
     [Selector("assumesHTTP3Capable")] public bool AssumesHTTP3Capable { get; }
     [Selector("attribution")] public NSURLRequestAttribution Attribution { get; }
     [Selector("requiresDNSSECValidation")] public bool RequiresDNSSECValidation { get; }
-    /// macOS 15.0 and later.
     [Selector("allowsPersistentDNS")] public bool AllowsPersistentDNS { get; }
     /// macOS 15.2 and later.
     [Selector("cookiePartitionIdentifier")] public NSString? CookiePartitionIdentifier { get; }
@@ -101,7 +100,6 @@ public extern objc class NSMutableURLRequest : NSURLRequest
     [Selector("assumesHTTP3Capable", "setAssumesHTTP3Capable:")] public bool AssumesHTTP3Capable { get; set; }
     [Selector("attribution", "setAttribution:")] public NSURLRequestAttribution Attribution { get; set; }
     [Selector("requiresDNSSECValidation", "setRequiresDNSSECValidation:")] public bool RequiresDNSSECValidation { get; set; }
-    /// macOS 15.0 and later.
     [Selector("allowsPersistentDNS", "setAllowsPersistentDNS:")] public bool AllowsPersistentDNS { get; set; }
     /// macOS 15.2 and later.
     [Selector("cookiePartitionIdentifier", "setCookiePartitionIdentifier:")] public NSString? CookiePartitionIdentifier { get; set; }

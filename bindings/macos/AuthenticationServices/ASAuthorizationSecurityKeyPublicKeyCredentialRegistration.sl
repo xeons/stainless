@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public extern objc class ASAuthorizationSecurityKeyPublicKeyCredentialRegistration : NSObject, ASAuthorizationPublicKeyCredentialRegistration
 {
-    /// macOS 14.5 and later.
     [Selector("transports")] public NSArray Transports { get; }
 }
 

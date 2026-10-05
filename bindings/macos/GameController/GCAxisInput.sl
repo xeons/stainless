@@ -41,7 +41,6 @@ public objc interface GCAxisInput : NSObjectProtocol
     [Selector("canWrap")] bool CanWrap { get; }
     [Selector("lastValueTimestamp")] NSTimeInterval LastValueTimestamp { get; }
     [Selector("lastValueLatency")] NSTimeInterval LastValueLatency { get; }
-    /// macOS 14.0 and later.
     [Selector("sources")] NSSet Sources { get; }
 }
 

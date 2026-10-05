@@ -38,7 +38,6 @@ public enum ASPublicKeyCredentialClientDataCrossOriginValue : long
     SameOriginWithAncestors = 2,
 }
 
-/// macOS 13.5 and later.
 public extern objc class ASPublicKeyCredentialClientData : NSObject
 {
     [Selector("challenge", "setChallenge:")] public NSData Challenge { get; set; }

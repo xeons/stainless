@@ -32,14 +32,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 14.0 and later.
 public enum NSMenuPresentationStyle : long
 {
     Regular = 0,
     Palette = 1,
 }
 
-/// macOS 14.0 and later.
 public enum NSMenuSelectionMode : long
 {
     Automatic = 0,
@@ -104,15 +102,10 @@ public objc closure void NSMenuPaletteMenuWithColorsTitlesTemplateImageSelection
 /// NSPaletteMenus, a category of NSMenu.
 public extern objc class NSMenu
 {
-    /// macOS 14.0 and later.
     [Selector("presentationStyle", "setPresentationStyle:")] public NSMenuPresentationStyle PresentationStyle { get; set; }
-    /// macOS 14.0 and later.
     [Selector("selectionMode", "setSelectionMode:")] public NSMenuSelectionMode SelectionMode { get; set; }
-    /// macOS 14.0 and later.
     [Selector("selectedItems", "setSelectedItems:")] public NSArray? SelectedItems { get; set; }
-    /// macOS 14.0 and later.
     [Selector("paletteMenuWithColors:titles:selectionHandler:")] public static Self PaletteMenuWithColorsTitlesSelectionHandler(NSArray colors, NSArray itemTitles, NSMenuPaletteMenuWithColorsTitlesSelectionHandlerOnSelectionChangeBlock? onSelectionChange);
-    /// macOS 14.0 and later.
     [Selector("paletteMenuWithColors:titles:templateImage:selectionHandler:")] public static Self PaletteMenuWithColorsTitlesTemplateImageSelectionHandler(NSArray colors, NSArray itemTitles, NSImage image, NSMenuPaletteMenuWithColorsTitlesTemplateImageSelectionHandlerOnSelectionChangeBlock? onSelectionChange);
 }
 

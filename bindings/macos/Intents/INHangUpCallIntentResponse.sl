@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 13.1 and later.
 public enum INHangUpCallIntentResponseCode : long
 {
     Unspecified = 0,
@@ -42,7 +41,6 @@ public enum INHangUpCallIntentResponseCode : long
     FailureNoCallToHangUp = 6,
 }
 
-/// macOS 13.1 and later.
 public extern objc class INHangUpCallIntentResponse : INIntentResponse
 {
     [Selector("code")] public INHangUpCallIntentResponseCode Code { get; }

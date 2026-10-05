@@ -213,16 +213,13 @@ public extern objc class HKUnit
 /// Illuminance, a category of HKUnit.
 public extern objc class HKUnit
 {
-    /// macOS 14.0 and later.
     [Selector("luxUnitWithMetricPrefix:")] public static Self LuxUnitWithMetricPrefix(HKMetricPrefix prefix);
-    /// macOS 14.0 and later.
     [Selector("luxUnit")] public static Self LuxUnit();
 }
 
 /// UnitLess, a category of HKUnit.
 public extern objc class HKUnit
 {
-    /// macOS 15.0 and later.
     [Selector("appleEffortScoreUnit")] public static Self AppleEffortScoreUnit();
 }
 

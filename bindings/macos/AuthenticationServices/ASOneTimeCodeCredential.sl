@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 15.0 and later.
 public extern objc class ASOneTimeCodeCredential : NSObject, ASAuthorizationCredential
 {
     [Selector("code")] public NSString Code { get; }

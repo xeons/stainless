@@ -46,29 +46,21 @@ public enum AVAudioApplicationMicrophoneInjectionPermission : long
     Granted = 1735552628,
 }
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName? AVAudioApplicationInputMuteStateChangeNotification;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? AVAudioApplicationMuteStateKey;
 
 public objc closure bool AVAudioApplicationSetInputMuteStateChangeHandlerErrorInputMuteHandlerBlock(bool arg0);
 
 public objc closure void AVAudioApplicationRequestRecordPermissionWithCompletionHandlerResponseBlock(bool arg0);
 
-/// macOS 14.0 and later.
 public extern objc class AVAudioApplication : NSObject
 {
     [Selector("sharedInstance")] public static AVAudioApplication? SharedInstance { get; }
-    /// macOS 14.0 and later.
     [Selector("isInputMuted")] public bool InputMuted { get; }
-    /// macOS 14.0 and later.
     [Selector("recordPermission")] public AVAudioApplicationRecordPermission RecordPermission { get; }
-    /// macOS 14.0 and later.
     [Selector("setInputMuted:error:")] public bool SetInputMutedError(bool muted, out NSError? outError);
-    /// macOS 14.0 and later.
     [Selector("setInputMuteStateChangeHandler:error:")] public bool SetInputMuteStateChangeHandlerError(AVAudioApplicationSetInputMuteStateChangeHandlerErrorInputMuteHandlerBlock? inputMuteHandler, out NSError? outError);
-    /// macOS 14.0 and later.
     [Selector("requestRecordPermissionWithCompletionHandler:")] public static void RequestRecordPermissionWithCompletionHandler(AVAudioApplicationRequestRecordPermissionWithCompletionHandlerResponseBlock response);
 }
 

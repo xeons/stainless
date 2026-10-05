@@ -60,7 +60,6 @@ public extern objc class LAContext : NSObject
     [Selector("biometryType")] public LABiometryType BiometryType { get; }
     /// Deprecated in macOS 15.0.
     [Selector("evaluatedPolicyDomainState")] public NSData? EvaluatedPolicyDomainState { get; }
-    /// macOS 15.0 and later.
     [Selector("domainState")] public LADomainState DomainState { get; }
     [Selector("canEvaluatePolicy:error:")] public bool CanEvaluatePolicyError(LAPolicy policy, out NSError? error);
     [Selector("evaluatePolicy:localizedReason:reply:")] public void EvaluatePolicyLocalizedReasonReply(LAPolicy policy, NSString localizedReason, LAContextEvaluatePolicyLocalizedReasonReplyReplyBlock reply);

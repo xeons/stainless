@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Metal")
 
-/// macOS 15.0 and later.
 public enum MTLLogLevel : long
 {
     Undefined = 0,
@@ -44,23 +43,19 @@ public enum MTLLogLevel : long
 
 public objc closure void MTLLogStateAddLogHandlerBlock(NSString? arg0, NSString? arg1, MTLLogLevel arg2, NSString arg3);
 
-/// macOS 15.0 and later.
 public objc interface MTLLogState : NSObjectProtocol
 {
     [Selector("addLogHandler:")] void AddLogHandler(MTLLogStateAddLogHandlerBlock block);
 }
 
-/// macOS 15.0 and later.
 public extern objc class MTLLogStateDescriptor : NSObject, NSCopying
 {
     [Selector("level", "setLevel:")] public MTLLogLevel Level { get; set; }
     [Selector("bufferSize", "setBufferSize:")] public NSInteger BufferSize { get; set; }
 }
 
-/// macOS 15.0 and later.
 public extern "C" NSErrorDomain MTLLogStateErrorDomain;
 
-/// macOS 15.0 and later.
 public enum MTLLogStateError : ulong
 {
     MTLLogStateErrorInvalidSize = 1,

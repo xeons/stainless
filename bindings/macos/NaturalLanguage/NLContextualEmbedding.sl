@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public objc closure void NLContextualEmbeddingRequestEmbeddingAssetsWithCompletionHandlerCompletionHandlerBlock(NLContextualEmbeddingAssetsResult arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class NLContextualEmbedding : NSObject
 {
     [Selector("modelIdentifier")] public NSString ModelIdentifier { get; }
@@ -70,7 +69,6 @@ public enum NLContextualEmbeddingAssetsResult : long
 
 public objc closure void NLContextualEmbeddingResultEnumerateTokenVectorsInRangeUsingBlockBlock(NSArray arg0, NSRange arg1, bool* arg2);
 
-/// macOS 14.0 and later.
 public extern objc class NLContextualEmbeddingResult : NSObject
 {
     [Selector("string")] public NSString String { get; }

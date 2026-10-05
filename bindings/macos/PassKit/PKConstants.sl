@@ -43,7 +43,6 @@ public extern "C" PKPaymentNetwork? PKPaymentNetworkAmex;
 /// Deprecated in macOS 14.0.
 public extern "C" PKPaymentNetwork? PKPaymentNetworkBancomat;
 
-/// macOS 14.0 and later.
 public extern "C" PKPaymentNetwork? PKPaymentNetworkPagoBancomat;
 
 public extern "C" PKPaymentNetwork? PKPaymentNetworkBancontact;
@@ -100,19 +99,14 @@ public extern "C" PKPaymentNetwork? PKPaymentNetworkWaon;
 
 public extern "C" PKPaymentNetwork? PKPaymentNetworkNanaco;
 
-/// macOS 13.3 and later.
 public extern "C" PKPaymentNetwork? PKPaymentNetworkPostFinance;
 
-/// macOS 14.0 and later.
 public extern "C" PKPaymentNetwork? PKPaymentNetworkTmoney;
 
-/// macOS 14.4 and later.
 public extern "C" PKPaymentNetwork? PKPaymentNetworkMeeza;
 
-/// macOS 14.5 and later.
 public extern "C" PKPaymentNetwork? PKPaymentNetworkNAPAS;
 
-/// macOS 14.5 and later.
 public extern "C" PKPaymentNetwork? PKPaymentNetworkBankAxept;
 
 /// macOS 15.4 and later.

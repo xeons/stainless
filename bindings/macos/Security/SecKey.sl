@@ -225,37 +225,26 @@ public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureMessageX962SHA38
 
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureMessageX962SHA512;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureDigestRFC4754;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureDigestRFC4754SHA1;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureDigestRFC4754SHA224;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureDigestRFC4754SHA256;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureDigestRFC4754SHA384;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureDigestRFC4754SHA512;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureMessageRFC4754SHA1;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureMessageRFC4754SHA224;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureMessageRFC4754SHA256;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureMessageRFC4754SHA384;
 
-/// macOS 14.0 and later.
 public extern "C" SecKeyAlgorithm kSecKeyAlgorithmECDSASignatureMessageRFC4754SHA512;
 
 /// Deprecated in macOS 14.0.

@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MetalPerformanceShaders")
 
-/// macOS 15.0 and later.
 public extern objc class MPSNDArrayIdentity : MPSNDArrayUnaryKernel
 {
     [Selector("initWithDevice:")] public Self InitWithDevice(MTLDevice device);

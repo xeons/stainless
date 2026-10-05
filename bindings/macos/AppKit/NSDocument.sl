@@ -109,7 +109,6 @@ public extern objc class NSDocument : NSObject, NSEditorRegistration, NSFilePres
     [Selector("autosavingIsImplicitlyCancellable")] public bool AutosavingIsImplicitlyCancellable { get; }
     [Selector("keepBackupFile")] public bool KeepBackupFile { get; }
     [Selector("backupFileURL")] public NSURL? BackupFileURL { get; }
-    /// macOS 15.0 and later.
     [Selector("savePanelShowsFileFormatsControl")] public bool SavePanelShowsFileFormatsControl { get; }
     [Selector("fileNameExtensionWasHiddenInLastRunSavePanel")] public bool FileNameExtensionWasHiddenInLastRunSavePanel { get; }
     [Selector("fileTypeFromLastRunSavePanel")] public NSString? FileTypeFromLastRunSavePanel { get; }
@@ -124,7 +123,6 @@ public extern objc class NSDocument : NSObject, NSEditorRegistration, NSFilePres
     [Selector("printInfo", "setPrintInfo:")] public NSPrintInfo PrintInfo { get; set; }
     [Selector("PDFPrintOperation")] public NSPrintOperation? PDFPrintOperation { get; }
     [Selector("allowsDocumentSharing")] public bool AllowsDocumentSharing { get; }
-    /// macOS 13.2 and later.
     [Selector("previewRepresentableActivityItems", "setPreviewRepresentableActivityItems:")] public NSArray? PreviewRepresentableActivityItems { get; set; }
     [Selector("isDocumentEdited")] public bool DocumentEdited { get; }
     [Selector("isInViewingMode")] public bool InViewingMode { get; }

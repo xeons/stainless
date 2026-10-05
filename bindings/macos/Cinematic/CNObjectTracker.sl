@@ -35,14 +35,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Cinematic")
 
-/// macOS 14.0 and later.
 public extern objc class CNBoundsPrediction : NSObject, NSCopying, NSMutableCopying
 {
     [Selector("normalizedBounds", "setNormalizedBounds:")] public CGRect NormalizedBounds { get; set; }
     [Selector("confidence", "setConfidence:")] public float Confidence { get; set; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNObjectTracker : NSObject
 {
     [Selector("isSupported")] public static bool IsSupported { get; }

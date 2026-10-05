@@ -27,7 +27,6 @@ module MacOS.CoreML;
 
 #pragma comment(framework, "CoreML")
 
-/// macOS 15.0 and later.
 public enum MLSpecializationStrategy : long
 {
     Default = 0,

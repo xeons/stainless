@@ -60,15 +60,10 @@ public extern objc class AVCaptureSession : NSObject
     [Selector("inputs")] public NSArray Inputs { get; }
     [Selector("outputs")] public NSArray Outputs { get; }
     [Selector("connections")] public NSArray? Connections { get; }
-    /// macOS 15.0 and later.
     [Selector("supportsControls")] public bool SupportsControls { get; }
-    /// macOS 15.0 and later.
     [Selector("maxControlsCount")] public NSInteger MaxControlsCount { get; }
-    /// macOS 15.0 and later.
     [Selector("controlsDelegate")] public AVCaptureSessionControlsDelegate? ControlsDelegate { get; }
-    /// macOS 15.0 and later.
     [Selector("controlsDelegateCallbackQueue")] public dispatch_queue_t? ControlsDelegateCallbackQueue { get; }
-    /// macOS 15.0 and later.
     [Selector("controls")] public NSArray? Controls { get; }
     [Selector("isRunning")] public bool Running { get; }
     [Selector("synchronizationClock")] public CMClockRef? SynchronizationClock { get; }
@@ -94,13 +89,9 @@ public extern objc class AVCaptureSession : NSObject
     [Selector("canAddConnection:")] public bool CanAddConnection(AVCaptureConnection connection);
     [Selector("addConnection:")] public void AddConnection(AVCaptureConnection connection);
     [Selector("removeConnection:")] public void RemoveConnection(AVCaptureConnection connection);
-    /// macOS 15.0 and later.
     [Selector("setControlsDelegate:queue:")] public void SetControlsDelegateQueue(AVCaptureSessionControlsDelegate? controlsDelegate, dispatch_queue_t? controlsDelegateCallbackQueue);
-    /// macOS 15.0 and later.
     [Selector("canAddControl:")] public bool CanAddControl(AVCaptureControl control);
-    /// macOS 15.0 and later.
     [Selector("addControl:")] public void AddControl(AVCaptureControl control);
-    /// macOS 15.0 and later.
     [Selector("removeControl:")] public void RemoveControl(AVCaptureControl control);
     [Selector("beginConfiguration")] public void BeginConfiguration();
     [Selector("commitConfiguration")] public void CommitConfiguration();
@@ -112,7 +103,6 @@ public extern objc class AVCaptureSession : NSObject
     [Selector("setDeferredStartDelegate:deferredStartDelegateCallbackQueue:")] public void SetDeferredStartDelegateDeferredStartDelegateCallbackQueue(AVCaptureSessionDeferredStartDelegate? deferredStartDelegate, dispatch_queue_t? deferredStartDelegateCallbackQueue);
 }
 
-/// macOS 15.0 and later.
 public objc interface AVCaptureSessionControlsDelegate : NSObjectProtocol
 {
     [Selector("sessionControlsDidBecomeActive:")] void SessionControlsDidBecomeActive(AVCaptureSession session);
@@ -147,7 +137,6 @@ public extern objc class AVCaptureConnection : NSObject
     [Selector("isVideoMirroringSupported")] public bool SupportsVideoMirroring { get; }
     [Selector("isVideoMirrored", "setVideoMirrored:")] public bool VideoMirrored { get; set; }
     [Selector("automaticallyAdjustsVideoMirroring", "setAutomaticallyAdjustsVideoMirroring:")] public bool AutomaticallyAdjustsVideoMirroring { get; set; }
-    /// macOS 14.0 and later.
     [Selector("videoRotationAngle", "setVideoRotationAngle:")] public CGFloat VideoRotationAngle { get; set; }
     /// Deprecated in macOS 14.0.
     [Selector("isVideoOrientationSupported")] public bool SupportsVideoOrientation { get; }

@@ -53,7 +53,6 @@ public extern "C" NSTextCheckingOptionKey? NSTextCheckingRegularExpressionsKey;
 
 public extern "C" NSTextCheckingOptionKey? NSTextCheckingSelectedRangeKey;
 
-/// macOS 14.0 and later.
 public extern "C" NSTextCheckingOptionKey? NSTextCheckingGenerateInlinePredictionsKey;
 
 public objc closure void NSSpellCheckerRequestCheckingOfStringRangeTypesOptionsInSpellDocumentWithTagCompletionHandlerCompletionHandlerBlock(NSInteger arg0, NSArray arg1, NSOrthography arg2, NSInteger arg3);
@@ -81,7 +80,6 @@ public extern objc class NSSpellChecker : NSObject
     [Selector("isAutomaticCapitalizationEnabled")] public static bool AutomaticCapitalizationEnabled { get; }
     [Selector("isAutomaticPeriodSubstitutionEnabled")] public static bool AutomaticPeriodSubstitutionEnabled { get; }
     [Selector("isAutomaticTextCompletionEnabled")] public static bool AutomaticTextCompletionEnabled { get; }
-    /// macOS 14.0 and later.
     [Selector("isAutomaticInlinePredictionEnabled")] public static bool AutomaticInlinePredictionEnabled { get; }
     [Selector("uniqueSpellDocumentTag")] public static NSInteger UniqueSpellDocumentTag();
     [Selector("checkSpellingOfString:startingAt:language:wrap:inSpellDocumentWithTag:wordCount:")] public NSRange CheckSpellingOfStringStartingAtLanguageWrapInSpellDocumentWithTagWordCount(NSString stringToCheck, NSInteger startingOffset, NSString? language, bool wrapFlag, NSInteger tag, NSInteger* wordCount);
@@ -107,7 +105,6 @@ public extern objc class NSSpellChecker : NSObject
     [Selector("recordResponse:toCorrection:forWord:language:inSpellDocumentWithTag:")] public void RecordResponseToCorrectionForWordLanguageInSpellDocumentWithTag(NSCorrectionResponse response, NSString correction, NSString word, NSString? language, NSInteger tag);
     [Selector("showCorrectionIndicatorOfType:primaryString:alternativeStrings:forStringInRect:view:completionHandler:")] public void ShowCorrectionIndicatorOfTypePrimaryStringAlternativeStringsForStringInRectViewCompletionHandler(NSCorrectionIndicatorType type, NSString primaryString, NSArray alternativeStrings, NSRect rectOfTypedString, NSView view, NSSpellCheckerShowCorrectionIndicatorOfTypePrimaryStringAlternativeStringsForStringInRectViewCompletionHandlerCompletionBlock? completionBlock);
     [Selector("dismissCorrectionIndicatorForView:")] public void DismissCorrectionIndicatorForView(NSView view);
-    /// macOS 14.0 and later.
     [Selector("showInlinePredictionForCandidates:client:")] public void ShowInlinePredictionForCandidatesClient(NSArray candidates, NSTextInputClient client);
     [Selector("preventsAutocorrectionBeforeString:language:")] public bool PreventsAutocorrectionBeforeStringLanguage(NSString string, NSString? language);
     [Selector("deletesAutospaceBetweenString:andString:language:")] public bool DeletesAutospaceBetweenStringAndStringLanguage(NSString precedingString, NSString followingString, NSString? language);
@@ -150,7 +147,6 @@ public extern "C" NSNotificationName? NSSpellCheckerDidChangeAutomaticPeriodSubs
 
 public extern "C" NSNotificationName? NSSpellCheckerDidChangeAutomaticTextCompletionNotification;
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName? NSSpellCheckerDidChangeAutomaticInlinePredictionNotification;
 
 /// NSDeprecated, a category of NSSpellChecker.

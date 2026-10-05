@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Symbols")
 
-/// macOS 15.0 and later.
 public extern objc class NSSymbolEffectOptionsRepeatBehavior : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("behaviorPeriodic")] public static Self BehaviorPeriodic();
@@ -41,36 +40,27 @@ public extern objc class NSSymbolEffectOptionsRepeatBehavior : NSObject, NSCopyi
     [Selector("behaviorContinuous")] public static Self BehaviorContinuous();
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolEffectOptions : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("options")] public static Self Options();
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 100000.
     [Selector("optionsWithRepeating")] public static Self OptionsWithRepeating();
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 100000.
     [Selector("optionsWithRepeating")] public Self OptionsWithRepeatingMethod();
     [Selector("optionsWithNonRepeating")] public static Self OptionsWithNonRepeating();
     [Selector("optionsWithNonRepeating")] public Self OptionsWithNonRepeatingMethod();
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 100000.
     [Selector("optionsWithRepeatCount:")] public static Self OptionsWithRepeatCount(NSInteger count);
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 100000.
     [Selector("optionsWithRepeatCount:")] public Self OptionsWithRepeatCountMethod(NSInteger count);
     [Selector("optionsWithSpeed:")] public static Self OptionsWithSpeed(double speed);
     [Selector("optionsWithSpeed:")] public Self OptionsWithSpeedMethod(double speed);
-    /// macOS 15.0 and later.
     [Selector("optionsWithRepeatBehavior:")] public static Self OptionsWithRepeatBehavior(NSSymbolEffectOptionsRepeatBehavior behavior);
-    /// macOS 15.0 and later.
     [Selector("optionsWithRepeatBehavior:")] public Self OptionsWithRepeatBehaviorMethod(NSSymbolEffectOptionsRepeatBehavior behavior);
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolEffect : NSObject, NSCopying, NSSecureCoding { }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolPulseEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -78,7 +68,6 @@ public extern objc class NSSymbolPulseEffect : NSSymbolEffect
     [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolBounceEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -88,7 +77,6 @@ public extern objc class NSSymbolBounceEffect : NSSymbolEffect
     [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolVariableColorEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -100,7 +88,6 @@ public extern objc class NSSymbolVariableColorEffect : NSSymbolEffect
     [Selector("effectWithDimInactiveLayers")] public Self EffectWithDimInactiveLayers();
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolScaleEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -110,7 +97,6 @@ public extern objc class NSSymbolScaleEffect : NSSymbolEffect
     [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolAppearEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -120,7 +106,6 @@ public extern objc class NSSymbolAppearEffect : NSSymbolEffect
     [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolDisappearEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -130,7 +115,6 @@ public extern objc class NSSymbolDisappearEffect : NSSymbolEffect
     [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
 }
 
-/// macOS 15.0 and later.
 public extern objc class NSSymbolWiggleEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -147,7 +131,6 @@ public extern objc class NSSymbolWiggleEffect : NSSymbolEffect
     [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
 }
 
-/// macOS 15.0 and later.
 public extern objc class NSSymbolRotateEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -157,7 +140,6 @@ public extern objc class NSSymbolRotateEffect : NSSymbolEffect
     [Selector("effectWithWholeSymbol")] public Self EffectWithWholeSymbol();
 }
 
-/// macOS 15.0 and later.
 public extern objc class NSSymbolBreatheEffect : NSSymbolEffect
 {
     [Selector("effect")] public static Self Effect();
@@ -187,13 +169,10 @@ public extern objc class NSSymbolDrawOffEffect : NSSymbolEffect
     [Selector("effectWithNonReversed")] public Self EffectWithNonReversed();
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolContentTransition : NSObject, NSCopying, NSSecureCoding { }
 
-/// macOS 15.0 and later.
 public extern objc class NSSymbolMagicReplaceContentTransition : NSSymbolContentTransition { }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolReplaceContentTransition : NSSymbolContentTransition
 {
     [Selector("transition")] public static Self Transition();
@@ -202,11 +181,9 @@ public extern objc class NSSymbolReplaceContentTransition : NSSymbolContentTrans
     [Selector("replaceOffUpTransition")] public static Self ReplaceOffUpTransition();
     [Selector("transitionWithByLayer")] public Self TransitionWithByLayer();
     [Selector("transitionWithWholeSymbol")] public Self TransitionWithWholeSymbol();
-    /// macOS 15.0 and later.
     [Selector("magicTransitionWithFallback:")] public static NSSymbolMagicReplaceContentTransition MagicTransitionWithFallback(NSSymbolReplaceContentTransition fallback);
 }
 
-/// macOS 14.0 and later.
 public extern objc class NSSymbolAutomaticContentTransition : NSSymbolContentTransition
 {
     [Selector("transition")] public static Self Transition();

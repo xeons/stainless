@@ -72,9 +72,7 @@ public extern objc class NSURL : NSObject, NSSecureCoding, NSCopying
     [Selector("initWithString:relativeToURL:")] public Self? InitWithStringRelativeToURL(NSString URLString, NSURL? baseURL);
     [Selector("URLWithString:")] public static Self? URLWithString(NSString URLString);
     [Selector("URLWithString:relativeToURL:")] public static Self? URLWithStringRelativeToURL(NSString URLString, NSURL? baseURL);
-    /// macOS 14.0 and later.
     [Selector("initWithString:encodingInvalidCharacters:")] public Self? InitWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
-    /// macOS 14.0 and later.
     [Selector("URLWithString:encodingInvalidCharacters:")] public static Self? URLWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
     [Selector("initWithDataRepresentation:relativeToURL:")] public Self InitWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
     [Selector("URLWithDataRepresentation:relativeToURL:")] public static NSURL URLWithDataRepresentationRelativeToURL(NSData data, NSURL? baseURL);
@@ -196,7 +194,6 @@ public extern "C" NSURLResourceKey? NSURLQuarantinePropertiesKey;
 
 public extern "C" NSURLResourceKey NSURLFileResourceTypeKey;
 
-/// macOS 13.3 and later.
 public extern "C" NSURLResourceKey NSURLFileIdentifierKey;
 
 public extern "C" NSURLResourceKey NSURLFileContentIdentifierKey;
@@ -260,7 +257,6 @@ public extern "C" NSURLFileProtectionType NSURLFileProtectionCompleteUnlessOpen;
 
 public extern "C" NSURLFileProtectionType NSURLFileProtectionCompleteUntilFirstUserAuthentication;
 
-/// macOS 14.0 and later.
 public extern "C" NSURLResourceKey NSURLDirectoryEntryCountKey;
 
 public extern "C" NSURLResourceKey NSURLVolumeLocalizedFormatDescriptionKey;
@@ -347,13 +343,10 @@ public extern "C" NSURLResourceKey NSURLVolumeAvailableCapacityForImportantUsage
 
 public extern "C" NSURLResourceKey NSURLVolumeAvailableCapacityForOpportunisticUsageKey;
 
-/// macOS 13.3 and later.
 public extern "C" NSURLResourceKey NSURLVolumeTypeNameKey;
 
-/// macOS 13.3 and later.
 public extern "C" NSURLResourceKey NSURLVolumeSubtypeKey;
 
-/// macOS 13.3 and later.
 public extern "C" NSURLResourceKey NSURLVolumeMountFromLocationKey;
 
 public extern "C" NSURLResourceKey NSURLIsUbiquitousItemKey;
@@ -499,9 +492,7 @@ public extern objc class NSURLComponents : NSObject, NSCopying
     [Selector("componentsWithURL:resolvingAgainstBaseURL:")] public static Self? ComponentsWithURLResolvingAgainstBaseURL(NSURL url, bool resolve);
     [Selector("initWithString:")] public Self? InitWithString(NSString URLString);
     [Selector("componentsWithString:")] public static Self? ComponentsWithString(NSString URLString);
-    /// macOS 14.0 and later.
     [Selector("initWithString:encodingInvalidCharacters:")] public Self? InitWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
-    /// macOS 14.0 and later.
     [Selector("componentsWithString:encodingInvalidCharacters:")] public static Self? ComponentsWithStringEncodingInvalidCharacters(NSString URLString, bool encodingInvalidCharacters);
     [Selector("URLRelativeToURL:")] public NSURL? URLRelativeToURL(NSURL? baseURL);
 }

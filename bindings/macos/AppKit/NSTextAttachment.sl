@@ -62,7 +62,6 @@ public extern objc class NSTextAttachment : NSObject, NSTextAttachmentLayout, NS
 public extern objc class NSAttributedString
 {
     [Selector("attributedStringWithAttachment:")] public static NSAttributedString AttributedStringWithAttachment(NSTextAttachment attachment);
-    /// macOS 15.0 and later.
     [Selector("attributedStringWithAttachment:attributes:")] public static Self AttributedStringWithAttachmentAttributes(NSTextAttachment attachment, NSDictionary attributes);
 }
 

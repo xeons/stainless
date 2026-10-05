@@ -110,7 +110,6 @@ public objc interface AVPlayerItemMetadataOutputPushDelegate : AVPlayerItemOutpu
     [Optional] [Selector("metadataOutput:didOutputTimedMetadataGroups:fromPlayerItemTrack:")] void MetadataOutputDidOutputTimedMetadataGroupsFromPlayerItemTrack(AVPlayerItemMetadataOutput output, NSArray groups, AVPlayerItemTrack? track);
 }
 
-/// macOS 15.0 and later.
 public extern objc class AVPlayerItemRenderedLegibleOutput : AVPlayerItemOutput
 {
     [Selector("delegate")] public AVPlayerItemRenderedLegibleOutputPushDelegate? Delegate { get; }
@@ -121,10 +120,8 @@ public extern objc class AVPlayerItemRenderedLegibleOutput : AVPlayerItemOutput
     [Selector("setDelegate:queue:")] public void SetDelegateQueue(AVPlayerItemRenderedLegibleOutputPushDelegate? @delegate, dispatch_queue_t? delegateQueue);
 }
 
-/// macOS 15.0 and later.
 public objc interface AVPlayerItemRenderedLegibleOutputPushDelegate : AVPlayerItemOutputPushDelegate
 {
-    /// macOS 15.0 and later.
     [Optional] [Selector("renderedLegibleOutput:didOutputRenderedCaptionImages:forItemTime:")] void RenderedLegibleOutputDidOutputRenderedCaptionImagesForItemTime(AVPlayerItemRenderedLegibleOutput output, NSArray captionImages, CMTime itemTime);
 }
 

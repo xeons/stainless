@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "HealthKit")
 
-/// macOS 15.0 and later.
 public extern objc class HKWorkoutEffortRelationship : NSObject, NSSecureCoding, NSCopying
 {
     [Selector("workout")] public HKWorkout Workout { get; }
@@ -39,7 +38,6 @@ public extern objc class HKWorkoutEffortRelationship : NSObject, NSSecureCoding,
     [Selector("samples")] public NSArray? Samples { get; }
 }
 
-/// macOS 15.0 and later.
 public enum HKWorkoutEffortRelationshipQueryOptions : long
 {
     Default = 0,
@@ -48,7 +46,6 @@ public enum HKWorkoutEffortRelationshipQueryOptions : long
 
 public objc closure void HKWorkoutEffortRelationshipQueryInitWithPredicateAnchorOptionsResultsHandlerResultsHandlerBlock(HKWorkoutEffortRelationshipQuery arg0, NSArray? arg1, HKQueryAnchor? arg2, NSError? arg3);
 
-/// macOS 15.0 and later.
 public extern objc class HKWorkoutEffortRelationshipQuery : HKQuery
 {
     [Selector("initWithPredicate:anchor:options:resultsHandler:")] public Self InitWithPredicateAnchorOptionsResultsHandler(NSPredicate? predicate, HKQueryAnchor? anchor, HKWorkoutEffortRelationshipQueryOptions options, HKWorkoutEffortRelationshipQueryInitWithPredicateAnchorOptionsResultsHandlerResultsHandlerBlock resultsHandler);

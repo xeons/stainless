@@ -83,7 +83,6 @@ public extern "C" NSString NSPersistentStoreConnectionPoolMaxSizeKey;
 
 public extern "C" NSString NSCoreDataCoreSpotlightExporter;
 
-/// macOS 14.0 and later.
 public extern "C" NSString NSPersistentStoreStagedMigrationManagerOptionKey;
 
 /// Deprecated in macOS 10.13.
@@ -134,7 +133,6 @@ public extern "C" NSString NSPersistentHistoryTokenKey;
 
 public extern "C" NSString NSPersistentStoreDeferredLightweightMigrationOptionKey;
 
-/// macOS 15.0 and later.
 public extern "C" NSString NSPersistentStoreModelVersionChecksumKey;
 
 public objc closure void NSPersistentStoreCoordinatorAddPersistentStoreWithDescriptionCompletionHandlerBlock(NSPersistentStoreDescription arg0, NSError? arg1);

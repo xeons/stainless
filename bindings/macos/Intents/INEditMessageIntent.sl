@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 14.0 and later.
 public extern objc class INEditMessageIntent : INIntent
 {
     [Selector("messageIdentifier")] public NSString? MessageIdentifier { get; }
@@ -45,7 +44,6 @@ public objc closure void INEditMessageIntentHandlingConfirmEditMessageCompletion
 
 public objc closure void INEditMessageIntentHandlingResolveEditedContentForEditMessageWithCompletionCompletionBlock(INStringResolutionResult arg0);
 
-/// macOS 14.0 and later.
 public objc interface INEditMessageIntentHandling : NSObjectProtocol
 {
     [Selector("handleEditMessage:completion:")] void HandleEditMessageCompletion(INEditMessageIntent intent, INEditMessageIntentHandlingHandleEditMessageCompletionCompletionBlock completion);

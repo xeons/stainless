@@ -245,7 +245,6 @@ public extern objc class NSDateComponents : NSObject, NSCopying, NSSecureCoding
     [Selector("weekOfMonth", "setWeekOfMonth:")] public NSInteger WeekOfMonth { get; set; }
     [Selector("weekOfYear", "setWeekOfYear:")] public NSInteger WeekOfYear { get; set; }
     [Selector("yearForWeekOfYear", "setYearForWeekOfYear:")] public NSInteger YearForWeekOfYear { get; set; }
-    /// macOS 15.0 and later.
     [Selector("dayOfYear", "setDayOfYear:")] public NSInteger DayOfYear { get; set; }
     [Selector("isLeapMonth", "setLeapMonth:")] public bool LeapMonth { get; set; }
     /// macOS 26.0 and later.

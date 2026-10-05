@@ -30,16 +30,12 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreGraphics")
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGEXRToneMappingGammaDefog;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGEXRToneMappingGammaExposure;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGEXRToneMappingGammaKneeLow;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGEXRToneMappingGammaKneeHigh;
 
 /// macOS 26.0 and later.

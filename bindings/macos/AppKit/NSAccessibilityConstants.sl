@@ -255,7 +255,6 @@ public extern "C" NSAttributedStringKey? NSAccessibilityCustomTextAttribute;
 
 public extern "C" NSAttributedStringKey? NSAccessibilityAnnotationTextAttribute;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? NSAccessibilityTextCompletionAttribute;
 
 public using NSAccessibilityAnnotationAttributeKey = NSString;

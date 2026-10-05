@@ -42,7 +42,6 @@ public objc closure void ASAuthorizationWebBrowserPublicKeyCredentialManagerRequ
 
 public objc closure void ASAuthorizationWebBrowserPublicKeyCredentialManagerPlatformCredentialsForRelyingPartyCompletionHandlerCompletionHandlerBlock(NSArray arg0);
 
-/// macOS 13.3 and later.
 public extern objc class ASAuthorizationWebBrowserPublicKeyCredentialManager : NSObject
 {
     /// macOS 26.2 and later.

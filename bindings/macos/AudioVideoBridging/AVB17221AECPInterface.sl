@@ -48,7 +48,6 @@ public extern objc class AVB17221AECPInterface : AVB1722ControlInterface
     [Selector("removeResponseHandlerForControllerEntityID:")] public void RemoveResponseHandlerForControllerEntityID(ulong controllerEntityID);
     [Selector("sendCommand:toMACAddress:completionHandler:")] public bool SendCommandToMACAddressCompletionHandler(AVB17221AECPMessage message, AVBMACAddress destMAC, AVB17221AECPInterfaceCompletion completionHandler);
     [Selector("sendResponse:toMACAddress:error:")] public bool SendResponseToMACAddressError(AVB17221AECPMessage message, AVBMACAddress destMAC, out NSError? error);
-    /// macOS 14 and later.
     [Selector("sendVendorUniqueCommand:toMACAddress:expectResponseWithinTimeout:completionHandler:")] public bool SendVendorUniqueCommandToMACAddressExpectResponseWithinTimeoutCompletionHandler(AVB17221AECPVendorMessage message, AVBMACAddress destMAC, long timeout, AVB17221AECPInterfaceCompletion completionHandler);
 }
 

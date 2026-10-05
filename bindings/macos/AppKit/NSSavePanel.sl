@@ -43,7 +43,6 @@ public extern objc class NSSavePanel : NSPanel
     [Selector("directoryURL", "setDirectoryURL:")] public NSURL? DirectoryURL { get; set; }
     [Selector("allowedContentTypes", "setAllowedContentTypes:")] public NSArray? AllowedContentTypes { get; set; }
     [Selector("allowsOtherFileTypes", "setAllowsOtherFileTypes:")] public bool AllowsOtherFileTypes { get; set; }
-    /// macOS 15.0 and later.
     [Selector("currentContentType", "setCurrentContentType:")] public UTType? CurrentContentType { get; set; }
     [Selector("accessoryView", "setAccessoryView:")] public NSView? AccessoryView { get; set; }
     [Selector("delegate", "setDelegate:")] public NSOpenSavePanelDelegate? Delegate { get; set; }
@@ -60,7 +59,6 @@ public extern objc class NSSavePanel : NSPanel
     [Selector("showsHiddenFiles", "setShowsHiddenFiles:")] public bool ShowsHiddenFiles { get; set; }
     [Selector("showsTagField", "setShowsTagField:")] public bool ShowsTagField { get; set; }
     [Selector("tagNames", "setTagNames:")] public NSArray? TagNames { get; set; }
-    /// macOS 15.0 and later.
     [Selector("showsContentTypes", "setShowsContentTypes:")] public bool ShowsContentTypes { get; set; }
     [Selector("savePanel")] public static NSSavePanel SavePanel();
     [Selector("validateVisibleColumns")] public void ValidateVisibleColumns();
@@ -79,9 +77,7 @@ public objc interface NSOpenSavePanelDelegate : NSObjectProtocol
     [Optional] [Selector("panel:userEnteredFilename:confirmed:")] NSString? PanelUserEnteredFilenameConfirmed(AnyObject sender, NSString filename, bool okFlag);
     [Optional] [Selector("panel:willExpand:")] void PanelWillExpand(AnyObject sender, bool expanding);
     [Optional] [Selector("panelSelectionDidChange:")] void PanelSelectionDidChange(AnyObject? sender);
-    /// macOS 15.0 and later.
     [Optional] [Selector("panel:displayNameForType:")] NSString? PanelDisplayNameForType(AnyObject sender, UTType type);
-    /// macOS 15.0 and later.
     [Optional] [Selector("panel:didSelectType:")] void PanelDidSelectType(AnyObject sender, UTType? type);
 }
 

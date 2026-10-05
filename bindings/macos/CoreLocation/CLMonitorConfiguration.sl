@@ -35,7 +35,6 @@ public objc closure void CLMonitorConfigurationEventHandlerBlock(CLMonitor arg0,
 
 public objc closure void CLMonitorConfigurationConfigWithMonitorNameQueueEventHandlerEventHandlerBlock(CLMonitor arg0, CLMonitoringEvent arg1);
 
-/// macOS 14.0 and later.
 public extern objc class CLMonitorConfiguration : NSObject
 {
     [Selector("name")] public NSString Name { get; }

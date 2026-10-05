@@ -31,27 +31,20 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMIDI")
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDIUMPEndpointWasAddedNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDIUMPEndpointWasRemovedNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDIUMPEndpointWasUpdatedNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDIUMPFunctionBlockWasUpdatedNotification;
 
 public using MIDIUMPEndpointManagerDictionaryKey = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" MIDIUMPEndpointManagerDictionaryKey? MIDIUMPEndpointObjectKey;
 
-/// macOS 15.0 and later.
 public extern "C" MIDIUMPEndpointManagerDictionaryKey? MIDIUMPFunctionBlockObjectKey;
 
-/// macOS 15.0 and later.
 public extern objc class MIDIUMPEndpointManager : NSObject
 {
     [Selector("sharedInstance")] public static MIDIUMPEndpointManager? SharedInstance { get; }

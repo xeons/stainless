@@ -30,7 +30,6 @@ import Standard.ObjC;
 #pragma comment(framework, "Virtualization")
 
 #if ARM64
-/// macOS 14.0 and later.
 public extern objc class VZMacKeyboardConfiguration : VZKeyboardConfiguration
 {
     [Selector("init")] public Self Init();

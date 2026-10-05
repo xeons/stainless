@@ -43,11 +43,8 @@ public extern objc class NEVPNProtocol : NSObject, NSCopying, NSSecureCoding
     [Selector("proxySettings", "setProxySettings:")] public NEProxySettings? ProxySettings { get; set; }
     [Selector("includeAllNetworks", "setIncludeAllNetworks:")] public bool IncludeAllNetworks { get; set; }
     [Selector("excludeLocalNetworks", "setExcludeLocalNetworks:")] public bool ExcludeLocalNetworks { get; set; }
-    /// macOS 13.3 and later.
     [Selector("excludeCellularServices", "setExcludeCellularServices:")] public bool ExcludeCellularServices { get; set; }
-    /// macOS 13.3 and later.
     [Selector("excludeAPNs", "setExcludeAPNs:")] public bool ExcludeAPNs { get; set; }
-    /// macOS 14.4 and later.
     [Selector("excludeDeviceCommunication", "setExcludeDeviceCommunication:")] public bool ExcludeDeviceCommunication { get; set; }
     [Selector("enforceRoutes", "setEnforceRoutes:")] public bool EnforceRoutes { get; set; }
 }

@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 14.0 and later.
 public enum INEditMessageIntentResponseCode : long
 {
     Unspecified = 0,
@@ -47,7 +46,6 @@ public enum INEditMessageIntentResponseCode : long
     FailureRequiringInAppAuthentication = 11,
 }
 
-/// macOS 14.0 and later.
 public extern objc class INEditMessageIntentResponse : INIntentResponse
 {
     [Selector("code")] public INEditMessageIntentResponseCode Code { get; }

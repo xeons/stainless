@@ -30,12 +30,10 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 13.5 and later.
 public objc interface ASAuthorizationWebBrowserPlatformPublicKeyCredentialRegistrationRequest
 {
     [Selector("clientData")] ASPublicKeyCredentialClientData? ClientData { get; }
     [Selector("excludedCredentials", "setExcludedCredentials:")] NSArray? ExcludedCredentials { get; set; }
-    /// macOS 13.5 and later.
     [Selector("shouldShowHybridTransport", "setShouldShowHybridTransport:")] bool ShouldShowHybridTransport { get; set; }
 }
 

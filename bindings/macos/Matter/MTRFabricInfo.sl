@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.4 and later.
 public extern objc class MTRFabricInfo : NSObject
 {
     [Selector("rootPublicKey")] public NSData RootPublicKey { get; }

@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 public objc interface GCDirectionPadElement : GCPhysicalInputElement
 {
-    /// macOS 14.3 and later.
     [Selector("xyAxes")] GCAxis2DInput XyAxes { get; }
     [Selector("xAxis")] GCAxisInput XAxis { get; }
     [Selector("yAxis")] GCAxisInput YAxis { get; }

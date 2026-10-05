@@ -59,7 +59,6 @@ public enum MTLAccelerationStructureInstanceOptions : uint
     NonOpaque = 8,
 }
 
-/// macOS 15.0 and later.
 public enum MTLMatrixLayout : long
 {
     ColumnMajor = 0,
@@ -112,7 +111,6 @@ public extern objc class MTLAccelerationStructureTriangleGeometryDescriptor : MT
     [Selector("triangleCount", "setTriangleCount:")] public NSUInteger TriangleCount { get; set; }
     [Selector("transformationMatrixBuffer", "setTransformationMatrixBuffer:")] public MTLBuffer? TransformationMatrixBuffer { get; set; }
     [Selector("transformationMatrixBufferOffset", "setTransformationMatrixBufferOffset:")] public NSUInteger TransformationMatrixBufferOffset { get; set; }
-    /// macOS 15.0 and later.
     [Selector("transformationMatrixLayout", "setTransformationMatrixLayout:")] public MTLMatrixLayout TransformationMatrixLayout { get; set; }
     [Selector("descriptor")] public static Self Descriptor();
 }
@@ -144,7 +142,6 @@ public extern objc class MTLAccelerationStructureMotionTriangleGeometryDescripto
     [Selector("triangleCount", "setTriangleCount:")] public NSUInteger TriangleCount { get; set; }
     [Selector("transformationMatrixBuffer", "setTransformationMatrixBuffer:")] public MTLBuffer? TransformationMatrixBuffer { get; set; }
     [Selector("transformationMatrixBufferOffset", "setTransformationMatrixBufferOffset:")] public NSUInteger TransformationMatrixBufferOffset { get; set; }
-    /// macOS 15.0 and later.
     [Selector("transformationMatrixLayout", "setTransformationMatrixLayout:")] public MTLMatrixLayout TransformationMatrixLayout { get; set; }
     [Selector("descriptor")] public static Self Descriptor();
 }
@@ -157,14 +154,12 @@ public extern objc class MTLAccelerationStructureMotionBoundingBoxGeometryDescri
     [Selector("descriptor")] public static Self Descriptor();
 }
 
-/// macOS 14.0 and later.
 public enum MTLCurveType : long
 {
     Round = 0,
     Flat = 1,
 }
 
-/// macOS 14.0 and later.
 public enum MTLCurveBasis : long
 {
     BSpline = 0,
@@ -173,7 +168,6 @@ public enum MTLCurveBasis : long
     Bezier = 3,
 }
 
-/// macOS 14.0 and later.
 public enum MTLCurveEndCaps : long
 {
     None = 0,
@@ -181,7 +175,6 @@ public enum MTLCurveEndCaps : long
     Sphere = 2,
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTLAccelerationStructureCurveGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
     [Selector("controlPointBuffer", "setControlPointBuffer:")] public MTLBuffer? ControlPointBuffer { get; set; }
@@ -204,7 +197,6 @@ public extern objc class MTLAccelerationStructureCurveGeometryDescriptor : MTLAc
     [Selector("descriptor")] public static Self Descriptor();
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTLAccelerationStructureMotionCurveGeometryDescriptor : MTLAccelerationStructureGeometryDescriptor
 {
     [Selector("controlPointBuffers", "setControlPointBuffers:")] public NSArray ControlPointBuffers { get; set; }
@@ -268,7 +260,6 @@ public struct MTLAccelerationStructureMotionInstanceDescriptor
     public float motionEndTime;
 }
 
-/// macOS 14.0 and later.
 public struct MTLIndirectAccelerationStructureInstanceDescriptor
 {
     public MTLPackedFloat4x3 transformationMatrix;
@@ -279,7 +270,6 @@ public struct MTLIndirectAccelerationStructureInstanceDescriptor
     public MTLResourceID accelerationStructureID;
 }
 
-/// macOS 14.0 and later.
 public struct MTLIndirectAccelerationStructureMotionInstanceDescriptor
 {
     public MTLAccelerationStructureInstanceOptions options;
@@ -295,7 +285,6 @@ public struct MTLIndirectAccelerationStructureMotionInstanceDescriptor
     public float motionEndTime;
 }
 
-/// macOS 15.0 and later.
 public enum MTLTransformType : long
 {
     PackedFloat4x3 = 0,
@@ -313,16 +302,12 @@ public extern objc class MTLInstanceAccelerationStructureDescriptor : MTLAcceler
     [Selector("motionTransformBuffer", "setMotionTransformBuffer:")] public MTLBuffer? MotionTransformBuffer { get; set; }
     [Selector("motionTransformBufferOffset", "setMotionTransformBufferOffset:")] public NSUInteger MotionTransformBufferOffset { get; set; }
     [Selector("motionTransformCount", "setMotionTransformCount:")] public NSUInteger MotionTransformCount { get; set; }
-    /// macOS 15.0 and later.
     [Selector("instanceTransformationMatrixLayout", "setInstanceTransformationMatrixLayout:")] public MTLMatrixLayout InstanceTransformationMatrixLayout { get; set; }
-    /// macOS 15.0 and later.
     [Selector("motionTransformType", "setMotionTransformType:")] public MTLTransformType MotionTransformType { get; set; }
-    /// macOS 15.0 and later.
     [Selector("motionTransformStride", "setMotionTransformStride:")] public NSUInteger MotionTransformStride { get; set; }
     [Selector("descriptor")] public static Self Descriptor();
 }
 
-/// macOS 14.0 and later.
 public extern objc class MTLIndirectInstanceAccelerationStructureDescriptor : MTLAccelerationStructureDescriptor
 {
     [Selector("instanceDescriptorBuffer", "setInstanceDescriptorBuffer:")] public MTLBuffer? InstanceDescriptorBuffer { get; set; }
@@ -337,11 +322,8 @@ public extern objc class MTLIndirectInstanceAccelerationStructureDescriptor : MT
     [Selector("maxMotionTransformCount", "setMaxMotionTransformCount:")] public NSUInteger MaxMotionTransformCount { get; set; }
     [Selector("motionTransformCountBuffer", "setMotionTransformCountBuffer:")] public MTLBuffer? MotionTransformCountBuffer { get; set; }
     [Selector("motionTransformCountBufferOffset", "setMotionTransformCountBufferOffset:")] public NSUInteger MotionTransformCountBufferOffset { get; set; }
-    /// macOS 15.0 and later.
     [Selector("instanceTransformationMatrixLayout", "setInstanceTransformationMatrixLayout:")] public MTLMatrixLayout InstanceTransformationMatrixLayout { get; set; }
-    /// macOS 15.0 and later.
     [Selector("motionTransformType", "setMotionTransformType:")] public MTLTransformType MotionTransformType { get; set; }
-    /// macOS 15.0 and later.
     [Selector("motionTransformStride", "setMotionTransformStride:")] public NSUInteger MotionTransformStride { get; set; }
     [Selector("descriptor")] public static Self Descriptor();
 }

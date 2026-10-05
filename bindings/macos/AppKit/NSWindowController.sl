@@ -37,7 +37,6 @@ public extern objc class NSWindowController : NSResponder, NSSeguePerforming
     [Selector("owner")] public AnyObject? Owner { get; }
     [Selector("windowFrameAutosaveName", "setWindowFrameAutosaveName:")] public NSWindowFrameAutosaveName WindowFrameAutosaveName { get; set; }
     [Selector("shouldCascadeWindows", "setShouldCascadeWindows:")] public bool ShouldCascadeWindows { get; set; }
-    /// macOS 13.2 and later.
     [Selector("previewRepresentableActivityItems", "setPreviewRepresentableActivityItems:")] public NSArray? PreviewRepresentableActivityItems { get; set; }
     [Selector("document", "setDocument:")] public AnyObject? Document { get; set; }
     [Selector("shouldCloseDocument", "setShouldCloseDocument:")] public bool ShouldCloseDocument { get; set; }

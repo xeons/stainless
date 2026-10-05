@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "PassKit")
 
-/// macOS 13.3 and later.
 public extern objc class PKDeferredPaymentRequest : NSObject
 {
     [Selector("paymentDescription", "setPaymentDescription:")] public NSString PaymentDescription { get; set; }

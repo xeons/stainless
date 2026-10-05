@@ -35,7 +35,6 @@ public extern objc class MXDiagnostic : NSObject, NSSecureCoding
 {
     [Selector("metaData")] public MXMetaData MetaData { get; }
     [Selector("applicationVersion")] public NSString ApplicationVersion { get; }
-    /// macOS 14.0 and later.
     [Selector("signpostData")] public NSArray? SignpostData { get; }
     [Selector("JSONRepresentation")] public NSData JSONRepresentation();
     [Selector("dictionaryRepresentation")] public NSDictionary DictionaryRepresentation();

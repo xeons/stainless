@@ -33,18 +33,14 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName? AVSampleBufferVideoRendererDidFailToDecodeNotification;
 
-/// macOS 14.0 and later.
 public extern "C" NSString? AVSampleBufferVideoRendererDidFailToDecodeNotificationErrorKey;
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName? AVSampleBufferVideoRendererRequiresFlushToResumeDecodingDidChangeNotification;
 
 public objc closure void AVSampleBufferVideoRendererFlushWithRemovalOfDisplayedImageCompletionHandlerHandlerBlock();
 
-/// macOS 14.0 and later.
 public extern objc class AVSampleBufferVideoRenderer : NSObject, AVQueuedSampleBufferRendering
 {
     [Selector("status")] public AVQueuedSampleBufferRenderingStatus Status { get; }
@@ -53,35 +49,27 @@ public extern objc class AVSampleBufferVideoRenderer : NSObject, AVQueuedSampleB
     [Selector("flushWithRemovalOfDisplayedImage:completionHandler:")] public void FlushWithRemovalOfDisplayedImageCompletionHandler(bool removeDisplayedImage, AVSampleBufferVideoRendererFlushWithRemovalOfDisplayedImageCompletionHandlerHandlerBlock? handler);
 }
 
-/// macOS 14.4 and later.
 /// AVSampleBufferVideoRendererPixelBufferOutput, a category of AVSampleBufferVideoRenderer.
 public extern objc class AVSampleBufferVideoRenderer
 {
-    /// macOS 14.4 and later.
     [Selector("copyDisplayedPixelBuffer")] public CVPixelBufferRef? CopyDisplayedPixelBuffer();
 }
 
-/// macOS 14.4 and later.
 /// AVSampleBufferVideoRendererPowerOptimization, a category of AVSampleBufferVideoRenderer.
 public extern objc class AVSampleBufferVideoRenderer
 {
     /// macOS 26.0 and later.
     [Selector("recommendedPixelBufferAttributes")] public NSDictionary? RecommendedPixelBufferAttributes { get; }
-    /// macOS 14.4 and later.
     [Selector("expectMinimumUpcomingSampleBufferPresentationTime:")] public void ExpectMinimumUpcomingSampleBufferPresentationTime(CMTime minimumUpcomingPresentationTime);
-    /// macOS 14.4 and later.
     [Selector("expectMonotonicallyIncreasingUpcomingSampleBufferPresentationTimes")] public void ExpectMonotonicallyIncreasingUpcomingSampleBufferPresentationTimes();
-    /// macOS 14.4 and later.
     [Selector("resetUpcomingSampleBufferPresentationTimeExpectations")] public void ResetUpcomingSampleBufferPresentationTimeExpectations();
 }
 
 public objc closure void AVSampleBufferVideoRendererLoadVideoPerformanceMetricsWithCompletionHandlerCompletionHandlerBlock(AVVideoPerformanceMetrics? arg0);
 
-/// macOS 14.4 and later.
 /// AVSampleBufferVideoRendererVideoPerformanceMetrics, a category of AVSampleBufferVideoRenderer.
 public extern objc class AVSampleBufferVideoRenderer
 {
-    /// macOS 14.4 and later.
     [Selector("loadVideoPerformanceMetricsWithCompletionHandler:")] public void LoadVideoPerformanceMetricsWithCompletionHandler(AVSampleBufferVideoRendererLoadVideoPerformanceMetricsWithCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 

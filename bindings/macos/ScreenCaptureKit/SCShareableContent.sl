@@ -56,7 +56,6 @@ public extern objc class SCWindow : NSObject
     [Selector("windowLayer")] public NSInteger WindowLayer { get; }
     [Selector("owningApplication")] public SCRunningApplication? OwningApplication { get; }
     [Selector("isOnScreen")] public bool OnScreen { get; }
-    /// macOS 13.1 and later.
     [Selector("isActive")] public bool Active { get; }
 }
 
@@ -68,7 +67,6 @@ public extern objc class SCDisplay : NSObject
     [Selector("frame")] public CGRect Frame { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class SCShareableContentInfo : NSObject
 {
     [Selector("style")] public SCShareableContentStyle Style { get; }
@@ -92,12 +90,10 @@ public extern objc class SCShareableContent : NSObject
     [Selector("displays")] public NSArray Displays { get; }
     [Selector("applications")] public NSArray Applications { get; }
     [Selector("getShareableContentWithCompletionHandler:")] public static void GetShareableContentWithCompletionHandler(SCShareableContentGetShareableContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.4 and later.
     [Selector("getCurrentProcessShareableContentWithCompletionHandler:")] public static void GetCurrentProcessShareableContentWithCompletionHandler(SCShareableContentGetCurrentProcessShareableContentWithCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnly:completionHandler:")] public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyCompletionHandler(bool excludeDesktopWindows, bool onScreenWindowsOnly, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnlyBelowWindow:completionHandler:")] public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyBelowWindowCompletionHandler(bool excludeDesktopWindows, SCWindow window, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyBelowWindowCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("getShareableContentExcludingDesktopWindows:onScreenWindowsOnlyAboveWindow:completionHandler:")] public static void GetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyAboveWindowCompletionHandler(bool excludeDesktopWindows, SCWindow window, SCShareableContentGetShareableContentExcludingDesktopWindowsOnScreenWindowsOnlyAboveWindowCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Selector("infoForFilter:")] public static SCShareableContentInfo InfoForFilter(SCContentFilter filter);
 }
 

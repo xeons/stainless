@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 14.0 and later.
 public enum NSImageDynamicRange : long
 {
     Unspecified = -1,
@@ -50,11 +49,8 @@ public extern objc class NSImageView : NSControl, NSAccessibilityImage, NSMenuIt
     [Selector("contentTintColor", "setContentTintColor:")] public NSColor? ContentTintColor { get; set; }
     [Selector("animates", "setAnimates:")] public bool Animates { get; set; }
     [Selector("allowsCutCopyPaste", "setAllowsCutCopyPaste:")] public bool AllowsCutCopyPaste { get; set; }
-    /// macOS 14.0 and later.
     [Selector("defaultPreferredImageDynamicRange", "setDefaultPreferredImageDynamicRange:")] public static NSImageDynamicRange DefaultPreferredImageDynamicRange { get; set; }
-    /// macOS 14.0 and later.
     [Selector("preferredImageDynamicRange", "setPreferredImageDynamicRange:")] public NSImageDynamicRange PreferredImageDynamicRange { get; set; }
-    /// macOS 14.0 and later.
     [Selector("imageDynamicRange")] public NSImageDynamicRange ImageDynamicRange { get; }
     [Selector("imageViewWithImage:")] public static Self ImageViewWithImage(NSImage image);
 }
@@ -62,27 +58,16 @@ public extern objc class NSImageView : NSControl, NSAccessibilityImage, NSMenuIt
 /// NSSymbolEffect, a category of NSImageView.
 public extern objc class NSImageView
 {
-    /// macOS 14.0 and later.
     [Selector("addSymbolEffect:")] public void AddSymbolEffect(NSSymbolEffect symbolEffect);
-    /// macOS 14.0 and later.
     [Selector("addSymbolEffect:options:")] public void AddSymbolEffectOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
-    /// macOS 14.0 and later.
     [Selector("addSymbolEffect:options:animated:")] public void AddSymbolEffectOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
-    /// macOS 14.0 and later.
     [Selector("removeSymbolEffectOfType:")] public void RemoveSymbolEffectOfType(NSSymbolEffect symbolEffect);
-    /// macOS 14.0 and later.
     [Selector("removeSymbolEffectOfType:options:")] public void RemoveSymbolEffectOfTypeOptions(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options);
-    /// macOS 14.0 and later.
     [Selector("removeSymbolEffectOfType:options:animated:")] public void RemoveSymbolEffectOfTypeOptionsAnimated(NSSymbolEffect symbolEffect, NSSymbolEffectOptions options, bool animated);
-    /// macOS 14.0 and later.
     [Selector("removeAllSymbolEffects")] public void RemoveAllSymbolEffects();
-    /// macOS 14.0 and later.
     [Selector("removeAllSymbolEffectsWithOptions:")] public void RemoveAllSymbolEffectsWithOptions(NSSymbolEffectOptions options);
-    /// macOS 14.0 and later.
     [Selector("removeAllSymbolEffectsWithOptions:animated:")] public void RemoveAllSymbolEffectsWithOptionsAnimated(NSSymbolEffectOptions options, bool animated);
-    /// macOS 14.0 and later.
     [Selector("setSymbolImage:withContentTransition:")] public void SetSymbolImageWithContentTransition(NSImage symbolImage, NSSymbolContentTransition transition);
-    /// macOS 14.0 and later.
     [Selector("setSymbolImage:withContentTransition:options:")] public void SetSymbolImageWithContentTransitionOptions(NSImage symbolImage, NSSymbolContentTransition transition, NSSymbolEffectOptions options);
 }
 

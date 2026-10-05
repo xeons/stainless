@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 15.0 and later.
 public extern objc class AVCaptureControl : NSObject
 {
     [Selector("isEnabled", "setEnabled:")] public bool Enabled { get; set; }

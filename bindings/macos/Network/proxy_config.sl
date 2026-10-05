@@ -38,51 +38,36 @@ public objc interface OS_nw_relay_hop : NSObjectProtocol { }
 
 public using nw_relay_hop_t = NSObject;
 
-/// macOS 14.0 and later.
 public extern "C" nw_relay_hop_t nw_relay_hop_create(nw_endpoint_t? http3_relay_endpoint, nw_endpoint_t? http2_relay_endpoint, nw_protocol_options_t? relay_tls_options);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_relay_hop_add_additional_http_header_field(nw_relay_hop_t relay_hop, byte* field_name, byte* field_value);
 
-/// macOS 14.0 and later.
 public extern "C" nw_proxy_config_t nw_proxy_config_create_relay(nw_relay_hop_t first_hop, nw_relay_hop_t? second_hop);
 
-/// macOS 14.0 and later.
 public extern "C" nw_proxy_config_t nw_proxy_config_create_oblivious_http(nw_relay_hop_t relay, byte* relay_resource_path, byte* gateway_key_config, nuint gateway_key_config_length);
 
-/// macOS 14.0 and later.
 public extern "C" nw_proxy_config_t nw_proxy_config_create_http_connect(nw_endpoint_t proxy_endpoint, nw_protocol_options_t? proxy_tls_options);
 
-/// macOS 14.0 and later.
 public extern "C" nw_proxy_config_t nw_proxy_config_create_socksv5(nw_endpoint_t proxy_endpoint);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_set_username_and_password(nw_proxy_config_t proxy_config, byte* username, byte* password);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_set_failover_allowed(nw_proxy_config_t proxy_config, bool failover_allowed);
 
-/// macOS 14.0 and later.
 public extern "C" bool nw_proxy_config_get_failover_allowed(nw_proxy_config_t proxy_config);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_add_match_domain(nw_proxy_config_t config, byte* match_domain);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_clear_match_domains(nw_proxy_config_t config);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_add_excluded_domain(nw_proxy_config_t config, byte* excluded_domain);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_clear_excluded_domains(nw_proxy_config_t config);
 
 public objc closure void nw_proxy_domain_enumerator_t(byte* arg0);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_enumerate_match_domains(nw_proxy_config_t config, nw_proxy_domain_enumerator_t enumerator);
 
-/// macOS 14.0 and later.
 public extern "C" void nw_proxy_config_enumerate_excluded_domains(nw_proxy_config_t config, nw_proxy_domain_enumerator_t enumerator);
 
 #endif

@@ -53,16 +53,12 @@ public enum CAAutoresizingMask : uint
     MaxYMargin = 32,
 }
 
-/// macOS 15.0 and later.
 public using CAToneMapMode = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" CAToneMapMode? CAToneMapModeAutomatic;
 
-/// macOS 15.0 and later.
 public extern "C" CAToneMapMode? CAToneMapModeNever;
 
-/// macOS 15.0 and later.
 public extern "C" CAToneMapMode? CAToneMapModeIfSupported;
 
 /// macOS 26.0 and later.
@@ -121,10 +117,8 @@ public extern objc class CALayer : NSObject, NSSecureCoding, CAMediaTiming
     [Selector("contentsScale", "setContentsScale:")] public CGFloat ContentsScale { get; set; }
     [Selector("contentsCenter", "setContentsCenter:")] public CGRect ContentsCenter { get; set; }
     [Selector("contentsFormat", "setContentsFormat:")] public CALayerContentsFormat? ContentsFormat { get; set; }
-    /// macOS 14.0 and later.
     /// Deprecated in macOS 26.0.
     [Selector("wantsExtendedDynamicRangeContent", "setWantsExtendedDynamicRangeContent:")] public bool WantsExtendedDynamicRangeContent { get; set; }
-    /// macOS 15.0 and later.
     [Selector("toneMapMode", "setToneMapMode:")] public CAToneMapMode? ToneMapMode { get; set; }
     /// macOS 26.0 and later.
     [Selector("preferredDynamicRange", "setPreferredDynamicRange:")] public CADynamicRange? PreferredDynamicRange { get; set; }

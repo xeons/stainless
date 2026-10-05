@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 14.0 and later.
 public extern objc class VZMacGraphicsDisplay : VZGraphicsDisplay
 {
     [Selector("pixelsPerInch")] public NSInteger PixelsPerInch { get; }

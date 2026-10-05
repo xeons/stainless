@@ -66,9 +66,7 @@ public extern objc class MKMapView : NSView, NSCoding
     [Selector("isScrollEnabled", "setScrollEnabled:")] public bool ScrollEnabled { get; set; }
     [Selector("isRotateEnabled", "setRotateEnabled:")] public bool RotateEnabled { get; set; }
     [Selector("isPitchEnabled", "setPitchEnabled:")] public bool PitchEnabled { get; set; }
-    /// macOS 14.0 and later.
     [Selector("showsUserTrackingButton", "setShowsUserTrackingButton:")] public bool ShowsUserTrackingButton { get; set; }
-    /// macOS 14.0 and later.
     [Selector("pitchButtonVisibility", "setPitchButtonVisibility:")] public MKFeatureVisibility PitchButtonVisibility { get; set; }
     [Selector("showsPitchControl", "setShowsPitchControl:")] public bool ShowsPitchControl { get; set; }
     [Selector("showsZoomControls", "setShowsZoomControls:")] public bool ShowsZoomControls { get; set; }
@@ -152,7 +150,6 @@ public objc interface MKMapViewDelegate : NSObjectProtocol
     [Optional] [Selector("mapView:didAddAnnotationViews:")] void MapViewDidAddAnnotationViews(MKMapView mapView, NSArray views);
     [Optional] [Selector("mapView:didSelectAnnotationView:")] void MapViewDidSelectAnnotationView(MKMapView mapView, MKAnnotationView view);
     [Optional] [Selector("mapView:didDeselectAnnotationView:")] void MapViewDidDeselectAnnotationView(MKMapView mapView, MKAnnotationView view);
-    /// macOS 15.0 and later.
     [Optional] [Selector("mapView:selectionAccessoryForAnnotation:")] MKSelectionAccessory? MapViewSelectionAccessoryForAnnotation(MKMapView mapView, MKAnnotation annotation);
     [Optional] [Selector("mapViewWillStartLocatingUser:")] void MapViewWillStartLocatingUser(MKMapView mapView);
     [Optional] [Selector("mapViewDidStopLocatingUser:")] void MapViewDidStopLocatingUser(MKMapView mapView);

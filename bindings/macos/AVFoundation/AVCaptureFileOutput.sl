@@ -73,9 +73,7 @@ public extern objc class AVCaptureMovieFileOutput : AVCaptureFileOutput
     [Selector("isPrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled", "setPrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled:")] public bool PrimaryConstituentDeviceSwitchingBehaviorForRecordingEnabled { get; set; }
     [Selector("primaryConstituentDeviceSwitchingBehaviorForRecording")] public AVCapturePrimaryConstituentDeviceSwitchingBehavior PrimaryConstituentDeviceSwitchingBehaviorForRecording { get; }
     [Selector("primaryConstituentDeviceRestrictedSwitchingBehaviorConditionsForRecording")] public AVCapturePrimaryConstituentDeviceRestrictedSwitchingBehaviorConditions PrimaryConstituentDeviceRestrictedSwitchingBehaviorConditionsForRecording { get; }
-    /// macOS 15.0 and later.
     [Selector("isSpatialVideoCaptureSupported")] public bool SpatialVideoCaptureSupported { get; }
-    /// macOS 15.0 and later.
     [Selector("isSpatialVideoCaptureEnabled", "setSpatialVideoCaptureEnabled:")] public bool SpatialVideoCaptureEnabled { get; set; }
     [Selector("init")] public Self Init();
     [Selector("new")] public static Self New();

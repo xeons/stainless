@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MetricKit")
 
-/// macOS 14.0 and later.
 public extern objc class MXCrashDiagnosticObjectiveCExceptionReason : NSObject, NSSecureCoding
 {
     [Selector("composedMessage")] public NSString ComposedMessage { get; }

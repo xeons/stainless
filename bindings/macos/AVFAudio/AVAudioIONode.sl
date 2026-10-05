@@ -35,14 +35,12 @@ import Standard.ObjC;
 
 public objc closure AudioBufferList* AVAudioIONodeInputBlock(AVAudioFrameCount arg0);
 
-/// macOS 14.0 and later.
 public enum AVAudioVoiceProcessingSpeechActivityEvent : long
 {
     Started = 0,
     Ended = 1,
 }
 
-/// macOS 14.0 and later.
 public enum AVAudioVoiceProcessingOtherAudioDuckingLevel : long
 {
     Default = 0,
@@ -51,7 +49,6 @@ public enum AVAudioVoiceProcessingOtherAudioDuckingLevel : long
     Max = 30,
 }
 
-/// macOS 14.0 and later.
 public struct AVAudioVoiceProcessingOtherAudioDuckingConfiguration
 {
     public BOOL enableAdvancedDucking;
@@ -73,10 +70,8 @@ public extern objc class AVAudioInputNode : AVAudioIONode, AVAudioMixing
     [Selector("isVoiceProcessingBypassed", "setVoiceProcessingBypassed:")] public bool VoiceProcessingBypassed { get; set; }
     [Selector("isVoiceProcessingAGCEnabled", "setVoiceProcessingAGCEnabled:")] public bool VoiceProcessingAGCEnabled { get; set; }
     [Selector("isVoiceProcessingInputMuted", "setVoiceProcessingInputMuted:")] public bool VoiceProcessingInputMuted { get; set; }
-    /// macOS 14.0 and later.
     [Selector("voiceProcessingOtherAudioDuckingConfiguration", "setVoiceProcessingOtherAudioDuckingConfiguration:")] public AVAudioVoiceProcessingOtherAudioDuckingConfiguration VoiceProcessingOtherAudioDuckingConfiguration { get; set; }
     [Selector("setManualRenderingInputPCMFormat:inputBlock:")] public bool SetManualRenderingInputPCMFormatInputBlock(AVAudioFormat format, AVAudioIONodeInputBlock block);
-    /// macOS 14.0 and later.
     [Selector("setMutedSpeechActivityEventListener:")] public bool SetMutedSpeechActivityEventListener(AVAudioInputNodeSetMutedSpeechActivityEventListenerListenerBlock? listenerBlock);
 }
 

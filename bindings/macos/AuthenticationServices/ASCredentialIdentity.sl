@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.0 and later.
 public objc interface ASCredentialIdentity : NSObjectProtocol
 {
     [Selector("serviceIdentifier")] ASCredentialServiceIdentifier ServiceIdentifier { get; }

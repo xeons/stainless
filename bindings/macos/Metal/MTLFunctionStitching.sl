@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Metal")
 
-/// macOS 15.0 and later.
 [Flags]
 public enum MTLStitchedLibraryOptions : ulong
 {
@@ -73,9 +72,7 @@ public extern objc class MTLStitchedLibraryDescriptor : NSObject, NSCopying
 {
     [Selector("functionGraphs", "setFunctionGraphs:")] public NSArray FunctionGraphs { get; set; }
     [Selector("functions", "setFunctions:")] public NSArray Functions { get; set; }
-    /// macOS 15.0 and later.
     [Selector("binaryArchives", "setBinaryArchives:")] public NSArray BinaryArchives { get; set; }
-    /// macOS 15.0 and later.
     [Selector("options", "setOptions:")] public MTLStitchedLibraryOptions Options { get; set; }
 }
 

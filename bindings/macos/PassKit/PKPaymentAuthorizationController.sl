@@ -82,13 +82,9 @@ public extern objc class PKPaymentAuthorizationController : NSObject
     [Selector("initWithPaymentRequest:")] public Self InitWithPaymentRequest(PKPaymentRequest request);
     [Selector("presentWithCompletion:")] public void PresentWithCompletion(PKPaymentAuthorizationControllerPresentWithCompletionCompletionBlock? completion);
     [Selector("dismissWithCompletion:")] public void DismissWithCompletion(PKPaymentAuthorizationControllerDismissWithCompletionCompletionBlock? completion);
-    /// macOS 15.0 and later.
     [Selector("supportsDisbursements")] public static bool SupportsDisbursements();
-    /// macOS 15.0 and later.
     [Selector("supportsDisbursementsUsingNetworks:")] public static bool SupportsDisbursementsUsingNetworks(NSArray supportedNetworks);
-    /// macOS 15.0 and later.
     [Selector("supportsDisbursementsUsingNetworks:capabilities:")] public static bool SupportsDisbursementsUsingNetworksCapabilities(NSArray supportedNetworks, PKMerchantCapability capabilties);
-    /// macOS 15.0 and later.
     [Selector("initWithDisbursementRequest:")] public Self InitWithDisbursementRequest(PKDisbursementRequest request);
 }
 

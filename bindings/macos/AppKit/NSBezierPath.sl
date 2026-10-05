@@ -65,7 +65,6 @@ public enum NSBezierPathElement : ulong
 
 public extern objc class NSBezierPath : NSObject, NSCopying, NSSecureCoding
 {
-    /// macOS 14.0 and later.
     [Selector("CGPath", "setCGPath:")] public CGPathRef? CGPath { get; set; }
     [Selector("defaultMiterLimit", "setDefaultMiterLimit:")] public static CGFloat DefaultMiterLimit { get; set; }
     [Selector("defaultFlatness", "setDefaultFlatness:")] public static CGFloat DefaultFlatness { get; set; }
@@ -90,7 +89,6 @@ public extern objc class NSBezierPath : NSObject, NSCopying, NSSecureCoding
     [Selector("bezierPathWithRect:")] public static NSBezierPath BezierPathWithRect(NSRect rect);
     [Selector("bezierPathWithOvalInRect:")] public static NSBezierPath BezierPathWithOvalInRect(NSRect rect);
     [Selector("bezierPathWithRoundedRect:xRadius:yRadius:")] public static NSBezierPath BezierPathWithRoundedRectXRadiusYRadius(NSRect rect, CGFloat xRadius, CGFloat yRadius);
-    /// macOS 14.0 and later.
     [Selector("bezierPathWithCGPath:")] public static NSBezierPath BezierPathWithCGPath(CGPathRef cgPath);
     [Selector("fillRect:")] public static void FillRect(NSRect rect);
     [Selector("strokeRect:")] public static void StrokeRect(NSRect rect);
@@ -100,14 +98,12 @@ public extern objc class NSBezierPath : NSObject, NSCopying, NSSecureCoding
     [Selector("moveToPoint:")] public void MoveToPoint(NSPoint point);
     [Selector("lineToPoint:")] public void LineToPoint(NSPoint point);
     [Selector("curveToPoint:controlPoint1:controlPoint2:")] public void CurveToPointControlPoint1ControlPoint2(NSPoint endPoint, NSPoint controlPoint1, NSPoint controlPoint2);
-    /// macOS 14.0 and later.
     [Selector("curveToPoint:controlPoint:")] public void CurveToPointControlPoint(NSPoint endPoint, NSPoint controlPoint);
     [Selector("closePath")] public void ClosePath();
     [Selector("removeAllPoints")] public void RemoveAllPoints();
     [Selector("relativeMoveToPoint:")] public void RelativeMoveToPoint(NSPoint point);
     [Selector("relativeLineToPoint:")] public void RelativeLineToPoint(NSPoint point);
     [Selector("relativeCurveToPoint:controlPoint1:controlPoint2:")] public void RelativeCurveToPointControlPoint1ControlPoint2(NSPoint endPoint, NSPoint controlPoint1, NSPoint controlPoint2);
-    /// macOS 14.0 and later.
     [Selector("relativeCurveToPoint:controlPoint:")] public void RelativeCurveToPointControlPoint(NSPoint endPoint, NSPoint controlPoint);
     [Selector("getLineDash:count:phase:")] public void GetLineDashCountPhase(CGFloat* pattern, NSInteger* count, CGFloat* phase);
     [Selector("setLineDash:count:phase:")] public void SetLineDashCountPhase(CGFloat* pattern, NSInteger count, CGFloat phase);

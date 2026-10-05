@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AppKit")
 
-/// macOS 15.0 and later.
 public extern objc class NSAdaptiveImageGlyph : NSObject, NSCopying, NSSecureCoding, CTAdaptiveImageProviding
 {
     [Selector("imageContent")] public NSData ImageContent { get; }
@@ -47,7 +46,6 @@ public extern objc class NSAdaptiveImageGlyph : NSObject, NSCopying, NSSecureCod
 /// NSAttributedStringAdaptiveImageGlyphConveniences, a category of NSAttributedString.
 public extern objc class NSAttributedString
 {
-    /// macOS 15.0 and later.
     [Selector("attributedStringWithAdaptiveImageGlyph:attributes:")] public static Self AttributedStringWithAdaptiveImageGlyphAttributes(NSAdaptiveImageGlyph adaptiveImageGlyph, NSDictionary attributes);
 }
 

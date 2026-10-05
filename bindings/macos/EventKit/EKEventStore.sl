@@ -52,11 +52,8 @@ public extern objc class EKEventStore : NSObject
     [Selector("initWithAccessToEntityTypes:")] public AnyObject InitWithAccessToEntityTypes(EKEntityMask entityTypes);
     [Selector("init")] public AnyObject Init();
     [Selector("initWithSources:")] public Self InitWithSources(NSArray sources);
-    /// macOS 14.0 and later.
     [Selector("requestFullAccessToEventsWithCompletion:")] public void RequestFullAccessToEventsWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
-    /// macOS 14.0 and later.
     [Selector("requestWriteOnlyAccessToEventsWithCompletion:")] public void RequestWriteOnlyAccessToEventsWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
-    /// macOS 14.0 and later.
     [Selector("requestFullAccessToRemindersWithCompletion:")] public void RequestFullAccessToRemindersWithCompletion(EKEventStoreRequestAccessCompletionHandler completion);
     /// Deprecated in macOS 14.0.
     [Selector("requestAccessToEntityType:completion:")] public void RequestAccessToEntityTypeCompletion(EKEntityType entityType, EKEventStoreRequestAccessCompletionHandler completion);

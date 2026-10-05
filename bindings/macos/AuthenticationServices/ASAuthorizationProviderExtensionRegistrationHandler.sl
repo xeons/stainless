@@ -60,7 +60,6 @@ public enum ASAuthorizationProviderExtensionRegistrationResult : long
     FailedNoRetry = 3,
 }
 
-/// macOS 14.0 and later.
 [Flags]
 public enum ASAuthorizationProviderExtensionSupportedGrantTypes : long
 {
@@ -71,7 +70,6 @@ public enum ASAuthorizationProviderExtensionSupportedGrantTypes : long
     SAML2_0 = 8,
 }
 
-/// macOS 14.0 and later.
 public enum ASAuthorizationProviderExtensionPlatformSSOProtocolVersion : long
 {
     Version1_0 = 0,
@@ -90,22 +88,15 @@ public objc closure void ASAuthorizationProviderExtensionRegistrationHandlerProf
 
 public objc interface ASAuthorizationProviderExtensionRegistrationHandler : NSObjectProtocol
 {
-    /// macOS 15.0 and later.
     [Optional] [Selector("supportedDeviceSigningAlgorithms")] NSArray? SupportedDeviceSigningAlgorithms { get; }
-    /// macOS 15.0 and later.
     [Optional] [Selector("supportedDeviceEncryptionAlgorithms")] NSArray? SupportedDeviceEncryptionAlgorithms { get; }
-    /// macOS 15.0 and later.
     [Optional] [Selector("supportedUserSecureEnclaveKeySigningAlgorithms")] NSArray? SupportedUserSecureEnclaveKeySigningAlgorithms { get; }
     [Selector("beginDeviceRegistrationUsingLoginManager:options:completion:")] void BeginDeviceRegistrationUsingLoginManagerOptionsCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRequestOptions options, ASAuthorizationProviderExtensionRegistrationHandlerBeginDeviceRegistrationUsingLoginManagerOptionsCompletionCompletionBlock completion);
     [Selector("beginUserRegistrationUsingLoginManager:userName:authenticationMethod:options:completion:")] void BeginUserRegistrationUsingLoginManagerUserNameAuthenticationMethodOptionsCompletion(ASAuthorizationProviderExtensionLoginManager loginManager, NSString? userName, ASAuthorizationProviderExtensionAuthenticationMethod authenticationMethod, ASAuthorizationProviderExtensionRequestOptions options, ASAuthorizationProviderExtensionRegistrationHandlerBeginUserRegistrationUsingLoginManagerUserNameAuthenticationMethodOptionsCompletionCompletionBlock completion);
     [Optional] [Selector("registrationDidComplete")] void RegistrationDidComplete();
-    /// macOS 14.0 and later.
     [Optional] [Selector("registrationDidCancel")] void RegistrationDidCancel();
-    /// macOS 14.0 and later.
     [Optional] [Selector("supportedGrantTypes")] ASAuthorizationProviderExtensionSupportedGrantTypes SupportedGrantTypes();
-    /// macOS 14.0 and later.
     [Optional] [Selector("protocolVersion")] ASAuthorizationProviderExtensionPlatformSSOProtocolVersion ProtocolVersion();
-    /// macOS 15.0 and later.
     [Optional] [Selector("keyWillRotateForKeyType:newKey:loginManager:completion:")] void KeyWillRotateForKeyTypeNewKeyLoginManagerCompletion(ASAuthorizationProviderExtensionKeyType keyType, SecKeyRef newKey, ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerKeyWillRotateForKeyTypeNewKeyLoginManagerCompletionCompletionBlock completion);
     /// macOS 26.0 and later.
     [Optional] [Selector("displayNamesForGroups:loginManager:completion:")] void DisplayNamesForGroupsLoginManagerCompletion(NSArray groups, ASAuthorizationProviderExtensionLoginManager loginManager, ASAuthorizationProviderExtensionRegistrationHandlerDisplayNamesForGroupsLoginManagerCompletionCompletionBlock completion);

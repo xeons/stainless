@@ -45,9 +45,7 @@ public extern objc class ASWebAuthenticationSessionRequest : NSObject, NSSecureC
     [Selector("callbackURLScheme")] public NSString? CallbackURLScheme { get; }
     [Selector("shouldUseEphemeralSession")] public bool ShouldUseEphemeralSession { get; }
     [Selector("delegate", "setDelegate:")] public ASWebAuthenticationSessionRequestDelegate? Delegate { get; set; }
-    /// macOS 14.4 and later.
     [Selector("additionalHeaderFields")] public NSDictionary? AdditionalHeaderFields { get; }
-    /// macOS 14.4 and later.
     [Selector("callback")] public ASWebAuthenticationSessionCallback? Callback { get; }
     [Selector("cancelWithError:")] public void CancelWithError(NSError error);
     [Selector("completeWithCallbackURL:")] public void CompleteWithCallbackURL(NSURL url);

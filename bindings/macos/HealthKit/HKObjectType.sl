@@ -39,7 +39,6 @@ public extern objc class HKObjectType : NSObject, NSSecureCoding, NSCopying
     [Selector("characteristicTypeForIdentifier:")] public static HKCharacteristicType? CharacteristicTypeForIdentifier(HKCharacteristicTypeIdentifier identifier);
     [Selector("correlationTypeForIdentifier:")] public static HKCorrelationType? CorrelationTypeForIdentifier(HKCorrelationTypeIdentifier identifier);
     [Selector("documentTypeForIdentifier:")] public static HKDocumentType? DocumentTypeForIdentifier(HKDocumentTypeIdentifier identifier);
-    /// macOS 15.0 and later.
     [Selector("scoredAssessmentTypeForIdentifier:")] public static HKScoredAssessmentType? ScoredAssessmentTypeForIdentifier(HKScoredAssessmentTypeIdentifier identifier);
     [Selector("seriesTypeForIdentifier:")] public static HKSeriesType? SeriesTypeForIdentifier(NSString identifier);
     [Selector("workoutType")] public static HKWorkoutType WorkoutType();
@@ -49,7 +48,6 @@ public extern objc class HKObjectType : NSObject, NSSecureCoding, NSCopying
     /// macOS 26.0 and later.
     [Selector("medicationDoseEventType")] public static HKMedicationDoseEventType MedicationDoseEventType();
     [Selector("visionPrescriptionType")] public static HKPrescriptionType VisionPrescriptionType();
-    /// macOS 15.0 and later.
     [Selector("stateOfMindType")] public static HKStateOfMindType StateOfMindType();
     /// macOS 26.0 and later.
     [Selector("userAnnotatedMedicationType")] public static HKUserAnnotatedMedicationType UserAnnotatedMedicationType();
@@ -98,10 +96,8 @@ public extern objc class HKMedicationDoseEventType : HKSampleType { }
 
 public extern objc class HKPrescriptionType : HKSampleType { }
 
-/// macOS 15.0 and later.
 public extern objc class HKScoredAssessmentType : HKSampleType { }
 
-/// macOS 15.0 and later.
 public extern objc class HKStateOfMindType : HKSampleType { }
 
 /// macOS 26.0 and later.

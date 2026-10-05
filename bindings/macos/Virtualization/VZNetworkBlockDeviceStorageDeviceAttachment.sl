@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 14.0 and later.
 public extern objc class VZNetworkBlockDeviceStorageDeviceAttachment : VZStorageDeviceAttachment
 {
     [Selector("URL")] public NSURL URL { get; }
@@ -44,7 +43,6 @@ public extern objc class VZNetworkBlockDeviceStorageDeviceAttachment : VZStorage
     [Selector("validateURL:error:")] public static bool ValidateURLError(NSURL URL, out NSError? error);
 }
 
-/// macOS 14.0 and later.
 public objc interface VZNetworkBlockDeviceStorageDeviceAttachmentDelegate : NSObjectProtocol
 {
     [Optional] [Selector("attachmentWasConnected:")] void AttachmentWasConnected(VZNetworkBlockDeviceStorageDeviceAttachment attachment);

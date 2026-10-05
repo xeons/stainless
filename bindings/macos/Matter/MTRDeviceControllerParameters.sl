@@ -31,26 +31,22 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 14.6 and later.
 public extern objc class MTRDeviceControllerAbstractParameters : NSObject
 {
     [Selector("startSuspended", "setStartSuspended:")] public bool StartSuspended { get; set; }
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 {
     [Selector("productAttestationAuthorityCertificates", "setProductAttestationAuthorityCertificates:")] public NSArray? ProductAttestationAuthorityCertificates { get; set; }
     [Selector("certificationDeclarationCertificates", "setCertificationDeclarationCertificates:")] public NSArray? CertificationDeclarationCertificates { get; set; }
     [Selector("shouldAdvertiseOperational", "setShouldAdvertiseOperational:")] public bool ShouldAdvertiseOperational { get; set; }
-    /// macOS 14.6 and later.
     [Selector("concurrentSubscriptionEstablishmentsAllowedOnThread", "setConcurrentSubscriptionEstablishmentsAllowedOnThread:")] public NSUInteger ConcurrentSubscriptionEstablishmentsAllowedOnThread { get; set; }
     [Selector("storageBehaviorConfiguration", "setStorageBehaviorConfiguration:")] public MTRDeviceStorageBehaviorConfiguration? StorageBehaviorConfiguration { get; set; }
     [Selector("setOperationalCertificateIssuer:queue:")] public void SetOperationalCertificateIssuerQueue(MTROperationalCertificateIssuer operationalCertificateIssuer, dispatch_queue_t queue);
     [Selector("setOTAProviderDelegate:queue:")] public void SetOTAProviderDelegateQueue(MTROTAProviderDelegate otaProviderDelegate, dispatch_queue_t queue);
 }
 
-/// macOS 14.6 and later.
 public extern objc class MTRDeviceControllerExternalCertificateParameters : MTRDeviceControllerParameters
 {
     /// macOS 15.2 and later.

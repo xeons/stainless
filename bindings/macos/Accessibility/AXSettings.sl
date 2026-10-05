@@ -31,25 +31,18 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Accessibility")
 
-/// macOS 14.0 and later.
 public extern "C" BOOL AXPrefersHorizontalTextLayout();
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName? AXPrefersHorizontalTextLayoutDidChangeNotification;
 
-/// macOS 14.0 and later.
 public extern "C" BOOL AXAnimatedImagesEnabled();
 
-/// macOS 14.0 and later.
 public extern "C" NSNotificationName? AXAnimatedImagesEnabledDidChangeNotification;
 
-/// macOS 15.0 and later.
 public extern "C" BOOL AXAssistiveAccessEnabled();
 
-/// macOS 15.0 and later.
 public extern "C" BOOL AXPrefersNonBlinkingTextInsertionIndicator();
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? AXPrefersNonBlinkingTextInsertionIndicatorDidChangeNotification;
 
 /// macOS 26.1 and later.
@@ -64,7 +57,6 @@ public extern "C" BOOL AXShowBordersEnabled();
 /// macOS 26.1 and later.
 public extern "C" NSNotificationName? AXShowBordersEnabledStatusDidChangeNotification;
 
-/// macOS 15.0 and later.
 public enum AXSettingsFeature : long
 {
     PersonalVoiceAllowAppsToRequestToUse = 1,
@@ -76,7 +68,6 @@ public enum AXSettingsFeature : long
 
 public objc closure void AXOpenSettingsFeatureCompletionHandlerBlock(NSError? arg0);
 
-/// macOS 15.0 and later.
 public extern "C" void AXOpenSettingsFeature(AXSettingsFeature feature, AXOpenSettingsFeatureCompletionHandlerBlock? completionHandler);
 
 #endif

@@ -39,7 +39,6 @@ public enum MTRLogType : long
 
 public objc closure void MTRLogCallback(MTRLogType arg0, NSString arg1, NSString arg2);
 
-/// macOS 13.3 and later.
 public extern "C" void MTRSetLogCallback(MTRLogType logTypeThreshold, MTRLogCallback? callback);
 
 #endif

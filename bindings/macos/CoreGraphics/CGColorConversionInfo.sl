@@ -52,7 +52,6 @@ public enum CGColorConversionInfoTransformType : uint
 
 [ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateFromListWithArguments(CFDictionaryRef? options, CGColorSpaceRef? arg1, CGColorConversionInfoTransformType arg2, CGColorRenderingIntent arg3, VaList arg4);
 
-/// macOS 15.0 and later.
 [ReturnsRetained] public extern "C" CGColorConversionInfoRef? CGColorConversionInfoCreateForToneMapping(CGColorSpaceRef from, float source_headroom, CGColorSpaceRef to, float target_headroom, CGToneMapping method, CFDictionaryRef? options, __CFError** error);
 
 public struct CGColorBufferFormat
@@ -64,7 +63,6 @@ public struct CGColorBufferFormat
     public nuint bytesPerRow;
 }
 
-/// macOS 15.0 and later.
 public extern "C" bool CGColorConversionInfoConvertData(CGColorConversionInfoRef info, nuint width, nuint height, void* dst_data, CGColorBufferFormat dst_format, void* src_data, CGColorBufferFormat src_format, CFDictionaryRef? options);
 
 public extern "C" CFStringRef kCGColorConversionBlackPointCompensation;

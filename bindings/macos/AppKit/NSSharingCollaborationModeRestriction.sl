@@ -37,7 +37,6 @@ public enum NSSharingCollaborationMode : long
     Collaborate = 1,
 }
 
-/// macOS 15.0 and later.
 public extern objc class NSSharingCollaborationModeRestriction : NSObject, NSSecureCoding, NSCopying
 {
     [Selector("disabledMode")] public NSSharingCollaborationMode DisabledMode { get; }

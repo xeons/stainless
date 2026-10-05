@@ -35,7 +35,6 @@ public objc closure NSString AVCaptureIndexPickerInitWithLocalizedTitleSymbolNam
 
 public objc closure void AVCaptureIndexPickerSetActionQueueActionActionBlock(NSInteger arg0);
 
-/// macOS 15.0 and later.
 public extern objc class AVCaptureIndexPicker : AVCaptureControl
 {
     [Selector("selectedIndex", "setSelectedIndex:")] public NSInteger SelectedIndex { get; set; }

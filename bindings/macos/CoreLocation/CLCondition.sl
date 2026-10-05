@@ -31,9 +31,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreLocation")
 
-/// macOS 14.0 and later.
 public extern objc class CLCondition : NSObject, NSSecureCoding, NSCopying { }
 
-public const int CL_TARGET_SUPPORTS_CONDITIONS = 0;
+public const int CL_TARGET_SUPPORTS_CONDITIONS = 1;
 
 #endif

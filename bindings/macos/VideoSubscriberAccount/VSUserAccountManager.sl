@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "VideoSubscriberAccount")
 
-/// macOS 13.3 and later.
 [Flags]
 public enum VSUserAccountQueryOptions : long
 {
@@ -47,7 +46,6 @@ public objc closure void VSUserAccountManagerQueryAutoSignInTokenWithCompletionH
 
 public objc closure void VSUserAccountManagerDeleteAutoSignInTokenWithCompletionHandlerCompletionBlock(NSError? arg0);
 
-/// macOS 13.3 and later.
 public extern objc class VSUserAccountManager : NSObject
 {
     [Selector("sharedUserAccountManager")] public static VSUserAccountManager SharedUserAccountManager { get; }

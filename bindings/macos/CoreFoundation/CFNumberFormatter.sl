@@ -157,7 +157,6 @@ public extern "C" CFNumberFormatterKey? kCFNumberFormatterMinSignificantDigits;
 
 public extern "C" CFNumberFormatterKey? kCFNumberFormatterMaxSignificantDigits;
 
-/// macOS 15.0 and later.
 public extern "C" CFNumberFormatterKey? kCFNumberFormatterMinGroupingDigits;
 
 public enum CFNumberFormatterRoundingMode : long

@@ -228,7 +228,6 @@ public extern objc class AVPlayer
     [Selector("playbackCoordinator")] public AVPlayerPlaybackCoordinator? PlaybackCoordinator { get; }
 }
 
-/// macOS 14.2 and later.
 /// AVPlayerOutputSupport, a category of AVPlayer.
 public extern objc class AVPlayer
 {

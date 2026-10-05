@@ -82,10 +82,8 @@ public extern "C" GCInputButtonName? GCInputLeftShoulder;
 
 public extern "C" GCInputButtonName? GCInputRightShoulder;
 
-/// macOS 14.4 and later.
 public extern "C" GCInputButtonName? GCInputLeftBumper;
 
-/// macOS 14.4 and later.
 public extern "C" GCInputButtonName? GCInputRightBumper;
 
 /// macOS 26.0 and later.
@@ -95,10 +93,8 @@ public extern "C" GCInputButtonName? GCInputLeftTrigger;
 
 public extern "C" GCInputButtonName? GCInputRightTrigger;
 
-/// macOS 14.4 and later.
 public extern "C" GCInputButtonName? GCInputBackLeftButton(NSInteger position);
 
-/// macOS 14.4 and later.
 public extern "C" GCInputButtonName? GCInputBackRightButton(NSInteger position);
 
 public extern "C" GCInputButtonName? GCInputButtonHome;

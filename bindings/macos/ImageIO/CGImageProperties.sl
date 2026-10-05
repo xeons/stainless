@@ -134,10 +134,8 @@ public extern "C" CFStringRef kCGImagePropertyTIFFXResolution;
 
 public extern "C" CFStringRef kCGImagePropertyTIFFYResolution;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef kCGImagePropertyTIFFXPosition;
 
-/// macOS 14.4 and later.
 public extern "C" CFStringRef kCGImagePropertyTIFFYPosition;
 
 public extern "C" CFStringRef kCGImagePropertyTIFFResolutionUnit;
@@ -1301,7 +1299,6 @@ public extern "C" CFStringRef kCGImageAuxiliaryDataTypeSemanticSegmentationSkyMa
 
 public extern "C" CFStringRef kCGImageAuxiliaryDataTypeHDRGainMap;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGImageAuxiliaryDataTypeISOGainMap;
 
 public extern "C" CFStringRef kCGImageAuxiliaryDataInfoData;
@@ -1310,7 +1307,6 @@ public extern "C" CFStringRef kCGImageAuxiliaryDataInfoDataDescription;
 
 public extern "C" CFStringRef kCGImageAuxiliaryDataInfoMetadata;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGImageAuxiliaryDataInfoColorSpace;
 
 public extern "C" CFStringRef kCGImagePropertyImageCount;
@@ -1351,14 +1347,12 @@ public extern "C" CFStringRef kCGImagePropertyGroupImageIndexLeft;
 
 public extern "C" CFStringRef kCGImagePropertyGroupImageIndexRight;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGImagePropertyGroupImageIndexMonoscopic;
 
 public extern "C" CFStringRef kCGImagePropertyGroupImageIsLeftImage;
 
 public extern "C" CFStringRef kCGImagePropertyGroupImageIsRightImage;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGImagePropertyGroupImageIsMonoscopicImage;
 
 public extern "C" CFStringRef kCGImagePropertyGroupImageIsAlternateImage;
@@ -1367,31 +1361,22 @@ public extern "C" CFStringRef kCGImagePropertyGroupImageBaseline;
 
 public extern "C" CFStringRef kCGImagePropertyGroupImageDisparityAdjustment;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGImagePropertyGroupImageStereoAggressors;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIIOStereoAggressors_Type;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIIOStereoAggressors_SubTypeURI;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIIOStereoAggressors_Severity;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kCGImagePropertyGroupMonoscopicImageLocation;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIIOMonoscopicImageLocation_Unspecified;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIIOMonoscopicImageLocation_Left;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIIOMonoscopicImageLocation_Right;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kIIOMonoscopicImageLocation_Center;
 
 public extern "C" CFStringRef kIIOMetadata_CameraExtrinsicsKey;

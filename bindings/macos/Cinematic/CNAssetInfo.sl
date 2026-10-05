@@ -38,7 +38,6 @@ public objc closure void CNAssetInfoCheckIfCinematicCompletionHandlerCompletionH
 
 public objc closure void CNAssetInfoLoadFromAssetCompletionHandlerCompletionHandlerBlock(CNAssetInfo? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class CNAssetInfo : NSObject
 {
     [Selector("asset")] public AVAsset Asset { get; }
@@ -54,7 +53,6 @@ public extern objc class CNAssetInfo : NSObject
     [Selector("loadFromAsset:completionHandler:")] public static void LoadFromAssetCompletionHandler(AVAsset asset, CNAssetInfoLoadFromAssetCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
-/// macOS 14.0 and later.
 /// AbstractTracks, a category of CNAssetInfo.
 public extern objc class CNAssetInfo
 {
@@ -64,13 +62,11 @@ public extern objc class CNAssetInfo
     [Selector("sampleDataTrackIDs")] public NSArray SampleDataTrackIDs { get; }
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNCompositionInfo : CNAssetInfo
 {
     [Selector("insertTimeRange:ofCinematicAssetInfo:atTime:error:")] public bool InsertTimeRangeOfCinematicAssetInfoAtTimeError(CMTimeRange timeRange, CNAssetInfo assetInfo, CMTime startTime, out NSError? outError);
 }
 
-/// macOS 14.0 and later.
 /// CNComposition, a category of AVMutableComposition.
 public extern objc class AVMutableComposition
 {

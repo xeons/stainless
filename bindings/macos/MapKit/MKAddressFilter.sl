@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MapKit")
 
-/// macOS 15.0 and later.
 [Flags]
 public enum MKAddressFilterOption : ulong
 {
@@ -43,7 +42,6 @@ public enum MKAddressFilterOption : ulong
     PostalCode = 32,
 }
 
-/// macOS 15.0 and later.
 public extern objc class MKAddressFilter : NSObject, NSSecureCoding, NSCopying
 {
     [Selector("filterIncludingAll")] public static MKAddressFilter? FilterIncludingAll { get; }

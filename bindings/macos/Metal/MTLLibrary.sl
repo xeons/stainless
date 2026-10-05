@@ -140,7 +140,6 @@ public enum MTLLibraryOptimizationLevel : long
     Size = 1,
 }
 
-/// macOS 13.3 and later.
 public enum MTLCompileSymbolVisibility : long
 {
     Default = 0,
@@ -165,9 +164,7 @@ public extern objc class MTLCompileOptions : NSObject, NSCopying
     [Selector("preprocessorMacros", "setPreprocessorMacros:")] public NSDictionary? PreprocessorMacros { get; set; }
     /// Deprecated in macOS 15.0.
     [Selector("fastMathEnabled", "setFastMathEnabled:")] public bool FastMathEnabled { get; set; }
-    /// macOS 15.0 and later.
     [Selector("mathMode", "setMathMode:")] public MTLMathMode MathMode { get; set; }
-    /// macOS 15.0 and later.
     [Selector("mathFloatingPointFunctions", "setMathFloatingPointFunctions:")] public MTLMathFloatingPointFunctions MathFloatingPointFunctions { get; set; }
     [Selector("languageVersion", "setLanguageVersion:")] public MTLLanguageVersion LanguageVersion { get; set; }
     [Selector("libraryType", "setLibraryType:")] public MTLLibraryType LibraryType { get; set; }
@@ -175,15 +172,11 @@ public extern objc class MTLCompileOptions : NSObject, NSCopying
     [Selector("libraries", "setLibraries:")] public NSArray? Libraries { get; set; }
     [Selector("preserveInvariance", "setPreserveInvariance:")] public bool PreserveInvariance { get; set; }
     [Selector("optimizationLevel", "setOptimizationLevel:")] public MTLLibraryOptimizationLevel OptimizationLevel { get; set; }
-    /// macOS 13.3 and later.
     [Selector("compileSymbolVisibility", "setCompileSymbolVisibility:")] public MTLCompileSymbolVisibility CompileSymbolVisibility { get; set; }
-    /// macOS 13.3 and later.
     [Selector("allowReferencingUndefinedSymbols", "setAllowReferencingUndefinedSymbols:")] public bool AllowReferencingUndefinedSymbols { get; set; }
-    /// macOS 13.3 and later.
     [Selector("maxTotalThreadsPerThreadgroup", "setMaxTotalThreadsPerThreadgroup:")] public NSUInteger MaxTotalThreadsPerThreadgroup { get; set; }
     /// macOS 26.0 and later.
     [Selector("requiredThreadsPerThreadgroup", "setRequiredThreadsPerThreadgroup:")] public MTLSize RequiredThreadsPerThreadgroup { get; set; }
-    /// macOS 15.0 and later.
     [Selector("enableLogging", "setEnableLogging:")] public bool EnableLogging { get; set; }
 }
 

@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 14.0 and later.
 public extern objc class VZDiskBlockDeviceStorageDeviceAttachment : VZStorageDeviceAttachment
 {
     [Selector("fileHandle")] public NSFileHandle FileHandle { get; }

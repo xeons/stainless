@@ -30,10 +30,8 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Foundation")
 
-/// macOS 15.0 and later.
 public extern objc class NSKeyValueSharedObserversSnapshot : NSObject { }
 
-/// macOS 15.0 and later.
 public extern objc class NSKeyValueSharedObservers : NSObject
 {
     [Selector("initWithObservableClass:")] public AnyObject InitWithObservableClass(Class observableClass);
@@ -44,7 +42,6 @@ public extern objc class NSKeyValueSharedObservers : NSObject
 /// NSKeyValueSharedObserverRegistration, a category of NSObject.
 public extern objc class NSObject
 {
-    /// macOS 15.0 and later.
     [Selector("setSharedObservers:")] public void SetSharedObservers(NSKeyValueSharedObserversSnapshot? sharedObservers);
 }
 

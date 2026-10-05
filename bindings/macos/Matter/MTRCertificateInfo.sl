@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public extern objc class MTRCertificateInfo : NSObject, NSCopying
 {
     [Selector("issuer")] public MTRDistinguishedNameInfo Issuer { get; }
@@ -43,7 +42,6 @@ public extern objc class MTRCertificateInfo : NSObject, NSCopying
     [Selector("initWithTLVBytes:")] public Self? InitWithTLVBytes(MTRCertificateTLVBytes bytes);
 }
 
-/// macOS 13.3 and later.
 public extern objc class MTRDistinguishedNameInfo : NSObject, NSCopying
 {
     [Selector("nodeID")] public NSNumber? NodeID { get; }

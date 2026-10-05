@@ -29,7 +29,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Vision")
 
-/// macOS 14.0 and later.
 public extern objc class VNRecognizedPoint3D : VNPoint3D
 {
     [Selector("identifier")] public VNRecognizedPointKey Identifier { get; }

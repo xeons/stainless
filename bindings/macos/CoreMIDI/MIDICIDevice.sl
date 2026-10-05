@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMIDI")
 
-/// macOS 15.0 and later.
 public extern objc class MIDICIDevice : NSObject
 {
     [Selector("deviceInfo")] public MIDI2DeviceInfo DeviceInfo { get; }

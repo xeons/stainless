@@ -39,7 +39,6 @@ public extern objc class PKDrawing : NSObject, NSCopying, NSSecureCoding
 {
     [Selector("strokes")] public NSArray Strokes { get; }
     [Selector("bounds")] public CGRect Bounds { get; }
-    /// macOS 14.0 and later.
     [Selector("requiredContentVersion")] public PKContentVersion RequiredContentVersion { get; }
     [Selector("init")] public Self Init();
     [Selector("initWithStrokes:")] public Self InitWithStrokes(NSArray strokes);

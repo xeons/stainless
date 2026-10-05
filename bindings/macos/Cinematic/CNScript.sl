@@ -35,7 +35,6 @@ import Standard.ObjC;
 
 public objc closure void CNScriptLoadFromAssetChangesProgressCompletionHandlerCompletionHandlerBlock(CNScript? arg0, NSError? arg1);
 
-/// macOS 14.0 and later.
 public extern objc class CNScript : NSObject
 {
     [Selector("timeRange")] public CMTimeRange TimeRange { get; }
@@ -66,7 +65,6 @@ public extern objc class CNScript : NSObject
     [Selector("removeDetectionTrack:")] public bool RemoveDetectionTrack(CNDetectionTrack detectionTrack);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNScriptChanges : NSObject
 {
     [Selector("dataRepresentation")] public NSData DataRepresentation { get; }
@@ -76,7 +74,6 @@ public extern objc class CNScriptChanges : NSObject
     [Selector("initWithDataRepresentation:")] public Self? InitWithDataRepresentation(NSData dataRepresentation);
 }
 
-/// macOS 14.0 and later.
 public extern objc class CNScriptFrame : NSObject, NSCopying
 {
     [Selector("time")] public CMTime Time { get; }
@@ -85,7 +82,6 @@ public extern objc class CNScriptFrame : NSObject, NSCopying
     [Selector("allDetections")] public NSArray AllDetections { get; }
 }
 
-/// macOS 14.0 and later.
 /// CNExtensions, a category of CNScriptFrame.
 public extern objc class CNScriptFrame
 {

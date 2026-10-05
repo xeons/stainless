@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AVFoundation")
 
-/// macOS 15.0 and later.
 public extern objc class AVRenderedCaptionImage : NSObject
 {
     [Selector("pixelBuffer")] public CVPixelBufferRef PixelBuffer { get; }

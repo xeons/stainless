@@ -32,7 +32,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMedia")
 
-/// macOS 14.0 and later.
 public enum CMTaggedBufferGroupError : int
 {
     ParamErr = -15780,
@@ -42,59 +41,42 @@ public enum CMTaggedBufferGroupError : int
 
 public struct OpaqueCMTaggedBufferGroup;
 
-/// macOS 14.0 and later.
 [CFType("CMTaggedBufferGroupGetTypeID")]
 public extern objc class CMTaggedBufferGroupRef : CFTypeRef { }
 
-/// macOS 14.0 and later.
 public extern "C" CFTypeID CMTaggedBufferGroupGetTypeID();
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTaggedBufferGroupCreate(CFAllocatorRef? allocator, CFArrayRef tagCollections, CFArrayRef buffers, OpaqueCMTaggedBufferGroup** groupOut);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTaggedBufferGroupCreateCombined(CFAllocatorRef? allocator, CFArrayRef taggedBufferGroups, OpaqueCMTaggedBufferGroup** groupOut);
 
-/// macOS 14.0 and later.
 public extern "C" CMItemCount CMTaggedBufferGroupGetCount(CMTaggedBufferGroupRef group);
 
-/// macOS 14.0 and later.
 public extern "C" CMTagCollectionRef? CMTaggedBufferGroupGetTagCollectionAtIndex(CMTaggedBufferGroupRef group, CFIndex index);
 
-/// macOS 14.0 and later.
 public extern "C" CVPixelBufferRef? CMTaggedBufferGroupGetCVPixelBufferAtIndex(CMTaggedBufferGroupRef group, CFIndex index);
 
-/// macOS 14.0 and later.
 public extern "C" CVPixelBufferRef? CMTaggedBufferGroupGetCVPixelBufferForTag(CMTaggedBufferGroupRef group, CMTag tag, CFIndex* indexOut);
 
-/// macOS 14.0 and later.
 public extern "C" CVPixelBufferRef? CMTaggedBufferGroupGetCVPixelBufferForTagCollection(CMTaggedBufferGroupRef group, CMTagCollectionRef tagCollection, CFIndex* indexOut);
 
-/// macOS 14.0 and later.
 public extern "C" CMSampleBufferRef? CMTaggedBufferGroupGetCMSampleBufferAtIndex(CMTaggedBufferGroupRef group, CFIndex index);
 
-/// macOS 14.0 and later.
 public extern "C" CMSampleBufferRef? CMTaggedBufferGroupGetCMSampleBufferForTag(CMTaggedBufferGroupRef group, CMTag tag, CFIndex* indexOut);
 
-/// macOS 14.0 and later.
 public extern "C" CMSampleBufferRef? CMTaggedBufferGroupGetCMSampleBufferForTagCollection(CMTaggedBufferGroupRef group, CMTagCollectionRef tagCollection, CFIndex* indexOut);
 
-/// macOS 14.0 and later.
 public extern "C" CMItemCount CMTaggedBufferGroupGetNumberOfMatchesForTagCollection(CMTaggedBufferGroupRef group, CMTagCollectionRef tagCollection);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMTaggedBufferGroupFormatDescriptionCreateForTaggedBufferGroup(CFAllocatorRef? allocator, CMTaggedBufferGroupRef taggedBufferGroup, void** formatDescriptionOut);
 
 /// macOS 26.0 and later.
 public extern "C" OSStatus CMTaggedBufferGroupFormatDescriptionCreateForTaggedBufferGroupWithExtensions(CFAllocatorRef? allocator, CMTaggedBufferGroupRef taggedBufferGroup, CFDictionaryRef? extensions, void** formatDescriptionOut);
 
-/// macOS 14.0 and later.
 public extern "C" Boolean CMTaggedBufferGroupFormatDescriptionMatchesTaggedBufferGroup(CMTaggedBufferGroupFormatDescriptionRef desc, CMTaggedBufferGroupRef taggedBufferGroup);
 
-/// macOS 14.0 and later.
 public extern "C" OSStatus CMSampleBufferCreateForTaggedBufferGroup(CFAllocatorRef? allocator, CMTaggedBufferGroupRef taggedBufferGroup, CMTime sbufPTS, CMTime sbufDuration, CMTaggedBufferGroupFormatDescriptionRef formatDescription, opaqueCMSampleBuffer** sBufOut);
 
-/// macOS 14.0 and later.
 public extern "C" CMTaggedBufferGroupRef? CMSampleBufferGetTaggedBufferGroup(CMSampleBufferRef sbuf);
 
 #endif

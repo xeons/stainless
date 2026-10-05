@@ -56,13 +56,10 @@ public extern objc class AVVideoComposition : NSObject, NSCopying, NSMutableCopy
     [Selector("videoCompositionWithPropertiesOfAsset:completionHandler:")] public static void VideoCompositionWithPropertiesOfAssetCompletionHandler(AVAsset asset, AVVideoCompositionVideoCompositionWithPropertiesOfAssetCompletionHandlerCompletionHandlerBlock completionHandler);
 }
 
-/// macOS 14.0 and later.
 public using AVVideoCompositionPerFrameHDRDisplayMetadataPolicy = NSString;
 
-/// macOS 14.0 and later.
 public extern "C" AVVideoCompositionPerFrameHDRDisplayMetadataPolicy AVVideoCompositionPerFrameHDRDisplayMetadataPolicyPropagate;
 
-/// macOS 14.0 and later.
 public extern "C" AVVideoCompositionPerFrameHDRDisplayMetadataPolicy AVVideoCompositionPerFrameHDRDisplayMetadataPolicyGenerate;
 
 /// AVVideoCompositionColorimetery, a category of AVVideoComposition.
@@ -71,7 +68,6 @@ public extern objc class AVVideoComposition
     [Selector("colorPrimaries")] public NSString? ColorPrimaries { get; }
     [Selector("colorYCbCrMatrix")] public NSString? ColorYCbCrMatrix { get; }
     [Selector("colorTransferFunction")] public NSString? ColorTransferFunction { get; }
-    /// macOS 14.0 and later.
     [Selector("perFrameHDRDisplayMetadataPolicy")] public AVVideoCompositionPerFrameHDRDisplayMetadataPolicy PerFrameHDRDisplayMetadataPolicy { get; }
 }
 
@@ -120,7 +116,6 @@ public extern objc class AVMutableVideoComposition
     [Selector("colorPrimaries", "setColorPrimaries:")] public NSString? ColorPrimaries { get; set; }
     [Selector("colorYCbCrMatrix", "setColorYCbCrMatrix:")] public NSString? ColorYCbCrMatrix { get; set; }
     [Selector("colorTransferFunction", "setColorTransferFunction:")] public NSString? ColorTransferFunction { get; set; }
-    /// macOS 14.0 and later.
     [Selector("perFrameHDRDisplayMetadataPolicy", "setPerFrameHDRDisplayMetadataPolicy:")] public AVVideoCompositionPerFrameHDRDisplayMetadataPolicy PerFrameHDRDisplayMetadataPolicy { get; set; }
 }
 
@@ -206,7 +201,6 @@ public extern objc class AVVideoComposition
     [Selector("isValidForAsset:timeRange:validationDelegate:")] public bool IsValidForAssetTimeRangeValidationDelegate(AVAsset? asset, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate);
     /// Deprecated in macOS 15.0.
     [Selector("determineValidityForAsset:timeRange:validationDelegate:completionHandler:")] public void DetermineValidityForAssetTimeRangeValidationDelegateCompletionHandler(AVAsset? asset, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate, AVVideoCompositionDetermineValidityForAssetTimeRangeValidationDelegateCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 15.0 and later.
     [Selector("isValidForTracks:assetDuration:timeRange:validationDelegate:")] public bool IsValidForTracksAssetDurationTimeRangeValidationDelegate(NSArray tracks, CMTime duration, CMTimeRange timeRange, AVVideoCompositionValidationHandling? validationDelegate);
 }
 

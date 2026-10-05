@@ -31,27 +31,20 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMIDI")
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDICIDeviceWasAddedNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDICIDeviceWasRemovedNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDICIProfileWasUpdatedNotification;
 
-/// macOS 15.0 and later.
 public extern "C" NSNotificationName? MIDICIProfileWasRemovedNotification;
 
 public using MIDICIDeviceManagerDictionaryKey = NSString;
 
-/// macOS 15.0 and later.
 public extern "C" MIDICIDeviceManagerDictionaryKey? MIDICIDeviceObjectKey;
 
-/// macOS 15.0 and later.
 public extern "C" MIDICIDeviceManagerDictionaryKey? MIDICIProfileObjectKey;
 
-/// macOS 15.0 and later.
 public extern objc class MIDICIDeviceManager : NSObject
 {
     [Selector("sharedInstance")] public static MIDICIDeviceManager? SharedInstance { get; }

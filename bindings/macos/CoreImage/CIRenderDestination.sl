@@ -69,7 +69,6 @@ public enum CIRenderDestinationAlphaMode : ulong
 public extern objc class CIRenderInfo : NSObject
 {
     [Selector("kernelExecutionTime")] public NSTimeInterval KernelExecutionTime { get; }
-    /// macOS 14.0 and later.
     [Selector("kernelCompileTime")] public NSTimeInterval KernelCompileTime { get; }
     [Selector("passCount")] public NSInteger PassCount { get; }
     [Selector("pixelsProcessed")] public NSInteger PixelsProcessed { get; }

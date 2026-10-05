@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Virtualization")
 
-/// macOS 15.0 and later.
 public extern objc class VZUSBControllerConfiguration : NSObject, NSCopying
 {
     [Selector("usbDevices", "setUsbDevices:")] public NSArray UsbDevices { get; set; }

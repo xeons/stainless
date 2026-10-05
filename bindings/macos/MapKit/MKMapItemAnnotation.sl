@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MapKit")
 
-/// macOS 15.0 and later.
 public extern objc class MKMapItemAnnotation : NSObject, MKAnnotation
 {
     [Selector("mapItem")] public MKMapItem MapItem { get; }

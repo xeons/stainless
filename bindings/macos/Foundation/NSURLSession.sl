@@ -60,7 +60,6 @@ public extern objc class NSURLSession : NSObject
     [Selector("dataTaskWithURL:")] public NSURLSessionDataTask DataTaskWithURL(NSURL url);
     [Selector("uploadTaskWithRequest:fromFile:")] public NSURLSessionUploadTask UploadTaskWithRequestFromFile(NSURLRequest request, NSURL fileURL);
     [Selector("uploadTaskWithRequest:fromData:")] public NSURLSessionUploadTask UploadTaskWithRequestFromData(NSURLRequest request, NSData bodyData);
-    /// macOS 14.0 and later.
     [Selector("uploadTaskWithResumeData:")] public NSURLSessionUploadTask UploadTaskWithResumeData(NSData resumeData);
     [Selector("uploadTaskWithStreamedRequest:")] public NSURLSessionUploadTask UploadTaskWithStreamedRequest(NSURLRequest request);
     [Selector("downloadTaskWithRequest:")] public NSURLSessionDownloadTask DownloadTaskWithRequest(NSURLRequest request);
@@ -101,7 +100,6 @@ public extern objc class NSURLSession
     [Selector("dataTaskWithURL:completionHandler:")] public NSURLSessionDataTask DataTaskWithURLCompletionHandler(NSURL url, NSURLSessionDataTaskWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("uploadTaskWithRequest:fromFile:completionHandler:")] public NSURLSessionUploadTask UploadTaskWithRequestFromFileCompletionHandler(NSURLRequest request, NSURL fileURL, NSURLSessionUploadTaskWithRequestFromFileCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("uploadTaskWithRequest:fromData:completionHandler:")] public NSURLSessionUploadTask UploadTaskWithRequestFromDataCompletionHandler(NSURLRequest request, NSData? bodyData, NSURLSessionUploadTaskWithRequestFromDataCompletionHandlerCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Selector("uploadTaskWithResumeData:completionHandler:")] public NSURLSessionUploadTask UploadTaskWithResumeDataCompletionHandler(NSData resumeData, NSURLSessionUploadTaskWithResumeDataCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("downloadTaskWithRequest:completionHandler:")] public NSURLSessionDownloadTask DownloadTaskWithRequestCompletionHandler(NSURLRequest request, NSURLSessionDownloadTaskWithRequestCompletionHandlerCompletionHandlerBlock completionHandler);
     [Selector("downloadTaskWithURL:completionHandler:")] public NSURLSessionDownloadTask DownloadTaskWithURLCompletionHandler(NSURL url, NSURLSessionDownloadTaskWithURLCompletionHandlerCompletionHandlerBlock completionHandler);
@@ -167,7 +165,6 @@ public extern objc class NSURLSessionUploadTask : NSURLSessionDataTask
     [Selector("init")] public Self Init();
     /// Deprecated in macOS 10.15.
     [Selector("new")] public static Self New();
-    /// macOS 14.0 and later.
     [Selector("cancelByProducingResumeData:")] public void CancelByProducingResumeData(NSURLSessionUploadTaskCancelByProducingResumeDataCompletionHandlerBlock completionHandler);
 }
 
@@ -350,10 +347,8 @@ public objc interface NSURLSessionTaskDelegate : NSURLSessionDelegate
     [Optional] [Selector("URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:")] void URLSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandler(NSURLSession session, NSURLSessionTask task, NSHTTPURLResponse response, NSURLRequest request, NSURLSessionTaskDelegateURLSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandlerCompletionHandlerBlock completionHandler);
     [Optional] [Selector("URLSession:task:didReceiveChallenge:completionHandler:")] void URLSessionTaskDidReceiveChallengeCompletionHandler(NSURLSession session, NSURLSessionTask task, NSURLAuthenticationChallenge challenge, NSURLSessionTaskDelegateURLSessionTaskDidReceiveChallengeCompletionHandlerCompletionHandlerBlock completionHandler);
     [Optional] [Selector("URLSession:task:needNewBodyStream:")] void URLSessionTaskNeedNewBodyStream(NSURLSession session, NSURLSessionTask task, NSURLSessionTaskDelegateURLSessionTaskNeedNewBodyStreamCompletionHandlerBlock completionHandler);
-    /// macOS 14.0 and later.
     [Optional] [Selector("URLSession:task:needNewBodyStreamFromOffset:completionHandler:")] void URLSessionTaskNeedNewBodyStreamFromOffsetCompletionHandler(NSURLSession session, NSURLSessionTask task, long offset, NSURLSessionTaskDelegateURLSessionTaskNeedNewBodyStreamFromOffsetCompletionHandlerCompletionHandlerBlock completionHandler);
     [Optional] [Selector("URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:")] void URLSessionTaskDidSendBodyDataTotalBytesSentTotalBytesExpectedToSend(NSURLSession session, NSURLSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend);
-    /// macOS 14.0 and later.
     [Optional] [Selector("URLSession:task:didReceiveInformationalResponse:")] void URLSessionTaskDidReceiveInformationalResponse(NSURLSession session, NSURLSessionTask task, NSHTTPURLResponse response);
     [Optional] [Selector("URLSession:task:didFinishCollectingMetrics:")] void URLSessionTaskDidFinishCollectingMetrics(NSURLSession session, NSURLSessionTask task, NSURLSessionTaskMetrics metrics);
     [Optional] [Selector("URLSession:task:didCompleteWithError:")] void URLSessionTaskDidCompleteWithError(NSURLSession session, NSURLSessionTask task, NSError? error);
@@ -395,7 +390,6 @@ public objc interface NSURLSessionWebSocketDelegate : NSURLSessionTaskDelegate
 
 public extern "C" NSString NSURLSessionDownloadTaskResumeData;
 
-/// macOS 14.0 and later.
 public extern "C" NSString NSURLSessionUploadTaskResumeData;
 
 /// NSURLSessionDeprecated, a category of NSURLSessionConfiguration.

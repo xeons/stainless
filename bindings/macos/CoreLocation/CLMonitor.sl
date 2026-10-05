@@ -33,7 +33,6 @@ import Standard.ObjC;
 
 public objc closure void CLMonitorRequestMonitorWithConfigurationCompletionCompletionHandlerBlock(CLMonitor arg0);
 
-/// macOS 14.0 and later.
 public extern objc class CLMonitor : NSObject
 {
     [Selector("name")] public NSString Name { get; }

@@ -33,7 +33,6 @@ public objc closure bool NSCustomMigrationStageWillMigrateHandlerBlock(NSStagedM
 
 public objc closure bool NSCustomMigrationStageDidMigrateHandlerBlock(NSStagedMigrationManager arg0, NSCustomMigrationStage arg1, void** arg2);
 
-/// macOS 14.0 and later.
 public extern objc class NSCustomMigrationStage : NSMigrationStage
 {
     [Selector("currentModel")] public NSManagedObjectModelReference CurrentModel { get; }

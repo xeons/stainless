@@ -54,7 +54,6 @@ public extern "C" NSString HKPredicateKeyPathDevice;
 
 public extern "C" NSString HKPredicateKeyPathSourceRevision;
 
-/// macOS 15.0 and later.
 public extern "C" NSString HKPredicateKeyPathWorkoutEffortRelationship;
 
 #endif

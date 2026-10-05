@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreMotion")
 
-/// macOS 14.0 and later.
 public objc interface CMHeadphoneMotionManagerDelegate : NSObjectProtocol
 {
     [Optional] [Selector("headphoneMotionManagerDidConnect:")] void HeadphoneMotionManagerDidConnect(CMHeadphoneMotionManager manager);

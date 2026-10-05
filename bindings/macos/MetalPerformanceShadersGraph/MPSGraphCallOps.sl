@@ -33,7 +33,6 @@ import Standard.ObjC;
 /// CallOp, a category of MPSGraph.
 public extern objc class MPSGraph
 {
-    /// macOS 15.0 and later.
     [Selector("callSymbolName:inputTensors:outputTypes:name:")] public NSArray CallSymbolNameInputTensorsOutputTypesName(NSString symbolName, NSArray inputTensors, NSArray outputTypes, NSString? name);
 }
 

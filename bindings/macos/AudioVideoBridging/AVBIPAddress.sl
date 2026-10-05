@@ -36,7 +36,6 @@ public extern objc class AVBIPAddress : NSObject, NSCopying
     [Selector("representsIPv4Address")] public bool RepresentsIPv4Address { get; }
     [Selector("ipv6Address", "setIpv6Address:")] public NSData Ipv6Address { get; set; }
     [Selector("ipv4Address", "setIpv4Address:")] public uint Ipv4Address { get; set; }
-    /// macOS 14 and later.
     [Selector("stringRepresentation", "setStringRepresentation:")] public NSString? StringRepresentation { get; set; }
     [Selector("initWithIPv6Address:")] public Self InitWithIPv6Address(byte* ipv6Address);
     [Selector("initWithIPv6AddressData:")] public Self InitWithIPv6AddressData(NSData ipv6Address);

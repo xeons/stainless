@@ -30,7 +30,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "AuthenticationServices")
 
-/// macOS 14.4 and later.
 public objc interface ASAuthorizationWebBrowserSecurityKeyPublicKeyCredentialProvider
 {
     [Selector("createCredentialRegistrationRequestWithClientData:displayName:name:userID:")] ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest CreateCredentialRegistrationRequestWithClientDataDisplayNameNameUserID(ASPublicKeyCredentialClientData clientData, NSString displayName, NSString name, NSData userID);

@@ -45,14 +45,10 @@ public extern objc class MPSGraph
     [Selector("constantWithData:shape:dataType:")] public MPSGraphTensor ConstantWithDataShapeDataType(NSData data, MPSShape shape, MPSDataType dataType);
     [Selector("constantWithScalar:dataType:")] public MPSGraphTensor ConstantWithScalarDataType(double scalar, MPSDataType dataType);
     [Selector("constantWithScalar:shape:dataType:")] public MPSGraphTensor ConstantWithScalarShapeDataType(double scalar, MPSShape shape, MPSDataType dataType);
-    /// macOS 14.0 and later.
     [Selector("constantWithRealPart:imaginaryPart:")] public MPSGraphTensor ConstantWithRealPartImaginaryPart(double realPart, double imaginaryPart);
-    /// macOS 14.0 and later.
     [Selector("constantWithRealPart:imaginaryPart:dataType:")] public MPSGraphTensor ConstantWithRealPartImaginaryPartDataType(double realPart, double imaginaryPart, MPSDataType dataType);
-    /// macOS 14.0 and later.
     [Selector("constantWithRealPart:imaginaryPart:shape:dataType:")] public MPSGraphTensor ConstantWithRealPartImaginaryPartShapeDataType(double realPart, double imaginaryPart, MPSShape shape, MPSDataType dataType);
     [Selector("variableWithData:shape:dataType:name:")] public MPSGraphTensor VariableWithDataShapeDataTypeName(NSData data, MPSShape shape, MPSDataType dataType, NSString? name);
-    /// macOS 15.0 and later.
     [Selector("variableFromTensorWithTensor:name:")] public MPSGraphTensor VariableFromTensorWithTensorName(MPSGraphTensor tensor, NSString? name);
     [Selector("readVariable:name:")] public MPSGraphTensor ReadVariableName(MPSGraphTensor variable, NSString? name);
     [Selector("assignVariable:withValueOfTensor:name:")] public MPSGraphOperation AssignVariableWithValueOfTensorName(MPSGraphTensor variable, MPSGraphTensor tensor, NSString? name);

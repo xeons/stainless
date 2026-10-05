@@ -48,14 +48,12 @@ public enum PHPickerConfigurationSelection : long
     ContinuousAndOrdered = 3,
 }
 
-/// macOS 14 and later.
 public enum PHPickerMode : long
 {
     Default = 0,
     Compact = 1,
 }
 
-/// macOS 14 and later.
 [Flags]
 public enum PHPickerCapabilities : ulong
 {
@@ -80,7 +78,6 @@ public extern objc class PHPickerFilter : NSObject, NSCopying
     [Selector("cinematicVideosFilter")] public static PHPickerFilter? CinematicVideosFilter { get; }
     [Selector("slomoVideosFilter")] public static PHPickerFilter? SlomoVideosFilter { get; }
     [Selector("timelapseVideosFilter")] public static PHPickerFilter? TimelapseVideosFilter { get; }
-    /// macOS 15 and later.
     [Selector("spatialMediaFilter")] public static PHPickerFilter SpatialMediaFilter { get; }
     [Selector("playbackStyleFilter:")] public static PHPickerFilter PlaybackStyleFilter(PHAssetPlaybackStyle playbackStyle);
     [Selector("anyFilterMatchingSubfilters:")] public static PHPickerFilter AnyFilterMatchingSubfilters(NSArray subfilters);
@@ -88,12 +85,9 @@ public extern objc class PHPickerFilter : NSObject, NSCopying
     [Selector("notFilterOfSubfilter:")] public static PHPickerFilter NotFilterOfSubfilter(PHPickerFilter subfilter);
 }
 
-/// macOS 14 and later.
 public extern objc class PHPickerUpdateConfiguration : NSObject, NSCopying
 {
-    /// macOS 14 and later.
     [Selector("selectionLimit", "setSelectionLimit:")] public NSInteger SelectionLimit { get; set; }
-    /// macOS 14 and later.
     [Selector("edgesWithoutContentMargins", "setEdgesWithoutContentMargins:")] public NSDirectionalRectEdge EdgesWithoutContentMargins { get; set; }
 }
 
@@ -104,11 +98,8 @@ public extern objc class PHPickerConfiguration : NSObject, NSCopying
     [Selector("selectionLimit", "setSelectionLimit:")] public NSInteger SelectionLimit { get; set; }
     [Selector("filter", "setFilter:")] public PHPickerFilter? Filter { get; set; }
     [Selector("preselectedAssetIdentifiers", "setPreselectedAssetIdentifiers:")] public NSArray? PreselectedAssetIdentifiers { get; set; }
-    /// macOS 14 and later.
     [Selector("mode", "setMode:")] public PHPickerMode Mode { get; set; }
-    /// macOS 14 and later.
     [Selector("edgesWithoutContentMargins", "setEdgesWithoutContentMargins:")] public NSDirectionalRectEdge EdgesWithoutContentMargins { get; set; }
-    /// macOS 14 and later.
     [Selector("disabledCapabilities", "setDisabledCapabilities:")] public PHPickerCapabilities DisabledCapabilities { get; set; }
     [Selector("initWithPhotoLibrary:")] public Self InitWithPhotoLibrary(PHPhotoLibrary photoLibrary);
     [Selector("init")] public Self Init();
@@ -130,15 +121,11 @@ public extern objc class PHPickerViewController : NSViewController
     [Selector("configuration")] public PHPickerConfiguration? Configuration { get; }
     [Selector("delegate", "setDelegate:")] public PHPickerViewControllerDelegate? Delegate { get; set; }
     [Selector("initWithConfiguration:")] public Self InitWithConfiguration(PHPickerConfiguration configuration);
-    /// macOS 14 and later.
     [Selector("updatePickerUsingConfiguration:")] public void UpdatePickerUsingConfiguration(PHPickerUpdateConfiguration configuration);
     [Selector("deselectAssetsWithIdentifiers:")] public void DeselectAssetsWithIdentifiers(NSArray identifiers);
     [Selector("moveAssetWithIdentifier:afterAssetWithIdentifier:")] public void MoveAssetWithIdentifierAfterAssetWithIdentifier(NSString identifier, NSString? afterIdentifier);
-    /// macOS 14 and later.
     [Selector("scrollToInitialPosition")] public void ScrollToInitialPosition();
-    /// macOS 14 and later.
     [Selector("zoomIn")] public void ZoomIn();
-    /// macOS 14 and later.
     [Selector("zoomOut")] public void ZoomOut();
 }
 

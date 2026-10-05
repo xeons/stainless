@@ -58,7 +58,6 @@ public extern objc class NEAppProxyFlow : NSObject
     [Selector("networkInterface", "setNetworkInterface:")] public nw_interface_t? NetworkInterface { get; set; }
     [Selector("remoteHostname")] public NSString? RemoteHostname { get; }
     [Selector("isBound")] public bool IsBound { get; }
-    /// macOS 15.0 and later.
     [Selector("openWithLocalFlowEndpoint:completionHandler:")] public void OpenWithLocalFlowEndpointCompletionHandler(nw_endpoint_t? localEndpoint, NEAppProxyFlowOpenWithLocalFlowEndpointCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 15.0.
     [Selector("openWithLocalEndpoint:completionHandler:")] public void OpenWithLocalEndpointCompletionHandler(NWHostEndpoint? localEndpoint, NEAppProxyFlowOpenWithLocalEndpointCompletionHandlerCompletionHandlerBlock completionHandler);

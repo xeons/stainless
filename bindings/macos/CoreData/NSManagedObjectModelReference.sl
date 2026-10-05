@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "CoreData")
 
-/// macOS 14.0 and later.
 public extern objc class NSManagedObjectModelReference : NSObject
 {
     [Selector("resolvedModel")] public NSManagedObjectModel ResolvedModel { get; }

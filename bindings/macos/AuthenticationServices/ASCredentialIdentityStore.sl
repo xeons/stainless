@@ -40,7 +40,6 @@ public enum ASCredentialIdentityStoreErrorCode : long
     StoreBusy = 2,
 }
 
-/// macOS 14.4 and later.
 [Flags]
 public enum ASCredentialIdentityTypes : ulong
 {
@@ -72,20 +71,16 @@ public extern objc class ASCredentialIdentityStore : NSObject
 {
     [Selector("sharedStore")] public static ASCredentialIdentityStore SharedStore { get; }
     [Selector("getCredentialIdentityStoreStateWithCompletion:")] public void GetCredentialIdentityStoreStateWithCompletion(ASCredentialIdentityStoreGetCredentialIdentityStoreStateWithCompletionCompletionBlock completion);
-    /// macOS 14.4 and later.
     [Selector("getCredentialIdentitiesForService:credentialIdentityTypes:completionHandler:")] public void GetCredentialIdentitiesForServiceCredentialIdentityTypesCompletionHandler(ASCredentialServiceIdentifier? serviceIdentifier, ASCredentialIdentityTypes credentialIdentityTypes, ASCredentialIdentityStoreGetCredentialIdentitiesForServiceCredentialIdentityTypesCompletionHandlerCompletionHandlerBlock completionHandler);
     /// Deprecated in macOS 14.0.
     [Selector("saveCredentialIdentities:completion:")] public void SaveCredentialIdentitiesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreSaveCredentialIdentitiesCompletionCompletionBlock? completion);
-    /// macOS 14.0 and later.
     [Selector("saveCredentialIdentityEntries:completion:")] public void SaveCredentialIdentityEntriesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreSaveCredentialIdentityEntriesCompletionCompletionBlock? completion);
     /// Deprecated in macOS 14.0.
     [Selector("removeCredentialIdentities:completion:")] public void RemoveCredentialIdentitiesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreRemoveCredentialIdentitiesCompletionCompletionBlock? completion);
-    /// macOS 14.0 and later.
     [Selector("removeCredentialIdentityEntries:completion:")] public void RemoveCredentialIdentityEntriesCompletion(NSArray credentialIdentities, ASCredentialIdentityStoreRemoveCredentialIdentityEntriesCompletionCompletionBlock? completion);
     [Selector("removeAllCredentialIdentitiesWithCompletion:")] public void RemoveAllCredentialIdentitiesWithCompletion(ASCredentialIdentityStoreRemoveAllCredentialIdentitiesWithCompletionCompletionBlock? completion);
     /// Deprecated in macOS 14.0.
     [Selector("replaceCredentialIdentitiesWithIdentities:completion:")] public void ReplaceCredentialIdentitiesWithIdentitiesCompletion(NSArray newCredentialIdentities, ASCredentialIdentityStoreReplaceCredentialIdentitiesWithIdentitiesCompletionCompletionBlock? completion);
-    /// macOS 14.0 and later.
     [Selector("replaceCredentialIdentityEntries:completion:")] public void ReplaceCredentialIdentityEntriesCompletion(NSArray newCredentialIdentities, ASCredentialIdentityStoreReplaceCredentialIdentityEntriesCompletionCompletionBlock? completion);
 }
 

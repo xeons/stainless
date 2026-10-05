@@ -39,7 +39,6 @@ public objc interface GCPressedStateInput : NSObjectProtocol
     [Selector("isPressed")] bool Pressed { get; }
     [Selector("lastPressedStateTimestamp")] NSTimeInterval LastPressedStateTimestamp { get; }
     [Selector("lastPressedStateLatency")] NSTimeInterval LastPressedStateLatency { get; }
-    /// macOS 14.0 and later.
     [Selector("sources")] NSSet Sources { get; }
 }
 

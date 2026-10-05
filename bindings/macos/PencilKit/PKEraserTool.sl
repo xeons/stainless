@@ -40,16 +40,11 @@ public enum PKEraserType : long
 public extern objc class PKEraserTool : PKTool
 {
     [Selector("eraserType")] public PKEraserType EraserType { get; }
-    /// macOS 13.3 and later.
     [Selector("width")] public CGFloat Width { get; }
     [Selector("initWithEraserType:")] public Self InitWithEraserType(PKEraserType eraserType);
-    /// macOS 13.3 and later.
     [Selector("initWithEraserType:width:")] public Self InitWithEraserTypeWidth(PKEraserType eraserType, CGFloat width);
-    /// macOS 13.3 and later.
     [Selector("defaultWidthForEraserType:")] public static CGFloat DefaultWidthForEraserType(PKEraserType eraserType);
-    /// macOS 13.3 and later.
     [Selector("minimumWidthForEraserType:")] public static CGFloat MinimumWidthForEraserType(PKEraserType eraserType);
-    /// macOS 13.3 and later.
     [Selector("maximumWidthForEraserType:")] public static CGFloat MaximumWidthForEraserType(PKEraserType eraserType);
 }
 

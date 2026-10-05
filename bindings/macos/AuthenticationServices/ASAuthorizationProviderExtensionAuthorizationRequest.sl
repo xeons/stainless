@@ -58,7 +58,6 @@ public extern objc class ASAuthorizationProviderExtensionAuthorizationRequest : 
     [Selector("isCallerManaged")] public bool CallerManaged { get; }
     [Selector("callerTeamIdentifier")] public NSString CallerTeamIdentifier { get; }
     [Selector("localizedCallerDisplayName")] public NSString LocalizedCallerDisplayName { get; }
-    /// macOS 14.0 and later.
     [Selector("callerAuditToken")] public NSData CallerAuditToken { get; }
     [Selector("isUserInterfaceEnabled")] public bool UserInterfaceEnabled { get; }
     [Selector("loginManager")] public ASAuthorizationProviderExtensionLoginManager? LoginManager { get; }

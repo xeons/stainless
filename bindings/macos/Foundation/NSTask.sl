@@ -44,7 +44,6 @@ public extern objc class NSTask : NSObject
     [Selector("arguments", "setArguments:")] public NSArray? Arguments { get; set; }
     [Selector("environment", "setEnvironment:")] public NSDictionary? Environment { get; set; }
     [Selector("currentDirectoryURL", "setCurrentDirectoryURL:")] public NSURL? CurrentDirectoryURL { get; set; }
-    /// macOS 14.4 and later.
     [Selector("launchRequirementData", "setLaunchRequirementData:")] public NSData? LaunchRequirementData { get; set; }
     [Selector("standardInput", "setStandardInput:")] public AnyObject? StandardInput { get; set; }
     [Selector("standardOutput", "setStandardOutput:")] public AnyObject? StandardOutput { get; set; }

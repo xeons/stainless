@@ -31,12 +31,10 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Intents")
 
-/// macOS 13.1 and later.
 public extern objc class INAnswerCallIntent : INIntent
 {
     [Selector("audioRoute")] public INCallAudioRoute AudioRoute { get; }
     [Selector("callIdentifier")] public NSString? CallIdentifier { get; }
-    /// macOS 13.1 and later.
     [Selector("initWithAudioRoute:callIdentifier:")] public Self InitWithAudioRouteCallIdentifier(INCallAudioRoute audioRoute, NSString? callIdentifier);
 }
 
@@ -44,7 +42,6 @@ public objc closure void INAnswerCallIntentHandlingHandleAnswerCallCompletionCom
 
 public objc closure void INAnswerCallIntentHandlingConfirmAnswerCallCompletionCompletionBlock(INAnswerCallIntentResponse arg0);
 
-/// macOS 13.1 and later.
 public objc interface INAnswerCallIntentHandling : NSObjectProtocol
 {
     [Selector("handleAnswerCall:completion:")] void HandleAnswerCallCompletion(INAnswerCallIntent intent, INAnswerCallIntentHandlingHandleAnswerCallCompletionCompletionBlock completion);

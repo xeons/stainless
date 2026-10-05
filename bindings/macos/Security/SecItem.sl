@@ -295,7 +295,6 @@ public extern "C" CFStringRef kSecMatchEmailAddressIfPresent;
 
 public extern "C" CFStringRef kSecMatchSubjectContains;
 
-/// macOS 15.0 and later.
 public extern "C" CFStringRef kSecMatchHostOrSubdomainOfHost;
 
 public extern "C" CFStringRef kSecMatchSubjectStartsWith;

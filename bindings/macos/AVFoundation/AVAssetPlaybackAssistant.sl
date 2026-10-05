@@ -37,7 +37,6 @@ public extern "C" AVAssetPlaybackConfigurationOption AVAssetPlaybackConfiguratio
 
 public extern "C" AVAssetPlaybackConfigurationOption AVAssetPlaybackConfigurationOptionStereoMultiviewVideo;
 
-/// macOS 15.0 and later.
 public extern "C" AVAssetPlaybackConfigurationOption AVAssetPlaybackConfigurationOptionSpatialVideo;
 
 /// macOS 26.0 and later.

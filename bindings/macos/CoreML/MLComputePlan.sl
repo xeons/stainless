@@ -35,7 +35,6 @@ public objc closure void MLComputePlanLoadContentsOfURLConfigurationCompletionHa
 
 public objc closure void MLComputePlanLoadModelAssetConfigurationCompletionHandlerHandlerBlock(MLComputePlan? arg0, NSError? arg1);
 
-/// macOS 14.4 and later.
 public extern objc class MLComputePlan : NSObject
 {
     [Selector("modelStructure")] public MLModelStructure ModelStructure { get; }

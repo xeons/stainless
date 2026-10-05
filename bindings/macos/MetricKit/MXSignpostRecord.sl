@@ -31,7 +31,6 @@ import Standard.ObjC;
 
 #pragma comment(framework, "MetricKit")
 
-/// macOS 14.0 and later.
 public extern objc class MXSignpostRecord : NSObject, NSSecureCoding
 {
     [Selector("subsystem")] public NSString Subsystem { get; }

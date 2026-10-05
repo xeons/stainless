@@ -31,21 +31,16 @@ import Standard.ObjC;
 
 #pragma comment(framework, "Matter")
 
-/// macOS 13.3 and later.
 public extern objc class MTROperationalCSRInfo : NSObject
 {
     [Selector("csr")] public MTRCSRDERBytes Csr { get; }
     [Selector("csrNonce")] public NSData CsrNonce { get; }
     [Selector("csrElementsTLV")] public MTRTLVBytes CsrElementsTLV { get; }
     [Selector("attestationSignature")] public NSData AttestationSignature { get; }
-    /// macOS 13.3 and later.
     /// Deprecated in macOS 14.0.
     [Selector("initWithCSR:csrNonce:csrElementsTLV:attestationSignature:")] public Self InitWithCSRCsrNonceCsrElementsTLVAttestationSignature(MTRCSRDERBytes csr, NSData csrNonce, MTRTLVBytes csrElementsTLV, NSData attestationSignature);
-    /// macOS 14.0 and later.
     [Selector("initWithCSRNonce:csrElementsTLV:attestationSignature:")] public Self? InitWithCSRNonceCsrElementsTLVAttestationSignature(NSData csrNonce, MTRTLVBytes csrElementsTLV, NSData attestationSignature);
-    /// macOS 14.0 and later.
     [Selector("initWithCSRElementsTLV:attestationSignature:")] public Self? InitWithCSRElementsTLVAttestationSignature(MTRTLVBytes csrElementsTLV, NSData attestationSignature);
-    /// macOS 14.0 and later.
     [Selector("initWithCSRResponseParams:")] public Self? InitWithCSRResponseParams(MTROperationalCredentialsClusterCSRResponseParams responseParams);
 }
 
