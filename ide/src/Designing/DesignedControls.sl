@@ -33,7 +33,8 @@ import Ide.Designer;
 public String[] ListDesignableTypes() =>
     ["Button", "Label", "TextBox", "CheckBox", "RadioButton", "ToggleButton",
      "ListBox", "ComboBox", "CheckListBox", "SpinEdit", "ProgressBar", "TrackBar",
-     "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Image", "Timer"];
+     "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Image", "PaintBox",
+     "Shape", "Bevel", "Timer"];
 
 /// Whether controls may be put inside one of these. A `TabControl` holds
 /// pages and nothing else, so it is not one.
@@ -70,6 +71,9 @@ public Control? CreateDesignedControl(String typeName, WindowedControl parent)
         case "TabControl": return new TabControl(parent);
         case "TabPage": return parent is TabControl tabs ? new TabPage(tabs) : null;
         case "Image": return new Image(parent);
+        case "PaintBox": return new PaintBox(parent);
+        case "Shape": return new Shape(parent);
+        case "Bevel": return new Bevel(parent);
         default: return null;
     }
 }

@@ -5214,6 +5214,23 @@ public class Shell : Form
             Console.WriteLine("FAIL: an Image was not placed, given its picture, or found under a band");
             ok = false;
         }
+        // The other drawn controls, set through the grid as the windowed are.
+        surface.PlaceComponent("Shape", Point.FromXY(8, 200));
+        _grid.SelectProperty("Kind");
+        _grid.ApplyText("Ellipse");
+        _grid.SelectProperty("FillColor");
+        _grid.ApplyText("Teal");
+        surface.PlaceComponent("PaintBox", Point.FromXY(96, 200));
+        surface.PlaceComponent("Bevel", Point.FromXY(8, 280));
+        var shape = surface.FindLiveControl("_shape1");
+        String shapes = pad.Editor.Contents.GetText();
+        if (shape == null || !(shape is Shape) || ((Shape)shape).Kind != ShapeKind.Ellipse
+            || !shapes.Contains("Kind = ShapeKind.Ellipse;") || !shapes.Contains("FillColor = Colors.Teal;")
+            || surface.FindLiveControl("_paintBox1") == null || surface.FindLiveControl("_bevel1") == null)
+        {
+            Console.WriteLine("FAIL: a Shape, a PaintBox or a Bevel was not placed and set");
+            ok = false;
+        }
         surface.SelectComponent("_ok");
 
         long click = _grid.FindEventIndex("Click");

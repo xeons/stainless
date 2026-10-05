@@ -35,6 +35,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 // ================================================================= paint box
 
@@ -53,9 +56,29 @@ import Forms.Platform;
 ///
 /// **The coordinates are the box's own.** (0, 0) is its top-left corner
 /// wherever it sits on the form, and nothing drawn outside its bounds appears.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class PaintBox : GraphicControl
 {
     public PaintBox(WindowedControl parent) => base(parent);
+
+    /// Designed, it is a dashed box crossed corner to corner, as the LCL's
+    /// `TPaintBox` is: what it shows is what its handler draws, and no
+    /// handler runs in a designer.
+    protected override void OnPaint(PaintEventArgs args)
+    {
+        if (IsDesigning)
+        {
+            var dashed = new Pen(Colors.Black, 1, PenStyle.Dash);
+            int right = Width - 1;
+            int bottom = Height - 1;
+            args.Graphics.DrawRectangle(dashed, Rectangle.FromBounds(0, 0, right, bottom));
+            args.Graphics.DrawLine(dashed, 0, 0, right, bottom);
+            args.Graphics.DrawLine(dashed, 0, bottom, right, 0);
+        }
+        base.OnPaint(args);
+    }
 }
 
 // ===================================================================== shape
@@ -67,6 +90,9 @@ public enum ShapeKind { Rectangle, RoundRectangle, Ellipse, Circle, Square }
 ///
 /// `TShape` with the same members under the same names, less `TBrushStyle` --
 /// there is one brush here and it is solid.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Shape : GraphicControl
 {
     ShapeKind _kind;
@@ -167,6 +193,9 @@ public enum BevelStyle { Lowered, Raised }
 ///
 /// Two lines of contrasting colour, which is the whole of what a bevel is and
 /// what `TBevel` does with `clBtnShadow` and `clBtnHighlight`.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class Bevel : GraphicControl
 {
     BevelKind _kind;

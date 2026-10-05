@@ -1168,7 +1168,10 @@ public class DesignSurface : Panel
             case "Panel":
             case "GroupBox": return Size.FromDimensions(160, 96);
             case "TabControl": return Size.FromDimensions(200, 128);
-            case "Image": return Size.FromDimensions(64, 64);
+            case "Image":
+            case "Shape": return Size.FromDimensions(64, 64);
+            case "PaintBox": return Size.FromDimensions(104, 104);
+            case "Bevel": return Size.FromDimensions(160, 48);
             default: return Size.FromDimensions(80, 24);
         }
     }

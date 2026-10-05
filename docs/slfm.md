@@ -227,7 +227,3 @@ with `partial`, and Stainless allows it for a class.
 - **Items that are not strings.** A list's rows are an array, but a
   `MenuItem`'s children and a `ToolBar`'s buttons are made by calling methods,
   not by setting properties.
-- **The other drawn controls.** `Image` is designed as the LCL designs any
-  `TControl`, window or none, and framed with a dashed line while it is;
-  `PaintBox`, `Shape` and `Bevel` are drawn the same way and are not in the
-  Toolbox yet.

@@ -189,8 +189,10 @@ backends render it. The IDE is what found the faults listed in
   click on the form to place one, inside a `Panel`, `GroupBox` or tab page if
   that is what was clicked. A `TabControl` comes with a page, and a `TabPage`
   goes on the `TabControl` clicked; a `Timer` goes in a tray under the form.
-  An `Image` has no window of its own and is designed all the same, framed
-  with a dashed line so an empty one can be seen, as Lazarus frames a `TImage`.
+  An `Image`, a `PaintBox`, a `Shape` and a `Bevel` have no window of their
+  own and are designed all the same, as Lazarus designs any `TControl`; an
+  `Image` is framed with a dashed line so an empty one can be seen, and a
+  `PaintBox`, whose handler does not run in the designer, is crossed as well.
   The grid shows the selected control's properties -- or the form's title and
   size -- and sets them on the live control and in the file as they are
   changed; an enum is a list of its members and a `[Flags]` enum a box per
