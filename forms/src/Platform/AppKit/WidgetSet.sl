@@ -49,6 +49,34 @@ T RefuseAppKitControl<T>(String what)
     sl_fail(("the AppKit backend has no " + what + " yet; build with FORMS_GTK to use GTK").ToPointer());
 }
 
+/// The directory `STAINLESS_FORMS_SHOT` names, or null for none.
+public String? FindScreenshotDirectory() => Standard.Env.GetEnvironmentVariable("STAINLESS_FORMS_SHOT");
+
+/// A form's content as AppKit draws it, written as a PNG named after its title
+/// into `directory`.
+///
+/// **What a screenshot is for when there is no screen to grab.** Over ssh a
+/// program cannot read the display without Screen Recording permission;
+/// `cacheDisplayInRect:` asks the view to draw itself into a bitmap, which
+/// needs none -- the same as `forms/screenshot.ps1`'s `PrintWindow`. Taken
+/// after every `PumpEvents` and as the program closes a form.
+public void WriteWindowScreenshot(NSWindow window, String directory)
+{
+    var content = window.ContentView;
+    if (!window.Visible || content == null || !((NSView)content is FormsView))
+        return;
+    var view = (NSView)content;
+    var bitmap = view.BitmapImageRepForCachingDisplayInRect(view.Bounds);
+    if (bitmap == null)
+        return;
+    view.CacheDisplayInRectToBitmapImageRep(view.Bounds, (NSBitmapImageRep)bitmap);
+    var png = ((NSBitmapImageRep)bitmap).RepresentationUsingTypeProperties(NSBitmapImageFileType.PNG,
+                                                                          NSDictionary.Dictionary());
+    String title = FromNSString(window.Title).Replace("/", "-");
+    if (png != null)
+        ((NSData)png).WriteToFileAtomically(ToNSString(directory + "/" + (title == "" ? "window" : title) + ".png"), true);
+}
+
 /// What another thread asks the main thread to do: run what it posted.
 public objc class FormsWaker : NSObject
 {
@@ -120,6 +148,7 @@ public class AppKitWidgetSet : IWidgetSet
     FormsWaker _waker;
     Forms.Drawing.Font? _defaultFont;
     bool _quitting;
+    String? _shots;
 
     public AppKitWidgetSet()
     {
@@ -129,6 +158,16 @@ public class AppKitWidgetSet : IWidgetSet
         _waker = FormsWaker.Alloc().Init()!;
         _defaultFont = null;
         _quitting = false;
+        _shots = FindScreenshotDirectory();
+    }
+
+    /// Each visible form, as `WriteWindowScreenshot` writes one, after every
+    /// turn of the loop a program drives itself.
+    void WriteScreenshots(String directory)
+    {
+        var windows = _application.Windows;
+        for (nuint i = 0u; i < windows.Count; i++)
+            WriteWindowScreenshot((NSWindow)windows.ObjectAtIndex(i), directory);
     }
 
     public String Name => "AppKit";
@@ -147,18 +186,18 @@ public class AppKitWidgetSet : IWidgetSet
     }
 
     public IPushButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent) =>
-        RefuseAppKitControl<IPushButtonPeer>("button");
+        Adopt(parent, new AppKitButtonPeer(owner));
     public ICheckPeer CreateCheck(IControlNotify owner, IContainerPeer parent, CheckKind kind) =>
-        RefuseAppKitControl<ICheckPeer>("check box");
-    public ILabelPeer CreateLabel(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<ILabelPeer>("label");
+        Adopt(parent, new AppKitCheckPeer(owner, kind));
+    public ILabelPeer CreateLabel(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitLabelPeer(owner));
     public ITextEntryPeer CreateTextEntry(IControlNotify owner, IContainerPeer parent, bool multiline) =>
-        RefuseAppKitControl<ITextEntryPeer>("text box");
+        Adopt(parent, new AppKitTextEntryPeer(owner, multiline));
     public IListPeer CreateList(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IListPeer>("list box");
     public IComboPeer CreateCombo(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IComboPeer>("combo box");
-    public IGroupPeer CreateGroup(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IGroupPeer>("group box");
+    public IGroupPeer CreateGroup(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitGroupPeer(owner));
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent, bool vertical) =>
-        RefuseAppKitControl<IScrollBarPeer>("scroll bar");
-    public ISpinPeer CreateSpin(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<ISpinPeer>("spin edit");
+        Adopt(parent, new AppKitScrollBarPeer(owner, vertical));
+    public ISpinPeer CreateSpin(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitSpinPeer(owner));
     public ICheckListPeer CreateCheckList(IControlNotify owner, IContainerPeer parent) =>
         RefuseAppKitControl<ICheckListPeer>("check list");
     public IHeaderPeer CreateHeader(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IHeaderPeer>("header");
@@ -166,9 +205,9 @@ public class AppKitWidgetSet : IWidgetSet
     public IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent) =>
         RefuseAppKitControl<IStatusBarPeer>("status bar");
     public IProgressPeer CreateProgress(IControlNotify owner, IContainerPeer parent) =>
-        RefuseAppKitControl<IProgressPeer>("progress bar");
+        Adopt(parent, new AppKitProgressPeer(owner));
     public ITrackBarPeer CreateTrackBar(IControlNotify owner, IContainerPeer parent, bool vertical) =>
-        RefuseAppKitControl<ITrackBarPeer>("track bar");
+        Adopt(parent, new AppKitTrackBarPeer(owner, vertical));
     public ITabControlPeer CreateTabControl(IControlNotify owner, IContainerPeer parent) =>
         RefuseAppKitControl<ITabControlPeer>("tab control");
     public ITreeViewPeer CreateTreeView(IControlNotify owner, IContainerPeer parent) =>
@@ -321,6 +360,9 @@ public class AppKitWidgetSet : IWidgetSet
             _application.SendEvent((NSEvent)event);
         }
         _application.UpdateWindows();
+        var shots = _shots;
+        if (shots != null)
+            WriteScreenshots((String)shots);
         return !_quitting;
     }
 

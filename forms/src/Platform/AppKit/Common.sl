@@ -286,19 +286,10 @@ public objc class FormsView : NSView
         return true;
     }
 
-    /// **Nothing is drawn outside the view's own bounds.** AppKit hands a view
-    /// a dirty rectangle that may be the whole window, and since macOS 14 does
-    /// not clip a view to its bounds unless asked -- so a fill of that
-    /// rectangle paints over every sibling. `clipsToBounds` is newer than the
-    /// oldest macOS this targets, so the clip is made here instead.
+    /// The background is the view's bounds and not the dirty rectangle, which
+    /// AppKit may make the whole window.
     public override void DrawRect(NSRect dirtyRect)
     {
-        var context = NSGraphicsContext.CurrentContext;
-        if (context == null)
-            return;
-        var drawing = ((NSGraphicsContext)context).CGContext;
-        CGContextSaveGState(drawing);
-        CGContextClipToRect(drawing, Bounds);
         if (FillsBackground && !Transparent)
         {
             ToNSColor(Background).SetFill();
@@ -306,7 +297,6 @@ public objc class FormsView : NSView
         }
         if (FindPeer() is AppKitPeer peer)
             peer.ReportPaint(dirtyRect);
-        CGContextRestoreGState(drawing);
     }
 
     /// Hears the pointer move with no button down, and cross the edge, for as
@@ -383,13 +373,17 @@ public objc class FormsView : NSView
             peer.ReportMove(event, PointOf(event));
     }
 
-    /// Where an event happened, in this view's own coordinates -- which, the
-    /// view being flipped, are the control's.
-    FPoint PointOf(NSEvent event)
-    {
-        var at = ConvertPointFromView(event.LocationInWindow, null);
-        return CreatePoint(FloorToInt(at.x), FloorToInt(at.y));
-    }
+    FPoint PointOf(NSEvent event) => FindEventPoint(this, event);
+}
+
+/// Where an event happened, in a view's own coordinates. A native control is
+/// not flipped, so its height is taken off; a `FormsView` already measures
+/// down from the top.
+public FPoint FindEventPoint(NSView view, NSEvent event)
+{
+    var at = view.ConvertPointFromView(event.LocationInWindow, null);
+    double y = view.Flipped ? at.y : view.Bounds.size.height - at.y;
+    return CreatePoint(FloorToInt(at.x), FloorToInt(y));
 }
 
 // ===================================================================== peer
@@ -438,6 +432,9 @@ public class AppKitPeer : IControlPeer
     }
 
     // ------------------------------------------------------------ reports
+
+    /// The native control's action: a click, a step, a value set by the user.
+    public virtual void ReportAction() { }
 
     public void ReportPaint(NSRect dirty)
     {
@@ -553,6 +550,16 @@ public class AppKitPeer : IControlPeer
             ((IControlNotify)owner).OnPlatformGotFocus();
         else
             ((IControlNotify)owner).OnPlatformLostFocus();
+    }
+
+    /// Moves the focus from this control in the form's order, as Tab does,
+    /// and answers whether there was a form to do it.
+    public bool NavigateFromHere(bool backward)
+    {
+        var form = FindWindowNotify();
+        if (form == null)
+            return false;
+        return ((IWindowNotify)form).OnPlatformNavigate(Key.Tab, backward);
     }
 
     /// The form this control is on, which hears Tab: the peer of the window's
@@ -674,7 +681,7 @@ public class AppKitPeer : IControlPeer
         return CreatePoint(FloorToInt(at.x), FloorToInt(at.y));
     }
 
-    public FRect ClientBounds
+    public virtual FRect ClientBounds
     {
         get
         {
@@ -694,10 +701,36 @@ public class AppKitPeer : IControlPeer
         if (IsDestroyed)
             return;
         IsDestroyed = true;
-        if (View is FormsView drawn)
-            drawn.Peer = null;
+        ForgetReporters();
         View.RemoveFromSuperview();
     }
+
+    /// Empties every weak slot that names this peer: the view's, and the
+    /// relays' and delegates' a subclass made.
+    ///
+    /// **Not left to the views to outlive.** A weak reference keeps its
+    /// target's memory, though not its life, until the slot is emptied, and
+    /// AppKit frees a closed window's views when its autorelease pool drains
+    /// -- which for the last window of a program is after the program has
+    /// ended. A peer that left its slots full would be counted as alive.
+    protected virtual void ForgetReporters() => ForgetPeer(View);
+}
+
+/// Empties the `Peer` of any of this backend's views.
+public void ForgetPeer(NSView view)
+{
+    if (view is FormsView drawn)
+        drawn.Peer = null;
+    else if (view is FormsButton button)
+        button.Peer = null;
+    else if (view is FormsSecureTextField hidden)
+        hidden.Peer = null;
+    else if (view is FormsTextField field)
+        field.Peer = null;
+    else if (view is FormsTextView text)
+        text.Peer = null;
+    else if (view is FormsSlider slider)
+        slider.Peer = null;
 }
 
 /// A peer other controls can be put inside.
@@ -776,6 +809,15 @@ public class AppKitCustomPeer : AppKitContainerPeer, ICustomPeer
 }
 
 /// A new flipped view, at the origin and empty.
-public FormsView CreateFormsView() => FormsView.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 0.0, 0.0));
+///
+/// **Nothing it draws reaches outside its bounds**, as no control's does on
+/// Windows or GTK. Since macOS 14 a view is not clipped unless it asks, and
+/// a control drawing past its edge paints over its siblings.
+public FormsView CreateFormsView()
+{
+    var made = FormsView.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 0.0, 0.0));
+    made.ClipsToBounds = true;
+    return made;
+}
 
 #endif

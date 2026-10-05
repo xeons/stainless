@@ -134,9 +134,16 @@ src/Platform/AppKit/*.sl    the AppKit backend, in progress (lcl/interfaces/coco
 
 **AppKit is being built.** A macOS build defining `FORMS_APPKIT` uses it,
 naming `bindings/macos` among its sources; without the define macOS uses GTK,
-as before. It has windows, panels, drawn controls, the drawing surface, timers
-and the mouse and keyboard so far, and refuses every other control by name.
-Once it runs the IDE it becomes the default and `FORMS_GTK` selects GTK.
+as before. It has windows, panels, drawn controls, the drawing surface, timers,
+the mouse and keyboard, and the standard controls -- buttons, check and radio
+buttons, labels, text boxes, group boxes, progress and track bars, spin edits
+and scroll bars -- each a native control, and refuses the rest by name. Once it
+runs the IDE it becomes the default and `FORMS_GTK` selects GTK.
+
+`STAINLESS_FORMS_SHOT=dir` writes each form's content to `dir/<title>.png`
+after every `DoEvents` and as the program closes it. It is how a Mac reached
+over ssh is screenshotted: the view draws itself into a bitmap, which needs no
+Screen Recording permission, as `screenshot.ps1`'s `PrintWindow` needs none.
 
 Roughly 12,900 lines of portable code against the LCL's 276,000 -- which is the
 scope difference, not a compression ratio -- plus about 7,700 per backend. See

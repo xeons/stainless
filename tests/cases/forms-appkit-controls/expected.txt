@@ -1,0 +1,8 @@
+clicked OK
+checked on
+typed 'h'
+typed 'hi'
+key Enter
+text 'hi', label 'A label'
+inside the group: yes, room under the caption
+track 7, spin 9, progress 40, scroll 90

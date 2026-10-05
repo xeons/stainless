@@ -257,7 +257,13 @@ public class AppKitWindowPeer : AppKitContainerPeer, IWindowPeer
     public void Activate() => _window.MakeKeyAndOrderFront(null);
 
     /// As the close box does: the form is asked first.
-    public void Close() => _window.PerformClose(null);
+    public void Close()
+    {
+        var shots = FindScreenshotDirectory();
+        if (shots != null)
+            WriteWindowScreenshot(_window, (String)shots);
+        _window.PerformClose(null);
+    }
 
     public void CenterOnScreen()
     {
