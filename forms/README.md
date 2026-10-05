@@ -145,7 +145,10 @@ the mouse and keyboard, and the standard controls -- buttons, check and radio
 buttons, labels, text boxes, group boxes, progress and track bars, spin edits
 and scroll bars -- and the lists: list boxes, check lists, combo boxes, headers,
 trees and details lists. Each is a native control; the five on a table are
-`NSTableView`, as GTK's are `GtkTreeView`. It refuses the rest by name. Once it
+`NSTableView`, as GTK's are `GtkTreeView`. A tab control is an `NSTabView`; a
+toolbar is a row of native buttons and a status bar a row of labels, since
+`NSToolbar` belongs to a window's title bar and AppKit has no status bar. It
+refuses the rest -- menus, dialogs, the clipboard -- by name. Once it
 runs the IDE it becomes the default and `FORMS_GTK` selects GTK.
 
 `STAINLESS_FORMS_SHOT=dir` writes each form's content to `dir/<title>.png`

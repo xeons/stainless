@@ -1,0 +1,8 @@
+clicked Open
+Bold is on
+tab 1
+status: Ready, no file
+toolbar docked at the top, status bar at the bottom
+page 1 of 2, label showing
+tab 0
+back to page 0

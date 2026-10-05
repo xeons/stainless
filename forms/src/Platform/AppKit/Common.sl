@@ -750,7 +750,7 @@ public class AppKitContainerPeer : AppKitPeer, IContainerPeer
     /// Where children go: the view itself, or for a window its content.
     protected virtual NSView Content => View;
 
-    public void AddChild(IControlPeer child)
+    public virtual void AddChild(IControlPeer child)
     {
         var added = (AppKitPeer)child;
         added.View.RemoveFromSuperview();

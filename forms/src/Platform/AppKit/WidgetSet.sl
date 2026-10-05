@@ -201,15 +201,16 @@ public class AppKitWidgetSet : IWidgetSet
     public ICheckListPeer CreateCheckList(IControlNotify owner, IContainerPeer parent) =>
         Adopt(parent, new AppKitCheckListPeer(owner));
     public IHeaderPeer CreateHeader(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitHeaderPeer(owner));
-    public IToolBarPeer CreateToolBar(IControlNotify owner, IContainerPeer parent) => RefuseAppKitControl<IToolBarPeer>("tool bar");
+    public IToolBarPeer CreateToolBar(IControlNotify owner, IContainerPeer parent) =>
+        Adopt(parent, new AppKitToolBarPeer(owner));
     public IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent) =>
-        RefuseAppKitControl<IStatusBarPeer>("status bar");
+        Adopt(parent, new AppKitStatusBarPeer(owner));
     public IProgressPeer CreateProgress(IControlNotify owner, IContainerPeer parent) =>
         Adopt(parent, new AppKitProgressPeer(owner));
     public ITrackBarPeer CreateTrackBar(IControlNotify owner, IContainerPeer parent, bool vertical) =>
         Adopt(parent, new AppKitTrackBarPeer(owner, vertical));
     public ITabControlPeer CreateTabControl(IControlNotify owner, IContainerPeer parent) =>
-        RefuseAppKitControl<ITabControlPeer>("tab control");
+        Adopt(parent, new AppKitTabControlPeer(owner));
     public ITreeViewPeer CreateTreeView(IControlNotify owner, IContainerPeer parent) =>
         Adopt(parent, new AppKitTreePeer(owner));
     public IListViewPeer CreateListView(IControlNotify owner, IContainerPeer parent) =>
