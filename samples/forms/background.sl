@@ -33,13 +33,13 @@ String Fetch(String city)
 
 public class BackgroundForm : Form
 {
-    Label _explain;
-    TextBox _city;
-    Button _fetch;
-    Button _block;
-    Button _count;
-    Label _forecast;
-    Label _clicks;
+    late Label _explain;
+    late TextBox _city;
+    late Button _fetch;
+    late Button _block;
+    late Button _count;
+    late Label _forecast;
+    late Label _clicks;
 
     int _clicked;
 
@@ -50,12 +50,12 @@ public class BackgroundForm : Form
 
     public BackgroundForm()
     {
+        Delivered = "";
         base(WindowBorder.Sizable);
         Text = "Work on another thread";
         SetBounds(0, 0, 520, 230);
 
         _clicked = 0;
-        Delivered = "";
         DeliveredOnUiThread = false;
 
         _explain = new Label(this);

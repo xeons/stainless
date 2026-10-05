@@ -42,33 +42,33 @@ import Ide.Project;
 /// The project properties window.
 public class ProjectDialog : Form
 {
-    TabControl _pages;
+    late TabControl _pages;
 
     // General.
-    TextBox _name;
-    TextBox _version;
-    ComboBox _kind;
-    TextBox _output;
+    late TextBox _name;
+    late TextBox _version;
+    late ComboBox _kind;
+    late TextBox _output;
 
     // Build.
-    ComboBox _optimize;
-    CheckBox _debug;
-    TextBox _defines;
-    ComboBox _abi;
-    ComboBox _runtime;
+    late ComboBox _optimize;
+    late CheckBox _debug;
+    late TextBox _defines;
+    late ComboBox _abi;
+    late ComboBox _runtime;
 
     // References.
-    ListBox _references;
-    TextBox _libraries;
+    late ListBox _references;
+    late TextBox _libraries;
 
     // Paths.
-    TextBox _sources;
-    TextBox _buildDirectory;
-    TextBox _objectDirectory;
-    TextBox _header;
+    late TextBox _sources;
+    late TextBox _buildDirectory;
+    late TextBox _objectDirectory;
+    late TextBox _header;
 
-    Button _ok;
-    Button _cancel;
+    late Button _ok;
+    late Button _cancel;
 
     /// Whether OK was pressed. `Form.ShowModal` answers nothing by design --
     /// `forms/Form.sl` argues that a dialog with an answer should carry it as a

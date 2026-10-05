@@ -49,8 +49,6 @@ public sealed class Md5 : HashAlgorithm
 
     public Md5()
     {
-        base(64u, 8u, false);
-
         // floor(abs(sin(i + 1)) * 2^32), written out rather than computed:
         // the table is the specification, and a rounding that differed by one
         // in the last place would be a hash that is silently not MD5.
@@ -84,6 +82,7 @@ public sealed class Md5 : HashAlgorithm
             6u, 10u, 15u, 21u, 6u, 10u, 15u, 21u,
         ];
 
+        base(64u, 8u, false);
         InitializeState();
     }
 

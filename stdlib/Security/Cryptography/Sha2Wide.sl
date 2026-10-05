@@ -42,8 +42,6 @@ public abstract class Sha2Wide : HashAlgorithm
 
     protected Sha2Wide()
     {
-        base(128u, 16u, true);
-
         _state = new ulong[8u];
         _constants = [
             0x428A2F98D728AE22u, 0x7137449123EF65CDu, 0xB5C0FBCFEC4D3B2Fu, 0xE9B5DBA58189DBBCu,
@@ -67,6 +65,8 @@ public abstract class Sha2Wide : HashAlgorithm
             0x28DB77F523047D84u, 0x32CAAB7B40C72493u, 0x3C9EBE0A15C9BEBCu, 0x431D67C49C100D4Cu,
             0x4CC5D4BECB3E42B6u, 0x597F299CFC657E2Au, 0x5FCB6FAB3AD6FAECu, 0x6C44198C4A475817u,
         ];
+
+        base(128u, 16u, true);
     }
 
     ~Sha2Wide() => CryptographicOperations.ZeroMemory(_state);

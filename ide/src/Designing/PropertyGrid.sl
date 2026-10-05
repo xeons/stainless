@@ -60,20 +60,20 @@ class GridRow
 /// The Properties window.
 public class PropertyGrid : Panel
 {
-    private Label _heading;
-    private TabControl _tabs;
-    private ListView _properties;
-    private ListView _events;
-    private Panel _editor;
-    private Label _editing;
-    private TextBox _text;
-    private ComboBox _choice;
-    private Panel _flags;
+    private late Label _heading;
+    private late TabControl _tabs;
+    private late ListView _properties;
+    private late ListView _events;
+    private late Panel _editor;
+    private late Label _editing;
+    private late TextBox _text;
+    private late ComboBox _choice;
+    private late Panel _flags;
     private List<CheckBox> _flagBoxes;
-    private Button _pick;
-    private TextBox _lines;
-    private Button _apply;
-    private TextBox _handler;
+    private late Button _pick;
+    private late TextBox _lines;
+    private late Button _apply;
+    private late TextBox _handler;
 
     private DesignSurface? _surface;
     private FormComponent? _component;
@@ -87,7 +87,6 @@ public class PropertyGrid : Panel
 
     public PropertyGrid(WindowedControl parent)
     {
-        base(parent);
         _rows = new List<GridRow>();
         _eventNames = new List<String>();
         _eventTypes = new List<String>();
@@ -95,6 +94,7 @@ public class PropertyGrid : Panel
         _surface = null;
         _component = null;
         _filling = false;
+        base(parent);
         _type = FindType("");
 
         _heading = new Label(this);

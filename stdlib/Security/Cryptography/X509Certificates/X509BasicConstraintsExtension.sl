@@ -55,8 +55,8 @@ public sealed class X509BasicConstraintsExtension : X509Extension
                                           bool certificateAuthority, bool hasPathLengthConstraint,
                                           int pathLengthConstraint)
     {
-        base("2.5.29.19", rawData, critical);
         _certificateAuthority = certificateAuthority;
+        base("2.5.29.19", rawData, critical);
         _hasPathLengthConstraint = hasPathLengthConstraint && pathLengthConstraint >= 0;
         _pathLengthConstraint = _hasPathLengthConstraint ? pathLengthConstraint : 0;
     }

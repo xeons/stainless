@@ -84,7 +84,7 @@ public enum CloseReason { User, Program, ApplicationExit }
 #endif
 public class Form : WindowedControl, IWindowNotify
 {
-    IWindowPeer _windowPeer;
+    late IWindowPeer _windowPeer;
     MainMenu? _menu;
     WindowBorder _border;
     /// Set while `Closing` is being raised, so a handler calling `Close` does
@@ -106,7 +106,6 @@ public class Form : WindowedControl, IWindowNotify
     /// it later costs the window on Windows.
     public Form(WindowBorder border)
     {
-        base(null);
         _border = border;
         _menu = null;
         _isAskingToClose = false;
@@ -114,6 +113,7 @@ public class Form : WindowedControl, IWindowNotify
         _isRegistered = false;
         _isModal = false;
         _wasShown = false;
+        base(null);
         _activation = 0;
         Visible = false;
         _windowPeer = WidgetSet.Current.CreateWindow(this, border);

@@ -123,14 +123,16 @@ dropped.
 
 `slforms` and the designer write `Name.designer.sl` beside `Name.slfm`. It is
 one declaration of the form's class, holding a field per control and
-`InitializeComponent`:
+`InitializeComponent`. Each field is `late`: the control is made with the form
+as its parent, and so after the form can be reached (see
+[late fields](spec/02-types.md#2165-late-fields)).
 
 ```csharp
 public class GreeterForm : Form
 {
-    private Button _greet;
-    private Panel _footer;
-    private Label _greeting;
+    private late Button _greet;
+    private late Panel _footer;
+    private late Label _greeting;
 
     private void InitializeComponent()
     {

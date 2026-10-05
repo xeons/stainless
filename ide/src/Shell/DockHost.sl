@@ -94,10 +94,10 @@ class CaptionBar : CustomControl
 
     public CaptionBar(WindowedControl parent)
     {
-        base(parent);
         _title = "";
         _pinned = true;
         _active = false;
+        base(parent);
         _hotGlyph = 0;
         // It is chrome. Taking the focus would move the caret out of the editor
         // every time someone pinned a pane.
@@ -296,10 +296,10 @@ public class ToolWindow : Panel
 
     public ToolWindow(TabPage parent, String name, String title)
     {
-        base(parent);
-        _paneName = name;
         _title = title;
+        _paneName = name;
         _tab = parent;
+        base(parent);
         Dock = DockStyle.Fill;
         parent.Caption = title;
     }
@@ -348,10 +348,10 @@ class AutoHideStrip : CustomControl
 
     public AutoHideStrip(WindowedControl parent, DockEdge edge)
     {
-        base(parent);
         _panes = new List<ToolWindow>();
         _labelBounds = new List<Rectangle>();
         _edge = edge;
+        base(parent);
         _hotLabel = -1;
         ChosenIndex = 0u;
         Focusable = false;
@@ -521,8 +521,8 @@ class AutoHideStrip : CustomControl
 /// three are this same object in the same place in the tree.
 public class DockWell : Panel
 {
-    CaptionBar _caption;
-    TabControl _tabs;
+    late CaptionBar _caption;
+    late TabControl _tabs;
     List<ToolWindow> _panes;
     DockEdge _edge;
 
@@ -533,9 +533,9 @@ public class DockWell : Panel
 
     public DockWell(WindowedControl parent, DockEdge edge)
     {
-        base(parent);
-        _edge = edge;
         _panes = new List<ToolWindow>();
+        _edge = edge;
+        base(parent);
 
         // The book first so the caption, made second, stacks in front of it.
         // The layout would put them in different places anyway; this is about
@@ -651,19 +651,19 @@ public class DockHost : Panel
 {
     DockLayout _layout;
 
-    AutoHideStrip _leftStrip;
-    AutoHideStrip _rightStrip;
-    AutoHideStrip _bottomStrip;
+    late AutoHideStrip _leftStrip;
+    late AutoHideStrip _rightStrip;
+    late AutoHideStrip _bottomStrip;
 
-    DockWell _leftWell;
-    DockWell _rightWell;
-    DockWell _bottomWell;
+    late DockWell _leftWell;
+    late DockWell _rightWell;
+    late DockWell _bottomWell;
 
-    Splitter _leftSplit;
-    Splitter _rightSplit;
-    Splitter _bottomSplit;
+    late Splitter _leftSplit;
+    late Splitter _rightSplit;
+    late Splitter _bottomSplit;
 
-    Panel _documents;
+    late Panel _documents;
 
     /// The well currently slid out over the documents, or null.
     DockWell? _flyout;
@@ -675,9 +675,10 @@ public class DockHost : Panel
 
     public DockHost(WindowedControl parent, DockLayout layout)
     {
-        base(parent);
         _layout = layout;
+        _pointerTimer = new Timer(250);
         _flyout = null;
+        base(parent);
 
         _leftStrip = new AutoHideStrip(this, DockEdge.Left);
         _leftWell = new DockWell(this, DockEdge.Left);
@@ -724,7 +725,6 @@ public class DockHost : Panel
         _rightStrip.Chosen += this.OnStripChosen;
         _bottomStrip.Chosen += this.OnStripChosen;
 
-        _pointerTimer = new Timer(250);
         _pointerTimer.Tick += this.OnPointerTimerTick;
     }
 

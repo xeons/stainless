@@ -51,7 +51,7 @@ import Standard.Reflection;
 #endif
 public class Label : WindowedControl
 {
-    ILabelPeer _native;
+    late ILabelPeer _native;
     HorizontalAlignment _textAlign;
     bool _wordWrap;
 
@@ -232,7 +232,7 @@ public abstract class TextBoxBase : WindowedControl
 #endif
 public class TextBox : TextBoxBase
 {
-    ITextEntryPeer _native;
+    late ITextEntryPeer _native;
     bool _multiline;
 
     /// **Multiline is chosen here and cannot change.** It is a creation-time

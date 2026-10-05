@@ -40,8 +40,8 @@ public sealed class Sha1 : HashAlgorithm
 
     public Sha1()
     {
-        base(64u, 8u, true);
         _state = new uint[5u];
+        base(64u, 8u, true);
         InitializeState();
     }
 

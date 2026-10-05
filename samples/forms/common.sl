@@ -30,48 +30,50 @@ public class CommonForm : Form
     /// One item off the menu, kept so the self test can ask whether *this*
     /// platform draws its own chrome -- which is the only honest thing to
     /// compare the toolbar's answer against.
-    MenuItem _anyMenuItem;
+    late MenuItem _anyMenuItem;
 
-    ToolBar _tools;
-    StatusBar _status;
-    TabControl _tabs;
-    TabPage _treePage;
-    TabPage _listPage;
-    TabPage _gaugePage;
-    TabPage _formPage;
-    TreeView _tree;
-    ListView _list;
-    ProgressBar _progress;
-    TrackBar _slider;
-    Label _readout;
+    late ToolBar _tools;
+    late StatusBar _status;
+    late TabControl _tabs;
+    late TabPage _treePage;
+    late TabPage _listPage;
+    late TabPage _gaugePage;
+    late TabPage _formPage;
+    late TreeView _tree;
+    late ListView _list;
+    late ProgressBar _progress;
+    late TrackBar _slider;
+    late Label _readout;
     ImageList _icons;
     PopupMenu _context;
 
-    public MenuItem WrapItem;
-    public ToolButton BoldButton;
-    public Bevel Divider;
-    public RadioGroup Priority;
-    public CheckGroup Options;
-    public LabeledEdit Named;
-    public SpinEdit Quantity;
-    public CheckListBox Chores;
-    public HeaderControl Headings;
-    public Shape Blob;
-    public PaintBox Canvas;
+    public late MenuItem WrapItem;
+    public late ToolButton BoldButton;
+    public late Bevel Divider;
+    public late RadioGroup Priority;
+    public late CheckGroup Options;
+    public late LabeledEdit Named;
+    public late SpinEdit Quantity;
+    public late CheckListBox Chores;
+    public late HeaderControl Headings;
+    public late Shape Blob;
+    public late PaintBox Canvas;
     public Timer Clock;
     public int Ticks;
 
     public CommonForm()
     {
+        _icons = new ImageList(16, 16);
+        _chrome = new OfficeXpRenderer();
+        Clock = new Timer(100);
+        _context = new PopupMenu();
         base(WindowBorder.Sizable);
         Text = "Common controls";
         SetBounds(0, 0, 820, 560);
 
-        _icons = new ImageList(16, 16);
         Ticks = 0;
         _clicks = 0;
 
-        _chrome = new OfficeXpRenderer();
         BuildMenu();
 
         // A toolbar docked to the top, which takes its bite out of the client
@@ -171,7 +173,6 @@ public class CommonForm : Form
         Canvas.Paint += this.OnDraw;
         Canvas.MouseDown += this.OnCanvasDown;
 
-        Clock = new Timer(100);
         Clock.Tick += this.OnTick;
 
         // A fourth page, for the composites -- each of which is a container
@@ -219,7 +220,6 @@ public class CommonForm : Form
         Headings.Add("Size", 80);
 
         // A context menu, built once and shown where the user asked for it.
-        _context = new PopupMenu();
         _context.Add("Add a row").Click += this.OnAddRow;
         _context.Add("Remove the row").Click += this.OnRemoveRow;
         _context.Add(MenuItem.CreateSeparator());

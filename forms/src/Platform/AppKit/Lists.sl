@@ -441,10 +441,8 @@ NSScrollView CreateTableScroller(NSTableView table, bool scrolls)
 /// **A double click is the table's double action**, sent to a relay as a
 /// button's action is; the single click's action is left unset.
 ///
-/// **The source is connected last.** AppKit asks it for the rows as soon as
-/// it is set, and the rows are the derived class's; so each derived class
-/// MUST call `ConnectSource` at the end of its constructor, and a class that
-/// derives from one of those MUST NOT add fields the rows depend on.
+/// AppKit asks the source for the rows as soon as it is set, which is here,
+/// in this constructor: a derived class's rows have their values by then.
 public class AppKitTablePeer : AppKitPeer
 {
     protected FormsTableView Table;
@@ -455,25 +453,19 @@ public class AppKitTablePeer : AppKitPeer
 
     public AppKitTablePeer(IControlNotify owner, bool scrolls)
     {
-        base(CreateTableScroller(FormsTableView.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 120.0, 80.0)), scrolls),
-             owner);
-        var table = (FormsTableView)((NSScrollView)View).DocumentView!;
-        Table = table;
-        Table.Peer = this;
+        Table = FormsTableView.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 120.0, 80.0));
         Style = new AppKitCellStyle();
         Table.RowHeight = Style.RowHeight;
         _quiet = false;
         Source = FormsTableSource.Alloc().Init()!;
-        Source.Peer = this;
         _relay = FormsTarget.Alloc().Init()!;
-        _relay.Peer = this;
         Table.Target = _relay;
         Table.DoubleAction = Selector.Named("act:");
-    }
+        base(CreateTableScroller(Table, scrolls), owner);
 
-    /// Hands the table its source, once the rows it answers from exist.
-    protected void ConnectSource()
-    {
+        Table.Peer = this;
+        Source.Peer = this;
+        _relay.Peer = this;
         Table.DataSource = Source;
         Table.Delegate = Source;
     }
@@ -597,16 +589,15 @@ public class AppKitListPeer : AppKitTablePeer, IListPeer
 
     public AppKitListPeer(IControlNotify owner, bool ticked)
     {
-        base(owner, true);
         _items = new List<String>();
         _ticks = new List<bool>();
         _ticked = ticked;
         _column = CreateTableColumn(0, "", 100);
         _column.ResizingMask = NSTableColumnResizingOptions.AutoresizingMask;
+        base(owner, true);
         Table.AddTableColumn(_column);
         Table.HeaderView = null;
         Table.ColumnAutoresizingStyle = NSTableViewColumnAutoresizingStyle.LastColumnOnlyAutoresizingStyle;
-        ConnectSource();
     }
 
     public override int RowCount => (int)_items.Count;
@@ -712,10 +703,9 @@ public class AppKitHeaderPeer : AppKitTablePeer, IHeaderPeer
 
     public AppKitHeaderPeer(IControlNotify owner)
     {
-        base(owner, false);
         _sections = new List<NSTableColumn>();
+        base(owner, false);
         ((NSScrollView)View).BorderType = NSBorderType.NoBorder;
-        ConnectSource();
     }
 
     /// A heading dragged wider or narrower.
@@ -785,14 +775,13 @@ public class AppKitListViewPeer : AppKitTablePeer, IListViewPeer
 
     public AppKitListViewPeer(IControlNotify owner)
     {
-        base(owner, true);
         _rows = new List<AppKitListViewRow>();
         _columns = new List<NSTableColumn>();
         _alignments = new List<NSTextAlignment>();
         _implicit = false;
-        _header = Table.HeaderView;
         _images = null;
-        ConnectSource();
+        base(owner, true);
+        _header = Table.HeaderView;
     }
 
     public override int RowCount => (int)_rows.Count;
@@ -969,11 +958,7 @@ public class AppKitTreePeer : AppKitPeer, ITreeViewPeer
 
     public AppKitTreePeer(IControlNotify owner)
     {
-        base(CreateTableScroller(FormsOutlineView.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 120.0, 80.0)), true),
-             owner);
-        var outline = (FormsOutlineView)((NSScrollView)View).DocumentView!;
-        _outline = outline;
-        _outline.Peer = this;
+        _outline = FormsOutlineView.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 120.0, 80.0));
         _style = new AppKitCellStyle();
         _outline.RowHeight = _style.RowHeight;
         _column = CreateTableColumn(0, "", 100);
@@ -988,13 +973,16 @@ public class AppKitTreePeer : AppKitPeer, ITreeViewPeer
         _images = null;
         _quiet = false;
         _source = FormsTreeSource.Alloc().Init()!;
-        _source.Peer = this;
-        _outline.DataSource = _source;
-        _outline.Delegate = _source;
         _relay = FormsTarget.Alloc().Init()!;
-        _relay.Peer = this;
         _outline.Target = _relay;
         _outline.DoubleAction = Selector.Named("act:");
+        base(CreateTableScroller(_outline, true), owner);
+
+        _outline.Peer = this;
+        _source.Peer = this;
+        _relay.Peer = this;
+        _outline.DataSource = _source;
+        _outline.Delegate = _source;
     }
 
     protected override void ForgetReporters()
@@ -1337,14 +1325,14 @@ public class AppKitComboPeer : AppKitControlPeer, IComboPeer
 
     public AppKitComboPeer(IControlNotify owner)
     {
-        base(CreateComboView(false), owner);
         _items = new List<String>();
         _editable = false;
         _chosen = -1;
         _quiet = false;
         _itemRelay = FormsTarget.Alloc().Init()!;
-        _itemRelay.Peer = this;
         _delegate = FormsComboDelegate.Alloc().Init()!;
+        base(CreateComboView(false), owner);
+        _itemRelay.Peer = this;
         _delegate.Peer = this;
         ListenForAction();
     }

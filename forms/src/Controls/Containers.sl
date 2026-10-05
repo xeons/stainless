@@ -49,7 +49,7 @@ import Standard.Reflection;
 #endif
 public class Panel : WindowedControl
 {
-    IPanelPeer _native;
+    late IPanelPeer _native;
     ControlBorder _border;
 
     public Panel(WindowedControl parent)
@@ -85,7 +85,7 @@ public class Panel : WindowedControl
 #endif
 public class GroupBox : WindowedControl
 {
-    IGroupPeer _native;
+    late IGroupPeer _native;
 
     public GroupBox(WindowedControl parent)
     {
@@ -112,7 +112,7 @@ public class GroupBox : WindowedControl
 /// place on a form when the thing being scrolled is yours.
 public class ScrollBar : WindowedControl
 {
-    IScrollBarPeer _native;
+    late IScrollBarPeer _native;
     bool _isVertical;
     int _minimum;
     int _maximum;
@@ -239,7 +239,7 @@ public class ScrollBar : WindowedControl
 /// scroll bar beside its own content needs.
 public class CustomControl : WindowedControl
 {
-    ICustomPeer _native;
+    late ICustomPeer _native;
     ControlBorder _border;
     Rectangle _caret;
     bool _focusable;

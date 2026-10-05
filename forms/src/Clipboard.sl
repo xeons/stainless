@@ -334,7 +334,7 @@ public sealed class ClipboardData
 /// now is `Clipboard`'s to answer.
 public class ClipboardWatcher : IClipboardNotify
 {
-    IClipboardWatchPeer _peer;
+    late IClipboardWatchPeer _peer;
     bool _enabled;
 
     /// A watcher that is already watching.

@@ -721,7 +721,7 @@ public class GtkPeer : IControlPeer
     protected bool IsEchoing;
 
     /// What this peer's handlers hold instead of the peer. See `PeerRelay`.
-    PeerRelay _relay;
+    late PeerRelay _relay;
 
     /// Whether this peer holds the mouse, in which case every mouse event is
     /// its to report, as it is for a window that has called `SetCapture`.

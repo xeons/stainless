@@ -252,7 +252,7 @@ public class ToolButton
 /// A row of buttons.
 public class ToolBar : WindowedControl
 {
-    IToolBarPeer _native;
+    late IToolBarPeer _native;
     List<ToolButton> _buttons;
     ImageList? _images;
     bool _showText;
@@ -260,11 +260,11 @@ public class ToolBar : WindowedControl
 
     public ToolBar(WindowedControl parent)
     {
-        base(parent);
         _buttons = new List<ToolButton>();
+        _renderer = new SystemChromeRenderer();
         _images = null;
         _showText = true;
-        _renderer = new SystemChromeRenderer();
+        base(parent);
         _native = WidgetSet.Current.CreateToolBar(this, ParentPeer);
         AttachPeer(_native);
     }
@@ -395,15 +395,15 @@ public class ToolBar : WindowedControl
 /// The strip along the bottom, divided into panels.
 public class StatusBar : WindowedControl
 {
-    IStatusBarPeer _native;
+    late IStatusBarPeer _native;
     List<String> _texts;
     List<int> _widths;
 
     public StatusBar(WindowedControl parent)
     {
-        base(parent);
         _texts = new List<String>();
         _widths = new List<int>();
+        base(parent);
         _native = WidgetSet.Current.CreateStatusBar(this, ParentPeer);
         AttachPeer(_native);
         Dock = DockStyle.Bottom;
@@ -489,7 +489,7 @@ int ClampToRange(int value, int low, int high)
 #endif
 public class ProgressBar : WindowedControl
 {
-    IProgressPeer _native;
+    late IProgressPeer _native;
     int _minimum;
     int _maximum;
     bool _indeterminate;
@@ -567,7 +567,7 @@ public class ProgressBar : WindowedControl
 #endif
 public class TrackBar : WindowedControl
 {
-    ITrackBarPeer _native;
+    late ITrackBarPeer _native;
     int _minimum;
     int _maximum;
     int _tickFrequency;
@@ -658,7 +658,7 @@ public class TrackBar : WindowedControl
 #endif
 public class TabPage : WindowedControl
 {
-    IPanelPeer _native;
+    late IPanelPeer _native;
     int _index;
 
     public TabPage(TabControl owner, String text)
@@ -707,7 +707,7 @@ public class TabPage : WindowedControl
 #endif
 public class TabControl : WindowedControl
 {
-    ITabControlPeer _native;
+    late ITabControlPeer _native;
     List<TabPage> _pages;
     ImageList? _images;
     /// A page asked for before it was added, chosen when it is; -1 for none.
@@ -715,9 +715,9 @@ public class TabControl : WindowedControl
 
     public TabControl(WindowedControl parent)
     {
-        base(parent);
         _pages = new List<TabPage>();
         _images = null;
+        base(parent);
         _wanted = -1;
         _native = WidgetSet.Current.CreateTabControl(this, ParentPeer);
         AttachContainerPeer(_native);
@@ -956,7 +956,7 @@ public class TreeNode
 #endif
 public class TreeView : WindowedControl
 {
-    ITreeViewPeer _native;
+    late ITreeViewPeer _native;
     ImageList? _images;
     List<TreeNode> _nodes;
     /// Every node made, so that the handle the platform reports can be turned
@@ -965,10 +965,10 @@ public class TreeView : WindowedControl
 
     public TreeView(WindowedControl parent)
     {
-        base(parent);
         _nodes = new List<TreeNode>();
         _all = new List<TreeNode>();
         _images = null;
+        base(parent);
         _native = WidgetSet.Current.CreateTreeView(this, ParentPeer);
         AttachPeer(_native);
     }
@@ -1091,7 +1091,7 @@ public class TreeView : WindowedControl
 #endif
 public class ListView : WindowedControl
 {
-    IListViewPeer _native;
+    late IListViewPeer _native;
     ListViewStyle _view;
     ImageList? _images;
 

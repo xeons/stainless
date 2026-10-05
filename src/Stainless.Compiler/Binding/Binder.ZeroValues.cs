@@ -301,6 +301,8 @@ public sealed partial class Binder
             if (JumpFinder.Contains(bound.Body))
                 continue;
 
+            CheckFirstPhase(bound.Symbol, bound.Body);
+
             // A field of a struct with no zero value may be written whole, or
             // a field at a time as a local is.
             foreach (var field in FieldsNeedingValues(type, bound.Symbol.SetsRequiredMembers))
@@ -387,7 +389,7 @@ public sealed partial class Binder
         var events = type.Events.Select(e => e.BackingField).OfType<FieldSymbol>().ToHashSet();
 
         return type.Fields.Where(f =>
-            f.InitializerSyntax is null && !events.Contains(f) && !f.IsFilledOnFirstUse &&
+            f.InitializerSyntax is null && !events.Contains(f) && !f.IsFilledOnFirstUse && !f.IsLate &&
             (setsRequired || !f.IsRequired && !required.Contains(f)) &&
             !f.Type.IsError() && !ZeroValues.HasZeroValue(f.Type));
     }

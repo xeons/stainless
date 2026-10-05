@@ -80,17 +80,13 @@ public sealed partial class Binder
         _patternVariableNames.Clear();
         int semantic = SemanticNodes.Made;
 
-        // `base(...)` is only a statement at the very head of a constructor, so
-        // the one place it may appear is found before anything is bound and
-        // every other appearance is refused where it stands.
+        // `this(...)` is only a statement at the very head of a constructor,
+        // and `base(...)` only a statement of its body's own, after what gives
+        // the fields their values. The one place either may appear is found
+        // before anything is bound, and every other appearance is refused
+        // where it stands.
         var chain = function.Kind == FunctionKind.Constructor
-            ? function.Body.Statements.FirstOrDefault() is
-                ExpressionStatementSyntax
-                {
-                    Expression: CallSyntax { Callee: BaseSyntax or ThisSyntax } head
-                }
-                ? head
-                : null
+            ? FindConstructorChain(function.Body, function.ContainingType is ClassTypeSymbol { IsObjC: true })
             : null;
 
         // Bound against the imports of the file it was written in.
@@ -129,6 +125,9 @@ public sealed partial class Binder
             body = WithFieldInitializers(function, body);
             body = WithBaseConstruction(function, body);
             body = WithPrimaryCaptures(function, body);
+            if (chain is { Callee: BaseSyntax, IsClause: true })
+                body = WithClauseBaseAtFirstReach(function, body);
+            RecordFirstPhase(function, body);
         }
 
         SettleUnsetLocals(body);
@@ -149,14 +148,36 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// Puts the base construction at the head of a constructor when the source
-    /// did not write one.
+    /// The <c>this(...)</c> that heads a constructor, or the first
+    /// <c>base(...)</c> among its body's own statements. An Objective-C
+    /// class's <c>base(...)</c> is <c>[super init...]</c>, which answers the
+    /// object the rest works on, so there it heads the body too.
+    /// </summary>
+    private static CallSyntax? FindConstructorChain(BlockSyntax body, bool objectiveC)
+    {
+        if (body.Statements.FirstOrDefault() is
+            ExpressionStatementSyntax { Expression: CallSyntax { Callee: ThisSyntax or BaseSyntax } first } &&
+            (objectiveC || first.Callee is ThisSyntax))
+            return first;
+        if (objectiveC)
+            return null;
+
+        foreach (var statement in body.Statements)
+            if (statement is ExpressionStatementSyntax { Expression: CallSyntax { Callee: BaseSyntax } built })
+                return built;
+        return null;
+    }
+
+    /// <summary>
+    /// Puts the base construction into a constructor whose source did not
+    /// write one.
     ///
-    /// A base class is constructed before the derived class's body runs, always:
-    /// the derived body may read what the base set up, and nothing else would
-    /// make that safe. Written explicitly, the call is already the first
-    /// statement; left out, it is the base's parameterless constructor, and
-    /// there being none is an error rather than a class that skips it.
+    /// A base class is constructed before the derived body reaches the
+    /// object, always: the derived body may read what the base set up, and
+    /// nothing else would make that safe. Left out, it is the base's
+    /// parameterless constructor, run at the end of the first phase -- before
+    /// the first statement that reaches the object or returns -- and there
+    /// being none is an error rather than a class that skips it.
     /// </summary>
     private BoundBlock WithBaseConstruction(FunctionSymbol constructor, BoundBlock body)
     {
@@ -181,7 +202,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0517", constructor.Span,
                 $"'{NearestConstructing(classType)!.Name}' has no constructor that takes no " +
                 $"arguments, so '{classType.Name}' has to say which one to run: write " +
-                "'base(...)' as the first statement of its constructor",
+                "'base(...)' in its constructor, after the statements that give its fields " +
+                "their values",
                 classType);
             return body;
         }
@@ -192,9 +214,12 @@ public sealed partial class Binder
         var call = new BoundCall(constructor.Span, chained,
             new BoundConversion(constructor.Span, chained.ContainingType!, self, ConversionKind.Upcast),
             []) { IsNonVirtual = true };
+        var statement = new BoundExpressionStatement(constructor.Span, call);
+        _implicitBaseCall = statement;
 
+        int at = FindFirstReach(constructor, body.Statements);
         return new BoundBlock(body.Span,
-            [new BoundExpressionStatement(constructor.Span, call), .. body.Statements]);
+            [.. body.Statements.Take(at), statement, .. body.Statements.Skip(at)]);
     }
 
     /// <summary>Set while binding a constructor whose source wrote its own chain.</summary>
@@ -205,12 +230,12 @@ public sealed partial class Binder
     /// they were declared.
     ///
     /// <para>
-    /// <b>After the base construction and before the body.</b> A field
-    /// initializer may not read anything -- it is bound with <c>this</c> out of
-    /// reach -- so nothing in it can see whether the base has run; what the
-    /// order buys is that the constructor's own body has the last word, which
-    /// is what somebody writing <c>Width = width;</c> beside <c>int Width =
-    /// 80;</c> means.
+    /// <b>Before the base construction and the body.</b> A field initializer
+    /// may not read anything -- it is bound with <c>this</c> out of reach --
+    /// so it belongs to the first phase, and a base that calls a virtual
+    /// method finds the field set. The constructor's own body still has the
+    /// last word, which is what somebody writing <c>Width = width;</c> beside
+    /// <c>int Width = 80;</c> means.
     /// </para>
     ///
     /// <para>
@@ -271,12 +296,7 @@ public sealed partial class Binder
                 written.Span, new BoundAssignment(written.Span, target, value)));
         }
 
-        // After an explicit `base(...)` or the chain check would move it; the
-        // implicit one is prepended after this runs.
-        int at = _boundExplicitChain && body.Statements.Count > 0 ? 1 : 0;
-
-        return new BoundBlock(body.Span,
-            [.. body.Statements.Take(at), .. statements, .. body.Statements.Skip(at)]);
+        return new BoundBlock(body.Span, [.. statements, .. body.Statements]);
     }
 
     /// <summary>
@@ -289,11 +309,11 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0516", syntax.Span,
                 _context.Function?.Kind == FunctionKind.Constructor
-                    ? "'base(...)' has to be the first statement of the constructor: the base " +
-                      "class is built before this class's body runs, and a body that had already " +
-                      "run would be reading fields nothing had set"
-                    : "'base(...)' constructs the base class, so it belongs at the head of a " +
-                      "constructor and nowhere else");
+                    ? "'base(...)' is a statement of the constructor's body itself, once: the base " +
+                      "class is built exactly once, on every path, when this class's fields have " +
+                      "their values"
+                    : "'base(...)' constructs the base class, so it belongs in a constructor and " +
+                      "nowhere else");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -336,7 +356,9 @@ public sealed partial class Binder
         var receiver = new BoundConversion(syntax.Span, ancestor, self, ConversionKind.Upcast);
 
         _boundExplicitChain = true;
-        return BuildCall(syntax, chosen, receiver, arguments, nonVirtual: true);
+        var call = BuildCall(syntax, chosen, receiver, arguments, nonVirtual: true);
+        _writtenBaseCall = call;
+        return call;
     }
 
     /// <summary>

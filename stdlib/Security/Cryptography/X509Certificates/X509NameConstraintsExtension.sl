@@ -78,7 +78,6 @@ public sealed class X509NameConstraintsExtension : X509Extension
                                          String[] excludedEmailAddresses,
                                          bool hasUnenforcedSubtrees)
     {
-        base("2.5.29.30", rawData, critical);
         _permittedDnsNames = permittedDnsNames;
         _permittedIPRanges = permittedIPRanges;
         _excludedDnsNames = excludedDnsNames;
@@ -88,6 +87,7 @@ public sealed class X509NameConstraintsExtension : X509Extension
         _permittedEmailAddresses = permittedEmailAddresses;
         _excludedEmailAddresses = excludedEmailAddresses;
         _hasUnenforcedSubtrees = hasUnenforcedSubtrees;
+        base("2.5.29.30", rawData, critical);
     }
 
     /// The permitted DNS subtrees.

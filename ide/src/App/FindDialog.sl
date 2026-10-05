@@ -49,26 +49,26 @@ public closure CodeEditor? EditorSource();
 /// The find and replace window.
 public class FindDialog : Form
 {
-    Label _findLabel;
-    TextBox _find;
-    Label _replaceLabel;
-    TextBox _replace;
-    CheckBox _matchCase;
-    Button _findNext;
-    Button _replaceOne;
-    Button _replaceAll;
-    Button _close;
-    Label _statusLabel;
+    late Label _findLabel;
+    late TextBox _find;
+    late Label _replaceLabel;
+    late TextBox _replace;
+    late CheckBox _matchCase;
+    late Button _findNext;
+    late Button _replaceOne;
+    late Button _replaceAll;
+    late Button _close;
+    late Label _statusLabel;
 
     EditorSource _editorSource;
 
     public FindDialog(EditorSource source)
     {
+        _editorSource = source;
         // `Tool` rather than `Fixed`: a thin caption and absent from the task
         // bar, which is what a utility window that belongs to another window
         // should be. Not sizable, because nothing in it would use the room.
         base(WindowBorder.Tool);
-        _editorSource = source;
         Title = "Find and replace";
         // The outer frame, caption and borders included -- there is no
         // client-size setter -- so this is the 140 the controls need plus the

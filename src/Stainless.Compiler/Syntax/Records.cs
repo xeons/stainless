@@ -69,12 +69,14 @@ public static class Records
         if (source.BaseArguments is { } given)
             constructor = constructor with
             {
+                // The record's own properties first: the base is built once
+                // they have their values.
                 Body = new BlockSyntax(constructor.Body.Span,
                 [
+                    .. constructor.Body.Statements,
                     new ExpressionStatementSyntax(source.BaseArgumentsSpan,
                         new CallSyntax(source.BaseArgumentsSpan,
                             new BaseSyntax(source.BaseArgumentsSpan), given)),
-                    .. constructor.Body.Statements,
                 ]),
             };
 

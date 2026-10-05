@@ -499,6 +499,12 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     public bool IsRequired { get; init; }
 
     /// <summary>
+    /// Declared <c>late</c>: given its value once the object can be reached,
+    /// so no constructor is held to writing it and every read checks it.
+    /// </summary>
+    public bool IsLate { get; init; }
+
+    /// <summary>
     /// A property's storage its accessors read only to fill with
     /// <c>field ??= ...</c>, so it may start empty whatever its type says.
     /// </summary>

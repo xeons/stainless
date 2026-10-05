@@ -90,8 +90,8 @@ public class Circle : Shape
 
     Circle(double r)
     {
-        base(1);
         _radius = r;
+        base(1);
         closed = true;
     }
 

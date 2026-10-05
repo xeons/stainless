@@ -6,7 +6,7 @@ module Parts;
 
 public class Window
 {
-    public String Caption;
+    public late String Caption;
     public int Clicks;
 
     void InitializeComponent()

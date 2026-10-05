@@ -157,15 +157,15 @@ public abstract class WindowedControl : Control
     /// by calling `AttachContainerPeer` instead of `AttachPeer`.
     IContainerPeer? _containerPeer;
     List<Control> _children;
-    ControlList _controls;
+    late ControlList _controls;
     bool _isLayingOut;
 
     protected WindowedControl(WindowedControl? parent)
     {
-        base();
+        _children = new List<Control>();
         _peer = null;
         _containerPeer = null;
-        _children = new List<Control>();
+        base();
         _controls = new ControlList(_children);
         _isLayingOut = false;
         _grabbed = null;

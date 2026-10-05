@@ -117,19 +117,6 @@ class Deflater
         _level = level;
         _error = IOError.None;
 
-        switch (level)
-        {
-            case CompressionLevel.Fastest:
-                SetEffort(4, 4, 8, 4, true);
-                break;
-            case CompressionLevel.SmallestSize:
-                SetEffort(32, 258, 258, 4096, false);
-                break;
-            default:
-                SetEffort(8, 16, 128, 128, false);
-                break;
-        }
-
         // The slack past two windows is what a match compared at the very
         // end may read; nothing past the data is ever taken into one.
         _window = new byte[(nuint)(2 * WindowSize + MaxMatch + 8)];
@@ -170,6 +157,19 @@ class Deflater
         _output = new byte[OutputSize];
         _crc = new Crc32();
         _adler = new Adler32();
+
+        switch (level)
+        {
+            case CompressionLevel.Fastest:
+                SetEffort(4, 4, 8, 4, true);
+                break;
+            case CompressionLevel.SmallestSize:
+                SetEffort(32, 258, 258, 4096, false);
+                break;
+            default:
+                SetEffort(8, 16, 128, 128, false);
+                break;
+        }
 
         for (nuint i = 0; i < 288u; i++)
         {

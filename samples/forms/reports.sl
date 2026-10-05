@@ -33,25 +33,25 @@ import Forms.Platform.Gtk;
 
 public class ReportsForm : Form
 {
-    public CheckBox Option;
-    public TextBox Entry;
-    public ComboBox Combo;
-    public ListBox Rows;
-    public ScrollBar Scroll;
-    public SpinEdit Spin;
-    public TrackBar Track;
-    public TabControl Tabs;
-    public TabPage First;
-    public TabPage Second;
-    public Panel Pane;
-    public PaintBox Box;
-    public Panel Choices;
-    public RadioButton Near;
-    public RadioButton Far;
-    public Button Back;
-    public Button Front;
-    public MenuItem Go;
-    public MenuItem Ticked;
+    public late CheckBox Option;
+    public late TextBox Entry;
+    public late ComboBox Combo;
+    public late ListBox Rows;
+    public late ScrollBar Scroll;
+    public late SpinEdit Spin;
+    public late TrackBar Track;
+    public late TabControl Tabs;
+    public late TabPage First;
+    public late TabPage Second;
+    public late Panel Pane;
+    public late PaintBox Box;
+    public late Panel Choices;
+    public late RadioButton Near;
+    public late RadioButton Far;
+    public late Button Back;
+    public late Button Front;
+    public late MenuItem Go;
+    public late MenuItem Ticked;
 
     // What each control reported, counted.
     public int Options;

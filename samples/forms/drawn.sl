@@ -51,8 +51,8 @@ public class Scratch : CustomControl
 
     public Scratch(WindowedControl parent)
     {
-        base(parent);
         _text = "";
+        base(parent);
         _at = 0u;
         _pending = -1;
         Border = ControlBorder.Sunken;
@@ -212,9 +212,9 @@ public class Scratch : CustomControl
 
 public class DrawnForm : Form
 {
-    Label _explain;
-    Scratch _field;
-    Label _note;
+    late Label _explain;
+    late Scratch _field;
+    late Label _note;
 
     public DrawnForm()
     {

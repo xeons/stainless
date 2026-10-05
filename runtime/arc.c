@@ -291,6 +291,17 @@ void sl_objc_cast_failed(const char *actual, const char *wanted)
     abort();
 }
 
+/* A late field read before anything gave it a value. */
+void sl_late_unset(const char *field)
+{
+    fflush(NULL);
+
+    fprintf(stderr, "stainless: '%s' was read before it was given a value\n", field);
+    fflush(stderr);
+
+    abort();
+}
+
 void sl_cast_failed(const void *object, const char *wanted)
 {
     const SlObject *header = (const SlObject *)object;

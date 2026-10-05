@@ -484,6 +484,7 @@ public static class MetadataWriter
         IsPublic = field.IsPublic,
         IsBackingField = field.IsBackingField,
         IsRequired = field.IsRequired,
+        IsLate = field.IsLate,
         BitWidth = field.BitWidth,
         BitOffset = field.BitOffset,
     };

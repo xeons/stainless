@@ -194,6 +194,7 @@ public static class Digest
                 field.BitWidth is { } width ? Number(width) : "",
                 Number(field.BitOffset),
                 .. field.IsRequired ? ["required"] : Array.Empty<string>(),
+                .. field.IsLate ? ["late"] : Array.Empty<string>(),
             ]);
 
         foreach (var member in type.Members.OrderBy(m => m.Name, StringComparer.Ordinal))

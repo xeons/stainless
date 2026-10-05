@@ -20,22 +20,23 @@ import MacOS.AppKit;
 class ListsForm : Form
 {
     public String Seen;
-    ListBox _list;
-    CheckListBox _checks;
-    ComboBox _combo;
-    HeaderControl _header;
-    TreeView _tree;
-    TreeNode _root;
-    ListView _view;
+    late ListBox _list;
+    late CheckListBox _checks;
+    late ComboBox _combo;
+    late HeaderControl _header;
+    late TreeView _tree;
+    late TreeNode _root;
+    late ListView _view;
     Timer _clock;
     int _ticks;
 
     public ListsForm()
     {
+        Seen = "";
+        _clock = new Timer(100);
         base();
         Text = "AppKit lists";
         SetBounds(160, 160, 640, 360);
-        Seen = "";
         _ticks = 0;
 
         _list = new ListBox(this);
@@ -75,7 +76,6 @@ class ListsForm : Form
         _view.AddRow(["picture", "2 KB"]);
         _view.SelectedIndexChanged += (sender) => this.Note("view chose " + Standard.Text.FromInteger(this.ViewIndex));
 
-        _clock = new Timer(100);
         _clock.Tick += this.OnTick;
         _clock.Start();
     }

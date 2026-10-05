@@ -628,14 +628,14 @@ the initializers run there.
 
 **A field with no initializer is written by every constructor** when its type
 has no zero value: a `String` field that no path writes would be read as a
-null. A private helper the constructor calls counts, as does `required`
-(SL0813, [§2.16.2](#2162-fields)).
+null. `required` counts (SL0813, [§2.16.2](#2162-fields)). The write MUST come
+before the object can be reached (SL0938), or the field is `late`
+([§2.16.5](#2165-late-fields)).
 
 **A constructor that chains to `this(...)` does not run them**, because the one
 it delegates to already did, and running them twice would undo whatever that
 constructor decided. The base class's initializers are not here either: the
-base's own constructor runs them, and that call is what a derived constructor
-starts with.
+base's own constructor runs them, after this class's.
 
 **An initializer cannot read the object** (SL0617) — not `this`, not another
 field, not a method. It runs before the constructor's body and in declaration
@@ -699,8 +699,8 @@ public class Polygon : Shape
 
     Polygon(int howMany, double w)
     {
-        base(howMany);                      // first statement, always
-        width = w;
+        width = w;                          // this class's fields first
+        base(howMany);                      // then the base
     }
 
     public override double Area() => width * width;
@@ -780,38 +780,74 @@ public override int Value { get => base.Value; }
 
 would otherwise call itself for ever. A member the base declares `abstract`
 has no implementation there, so `base.M()` or `base.P` naming one is an
-error (SL0806) rather than a call to nothing. `base(...)` runs the base constructor, before this class's body: the base is
-built first, and a body that had already run would be reading fields nothing
-had set. Left out, the base's constructor taking no arguments is called for
-you, and there being none is an error rather than a class that skips it.
+error (SL0806) rather than a call to nothing.
 
-**It is written in one of two places**, and they mean the same thing:
+**Construction is in two phases: an object can be reached only once every
+field it has holds a value**, as
+Swift's two-phase initialization has it. A constructor's *first phase* gives
+this class's own fields their values, and may read back the ones it has given.
+It may do nothing else with the object: call no method, read no property but an
+automatic one of its own, hand `this` to nothing -- and, for a derived class,
+not yet build the base. `base(...)` runs the base's constructor over the object
+like any other method, so it is what ends the first phase:
 
 ```csharp
-public Square(double side) : base(4)     // after the parameters, as in C#
-{
-    _side = side;
-}
-
 public Square(double side)
 {
-    base(4);                             // or as the very first statement
+    _side = side;                        // the first phase: this class's fields
+    base(4);                             // the base, which may call Area()
+    Describe();                          // the object is whole
+}
+```
+
+**The point is the base's virtual calls.** A base constructor that calls a
+method this class overrides runs that override before the rest of the derived
+constructor. Built the other way round -- C#'s and Java's order -- the override
+reads fields nothing has set, which for a field that is never null is a null
+where none can be. Here the derived fields are set before the base starts.
+
+The first phase ends at a written `base(...)`. Left out, the base's
+constructor taking no arguments runs where the first phase ends anyway: before
+the first statement that reaches the object or returns. A class with no base,
+and a struct, have the same boundary and nothing to run at it. Written after
+the parameters, as in C#, the clause names the base constructor and is run at
+that same place:
+
+```csharp
+public Square(double side) : base(4)     // runs after '_side = side'
+{
     _side = side;
 }
 ```
 
-The clause is the one to reach for — a reader looking at a constructor's
-signature sees what it builds without reading into the body — but the statement
-form is not going anywhere, and most of this repository still writes it.
+Field initializers run first of all, in the first phase: they cannot read the
+object, so nothing in them can tell.
+
+**Every field with no zero value MUST have its value by the end of the first
+phase** (SL0938), and none may be read before it has one (SL0939). Before a
+written `base(...)`, reaching the object is refused (SL0937), as is returning:
+the base would never be built. A field whose value needs the finished object --
+a child that is handed its parent, a peer handed the control it reports to --
+is declared `late` instead ([section 2.16.5](#2165-late-fields)).
 
 A constructor writes the call once, in one place or the other, and nothing may
 follow the `:` but these two calls:
 
 ```
-error[SL0516]: 'base(...)' has to be the first statement of the constructor
+error[SL0516]: 'base(...)' is a statement of the constructor's body itself,
+once: the base class is built exactly once, on every path, when this class's
+fields have their values
 error[SL0517]: 'Shape' has no constructor that takes no arguments, so 'Circle'
-has to say which one to run: write 'base(...)' as the first statement of its
-constructor
+has to say which one to run: write 'base(...)' in its constructor, after the
+statements that give its fields their values
+error[SL0937]: this reaches the object before 'base(...)' has run; until then a
+constructor may only give this class's own fields their values and read them
+back, because the object is not whole
+error[SL0938]: 'Button._native' has no value yet when 'base(...)' runs, and
+'IPushButtonPeer' has no zero value: ... Give it its value before this, so that
+nothing can find the object without it
+error[SL0939]: '_items' is read here before the constructor has given it a
+value, and 'List<int>' has no zero value: ...
 error[SL0732]: a constructor may be followed by ': base(...)' or ': this(...)'
 and nothing else; there are no initializer lists here, because a field is
 initialized where it is declared or in the body
@@ -3270,31 +3306,30 @@ before it. A field of a struct type may be written whole or a field at a time,
 as a local may. An event's storage is the compiler's, and is exempt.
 
 **A call to one of the type's own private methods is followed**, as though its
-body were written at the call. That is how a form is built — the designer's
-half is one call:
-
-```csharp
-public MainForm()
-{
-    InitializeComponent();              // writes _save, _open and the rest
-}
-```
-
-A private method has one body, so following it is exact; a method still being
-asked about, because it calls itself, answers that it writes nothing. A
-public, protected or virtual one is not followed: an override could write
-nothing. Nothing is written on the helper to say what it does — the body says
-it.
+body were written at the call. A private method has one body, so following it
+is exact; a method still being asked about, because it calls itself, answers
+that it writes nothing. A public, protected or virtual one is not followed: an
+override could write nothing.
 
 **A class with no constructor has only its initializers**, so a field with
 neither is reported at the class.
 
-**`this` escaping a constructor is the one gap left open.** A base constructor
-that calls a virtual method, or a constructor that hands `this` to something
-before every field is written, can have a field read as null. Swift closes it
-by forbidding any use of `self` until every field is set, which would refuse
-every form here: `base(...)` dispatches. C#, Java and Kotlin leave it open, and
-so does this.
+**The write MUST come in the constructor's first phase**
+([section 2.4.3](#243-inheritance)), before anything reaches the object (SL0938):
+a call to a helper reaches it, so a field a helper writes has its value too
+late to count. That closes `this` escaping a constructor: a base constructor's
+virtual call, or `this` handed to something, finds every field with no zero
+value already set. A field whose value needs the object is `late`
+([section 2.16.5](#2165-late-fields)), which a form's controls are -- the
+designer's half writes them in one call:
+
+```csharp
+public MainForm()
+{
+    base();
+    InitializeComponent();              // writes _save, _open and the rest
+}
+```
 
 ### 2.16.3 Arrays
 
@@ -3376,6 +3411,68 @@ public void Clear() where T : zeroable      // Span<String> has no Clear
 
 **Not in scope:** an `enum` with no member at zero, and a `variant` whose
 cases leave tag zero unused. Their zero names nothing, but it is not a null.
+
+### 2.16.5 Late fields
+
+```csharp
+public class Button : Control
+{
+    late IPushButtonPeer _native;
+
+    public Button(Container parent)
+    {
+        base(parent);
+        _native = WidgetSet.Current.CreateButton(this, ParentPeer);
+    }
+}
+```
+
+**The problem it solves.** Construction is in two phases
+([section 2.4.3](#243-inheritance)): every field with no zero value has its
+value before anything can reach the object, so that a base constructor's
+virtual call, or `this` handed to something, never finds a null where the type
+promises none. Some values cannot be made that early, because making them
+needs the object itself. The button's peer above is made with the button it
+reports to; a form's child controls are made with the form as their parent.
+The two objects refer to each other, and one of them has to exist first.
+
+Without `late`, the ways out are each worse:
+
+- an optional field, `IPushButtonPeer? _native`, with a `!` at every one of
+  hundreds of reads -- or an `if` at every read, which silently does nothing
+  when the field is empty and hides the mistake;
+- a placeholder value, a do-nothing peer standing in until the real one
+  arrives, which never fails and so never says that the real one never came;
+- a value made early from whatever is to hand, before the object it describes
+  is ready.
+
+**What `late` means.** A field declared `late` may be given its value after the
+object can be reached. No constructor is held to writing it (SL0813, SL0938).
+Its storage starts empty, as every reference's does, and **every read checks
+that it has a value and stops the program when it has none**, naming the
+field:
+
+```
+stainless: 'Button._native' was read before it was given a value
+```
+
+So the mistake the rule exists to catch is still caught: at the first read
+that would have seen the null, rather than at some later use of it, and never
+silently. Writing it is an ordinary assignment; it cannot be emptied again,
+and there is no asking whether it has a value -- a field that may be empty is
+an optional.
+
+It is Swift's implicitly unwrapped optional, `T!`, and Kotlin's `lateinit`,
+spelled as Dart spells it. The check is a comparison with null on each read,
+which is why it is written rather than inferred: a field that can be given its
+value in the first phase should be, and then costs nothing. A form's
+designer-generated half declares its controls `late`, since it makes them with
+the form as their parent. Reflection treats a `late` field as one that may be
+empty ([section 6.5](06-attributes-reflection.md#65-what-is-emitted)).
+
+Only a class's field whose type is a reference that is never null may be
+`late` (SL0940): a field that may be empty is an optional, one with a zero value
+has it, and a `required` field is given its value by every `new`.
 
 ## 2.17 `vfloat4` -- SIMD vectors
 

@@ -88,7 +88,7 @@ public class Fixed
 public class Named
 {
     bool _busy;
-    public Act Body;
+    public late Act Body;
 
     public Named()
     {
@@ -114,7 +114,7 @@ public class Named
 public class Correct
 {
     bool _busy;
-    public Act Body;
+    public late Act Body;
 
     bool Busy() => _busy;
 
@@ -150,7 +150,7 @@ public class Correct
 public class Stale
 {
     bool _busy;
-    public Act Body;
+    public late Act Body;
 
     bool Busy => _busy;
 

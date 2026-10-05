@@ -16,8 +16,8 @@ public class Dog : Animal
     // The base constructor runs first, across the boundary.
     public Dog(String toy)
     {
-        base(4, "dog");
         this._toy = toy;
+        base(4, "dog");
     }
 
     ~Dog() { Console.WriteLine("~Dog " + _toy); }

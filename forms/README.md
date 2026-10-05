@@ -14,8 +14,8 @@ import Forms.Platform;
 
 public class MainForm : Form
 {
-    private Button _greet;
-    private Label _said;
+    private late Button _greet;
+    private late Label _said;
 
     public MainForm()
     {
@@ -50,6 +50,12 @@ Those are real platform controls — a real `BUTTON` and `STATIC` on Windows, a
 real `GtkButton` and `GtkLabel` on Linux — in a real window. No VM, no GC, no
 designer, no generated code, and **the source above is the same source on
 both**.
+
+The controls are `late` because each is made with the form as its parent, so
+it cannot exist before the form does. A field like that is checked on every
+read and stops the program, naming it, if it is read before it is given a
+value; see the language's two-phase construction in
+[docs/spec/02-types.md](../docs/spec/02-types.md#2165-late-fields).
 
 ---
 

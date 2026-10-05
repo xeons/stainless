@@ -438,9 +438,9 @@ public class GtkHeaderPeer : GtkPeer, IHeaderPeer
 
     public GtkHeaderPeer(IControlNotify owner)
     {
-        base(gtk_tree_view_new(), owner);
         _sections = new List<gpointer>();
         _widths = new List<int>();
+        base(gtk_tree_view_new(), owner);
         gtk_tree_view_set_headers_visible(Widget, 1);
     }
 
@@ -499,8 +499,8 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
 
     public GtkTreePeer(IControlNotify owner)
     {
-        base(owner);
         _nodes = new Dictionary<nuint, gpointer>();
+        base(owner);
         _nextId = 1u;
         _images = null;
 
@@ -783,8 +783,8 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
 
     public GtkListViewPeer(IControlNotify owner)
     {
-        base(owner);
         _headings = new List<gpointer>();
+        base(owner);
         _images = null;
 
         // **The column count is fixed when the store is made**, and a

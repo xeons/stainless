@@ -855,7 +855,8 @@ public sealed class Parser
         TokenKind.ComKeyword => Modifiers.Com,
         TokenKind.ObjcKeyword => Modifiers.Objc,
 
-        TokenKind.Identifier when AtRequiredModifier() => Modifiers.Required,
+        TokenKind.Identifier when AtContextualModifier("required") => Modifiers.Required,
+        TokenKind.Identifier when AtContextualModifier("late") => Modifiers.Late,
         _ => Modifiers.None,
     };
 
@@ -904,12 +905,12 @@ public sealed class Parser
     };
 
     /// <summary>
-    /// Whether <c>required</c> here is the modifier rather than a type of
-    /// that name: it is when a member's type and name follow it.
+    /// Whether <c>required</c> or <c>late</c> here is the modifier rather than
+    /// a type of that name: it is when a member's type and name follow it.
     /// </summary>
-    private bool AtRequiredModifier()
+    private bool AtContextualModifier(string word)
     {
-        if (!AtWord || Current.Text != "required") return false;
+        if (!AtWord || Current.Text != word) return false;
 
         var next = Peek(1);
         if (IsModifierKeyword(next.Kind) || PrimitiveKeywords.Contains(next.Kind)) return true;
@@ -4594,7 +4595,7 @@ public sealed class Parser
             : new ThisSyntax(SpanFrom(keyword));
 
         var arguments = At(TokenKind.OpenParen) ? ParseArgumentList() : [];
-        return new CallSyntax(SpanFrom(start), callee, arguments);
+        return new CallSyntax(SpanFrom(start), callee, arguments) { IsClause = true };
     }
 
     /// <summary>

@@ -41,7 +41,7 @@ import Standard.Text;
 /// beginning.
 public abstract class HttpContent : IDisposable
 {
-    private HttpContentHeaders _headers;
+    private late HttpContentHeaders _headers;
     private byte[] _buffer = new byte[0u];
     private bool _buffered = false;
 

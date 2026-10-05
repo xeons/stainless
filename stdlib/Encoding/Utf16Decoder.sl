@@ -28,8 +28,8 @@ class Utf16Decoder : TailDecoder
 
     public Utf16Decoder(IEncoding encoding, bool big)
     {
-        base(encoding);
         _bigEndian = big;
+        base(encoding);
     }
 
     protected override nuint CountIncompleteTail(byte[] data, nuint length)

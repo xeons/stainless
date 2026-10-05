@@ -164,6 +164,12 @@ public enum Modifiers
     /// function defined somewhere else.
     /// </summary>
     Extern = 1 << 14,
+
+    /// <summary>
+    /// On a field, one given its value after the object can be reached rather
+    /// than before: every read checks it has one, and aborts if not.
+    /// </summary>
+    Late = 1 << 15,
 }
 
 /// <summary>
@@ -1402,7 +1408,14 @@ public sealed record AssignmentSyntax(
 public sealed record CallSyntax(
     SourceSpan Span,
     ExpressionSyntax Callee,
-    IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span);
+    IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span)
+{
+    /// <summary>
+    /// <c>: base(...)</c> or <c>: this(...)</c> written after a constructor's
+    /// parameters rather than in its body.
+    /// </summary>
+    public bool IsClause { get; init; }
+}
 
 /// <summary>
 /// <c>base</c>: this object, seen as the class it derives from.

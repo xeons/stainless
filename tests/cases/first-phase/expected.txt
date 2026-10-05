@@ -1,0 +1,3 @@
+base sees a square with 4 sides
+base sees 3 corners with 3 sides
+base sees a circle, then its twin

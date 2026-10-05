@@ -102,7 +102,12 @@ last person to edit it -- the suite is the authority.
   assignment a field at a time; a constructor's calls to the type's own private
   methods are followed, so `InitializeComponent()` counts; an initializer,
   `: this(...)`, `required` and a primary constructor discharge a field, and so
-  does storage a property only fills with `field ??=`. Generic bodies are judged
+  does storage a property only fills with `field ??=`. Construction is in two
+  phases, as Swift's: every such field has its value before the object can be
+  reached -- before `base(...)`, a method call or `this` handed on (SL0937,
+  SL0938, SL0939) -- so a base constructor's virtual call finds derived fields
+  set. A field whose value needs the finished object is `late` (SL0940), and a
+  read of one with no value yet stops the program, naming it. Generic bodies are judged
   per instantiation. `Array.Create` and `Array.Repeat` make an array whole,
   `Array.Create` filled in place where it is called, and a `Slot<T>[]` is room
   for elements not there yet: empty at zero, the size of `T`, and a read of an

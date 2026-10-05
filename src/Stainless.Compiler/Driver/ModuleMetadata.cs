@@ -343,6 +343,9 @@ public sealed record MetadataField
     /// <summary>Declared <c>required</c>: a consumer's <c>new</c> must set it.</summary>
     public bool IsRequired { get; init; }
 
+    /// <summary>Declared <c>late</c>: a consumer's read checks it has a value.</summary>
+    public bool IsLate { get; init; }
+
     /// <summary>
     /// For a bit-field, how wide it is and where in its storage unit it starts.
     /// Both have to cross: a consumer that knew only the byte offset would read

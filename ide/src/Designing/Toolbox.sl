@@ -25,13 +25,13 @@ public closure void ToolChosenHandler(String typeName);
 /// A list of the types the designer can make.
 public class Toolbox : Panel
 {
-    private ListBox _types;
+    private late ListBox _types;
     private bool _clearing;
 
     public Toolbox(WindowedControl parent)
     {
-        base(parent);
         _clearing = false;
+        base(parent);
         _types = new ListBox(this);
         _types.Dock = DockStyle.Fill;
         _types.Items = ListDesignableTypes();

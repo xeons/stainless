@@ -18,9 +18,9 @@ public class Window : Surface
 
     public Window()
     {
+        Note = "own state";
         base(640);
         InitializeComponent();
-        Note = "own state";
     }
 
     public override String Describe() => Caption + ", " + Note;

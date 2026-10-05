@@ -432,6 +432,7 @@ public sealed class MetadataLoader(
                 IsPublic = field.IsPublic,
                 IsBackingField = field.IsBackingField,
                 IsRequired = field.IsRequired,
+                IsLate = field.IsLate,
                 Offset = field.Offset,
                 BitWidth = field.BitWidth,
                 BitOffset = field.BitOffset,

@@ -74,11 +74,11 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
 
     public ToolBarPeer(IControlNotify owner, IContainerPeer parent)
     {
+        _commands = new List<int>();
         base(CreateChildWindow("ToolbarWindow32", GetContainerWindow(parent),
                        GetChildStyle() | GetFixedBarStyle() | TbStyleFlat | TbStyleList, 0u),
              owner, true);
         _owner = owner;
-        _commands = new List<int>();
         _isOwnerDrawn = false;
 
         // Windows needs to be told how wide a `TBBUTTON` is before any is

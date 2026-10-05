@@ -53,8 +53,8 @@ public sealed class X509EnhancedKeyUsageExtension : X509Extension
     private X509EnhancedKeyUsageExtension(ReadOnlySpan<byte> rawData, bool critical,
                                           String[] enhancedKeyUsages)
     {
-        base("2.5.29.37", rawData, critical);
         _enhancedKeyUsages = enhancedKeyUsages;
+        base("2.5.29.37", rawData, critical);
     }
 
     /// `id-kp-serverAuth`: a TLS server.

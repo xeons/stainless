@@ -310,8 +310,8 @@ public class AppKitControlPeer : AppKitPeer
 
     public AppKitControlPeer(NSControl made, IControlNotify owner)
     {
-        base(made, owner);
         _relay = null;
+        base(made, owner);
     }
 
     protected NSControl Control => (NSControl)View;
@@ -359,9 +359,8 @@ public class AppKitButtonPeer : AppKitControlPeer, IPushButtonPeer
 
     public AppKitButtonPeer(IControlNotify owner)
     {
-        base(FormsButton.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 80.0, 24.0)), owner);
-        var made = (FormsButton)View;
-        _button = made;
+        _button = FormsButton.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 80.0, 24.0));
+        base(_button, owner);
         _button.Peer = this;
         _button.SetButtonType(NSButtonType.MomentaryPushIn);
         _button.BezelStyle = NSBezelStyle.Push;
@@ -431,11 +430,10 @@ public class AppKitCheckPeer : AppKitControlPeer, ICheckPeer
 
     public AppKitCheckPeer(IControlNotify owner, CheckKind kind)
     {
-        base(FormsButton.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 100.0, 24.0)), owner);
-        var made = (FormsButton)View;
-        _button = made;
-        _button.Peer = this;
+        _button = FormsButton.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 100.0, 24.0));
         _kind = kind;
+        base(_button, owner);
+        _button.Peer = this;
         switch (kind)
         {
             case CheckKind.Radio:
@@ -482,9 +480,8 @@ public class AppKitLabelPeer : AppKitControlPeer, ILabelPeer
 
     public AppKitLabelPeer(IControlNotify owner)
     {
-        base(FormsTextField.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 80.0, 16.0)), owner);
-        var made = (FormsTextField)View;
-        _field = made;
+        _field = FormsTextField.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 80.0, 16.0));
+        base(_field, owner);
         _field.Peer = this;
         _field.Editable = false;
         _field.Selectable = false;
@@ -544,11 +541,11 @@ public class AppKitTextEntryPeer : AppKitPeer, ITextEntryPeer
 
     public AppKitTextEntryPeer(IControlNotify owner, bool multiline)
     {
-        base(CreateEntryView(multiline), owner);
         _multiline = multiline;
         _maxLength = 0;
         _readOnly = false;
         _delegate = FormsTextDelegate.Alloc().Init()!;
+        base(CreateEntryView(multiline), owner);
         _delegate.Peer = this;
 
         if (multiline)
@@ -885,12 +882,11 @@ public class AppKitGroupPeer : AppKitContainerPeer, IGroupPeer
 
     public AppKitGroupPeer(IControlNotify owner)
     {
-        base(NSBox.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 160.0, 96.0)), owner);
-        var box = (NSBox)View;
-        _box = box;
+        _box = NSBox.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 160.0, 96.0));
         _box.BoxType = NSBoxType.Primary;
         _box.TitlePosition = NSTitlePosition.AtTop;
         _content = CreateFormsView();
+        base(_box, owner);
         _content.Peer = this;
         _content.TrackPointer();
         _box.ContentView = _content;
@@ -961,9 +957,8 @@ public class AppKitProgressPeer : AppKitPeer, IProgressPeer
 
     public AppKitProgressPeer(IControlNotify owner)
     {
-        base(NSProgressIndicator.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 160.0, 20.0)), owner);
-        var made = (NSProgressIndicator)View;
-        _bar = made;
+        _bar = NSProgressIndicator.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 160.0, 20.0));
+        base(_bar, owner);
         _bar.Style = NSProgressIndicatorStyle.Bar;
         _bar.Indeterminate = false;
         _bar.MinValue = 0.0;
@@ -998,15 +993,14 @@ public class AppKitTrackBarPeer : AppKitControlPeer, ITrackBarPeer
 
     public AppKitTrackBarPeer(IControlNotify owner, bool vertical)
     {
-        base(FormsSlider.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 160.0, 24.0)), owner);
-        var made = (FormsSlider)View;
-        _slider = made;
-        _slider.Peer = this;
+        _slider = FormsSlider.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 160.0, 24.0));
         _slider.Vertical = vertical;
         _slider.MinValue = 0.0;
         _slider.MaxValue = 10.0;
         _slider.Continuous = true;
         _every = 1;
+        base(_slider, owner);
+        _slider.Peer = this;
         ListenForAction();
         ApplyTicks();
     }
@@ -1059,27 +1053,31 @@ public class AppKitSpinPeer : AppKitContainerPeer, ISpinPeer
 
     public AppKitSpinPeer(IControlNotify owner)
     {
-        base(CreateFormsView(), owner);
         _minimum = 0;
         _maximum = 100;
         _value = 0;
 
         _field = FormsTextField.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 60.0, 22.0));
-        _field.Peer = this;
         _field.Bezeled = true;
         _field.Editable = true;
         _field.UsesSingleLineMode = true;
-        _fieldRelay = ConnectAction(_field, this);
-        View.AddSubview(_field);
+        _fieldRelay = FormsTarget.Alloc().Init()!;
+        _field.Target = _fieldRelay;
+        _field.Action = Selector.Named("act:");
 
         _stepper = NSStepper.Alloc().InitWithFrame(MakeNSRect(60.0, 0.0, 19.0, 22.0));
         _stepper.Increment = 1.0;
         _stepper.ValueWraps = false;
         _stepper.Autorepeat = true;
         _stepperRelay = FormsTarget.Alloc().Init()!;
-        _stepperRelay.Peer = this;
         _stepper.Target = _stepperRelay;
         _stepper.Action = Selector.Named("act:");
+        base(CreateFormsView(), owner);
+
+        _field.Peer = this;
+        _fieldRelay.Peer = this;
+        _stepperRelay.Peer = this;
+        View.AddSubview(_field);
         View.AddSubview(_stepper);
         ApplyValue();
     }
@@ -1170,16 +1168,15 @@ public class AppKitScrollBarPeer : AppKitControlPeer, IScrollBarPeer
 
     public AppKitScrollBarPeer(IControlNotify owner, bool vertical)
     {
-        base(NSScroller.Alloc().InitWithFrame(vertical ? MakeNSRect(0.0, 0.0, 15.0, 100.0)
-                                                             : MakeNSRect(0.0, 0.0, 100.0, 15.0)), owner);
-        var made = (NSScroller)View;
-        _scroller = made;
+        _scroller = NSScroller.Alloc().InitWithFrame(vertical ? MakeNSRect(0.0, 0.0, 15.0, 100.0)
+                                                              : MakeNSRect(0.0, 0.0, 100.0, 15.0));
         _scroller.ScrollerStyle = NSScrollerStyle.Legacy;
         _scroller.Enabled = true;
         _minimum = 0;
         _maximum = 100;
         _page = 10;
         _value = 0;
+        base(_scroller, owner);
         ListenForAction();
         ApplyPosition();
     }

@@ -320,8 +320,8 @@ public class DocPolygon : DocShape
 
     DocPolygon(int howMany, double w)
     {
-        base(howMany);
         _width = w;
+        base(howMany);
     }
 
     public override double Area() => _width * _width;

@@ -588,8 +588,8 @@ public class GtkButtonPeer : GtkPeer, IPushButtonPeer
 
     public GtkButtonPeer(IControlNotify owner)
     {
-        base(gtk_button_new_with_label(""), owner);
         _image = null;
+        base(gtk_button_new_with_label(""), owner);
         _imageAlign = ImageAlignment.Left;
         _imageSpacing = 4;
         ConnectPeerSignal(Widget, "clicked", (peer) => { ((GtkButtonPeer)peer).OnClicked(); });
@@ -731,9 +731,9 @@ public class GtkCheckPeer : GtkPeer, ICheckPeer
 
     public GtkCheckPeer(IControlNotify owner, CheckKind kind)
     {
-        base(CreateCheckWidget(kind), owner);
         _kind = kind;
         _unticked = null;
+        base(CreateCheckWidget(kind), owner);
         ConnectPeerSignal(Widget, "toggled", (peer) => { ((GtkCheckPeer)peer).OnToggled(); });
     }
 
@@ -871,8 +871,8 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
 
     public GtkEntryPeer(IControlNotify owner, bool lines)
     {
-        base(lines ? gtk_scrolled_window_new(null, null) : gtk_entry_new(), owner);
         _multiline = lines;
+        base(lines ? gtk_scrolled_window_new(null, null) : gtk_entry_new(), owner);
 
         if (lines)
         {
@@ -1537,8 +1537,8 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
 
     public GtkTabControlPeer(IControlNotify owner)
     {
-        base(gtk_notebook_new(), owner, gtk_fixed_new());
         _pages = new List<GtkWidget*>();
+        base(gtk_notebook_new(), owner, gtk_fixed_new());
         _reported = CreateRectangle(0, 0, 0, 0);
         _queued = false;
         _waiting = null;
@@ -1809,8 +1809,8 @@ public class GtkStatusBarPeer : GtkPeer, IStatusBarPeer
 
     public GtkStatusBarPeer(IControlNotify owner)
     {
-        base(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2), owner);
         _cells = new List<GtkWidget*>();
+        base(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2), owner);
     }
 
     public void SetPanels(int[] edges)
@@ -1871,9 +1871,9 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
 
     public GtkToolBarPeer(IControlNotify owner)
     {
-        base(gtk_toolbar_new(), owner);
-        _items = new List<GtkWidget*>();
         _toggles = new List<bool>();
+        _items = new List<GtkWidget*>();
+        base(gtk_toolbar_new(), owner);
         _images = null;
         _showText = false;
         gtk_toolbar_set_style(Widget, GTK_TOOLBAR_ICONS);

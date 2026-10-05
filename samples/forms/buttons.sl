@@ -23,26 +23,26 @@ import Forms.Platform;
 
 public class ButtonsForm : Form
 {
-    public CoolBar Bar;
-    public CoolBand ToolsBand;
-    public CoolBand ZoomBand;
-    public ToolBar Tools;
-    public ComboBox Zoom;
+    public late CoolBar Bar;
+    public late CoolBand ToolsBand;
+    public late CoolBand ZoomBand;
+    public late ToolBar Tools;
+    public late ComboBox Zoom;
 
-    public Notebook Pages;
-    public NotebookPage FirstPage;
-    public NotebookPage SecondPage;
-    public NotebookPage ThirdPage;
+    public late Notebook Pages;
+    public late NotebookPage FirstPage;
+    public late NotebookPage SecondPage;
+    public late NotebookPage ThirdPage;
 
-    public ToggleButton Bold;
-    public ToggleButton Italic;
-    public Button Pictured;
-    public SpeedButton Pen;
-    public SpeedButton Brush;
-    public SpeedButton Eraser;
-    public Label Readout;
+    public late ToggleButton Bold;
+    public late ToggleButton Italic;
+    public late Button Pictured;
+    public late SpeedButton Pen;
+    public late SpeedButton Brush;
+    public late SpeedButton Eraser;
+    public late Label Readout;
 
-    public ButtonPanel Buttons;
+    public late ButtonPanel Buttons;
 
     public int Presses;
 

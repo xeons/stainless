@@ -9,11 +9,11 @@ import Forms.Drawing;
 
 public class GreeterForm : Form
 {
-    private Label _prompt;
-    private TextBox _name;
-    private Button _greet;
-    private Panel _footer;
-    private Label _greeting;
+    private late Label _prompt;
+    private late TextBox _name;
+    private late Button _greet;
+    private late Panel _footer;
+    private late Label _greeting;
 
     [Embed("greet.png")]
     private static readonly byte[] s_greetImage;

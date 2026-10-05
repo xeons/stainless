@@ -45,8 +45,8 @@ public sealed class X509KeyUsageExtension : X509Extension
     private X509KeyUsageExtension(ReadOnlySpan<byte> rawData, bool critical,
                                   X509KeyUsageFlags keyUsages)
     {
-        base("2.5.29.15", rawData, critical);
         _keyUsages = keyUsages;
+        base("2.5.29.15", rawData, critical);
     }
 
     /// What the key may do.

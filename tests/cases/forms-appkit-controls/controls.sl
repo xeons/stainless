@@ -18,25 +18,26 @@ import MacOS.AppKit;
 class ControlsForm : Form
 {
     public String Seen;
-    Button _ok;
-    CheckBox _check;
-    TextBox _name;
-    Label _label;
-    GroupBox _group;
-    Label _inside;
-    TrackBar _track;
-    SpinEdit _spin;
-    ProgressBar _progress;
-    ScrollBar _scroll;
+    late Button _ok;
+    late CheckBox _check;
+    late TextBox _name;
+    late Label _label;
+    late GroupBox _group;
+    late Label _inside;
+    late TrackBar _track;
+    late SpinEdit _spin;
+    late ProgressBar _progress;
+    late ScrollBar _scroll;
     Timer _clock;
     int _ticks;
 
     public ControlsForm()
     {
+        Seen = "";
+        _clock = new Timer(100);
         base();
         Text = "AppKit controls";
         SetBounds(160, 160, 480, 320);
-        Seen = "";
         _ticks = 0;
 
         _ok = new Button(this);
@@ -88,7 +89,6 @@ class ControlsForm : Form
         _scroll.PageSize = 10;
         _scroll.Value = 95;
 
-        _clock = new Timer(100);
         _clock.Tick += this.OnTick;
         _clock.Start();
     }

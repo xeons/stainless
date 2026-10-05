@@ -437,6 +437,7 @@ SL_API int   sl_implements(const void *object, size_t interfaceId);
  * is the question the programmer is about to ask. Never returns.
  */
 SL_API SL_NORETURN void sl_cast_failed(const void *object, const char *wanted);
+SL_API SL_NORETURN void sl_late_unset(const char *field);
 
 /*
  * A Slot<T> read while empty, for a T with no zero value to stand in. `slot`

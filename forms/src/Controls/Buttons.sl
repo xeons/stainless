@@ -110,15 +110,15 @@ public abstract class ButtonBase : WindowedControl
 #endif
 public class Button : ButtonBase
 {
-    IPushButtonPeer _native;
+    late IPushButtonPeer _native;
     Bitmap? _image;
     ImageAlignment _imageAlign;
     int _imageSpacing;
 
     public Button(WindowedControl parent)
     {
-        base(parent);
         _image = null;
+        base(parent);
         _imageAlign = ImageAlignment.Left;
         _imageSpacing = 4;
         _native = WidgetSet.Current.CreateButton(this, ParentPeer);
@@ -214,7 +214,7 @@ public class Button : ButtonBase
 #endif
 public class CheckBox : ButtonBase
 {
-    ICheckPeer _native;
+    late ICheckPeer _native;
 
     public CheckBox(WindowedControl parent)
     {
@@ -403,8 +403,8 @@ public class SpeedButton : GraphicControl
 
     public SpeedButton(WindowedControl parent)
     {
-        base(parent);
         _image = null;
+        base(parent);
         _imageAlign = ImageAlignment.Left;
         _margin = -1;
         _spacing = 4;

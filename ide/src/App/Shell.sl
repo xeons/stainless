@@ -124,20 +124,20 @@ public enum Configuration { Debug, Release }
 /// The main window.
 public class Shell : Form
 {
-    TabControl _tabs;
+    late TabControl _tabs;
     List<EditorTab> _openTabs;
-    Toolbox _toolbox;
-    PropertyGrid _grid;
+    late Toolbox _toolbox;
+    late PropertyGrid _grid;
 
     /// The wells, the splitters and the strips. Everything but the menu and the
     /// status bar lives inside it.
-    DockHost _dock;
+    late DockHost _dock;
     /// Where the panes are and how wide, read at startup and written at exit.
-    DockLayout _layout;
+    late DockLayout _layout;
 
-    ListBox _outputList;
-    ListView _errorList;
-    TreeView _tree;
+    late ListBox _outputList;
+    late ListView _errorList;
+    late TreeView _tree;
 
     // ------------------------------------------------------------ debugging
 
@@ -154,12 +154,12 @@ public class Shell : Form
     /// run since.
     Snapshot? _lastStop;
 
-    ListView _callStackList;
-    ListView _threadList;
-    ListView _localsList;
-    ListView _watchList;
-    ListView _breakList;
-    ListBox _debugOutput;
+    late ListView _callStackList;
+    late ListView _threadList;
+    late ListView _localsList;
+    late ListView _watchList;
+    late ListView _breakList;
+    late ListBox _debugOutput;
 
     /// The watch expressions, which outlive each session the way breakpoints
     /// do -- a debugger that forgets what you were watching when the program
@@ -176,17 +176,17 @@ public class Shell : Form
     /// would otherwise bring forward. Empty when nobody asked.
     String _preferredPane;
 
-    ToolBar _debugTools;
-    ToolButton _startButton;
-    ToolButton _pauseButton;
-    ToolButton _stopDebugButton;
-    ToolButton _stepIntoButton;
-    ToolButton _stepOverButton;
-    ToolButton _stepOutButton;
-    StatusBar _statusBar;
-    MainMenu _menuBar;
+    late ToolBar _debugTools;
+    late ToolButton _startButton;
+    late ToolButton _pauseButton;
+    late ToolButton _stopDebugButton;
+    late ToolButton _stepIntoButton;
+    late ToolButton _stepOverButton;
+    late ToolButton _stepOutButton;
+    late StatusBar _statusBar;
+    late MainMenu _menuBar;
 
-    MenuItem _themeItem;
+    late MenuItem _themeItem;
 
     /// The find window, made the first time it is asked for and kept after
     /// that -- so the last search and the Match case tick survive closing it.
@@ -199,7 +199,7 @@ public class Shell : Form
     bool _isDark;
 
     /// Where the compiler is. Found once at startup.
-    String _compilerPath;
+    late String _compilerPath;
 
     /// What the last build reported, one entry per line of its output.
     List<BuildMessage> _messages;
@@ -254,7 +254,7 @@ public class Shell : Form
     String _outputTail;
 
     /// The strip across the top: the commands, and what they build for.
-    CoolBar _coolBar;
+    late CoolBar _coolBar;
 
     /// What draws the menus and the toolbar, which is deliberately **one**
     /// object shared by both: Office XP's hot menu item and its hot toolbar
@@ -266,9 +266,9 @@ public class Shell : Form
     /// list is what owns them. Null when the widget set refused, which leaves
     /// the buttons as captions and is not worth reporting.
     ImageList? _icons;
-    ToolBar _tools;
-    ComboBox _configuration;
-    ToolButton _stopButton;
+    late ToolBar _tools;
+    late ComboBox _configuration;
+    late ToolButton _stopButton;
 
     /// The compiler, while it is running, so that Cancel has something to
     /// stop.
@@ -305,30 +305,31 @@ public class Shell : Form
 
     public Shell()
     {
-        base(WindowBorder.Sizable);
-        Text = "Stainless";
-        SetBounds(0, 0, 1000, 700);
-
         _openTabs = new List<EditorTab>();
         _messages = new List<BuildMessage>();
         _errorLines = new List<nuint>();
         _treeEntries = new List<TreeEntry>();
-        _menuTarget = null;
-        _project = null;
         _projectPath = "";
-        _findDialog = null;
-        _isBuilding = false;
-        _compilerProcess = null;
-        _icons = null;
         _errorTail = "";
         _outputTail = "";
         _breakpoints = new BreakpointStore();
         _watches = new List<String>();
+        _preferredPane = "";
+        _chrome = new OfficeXpRenderer();
+        base(WindowBorder.Sizable);
+        Text = "Stainless";
+        SetBounds(0, 0, 1000, 700);
+
+        _menuTarget = null;
+        _project = null;
+        _findDialog = null;
+        _isBuilding = false;
+        _compilerProcess = null;
+        _icons = null;
         _session = null;
         _lastStop = null;
         _selectedFrame = 0u;
         _isFirstStop = true;
-        _preferredPane = "";
         _compilerPath = FindCompiler();
         _textSize = 10;
         _isDark = false;
@@ -362,7 +363,6 @@ public class Shell : Form
         //
         // Made before the dock host so that it takes its bite out of the
         // client area first; the host fills what is left.
-        _chrome = new OfficeXpRenderer();
 
         _coolBar = new CoolBar(this);
         _coolBar.Dock = DockStyle.Top;

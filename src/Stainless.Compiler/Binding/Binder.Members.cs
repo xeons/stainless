@@ -642,11 +642,15 @@ public sealed partial class Binder
                         CheckRequiredVisible(type, field.Name,
                             field.Modifiers.HasFlag(Modifiers.Public), field.Span);
 
+                    bool fieldLate = field.Modifiers.HasFlag(Modifiers.Late) &&
+                                     CheckLateField(type, field, fieldType, fieldRequired);
+
                     var declared = new FieldSymbol(field.Name, fieldType, type, type.Fields.Count)
                     {
                         IsPublic = field.Modifiers.HasFlag(Modifiers.Public),
                         IsProtected = field.Modifiers.HasFlag(Modifiers.Protected),
                         IsRequired = fieldRequired,
+                        IsLate = fieldLate,
                         IsAnonymous = field.IsAnonymous,
                         Documentation = field.Documentation,
                         InitializerSyntax = CheckedFieldInitializer(type, field, declaration),

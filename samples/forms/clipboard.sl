@@ -51,16 +51,17 @@ byte[] SamplePixels()
 
 public class MainForm : Form
 {
-    TextBox _editor;
-    TextBox _lines;
-    ListBox _formats;
-    Label _said;
-    Image _pasted;
+    late TextBox _editor;
+    late TextBox _lines;
+    late ListBox _formats;
+    late Label _said;
+    late Image _pasted;
     ClipboardWatcher _watcher;
     int _changes;
 
     public MainForm()
     {
+        _watcher = new ClipboardWatcher();
         base(WindowBorder.Sizable);
         Text = "Clipboard";
         SetBounds(0, 0, 620, 420);
@@ -97,7 +98,6 @@ public class MainForm : Form
         _said.SetBounds(310, 350, 290, 20);
 
         _changes = 0;
-        _watcher = new ClipboardWatcher();
         _watcher.Changed += this.OnClipboardChanged;
         ShowFormats();
     }

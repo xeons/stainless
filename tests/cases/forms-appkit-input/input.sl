@@ -18,16 +18,17 @@ import MacOS.AppKit;
 class InputForm : Form
 {
     public String Seen;
-    CustomControl _canvas;
+    late CustomControl _canvas;
     Timer _clock;
     int _ticks;
 
     public InputForm()
     {
+        Seen = "";
+        _clock = new Timer(100);
         base();
         Text = "AppKit input";
         SetBounds(140, 140, 420, 260);
-        Seen = "";
         _ticks = 0;
 
         _canvas = new CustomControl(this);
@@ -37,7 +38,6 @@ class InputForm : Form
         _canvas.KeyPress += (sender, args) => this.Note("typed " + Standard.Text.FromChar(args.KeyChar));
         _canvas.GotFocus += (sender) => this.Note("focus");
 
-        _clock = new Timer(100);
         _clock.Tick += this.OnTick;
         _clock.Start();
     }

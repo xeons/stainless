@@ -240,7 +240,7 @@ public class FontDialog
 #endif
 public class Timer : ITimerNotify
 {
-    ITimerPeer _native;
+    late ITimerPeer _native;
     int _interval;
     bool _enabled;
 
@@ -337,10 +337,10 @@ public closure void TimerHandler(Timer sender);
 /// ```
 public class InputDialog : Form
 {
-    Label _prompt;
-    TextBox _entry;
-    Button _ok;
-    Button _cancel;
+    late Label _prompt;
+    late TextBox _entry;
+    late Button _ok;
+    late Button _cancel;
 
     /// What was typed, taken **inside** the OK handler.
     ///
@@ -356,10 +356,10 @@ public class InputDialog : Form
     /// field should not be one a caller can hold and read at the wrong moment.
     InputDialog(String caption, String question, String initial)
     {
+        _answer = "";
         base(WindowBorder.Fixed);
         Title = caption;
         SetBounds(0, 0, 380, 148);
-        _answer = "";
         _accepted = false;
 
         _prompt = new Label(this);

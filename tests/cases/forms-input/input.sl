@@ -27,8 +27,8 @@ import Win32.User32;
 
 public class InputForm : Form
 {
-    public TextBox Entry;
-    public TextBox Notes;
+    public late TextBox Entry;
+    public late TextBox Notes;
 
     public InputForm()
     {

@@ -94,7 +94,7 @@ public const int DefaultTextSize = 10;
 public class CodeEditor : CustomControl
 {
     Document _contents;
-    Theme _palette;
+    late Theme _palette;
 
     /// Where the caret is, and where a selection started.
     ///
@@ -124,8 +124,8 @@ public class CodeEditor : CustomControl
     /// so the first paint places it again with real sizes.
     bool _isPlacingCaretOnPaint;
 
-    ScrollBar _verticalScroll;
-    ScrollBar _horizontalScroll;
+    late ScrollBar _verticalScroll;
+    late ScrollBar _horizontalScroll;
 
     /// The width of one character and the height of one line, measured once
     /// from the font. Zero until the first paint, which is the first time there
@@ -143,7 +143,7 @@ public class CodeEditor : CustomControl
     ///
     /// A closure is a value and cannot be null, so `_isMarginShown` is what
     /// says whether anyone has asked. Until then this answers `None`.
-    MarkAsker _markAsker;
+    late MarkAsker _markAsker;
     bool _isMarginShown;
 
     /// The line the program is stopped on, and whether there is one.
@@ -174,8 +174,9 @@ public class CodeEditor : CustomControl
 
     public CodeEditor(WindowedControl parent)
     {
-        base(parent);
         _contents = new Document();
+        _hoveredWord = "";
+        base(parent);
         _palette = Theme.CreateLight();
         _caretPosition = Position.Create(0u, 0u);
         _anchor = _caretPosition;
@@ -194,7 +195,6 @@ public class CodeEditor : CustomControl
         _hasStatement = false;
         _statementIsTop = true;
         _isDragging = false;
-        _hoveredWord = "";
         _isReady = false;
 
         Border = ControlBorder.Sunken;

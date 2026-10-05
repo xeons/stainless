@@ -77,7 +77,7 @@ public String GenerateFormSource(FormDocument document, String sourceName)
     var fields = new List<FormComponent>();
     CollectFormFields(form, fields);
     for (nuint i = 0u; i < fields.Count; i++)
-        text.AppendLine("    private " + fields[i].TypeName + " " + fields[i].Name + ";");
+        text.AppendLine("    private late " + fields[i].TypeName + " " + fields[i].Name + ";");
     if (fields.Count > 0u)
         text.AppendLine();
 

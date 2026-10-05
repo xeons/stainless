@@ -371,12 +371,12 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
     public WindowPeer(IWindowNotify owner, WindowBorder border)
     {
-        base(CreateTopLevelWindow(border), owner, false);
+        _disabled = new List<nuint>();
         _owner = owner;
         _running = false;
         _quitOnClose = false;
-        _disabled = new List<nuint>();
         _menuBar = null;
+        base(CreateTopLevelWindow(border), owner, false);
     }
 
     /// Made before `base(...)` can run, because the base constructor needs the

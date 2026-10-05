@@ -56,8 +56,8 @@ public sealed class X509SubjectKeyIdentifierExtension : X509Extension
     private X509SubjectKeyIdentifierExtension(ReadOnlySpan<byte> rawData, bool critical,
                                               byte[] subjectKeyIdentifier)
     {
-        base("2.5.29.14", rawData, critical);
         _subjectKeyIdentifier = subjectKeyIdentifier;
+        base("2.5.29.14", rawData, critical);
     }
 
     /// The identifier in upper-case hexadecimal, as .NET gives it.

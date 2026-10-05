@@ -32,18 +32,18 @@ using FPoint = Forms.Drawing.Point;
 
 public class BackendForm : Form
 {
-    public TextBox Entry;
-    public ListView Rows;
-    public TreeView Tree;
-    public TreeNode Second;
-    public CheckListBox Chores;
-    public SpinEdit Quantity;
-    public HeaderControl Headings;
-    public ScrollBar Bar;
-    public Label Centered;
-    public Label Righted;
-    public ComboBox Choice;
-    public MenuItem FileItem;
+    public late TextBox Entry;
+    public late ListView Rows;
+    public late TreeView Tree;
+    public late TreeNode Second;
+    public late CheckListBox Chores;
+    public late SpinEdit Quantity;
+    public late HeaderControl Headings;
+    public late ScrollBar Bar;
+    public late Label Centered;
+    public late Label Righted;
+    public late ComboBox Choice;
+    public late MenuItem FileItem;
 
     public int UserEdits;
     public int TextChanges;

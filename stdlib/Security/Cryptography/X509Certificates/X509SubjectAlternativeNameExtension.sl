@@ -47,12 +47,12 @@ public sealed class X509SubjectAlternativeNameExtension : X509Extension
                                                  String[] uris, String[] emailAddresses,
                                                  X500DistinguishedName[] directoryNames)
     {
-        base("2.5.29.17", rawData, critical);
         _dnsNames = dnsNames;
         _ipAddresses = ipAddresses;
         _uris = uris;
         _emailAddresses = emailAddresses;
         _directoryNames = directoryNames;
+        base("2.5.29.17", rawData, critical);
     }
 
     /// The `dNSName` entries, as written.

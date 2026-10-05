@@ -26,12 +26,12 @@ import Win32.User32;
 
 public class MenuForm : Form
 {
-    public MenuItem Open;
-    public MenuItem Nested;
-    public MenuItem Heading;
-    public ToolBar Tools;
-    public ToolButton First;
-    public ToolButton Toggle;
+    public late MenuItem Open;
+    public late MenuItem Nested;
+    public late MenuItem Heading;
+    public late ToolBar Tools;
+    public late ToolButton First;
+    public late ToolButton Toggle;
 
     public MenuForm()
     {

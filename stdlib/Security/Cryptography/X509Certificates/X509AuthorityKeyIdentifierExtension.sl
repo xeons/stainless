@@ -40,10 +40,10 @@ public sealed class X509AuthorityKeyIdentifierExtension : X509Extension
                                                 Optional<byte[]> rawIssuer,
                                                 Optional<byte[]> serialNumber)
     {
-        base("2.5.29.35", rawData, critical);
         _keyIdentifier = keyIdentifier;
         _rawIssuer = rawIssuer;
         _serialNumber = serialNumber;
+        base("2.5.29.35", rawData, critical);
     }
 
     /// The signing key's identifier, when there is one.

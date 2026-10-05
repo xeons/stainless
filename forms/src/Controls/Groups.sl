@@ -64,7 +64,7 @@ public class RadioGroup : GroupBox
     /// Ticked to untick every choice, as `TCustomRadioGroup.FHiddenButton`
     /// is. GTK will not untick the last radio of a group, and a group always
     /// has one ticked; this is the one ticked when nothing is chosen.
-    RadioButton _none;
+    late RadioButton _none;
     /// The index `SelectedIndexChanged` last reported, or the program last
     /// set.
     int _reported;
@@ -73,8 +73,8 @@ public class RadioGroup : GroupBox
 
     public RadioGroup(WindowedControl parent)
     {
-        base(parent);
         _buttons = new List<RadioButton>();
+        base(parent);
         _none = new RadioButton(this);
         _none.Visible = false;
         _none.Checked = true;
@@ -232,8 +232,8 @@ public class CheckGroup : GroupBox
 
     public CheckGroup(WindowedControl parent)
     {
-        base(parent);
         _boxes = new List<CheckBox>();
+        base(parent);
         _columns = 1;
         _ready = true;
     }
@@ -354,8 +354,8 @@ public class CheckGroup : GroupBox
 /// contain both, and docking or anchoring it does the obvious thing.
 public class LabeledEdit : Panel
 {
-    Label _captionLabel;
-    TextBox _entry;
+    late Label _captionLabel;
+    late TextBox _entry;
     int _above;
     bool _ready;
 
@@ -459,12 +459,12 @@ public class Image : GraphicControl
 
     public Image(WindowedControl parent)
     {
-        base(parent);
         _picture = null;
         _stretch = false;
         _proportional = false;
         _center = false;
         _autoSize = false;
+        base(parent);
     }
 
     /// What is shown, or null for nothing.
@@ -622,7 +622,7 @@ public class Image : GraphicControl
 #endif
 public class SpinEdit : WindowedControl
 {
-    ISpinPeer _native;
+    late ISpinPeer _native;
     int _minimum;
     int _maximum;
 
@@ -698,7 +698,7 @@ public class SpinEdit : WindowedControl
 #endif
 public class CheckListBox : ListControl
 {
-    ICheckListPeer _native;
+    late ICheckListPeer _native;
 
     public CheckListBox(WindowedControl parent)
     {
@@ -753,7 +753,7 @@ public class CheckListBox : ListControl
 /// program owns, most likely.
 public class HeaderControl : WindowedControl
 {
-    IHeaderPeer _native;
+    late IHeaderPeer _native;
 
     public HeaderControl(WindowedControl parent)
     {

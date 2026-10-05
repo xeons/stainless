@@ -81,9 +81,9 @@ Standard.Drawing.Image? Draw(int width, int height)
 
 public class MainForm : Form
 {
-    Label _said;
-    Image _shown;
-    Image _stretched;
+    late Label _said;
+    late Image _shown;
+    late Image _stretched;
 
     public MainForm()
     {

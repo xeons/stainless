@@ -443,6 +443,7 @@ public sealed partial class LlvmEmitter
         // Ends the program, so the block after a call to one is unreachable and
         // LLVM may say so.
         Declare("sl_cast_failed", "declare void @sl_cast_failed(ptr, ptr) noreturn nounwind");
+        Declare("sl_late_unset", "declare void @sl_late_unset(ptr) noreturn nounwind");
         Declare("sl_slot_empty", "declare void @sl_slot_empty(ptr) noreturn nounwind");
         Declare("sl_foreign_null", "declare void @sl_foreign_null(ptr, ptr) noreturn nounwind");
         Declare("sl_objc_nil", "declare void @sl_objc_nil(ptr, ptr) noreturn nounwind");

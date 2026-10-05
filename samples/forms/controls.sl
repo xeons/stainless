@@ -42,50 +42,50 @@ public class BuiltPopup : PopupMenu
 
 public class ChecksForm : Form
 {
-    public MainMenu Bar;
-    public MenuItem Shared;
-    public BuiltPopup Popup;
+    public late MainMenu Bar;
+    public late MenuItem Shared;
+    public late BuiltPopup Popup;
 
-    public TabControl Tabs;
-    public TabPage TabOne;
-    public TabPage TabTwo;
-    public TabPage TabThree;
+    public late TabControl Tabs;
+    public late TabPage TabOne;
+    public late TabPage TabTwo;
+    public late TabPage TabThree;
 
-    public Notebook Book;
-    public NotebookPage PageOne;
-    public NotebookPage PageTwo;
-    public NotebookPage PageThree;
-    public NotebookPage PageFour;
+    public late Notebook Book;
+    public late NotebookPage PageOne;
+    public late NotebookPage PageTwo;
+    public late NotebookPage PageThree;
+    public late NotebookPage PageFour;
 
-    public TextBox Notes;
-    public RadioGroup Choice;
-    public SpeedButton Loose;
-    public SpeedButton Pen;
-    public SpeedButton Brush;
-    public Button Accept;
-    public Button Refuse;
+    public late TextBox Notes;
+    public late RadioGroup Choice;
+    public late SpeedButton Loose;
+    public late SpeedButton Pen;
+    public late SpeedButton Brush;
+    public late Button Accept;
+    public late Button Refuse;
 
-    public TrackBar Slider;
-    public ProgressBar Gauge;
-    public SpinEdit Count;
-    public ScrollBar Scroller;
+    public late TrackBar Slider;
+    public late ProgressBar Gauge;
+    public late SpinEdit Count;
+    public late ScrollBar Scroller;
 
-    public Panel Split;
-    public Panel Side;
-    public Panel Hidden;
-    public Splitter Divide;
-    public Panel Rest;
+    public late Panel Split;
+    public late Panel Side;
+    public late Panel Hidden;
+    public late Splitter Divide;
+    public late Panel Rest;
 
-    public TreeView Tree;
+    public late TreeView Tree;
     public ImageList Icons;
 
-    public Panel Strip;
-    public CoolBar Cool;
-    public CoolBand First;
-    public CoolBand Second;
-    public CoolBand Third;
-    public CoolBand Folded;
-    public Label FoldedLabel;
+    public late Panel Strip;
+    public late CoolBar Cool;
+    public late CoolBand First;
+    public late CoolBand Second;
+    public late CoolBand Third;
+    public late CoolBand Folded;
+    public late Label FoldedLabel;
 
     public int TabChanges;
     public int PageChanges;
@@ -94,6 +94,7 @@ public class ChecksForm : Form
 
     public ChecksForm()
     {
+        Icons = new ImageList(16, 16);
         base(WindowBorder.Sizable);
         Text = "Control checks";
         SetBounds(0, 0, 660, 620);
@@ -176,7 +177,6 @@ public class ChecksForm : Form
         Rest.Dock = DockStyle.Fill;
         Rest.BackColor = Colors.White;
 
-        Icons = new ImageList(16, 16);
         Tree = new TreeView(this);
         Tree.SetBounds(416, 244, 204, 120);
         Tree.Images = Icons;

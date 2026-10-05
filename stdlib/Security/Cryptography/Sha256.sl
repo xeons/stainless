@@ -34,8 +34,6 @@ public sealed class Sha256 : HashAlgorithm
 
     public Sha256()
     {
-        base(64u, 8u, true);
-
         _state = new uint[8u];
         _constants = [
             0x428A2F98u, 0x71374491u, 0xB5C0FBCFu, 0xE9B5DBA5u,
@@ -56,6 +54,7 @@ public sealed class Sha256 : HashAlgorithm
             0x90BEFFFAu, 0xA4506CEBu, 0xBEF9A3F7u, 0xC67178F2u,
         ];
 
+        base(64u, 8u, true);
         InitializeState();
     }
 

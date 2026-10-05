@@ -95,12 +95,12 @@ public class DesignSurface : Panel
     const int TrayHeight = 28;
 
     private FormDocument _document;
-    private Panel _frame;
+    private late Panel _frame;
     /// Below the form, the components with no window: Visual Studio's tray.
-    private Panel _tray;
-    private Label _caption;
-    private Panel _client;
-    private CustomControl _overlay;
+    private late Panel _tray;
+    private late Label _caption;
+    private late Panel _client;
+    private late CustomControl _overlay;
     private List<DesignedItem> _items;
 
     /// What is selected, in the order it was chosen, and empty when the form
@@ -123,19 +123,20 @@ public class DesignSurface : Panel
 
     public DesignSurface(WindowedControl parent)
     {
-        base(parent);
-        BackColor = SystemColors.ControlDark;
         _items = new List<DesignedItem>();
         _selection = new List<DesignedItem>();
         PendingType = "";
+        _boundsAtDrag = new List<Rectangle>();
+        _draggedTo = new List<Rectangle>();
+        _document = new FormDocument("", "", "Form");
+        BaseDirectory = "";
+        base(parent);
+        BackColor = SystemColors.ControlDark;
         _drag = DesignDrag.None;
         _dragStarted = false;
         _handle = 0;
         _dragFrom = Point.Empty;
-        _boundsAtDrag = new List<Rectangle>();
-        _draggedTo = new List<Rectangle>();
         _band = Rectangle.Empty;
-        _document = new FormDocument("", "", "Form");
 
         _frame = new Panel(this);
         _frame.BackColor = SystemColors.Highlight;
@@ -154,7 +155,6 @@ public class DesignSurface : Panel
         _tray = new Panel(this);
         _tray.BackColor = SystemColors.Window;
         _tray.Visible = false;
-        BaseDirectory = "";
     }
 
     /// Something a person asked for that the surface could not do, for the

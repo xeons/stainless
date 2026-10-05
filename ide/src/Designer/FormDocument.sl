@@ -64,10 +64,10 @@ public class FormProperty : FormMember
 
     public FormProperty(String name, FormValue value)
     {
-        base();
         Name = name;
         Value = value;
         TrailingComment = "";
+        base();
     }
 }
 
@@ -80,10 +80,10 @@ public class FormHandler : FormMember
 
     public FormHandler(String eventName, String methodName)
     {
-        base();
+        TrailingComment = "";
         EventName = eventName;
         MethodName = methodName;
-        TrailingComment = "";
+        base();
     }
 }
 
@@ -107,12 +107,12 @@ public class FormComponent : FormMember
 
     public FormComponent(String typeName, String name)
     {
-        base();
-        TypeName = typeName;
         Name = name;
+        TypeName = typeName;
         Members = new List<FormMember>();
         Initializer = "";
         ClosingComments = new List<String>();
+        base();
         HasBlankLineBeforeClosing = false;
     }
 

@@ -117,19 +117,18 @@ public class AppKitWindowPeer : AppKitContainerPeer, IWindowPeer
 
     public AppKitWindowPeer(IWindowNotify owner, WindowBorder border)
     {
-        base(CreateFormsView(), (IControlNotify)owner);
         _owner = owner;
         _isModal = false;
         _shown = false;
-
         _window = NSWindow.Alloc().InitWithContentRectStyleMaskBackingDefer(
             MakeNSRect(0.0, 0.0, 320.0, 240.0), FindStyle(border), NSBackingStoreType.Buffered, false);
         _window.ReleasedWhenClosed = false;
-        _window.ContentView = View;
-        ((FormsView)View).Focusable = true;
-
         _delegate = FormsWindowDelegate.Alloc().Init()!;
         _delegate.Owner = owner;
+        base(CreateFormsView(), (IControlNotify)owner);
+
+        _window.ContentView = View;
+        ((FormsView)View).Focusable = true;
         _delegate.Peer = this;
         _window.Delegate = _delegate;
     }

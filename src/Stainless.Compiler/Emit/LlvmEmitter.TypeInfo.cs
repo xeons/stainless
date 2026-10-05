@@ -350,13 +350,14 @@ public sealed partial class LlvmEmitter
     /// table that writing it would go straight past the setter.
     /// SL_FIELD_NO_ZERO and SL_FIELD_ELEMENT_NO_ZERO: zero bytes there are not
     /// a value of the type (§2.16), so reflection MUST NOT leave them zero.
-    /// Storage a property fills on first use may start empty, so it has a zero.
+    /// Storage a property fills on first use may start empty, and so may a
+    /// `late` field, so each has a zero.
     /// SL_FIELD_REQUIRED: the maker of an instance MUST supply it.
     /// </summary>
     private static int FieldFlags(FieldSymbol field, bool required)
     {
         int flags = field.IsBackingField ? 1 : 0;
-        if (!field.IsFilledOnFirstUse && !ZeroValues.HasZeroValue(field.Type))
+        if (!field.IsFilledOnFirstUse && !field.IsLate && !ZeroValues.HasZeroValue(field.Type))
             flags |= 2;
         if (required)
             flags |= 4;

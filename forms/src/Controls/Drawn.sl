@@ -298,8 +298,8 @@ public class Splitter : GraphicControl
 
     public Splitter(WindowedControl parent)
     {
-        base(parent);
         _dragging = false;
+        base(parent);
         _grabbed = Point.Empty;
         _startedAt = 0;
         _minimumSize = 40;

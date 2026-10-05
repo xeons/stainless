@@ -810,8 +810,33 @@ public sealed partial class LlvmEmitter
 
         string address = EmitAddress(expression);
         string llvmType = LlvmTypeOf(expression.Type);
-        return new Val(
+        var loaded = new Val(
             Emit(llvmType, $"load {llvmType}, ptr {address}{AlignedFor(expression.Type)}"), llvmType, expression.Type);
+
+        if (expression is BoundFieldAccess { Field.IsLate: true } late)
+            CheckLateFieldSet(loaded, late.Field);
+        return loaded;
+    }
+
+    /// <summary>
+    /// Aborts, naming the field, when a <c>late</c> field read has no value
+    /// yet. Every reference type's zero is a null pointer, so that is the test.
+    /// </summary>
+    private void CheckLateFieldSet(Val loaded, FieldSymbol field)
+    {
+        string pointer = loaded.LlvmType == "ptr"
+            ? loaded.Ref
+            : Emit("ptr", $"extractvalue {loaded.LlvmType} {loaded.Ref}, 0");
+        string set = Emit("i1", $"icmp ne ptr {pointer}, null");
+        string good = NextLabel("late.set");
+        string bad = NextLabel("late.unset");
+        Terminator($"br i1 {set}, label %{good}, label %{bad}");
+
+        Label(bad);
+        Line($"call void @sl_late_unset(ptr {InternBytes(field.ContainingType.Name + "." + field.Name)})");
+        Terminator("unreachable");
+
+        Label(good);
     }
 
     /// <summary>

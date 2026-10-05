@@ -276,7 +276,8 @@ A reflected type's `TypeInfo` gains six entries — a field count and table, an
 attribute count and table, and a property count and table — and each
 `SlFieldInfo` records a name, offset, kind, nested type, its own attributes and
 flags saying whether it is property storage, whether its type or its
-elements' type has a zero value ([§2.16](02-types.md#216-zero-values)), and
+elements' type has a zero value ([§2.16](02-types.md#216-zero-values)) -- a `late`
+field counts as having one, since it may be empty -- and
 whether it is `required`. A reflected class that `new` could make also gets a
 function that makes one, which is what `CreateInstance` calls
 ([§6.6.1](#661-making-an-object)). Each `SlPropertyInfo` records a

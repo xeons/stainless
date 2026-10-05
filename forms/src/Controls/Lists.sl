@@ -51,8 +51,8 @@ public abstract class ListControl : WindowedControl
 
     protected ListControl(WindowedControl parent)
     {
-        base(parent);
         _items = new List<String>();
+        base(parent);
     }
 
     /// The platform's side of the list, which the derived class made.
@@ -156,7 +156,7 @@ public abstract class ListControl : WindowedControl
 #endif
 public class ListBox : ListControl
 {
-    IListPeer _native;
+    late IListPeer _native;
 
     public ListBox(WindowedControl parent)
     {
@@ -176,7 +176,7 @@ public class ListBox : ListControl
 #endif
 public class ComboBox : ListControl
 {
-    IComboPeer _native;
+    late IComboPeer _native;
 
     public ComboBox(WindowedControl parent)
     {

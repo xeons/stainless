@@ -22,19 +22,19 @@ import Forms.Platform;
 /// needs, since a closure is a method and the object it belongs to.
 public class DemoForm : Form
 {
-    Panel _header;
-    Label _title;
-    Label _status;
-    TextBox _entry;
-    TextBox _notes;
-    Button _add;
-    Button _clear;
-    ListBox _items;
-    CheckBox _urgent;
-    GroupBox _choices;
-    RadioButton _low;
-    RadioButton _high;
-    ComboBox _kind;
+    late Panel _header;
+    late Label _title;
+    late Label _status;
+    late TextBox _entry;
+    late TextBox _notes;
+    late Button _add;
+    late Button _clear;
+    late ListBox _items;
+    late CheckBox _urgent;
+    late GroupBox _choices;
+    late RadioButton _low;
+    late RadioButton _high;
+    late ComboBox _kind;
 
     public DemoForm()
     {

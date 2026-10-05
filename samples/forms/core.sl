@@ -113,7 +113,7 @@ public class Host : Panel
 /// shape of every form, and a cycle unless the subscriptions are weak.
 public class HandledForm : Form
 {
-    Button _save;
+    late Button _save;
     int _presses;
 
     public HandledForm()
@@ -146,17 +146,17 @@ public class Watch
 
 public class CoreForm : Form
 {
-    Panel _header;
-    Panel _below;
-    Button _corner;
-    Button _stretch;
-    Button _center;
-    Host _host;
-    Button _inner;
-    Spot _spot;
-    GroupBox _group;
-    Spot _framed;
-    Panel _probe;
+    late Panel _header;
+    late Panel _below;
+    late Button _corner;
+    late Button _stretch;
+    late Button _center;
+    late Host _host;
+    late Button _inner;
+    late Spot _spot;
+    late GroupBox _group;
+    late Spot _framed;
+    late Panel _probe;
     int _resizes;
     int _moves;
 
