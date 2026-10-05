@@ -645,7 +645,10 @@ there when it runs.
 
 **`field` is contextual.** It means the storage only inside an accessor of a
 property, and is an ordinary name everywhere else. `@field` is the ordinary name
-inside one too, and `this.field` a member of that name.
+inside one too, and `this.field` a member of that name. A variable declared
+`field` inside an accessor is refused (SL0936): every later `field` would be
+the storage, so the variable could never be read, and an accessor that meant
+only to compute a value would quietly own storage.
 
 **On an interface**
 

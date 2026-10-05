@@ -221,6 +221,21 @@ public sealed class Parser
         return new Token(kind, Current.Span, kind.FixedText() ?? "");
     }
 
+    /// <summary>
+    /// Refuses a variable named <c>field</c> inside an accessor, where that
+    /// word is the property's storage: the variable could never be read by
+    /// its name, and every use of it would silently be the storage instead.
+    /// </summary>
+    private void RefuseFieldVariable(Token name)
+    {
+        if (_accessorProperty is not null && name.Kind == TokenKind.Identifier && !name.IsVerbatim &&
+            name.Text == "field")
+            _diagnostics.Error("SL0936", name.Span,
+                $"inside an accessor of '{_accessorProperty}', 'field' is the property's storage, so " +
+                "a variable of that name could never be read by it; name it something else, or " +
+                "write '@field'");
+    }
+
     private string ExpectIdentifier()
     {
         if (At(TokenKind.Identifier)) return Advance().Text;
@@ -2997,6 +3012,7 @@ public sealed class Parser
                 if (At(TokenKind.VarKeyword)) Advance();
                 else elementType = ParseType();
 
+                RefuseFieldVariable(Current);
                 string name = ExpectIdentifier();
                 Expect(TokenKind.InKeyword);
                 var collection = ParseExpression();
@@ -3466,6 +3482,7 @@ public sealed class Parser
             if (AtDesignation())
             {
                 var name = Advance();
+                RefuseFieldVariable(name);
                 return new TypePatternSyntax(
                     SpanFrom(start), type, name.Text == "_" ? null : name.Text, name.Span);
             }
@@ -3650,6 +3667,7 @@ public sealed class Parser
             return (null, default);
 
         var name = Advance();
+        RefuseFieldVariable(name);
         return (name.Text == "_" && !name.IsVerbatim ? null : name.Text, name.Span);
     }
 
@@ -3717,6 +3735,7 @@ public sealed class Parser
             if (isConst && !(At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.Equals))
                 type = ParseType();
 
+            RefuseFieldVariable(Current);
             string name = ExpectIdentifier();
             ExpressionSyntax? initializer = Match(TokenKind.Equals) ? ParseExpression() : null;
             if (requireSemicolon) Expect(TokenKind.Semicolon);
@@ -3726,6 +3745,7 @@ public sealed class Parser
         // `Type name ...` is a declaration; anything else is an expression.
         if (AtTypeStart() && Speculate(TryParseLocalDeclarationHead, out var head) && head is not null)
         {
+            RefuseFieldVariable(_tokens[_pos - 1]);
             ExpressionSyntax? initializer = Match(TokenKind.Equals) ? ParseExpression() : null;
             if (requireSemicolon) Expect(TokenKind.Semicolon);
             return new LocalDeclSyntax(SpanFrom(start), head.Type, head.Name, initializer, IsConst: false);
