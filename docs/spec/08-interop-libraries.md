@@ -1047,8 +1047,10 @@ Objective-C promised nothing, so a nil sent for a parameter declared `T` and
 not `T?` stops the program, naming the message and the parameter.
 
 **An Objective-C exception that reaches a method the class answers** stops
-the program, naming the method. It has unwound through Stainless frames that
-released nothing they held, and nothing after that could be trusted.
+the program, naming the method and saying the exception's reason. It has
+unwound through Stainless frames that released nothing they held, and nothing
+after that could be trusted. Any other exception -- a C++ one from a framework
+-- stops it the same way, with no reason to give.
 
 What a defined class cannot be is what the runtime has no way to give it: it
 is not a record, not `static`, takes no primary constructor, has no

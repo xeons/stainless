@@ -985,10 +985,12 @@ returned in memory has its pointer first. An object result outside the
 owning families is handed back through `objc_autoreleaseReturnValue`. An
 object parameter declared non-optional is checked for nil on entry
 (`sl_objc_nil_argument`). The body is reached with `invoke`, under
-`__objc_personality_v0`, so an Objective-C exception that unwinds out of
-Stainless code stops the program in a catch-all landing pad
-(`sl_objc_exception`) rather than going on past frames that released
-nothing.
+`__objc_personality_v0`, so an exception that unwinds out of Stainless code
+stops the program in a landing pad (`sl_objc_exception`) rather than going on
+past frames that released nothing. The pad catches `OBJC_EHTYPE_id` before
+anything else, as clang's `@catch (id)` does: both kinds are C++ exceptions
+underneath, and only the clause that matched says which. An Objective-C one is
+asked its `reason`, which the message carries.
 
 **Fields share one ivar.** The class's own fields are laid out from offset
 zero, continuing nothing, as one blob named `_sl` and typed `[nC]`. Its

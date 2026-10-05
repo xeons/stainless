@@ -54,7 +54,9 @@ define internal ptr @"\01-[ObjCClass.Canvas .cxx_construct]"(ptr %self, ptr %_cm
 define internal void @"\01-[ObjCClass.Canvas .cxx_destruct]"(ptr %self, ptr %_cmd)
 define internal void @"\01-[ObjCClass.Canvas dealloc]"(ptr %self, ptr %_cmd)
 personality ptr @__objc_personality_v0
-landingpad { ptr, i32 } catch ptr null
+# An Objective-C exception first, as clang's @catch (id) catches one, so that
+# its reason can be asked; then anything else.
+landingpad { ptr, i32 } catch ptr @OBJC_EHTYPE_id catch ptr null
 
 # A protocol is weak and hidden, and labelled in __objc_protolist.
 # clang: @"_OBJC_PROTOCOL_$_Shape" = weak hidden global %struct._protocol_t { ptr null, ...

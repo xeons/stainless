@@ -268,12 +268,16 @@ void sl_objc_init_replaced(const char *message, const void *answered)
 
 /* Called from the landing pad of a method a class defined in Stainless
    answers. An exception that got this far unwound through Stainless frames
-   without releasing what they held, so nothing after it can be trusted. */
-void sl_objc_exception(const char *message)
+   without releasing what they held, so nothing after it can be trusted.
+   `reason` is an Objective-C exception's own account, or null for an
+   exception that is not one or gave none. */
+void sl_objc_exception(const char *message, const char *reason)
 {
     fflush(NULL);
 
-    fprintf(stderr, "stainless: an Objective-C exception reached '%s'\n", message);
+    fprintf(stderr, "stainless: an exception reached '%s'\n", message);
+    if (reason != NULL)
+        fprintf(stderr, "stainless: it said: %s\n", reason);
     fflush(stderr);
 
     abort();

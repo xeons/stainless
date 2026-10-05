@@ -1,3 +1,4 @@
 running
 throwing
-stainless: an Objective-C exception reached '-[ObjCException.Runner run]'
+stainless: an exception reached '-[ObjCException.Runner run]'
+stainless: it said: thrown

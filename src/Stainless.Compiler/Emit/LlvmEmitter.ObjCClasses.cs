@@ -282,12 +282,36 @@ public sealed partial class LlvmEmitter
     /// <summary>
     /// Finishes an IMP: the landing pad an Objective-C exception stops the
     /// program at, and the definition around the body built so far.
+    ///
+    /// An Objective-C exception is asked its reason, which is what says what
+    /// went wrong: the IMP's own name says only where. It is told from any
+    /// other by the clause that caught it, as clang's `@catch (id)` does --
+    /// both kinds are C++ exceptions underneath, and an object asked of one
+    /// that is not Objective-C's would be read from whatever was thrown.
     /// </summary>
     private void EndImp(string landing, string description, string signature)
     {
         Label(landing);
-        Line("%exception = landingpad { ptr, i32 } catch ptr null");
-        Line($"call void @sl_objc_exception(ptr {InternBytes(description)})");
+        Line("%exception = landingpad { ptr, i32 } catch ptr @OBJC_EHTYPE_id catch ptr null");
+        string thrown = Emit("ptr", "extractvalue { ptr, i32 } %exception, 0");
+        string clause = Emit("i32", "extractvalue { ptr, i32 } %exception, 1");
+        string objectiveC = Emit("i32", "call i32 @llvm.eh.typeid.for.p0(ptr @OBJC_EHTYPE_id)");
+        string isObject = Emit("i1", $"icmp eq i32 {clause}, {objectiveC}");
+        string asked = NextLabel("exception.objc");
+        string foreign = NextLabel("exception.foreign");
+        Terminator($"br i1 {isObject}, label %{asked}, label %{foreign}");
+
+        Label(asked);
+        string caught = Emit("ptr", $"call ptr @objc_begin_catch(ptr {thrown})");
+        string askReason = Emit("ptr", $"load ptr, ptr {SelectorReference("reason")}");
+        string reason = Emit("ptr", $"call ptr @objc_msgSend(ptr {caught}, ptr {askReason})");
+        string askText = Emit("ptr", $"load ptr, ptr {SelectorReference("UTF8String")}");
+        string text = Emit("ptr", $"call ptr @objc_msgSend(ptr {reason}, ptr {askText})");
+        Line($"call void @sl_objc_exception(ptr {InternBytes(description)}, ptr {text})");
+        Terminator("unreachable");
+
+        Label(foreign);
+        Line($"call void @sl_objc_exception(ptr {InternBytes(description)}, ptr null)");
         Terminator("unreachable");
 
         _module.AppendLine(

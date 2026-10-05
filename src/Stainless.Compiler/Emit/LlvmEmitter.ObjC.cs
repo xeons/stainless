@@ -563,6 +563,9 @@ public sealed partial class LlvmEmitter
                 $"[{string.Join(", ", used.Select(u => "ptr " + u))}], section \"llvm.metadata\"");
 
         Declare("objc_msgSend", "declare ptr @objc_msgSend(ptr, ptr, ...)");
+        Declare("objc_begin_catch", "declare ptr @objc_begin_catch(ptr)");
+        Declare("OBJC_EHTYPE_id", "@OBJC_EHTYPE_id = external global ptr");
+        Declare("llvm.eh.typeid.for.p0", "declare i32 @llvm.eh.typeid.for.p0(ptr) nounwind memory(none)");
         if (TargetPlatform.Current.Architecture == TargetArch.X64)
             Declare("objc_msgSend_stret", "declare void @objc_msgSend_stret(ptr, ptr, ...)");
         if (_allocatesObjC)
