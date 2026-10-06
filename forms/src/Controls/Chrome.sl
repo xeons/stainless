@@ -217,7 +217,8 @@ public class OfficeXpRenderer : ChromeRenderer
         if (item.IsSeparator)
             return Size.FromDimensions(GutterWidth + 32, 3 + Padding);
 
-        var text = surface.MeasureString(RemoveMnemonics(item.Text), Font);
+        String plain = RemoveMnemonics(item.Text);
+        var text = surface.MeasureString(plain.SubstringBefore("\t"), Font);
 
         // A word on the bar, and **nothing added to it**.
         //
@@ -246,8 +247,20 @@ public class OfficeXpRenderer : ChromeRenderer
         // check-mark column to what is reported here, the same way it adds a
         // margin to a bar item. That cannot be measured from a menu nobody has
         // opened, so unlike the bar above this is proportioned by eye.
-        return Size.FromDimensions(GutterWidth + text.Width + 18, text.Height + Padding * 2);
+        //
+        // A shortcut after a tab is measured on its own, with a gap before it:
+        // the menu is as wide as its widest item, and each shortcut is drawn
+        // against the right edge of that.
+        int shortcut = 0;
+        String keys = plain.SubstringAfter("\t");
+        if (keys != "")
+            shortcut = ShortcutGap + surface.MeasureString(keys, Font).Width;
+        return Size.FromDimensions(GutterWidth + text.Width + shortcut + 18,
+                                   text.Height + Padding * 2);
     }
+
+    /// The least room between a caption and its shortcut.
+    const int ShortcutGap = 32;
 
     public override void DrawMenuItem(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state)
@@ -306,8 +319,16 @@ public class OfficeXpRenderer : ChromeRenderer
         format.Vertical = VerticalAlignment.Middle;
         format.Wrap = false;
 
-        surface.DrawString(caption, Font,
-                           disabled ? DisabledText : TextColor, text, format);
+        // The caption at the left, and the shortcut after its tab at the right,
+        // as Windows draws a menu it owns.
+        var ink = disabled ? DisabledText : TextColor;
+        DrawMnemonicText(surface, caption.SubstringBefore("\t"), ink, text, format);
+        String keys = caption.SubstringAfter("\t");
+        if (keys != "")
+        {
+            format.Horizontal = HorizontalAlignment.Right;
+            surface.DrawString(RemoveMnemonics(keys), Font, ink, text, format);
+        }
 
         if (item.HasItems)
             DrawSubmenuArrow(surface, bounds, disabled);
@@ -353,8 +374,7 @@ public class OfficeXpRenderer : ChromeRenderer
         format.Vertical = VerticalAlignment.Middle;
         format.Wrap = false;
 
-        surface.DrawString(caption, Font,
-                           disabled ? DisabledText : TextColor, bounds, format);
+        DrawMnemonicText(surface, caption, disabled ? DisabledText : TextColor, bounds, format);
     }
 
     /// A tick, drawn as two strokes rather than as a character: the glyph
@@ -521,6 +541,63 @@ public class OfficeXpRenderer : ChromeRenderer
     ///
     /// `&&` is a literal ampersand and stays one, which is the same rule
     /// `DrawTextW` follows.
+    /// A caption with its `&` markers taken out and the marked letter
+    /// underlined, as Windows draws a menu it owns while the keyboard is
+    /// choosing. `Graphics` draws text as it is given, so the marker would
+    /// otherwise be drawn as an ampersand.
+    void DrawMnemonicText(Graphics surface, String caption, Color ink, Rectangle bounds,
+                          TextFormat format)
+    {
+        String plain = RemoveMnemonics(caption);
+        surface.DrawString(plain, Font, ink, bounds, format);
+
+        long marked = FindMnemonic(caption);
+        if (marked < 0 || (nuint)marked >= plain.ByteLength())
+            return;
+
+        var whole = surface.MeasureString(plain, Font);
+        int left = bounds.X;
+        if (format.Horizontal == HorizontalAlignment.Center)
+            left = bounds.X + (bounds.Width - whole.Width) / 2;
+        else if (format.Horizontal == HorizontalAlignment.Right)
+            left = bounds.Right - whole.Width;
+        int top = bounds.Y + (bounds.Height - whole.Height) / 2;
+
+        String before = plain.Substring(0u, (nuint)marked);
+        String letter = plain.Substring((nuint)marked, plain.SkipCodePoint((nuint)marked) - (nuint)marked);
+        int x = left + (before == "" ? 0 : surface.MeasureString(before, Font).Width);
+        int wide = surface.MeasureString(letter, Font).Width;
+        int y = top + whole.Height - 2;
+        surface.DrawLine(new Pen(ink), x, y, x + wide - 1, y);
+    }
+
+    /// Where the letter a single `&` marks falls in the caption with the
+    /// markers removed, or -1 when nothing is marked.
+    static long FindMnemonic(String caption)
+    {
+        long kept = 0;
+        nuint at = 0u;
+        nuint length = caption.ByteLength();
+        while (at < length)
+        {
+            if (caption.GetByteAt(at) != (byte)38)              // '&'
+            {
+                at++;
+                kept++;
+                continue;
+            }
+            at++;
+            if (at < length && caption.GetByteAt(at) == (byte)38)
+            {
+                at++;
+                kept++;
+                continue;
+            }
+            return at < length ? kept : -1;
+        }
+        return -1;
+    }
+
     static String RemoveMnemonics(String caption)
     {
         if (!caption.Contains("&"))

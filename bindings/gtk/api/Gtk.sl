@@ -102,6 +102,11 @@ public const gint GTK_WIN_POS_CENTER_ON_PARENT = 4;
 
 /// `GtkOrientation`, taken at construction by a box, a separator, a paned
 /// and a scale alike -- one call each, rather than one per direction.
+/// `GtkReliefStyle`: no border until the pointer is over the button.
+public const gint GTK_RELIEF_NONE = 2;
+/// `GtkIconSize`: the size a menu item's icon is drawn at.
+public const gint GTK_ICON_SIZE_MENU = 1;
+
 public const gint GTK_ORIENTATION_HORIZONTAL = 0;
 public const gint GTK_ORIENTATION_VERTICAL   = 1;
 
@@ -344,6 +349,9 @@ public extern "C"
 {
     GtkWidget* gtk_button_new();
     GtkWidget* gtk_button_new_with_label(gchar* label);
+    /// A button showing a theme icon, `size` a `GTK_ICON_SIZE_*`.
+    GtkWidget* gtk_button_new_from_icon_name(gchar* iconName, gint size);
+    void gtk_button_set_relief(GtkWidget* button, gint relief);
 
     /// A button whose label carries an underscore before the mnemonic letter,
     /// as `_File` does.
@@ -747,6 +755,9 @@ public extern "C"
     /// needs and is only meaningful once the widget has been laid out.
     gint gtk_widget_get_allocated_width(GtkWidget* widget);
     gint gtk_widget_get_allocated_height(GtkWidget* widget);
+    /// Whether the widget is on screen, which a widget on a hidden page is not.
+    gboolean gtk_widget_get_mapped(GtkWidget* widget);
+    void gtk_widget_set_focus_on_click(GtkWidget* widget, gboolean focusOnClick);
 
     /// What the widget insists on, and what it would like. A size request
     /// below the minimum is not honoured: GTK gives the widget its minimum and

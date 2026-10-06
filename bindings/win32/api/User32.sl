@@ -226,6 +226,7 @@ public extern "C"
     int  EnumChildWindows(HWND parent, WindowEnumerator callback, nint parameter);
     nint GetWindowLongPtrW(HWND window, int index);
     nint SetWindowLongPtrW(HWND window, int index, nint value);
+    nint GetClassLongPtrW(HWND window, int index);
     uint GetWindowThreadProcessId(HWND window, uint* processId);
 
     int  SetWindowTextW(HWND window, char16* text);
@@ -323,6 +324,9 @@ public const int GwlpId           = -12;
 /// stays in front of its owner and is not given a task-bar button.
 public const int GwlpHwndParent   = -8;
 public const int GwlStyle         = -16;
+
+/// A `GetClassLongPtrW` index: the cursor the window class shows, or none.
+public const int GclpCursor       = -12;
 public const int GwlExtendedStyle = -20;
 
 // ================================================================= painting

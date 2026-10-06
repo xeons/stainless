@@ -1535,9 +1535,16 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
     /// The page GTK last said was current, or -1.
     int _shown;
 
+    /// Each tab's caption, to build its label again when the close buttons
+    /// come or go.
+    List<String> _texts;
+    bool _closable;
+
     public GtkTabControlPeer(IControlNotify owner)
     {
         _pages = new List<GtkWidget*>();
+        _texts = new List<String>();
+        _closable = false;
         base(gtk_notebook_new(), owner, gtk_fixed_new());
         _reported = CreateRectangle(0, 0, 0, 0);
         _queued = false;
@@ -1627,11 +1634,13 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         // reports that as a change of page.
         int index = (int)_pages.Count;
         var book = Widget;
+        var label = CreateTabLabel(page, text);
         RunQuietly(() =>
         {
-            gtk_notebook_append_page(book, page, gtk_label_new(text.ToPointer()));
+            gtk_notebook_append_page(book, page, label);
         });
         _pages.Add(page);
+        _texts.Add(text);
         if (_pages.Count == 1u)
             Content = page;
 
@@ -1660,6 +1669,7 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         // layer is still holding those controls.
         gtk_notebook_remove_page(Widget, index);
         _pages.RemoveAt((nuint)index);
+        _texts.RemoveAt((nuint)index);
         Content = _pages.Count == 0u ? Content : _pages[0u];
     }
 
@@ -1676,8 +1686,82 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
     {
         if (index < 0 || (nuint)index >= _pages.Count)
             return;
+        _texts[(nuint)index] = text;
         gtk_notebook_set_tab_label(Widget, _pages[(nuint)index],
-                                   gtk_label_new(text.ToPointer()));
+                                   CreateTabLabel(_pages[(nuint)index], text));
+    }
+
+    /// A tab's caption, with a close button after it when the tabs have them.
+    GtkWidget* CreateTabLabel(GtkWidget* page, String text)
+    {
+        GtkWidget* caption = gtk_label_new(text.ToPointer());
+        if (!_closable)
+        {
+            gtk_widget_show(caption);
+            return caption;
+        }
+        GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+        GtkWidget* close = gtk_button_new_from_icon_name("window-close-symbolic".ToPointer(),
+                                                         GTK_ICON_SIZE_MENU);
+        gtk_button_set_relief(close, GTK_RELIEF_NONE);
+        gtk_widget_set_focus_on_click(close, 0);
+        gtk_container_add(box, caption);
+        gtk_container_add(box, close);
+        gtk_widget_show_all(box);
+        ConnectPeerSignal(close, "clicked", (peer) =>
+        {
+            ((GtkTabControlPeer)peer).ReportClosing(page);
+        });
+        return box;
+    }
+
+    void ReportClosing(GtkWidget* page)
+    {
+        for (nuint i = 0u; i < _pages.Count; i++)
+        {
+            if (_pages[i] != page)
+                continue;
+            var owner = Owner;
+            if (owner != null)
+                ((IControlNotify)owner).OnPlatformTabClosing((int)i);
+            return;
+        }
+    }
+
+    public void SetTabsVisible(bool visible)
+    {
+        gtk_notebook_set_show_tabs(Widget, visible ? 1 : 0);
+        gtk_notebook_set_show_border(Widget, visible ? 1 : 0);
+    }
+
+    public bool SetCloseButtons(bool shown)
+    {
+        if (shown == _closable)
+            return true;
+        _closable = shown;
+        for (nuint i = 0u; i < _pages.Count; i++)
+            gtk_notebook_set_tab_label(Widget, _pages[i], CreateTabLabel(_pages[i], _texts[i]));
+        return true;
+    }
+
+    public int GetTabAt(FPoint at)
+    {
+        for (nuint i = 0u; i < _pages.Count; i++)
+        {
+            GtkWidget* label = gtk_notebook_get_tab_label(Widget, _pages[i]);
+            if (label == null || gtk_widget_get_mapped(label) == 0)
+                continue;
+            gint x = 0;
+            gint y = 0;
+            gtk_widget_translate_coordinates(label, Widget, 0, 0, &x, &y);
+            int wide = gtk_widget_get_allocated_width(label);
+            int tall = gtk_widget_get_allocated_height(label);
+            // The tab is the label and the padding around it; a few pixels
+            // either way still means this tab.
+            if (at.X >= x - 6 && at.X < x + wide + 6 && at.Y >= y - 6 && at.Y < y + tall + 6)
+                return (int)i;
+        }
+        return -1;
     }
 
     public void SetSelectedTab(int index)

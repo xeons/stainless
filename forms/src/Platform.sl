@@ -214,6 +214,10 @@ public interface IControlNotify
     /// constructor running its own handler against a half-built form.
     void OnPlatformToolClicked(int index);
 
+    /// The close button on a tab was pressed. The tab is still there: closing
+    /// it is the program's decision.
+    void OnPlatformTabClosing(int index);
+
     /// Fill a toolbar's background, before any of its buttons are drawn.
     ///
     /// Raised only for a toolbar that asked for `SetOwnerDrawn(true)`, and
@@ -903,6 +907,14 @@ public interface ITabControlPeer : IContainerPeer
     /// area: the tabs themselves are part of that.
     Rectangle PageArea { get; }
     void SetImages(IImageListBackend? images);
+
+    /// Shows a close button on every tab, and answers whether the platform
+    /// has one to show: AppKit's tabs hold a label and nothing else.
+    bool SetCloseButtons(bool shown);
+    /// The tab under a point in the control's coordinates, or -1.
+    int GetTabAt(Point at);
+    /// Shows the row of tabs, or hides it and gives the page the whole control.
+    void SetTabsVisible(bool visible);
 }
 
 /// A place in a tree. Opaque, because a tree is a linked structure and an index

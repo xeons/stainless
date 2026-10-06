@@ -555,6 +555,9 @@ public extern "C"
     /// backend makes and could be a box with a picture in it.
     void gtk_notebook_set_tab_label(GtkWidget* notebook, GtkWidget* page,
                                     GtkWidget* label);
+    GtkWidget* gtk_notebook_get_tab_label(GtkWidget* notebook, GtkWidget* page);
+    void gtk_notebook_set_show_tabs(GtkWidget* notebook, gboolean showTabs);
+    void gtk_notebook_set_show_border(GtkWidget* notebook, gboolean showBorder);
     void gtk_notebook_set_scrollable(GtkWidget* notebook, gboolean scrollable);
 }
 

@@ -552,11 +552,18 @@ public class ControlPeer : IControlPeer
         // Windows asks what the pointer should look like on every move, and
         // takes the answer from the window class unless something says
         // otherwise. Saying otherwise is the whole of a per-control cursor.
-        if (message == WmSetCursor)
+        // A window of one of this library's classes has no class cursor, so
+        // one whose control never set a shape MUST be given the arrow here;
+        // otherwise it keeps whatever the pointer last showed, as a splitter's
+        // arrows after the pointer crosses it.
+        if (message == WmSetCursor && (lParam & 0xFFFF) == HtClient)
         {
-            if (CursorHandle != null && (lParam & 0xFFFF) == HtClient)
+            var shown = CursorHandle;
+            if (shown == null && GetClassLongPtrW(Window, GclpCursor) == 0)
+                shown = LoadCursorFor(CursorKind.Default);
+            if (shown != null)
             {
-                Win32.User32.SetCursor(CursorHandle);
+                Win32.User32.SetCursor(shown);
                 return 1;
             }
         }

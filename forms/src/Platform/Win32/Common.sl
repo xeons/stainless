@@ -471,18 +471,167 @@ public class TrackBarPeer : ControlPeer, ITrackBarPeer
 
 // ============================================================== tab control
 
+/// **A close button is drawn over the themed tab, not instead of it.** The
+/// control has none of its own, and owner drawing would give up the theme for
+/// all of the tab to draw one glyph. So each caption is given trailing spaces
+/// to leave room, the control paints as it always does, and the glyph goes on
+/// top -- which is also where its clicks are taken before the control sees
+/// them. Spaces rather than `TCM_SETPADDING`, which widens both sides of a
+/// centred caption and leaves half its room on the wrong one.
 public class TabControlPeer : ControlPeer, ITabControlPeer
 {
     weak IControlNotify? _owner;
     int _tabs;
+    bool _closable;
+    /// The tab whose close button is under the pointer, or -1.
+    int _hotClose;
+    /// Each tab's caption as the program gave it, without the room.
+    List<String> _captions;
+    /// Whether the tabs are hidden. The control still draws them, under a page
+    /// that covers its whole client area: it clips its children, so nothing it
+    /// paints shows through one.
+    bool _tabsHidden;
+
+    /// The glyph's square.
+    const int CloseSize = 14;
 
     public TabControlPeer(IControlNotify owner, IContainerPeer parent)
     {
+        _captions = new List<String>();
         base(CreateChildWindow("SysTabControl32", GetContainerWindow(parent),
                        GetChildStyle() | WsClipChildren, 0u),
              owner, true);
         _owner = owner;
         _tabs = 0;
+        _closable = false;
+        _hotClose = -1;
+        _tabsHidden = false;
+    }
+
+    public void SetTabsVisible(bool visible) => _tabsHidden = !visible;
+
+    public bool SetCloseButtons(bool shown)
+    {
+        _closable = shown;
+        for (int i = 0; i < (int)_captions.Count; i++)
+            ApplyText(i, _captions[(nuint)i]);
+        InvalidateRect(Window, null, 1);
+        return true;
+    }
+
+    /// What a tab shows: its caption, and room for the close button after it.
+    String GetShownText(String caption)
+    {
+        if (!_closable)
+            return caption;
+        HDC dc = GetDC(Window);
+        HGDIOBJ font = (HGDIOBJ)(void*)(nuint)SendMessageW(Window, WmGetFont, 0u, 0);
+        HGDIOBJ was = font != null ? SelectObject(dc, font) : null;
+        Win32.User32.Size space;
+        var blank = " ".ToUtf16();
+        GetTextExtentPoint32W(dc, blank.ToPointer(), 1, &space);
+        if (was != null)
+            SelectObject(dc, was);
+        ReleaseDC(Window, dc);
+        int count = space.Width > 0 ? (CloseSize + 4 + space.Width - 1) / space.Width : 5;
+        return caption + " ".Repeat((nuint)count);
+    }
+
+    public int GetTabAt(FPoint at)
+    {
+        TabHitTest test;
+        test.Point.X = at.X;
+        test.Point.Y = at.Y;
+        test.Flags = 0u;
+        return (int)SendMessageW(Window, TcmHitTest, 0u, (long)(nuint)&test);
+    }
+
+    /// Where tab `index` draws its close button.
+    Rect GetCloseBox(int index)
+    {
+        Rect tab;
+        SendMessageW(Window, TcmGetItemRect, (ulong)index, (long)(nuint)&tab);
+        Rect box;
+        box.Right = tab.Right - 4;
+        box.Left = box.Right - CloseSize;
+        box.Top = tab.Top + (tab.Bottom - tab.Top - CloseSize) / 2;
+        box.Bottom = box.Top + CloseSize;
+        return box;
+    }
+
+    /// The tab whose close button is under a point, or -1.
+    int FindCloseAt(int x, int y)
+    {
+        for (int i = 0; i < TabCount; i++)
+        {
+            var box = GetCloseBox(i);
+            if (x >= box.Left && x < box.Right && y >= box.Top && y < box.Bottom)
+                return i;
+        }
+        return -1;
+    }
+
+    void DrawCloseButtons()
+    {
+        HDC dc = GetDC(Window);
+        for (int i = 0; i < TabCount; i++)
+        {
+            var box = GetCloseBox(i);
+            if (i == _hotClose)
+                FillRect(dc, &box, GetSysColorBrush(ColorBtnShadow));
+            HPEN pen = CreatePen(0, 1, GetSysColor(i == _hotClose ? ColorHighlightText : ColorBtnText));
+            HGDIOBJ was = SelectObject(dc, (HGDIOBJ)(void*)pen);
+            // A diagonal drawn by LineTo stops a pixel short of its end, so
+            // each runs one past the box's inner square.
+            int inset = 4;
+            MoveToEx(dc, box.Left + inset, box.Top + inset, null);
+            LineTo(dc, box.Right - inset + 1, box.Bottom - inset + 1);
+            MoveToEx(dc, box.Right - inset, box.Top + inset, null);
+            LineTo(dc, box.Left + inset - 1, box.Bottom - inset + 1);
+            SelectObject(dc, was);
+            DeleteObject((HGDIOBJ)(void*)pen);
+        }
+        ReleaseDC(Window, dc);
+    }
+
+    void SetHotClose(int index)
+    {
+        if (index == _hotClose)
+            return;
+        _hotClose = index;
+        InvalidateRect(Window, null, 0);
+    }
+
+    public override long WndProc(uint message, ulong wParam, long lParam)
+    {
+        if (!_closable)
+            return base.WndProc(message, wParam, lParam);
+
+        if (message == WmPaint)
+        {
+            long painted = base.WndProc(message, wParam, lParam);
+            DrawCloseButtons();
+            return painted;
+        }
+
+        int x = (int)(short)(lParam & 0xFFFF);
+        int y = (int)(short)((lParam >> 16) & 0xFFFF);
+        if (message == WmMouseMove)
+            SetHotClose(FindCloseAt(x, y));
+        else if (message == WmMouseLeave)
+            SetHotClose(-1);
+        else if (message == WmLeftButtonDown)
+        {
+            int closing = FindCloseAt(x, y);
+            if (closing >= 0)
+            {
+                IControlNotify? held = _owner;
+                if (held != null)
+                    ((IControlNotify)held).OnPlatformTabClosing(closing);
+                return 0;
+            }
+        }
+        return base.WndProc(message, wParam, lParam);
     }
 
     /// A tab control is a container, so a page's controls are children of it.
@@ -502,7 +651,7 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         item.Mask = TcifText;
         item.State = 0u;
         item.StateMask = 0u;
-        var wide = text.ToUtf16();
+        var wide = GetShownText(text).ToUtf16();
         item.Text = wide.ToPointer();
         item.TextLength = 0;
         item.Image = -1;
@@ -516,6 +665,7 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         int at = (int)SendMessageW(Window, TcmInsertItemW, (ulong)_tabs,
                                    (long)(nuint)&item);
         _tabs = _tabs + 1;
+        _captions.Insert((nuint)at, text);
         return at;
     }
 
@@ -524,15 +674,24 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         SendMessageW(Window, TcmDeleteItem, (ulong)index, 0);
         if (_tabs > 0)
             _tabs = _tabs - 1;
+        if (index >= 0 && (nuint)index < _captions.Count)
+            _captions.RemoveAt((nuint)index);
     }
 
     public void SetTabText(int index, String text)
+    {
+        if (index >= 0 && (nuint)index < _captions.Count)
+            _captions[(nuint)index] = text;
+        ApplyText(index, text);
+    }
+
+    void ApplyText(int index, String text)
     {
         TabItem item;
         item.Mask = TcifText;
         item.State = 0u;
         item.StateMask = 0u;
-        var wide = text.ToUtf16();
+        var wide = GetShownText(text).ToUtf16();
         item.Text = wide.ToPointer();
         item.TextLength = 0;
         item.Image = -1;
@@ -569,7 +728,8 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         {
             Rect area;
             GetClientRect(Window, &area);
-            SendMessageW(Window, TcmAdjustRect, 0u, (long)(nuint)&area);
+            if (!_tabsHidden)
+                SendMessageW(Window, TcmAdjustRect, 0u, (long)(nuint)&area);
             return CreateRectangleFromEdges(area.Left, area.Top, area.Right, area.Bottom);
         }
     }

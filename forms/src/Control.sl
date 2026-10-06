@@ -1106,6 +1106,10 @@ public abstract class Control : IControlNotify
     /// toolbar, which is why the base does nothing with it.
     public virtual void OnPlatformToolClicked(int index) { }
 
+    /// A tab's close button was pressed. Meaningless for everything that is
+    /// not a tab control.
+    public virtual void OnPlatformTabClosing(int index) { }
+
     /// A toolbar asked the program to fill its background. Answering false is
     /// what every control that is not an owner-drawn toolbar means, and is why
     /// the base can answer it for all of them.

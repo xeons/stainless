@@ -701,6 +701,8 @@ public class TabPage : WindowedControl
     }
 }
 
+public closure void TabPageEventHandler(TabControl sender, TabPage page);
+
 /// A stack of pages with tabs across the top.
 #if FORMS_REFLECT
 [Reflect]
@@ -710,6 +712,8 @@ public class TabControl : WindowedControl
     late ITabControlPeer _native;
     List<TabPage> _pages;
     ImageList? _images;
+    bool _closeButtons;
+    bool _showTabs;
     /// A page asked for before it was added, chosen when it is; -1 for none.
     int _wanted;
 
@@ -717,6 +721,8 @@ public class TabControl : WindowedControl
     {
         _pages = new List<TabPage>();
         _images = null;
+        _closeButtons = false;
+        _showTabs = true;
         base(parent);
         _wanted = -1;
         _native = WidgetSet.Current.CreateTabControl(this, ParentPeer);
@@ -869,6 +875,47 @@ public class TabControl : WindowedControl
     public event EventHandler SelectedIndexChanged;
 
     protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);
+
+    /// A close button on every tab, where the platform has them; reads false
+    /// where it has not, and the program offers closing some other way.
+    public bool ShowCloseButtons
+    {
+        get => _closeButtons;
+        set => _closeButtons = _native.SetCloseButtons(value) && value;
+    }
+
+    /// Whether the row of tabs is shown. Hidden, the showing page has the whole
+    /// control: what a stack of one page, or a wizard, wants.
+    public bool ShowTabs
+    {
+        get => _showTabs;
+        set
+        {
+            if (value == _showTabs)
+                return;
+            _showTabs = value;
+            _native.SetTabsVisible(value);
+            ShowOnlyPage(_native.GetSelectedTab());
+        }
+    }
+
+    /// The page whose tab is under a point in this control's coordinates, or
+    /// null: what a context menu or a middle click on the strip is about.
+    public TabPage? PageAt(Point at)
+    {
+        int index = _native.GetTabAt(at);
+        return index >= 0 && (nuint)index < _pages.Count ? _pages[(nuint)index] : null;
+    }
+
+    /// A tab's close button was pressed. Nothing is removed: a handler that
+    /// agrees calls `RemovePage`.
+    public event TabPageEventHandler TabClosing;
+
+    public override void OnPlatformTabClosing(int index)
+    {
+        if (index >= 0 && (nuint)index < _pages.Count)
+            TabClosing(this, _pages[(nuint)index]);
+    }
 
     public override void OnPlatformValueChanged()
     {

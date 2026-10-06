@@ -486,6 +486,18 @@ public const uint TcmSetCurSel   = 0x130Cu;
 public const uint TcmAdjustRect  = 0x1328u;
 public const uint TcmSetItemW    = 0x133Du;   // TCM_FIRST + 61
 public const uint TcmSetImageList = 0x1303u;
+public const uint TcmGetItemRect = 0x130Au;
+public const uint TcmHitTest     = 0x130Du;
+/// Room around a tab's icon and caption, as `MAKELPARAM(x, y)`. 6 by 3 unless
+/// set.
+public const uint TcmSetPadding  = 0x132Bu;
+
+/// `TCHITTESTINFO`.
+public struct TabHitTest
+{
+    public Point Point;
+    public uint Flags;
+}
 
 public const uint TcifText  = 0x0001u;
 public const uint TcifImage = 0x0002u;

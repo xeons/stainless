@@ -184,6 +184,21 @@ public class AppKitTabControlPeer : AppKitContainerPeer, ITabControlPeer
     /// A tab shows its caption only, as on GTK.
     public void SetImages(IImageListBackend? images) { }
 
+    /// An `NSTabView` tab holds its label and nothing else.
+    public bool SetCloseButtons(bool shown) => false;
+
+    public void SetTabsVisible(bool visible) =>
+        _tabs.TabViewType = visible ? NSTabViewType.TopTabsBezelBorder : NSTabViewType.NoTabsNoBorder;
+
+    public int GetTabAt(FPoint at)
+    {
+        NSPoint point;
+        point.x = (double)at.X;
+        point.y = _tabs.Flipped ? (double)at.Y : _tabs.Bounds.size.height - (double)at.Y;
+        var item = _tabs.TabViewItemAtPoint(point);
+        return item == null ? -1 : (int)_tabs.IndexOfTabViewItem((NSTabViewItem)item);
+    }
+
     public override void SetFont(Forms.Drawing.Font font) => _tabs.Font = ((AppKitFontBackend)font.Resource).Font;
 
     public override void SetBackColor(Color color) { }
