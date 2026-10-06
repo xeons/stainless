@@ -103,8 +103,9 @@ public extern objc class NSTask
     [Selector("currentDirectoryPath", "setCurrentDirectoryPath:")]
     public NSString? CurrentDirectoryPath { get; set; }
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("launch")]
-    public void Launch();
+    public ForeignException? Launch();
     /// Deprecated in macOS 100000.
     [Selector("launchedTaskWithLaunchPath:arguments:")]
     public static NSTask LaunchedTaskWithLaunchPathArguments(NSString path, NSArray arguments);

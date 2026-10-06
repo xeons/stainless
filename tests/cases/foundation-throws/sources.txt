@@ -1,0 +1,2 @@
+# The Foundation bindings, whose NSFileHandle reads are [Throws].
+bindings/macos

@@ -144,29 +144,37 @@ public extern objc class NSFileHandle
     [Selector("offsetInFile")]
     public ulong OffsetInFile { get; }
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("readDataToEndOfFile")]
-    public NSData ReadDataToEndOfFile();
+    public Result<NSData, ForeignException> ReadDataToEndOfFile();
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("readDataOfLength:")]
-    public NSData ReadDataOfLength(NSUInteger length);
+    public Result<NSData, ForeignException> ReadDataOfLength(NSUInteger length);
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("writeData:")]
-    public void WriteData(NSData data);
+    public ForeignException? WriteData(NSData data);
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("seekToEndOfFile")]
-    public ulong SeekToEndOfFile();
+    public Result<ulong, ForeignException> SeekToEndOfFile();
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("seekToFileOffset:")]
-    public void SeekToFileOffset(ulong offset);
+    public ForeignException? SeekToFileOffset(ulong offset);
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("truncateFileAtOffset:")]
-    public void TruncateFileAtOffset(ulong offset);
+    public ForeignException? TruncateFileAtOffset(ulong offset);
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("synchronizeFile")]
-    public void SynchronizeFile();
+    public ForeignException? SynchronizeFile();
     /// Deprecated in macOS 100000.
+    [Throws]
     [Selector("closeFile")]
-    public void CloseFile();
+    public ForeignException? CloseFile();
 }
 
 public extern objc class NSPipe : NSObject
