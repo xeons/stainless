@@ -944,6 +944,13 @@ public sealed class Compilation
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
 
+        // A program named after its module can land on a directory of that
+        // name, which on macOS's case-blind file system includes `tests` for
+        // a module `Tests`; the linker would report only an errno.
+        if (Directory.Exists(output))
+            return Failure($"the program would be written to '{output}', which is a directory; " +
+                           "name another path with -o");
+
         Directory.CreateDirectory(intermediate);
         string irPath = Path.Combine(intermediate,
             Path.GetFileNameWithoutExtension(output) + ".ll");
@@ -1602,8 +1609,12 @@ public sealed class Compilation
         return Path.Combine(CommonDirectory(sources), name + extension);
     }
 
-    /// <summary>The deepest directory containing every source file.</summary>
-    private static string CommonDirectory(IReadOnlyList<string> sources)
+    /// <summary>
+    /// The deepest directory containing every source file, or the current
+    /// directory when that is only the root of the file system -- which is
+    /// read-only on macOS, and nowhere to leave a build on any system.
+    /// </summary>
+    public static string CommonDirectory(IReadOnlyList<string> sources)
     {
         var directories = sources
             .Select(s => Path.GetDirectoryName(Path.GetFullPath(s)) ?? ".")
@@ -1612,7 +1623,7 @@ public sealed class Compilation
         string common = directories[0];
         foreach (string directory in directories.Skip(1))
         {
-            while (!directory.StartsWith(common, StringComparison.OrdinalIgnoreCase))
+            while (!IsWithinDirectory(directory, common))
             {
                 var parent = Directory.GetParent(common);
                 if (parent is null) return directories[0];
@@ -1620,7 +1631,22 @@ public sealed class Compilation
             }
         }
 
-        return common;
+        return Path.GetPathRoot(common) == common ? Directory.GetCurrentDirectory() : common;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="path"/> is <paramref name="directory"/> or under
+    /// it, by whole names: <c>/x/forms</c> does not hold <c>/x/formsrc</c>.
+    /// </summary>
+    private static bool IsWithinDirectory(string path, string directory)
+    {
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        if (!path.StartsWith(directory, comparison))
+            return false;
+        return path.Length == directory.Length
+            || Path.EndsInDirectorySeparator(directory)
+            || path[directory.Length] == Path.DirectorySeparatorChar
+            || path[directory.Length] == Path.AltDirectorySeparatorChar;
     }
 
     /// <summary>Each file the program embeds, once, however many objects it makes.</summary>
