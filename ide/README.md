@@ -7,27 +7,35 @@
 
 It editing its own source, on each backend, is in
 [the root README](../README.md#what-it-is-far-enough-along-to-build) —
-[Windows](../docs/images/ide-windows.png) and
-[Linux](../docs/images/ide-linux.png).
+[Windows](../docs/images/ide-windows.png),
+[Linux](../docs/images/ide-linux.png) and
+[macOS](../docs/images/ide-macos.png).
 
 ```
 dotnet build Stainless.slnx      # the compiler, which the IDE drives
-stainless build --project ide    # the IDE, on either system
+stainless build --project ide    # the IDE, on any of the three
 ```
 
-**The same line on both**, because of [ide/stainless.json](stainless.json).
-What each system needs -- the Win32 bindings and seven libraries here, the GTK
-and Linux bindings and six libraries there -- is a platform section in the
+**The same line on each**, because of [ide/stainless.json](stainless.json).
+What each system needs -- the Win32 bindings and seven libraries on Windows,
+the GTK and Linux bindings and six libraries on Linux, the macOS bindings on a
+Mac -- is a platform section in the
 project file rather than two command lines in a page nobody re-reads
 ([packages.md section 2.1](../docs/packages.md#21-what-one-platform-adds)).
 
-`build.ps1` is still there for what a project file does not cover, which is
-running the tests afterwards:
+`build.ps1` and `build.sh` are still there for what a project file does not
+cover, which is running the tests afterwards:
 
 ```
 .\ide\build.ps1 -Test            # build the IDE and run its tests
 .\ide\build.ps1 -Run -Open samples\shapes.sl
+ide/build.sh --test              # the same, on Linux and macOS
+ide/build.sh --run samples/shapes.sl
 ```
+
+Its settings live in `%APPDATA%\Stainless\ide` on Windows,
+`~/Library/Application Support/Stainless/ide` on macOS and
+`~/.config/stainless/ide` on Linux.
 
 It is a native binary with no VM, no GC and no web view — the same as anything
 else this compiler produces. The window is [forms/](../forms/README.md), the

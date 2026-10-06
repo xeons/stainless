@@ -434,7 +434,8 @@ public bool SaveLayout(DockLayout layout, String path)
     return File.WriteAllText(path, SerializeLayout(layout)) == IOError.None;
 }
 
-/// Where the settings live: `%APPDATA%/Stainless/ide` on Windows, and
+/// Where the settings live: `%APPDATA%/Stainless/ide` on Windows,
+/// `~/Library/Application Support/Stainless/ide` on macOS, and
 /// `$XDG_CONFIG_HOME/stainless/ide` -- falling back to `~/.config` -- on
 /// everything else.
 ///
@@ -448,6 +449,10 @@ public String GetSettingsDirectory()
     String roaming = Env.GetEnvironmentVariableOrDefault("APPDATA", "");
     if (roaming != "")
         return Path.Join(Path.Join(roaming, "Stainless"), "ide");
+#elif MACOS
+    String home = Env.GetEnvironmentVariableOrDefault("HOME", "");
+    if (home != "")
+        return Path.Join(Path.Join(Path.Join(home, "Library/Application Support"), "Stainless"), "ide");
 #else
     String config = Env.GetEnvironmentVariableOrDefault("XDG_CONFIG_HOME", "");
     if (config == "")

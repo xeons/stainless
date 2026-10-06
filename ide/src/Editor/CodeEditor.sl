@@ -250,16 +250,17 @@ public class CodeEditor : CustomControl
 
     /// The fixed-width font to use, by the name the platform knows it under.
     ///
-    /// Consolas ships with Windows and DejaVu Sans Mono with essentially every
-    /// desktop Linux; where neither is present the platform substitutes, and
-    /// what it substitutes for a name it does not know is its default
-    /// fixed-width face -- which is the right answer anyway.
+    /// Consolas ships with Windows, Menlo with macOS and DejaVu Sans Mono with
+    /// essentially every desktop Linux. A name AppKit does not know becomes
+    /// the system's proportional face, so each platform MUST name one it has.
     String MonospaceFamily
     {
         get
         {
             #if WINDOWS
             return "Consolas";
+            #elif MACOS
+            return "Menlo";
             #else
             return "DejaVu Sans Mono";
             #endif

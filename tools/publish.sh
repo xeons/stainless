@@ -115,19 +115,16 @@ fi
 
 # Built by the published compiler, which is a harder test of it than hello.sl,
 # and shipped beside it: the IDE looks for `stainless` next to itself first.
-# On macOS it builds, but its self test does not pass under GTK's Quartz
-# backend, so macOS ships without it.
 ide="$publish/stainless-ide"
 if [ "$runtime" != "$native" ]; then
     echo "warning: $runtime is not this machine, so the archive carries no IDE" >&2
-elif [ "$system" = osx ]; then
-    echo "warning: the IDE's self test does not pass on macOS yet, so the archive carries none" >&2
 else
     echo "building the IDE with the published compiler"
     "$compiler" build --project "$repository/ide" -o "$ide"
 
-    # The self test opens a window, so it needs a display; Xvfb stands in.
-    if [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
+    # The self test opens a window, so it needs a display. A Mac has one; on
+    # Linux Xvfb stands in.
+    if [ "$system" = osx ] || [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
         "$ide" --selftest
     elif command -v xvfb-run >/dev/null; then
         xvfb-run -a "$ide" --selftest

@@ -32,7 +32,7 @@ import Standard.Text;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if MACOS && FORMS_APPKIT
+#if MACOS && !FORMS_GTK
 import Standard.ObjC;
 import MacOS.System;
 import MacOS.CoreFoundation;
@@ -51,7 +51,8 @@ public String? FindScreenshotDirectory() => Standard.Env.GetEnvironmentVariable(
 /// program cannot read the display without Screen Recording permission;
 /// `cacheDisplayInRect:` asks the view to draw itself into a bitmap, which
 /// needs none -- the same as `forms/screenshot.ps1`'s `PrintWindow`. Taken
-/// after every `PumpEvents` and as the program closes a form.
+/// after every `PumpEvents`, each second of `RunEventLoop`, and as the
+/// program closes a form.
 public void WriteWindowScreenshot(NSWindow window, String directory)
 {
     var content = window.ContentView;
@@ -62,11 +63,54 @@ public void WriteWindowScreenshot(NSWindow window, String directory)
     if (bitmap == null)
         return;
     view.CacheDisplayInRectToBitmapImageRep(view.Bounds, (NSBitmapImageRep)bitmap);
+    FillScreenshotBackground(window, view.Bounds, (NSBitmapImageRep)bitmap);
     var png = ((NSBitmapImageRep)bitmap).RepresentationUsingTypeProperties(NSBitmapImageFileType.PNG,
                                                                           NSDictionary.Dictionary());
     String title = FromNSString(window.Title).Replace("/", "-");
     if (png != null)
         ((NSData)png).WriteToFileAtomically(ToNSString(directory + "/" + (title == "" ? "window" : title) + ".png"), true);
+}
+
+/// Paints the window's background behind what `cacheDisplayInRect:` drew.
+///
+/// A translucent material, such as an `NSTabView`'s tab strip, is blended by
+/// the window server and reaches the bitmap as transparent pixels.
+void FillScreenshotBackground(NSWindow window, NSRect bounds, NSBitmapImageRep bitmap)
+{
+    var context = NSGraphicsContext.GraphicsContextWithBitmapImageRep(bitmap);
+    if (context == null)
+        return;
+    NSGraphicsContext.SaveGraphicsState();
+    NSGraphicsContext.CurrentContext = context;
+    // The colour is resolved against the window's appearance, light or dark.
+    var appearance = window.EffectiveAppearance;
+    if (appearance == null)
+        FillBehind(bounds);
+    else
+        ((NSAppearance)appearance).PerformAsCurrentDrawingAppearance(() => FillBehind(bounds));
+    NSGraphicsContext.RestoreGraphicsState();
+}
+
+void FillBehind(NSRect bounds)
+{
+    NSColor.WindowBackgroundColor.SetFill();
+    NSRectFillUsingOperation(bounds, NSCompositingOperation.DestinationOver);
+}
+
+/// What a message box's modal session answers when Escape closed it:
+/// `NSModalResponseCancel`, which no button of an alert answers.
+const long EscapeResponse = 0;
+
+/// Stops an alert's modal session on Escape.
+public objc class FormsAlertEscape : NSView
+{
+    public override bool PerformKeyEquivalent(NSEvent event)
+    {
+        if (event.KeyCode != (ushort)53)
+            return base.PerformKeyEquivalent(event);
+        NSApplication.SharedApplication.StopModalWithCode((NSModalResponse)EscapeResponse);
+        return true;
+    }
 }
 
 /// What another thread asks the main thread to do: run what it posted.
@@ -158,8 +202,9 @@ public class AppKitWidgetSet : IWidgetSet
         _application.FinishLaunching();
     }
 
-    /// Each visible form, as `WriteWindowScreenshot` writes one, after every
-    /// turn of the loop a program drives itself.
+    /// Each visible form, as `WriteWindowScreenshot` writes one: after every
+    /// turn of the loop a program drives itself, and each second of one
+    /// AppKit runs.
     void WriteScreenshots(String directory)
     {
         var windows = _application.Windows;
@@ -343,7 +388,20 @@ public class AppKitWidgetSet : IWidgetSet
     public void RunEventLoop()
     {
         _quitting = false;
+        var shots = _shots;
+        if (shots == null)
+        {
+            _application.Run();
+            return;
+        }
+
+        // A program that hands the loop to AppKit turns it nowhere this
+        // backend can see, so its screenshots are taken on a timer.
+        String directory = (String)shots;
+        var timer = NSTimer.TimerWithTimeIntervalRepeatsBlock(1.0, true, (fired) => WriteScreenshots(directory));
+        NSRunLoop.MainRunLoop.AddTimerForMode(timer, NSRunLoopCommonModes);
         _application.Run();
+        timer.Invalidate();
     }
 
     /// Stops the loop. `stop:` takes effect after the next event, so one is
@@ -361,7 +419,16 @@ public class AppKitWidgetSet : IWidgetSet
             _application.PostEventAtStart((NSEvent)nudge, true);
     }
 
+    /// Each turn in a pool of its own, as `-[NSApplication run]` drains one
+    /// per event. A program that only pumps would otherwise keep every event
+    /// and closed window it ever had until it ended.
     public bool PumpEvents()
+    {
+        WithAutoreleasePool(() => this.PumpPendingEvents());
+        return !_quitting;
+    }
+
+    void PumpPendingEvents()
     {
         while (true)
         {
@@ -375,7 +442,6 @@ public class AppKitWidgetSet : IWidgetSet
         var shots = _shots;
         if (shots != null)
             WriteScreenshots((String)shots);
-        return !_quitting;
     }
 
     /// From any thread: the waker's method runs on the main one, in every mode,
@@ -409,7 +475,16 @@ public class AppKitWidgetSet : IWidgetSet
         foreach (var answer in answers)
             alert.AddButtonWithTitle(ToNSString(DescribeAnswer(answer)));
 
-        long chosen = (long)alert.RunModal() - 1000;
+        // Escape is a button's key only where one is Cancel. A box with one
+        // button closes on it too, as Windows' does, through a view of no size
+        // that hears the key -- the LCL's `TCocoaAlertCancelAccessoryView`.
+        if (answers.Length == 1u)
+            alert.AccessoryView = FormsAlertEscape.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 0.0, 0.0));
+
+        long response = (long)alert.RunModal();
+        if (response == EscapeResponse)
+            return answers[0u];
+        long chosen = response - 1000;
         return chosen >= 0 && (nuint)chosen < answers.Length ? answers[(nuint)chosen] : DialogResult.Cancel;
     }
 

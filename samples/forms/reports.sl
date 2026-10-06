@@ -11,8 +11,9 @@
 // backend has to hold it back, and this window is where that is checked.
 //
 // `--selftest` builds the window and runs the checks. The ones that need a
-// user's hand drive the platform directly -- GTK's own calls, and simulated X
-// input where the display can take it -- and say they were skipped elsewhere.
+// user's hand drive the platform directly -- GTK's or AppKit's own calls, and
+// simulated input where the display can take it -- and say they were skipped
+// elsewhere.
 module Reports;
 
 import Standard.Console;
@@ -22,13 +23,19 @@ import Standard.Threading;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if UNIX
+#if UNIX && (!MACOS || FORMS_GTK)
 import Gtk.GLib;
 import Gtk.GObject;
 import Gtk.Gdk;
 import Gtk.Api;
 import Gtk.Cairo;
 import Forms.Platform.Gtk;
+#elif MACOS
+import Standard.ObjC;
+import MacOS.Foundation;
+import MacOS.CoreGraphics;
+import MacOS.AppKit;
+import Forms.Platform.AppKit;
 #endif
 
 public class ReportsForm : Form
@@ -247,6 +254,15 @@ String FormatPoint(Point at)
 
 // ============================================================ both platforms
 
+/// The window's height with its title bar, which centring is measured by. A
+/// form's `Height` is that on Windows and the content's on AppKit; GTK's is
+/// the content's too, which under Xvfb has no title bar.
+#if MACOS && !FORMS_GTK
+int FindOuterHeight(Form form) => (int)((AppKitWindowPeer)form.WindowPeer).Window.Frame.size.height;
+#else
+int FindOuterHeight(Form form) => form.Height;
+#endif
+
 /// What must hold whoever is driving: a value the program set, a range it
 /// narrowed, a choice nobody has made.
 bool CheckPortable(ReportsForm form)
@@ -299,7 +315,7 @@ bool CheckPortable(ReportsForm form)
     SettleEvents();
     var area = Screen.WorkArea;
     int wantX = area.X + (area.Width - other.Width) / 2;
-    int wantY = area.Y + (area.Height - other.Height) / 2;
+    int wantY = area.Y + (area.Height - FindOuterHeight(other)) / 2;
     int awayX = other.Left - wantX;
     int awayY = other.Top - wantY;
     ok = ReportCheck(ok, "a form placed and then centred is centred, at "
@@ -320,7 +336,7 @@ bool CheckPortable(ReportsForm form)
 
 // ================================================================ GTK only
 
-#if UNIX
+#if UNIX && (!MACOS || FORMS_GTK)
 
 /// Every GLib warning and critical, counted and then printed as GLib would.
 static class GlibWatch
@@ -694,16 +710,354 @@ bool CheckDroppedTimer()
                        GlibWatch.Complaints == 0);
 }
 
+#elif MACOS
+
+// ============================================================= AppKit only
+
+NSView ViewOfControl(WindowedControl control) => (NSView)(void*)control.Handle;
+
+NSWindow WindowOfForm(Form form) => ((AppKitWindowPeer)form.WindowPeer).Window;
+
+/// Where a point in a view's own coordinates is in its window, which AppKit
+/// measures up from the bottom.
+NSPoint PointInWindow(NSView view, int x, int y)
+{
+    NSPoint at;
+    at.x = (double)x + 0.5;
+    at.y = (double)y + 0.5;
+    return view.ConvertPointToView(at, null);
+}
+
+/// A left click, as AppKit's own events. The release is queued first, so a
+/// control that tracks the press finds it waiting.
+void ClickWindowAt(NSWindow window, NSPoint at)
+{
+    var number = window.WindowNumber;
+    var down = NSEvent.MouseEventWithTypeLocationModifierFlagsTimestampWindowNumberContextEventNumberClickCountPressure(
+        NSEventType.LeftMouseDown, at, (NSEventModifierFlags)0u, 0.0, number, null, 0, 1, 1.0f);
+    var up = NSEvent.MouseEventWithTypeLocationModifierFlagsTimestampWindowNumberContextEventNumberClickCountPressure(
+        NSEventType.LeftMouseUp, at, (NSEventModifierFlags)0u, 0.0, number, null, 0, 1, 1.0f);
+    NSApplication.SharedApplication.PostEventAtStart(up!, true);
+    window.SendEvent(down!);
+    SettleEvents();
+}
+
+void ClickControlAt(Form form, WindowedControl control, int x, int y)
+{
+    ClickWindowAt(WindowOfForm(form), PointInWindow(ViewOfControl(control), x, y));
+}
+
+/// A key pressed and released, as AppKit's own events: `typed` is what it
+/// types with the modifiers applied and `plain` what it types without them.
+void PressKeyOn(Form form, ushort code, String typed, String plain, NSEventModifierFlags flags)
+{
+    var window = WindowOfForm(form);
+    NSPoint at;
+    at.x = 0.0;
+    at.y = 0.0;
+    var number = window.WindowNumber;
+    foreach (var type in [NSEventType.KeyDown, NSEventType.KeyUp])
+    {
+        var key = NSEvent.KeyEventWithTypeLocationModifierFlagsTimestampWindowNumberContextCharactersCharactersIgnoringModifiersIsARepeatKeyCode(
+            type, at, flags, 0.0, number, null, ToNSString(typed), ToNSString(plain), false, code);
+        window.SendEvent(key!);
+    }
+    SettleEvents();
+}
+
+/// A modifier key alone, which AppKit reports as a change of flags.
+void PressModifierOn(Form form, ushort code, NSEventModifierFlags flags)
+{
+    var window = WindowOfForm(form);
+    NSPoint at;
+    at.x = 0.0;
+    at.y = 0.0;
+    var number = window.WindowNumber;
+    var key = NSEvent.KeyEventWithTypeLocationModifierFlagsTimestampWindowNumberContextCharactersCharactersIgnoringModifiersIsARepeatKeyCode(
+        NSEventType.FlagsChanged, at, flags, 0.0, number, null, ToNSString(""), ToNSString(""), false, code);
+    window.SendEvent(key!);
+    SettleEvents();
+}
+
+/// The user changing each control's value after the program already has.
+bool CheckUserChanges(ReportsForm form)
+{
+    bool ok = true;
+
+    form.Option.Checked = true;
+    ((NSButton)ViewOfControl(form.Option)).PerformClick(null);
+    ok = ReportCheck(ok, "a check box ticked by the program still reports the user",
+                     form.Options == 1 && !form.Option.Checked);
+
+    // Typing goes through the window's field editor, as a keyboard's does.
+    form.Entry.Text = "set";
+    var field = (NSTextField)ViewOfControl(form.Entry);
+    WindowOfForm(form).MakeFirstResponder(field);
+    var editor = field.CurrentEditor();
+    if (editor != null)
+        ((NSTextView)editor).InsertText(ToNSString("typed"));
+    ok = ReportCheck(ok, "a text box reports typing after a program change", form.Edits == 1);
+
+    // A pop-up button's choice is its menu item's action.
+    form.Combo.SelectedIndex = 0;
+    var popup = (NSPopUpButton)ViewOfControl(form.Combo);
+    popup.SelectItemAtIndex((long)1);
+    popup.Menu!.PerformActionForItemAtIndex((long)1);
+    ok = ReportCheck(ok, "a combo box reports a choice after a program change", form.Combos == 1);
+    form.Combo.RemoveAt(1u);
+    ok = ReportCheck(ok, "and removing the chosen item reports nothing", form.Combos == 1);
+
+    form.Rows.SelectedIndex = 0;
+    var table = (NSTableView)((NSScrollView)ViewOfControl(form.Rows)).DocumentView!;
+    table.SelectRowIndexesByExtendingSelection(NSIndexSet.IndexSetWithIndex((ulong)2u), false);
+    ok = ReportCheck(ok, "a list reports a choice after a program change", form.Lists == 1);
+    form.Rows.RemoveAt(2u);
+    ok = ReportCheck(ok, "and removing the chosen row reports nothing", form.Lists == 1);
+
+    // A scroller knows which part was hit only from a press on it.
+    form.Scroll.Value = 5;
+    ClickControlAt(form, form.Scroll, form.Scroll.Width - 30, form.Scroll.Height / 2);
+    ok = ReportCheck(ok, "a scroll bar reports a press after a program change: "
+                         + Standard.Text.FromInteger((long)form.Scroll.Value),
+                     form.Scrolls == 1 && form.Scroll.Value > 5);
+
+    // The stepper is the spin edit's second half.
+    form.Spin.Value = 12;
+    var spin = ViewOfControl(form.Spin);
+    var stepper = (NSStepper)spin.Subviews.ObjectAtIndex((ulong)1u);
+    stepper.DoubleValue = 13.0;
+    stepper.SendActionTo(stepper.Action!, stepper.Target);
+    ok = ReportCheck(ok, "a spin edit reports a click after a program change",
+                     form.Spins == 1 && form.Spin.Value == 13);
+
+    form.Track.Value = 12;
+    var slider = (NSSlider)ViewOfControl(form.Track);
+    slider.DoubleValue = 30.0;
+    slider.SendActionTo(slider.Action!, slider.Target);
+    ok = ReportCheck(ok, "a track bar reports a drag after a program change", form.Tracks == 1);
+
+    form.Tabs.SelectedIndex = 1;
+    form.Tabs.SelectedIndex = 0;
+    int before = form.TabChanges;
+    ((NSTabView)ViewOfControl(form.Tabs)).SelectTabViewItemAtIndex((long)1);
+    SettleEvents();
+    ok = ReportCheck(ok, "a tab chosen by the user after the program chose one is reported, "
+                         + Standard.Text.FromInteger((long)(form.TabChanges - before)) + " times",
+                     form.TabChanges == before + 1);
+    ok = ReportCheck(ok, "and shows its page", form.Second.Visible && !form.First.Visible);
+
+    ((NSButton)ViewOfControl(form.Near)).PerformClick(null);
+    ok = ReportCheck(ok, "a radio button clicked is ticked and reported",
+                     form.Near.Checked && form.NearChanges == 1);
+    ((NSButton)ViewOfControl(form.Far)).PerformClick(null);
+    ok = ReportCheck(ok, "and the one it unticks reports nothing, as on Windows",
+                     form.Far.Checked && !form.Near.Checked
+                     && form.FarChanges == 1 && form.NearChanges == 1);
+
+    return ok;
+}
+
+/// Choosing a menu command leaves its tick as the program set it.
+bool CheckMenus(ReportsForm form)
+{
+    bool ok = true;
+    var go = (NSMenuItem)(void*)form.Go.PlatformId;
+    var ticked = (NSMenuItem)(void*)form.Ticked.PlatformId;
+
+    var menu = go.Menu!;
+    menu.PerformActionForItemAtIndex(menu.IndexOfItem(go));
+    ok = ReportCheck(ok, "choosing a command reports it", form.Goes == 1);
+    ok = ReportCheck(ok, "and leaves no tick behind", go.State == 0);
+    menu.PerformActionForItemAtIndex(menu.IndexOfItem(ticked));
+    ok = ReportCheck(ok, "a ticked command stays ticked when chosen",
+                     form.Ticks == 1 && ticked.State == 1 && form.Ticked.Checked);
+    return ok;
+}
+
+/// Where a click lands, and in whose coordinates. The pointer is not
+/// checked: an event sent to a window does not move it.
+bool CheckMouse(ReportsForm form)
+{
+    bool ok = true;
+    var window = WindowOfForm(form);
+
+    ClickWindowAt(window, PointInWindow(window.ContentView!, 600, 400));
+    ok = ReportCheck(ok, "a click on the form is reported once, not "
+                         + Standard.Text.FromInteger((long)form.FormDowns) + " times",
+                     form.FormDowns == 1);
+    ok = ReportCheck(ok, "in client coordinates: " + FormatPoint(form.FormAt),
+                     form.FormAt.X == 600 && form.FormAt.Y == 400);
+
+    ClickControlAt(form, form.Pane, 150, 90);
+    ok = ReportCheck(ok, "a click on a panel reaches the panel", form.PaneDowns == 1);
+    ok = ReportCheck(ok, "in the panel's coordinates: " + FormatPoint(form.PaneAt),
+                     form.PaneAt.X == 150 && form.PaneAt.Y == 90);
+    ok = ReportCheck(ok, "and not the form", form.FormDowns == 1);
+
+    ClickControlAt(form, form.Pane, form.Box.Left + 5, form.Box.Top + 7);
+    ok = ReportCheck(ok, "a click on a graphic control on a panel reaches it", form.BoxDowns == 1);
+    ok = ReportCheck(ok, "in its own coordinates: " + FormatPoint(form.BoxAt),
+                     form.BoxAt.X == 5 && form.BoxAt.Y == 7);
+    ok = ReportCheck(ok, "and neither the panel nor the form",
+                     form.PaneDowns == 1 && form.FormDowns == 1);
+
+    ClickControlAt(form, form.Back, 5, 5);
+    ok = ReportCheck(ok, "a click on a button is the button's",
+                     form.BackDowns == 1 && form.FormDowns == 1);
+    return ok;
+}
+
+/// The key a keystroke is, and whether it typed anything. Command is Control
+/// and Option is Alt.
+bool CheckKeys(ReportsForm form)
+{
+    bool ok = true;
+    form.Entry.Focus();
+    SettleEvents();
+    int typedBefore = form.KeyPresses;
+
+    PressKeyOn(form, (ushort)9, "v", "v", NSEventModifierFlags.Command);
+    ok = ReportCheck(ok, "Command+V is the key V with Control",
+                     form.LastKey == Key.V && form.LastModifiers == ModifierKeys.Control);
+    ok = ReportCheck(ok, "and types nothing", form.KeyPresses == typedBefore);
+
+    // Option is how a Mac types the characters a keyboard has no key for.
+    PressKeyOn(form, (ushort)12, "\u0153", "q", NSEventModifierFlags.Option);
+    ok = ReportCheck(ok, "Option+Q is the key Q with Alt, and types what the layout says",
+                     form.LastKey == Key.Q && form.LastModifiers == ModifierKeys.Alt
+                     && form.KeyPresses == typedBefore + 1 && form.LastTyped == 0x153u);
+
+    PressKeyOn(form, (ushort)18, "!", "1", NSEventModifierFlags.Shift);
+    ok = ReportCheck(ok, "Shift+1 is the key 1, as Windows says: "
+                         + Standard.Text.FromInteger((long)(int)form.LastKey),
+                     form.LastKey == Key.D1);
+    ok = ReportCheck(ok, "and types an exclamation mark",
+                     form.KeyPresses == typedBefore + 2 && form.LastTyped == 0x21u);
+
+    PressModifierOn(form, (ushort)56, NSEventModifierFlags.Shift);
+    ok = ReportCheck(ok, "Shift alone is Shift", form.LastKey == Key.Shift);
+    PressModifierOn(form, (ushort)55, NSEventModifierFlags.Command);
+    ok = ReportCheck(ok, "Command alone is Control", form.LastKey == Key.Control);
+    PressModifierOn(form, (ushort)57, NSEventModifierFlags.CapsLock);
+    ok = ReportCheck(ok, "Caps Lock is Caps Lock", form.LastKey == Key.CapsLock);
+    PressModifierOn(form, (ushort)57, (NSEventModifierFlags)0u);
+
+    PressKeyOn(form, (ushort)83, "1", "1", NSEventModifierFlags.NumericPad);
+    ok = ReportCheck(ok, "keypad 1 is VK_NUMPAD1: "
+                         + Standard.Text.FromInteger((long)(int)form.LastKey),
+                     (int)form.LastKey == 97);
+
+    // Last, because it takes the focus somewhere else.
+    PressKeyOn(form, (ushort)48, "\t", "\t", NSEventModifierFlags.Shift);
+    ok = ReportCheck(ok, "Shift+Tab is Tab", form.LastKey == Key.Tab);
+    return ok;
+}
+
+/// A control brought to the front is drawn and hit last.
+bool CheckStacking(ReportsForm form)
+{
+    form.Back.BringToFront();
+    var view = ViewOfControl(form.Back);
+    var siblings = view.Superview!.Subviews;
+    var last = (NSView)siblings.ObjectAtIndex(siblings.Count - 1u);
+    return ReportCheck(true, "a button brought to the front is last among its siblings", last == view);
+}
+
+/// What a 1-pixel pen covers, on a bitmap the right way up as a view is.
+bool CheckDrawing()
+{
+    bool ok = true;
+    byte[] pixels = new byte[40u * 40u * 4u];
+    var space = CGColorSpaceCreateDeviceRGB();
+    var context = CGBitmapContextCreate(&pixels[0u], 40u, 40u, 8u, 160u, space,
+                                        (CGBitmapInfo)(uint)CGImageAlphaInfo.PremultipliedLast);
+    CGContextTranslateCTM(context, 0.0, 40.0);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    var canvas = new AppKitGraphicsBackend(context, NSView.Alloc().Init()!);
+
+    canvas.FillRectangle(new Brush(Colors.White), Rectangle.FromBounds(0, 0, 40, 40));
+    canvas.DrawRectangle(new Pen(Colors.Black, 1, PenStyle.Solid), Rectangle.FromBounds(2, 2, 10, 10));
+    ok = ReportCheck(ok, "a 10 by 10 rectangle's right edge is its tenth column",
+                     pixels[5u * 160u + 11u * 4u] == 0u);
+    ok = ReportCheck(ok, "and nothing is drawn in the eleventh, as GDI draws it",
+                     pixels[5u * 160u + 12u * 4u] == 255u);
+    ok = ReportCheck(ok, "and the same at the bottom",
+                     pixels[11u * 160u + 5u * 4u] == 0u
+                     && pixels[12u * 160u + 5u * 4u] == 255u);
+    return ok;
+}
+
+/// Answers the next message box as Escape would, when it appears.
+class Dismisser
+{
+    public int Tries;
+    public Dismisser() => Tries = 0;
+
+    public void Tick(Timer sender)
+    {
+        Tries++;
+        var modal = NSApplication.SharedApplication.ModalWindow;
+        if (modal == null)
+            return;
+        var window = (NSWindow)modal;
+        NSPoint at;
+        at.x = 0.0;
+        at.y = 0.0;
+        String escape = "\u001b";
+        var key = NSEvent.KeyEventWithTypeLocationModifierFlagsTimestampWindowNumberContextCharactersCharactersIgnoringModifiersIsARepeatKeyCode(
+            NSEventType.KeyDown, at, (NSEventModifierFlags)0u, 0.0, window.WindowNumber, null,
+            ToNSString(escape), ToNSString(escape), false, (ushort)53);
+        window.SendEvent(key!);
+    }
+}
+
+bool CheckMessageBox()
+{
+    var dismisser = new Dismisser();
+    var clock = new Timer(50);
+    clock.Tick += dismisser.Tick;
+    clock.Start();
+    var answer = Application.ShowMessage("Closed from a timer.", "Dismiss me",
+                                         MessageButtons.Ok, MessageIcon.Information);
+    clock.Stop();
+    return ReportCheck(true, "a message box with one button closed by Escape answers Ok",
+                       answer == DialogResult.Ok);
+}
+
+int CountWindows() => (int)NSApplication.SharedApplication.Windows.Count;
+
+void MakeAndDropForm()
+{
+    var dropped = new Form(WindowBorder.Sizable);
+    dropped.Text = "Dropped";
+    dropped.SetBounds(0, 0, 200, 100);
+}
+
+/// A form nothing holds any more takes its window with it.
+///
+/// AppKit frees a window when the pool it was autoreleased into drains, and
+/// code outside the loop has no pool but the program's, so the form is made
+/// and dropped in one of its own -- as `NSApplication` runs each event.
+bool CheckDroppedForm()
+{
+    int before = CountWindows();
+    WithAutoreleasePool(() => MakeAndDropForm());
+    SettleEvents();
+    return ReportCheck(true, "a dropped form's window is destroyed: "
+                             + Standard.Text.FromInteger((long)(CountWindows() - before)) + " left",
+                       CountWindows() == before);
+}
+
 #endif
 
 int Main()
 {
-#if UNIX
+#if UNIX && (!MACOS || FORMS_GTK)
     // Before the display opens: simulated input is core X events.
     gdk_disable_multidevice();
 #endif
     Application.Initialize();
-#if UNIX
+#if UNIX && (!MACOS || FORMS_GTK)
     WatchGlib();
 #endif
     var form = new ReportsForm();
@@ -728,7 +1082,7 @@ int Main()
     SettleEvents();
 
     bool ok = CheckPortable(form);
-#if UNIX
+#if UNIX && (!MACOS || FORMS_GTK)
     ok = CheckUserChanges(form) && ok;
     ok = CheckMenus(form) && ok;
     ok = CheckMouse(form) && ok;
@@ -739,8 +1093,17 @@ int Main()
     ok = CheckMessageBox() && ok;
     ok = CheckDroppedForm() && ok;
     ok = CheckDroppedTimer() && ok;
+#elif MACOS
+    ok = CheckUserChanges(form) && ok;
+    ok = CheckMenus(form) && ok;
+    ok = CheckMouse(form) && ok;
+    ok = CheckKeys(form) && ok;
+    ok = CheckStacking(form) && ok;
+    ok = CheckDrawing() && ok;
+    ok = CheckMessageBox() && ok;
+    ok = CheckDroppedForm() && ok;
 #else
-    ReportSkipped("the checks that drive GTK directly");
+    ReportSkipped("the checks that drive the platform directly");
 #endif
 
     Console.WriteLine(ok ? "all checks passed" : "checks FAILED");

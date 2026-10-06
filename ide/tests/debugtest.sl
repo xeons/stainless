@@ -135,6 +135,24 @@ void TestSeparators(Harness harness)
                   && store.FindAtLine("src\\Main.sl", 5u) != null);
 }
 
+#elif MACOS
+
+/// On macOS a backslash is an ordinary character in a filename, and case is
+/// ignored, as the default volume ignores it.
+void TestSeparators(Harness harness)
+{
+    Console.WriteLine("paths, as macOS spells them");
+    var store = new BreakpointStore();
+    store.ToggleBreakpoint("/Users/p/src/Main.sl", 5u);
+
+    harness.Check("a backslash is not a separator",
+                  store.FindAtLine("/Users/p/src\\Main.sl", 5u) == null);
+    harness.Check("case is ignored",
+                  store.FindAtLine("/Users/p/SRC/main.sl", 5u) != null);
+    harness.Check("and a relative tail still matches",
+                  store.FindAtLine("src/Main.sl", 5u) != null);
+}
+
 #else
 
 /// On Linux a backslash is an ordinary character in a filename and case

@@ -39,7 +39,7 @@ import Standard.Text;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if MACOS && FORMS_APPKIT
+#if MACOS && !FORMS_GTK
 import Standard.ObjC;
 import MacOS.System;
 import MacOS.CoreFoundation;
@@ -123,6 +123,13 @@ public objc class FormsButton : NSButton
         base.KeyUp(event);
     }
 
+    public override void FlagsChanged(NSEvent event)
+    {
+        if (FindPeer() is AppKitPeer peer)
+            peer.ReportModifierKey(event);
+        base.FlagsChanged(event);
+    }
+
     public override bool BecomeFirstResponder()
     {
         bool taken = base.BecomeFirstResponder();
@@ -141,8 +148,7 @@ public objc class FormsButton : NSButton
 }
 
 /// A label or a one-line entry. The keys of an entry being edited go to the
-/// window's field editor rather than to this, so an entry hears them through
-/// its delegate; see `FormsTextDelegate`.
+/// window's field editor rather than to this; see `FormsFieldEditor`.
 public objc class FormsTextField : NSTextField
 {
     public weak AppKitPeer? Peer;
@@ -233,8 +239,44 @@ public objc class FormsTextDelegate : NSObject, NSTextFieldDelegate, NSTextViewD
     public bool ControlTextViewDoCommandBySelector(NSControl control, NSTextView textView, Selector commandSelector)
     {
         if (FindPeer() is AppKitTextEntryPeer peer)
-            return peer.ReportCommand(commandSelector.Name);
+            return peer.ReportCommand(commandSelector.Name, textView is FormsFieldEditor);
         return false;
+    }
+}
+
+/// What edits a one-line entry of ours: the window's field editor, which
+/// AppKit gives the keys of the entry being edited, reporting each to that
+/// entry -- its delegate while it edits. The LCL's `TCocoaFieldEditor`.
+public objc class FormsFieldEditor : NSTextView
+{
+    AppKitPeer? FindPeer()
+    {
+        if (!(Delegate is FormsTextField field))
+            return null;
+        AppKitPeer? held = field.Peer;
+        return held;
+    }
+
+    public override void KeyDown(NSEvent event)
+    {
+        // Tab has already moved the focus, and is not the editor's to insert.
+        if (FindPeer() is AppKitPeer peer && peer.ReportKey(event, true))
+            return;
+        base.KeyDown(event);
+    }
+
+    public override void KeyUp(NSEvent event)
+    {
+        if (FindPeer() is AppKitPeer peer)
+            peer.ReportKey(event, false);
+        base.KeyUp(event);
+    }
+
+    public override void FlagsChanged(NSEvent event)
+    {
+        if (FindPeer() is AppKitPeer peer)
+            peer.ReportModifierKey(event);
+        base.FlagsChanged(event);
     }
 }
 
@@ -263,6 +305,13 @@ public objc class FormsTextView : NSTextView
         if (FindPeer() is AppKitPeer peer)
             peer.ReportKey(event, false);
         base.KeyUp(event);
+    }
+
+    public override void FlagsChanged(NSEvent event)
+    {
+        if (FindPeer() is AppKitPeer peer)
+            peer.ReportModifierKey(event);
+        base.FlagsChanged(event);
     }
 
     public override bool BecomeFirstResponder()
@@ -631,11 +680,11 @@ public class AppKitTextEntryPeer : AppKitPeer, ITextEntryPeer
 
     /// The keys a field editor treats as commands, reported as the keys they
     /// are. Tab moves the focus in the form's order and is taken; the rest go
-    /// on to AppKit.
-    public bool ReportCommand(String command)
+    /// on to AppKit. A `FormsFieldEditor` has reported its keys already.
+    public bool ReportCommand(String command, bool reported)
     {
         var owner = Owner;
-        if (owner == null)
+        if (owner == null || reported)
             return false;
         var notify = (IControlNotify)owner;
         switch (command)

@@ -24,7 +24,7 @@ import Forms.Platform;
 #if WINDOWS
 import Win32.Handles;
 import Win32.User32;
-#elif MACOS && FORMS_APPKIT
+#elif MACOS && !FORMS_GTK
 import Forms.Platform.AppKit;
 import MacOS.AppKit;
 #elif UNIX
@@ -475,7 +475,7 @@ public class CoreForm : Form
         ok = Check(ok, "a form is hidden until it is shown", !spare.Visible);
 #if WINDOWS
         ok = Check(ok, "and so is its window", IsWindowVisible((HWND)(void*)spare.Handle) == 0);
-#elif MACOS && FORMS_APPKIT
+#elif MACOS && !FORMS_GTK
         ok = Check(ok, "and so is its window", !((AppKitWindowPeer)spare.WindowPeer).Window.Visible);
 #elif UNIX
         ok = Check(ok, "and so is its window",
@@ -519,7 +519,7 @@ public class CoreForm : Form
         _dialogModal = shown.IsModal;
 #if WINDOWS
         _mainBlocked = IsWindowEnabled((HWND)(void*)Handle) == 0;
-#elif MACOS && FORMS_APPKIT
+#elif MACOS && !FORMS_GTK
         var modal = NSApplication.SharedApplication.ModalWindow;
         _mainBlocked = modal != null && (NSWindow)modal == ((AppKitWindowPeer)shown.WindowPeer).Window;
 #elif UNIX

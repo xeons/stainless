@@ -2,8 +2,9 @@
 
 A GUI framework for Stainless: **the LCL's architecture, C#'s names.**
 
-> An extreme rough draft, like everything else here. Two backends --
-> Win32 and GTK 3 -- and the control set is everything the seam declares.
+> An extreme rough draft, like everything else here. Three backends --
+> Win32, GTK 3 and AppKit -- and the control set is everything the seam
+> declares.
 
 ```csharp
 module Hello;
@@ -135,30 +136,33 @@ src/Controls/Groups.sl      RadioGroup, CheckGroup, LabeledEdit, Image,
 src/Platform/Select.sl      which backend this build links  (lcl/interfaces/)
 src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 src/Platform/Gtk/*.sl       the GTK 3 backend           (lcl/interfaces/gtk3/)
-src/Platform/AppKit/*.sl    the AppKit backend, in progress (lcl/interfaces/cocoa/)
+src/Platform/AppKit/*.sl    the AppKit backend           (lcl/interfaces/cocoa/)
 ```
 
-**AppKit is being built.** A macOS build defining `FORMS_APPKIT` uses it,
-naming `bindings/macos` among its sources; without the define macOS uses GTK,
-as before. It has windows, panels, drawn controls, the drawing surface, timers,
-the mouse and keyboard, and the standard controls -- buttons, check and radio
-buttons, labels, text boxes, group boxes, progress and track bars, spin edits
-and scroll bars -- and the lists: list boxes, check lists, combo boxes, headers,
-trees and details lists. Each is a native control; the five on a table are
-`NSTableView`, as GTK's are `GtkTreeView`. A tab control is an `NSTabView`; a
-toolbar is a row of native buttons and a status bar a row of labels, since
-`NSToolbar` belongs to a window's title bar and AppKit has no status bar.
-Menus are `NSMenu`s: a form's bar goes across the top of the screen while the
-form is key, behind an application menu whose Quit closes each window as its
-close button would. The dialogs are AppKit's panels, run modally, and the
-clipboard is the general pasteboard, watched by polling its change count since
-AppKit reports none. Once it runs the IDE it becomes the default and
-`FORMS_GTK` selects GTK.
+**On macOS a program is drawn with AppKit**, naming `bindings/macos` among its
+sources; defining `FORMS_GTK` draws it with GTK instead, naming
+`bindings/gtk` and Homebrew's GTK libraries. Each control is a native one: the
+five on a table are `NSTableView`, as GTK's are `GtkTreeView`, a tab control is
+an `NSTabView`, and a toolbar is a row of native buttons and a status bar a row
+of labels, since `NSToolbar` belongs to a window's title bar and AppKit has no
+status bar. Menus are `NSMenu`s: a form's bar goes across the top of the screen
+while the form is key, behind an application menu whose Quit closes each window
+as its close button would. The dialogs are AppKit's panels, run modally, and
+the clipboard is the general pasteboard, watched by polling its change count
+since AppKit reports none. A one-line text box is edited by a field editor of
+the backend's own, the LCL's `TCocoaFieldEditor`, so that it hears every key
+and not only the ones AppKit treats as commands.
+
+Command is Control, so a Mac user's Command+C is a Forms program's Ctrl+C.
+Option is Alt, and types what the layout puts there, as Option does on a Mac.
+A fixed-pitch font is sized so a character is a whole number of pixels wide,
+as hinting leaves one on the other two, so text laid out by column lines up.
 
 `STAINLESS_FORMS_SHOT=dir` writes each form's content to `dir/<title>.png`
-after every `DoEvents` and as the program closes it. It is how a Mac reached
-over ssh is screenshotted: the view draws itself into a bitmap, which needs no
-Screen Recording permission, as `screenshot.ps1`'s `PrintWindow` needs none.
+after every `DoEvents`, each second of `Application.Run`, and as the program
+closes it. It is how a Mac reached over ssh is screenshotted: the view draws
+itself into a bitmap, which needs no Screen Recording permission, as
+`screenshot.ps1`'s `PrintWindow` needs none.
 
 Roughly 12,900 lines of portable code against the LCL's 276,000 -- which is the
 scope difference, not a compression ratio -- plus about 7,700 per backend. See
@@ -191,9 +195,16 @@ stainless run samples/forms/demo.sl forms/src bindings/gtk \
     -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0
 ```
 
-**Nothing in the sample changes between those two lines**, which is the whole
-claim the second backend exists to test. `forms/src/Platform/Select.sl` is
-where that choice is made, and it is a four-line `#if`.
+On macOS, AppKit's:
+
+```
+stainless run samples/forms/demo.sl forms/src bindings/macos
+```
+
+**Nothing in the sample changes between those lines**, which is the whole
+claim the other backends exist to test. `forms/src/Platform/Select.sl` is
+where that choice is made, and it is one short `#if`. `samples/forms/build.sh`
+is `build.ps1` for Linux and macOS, with `--test` and `--run <name>`.
 
 Every sample takes `--selftest`, which builds the same window, pumps the
 message queue, checks what can be checked without a person in front of it, and

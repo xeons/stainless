@@ -37,7 +37,7 @@ module Forms.Platform.Gtk;
 import Standard.Collections;
 import Standard.Text;
 import Forms.Platform;
-#if UNIX && !(MACOS && FORMS_APPKIT)
+#if UNIX && (!MACOS || FORMS_GTK)
 import Gtk.GLib;
 import Gtk.GObject;
 import Gtk.Gdk;

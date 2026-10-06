@@ -174,9 +174,9 @@ compiled in and costs nothing.
 
 `tools/leakcheck.ps1` on Windows and `tools/leakcheck.sh` on Linux and macOS
 build every sample and application this way, run each, and fail when one ends
-with more alive than `tools/leaks.baseline.txt` allows. The shell script skips,
-with the reason, what a Mac cannot build: the IDE and `sldb`, which use
-`bindings/linux`.
+with more alive than `tools/leaks.baseline.txt` allows. On a Mac the Forms
+programs are built on AppKit, or on GTK when `FORMS_GTK=1` is in the
+environment.
 
 ## Environment
 

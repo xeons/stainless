@@ -36,7 +36,7 @@ import Standard.Text;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if MACOS && FORMS_APPKIT
+#if MACOS && !FORMS_GTK
 import Standard.ObjC;
 import MacOS.System;
 import MacOS.CoreFoundation;
@@ -66,6 +66,17 @@ public class AppKitFontBackend : IFontBackend
             made = manager.ConvertFontToHaveTrait(made, NSFontTraitMask.BoldFontMask);
         if (font.Italic)
             made = manager.ConvertFontToHaveTrait(made, NSFontTraitMask.ItalicFontMask);
+
+        // A fixed-pitch face is sized so a cell is a whole number of pixels,
+        // as GDI's and FreeType's hinting leave one. Text laid out by cell
+        // otherwise drifts by the fraction at every column.
+        if (made.FixedPitch)
+        {
+            double advance = made.MaximumAdvancement.width;
+            double whole = (double)RoundToInt(advance);
+            if (advance > 0.0 && whole >= 1.0 && whole != advance)
+                made = made.FontWithSize(made.PointSize * whole / advance);
+        }
         Font = made;
     }
 

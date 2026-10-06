@@ -41,7 +41,7 @@ import Standard.Text;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if MACOS && FORMS_APPKIT
+#if MACOS && !FORMS_GTK
 import Standard.ObjC;
 import MacOS.System;
 import MacOS.CoreFoundation;
@@ -111,6 +111,13 @@ public objc class FormsTableView : NSTableView
         base.KeyUp(event);
     }
 
+    public override void FlagsChanged(NSEvent event)
+    {
+        if (FindPeer() is AppKitPeer peer)
+            peer.ReportModifierKey(event);
+        base.FlagsChanged(event);
+    }
+
     public override bool BecomeFirstResponder()
     {
         bool taken = base.BecomeFirstResponder();
@@ -171,6 +178,13 @@ public objc class FormsOutlineView : NSOutlineView
         if (FindPeer() is AppKitPeer peer)
             peer.ReportKey(event, false);
         base.KeyUp(event);
+    }
+
+    public override void FlagsChanged(NSEvent event)
+    {
+        if (FindPeer() is AppKitPeer peer)
+            peer.ReportModifierKey(event);
+        base.FlagsChanged(event);
     }
 
     public override bool BecomeFirstResponder()

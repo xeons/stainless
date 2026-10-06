@@ -113,13 +113,17 @@ reasons unrelated to your change* below.
 .\samples\forms\build.ps1 -Test         # build the Forms samples, run each --selftest
 .\ide\build.ps1 -Test                   # build the IDE, run the scanner tests and --selftest
 .\ide\build.ps1 -Run -Open samples\shapes.sl
+samples/forms/build.sh --test           # the same two on Linux and macOS
+ide/build.sh --test
 ```
 
 Forms is compiled into each program rather than linked, which is why every
 command names `forms/src` and `bindings/win32` alongside the program's own
 source. On Linux the equivalent needs the GTK libraries by name —
 [bindings/gtk/README.md](bindings/gtk/README.md) has the exact list, and leaving
-them off does not fail cleanly (see below).
+them off does not fail cleanly (see below). On macOS it is `bindings/macos`
+and AppKit, and nothing else; `-D FORMS_GTK` with `bindings/gtk` and
+Homebrew's GTK libraries draws with GTK instead.
 
 ## Layout
 
@@ -132,7 +136,7 @@ them off does not fail cleanly (see below).
 | `runtime/` | sixteen C files, embedded in the compiler as resources |
 | `stdlib/` | the standard library, in Stainless, also embedded: a folder per module, a file per public type |
 | `bindings/win32`, `bindings/gtk`, `bindings/linux`, `bindings/macos` | platform APIs, compiled only by a program that asks |
-| `forms/` | a GUI framework, one control layer over a Win32 and a GTK backend |
+| `forms/` | a GUI framework, one control layer over a Win32, a GTK and an AppKit backend |
 | `ide/` | an editor for Stainless, written in Stainless, on `forms/` |
 | `debug/` | `sldb`, a debugger written in Stainless; `stainless build --project debug` |
 | `tests/cases/` | one directory per end-to-end case |
@@ -340,11 +344,16 @@ Sync the same way as the Linux box, into `~/sl-sync`:
 tar -czf - $(git ls-files -c -o --exclude-standard) | ssh brandon@brandons-mini "mkdir -p ~/sl-sync && tar -xzf - -C ~/sl-sync"
 ```
 
-Take a screenshot of one window with `screencapture -l <windowid>`; the window
-id comes from the program or from `osascript`.
+Over ssh `screencapture` needs Screen Recording permission for
+`/usr/libexec/sshd-keygen-wrapper`, which only a person at the Mac can grant,
+in System Settings, and which macOS 15 asks to have re-confirmed from time
+to time. A Forms program screenshots itself instead:
+`STAINLESS_FORMS_SHOT=dir` writes each form's content to `dir/<title>.png`
+(see [forms/README.md](forms/README.md)).
 
-The Forms samples need `brew install gtk+3`, which is installed. Drawing on a
-Mac is ImageIO's, which every Mac has, so no libgd is needed there.
+The Forms samples and the IDE are drawn with AppKit there. GTK is installed
+too (`brew install gtk+3`) for a build defining `FORMS_GTK`. Drawing on a Mac
+is ImageIO's, which every Mac has, so no libgd is needed there.
 
 Rosetta is installed too, and `-- --target=x64-macos` runs the whole
 end-to-end suite as Intel code under it: every case without a `target.txt` of

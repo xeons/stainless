@@ -2355,6 +2355,8 @@ public class Shell : Form
         {
             #if WINDOWS
             return "Reveal in &Explorer";
+            #elif MACOS
+            return "Reveal in &Finder";
             #else
             return "Open containing &folder";
             #endif
@@ -2587,6 +2589,10 @@ public class Shell : Form
         String[] arguments = ["/select," + entry.FullPath];
         if (entry.IsFolder)
             arguments = [entry.FullPath];
+        #elif MACOS
+        // `-R` selects the item in its folder, as Explorer's `/select` does.
+        String program = "open";
+        String[] arguments = ["-R", entry.FullPath];
         #else
         String program = "xdg-open";
         String folder = entry.IsFolder ? entry.FullPath

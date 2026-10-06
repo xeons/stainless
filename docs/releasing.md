@@ -88,10 +88,9 @@ Only tracked files go in, so a publish needs a git checkout.
 
 **The IDE is built during the publish**, by the compiler just published, and
 must pass `--selftest` before it is packaged; on Linux the self test runs
-under `xvfb-run` when there is no display. It finds the compiler beside
-itself. A publish for another machine ships without it and says so, and so
-does one for macOS: the IDE builds there, but its self test does not pass
-under GTK's Quartz backend.
+under `xvfb-run` when there is no display, and on macOS it is drawn with
+AppKit. It finds the compiler beside itself. A publish for another machine
+ships without it and says so.
 
 **Three runtimes are published**: `win-x64`, `linux-x64` and `osx-arm64`.
 ARM64 Windows and Linux are targets the compiler builds for, but no runner

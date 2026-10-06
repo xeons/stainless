@@ -33,7 +33,7 @@ import Standard.Text;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if MACOS && FORMS_APPKIT
+#if MACOS && !FORMS_GTK
 import Standard.ObjC;
 import MacOS.System;
 import MacOS.CoreFoundation;

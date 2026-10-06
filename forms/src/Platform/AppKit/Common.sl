@@ -36,7 +36,7 @@ import Standard.Text;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if MACOS && FORMS_APPKIT
+#if MACOS && !FORMS_GTK
 import Standard.ObjC;
 import MacOS.System;
 import MacOS.CoreFoundation;
@@ -218,6 +218,40 @@ public Key GetKey(ushort code)
         case 124: return Key.Right;
         case 125: return Key.Down;
         case 126: return Key.Up;
+        // The right-hand modifiers.
+        case 54:
+        case 62: return Key.Control;
+        case 60: return Key.Shift;
+        case 61: return Key.Alt;
+        // The keypad, as `VK_NUMPAD0` and on; Clear is where Num Lock is.
+        case 82: return (Key)96;
+        case 83: return (Key)97;
+        case 84: return (Key)98;
+        case 85: return (Key)99;
+        case 86: return (Key)100;
+        case 87: return (Key)101;
+        case 88: return (Key)102;
+        case 89: return (Key)103;
+        case 91: return (Key)104;
+        case 92: return (Key)105;
+        case 67: return (Key)106;
+        case 69: return (Key)107;
+        case 78: return (Key)109;
+        case 65: return (Key)110;
+        case 75: return (Key)111;
+        case 71: return (Key)12;
+        // The punctuation keys of a US layout, `VK_OEM_*`.
+        case 41: return (Key)186;
+        case 24: return (Key)187;
+        case 43: return (Key)188;
+        case 27: return (Key)189;
+        case 47: return (Key)190;
+        case 44: return (Key)191;
+        case 50: return (Key)192;
+        case 33: return (Key)219;
+        case 42: return (Key)220;
+        case 30: return (Key)221;
+        case 39: return (Key)222;
         default: return Key.None;
     }
 }
@@ -350,6 +384,12 @@ public objc class FormsView : NSView
     {
         if (FindPeer() is AppKitPeer peer)
             peer.ReportKey(event, false);
+    }
+
+    public override void FlagsChanged(NSEvent event)
+    {
+        if (FindPeer() is AppKitPeer peer)
+            peer.ReportModifierKey(event);
     }
 
     void ReportPress(NSEvent event)
@@ -502,18 +542,20 @@ public class AppKitPeer : IControlPeer
                                                      GetModifiers(event.ModifierFlags));
     }
 
-    public void ReportKey(NSEvent event, bool down)
+    /// A key pressed or released, and what it typed. Answers whether Tab moved
+    /// the focus, which leaves nothing for AppKit to do with the key.
+    public bool ReportKey(NSEvent event, bool down)
     {
         var owner = Owner;
         if (owner == null)
-            return;
+            return false;
         var notify = (IControlNotify)owner;
         var modifiers = GetModifiers(event.ModifierFlags);
         var key = GetKey(event.KeyCode);
         if (!down)
         {
             notify.OnPlatformKeyUp(key, modifiers);
-            return;
+            return false;
         }
         notify.OnPlatformKeyDown(key, modifiers);
 
@@ -524,14 +566,14 @@ public class AppKitPeer : IControlPeer
             if (form != null)
             {
                 ((IWindowNotify)form).OnPlatformNavigate(key, modifiers.HasFlag(ModifierKeys.Shift));
-                return;
+                return true;
             }
         }
 
         // The typed text, with the layout and any dead keys applied. A shortcut
         // types nothing, and AppKit's private-use characters are function keys.
         if (modifiers.HasFlag(ModifierKeys.Control))
-            return;
+            return false;
         String typed = FromNSString(event.Characters);
         for (nuint at = 0u; at < typed.ByteLength(); at = typed.SkipCodePoint(at))
         {
@@ -539,6 +581,35 @@ public class AppKitPeer : IControlPeer
             if (scalar >= (char32)32 && scalar != (char32)127 && (scalar < (char32)0xF700 || scalar > (char32)0xF8FF))
                 notify.OnPlatformKeyPress(scalar);
         }
+        return false;
+    }
+
+    /// A modifier pressed or released alone, which AppKit reports as a change
+    /// of flags. Caps Lock is a press each time, as Windows reports it.
+    public void ReportModifierKey(NSEvent event)
+    {
+        var owner = Owner;
+        if (owner == null)
+            return;
+        var notify = (IControlNotify)owner;
+        var key = GetKey(event.KeyCode);
+        var modifiers = GetModifiers(event.ModifierFlags);
+        bool down;
+        switch (key)
+        {
+            case Key.Shift: down = modifiers.HasFlag(ModifierKeys.Shift); break;
+            case Key.Control: down = modifiers.HasFlag(ModifierKeys.Control); break;
+            case Key.Alt: down = modifiers.HasFlag(ModifierKeys.Alt); break;
+            case Key.CapsLock:
+                notify.OnPlatformKeyDown(key, modifiers);
+                notify.OnPlatformKeyUp(key, modifiers);
+                return;
+            default: return;
+        }
+        if (down)
+            notify.OnPlatformKeyDown(key, modifiers);
+        else
+            notify.OnPlatformKeyUp(key, modifiers);
     }
 
     public void ReportFocus(bool gained)

@@ -33,7 +33,7 @@ import Standard.Text;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
-#if MACOS && FORMS_APPKIT
+#if MACOS && !FORMS_GTK
 import Standard.ObjC;
 import MacOS.System;
 import MacOS.CoreFoundation;
@@ -57,11 +57,29 @@ public objc class FormsWindowDelegate : NSObject, NSWindowDelegate
 {
     public weak IWindowNotify? Owner;
     public weak AppKitWindowPeer? Peer;
+    /// The field editor this window's one-line entries share, made the first
+    /// time one is edited.
+    FormsFieldEditor? _editor;
 
     AppKitWindowPeer? FindPeer()
     {
         AppKitWindowPeer? held = Peer;
         return held;
+    }
+
+    /// An entry of ours is edited by a field editor that reports its keys.
+    /// Anything else, a secure field included, keeps AppKit's own.
+    public AnyObject? WindowWillReturnFieldEditorToObject(NSWindow sender, AnyObject? client)
+    {
+        if (!(client is FormsTextField))
+            return null;
+        if (_editor == null)
+        {
+            var made = FormsFieldEditor.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 0.0, 0.0));
+            made.FieldEditor = true;
+            _editor = made;
+        }
+        return _editor;
     }
 
     public bool WindowShouldClose(NSWindow sender)
@@ -290,9 +308,21 @@ public class AppKitWindowPeer : AppKitContainerPeer, IWindowPeer
         _window.PerformClose(null);
     }
 
+    /// Centred on the work area exactly. `center` puts a window above the
+    /// middle, which is AppKit's taste and not what the call says.
     public void CenterOnScreen()
     {
-        _window.Center();
+        NSScreen? screen = _window.Screen;
+        if (screen == null)
+            screen = NSScreen.MainScreen;
+        if (screen == null)
+            return;
+        var area = ((NSScreen)screen).VisibleFrame;
+        var frame = _window.Frame;
+        NSPoint corner;
+        corner.x = (double)FloorToInt(area.origin.x + (area.size.width - frame.size.width) / 2.0);
+        corner.y = (double)FloorToInt(area.origin.y + (area.size.height - frame.size.height) / 2.0);
+        _window.SetFrameOrigin(corner);
         ReportGeometry();
     }
 

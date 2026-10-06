@@ -190,8 +190,8 @@ bindings — in one readable pass.
 An [IDE for Stainless](ide/README.md), written in Stainless, on a
 [GUI framework](forms/README.md) also written in Stainless. A native binary
 with no VM, no collector and no web view: the window is one control layer over
-a Win32 and a GTK 3 backend, the text is drawn by the program itself, and the
-syntax is coloured by a lexer that takes one line at a time.
+a Win32, a GTK 3 and an AppKit backend, the text is drawn by the program
+itself, and the syntax is coloured by a lexer that takes one line at a time.
 
 Here it is editing its own source, having just built its own project — the
 Error List is the compiler's own `--diagnostics json`, read rather than parsed
@@ -205,6 +205,12 @@ The same program on both, from the same source and one `stainless build
 --project ide`. The differences in the pictures are the two desktops' own:
 Windows draws a toolbar button's label beside its icon and GTK does not, and
 the GTK build reports three warnings the Windows one has no reason to.
+
+![The IDE on macOS, AppKit backend: the window's content](docs/images/ide-macos.png)
+
+And on a Mac, the same again on AppKit: the picture is the window's content,
+drawn into a bitmap, so the title bar is not in it and the menu bar is where
+a Mac puts it, across the top of the screen.
 
 ---
 

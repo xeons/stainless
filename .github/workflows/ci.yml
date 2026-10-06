@@ -63,6 +63,26 @@ jobs:
 
       - run: dotnet run --project tests/Stainless.Tests --no-build -- --shard=${{ matrix.shard }}/2
 
+  # Forms on AppKit, the backend a Mac builds by default: every sample's self
+  # test, then the IDE's tests and its own. A macOS runner has a logged-in
+  # window server, so the windows are real ones.
+  forms-appkit:
+    name: Forms and the IDE (AppKit)
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - run: dotnet build Stainless.slnx
+
+      - run: samples/forms/build.sh --test
+
+      - run: ide/build.sh --test
+
   # Every case built as Intel code and run under Rosetta on Apple silicon. A
   # case the target cannot run is skipped by the harness, so the step after
   # it checks that the lane ran something rather than skipping everything.

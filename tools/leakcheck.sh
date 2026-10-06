@@ -23,6 +23,9 @@
 # tools/leakcheck.ps1 is the same on Windows and says why it exists. This one
 # is for Linux and macOS. --update rewrites the baseline entries this machine
 # measured and keeps the rest; --list prints what would be built and stops.
+#
+# On macOS the Forms programs are built on AppKit; FORMS_GTK=1 in the
+# environment builds them on GTK instead, as the define of that name does.
 
 set -uo pipefail
 
@@ -44,16 +47,22 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+# What a Forms program names beside its own source: the library, the
+# backend's bindings and the libraries they need.
 system="$(uname -s)"
 case "$system" in
     Linux)
-        gtk="-l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0"
+        forms="$repository/forms/src $repository/bindings/gtk -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0"
         ;;
     Darwin)
-        gtk="-l gtk-3 -l gdk-3 -l gobject-2.0 -l glib-2.0 -l cairo -l gdk_pixbuf-2.0"
-        # Homebrew's libraries are not on the default search path.
-        if command -v brew > /dev/null; then
-            export LIBRARY_PATH="$(brew --prefix)/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
+        if [ "${FORMS_GTK:-0}" != 0 ]; then
+            forms="$repository/forms/src $repository/bindings/gtk -D FORMS_GTK -l gtk-3 -l gdk-3 -l gobject-2.0 -l glib-2.0 -l cairo -l gdk_pixbuf-2.0"
+            # Homebrew's libraries are not on the default search path.
+            if command -v brew > /dev/null; then
+                export LIBRARY_PATH="$(brew --prefix)/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
+            fi
+        else
+            forms="$repository/forms/src $repository/bindings/macos"
         fi
         ;;
     *) echo "error: $system is neither Linux nor macOS; tools/leakcheck.ps1 is for Windows" >&2; exit 2 ;;
@@ -68,7 +77,7 @@ for sample in "$repository"/samples/*.sl; do
 done
 for sample in "$repository"/samples/forms/*.sl; do
     name="$(basename "$sample" .sl)"
-    programs+=("samples/forms/$name|1|$sample $repository/forms/src $repository/bindings/gtk $gtk")
+    programs+=("samples/forms/$name|1|$sample $forms")
 done
 programs+=("ide|1|$repository/ide")
 programs+=("sldb|0|$repository/debug")
