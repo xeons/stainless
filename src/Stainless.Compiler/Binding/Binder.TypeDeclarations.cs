@@ -54,7 +54,7 @@ public sealed partial class Binder
                     }
                     else if (ImportedHomeOf(declaration, scope, unit, homes) is { } other)
                     {
-                        diagnostics.Error("SL0551", declaration.Span,
+                        diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
                             $"'{declaration.Name}' already names its superclass in '{other}', which " +
                             "this file imports; a category adds members and protocols, and names no superclass");
                         continue;
@@ -78,7 +78,7 @@ public sealed partial class Binder
                     // Read here as well as below, because a generic declaration
                     // becomes a template and never reaches the code that does.
                     if (declaration.IsOpaque)
-                        diagnostics.Error("SL0523", declaration.Span,
+                        diagnostics.Report(Codes.BodilessTypeNotAllowed, declaration.Span,
                             $"'{declaration.Name}' has no body, so it has nothing for a type " +
                             "parameter to appear in");
                     else
@@ -219,7 +219,7 @@ public sealed partial class Binder
 
                 bool block = declaration.Modifiers.HasFlag(Modifiers.Objc);
                 if (block && !declaration.CarriesReceiver)
-                    diagnostics.Error("SL0900", declaration.Span,
+                    diagnostics.Report(Codes.ObjCModifierMisplaced, declaration.Span,
                         $"'objc' goes before 'interface', 'class' or 'closure', and " +
                         $"'{declaration.Name}' is a delegate, which is a C function pointer");
 
@@ -340,7 +340,7 @@ public sealed partial class Binder
             switch (found.Count)
             {
                 case 0:
-                    diagnostics.Error("SL0550", declaration.Span,
+                    diagnostics.Report(Codes.TypeRedeclarationUnresolved, declaration.Span,
                         $"'{declaration.Name}' names no superclass, so it adds to an Objective-C class " +
                         "declared elsewhere, and neither this module nor any this file imports declares one");
                     break;
@@ -350,7 +350,7 @@ public sealed partial class Binder
                     break;
 
                 default:
-                    diagnostics.Error("SL0550", declaration.Span,
+                    diagnostics.Report(Codes.TypeRedeclarationUnresolved, declaration.Span,
                         $"'{declaration.Name}' is an Objective-C class in both " +
                         $"'{found[0].ModuleName}' and '{found[1].ModuleName}', which this file " +
                         "imports, so there is no telling which this adds to");
@@ -398,7 +398,7 @@ public sealed partial class Binder
         if (!taken)
             return true;
 
-        diagnostics.Error("SL0201", declaration.Span,
+        diagnostics.Report(Codes.DuplicateModuleMember, declaration.Span,
             $"'{name}' is already declared in module '{module.Name}'");
         return false;
     }
@@ -419,7 +419,7 @@ public sealed partial class Binder
         if (type is VariantTypeSymbol or UnionTypeSymbol or EnumTypeSymbol
                  or DelegateTypeSymbol or AttributeTypeSymbol)
         {
-            diagnostics.Error("SL0582", span,
+            diagnostics.Report(Codes.ThreadsafeOnWrongKind, span,
                 $"'{type.Name}' cannot be 'threadsafe': the word says that operations on a " +
                 "type synchronize themselves, and this has none. A class, a struct or an " +
                 "interface may claim it",
@@ -450,7 +450,7 @@ public sealed partial class Binder
 
         if (!_aliasesInProgress.Add(alias))
         {
-            diagnostics.Error("SL0522", alias.Span,
+            diagnostics.Report(Codes.CircularTypeAlias, alias.Span,
                 $"'{alias.Name}' is defined in terms of itself, so it names no type");
             return alias.Target = ErrorTypeSymbol.Instance;
         }
@@ -484,7 +484,7 @@ public sealed partial class Binder
     {
         if (type is not StructTypeSymbol structType || type is UnionTypeSymbol or VariantTypeSymbol)
         {
-            diagnostics.Error("SL0523", declaration.Span,
+            diagnostics.Report(Codes.BodilessTypeNotAllowed, declaration.Span,
                 $"'{type.Name}' has no body, and only a 'struct' may be written that way. " +
                 "An incomplete type exists to be pointed at, and " +
                 (type is ClassTypeSymbol
@@ -496,7 +496,7 @@ public sealed partial class Binder
 
         if (declaration.TypeParameters.Count > 0)
         {
-            diagnostics.Error("SL0523", declaration.Span,
+            diagnostics.Report(Codes.BodilessTypeNotAllowed, declaration.Span,
                 $"'{type.Name}' has no body, so it has nothing for a type parameter to appear in",
                 type);
             return;
@@ -529,7 +529,7 @@ public sealed partial class Binder
         {
             if (type is ClassTypeSymbol comClass) comClass.IsCom = true;
             else if (type is not ComInterfaceTypeSymbol)
-                diagnostics.Error("SL0528", declaration.Span,
+                diagnostics.Report(Codes.ComModifierOnWrongKind, declaration.Span,
                     $"'com' goes before 'interface' or 'class', and '{type.Name}' is neither; " +
                     "a COM reference points at a vtable pointer, and only those two have one",
                     type);
@@ -538,7 +538,7 @@ public sealed partial class Binder
         if (type is not ClassTypeSymbol classType)
         {
             if (isAbstract || isSealed)
-                diagnostics.Error("SL0495", declaration.Span,
+                diagnostics.Report(Codes.AbstractOrSealedNonClass, declaration.Span,
                     $"'{type.Name}' is not a class, so it cannot be " +
                     $"'{(isAbstract ? "abstract" : "sealed")}'; only a class is derived from",
                     type);
@@ -547,7 +547,7 @@ public sealed partial class Binder
 
         if (isAbstract && isSealed)
         {
-            diagnostics.Error("SL0496", declaration.Span,
+            diagnostics.Report(Codes.AbstractAndSealed, declaration.Span,
                 $"'{type.Name}' cannot be both 'abstract' and 'sealed': the first says it must " +
                 "be derived from and the second says it cannot be",
                 type);
@@ -586,7 +586,7 @@ public sealed partial class Binder
             (existing is ClassTypeSymbol { ObjC: ObjCClassKind.Imported }) !=
                 declaration.Modifiers.HasFlag(Modifiers.Extern))
         {
-            diagnostics.Error("SL0550", declaration.Span,
+            diagnostics.Report(Codes.TypeRedeclarationUnresolved, declaration.Span,
                 $"'{declaration.Name}' is already declared in this module as a " +
                 $"{Described(existing)}, so this declaration cannot add to it. A type may be " +
                 "declared more than once inside its own module, but every declaration must " +
@@ -610,13 +610,13 @@ public sealed partial class Binder
                              existing is StructTypeSymbol and not (VariantTypeSymbol or UnionTypeSymbol);
 
             if (!takesList)
-                diagnostics.Error("SL0551", declaration.Span,
+                diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
                     $"'{declaration.Name}' is already declared in this module, so this " +
                     "declaration may add members but not a base list; only a class or a struct " +
                     "takes its base list from a declaration other than the first");
             else if (_typeSyntax.TryGetValue(existing, out var first) && first.Declaration.Implements.Count > 0 ||
                      _baseListSyntax.ContainsKey(existing))
-                diagnostics.Error("SL0551", declaration.Span,
+                diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
                     $"'{declaration.Name}' already says what it derives from in another " +
                     "declaration; write the base list on exactly one of them");
             else
@@ -624,7 +624,7 @@ public sealed partial class Binder
         }
 
         if (declaration.IsOpaque)
-            diagnostics.Error("SL0551", declaration.Span,
+            diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
                 $"'{declaration.Name}' is already declared in this module, so this declaration " +
                 "has nothing to say by having no body");
 

@@ -160,7 +160,7 @@ public sealed partial class Binder
 
         if (found is null || found.Declaration.Kind != TypeDeclKind.Class)
         {
-            diagnostics.Error("SL0920", OutsideTheLibrary(span),
+            diagnostics.Report(Codes.DefaultImplementationInvalid, OutsideTheLibrary(span),
                 $"'{template.Name}' says '{named ?? "(nothing)"}' is its default implementation, which " +
                 $"is not a generic class taking {contract.TypeArguments.Count} type " +
                 $"argument{(contract.TypeArguments.Count == 1 ? "" : "s")}; name it with its module, " +
@@ -189,7 +189,7 @@ public sealed partial class Binder
         if (asked is not ClassTypeSymbol { IsAbstract: false, IsStaticClass: false, RuntimeFactory: null } made ||
             made.ObjC != ObjCClassKind.None)
         {
-            diagnostics.Error("SL0917", at,
+            diagnostics.Report(Codes.InjectedTypeNotConstructible, at,
                 $"'{FullTypeName(asked)}' cannot be made by a container: it MUST be a class that is " +
                 "neither abstract nor static. Register the class that implements it, or a factory",
                 asked);
@@ -207,7 +207,7 @@ public sealed partial class Binder
         var reachable = made.Constructors.Where(c => c.IsPublic).ToList();
         if (reachable.Count == 0)
         {
-            diagnostics.Error("SL0917", at,
+            diagnostics.Report(Codes.InjectedTypeNotConstructible, at,
                 $"'{FullTypeName(asked)}' has no public constructor, so a container cannot make " +
                 "one. Make a constructor public, or register a factory",
                 asked);
@@ -218,7 +218,7 @@ public sealed partial class Binder
         var widest = reachable.Where(c => c.ParameterTypes.Count() == most).ToList();
         if (widest.Count > 1)
         {
-            diagnostics.Error("SL0918", at,
+            diagnostics.Report(Codes.InjectedConstructorAmbiguous, at,
                 $"'{FullTypeName(asked)}' has {widest.Count} public constructors taking {most} " +
                 $"parameter{(most == 1 ? "" : "s")}, and a container uses the one with most; it " +
                 "cannot choose between these. Remove one, or register a factory",
@@ -241,7 +241,7 @@ public sealed partial class Binder
                            !parameter.IsParams && !parameter.IsByReference && !parameter.IsOptional;
             if (!askable)
             {
-                diagnostics.Error("SL0919", at,
+                diagnostics.Report(Codes.InjectedParameterUnresolvable, at,
                     $"parameter '{parameter.Name}' of '{FullTypeName(asked)}' is " +
                     $"'{FullTypeName(parameter.Type)}', which a container cannot be asked for: a " +
                     "parameter MUST be a class or an interface, optional or an array of one, and " +

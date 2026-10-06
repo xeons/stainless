@@ -62,7 +62,7 @@ public sealed partial class Binder
 
             if (parameter.Mode != ParameterMode.Value)
             {
-                diagnostics.Error("SL0787", declaration.Span,
+                diagnostics.Report(Codes.PrimaryConstructorRefParameterCaptured, declaration.Span,
                     $"'{parameter.Name}' is a '{parameter.Mode.ToString().ToLowerInvariant()}' " +
                     $"parameter of the primary constructor of '{type.Name}', and a member body " +
                     "names it, so it would have to be kept after the constructor returns; what " +
@@ -188,7 +188,7 @@ public sealed partial class Binder
         if (constructor.ContainingType?.PrimaryConstructor is not { } primary) return;
         if (constructor == primary || _delegated.ContainsKey(constructor)) return;
 
-        diagnostics.Error("SL0785", constructor.Span,
+        diagnostics.Report(Codes.ConstructorMustChainToPrimary, constructor.Span,
             $"'{constructor.ContainingType.Name}' has a primary constructor, so every other " +
             "constructor has to run it first: write ': this(...)' after the parameters",
             constructor.ContainingType);
@@ -234,7 +234,7 @@ public sealed partial class Binder
             if (TryGiveLocalFunctionThis(_context.Function, span))
                 return new BoundErrorExpression(span);
 
-            diagnostics.Error("SL0576", span,
+            diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, span,
                 $"'{name}' is a parameter of the primary constructor of " +
                 $"'{owner.Name}', kept by each instance, and " +
                 $"'{_context.Function.Name}' is static, so there is no instance here",

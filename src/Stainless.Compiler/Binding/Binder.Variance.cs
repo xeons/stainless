@@ -328,7 +328,7 @@ public sealed partial class Binder
                 if (fits) return;
 
                 string word = written == Variance.Out ? "out" : "in";
-                diagnostics.Error("SL0801", named.Span,
+                diagnostics.Report(Codes.VarianceViolatedByPosition, named.Span,
                     $"'{named.Name.Text}' is '{word}', so it may appear only where a value " +
                     (written == Variance.Out ? "comes out" : "goes in") + $", and {where}" +
                     (position == Position.Invariant

@@ -120,7 +120,7 @@ public sealed partial class Binder
         if (site == PatternSite.Switch && bound.WhenFalse.Count > 0)
         {
             var lost = bound.WhenFalse[0];
-            diagnostics.Error("SL0619", lost.Span,
+            diagnostics.Report(Codes.InvalidPatternInSwitch, lost.Span,
                 $"'{lost.Name}' is named under a 'not', so it is assigned only where this " +
                 "pattern did not match -- and that is never where the arm runs");
             return null;
@@ -181,7 +181,7 @@ public sealed partial class Binder
                 return BindListPattern(list, subject, context);
 
             case SlicePatternSyntax slice:
-                diagnostics.Error("SL0775", slice.Span,
+                diagnostics.Report(Codes.InvalidSlicePattern, slice.Span,
                     "'..' stands for the run of elements a list pattern does not name, so it " +
                     "belongs directly inside '[...]'");
                 return null;
@@ -238,7 +238,7 @@ public sealed partial class Binder
         {
             if (left.WhenTrue.Concat(right.WhenTrue).FirstOrDefault() is { } lost)
             {
-                diagnostics.Error("SL0619", lost.Span,
+                diagnostics.Report(Codes.InvalidPatternInSwitch, lost.Span,
                     $"'{lost.Name}' is named on one side of an 'or', and which side matched is " +
                     "not known where the name would be used");
                 return null;
@@ -258,7 +258,7 @@ public sealed partial class Binder
 
         if (left.WhenFalse.Concat(right.WhenFalse).FirstOrDefault() is { } unassigned)
         {
-            diagnostics.Error("SL0619", unassigned.Span,
+            diagnostics.Report(Codes.InvalidPatternInSwitch, unassigned.Span,
                 $"'{unassigned.Name}' is named under a 'not' joined by 'and', so there is no " +
                 "outcome of the whole in which it is known to have been assigned");
             return null;
@@ -280,9 +280,11 @@ public sealed partial class Binder
         PatternContext context, List<PatternVariable> into)
     {
         if (!context.Names.Add(name) || LookupLocal(name) is not null)
-            diagnostics.Error("SL0218", span, $"'{name}' is already declared in this scope");
+            diagnostics.Report(Codes.DuplicateLocalName, span,
+                $"'{name}' is already declared in this scope");
         else if (_context.Function?.Parameters.Any(p => p.Name == name) == true)
-            diagnostics.Error("SL0219", span, $"'{name}' is already the name of a parameter");
+            diagnostics.Report(Codes.LocalShadowsParameter, span,
+                $"'{name}' is already the name of a parameter");
 
         var local = new LocalSymbol(name, type, isConst: true);
         into.Add(new PatternVariable(name, local, span));
@@ -484,7 +486,10 @@ public sealed partial class Binder
         {
             if (matched.Payload is null)
             {
-                diagnostics.Error(context.Site == PatternSite.Is ? "SL0586" : "SL0619", span,
+                diagnostics.Report(
+                    context.Site == PatternSite.Is
+                        ? Codes.PatternBindsEmptyCase : Codes.InvalidPatternInSwitch,
+                    span,
                     $"case '{matched.Name}' carries nothing, so there is nothing for " +
                     $"'{name}' to be; the test on its own is the whole question");
                 return null;
@@ -495,7 +500,10 @@ public sealed partial class Binder
 
         if (match.Value is null)
         {
-            diagnostics.Error(context.Site == PatternSite.Is ? "SL0587" : "SL0619", span,
+            diagnostics.Report(
+                context.Site == PatternSite.Is
+                    ? Codes.PatternBindsInterface : Codes.InvalidPatternInSwitch,
+                span,
                 $"a reference does not convert down to an interface, so there is nothing " +
                 $"for '{name}' to be; match the type without a name and reach the object " +
                 "through the interface it already has");
@@ -525,7 +533,8 @@ public sealed partial class Binder
                 variant.FindCase(only) is { } named)
                 return new TypeMatch(CaseTest(span, subject, named), null, named, named);
 
-            diagnostics.Error(inIs ? "SL0518" : "SL0619", span,
+            diagnostics.Report(inIs ? Codes.IsPatternNotApplicable : Codes.InvalidPatternInSwitch,
+                span,
                 $"'{variant.Name}' is a variant and has no case named " +
                 $"'{typeSyntax.Span.File.Text[typeSyntax.Span.Start..typeSyntax.Span.End]}'; " +
                 "what a pattern asks a variant is which case it holds, and those are " +
@@ -536,7 +545,8 @@ public sealed partial class Binder
 
         if (subject.Type is WeakTypeSymbol)
         {
-            diagnostics.Error(inIs ? "SL0518" : "SL0619", span,
+            diagnostics.Report(inIs ? Codes.IsPatternNotApplicable : Codes.InvalidPatternInSwitch,
+                span,
                 $"'{subject.Type.Name}' may already have died, so what it is cannot be asked " +
                 "directly; read it into an optional first, which is the check that makes it " +
                 "safe to look at",
@@ -554,12 +564,12 @@ public sealed partial class Binder
                 return new TypeMatch(Anything(span), subject, null, InstanceKey.Instance);
 
             if (inIs)
-                diagnostics.Error("SL0518", span,
+                diagnostics.Report(Codes.IsPatternNotApplicable, span,
                     $"'{subject.Type.Name}' is not a reference to an object, so 'is' has no type " +
                     "to ask about: a value is exactly what it was declared to be",
                     subject.Type);
             else
-                diagnostics.Error("SL0438", span,
+                diagnostics.Report(Codes.CasePatternOnNonVariant, span,
                     $"this matches a variant's case or an object's class, and " +
                     $"'{subject.Type.Name}' is neither: a value of it is exactly what it was " +
                     "declared to be. Match it against a value instead",
@@ -571,11 +581,11 @@ public sealed partial class Binder
         if (tested.IsError())
             return null;
 
-        string code = inIs ? "SL0518" : "SL0619";
+        var code = inIs ? Codes.IsPatternNotApplicable : Codes.InvalidPatternInSwitch;
 
         if (tested is not NamedTypeSymbol { IsReferenceType: true } wanted)
         {
-            diagnostics.Error(code, span,
+            diagnostics.Report(code, span,
                 $"'{tested.Name}' is not a class or an interface, so there is nothing to ask " +
                 "about it: every other type is known exactly where it is written",
                 tested);
@@ -584,7 +594,7 @@ public sealed partial class Binder
 
         if (subject.Type.AsReference() is not NamedTypeSymbol reference)
         {
-            diagnostics.Error(code, span,
+            diagnostics.Report(code, span,
                 $"'{subject.Type.Name}' is not a reference to an object, so what it really is " +
                 "is not a question",
                 subject.Type);
@@ -611,7 +621,7 @@ public sealed partial class Binder
         if (reference is ClassTypeSymbol subjectClass && wanted is ClassTypeSymbol wantedClass &&
             !subjectClass.DerivesFrom(wantedClass) && !wantedClass.DerivesFrom(subjectClass))
         {
-            diagnostics.Error(code, span,
+            diagnostics.Report(code, span,
                 $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
                 "neither derives from the other",
                 subjectClass, wantedClass);
@@ -626,7 +636,7 @@ public sealed partial class Binder
 
             if (inIs && !optional && ReferenceEquals(written, context.Root) &&
                 reference is ClassTypeSymbol && wanted is ClassTypeSymbol)
-                diagnostics.Warning("SL0520", span,
+                diagnostics.Report(Codes.TypeTestAlwaysTrue, span,
                     $"every '{reference.Name}' is a '{wanted.Name}', so this is always true",
                     reference, wanted);
 
@@ -663,12 +673,12 @@ public sealed partial class Binder
     /// same pointer, which the test has proved.
     /// </summary>
     private TypeMatch? BindObjCTypeTest(
-        string code, SourceSpan span, BoundPlaceholder subject,
+        DiagnosticDescriptor code, SourceSpan span, BoundPlaceholder subject,
         NamedTypeSymbol reference, NamedTypeSymbol wanted)
     {
         if (!IsObjCType(wanted) || !IsObjCType(reference))
         {
-            diagnostics.Error(code, span,
+            diagnostics.Report(code, span,
                 $"'{reference.Name}' and '{wanted.Name}' are not both Objective-C types, and only " +
                 "an Objective-C object can be asked what it is by Objective-C's runtime",
                 reference, wanted);
@@ -677,7 +687,7 @@ public sealed partial class Binder
 
         if (wanted == _builtins.AnyObject)
         {
-            diagnostics.Error(code, span,
+            diagnostics.Report(code, span,
                 "every Objective-C object is an 'AnyObject', so there is nothing to ask",
                 wanted);
             return null;
@@ -700,7 +710,7 @@ public sealed partial class Binder
 
         if (wanted is ClassTypeSymbol { IsCoreFoundation: true } cf && !IsAskableCFType(cf, reference))
         {
-            diagnostics.Error(code, span,
+            diagnostics.Report(code, span,
                 cf.BaseClass is null
                     ? $"every Objective-C object is a '{cf.Name}', so there is nothing to ask"
                     : $"'{cf.Name}' has no CFTypeID of its own, so an object cannot be asked whether " +
@@ -711,7 +721,7 @@ public sealed partial class Binder
 
         if (wanted is ObjCBlockTypeSymbol)
         {
-            diagnostics.Error(code, span,
+            diagnostics.Report(code, span,
                 $"'{wanted.Name}' is a block, and a block cannot be asked what it takes: the " +
                 "runtime knows only that it is one",
                 wanted);
@@ -779,7 +789,10 @@ public sealed partial class Binder
         }
         else if (subject.Type is WeakTypeSymbol or VariantTypeSymbol)
         {
-            diagnostics.Error(context.Site == PatternSite.Is ? "SL0518" : "SL0619", syntax.Span,
+            diagnostics.Report(
+                context.Site == PatternSite.Is
+                    ? Codes.IsPatternNotApplicable : Codes.InvalidPatternInSwitch,
+                syntax.Span,
                 subject.Type is WeakTypeSymbol
                     ? $"'{subject.Type.Name}' may already have died, so it cannot be taken apart " +
                       "directly; read it into an optional first"
@@ -796,7 +809,10 @@ public sealed partial class Binder
         if (match.Case is null && match.Value is null && (syntax.Positional is not null ||
             syntax.Properties is not null || syntax.Binding is not null))
         {
-            diagnostics.Error(context.Site == PatternSite.Is ? "SL0587" : "SL0619", syntax.Span,
+            diagnostics.Report(
+                context.Site == PatternSite.Is
+                    ? Codes.PatternBindsInterface : Codes.InvalidPatternInSwitch,
+                syntax.Span,
                 "a reference does not convert down to an interface, so there is nothing here " +
                 "to take apart or name; match the type on its own");
             return null;
@@ -954,7 +970,7 @@ public sealed partial class Binder
 
             if (element.Path is [var written] && written != name)
             {
-                diagnostics.Error("SL0776", element.PathSpan,
+                diagnostics.Report(Codes.InvalidPatternMemberName, element.PathSpan,
                     name is null
                         ? $"this position has no name to check '{written}' against"
                         : $"position {i + 1} is '{name}', not '{written}'");
@@ -983,7 +999,7 @@ public sealed partial class Binder
         if (count == written)
             return true;
 
-        diagnostics.Error("SL0609", span,
+        diagnostics.Report(Codes.DeconstructionArityMismatch, span,
             $"{what} has {Counted(count, noun)}, and this pattern names {written}");
         return false;
     }
@@ -999,7 +1015,7 @@ public sealed partial class Binder
             if (matched.FindField(name) is { } field)
                 return new BoundVariantPayload(member.PathSpan, viewed, matched, field);
 
-            diagnostics.Error("SL0247", member.PathSpan,
+            diagnostics.Report(Codes.MemberNotFound, member.PathSpan,
                 $"case '{matched.Name}' carries no '{name}'; it carries " +
                 (matched.Fields.Count == 0 ? "nothing" : matched.Signature),
                 [.. matched.Fields.Select(f => f.Type)]);
@@ -1015,7 +1031,7 @@ public sealed partial class Binder
 
         if (value is BoundFunctionGroup || value.Type.IsVoid())
         {
-            diagnostics.Error("SL0776", member.PathSpan,
+            diagnostics.Report(Codes.InvalidPatternMemberName, member.PathSpan,
                 $"'{name}' is a method, and a property pattern reads a field or a property; " +
                 "call it in a 'when' instead");
             return null;
@@ -1054,7 +1070,7 @@ public sealed partial class Binder
         var slices = syntax.Elements.OfType<SlicePatternSyntax>().ToList();
         if (slices.Count > 1)
         {
-            diagnostics.Error("SL0775", slices[1].Span,
+            diagnostics.Report(Codes.InvalidSlicePattern, slices[1].Span,
                 "a list pattern has one '..' at most: with two, which elements each stood " +
                 "for would not be known");
             return null;
@@ -1089,7 +1105,7 @@ public sealed partial class Binder
 
         if (ListShape(viewed, span) is not var (length, element, slice))
         {
-            diagnostics.Error("SL0774", span,
+            diagnostics.Report(Codes.ListPatternTypeNotIndexable, span,
                 $"'{viewed.Type.Name}' cannot be matched element by element: a list pattern " +
                 "takes an array, a slice, an inline array, or a type with a 'Count' or " +
                 "'Length' and an integer indexer",
@@ -1136,7 +1152,7 @@ public sealed partial class Binder
 
                 if (slice(start, end) is not { } taken)
                 {
-                    diagnostics.Error("SL0775", run.Span,
+                    diagnostics.Report(Codes.InvalidSlicePattern, run.Span,
                         $"'..' can name what it skipped only as a slice of an array or another " +
                         $"slice, or as what a type's 'Slice(start, length)' answers, and " +
                         $"'{viewed.Type.Name}' has neither; write '..' on its own",
@@ -1514,13 +1530,13 @@ public sealed partial class Binder
 
                 if (WholeCase(pattern) is { } named && guard is null && !covered.TryAdd(named, section.Span))
                 {
-                    diagnostics.Error("SL0405", section.Span,
+                    diagnostics.Report(Codes.DuplicateSwitchCase, section.Span,
                         $"this switch already has a case for '{named.Name}'");
                     duplicate = true;
                 }
 
                 if (!duplicate && !IsReachable(rows, pattern.Over, value.Type))
-                    diagnostics.Warning("SL0621", section.Patterns[i].Span,
+                    diagnostics.Report(Codes.UnreachableSwitchCase, section.Patterns[i].Span,
                         "nothing reaches this label: the ones before it match everything it does");
 
                 if (guard is null)
@@ -1540,7 +1556,7 @@ public sealed partial class Binder
             if (section.HasDefault)
             {
                 if (sawDefault)
-                    diagnostics.Error("SL0406", section.Span,
+                    diagnostics.Report(Codes.DuplicateSwitchDefault, section.Span,
                         "this switch already has a 'default' section");
                 else
                     frame.Default = sections.Count;
@@ -1553,7 +1569,7 @@ public sealed partial class Binder
 
             if (naming is not null && matched.Count > 1)
             {
-                diagnostics.Error("SL0619", section.Span,
+                diagnostics.Report(Codes.InvalidPatternInSwitch, section.Span,
                     $"'{naming.WhenTrue[0].Name}' is named by one label of a section with " +
                     "several, and which of them matched is not known in the body; give this " +
                     "label a section of its own");
@@ -1593,7 +1609,7 @@ public sealed partial class Binder
             _context.VariantFacts = saved;
 
             if (EndIsReachable(body))
-                diagnostics.Error("SL0407", section.Span,
+                diagnostics.Report(Codes.SwitchSectionFallsThrough, section.Span,
                     "a switch section must not run off its end; finish it with 'break', " +
                     "'return', 'continue' or 'goto'. Stack the labels instead, as in " +
                     "'case 1: case 2:', when two of them share a body");
@@ -1609,7 +1625,7 @@ public sealed partial class Binder
         bool exhaustive = !IsReachable(rows, Space.Any, value.Type);
 
         if (!exhaustive && !sawDefault && value.Type is VariantTypeSymbol variant)
-            diagnostics.Error("SL0436", syntax.Span,
+            diagnostics.Report(Codes.VariantSwitchNotExhaustive, syntax.Span,
                 $"this switch over '{variant.Name}' does not cover " +
                 Listed(UncoveredCases(rows, variant).Select(c => "'" + c.Name + "'")) +
                 "; a variant is the choice between its cases, so a switch that leaves one " +
@@ -1650,7 +1666,7 @@ public sealed partial class Binder
 
         if (syntax.Arms.Count == 0)
         {
-            diagnostics.Error("SL0620", syntax.Span,
+            diagnostics.Report(Codes.SwitchExpressionIncomplete, syntax.Span,
                 "this switch has no arms, so there is no value it could produce");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -1670,13 +1686,13 @@ public sealed partial class Binder
             if (WholeCase(pattern) is { } matched && arm.Guard is null &&
                 !covered.TryAdd(matched, arm.Span))
             {
-                diagnostics.Error("SL0405", arm.Span,
+                diagnostics.Report(Codes.DuplicateSwitchCase, arm.Span,
                     $"this switch already has an arm for '{matched.Name}'");
                 duplicate = true;
             }
 
             if (!duplicate && !IsReachable(rows, pattern.Over, value.Type))
-                diagnostics.Warning("SL0621", arm.Span,
+                diagnostics.Report(Codes.UnreachableSwitchCase, arm.Span,
                     rows.Count > 0 && rows[^1] is AnySpace
                         ? "nothing reaches this arm: an earlier one matches everything"
                         : "nothing reaches this arm: the ones before it match everything it does");
@@ -1709,7 +1725,8 @@ public sealed partial class Binder
 
         if (!totalAsNamed)
         {
-            diagnostics.Error("SL0620", syntax.Span, Uncovered(rows, value.Type));
+            diagnostics.Report(Codes.SwitchExpressionIncomplete, syntax.Span,
+                Uncovered(rows, value.Type));
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1719,7 +1736,7 @@ public sealed partial class Binder
 
         if (resultType.IsVoid())
         {
-            diagnostics.Error("SL0620", syntax.Arms[0].Value.Span,
+            diagnostics.Report(Codes.SwitchExpressionIncomplete, syntax.Arms[0].Value.Span,
                 "an arm of a switch expression produces a value, and this one produces " +
                 "nothing; write a statement switch instead");
             return new BoundErrorExpression(syntax.Span);

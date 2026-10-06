@@ -318,31 +318,20 @@ public sealed class DiagnosticBag
         }
     }
 
+    /// <summary>Reports <paramref name="what"/>, as severe as it is declared.</summary>
     /// <param name="about">
     /// What the message names. One that stands for an error already reported
     /// makes this a consequence of that error, and it is not said.
     /// </param>
-    public void Error(
-        string code, SourceSpan span, string message,
+    public void Report(
+        DiagnosticDescriptor what, SourceSpan span, string message,
         params ReadOnlySpan<IDiagnosticSubject?> about)
     {
-        Fresh(code);
+        Fresh(what.Code);
         if (IsConsequence(about)) return;
-        NotAboutTheErrorType(code, message);
+        NotAboutTheErrorType(what.Code, message);
         if (_muted > 0) return;
-        Keep(new Diagnostic(Severity.Error, code, message, span));
-    }
-
-    /// <inheritdoc cref="Error"/>
-    public void Warning(
-        string code, SourceSpan span, string message,
-        params ReadOnlySpan<IDiagnosticSubject?> about)
-    {
-        Fresh(code);
-        if (IsConsequence(about)) return;
-        NotAboutTheErrorType(code, message);
-        if (_muted > 0) return;
-        Keep(new Diagnostic(Severity.Warning, code, message, span));
+        Keep(new Diagnostic(what.Severity, what.Code, message, span));
     }
 
     private static bool IsConsequence(ReadOnlySpan<IDiagnosticSubject?> about)

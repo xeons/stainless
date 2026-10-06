@@ -53,7 +53,7 @@ public sealed partial class Binder
 
         if (IsObjCType(owner))
         {
-            diagnostics.Error("SL0480", syntax.Type.Span,
+            diagnostics.Report(Codes.OffsetOfInvalidType, syntax.Type.Span,
                 $"'{owner.Name}' is an Objective-C type, which the Objective-C runtime lays out " +
                 "and may move at load time, so a field of it has no offset to be known here",
                 owner);
@@ -62,7 +62,7 @@ public sealed partial class Binder
 
         if (owner is not NamedTypeSymbol named || owner is InterfaceTypeSymbol)
         {
-            diagnostics.Error("SL0480", syntax.Type.Span,
+            diagnostics.Report(Codes.OffsetOfInvalidType, syntax.Type.Span,
                 $"'offsetof' needs a struct, union, variant or class, and " +
                 $"'{owner.Name}' is none of those",
                 owner);
@@ -72,7 +72,7 @@ public sealed partial class Binder
         var field = named.Fields.FirstOrDefault(f => f.Name == syntax.Field);
         if (field is null)
         {
-            diagnostics.Error("SL0481", syntax.FieldSpan,
+            diagnostics.Report(Codes.OffsetOfFieldNotFound, syntax.FieldSpan,
                 $"'{named.Name}' has no field named '{syntax.Field}'",
                 named);
             return new BoundErrorExpression(syntax.Span);
@@ -80,7 +80,7 @@ public sealed partial class Binder
 
         if (field.IsBitField)
         {
-            diagnostics.Error("SL0482", syntax.FieldSpan,
+            diagnostics.Report(Codes.OffsetOfBitField, syntax.FieldSpan,
                 $"'{named.Name}.{field.Name}' is a bit-field, which has no byte " +
                 "offset of its own; C refuses this too",
                 named);
@@ -101,14 +101,14 @@ public sealed partial class Binder
 
         if (TypeHandle is not { } handle)
         {
-            diagnostics.Error("SL0347", syntax.Span,
+            diagnostics.Report(Codes.TypeofWithoutReflection, syntax.Span,
                 "'typeof' needs Standard.Reflection, which is not part of this compilation");
             return new BoundErrorExpression(syntax.Span);
         }
 
         if (IsObjCType(measured))
         {
-            diagnostics.Error("SL0923", syntax.Span,
+            diagnostics.Report(Codes.ObjCClassShapeUnsupported, syntax.Span,
                 $"'{measured.Name}' is an Objective-C type, which the Objective-C runtime " +
                 "describes; ask it for the class instead",
                 measured);
@@ -117,7 +117,7 @@ public sealed partial class Binder
 
         if (measured is not NamedTypeSymbol { IsReflected: true } reflected)
         {
-            diagnostics.Error("SL0346", syntax.Span,
+            diagnostics.Report(Codes.TypeofWithoutReflect, syntax.Span,
                 $"'{measured.Name}' carries no metadata, so 'typeof' cannot name it; " +
                 "mark its declaration '[Reflect]'",
                 measured);
@@ -134,7 +134,7 @@ public sealed partial class Binder
 
         if (named is not ComInterfaceTypeSymbol comInterface)
         {
-            diagnostics.Error("SL0542", syntax.Span,
+            diagnostics.Report(Codes.IidOfNonComInterface, syntax.Span,
                 $"'{named.Name}' is not a com interface, so it has no IID; 'iidof' names the " +
                 "'[Guid]' written on a 'com interface' declaration",
                 named);
@@ -175,7 +175,7 @@ public sealed partial class Binder
                   "there is no QueryInterface to ask"
                 : "";
 
-            diagnostics.Error("SL0243", syntax.Span,
+            diagnostics.Report(Codes.InvalidCast, syntax.Span,
                 $"cannot convert '{operand.Type.Name}' to '{targetType.Name}'{hint}",
                 operand.Type, targetType);
             return new BoundErrorExpression(syntax.Span);
@@ -240,7 +240,7 @@ public sealed partial class Binder
     {
         if (type is ClassTypeSymbol { IsStaticClass: true })
         {
-            diagnostics.Error("SL0583", syntax.Span,
+            diagnostics.Report(Codes.StaticClassMisused, syntax.Span,
                 $"'{type.Name}' is a static class, so there is nothing to make one of: its " +
                 "members belong to the type. Call them on the type itself",
                 type);
@@ -257,7 +257,7 @@ public sealed partial class Binder
 
         if (type is not ClassTypeSymbol classType)
         {
-            diagnostics.Error("SL0244", syntax.Span,
+            diagnostics.Report(Codes.NewOfNonConstructibleType, syntax.Span,
                 $"'{type.Name}' is not a class or a struct, so there is nothing for 'new' to " +
                 "make. " +
                 type switch
@@ -275,7 +275,7 @@ public sealed partial class Binder
 
         if (classType.ObjC == ObjCClassKind.Imported)
         {
-            diagnostics.Error("SL0914", syntax.Span,
+            diagnostics.Report(Codes.ExternObjCClassConstructedWithNew, syntax.Span,
                 $"'{classType.Name}' is an 'extern objc class', made by Objective-C rather than " +
                 "by 'new': send it the messages its headers make one with, as " +
                 $"'{classType.Name}.Alloc().Init()'",
@@ -285,7 +285,7 @@ public sealed partial class Binder
 
         if (classType.IsAbstract)
         {
-            diagnostics.Error("SL0514", syntax.Span,
+            diagnostics.Report(Codes.AbstractClassInstantiated, syntax.Span,
                 $"'{classType.Name}' is abstract, so there is no such object to make; " +
                 "it exists to be derived from. Make one of its derived classes instead",
                 classType);
@@ -296,7 +296,7 @@ public sealed partial class Binder
         if (classType.RuntimeFactory is not null)
         {
             if (syntax.Arguments.Count > 0)
-                diagnostics.Error("SL0308", syntax.Span,
+                diagnostics.Report(Codes.ConstructorTakesNoArguments, syntax.Span,
                     $"'new {classType.Name}()' takes no arguments",
                     classType);
             return new BoundNew(syntax.Span, classType, constructor: null, []);
@@ -305,7 +305,7 @@ public sealed partial class Binder
         if (classType.ObjC == ObjCClassKind.Defined && classType.Constructors.Count == 0)
         {
             if (arguments.Count > 0)
-                diagnostics.Error("SL0245", syntax.Span,
+                diagnostics.Report(Codes.NewWithoutConstructor, syntax.Span,
                     $"'{classType.Name}' has no constructor, so 'new {classType.Name}()' takes no arguments",
                     classType);
 
@@ -318,7 +318,7 @@ public sealed partial class Binder
         if (classType.Constructors.Count == 0)
         {
             if (arguments.Count > 0)
-                diagnostics.Error("SL0245", syntax.Span,
+                diagnostics.Report(Codes.NewWithoutConstructor, syntax.Span,
                     $"'{classType.Name}' has no constructor, so 'new {classType.Name}()' takes no arguments",
                     classType);
 
@@ -342,7 +342,7 @@ public sealed partial class Binder
         // insist on being made through a factory. That is the shape a Result-
         // returning `Open` needs -- without it the factory is advice.
         if (!CanReach(constructor.IsPublic, constructor.IsProtected, classType))
-            diagnostics.Error("SL0572", syntax.Span,
+            diagnostics.Report(Codes.ConstructorNotAccessible, syntax.Span,
                 $"'{classType.Name}' has no constructor that can be reached from here; " +
                 "the ones it declares belong to its own module. There is usually a " +
                 "function that makes one and says what went wrong if it could not",
@@ -356,7 +356,7 @@ public sealed partial class Binder
 
         if (map is null)
         {
-            diagnostics.Error("SL0601", syntax.Span,
+            diagnostics.Report(Codes.CallArgumentsDoNotFit, syntax.Span,
                 $"'new {classType.Name}' does not fit: " +
                 (why ?? "the names do not match its parameters"),
                 classType);
@@ -397,7 +397,7 @@ public sealed partial class Binder
     {
         if (structType.Constructors.Count == 0)
         {
-            diagnostics.Error("SL0245", syntax.Span,
+            diagnostics.Report(Codes.NewWithoutConstructor, syntax.Span,
                 $"'{structType.Name}' declares no constructor, so there is nothing for " +
                 $"'new {structType.Name}' to run; write '{structType.Name} value;' for the " +
                 "zero value and give its fields their values",
@@ -411,7 +411,7 @@ public sealed partial class Binder
         if (constructor is null) return new BoundErrorExpression(syntax.Span);
 
         if (!CanReach(constructor.IsPublic, constructor.IsProtected, structType))
-            diagnostics.Error("SL0572", syntax.Span,
+            diagnostics.Report(Codes.ConstructorNotAccessible, syntax.Span,
                 $"'{structType.Name}' has no constructor that can be reached from here; " +
                 "the ones it declares belong to its own module. There is usually a " +
                 "function that makes one and says what went wrong if it could not",
@@ -425,7 +425,7 @@ public sealed partial class Binder
 
         if (map is null)
         {
-            diagnostics.Error("SL0601", syntax.Span,
+            diagnostics.Report(Codes.CallArgumentsDoNotFit, syntax.Span,
                 $"'new {structType.Name}' does not fit: " +
                 (why ?? "the names do not match its parameters"),
                 structType);
@@ -487,7 +487,7 @@ public sealed partial class Binder
         if (missing.Count == 0) return;
 
         bool one = missing.Count == 1;
-        diagnostics.Error("SL0784", span,
+        diagnostics.Report(Codes.RequiredMembersNotSet, span,
             $"'{type.Name}' has {(one ? "a required member" : "required members")} " +
             $"this does not set: {Listed(missing)}. Give " +
             $"{(one ? "it a value" : "each a value")} in an object initializer, " +
@@ -533,7 +533,7 @@ public sealed partial class Binder
         foreach (var entry in initializer.Entries)
             if (entry.Name is not null != named)
             {
-                diagnostics.Error("SL0618", entry.Span,
+                diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.Span,
                     named
                         ? "this entry has no name, and the ones before it write members; a " +
                           "brace list either writes members or adds elements, and cannot be " +
@@ -576,7 +576,7 @@ public sealed partial class Binder
         {
             if (property.Setter is null)
             {
-                diagnostics.Error("SL0618", entry.NameSpan,
+                diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.NameSpan,
                     $"'{type.Name}.{name}' has no setter, so there is nothing here to " +
                     "write; a brace list writes members the way an assignment does",
                     type);
@@ -585,7 +585,7 @@ public sealed partial class Binder
 
             if (!CanReach(property.IsPublic, property.IsProtected, property.ContainingType))
             {
-                diagnostics.Error("SL0249", entry.NameSpan,
+                diagnostics.Report(Codes.MemberNotAccessible, entry.NameSpan,
                     NotVisible(property.ContainingType, name, property.IsProtected));
                 return null;
             }
@@ -601,7 +601,7 @@ public sealed partial class Binder
         {
             if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
             {
-                diagnostics.Error("SL0249", entry.NameSpan,
+                diagnostics.Report(Codes.MemberNotAccessible, entry.NameSpan,
                     NotVisible(field.ContainingType, name, field.IsProtected));
                 return null;
             }
@@ -613,7 +613,7 @@ public sealed partial class Binder
             return new BoundAssignment(entry.Span, target, value);
         }
 
-        diagnostics.Error("SL0618", entry.NameSpan,
+        diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.NameSpan,
             $"'{type.Name}' has no field or property named '{name}' to write",
             type);
         return null;
@@ -630,7 +630,7 @@ public sealed partial class Binder
 
         if (candidates.Count == 0)
         {
-            diagnostics.Error("SL0618", entry.Span,
+            diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.Span,
                 $"'{type.Name}' has no 'Add' method, so there is nothing for an element " +
                 "here to be added with; a brace list of values is a call to 'Add' per value",
                 type);
@@ -1034,13 +1034,13 @@ public sealed partial class Binder
 
         if (element.IsVoid())
         {
-            diagnostics.Error("SL0310", syntax.Span, "there is no array of 'void'");
+            diagnostics.Report(Codes.VoidArrayElement, syntax.Span, "there is no array of 'void'");
             return new BoundErrorExpression(syntax.Span);
         }
 
         if (length.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
-            diagnostics.Error("SL0312", syntax.Length.Span,
+            diagnostics.Report(Codes.ArrayLengthNotInteger, syntax.Length.Span,
                 $"an array length must be an integer, but this is '{length.Type.Name}'",
                 length.Type);
             return new BoundErrorExpression(syntax.Span);

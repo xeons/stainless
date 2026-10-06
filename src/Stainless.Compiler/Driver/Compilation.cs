@@ -823,7 +823,7 @@ public sealed class Compilation
         var programSpan = units[standardUnits < units.Count ? standardUnits : 0].Span;
 
         if (program.EntryPoint is null && !options.EmitIrOnly && needsEntryPoint)
-            diagnostics.Error("SL0290", programSpan,
+            diagnostics.Report(Codes.EntryPointNotFound, programSpan,
                 "no entry point was found; declare 'int Main()' in one of the compiled modules, " +
                 "or pass --shared to build a library instead");
 
@@ -832,7 +832,7 @@ public sealed class Compilation
         if (options.Shared && options.MetadataPath is null &&
             !program.Modules.SelectMany(m => m.Functions)
                 .Any(f => f.Linkage == LinkageKind.ExportC))
-            diagnostics.Warning("SL0476", programSpan,
+            diagnostics.Report(Codes.LibraryExportsNothing, programSpan,
                 "this library exports nothing; mark a function 'export \"C\"' to add it to the " +
                 "export table");
 
@@ -1085,7 +1085,8 @@ public sealed class Compilation
             // program's to fix and goes back to its line.
             if (AssemblerDiagnosis.Rejected(link.StandardError) && emitter.AsmBlocks.Count > 0)
             {
-                AssemblerDiagnosis.Report(link.StandardError, emitter.AsmBlocks, target, diagnostics);
+                AssemblerDiagnosis.Report(link.StandardError,
+                    emitter.AsmBlocks, target, diagnostics);
                 return Failed(diagnostics);
             }
 
@@ -1319,7 +1320,7 @@ public sealed class Compilation
 
         if (present.Count == 0) return;
 
-        diagnostics.Warning("SL0700", default,
+        diagnostics.Report(Codes.WindowsResourcesOnOtherTarget, default,
             $"this program's resources include {string.Join(", ", present)}, which only Windows " +
             $"acts on: {target.Triple} carries them and 'Standard.Resources' can read them, but " +
             "nothing here turns one into a window icon, a menu or a manifest");

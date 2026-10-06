@@ -76,7 +76,7 @@ public sealed partial class Binder
         {
             if (!writing.Contains(callee) || IsReadOnlyTarget(receiver) is not { } why) continue;
 
-            diagnostics.Error("SL0809", span,
+            diagnostics.Report(Codes.MutatingMemberOnReadOnlyStruct, span,
                 $"'{callee.ContainingType!.Name}.{callee.Name}' writes the struct it is called " +
                 $"on, and {why}; copy it into a local first if the change is meant to be kept " +
                 "there",

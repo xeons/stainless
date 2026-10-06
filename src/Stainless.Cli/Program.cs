@@ -54,6 +54,7 @@ internal static class Program
                 "doc" => Document(rest),
                 "init" => Init(rest),
                 "restore" => Restore(rest),
+                "explain" => Explain(rest),
                 _ => UnknownCommand(command),
             };
         }
@@ -83,6 +84,9 @@ internal static class Program
               stainless doc [paths...] [options]     write reference documentation
               stainless init [name] [--library]      write a {ProjectFile.FileName} here
               stainless restore [options]            resolve dependencies and lock them
+              stainless explain [code]               say what a diagnostic means, or list
+                                                     them all; --markdown writes the list
+                                                     as docs/diagnostics.md is
 
             PATHS
               Any mix of .sl files and directories. Directories are searched
@@ -361,6 +365,39 @@ internal static class Program
     /// two questions nobody wants to answer: what the package is called, and
     /// where its sources are.
     /// </summary>
+    /// <summary>
+    /// What a diagnostic means: one by its code, every one with none, or the
+    /// whole inventory as the page `docs/diagnostics.md` is.
+    /// </summary>
+    private static int Explain(string[] args)
+    {
+        if (args is ["--markdown"])
+        {
+            Console.Write(Source.DiagnosticInventory.Markdown());
+            return 0;
+        }
+
+        if (args.Length == 0)
+        {
+            foreach (var descriptor in Source.Codes.All)
+                Console.WriteLine(Source.DiagnosticInventory.Describe(descriptor));
+            return 0;
+        }
+
+        int status = 0;
+        foreach (string code in args)
+        {
+            if (Source.Codes.Find(code) is { } descriptor)
+            {
+                Console.WriteLine(Source.DiagnosticInventory.Describe(descriptor));
+                continue;
+            }
+            Error($"'{code}' is not a diagnostic this compiler reports");
+            status = 1;
+        }
+        return status;
+    }
+
     private static int Init(string[] args)
     {
         string directory = Environment.CurrentDirectory;

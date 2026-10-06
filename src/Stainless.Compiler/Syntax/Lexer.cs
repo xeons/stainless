@@ -127,7 +127,9 @@ public sealed class Lexer(
         if (!TooDeep)
         {
             foreach (var open in _conditions)
-                diagnostics.Error("SL0454", new SourceSpan(source, open.Start, open.Start + 3),
+                diagnostics.Report(Codes.UnclosedConditionalDirective,
+                    new SourceSpan(source, open.Start, open.Start + 3),
+                    
                     "this '#if' is never closed; add '#endif'");
         }
 
@@ -298,7 +300,7 @@ public sealed class Lexer(
         // brace allows; what follows is reported once, here, rather than as a
         // stream of complaints about declarations that were never lexed.
         UnterminatedAsm = start;
-        diagnostics.Error("SL0713", new SourceSpan(source, start, start + 1),
+        diagnostics.Report(Codes.AsmBlockUnterminated, new SourceSpan(source, start, start + 1),
             "this 'asm' block is never closed; its '}' is missing, so the rest of the file " +
             "was read as assembly. Braces inside the block are counted, comments included");
 
@@ -431,7 +433,8 @@ public sealed class Lexer(
                     else _pos++;
                 }
                 if (depth > 0)
-                    diagnostics.Error("SL0002", SpanFrom(start), "unterminated block comment");
+                    diagnostics.Report(Codes.UnterminatedBlockComment, SpanFrom(start),
+                        "unterminated block comment");
                 continue;
             }
 
@@ -499,7 +502,8 @@ public sealed class Lexer(
                 var current = _conditions[^1];
                 if (current.SawElse)
                 {
-                    diagnostics.Error("SL0455", span, "'#elif' cannot follow '#else'");
+                    diagnostics.Report(Codes.DirectiveAfterElse, span,
+                        "'#elif' cannot follow '#else'");
                     return;
                 }
 
@@ -516,7 +520,8 @@ public sealed class Lexer(
                 var current = _conditions[^1];
                 if (current.SawElse)
                 {
-                    diagnostics.Error("SL0455", span, "this '#if' already has an '#else'");
+                    diagnostics.Report(Codes.DirectiveAfterElse, span,
+                        "this '#if' already has an '#else'");
                     return;
                 }
 
@@ -540,7 +545,7 @@ public sealed class Lexer(
             case "undef":
                 if (_sawToken)
                 {
-                    diagnostics.Error("SL0456", span,
+                    diagnostics.Report(Codes.DefineAfterDeclaration, span,
                         $"'#{name}' must come before the first declaration in the file, as in " +
                         "C#; a symbol that changed halfway down would make the lines above and " +
                         "below it disagree");
@@ -549,7 +554,7 @@ public sealed class Lexer(
 
                 if (!IsSymbol(argument))
                 {
-                    diagnostics.Error("SL0457", span,
+                    diagnostics.Report(Codes.DefineArgumentNotName, span,
                         $"'#{name}' takes one name, and '{argument}' is not one");
                     return;
                 }
@@ -559,12 +564,12 @@ public sealed class Lexer(
                 return;
 
             case "error":
-                diagnostics.Error("SL0458", span,
+                diagnostics.Report(Codes.ErrorDirective, span,
                     argument.Length > 0 ? argument : "'#error'");
                 return;
 
             case "warning":
-                diagnostics.Warning("SL0459", span,
+                diagnostics.Report(Codes.WarningDirective, span,
                     argument.Length > 0 ? argument : "'#warning'");
                 return;
 
@@ -578,7 +583,7 @@ public sealed class Lexer(
                 return;
 
             default:
-                diagnostics.Error("SL0460", span,
+                diagnostics.Report(Codes.UnknownDirective, span,
                     $"'#{name}' is not a directive. Stainless has '#if', '#elif', '#else', " +
                     "'#endif', '#define', '#undef', '#error', '#warning', '#region', " +
                     "'#endregion' and '#pragma' -- and no macros, because a name always " +
@@ -604,7 +609,7 @@ public sealed class Lexer(
         if (!(text.StartsWith(Prefix, StringComparison.Ordinal) || framework) ||
             !text.EndsWith(")", StringComparison.Ordinal))
         {
-            diagnostics.Error("SL0483", span,
+            diagnostics.Report(Codes.UnknownPragma, span,
                 "the only pragma is '#pragma comment(lib, \"name\")', which names a " +
                 "library to link, or 'comment(framework, \"name\")' for an Apple framework");
             return;
@@ -613,7 +618,7 @@ public sealed class Lexer(
         string name = text[(framework ? FrameworkPrefix : Prefix).Length..^1];
         if (name.Length < 2 || name[0] != '"' || name[^1] != '"')
         {
-            diagnostics.Error("SL0484", span,
+            diagnostics.Report(Codes.PragmaLibraryNameInvalid, span,
                 "the library name in '#pragma comment(lib, ...)' must be quoted");
             return;
         }
@@ -626,7 +631,7 @@ public sealed class Lexer(
 
         if (name.Length == 0)
         {
-            diagnostics.Error("SL0484", span,
+            diagnostics.Report(Codes.PragmaLibraryNameInvalid, span,
                 "'#pragma comment(lib, ...)' names no library");
             return;
         }
@@ -640,7 +645,7 @@ public sealed class Lexer(
     {
         if (_conditions.Count > 0) return true;
 
-        diagnostics.Error("SL0461", span, $"'#{name}' has no '#if' to close");
+        diagnostics.Report(Codes.DirectiveWithoutIf, span, $"'#{name}' has no '#if' to close");
         return false;
     }
 
@@ -663,7 +668,8 @@ public sealed class Lexer(
     {
         if (text.Length == 0)
         {
-            diagnostics.Error("SL0462", span, "this directive needs a condition");
+            diagnostics.Report(Codes.MalformedDirectiveCondition, span,
+                "this directive needs a condition");
             return false;
         }
 
@@ -672,7 +678,7 @@ public sealed class Lexer(
 
         SkipSpace(text, ref at);
         if (at < text.Length)
-            diagnostics.Error("SL0462", span,
+            diagnostics.Report(Codes.MalformedDirectiveCondition, span,
                 $"'{text[at..]}' is left over after the condition; an '#if' takes names, " +
                 "'!', '&&', '||' and parentheses");
 
@@ -720,7 +726,8 @@ public sealed class Lexer(
             bool inner = Or(text, ref at, span);
             SkipSpace(text, ref at);
             if (!Take(text, ref at, ")"))
-                diagnostics.Error("SL0462", span, "a '(' in this condition is never closed");
+                diagnostics.Report(Codes.MalformedDirectiveCondition, span,
+                    "a '(' in this condition is never closed");
             return inner;
         }
 
@@ -729,7 +736,7 @@ public sealed class Lexer(
 
         if (at == start)
         {
-            diagnostics.Error("SL0462", span,
+            diagnostics.Report(Codes.MalformedDirectiveCondition, span,
                 $"expected a name in this condition, found '{text[start..]}'");
             at = text.Length;
             return false;
@@ -830,14 +837,14 @@ public sealed class Lexer(
         bool isSingle = false;
 
         if (suffixText is not ("" or "u" or "l" or "ul" or "lu" or "f" or "d"))
-            diagnostics.Error("SL0004", SpanFrom(start),
+            diagnostics.Report(Codes.InvalidNumericLiteral, SpanFrom(start),
                 $"'{suffixText}' is not a suffix a number can take; they are 'u', 'l', 'ul', " +
                 "'f' for a float and 'd' for a double");
         else if (suffixText is "f" or "d")
         {
             if (radix == 10) { isFloat = true; isSingle = suffixText == "f"; }
             else
-                diagnostics.Error("SL0004", SpanFrom(start),
+                diagnostics.Report(Codes.InvalidNumericLiteral, SpanFrom(start),
                     $"a binary literal is an integer, so it cannot take the '{suffixText}' " +
                     "suffix of a floating-point one");
         }
@@ -848,7 +855,8 @@ public sealed class Lexer(
 
         if (raw.Length == 0)
         {
-            diagnostics.Error("SL0003", span, "numeric literal has no digits");
+            diagnostics.Report(Codes.NumericLiteralWithoutDigits, span,
+                "numeric literal has no digits");
             return new Token(TokenKind.IntLiteral, span, text, 0UL);
         }
 
@@ -860,7 +868,8 @@ public sealed class Lexer(
             {
                 if (!float.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out float f))
                 {
-                    diagnostics.Error("SL0004", span, $"{raw} is not a valid floating-point literal");
+                    diagnostics.Report(Codes.InvalidNumericLiteral, span,
+                        $"{raw} is not a valid floating-point literal");
                     f = 0;
                 }
                 return new Token(TokenKind.FloatLiteral, span, text, f);
@@ -868,7 +877,8 @@ public sealed class Lexer(
 
             if (!double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
             {
-                diagnostics.Error("SL0004", span, $"{raw} is not a valid floating-point literal");
+                diagnostics.Report(Codes.InvalidNumericLiteral, span,
+                    $"{raw} is not a valid floating-point literal");
                 d = 0;
             }
             return new Token(TokenKind.FloatLiteral, span, text, d);
@@ -883,7 +893,8 @@ public sealed class Lexer(
         }
         catch (Exception e) when (e is OverflowException or FormatException or ArgumentException)
         {
-            diagnostics.Error("SL0005", span, $"integer literal {raw} does not fit in 64 bits");
+            diagnostics.Report(Codes.IntegerLiteralTooLarge, span,
+                $"integer literal {raw} does not fit in 64 bits");
             return new Token(TokenKind.IntLiteral, span, text, 0UL);
         }
     }
@@ -951,7 +962,9 @@ public sealed class Lexer(
         else
         {
             if (dollars > 1)
-                diagnostics.Error("SL0751", new SourceSpan(source, start, start + at),
+                diagnostics.Report(Codes.MultipleDollarsOnNonRawString,
+                    new SourceSpan(source, start, start + at),
+                    
                     "more than one '$' sets how many braces open a hole, and only a raw string " +
                     "has holes that need it; write one '$', or open the string with '\"\"\"'");
 
@@ -974,7 +987,7 @@ public sealed class Lexer(
         _pos += 2;
         if (token.Kind == TokenKind.InterpolatedString)
         {
-            diagnostics.Error("SL0752", SpanFrom(start),
+            diagnostics.Report(Codes.InterpolatedUtf8Literal, SpanFrom(start),
                 "an interpolated string is built when it runs, and 'u8' names bytes that are " +
                 "fixed when it compiles; build the String and call 'ToBytes()' on it");
             return token with { Span = SpanFrom(start), Text = _text[start.._pos] };
@@ -1009,7 +1022,8 @@ public sealed class Lexer(
             if (_pos >= _text.Length || (!verbatim && Current == '\n'))
             {
                 if (!TooDeep)
-                    diagnostics.Error("SL0006", SpanFrom(start), "unterminated string literal");
+                    diagnostics.Report(Codes.UnterminatedStringLiteral, SpanFrom(start),
+                        "unterminated string literal");
                 break;
             }
 
@@ -1041,7 +1055,7 @@ public sealed class Lexer(
 
                 if (c == '}')
                 {
-                    diagnostics.Error("SL0554", SpanFrom(_pos),
+                    diagnostics.Report(Codes.UnmatchedInterpolationBrace, SpanFrom(_pos),
                         "a '}' inside an interpolated string closes nothing; write '}}' for a " +
                         "literal brace");
                     _pos++;
@@ -1153,7 +1167,9 @@ public sealed class Lexer(
                 }
 
                 if (run > quotes)
-                    diagnostics.Error("SL0749", new SourceSpan(source, _pos, _pos + run),
+                    diagnostics.Report(Codes.RawStringQuoteRunTooLong,
+                        new SourceSpan(source, _pos, _pos + run),
+                        
                         $"this raw string opens with {quotes} quotes, so {run} in a row cannot be " +
                         $"part of it; open and close it with {run + 1}");
 
@@ -1182,7 +1198,9 @@ public sealed class Lexer(
 
                 if (c == '}')
                 {
-                    diagnostics.Error("SL0750", new SourceSpan(source, _pos, _pos + run),
+                    diagnostics.Report(Codes.InterpolationBraceRunInvalid,
+                        new SourceSpan(source, _pos, _pos + run),
+                        
                         $"with {dollars} '$', {dollars} braces belong to a hole, so these {run} " +
                         "'}' close one that was never opened; start the string with " +
                         $"{run + 1} '$' to write them as text");
@@ -1194,7 +1212,9 @@ public sealed class Lexer(
                 // text, so a run is text and a hole at once only while the
                 // text part is shorter than an opening.
                 if (run >= 2 * dollars)
-                    diagnostics.Error("SL0750", new SourceSpan(source, _pos, _pos + run),
+                    diagnostics.Report(Codes.InterpolationBraceRunInvalid,
+                        new SourceSpan(source, _pos, _pos + run),
+                        
                         $"with {dollars} '$', the last {dollars} of these {run} '{{' open a " +
                         $"hole and the rest are text, which only a run shorter than {dollars} " +
                         $"can be; start the string with {run / 2 + 1} '$'");
@@ -1216,7 +1236,7 @@ public sealed class Lexer(
         pieces.Add((text, null));
 
         if (!closed && !TooDeep)
-            diagnostics.Error("SL0006", SpanFrom(start),
+            diagnostics.Report(Codes.UnterminatedStringLiteral, SpanFrom(start),
                 $"unterminated raw string literal; it ends at a run of {quotes} quotes");
 
         if (closed && multiLine) TrimRawLines(pieces, start);
@@ -1256,7 +1276,9 @@ public sealed class Lexer(
         if (firstBreak < 0 || !IsBlank(opening, 0, firstBreak))
         {
             int at = first.Positions.Count > 0 ? first.Positions[0] : start;
-            diagnostics.Error("SL0746", new SourceSpan(source, at, at + 1),
+            diagnostics.Report(Codes.RawStringOpeningLineNotEmpty,
+                new SourceSpan(source, at, at + 1),
+                
                 "a raw string that spans lines starts on the line after its opening quotes, " +
                 "and nothing but whitespace may follow them");
             return;
@@ -1269,7 +1291,9 @@ public sealed class Lexer(
         if (lastBreak < 0 || !IsBlank(closing, lastBreak + 1, closing.Length))
         {
             bool empty = pieces.Count == 1 && IsBlank(closing, 0, closing.Length);
-            diagnostics.Error("SL0747", new SourceSpan(source, _pos - 1, _pos),
+            diagnostics.Report(Codes.RawStringClosingMalformed,
+                new SourceSpan(source, _pos - 1, _pos),
+                
                 empty
                     ? "a raw string that spans lines needs a line of content between its quotes"
                     : "the closing quotes of a raw string that spans lines stand on a line of " +
@@ -1320,7 +1344,9 @@ public sealed class Lexer(
                     {
                         reported = true;
                         int at = lineBegin < piece.Positions.Count ? piece.Positions[lineBegin] : start;
-                        diagnostics.Error("SL0748", new SourceSpan(source, at, at + 1),
+                        diagnostics.Report(Codes.RawStringIndentationMismatch,
+                            new SourceSpan(source, at, at + 1),
+                            
                             "this line of a raw string does not start with the whitespace its " +
                             "closing quotes are indented by, which is taken off every line; " +
                             "indent it at least as far, with the same characters");
@@ -1362,7 +1388,9 @@ public sealed class Lexer(
             if (!TooDeep)
             {
                 TooDeep = true;
-                diagnostics.Error("SL0108", new SourceSpan(source, openedAt, openedAt + 1),
+                diagnostics.Report(Codes.NestingTooDeep,
+                    new SourceSpan(source, openedAt, openedAt + 1),
+                    
                     $"this is nested more than {Source.Recursion.MaxDepth} levels deep, which " +
                     "is past what can be compiled; the usual cause is generated source, and " +
                     "the fix is to give the inner part a name of its own");
@@ -1406,7 +1434,8 @@ public sealed class Lexer(
             if (_pos >= _text.Length)
             {
                 if (!TooDeep)
-                    diagnostics.Error("SL0006", SpanFrom(outerStart), "unterminated string literal");
+                    diagnostics.Report(Codes.UnterminatedStringLiteral, SpanFrom(outerStart),
+                        "unterminated string literal");
                 break;
             }
 
@@ -1444,7 +1473,7 @@ public sealed class Lexer(
         }
 
         if (tokens.Count == 0 && !TooDeep)
-            diagnostics.Error("SL0555", SpanFrom(openedAt),
+            diagnostics.Report(Codes.EmptyInterpolation, SpanFrom(openedAt),
                 "this interpolation is empty; '{}' has no value to write");
 
         tokens.Add(new Token(TokenKind.EndOfFile, SpanFrom(_pos), ""));
@@ -1463,7 +1492,7 @@ public sealed class Lexer(
             _pos++;
 
         if (Current != '}' && !TooDeep)
-            diagnostics.Error("SL0006", SpanFrom(outerStart),
+            diagnostics.Report(Codes.UnterminatedStringLiteral, SpanFrom(outerStart),
                 "unterminated string literal; a hole's format runs to the '}' that closes it");
 
         return (_text[from.._pos].TrimEnd('\r'), new SourceSpan(source, from, _pos));
@@ -1482,7 +1511,9 @@ public sealed class Lexer(
             return;
         }
 
-        diagnostics.Error("SL0750", new SourceSpan(source, _pos, _pos + run),
+        diagnostics.Report(Codes.InterpolationBraceRunInvalid,
+            new SourceSpan(source, _pos, _pos + run),
+            
             $"this hole was opened with {braces} braces and is closed with {run}; a hole " +
             "closes with as many as opened it");
         _pos += run;
@@ -1508,12 +1539,13 @@ public sealed class Lexer(
             // A character literal is exactly one scalar, and none is not one.
             // Taken quietly it became a zero: something that compiles, runs,
             // and holds a value nobody wrote.
-            diagnostics.Error("SL0010", SpanFrom(start),
+            diagnostics.Report(Codes.EmptyCharacterLiteral, SpanFrom(start),
                 "a character literal holds one scalar, and this one is empty; write '\\0' for " +
                 "the zero character, or \"\" for an empty string");
 
         if (_pos < _text.Length && Current == '\'') _pos++;
-        else diagnostics.Error("SL0007", SpanFrom(start), "unterminated character literal");
+        else diagnostics.Report(Codes.UnterminatedCharacterLiteral, SpanFrom(start),
+            "unterminated character literal");
 
         return new Token(TokenKind.CharLiteral, SpanFrom(start), _text[start.._pos], value);
     }
@@ -1576,10 +1608,10 @@ public sealed class Lexer(
                 // two digits it found, made U+0012, and said nothing about the
                 // four that were meant.
                 if (count == 0)
-                    diagnostics.Error("SL0008", SpanFrom(start),
+                    diagnostics.Report(Codes.HexEscapeDigitCount, SpanFrom(start),
                         $"escape \\{c} needs at least one hex digit");
                 else if (c != 'x' && count < want)
-                    diagnostics.Error("SL0008", SpanFrom(start),
+                    diagnostics.Report(Codes.HexEscapeDigitCount, SpanFrom(start),
                         $"escape \\{c} takes exactly {want} hex digits and this one has {count}; " +
                         "'\\u' names a scalar up to U+FFFF and '\\U' one above it");
 
@@ -1588,7 +1620,7 @@ public sealed class Lexer(
                 // not one.
                 if (c != 'x' && (value > 0x10FFFF || (value >= 0xD800 && value <= 0xDFFF)))
                 {
-                    diagnostics.Error("SL0526", SpanFrom(start),
+                    diagnostics.Report(Codes.EscapeNotUnicodeScalar, SpanFrom(start),
                         $"U+{value:X4} is not a Unicode scalar value, so \\{c} cannot name it; " +
                         "scalars stop at U+10FFFF and the surrogate range U+D800 to U+DFFF is " +
                         "reserved for UTF-16 pairs");
@@ -1598,7 +1630,8 @@ public sealed class Lexer(
                 return value;
             }
             default:
-                diagnostics.Error("SL0009", SpanFrom(start), $"unrecognized escape sequence \\{c}");
+                diagnostics.Report(Codes.UnrecognizedEscapeSequence, SpanFrom(start),
+                    $"unrecognized escape sequence \\{c}");
                 return c;
         }
     }
@@ -1632,7 +1665,8 @@ public sealed class Lexer(
         }
 
         _pos++;
-        diagnostics.Error("SL0001", SpanFrom(start), $"unexpected character '{_text[start]}'");
+        diagnostics.Report(Codes.UnexpectedCharacter, SpanFrom(start),
+            $"unexpected character '{_text[start]}'");
         return new Token(TokenKind.Bad, SpanFrom(start), _text[start.._pos]);
     }
 

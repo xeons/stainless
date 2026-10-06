@@ -133,7 +133,7 @@ public sealed partial class Binder
         SettleUnsetLocals(body);
 
         if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && EndIsReachable(body))
-            diagnostics.Error("SL0217", function.Span,
+            diagnostics.Report(Codes.NotAllPathsReturn, function.Span,
                 $"not all paths through '{function.Name}' return a value of type '{function.ReturnType.Name}'",
                 function.ReturnType);
 
@@ -199,7 +199,7 @@ public sealed partial class Binder
 
         if (!TryImplicitBaseConstructor(classType, out var chained))
         {
-            diagnostics.Error("SL0517", constructor.Span,
+            diagnostics.Report(Codes.BaseConstructorCallMismatch, constructor.Span,
                 $"'{NearestConstructing(classType)!.Name}' has no constructor that takes no " +
                 $"arguments, so '{classType.Name}' has to say which one to run: write " +
                 "'base(...)' in its constructor, after the statements that give its fields " +
@@ -307,7 +307,7 @@ public sealed partial class Binder
     {
         if (!ReferenceEquals(syntax, _context.ConstructorChain))
         {
-            diagnostics.Error("SL0516", syntax.Span,
+            diagnostics.Report(Codes.ConstructorCallMisplaced, syntax.Span,
                 _context.Function?.Kind == FunctionKind.Constructor
                     ? "'base(...)' is a statement of the constructor's body itself, once: the base " +
                       "class is built exactly once, on every path, when this class's fields have " +
@@ -319,7 +319,7 @@ public sealed partial class Binder
 
         if (_context.Function!.ContainingType is not ClassTypeSymbol classType)
         {
-            diagnostics.Error("SL0515", syntax.Span,
+            diagnostics.Report(Codes.NoBaseToReach, syntax.Span,
                 $"'{_context.Function.ContainingType!.Name}' is a struct, so there is nothing " +
                 "above it to construct; only a class derives from another",
                 _context.Function.ContainingType);
@@ -328,7 +328,7 @@ public sealed partial class Binder
 
         if (classType.BaseClass is not { } baseClass)
         {
-            diagnostics.Error("SL0515", syntax.Span,
+            diagnostics.Report(Codes.NoBaseToReach, syntax.Span,
                 $"'{classType.Name}' derives from nothing, so it has no base to construct",
                 classType);
             return new BoundErrorExpression(syntax.Span);
@@ -341,7 +341,7 @@ public sealed partial class Binder
         // to run, and what is above it still has to be built.
         if (NearestConstructing(classType) is not { } ancestor)
         {
-            diagnostics.Error("SL0517", syntax.Span,
+            diagnostics.Report(Codes.BaseConstructorCallMismatch, syntax.Span,
                 $"nothing '{classType.Name}' derives from declares a constructor, so there is " +
                 "none to call; remove the 'base(...)'",
                 classType);
@@ -373,7 +373,7 @@ public sealed partial class Binder
     {
         if (!ReferenceEquals(syntax, _context.ConstructorChain))
         {
-            diagnostics.Error("SL0516", syntax.Span,
+            diagnostics.Report(Codes.ConstructorCallMisplaced, syntax.Span,
                 _context.Function?.Kind == FunctionKind.Constructor
                     ? "'this(...)' has to be the first statement of the constructor: it is what " +
                       "builds the object, and a body that had already run would be overwritten " +
@@ -391,7 +391,7 @@ public sealed partial class Binder
 
         if (chosen == _context.Function)
         {
-            diagnostics.Error("SL0521", syntax.Span,
+            diagnostics.Report(Codes.CircularConstructorDelegation, syntax.Span,
                 $"this constructor of '{owner.Name}' delegates to itself",
                 owner);
             return new BoundErrorExpression(syntax.Span);
@@ -430,7 +430,7 @@ public sealed partial class Binder
             {
                 if (seen.Add(current)) continue;
 
-                diagnostics.Error("SL0521", start.Span,
+                diagnostics.Report(Codes.CircularConstructorDelegation, start.Span,
                     $"the constructors of '{start.ContainingType!.Name}' delegate to each other " +
                     "in a ring, so none of them ever builds anything",
                     start.ContainingType);
@@ -1302,7 +1302,7 @@ public sealed partial class Binder
         foreach (var parameter in outward)
             if (!Assigns(body, new OutParameterPlace(parameter, function, diagnostics), false) &&
                 EndIsReachable(body))
-                diagnostics.Error("SL0600", function.Span,
+                diagnostics.Report(Codes.OutParameterNotAssigned, function.Span,
                     $"'{function.Name}' can return without writing to '{parameter.Name}', " +
                     "which is what 'out' promises the caller. Assign it on every path, or " +
                     "make it 'ref' and let the caller decide what it starts as");
@@ -1316,12 +1316,12 @@ public sealed partial class Binder
             expression is BoundParameterAccess named && ReferenceEquals(named.Parameter, parameter);
 
         public override void ReportReturn(SourceSpan span) =>
-            diagnostics.Error("SL0600", span,
+            diagnostics.Report(Codes.OutParameterNotAssigned, span,
                 $"'{owner.Name}' returns here without having written to " +
                 $"'{parameter.Name}', which is what 'out' promises the caller");
 
         public override void ReportEarlyReturn(SourceSpan span) =>
-            diagnostics.Error("SL0600", span,
+            diagnostics.Report(Codes.OutParameterNotAssigned, span,
                 $"'{owner.Name}' returns here if this fails, without having written to " +
                 $"'{parameter.Name}', which is what 'out' promises the caller");
     }
@@ -1507,9 +1507,11 @@ public sealed partial class Binder
         if (LookupLocal(name) is not null ||
             _context.LocalFunctionScopes.Count > 0 &&
             _context.LocalFunctionScopes[^1].ContainsKey(name))
-            diagnostics.Error("SL0218", span, $"'{name}' is already declared in this scope");
+            diagnostics.Report(Codes.DuplicateLocalName, span,
+                $"'{name}' is already declared in this scope");
         else if (_context.Function?.Parameters.Any(p => p.Name == name) == true)
-            diagnostics.Error("SL0219", span, $"'{name}' is already the name of a parameter");
+            diagnostics.Report(Codes.LocalShadowsParameter, span,
+                $"'{name}' is already the name of a parameter");
         _context.Locals[^1][name] = local;
         return local;
     }
@@ -1616,7 +1618,7 @@ public sealed partial class Binder
             // `var` requires an initializer to infer from.
             if (syntax.Initializer is null)
             {
-                diagnostics.Error("SL0220", syntax.Span,
+                diagnostics.Report(Codes.VarWithoutInitializer, syntax.Span,
                     $"'var {syntax.Name}' needs an initializer for its type to be inferred");
                 type = ErrorTypeSymbol.Instance;
             }
@@ -1639,7 +1641,7 @@ public sealed partial class Binder
                 }
                 else if (type.IsVoid())
                 {
-                    diagnostics.Error("SL0221", syntax.Initializer.Span,
+                    diagnostics.Report(Codes.VarInferredFromVoid, syntax.Initializer.Span,
                         "cannot infer a type from an expression of type 'void'");
                     type = ErrorTypeSymbol.Instance;
                 }
@@ -1665,7 +1667,7 @@ public sealed partial class Binder
                     }
                     else
                     {
-                        diagnostics.Error("SL0553", syntax.Initializer.Span,
+                        diagnostics.Report(Codes.VarTypeNotInferable, syntax.Initializer.Span,
                             $"'{syntax.Name}' cannot be a 'var': " +
                             (written.Parameters.Any(p => p.Type is null)
                                 ? "this lambda does not say what its parameters are, so there " +
@@ -1694,7 +1696,7 @@ public sealed partial class Binder
                     // closure it is stored in, and `var` supplies neither.
                     bool bound = initializer is BoundFunctionGroup { Receiver: not null };
 
-                    diagnostics.Error("SL0553", syntax.Initializer.Span,
+                    diagnostics.Report(Codes.VarTypeNotInferable, syntax.Initializer.Span,
                         $"'{syntax.Name}' cannot be a 'var': " +
                         (bound
                             ? "a method reached through an object is a closure, and which " +
@@ -1708,7 +1710,7 @@ public sealed partial class Binder
                 else if (type is VariantDraftType)
                 {
                     string built = (initializer as BoundVariantDraft)?.Case ?? "a case";
-                    diagnostics.Error("SL0287", syntax.Initializer.Span,
+                    diagnostics.Report(Codes.VarFromUnqualifiedCase, syntax.Initializer.Span,
                         $"'{syntax.Name}' cannot be a 'var': '{built}' names a case without " +
                         "naming its variant, and one value does not say what a variant's type " +
                         "arguments are. Write the type out, name the variant as in " +
@@ -1771,7 +1773,7 @@ public sealed partial class Binder
 
         bool hasEffect = Effective(expression);
         if (!hasEffect)
-            diagnostics.Warning("SL0222", syntax.Span,
+            diagnostics.Report(Codes.ExpressionHasNoEffect, syntax.Span,
                 "this expression has no effect; its result is discarded");
 
         return Discarding(expression, syntax.Span);
@@ -1993,7 +1995,7 @@ public sealed partial class Binder
 
             if (AsmRegisters.Find(target, operand.Register) is not { } register)
             {
-                diagnostics.Error("SL0716", operand.RegisterSpan,
+                diagnostics.Report(Codes.AsmRegisterUnknown, operand.RegisterSpan,
                     $"'{operand.Register}' is not a register an operand can name on " +
                     $"{AsmRegisters.ArchitectureName(target)}, which is what this build is " +
                     $"for; the registers are {AsmRegisters.Examples(target)}");
@@ -2002,7 +2004,7 @@ public sealed partial class Binder
 
             if (register.Refusal is { } refusal)
             {
-                diagnostics.Error("SL0717", operand.RegisterSpan,
+                diagnostics.Report(Codes.AsmRegisterNotAllowed, operand.RegisterSpan,
                     $"'{register.Name}' cannot be an 'asm' operand: it is {refusal}");
                 continue;
             }
@@ -2026,7 +2028,7 @@ public sealed partial class Binder
                 bool sameName = string.Equals(
                     earlier.Register, operand.Register, StringComparison.OrdinalIgnoreCase);
 
-                diagnostics.Error("SL0718", operand.RegisterSpan,
+                diagnostics.Report(Codes.AsmRegisterNamedTwice, operand.RegisterSpan,
                     $"'{operand.Register}' is named twice" +
                     (sameName ? "" : $", the first time as '{earlier.Register}'") +
                     "; a register holds one value going in and one coming out, so it may be " +
@@ -2098,7 +2100,7 @@ public sealed partial class Binder
 
         if (!general && !floating)
         {
-            diagnostics.Error("SL0719", operand.Value.Span,
+            diagnostics.Report(Codes.AsmOperandTypeNotAllowed, operand.Value.Span,
                 $"'{type.Name}' cannot travel in a register. An 'asm' operand is an integer, " +
                 "a 'bool', a character, an enum, a pointer or a delegate, or a 'float' or " +
                 "'double' in a vector register" +
@@ -2115,7 +2117,7 @@ public sealed partial class Binder
 
         if (general != (register.Kind == AsmRegisterKind.General))
         {
-            diagnostics.Error("SL0721", operand.Value.Span,
+            diagnostics.Report(Codes.AsmRegisterKindMismatch, operand.Value.Span,
                 register.Kind == AsmRegisterKind.Vector
                     ? $"'{register.Name}' is a vector register, which an operand uses for a " +
                       $"'float' or a 'double', and this is '{type.Name}'"
@@ -2132,7 +2134,7 @@ public sealed partial class Binder
         int bits = type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool } ? 8 : type.Size * 8;
         if (bits <= register.Bits) return true;
 
-        diagnostics.Error("SL0720", operand.Value.Span,
+        diagnostics.Report(Codes.AsmOperandTooWide, operand.Value.Span,
             $"'{type.Name}' is {bits} bits and '{register.Name}' holds {register.Bits}, so " +
             "the value would not fit; name the wider register" +
             (type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Double }
@@ -2157,7 +2159,7 @@ public sealed partial class Binder
 
         if (place is BoundFieldAccess { Field.IsBitField: true } bits)
         {
-            diagnostics.Error("SL0722", operand.Value.Span,
+            diagnostics.Report(Codes.AsmOutputToBitField, operand.Value.Span,
                 $"'{bits.Field.Name}' is a bit-field, and an 'asm' output is written through " +
                 "its place's address, which a bit-field does not have. Take the value into a " +
                 "local and assign the field from it");
@@ -2214,7 +2216,8 @@ public sealed partial class Binder
         if (step.Type is not (LambdaType or FunctionGroupType or ArrayDraftType or VariantDraftType or NullType))
             return step;
 
-        diagnostics.Warning("SL0222", syntax.Span, "this expression has no effect; its result is discarded");
+        diagnostics.Report(Codes.ExpressionHasNoEffect, syntax.Span,
+            "this expression has no effect; its result is discarded");
 
         var parts = new List<BoundExpression>();
         CollectDraftParts(step, parts);
@@ -2287,7 +2290,7 @@ public sealed partial class Binder
             source.FindMethod("GetEnumerator") is not { } getEnumerator ||
             getEnumerator.Parameters.Count(p => !p.IsThis) != 0)
         {
-            diagnostics.Error("SL0356", syntax.Collection.Span,
+            diagnostics.Report(Codes.ForEachNotEnumerable, syntax.Collection.Span,
                 $"'{collection.Name}' cannot be iterated; it is not an array and has no " +
                 "'GetEnumerator()' method taking no arguments",
                 collection);
@@ -2310,7 +2313,7 @@ public sealed partial class Binder
             current.Parameters.Count(p => !p.IsThis) != 0 ||
             current.ReturnType.IsVoid())
         {
-            diagnostics.Error("SL0357", syntax.Collection.Span,
+            diagnostics.Report(Codes.GetEnumeratorReturnsNonEnumerator, syntax.Collection.Span,
                 $"'{collection.Name}.GetEnumerator()' returns '{getEnumerator.ReturnType.Name}', " +
                 "which is not an enumerator; that needs a 'bool MoveNext()' and a 'Current' " +
                 "returning the element",
@@ -2390,7 +2393,7 @@ public sealed partial class Binder
     {
         if (_context.ParallelDepth == 0)
         {
-            diagnostics.Error("SL0364", syntax.Span,
+            diagnostics.Report(Codes.SpawnOutsideParallel, syntax.Span,
                 "'spawn' needs an enclosing 'parallel' block; it is that block's " +
                 "closing brace that waits for the work");
             return new BoundBlock(syntax.Span, []);
@@ -2404,7 +2407,7 @@ public sealed partial class Binder
         // has to be marshalled as well, and that can wait.
         if (call is not BoundCall spawned)
         {
-            diagnostics.Error("SL0365", syntax.Call.Span,
+            diagnostics.Report(Codes.SpawnTargetNotCall, syntax.Call.Span,
                 "'spawn' takes a function or method call; there is nothing else " +
                 "for a worker thread to run");
             return new BoundBlock(syntax.Span, []);
@@ -2431,7 +2434,7 @@ public sealed partial class Binder
 
         if (!target.IsLValue)
         {
-            diagnostics.Error("SL0366", syntax.Target.Span,
+            diagnostics.Report(Codes.SpawnResultNotStorable, syntax.Target.Span,
                 "a spawned result must be stored in a variable, field or element; " +
                 "the worker writes it there while the parent waits");
             return new BoundBlock(syntax.Span, []);
@@ -2439,7 +2442,7 @@ public sealed partial class Binder
 
         if (spawned.Type.IsVoid())
         {
-            diagnostics.Error("SL0367", syntax.Span,
+            diagnostics.Report(Codes.SpawnResultIsVoid, syntax.Span,
                 $"'{spawned.Function.Name}' returns nothing, so there is no result to store");
             return new BoundBlock(syntax.Span, []);
         }
@@ -2449,7 +2452,7 @@ public sealed partial class Binder
         var converted = BindConversion(spawned, target.Type, syntax.Span);
         if (converted is not BoundCall matched)
         {
-            diagnostics.Error("SL0368", syntax.Span,
+            diagnostics.Report(Codes.SpawnResultNeedsConversion, syntax.Span,
                 $"'{spawned.Function.Name}' returns '{spawned.Type.Name}', which needs a " +
                 $"conversion to '{target.Type.Name}'; assign it after the 'parallel' block instead",
                 spawned.Type, target.Type);
@@ -2495,7 +2498,7 @@ public sealed partial class Binder
         if (initializer is not BoundLocalDeclaration { Initializer: { } start } declaration ||
             declaration.Local.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
-            diagnostics.Error("SL0369", syntax.Initializer.Span,
+            diagnostics.Report(Codes.ParallelForVariableMissing, syntax.Initializer.Span,
                 "a 'for parallel' must start by declaring an integer loop variable, " +
                 "as in 'for parallel (int i = 0; ...)'");
             return new BoundBlock(syntax.Span, []);
@@ -2510,7 +2513,7 @@ public sealed partial class Binder
             } test ||
             Underlying(test.Left) is not BoundLocalAccess counted || counted.Local != variable)
         {
-            diagnostics.Error("SL0370", syntax.Condition.Span,
+            diagnostics.Report(Codes.ParallelForConditionInvalid, syntax.Condition.Span,
                 $"a 'for parallel' condition must be '{variable.Name} < limit' or " +
                 $"'{variable.Name} <= limit'; the loop is split before it runs, so its " +
                 "trip count has to be known up front");
@@ -2551,7 +2554,7 @@ public sealed partial class Binder
         }
         else
         {
-            diagnostics.Error("SL0371", syntax.Step.Span,
+            diagnostics.Report(Codes.ParallelForStepInvalid, syntax.Step.Span,
                 $"a 'for parallel' step must be '{variable.Name}++', " +
                 $"'{variable.Name} += stride' or '{variable.Name} = {variable.Name} + stride'");
             return new BoundBlock(syntax.Span, []);
@@ -2561,7 +2564,7 @@ public sealed partial class Binder
         // trip count meaningless. A literal can simply be checked.
         if (Underlying(stride) is not BoundLiteral { Value: ulong raw } || raw == 0)
         {
-            diagnostics.Error("SL0372", syntax.Step.Span,
+            diagnostics.Report(Codes.ParallelForStrideNotLiteral, syntax.Step.Span,
                 "the stride of a 'for parallel' must be a positive integer literal, " +
                 "because the iteration space is divided before the loop runs");
             return new BoundBlock(syntax.Span, []);
@@ -2588,7 +2591,7 @@ public sealed partial class Binder
 
         foreach (var (symbol, span, name) in walker.Assignments)
         {
-            diagnostics.Error("SL0373", span,
+            diagnostics.Report(Codes.ParallelForOuterAssignment, span,
                 $"'{name}' is declared outside this 'for parallel', so assigning to it " +
                 "races between chunks; accumulate into an AtomicLong, or into a " +
                 "distinct element per iteration");
@@ -2618,7 +2621,7 @@ public sealed partial class Binder
         // everything else crossing a thread already obeys.
         foreach (var parameter in call.Function.Parameters.Where(p => p.IsByReference))
         {
-            diagnostics.Error("SL0449", call.Span,
+            diagnostics.Report(Codes.SpawnedCallTakesReference, call.Span,
                 $"'{call.Function.Name}' takes '{Spelled(parameter)} {parameter.Name}', and a " +
                 "spawned call would hand a job the address of the caller's storage; two jobs " +
                 "given the same one would race on it. Pass a copy, or guard it with 'Mutex<T>'");
@@ -2629,7 +2632,7 @@ public sealed partial class Binder
         {
             if (receiver.Type.NeedsArc() && !IsHeldElsewhere(receiver))
             {
-                diagnostics.Error("SL0375", receiver.Span,
+                diagnostics.Report(Codes.SpawnBorrowsTemporary, receiver.Span,
                     "the receiver of a spawned call must be held in a variable or field; " +
                     "a job borrows what it is given, and a temporary is gone before it runs");
                 ok = false;
@@ -2645,7 +2648,7 @@ public sealed partial class Binder
         {
             if (argument.Type.NeedsArc() && !IsHeldElsewhere(argument))
             {
-                diagnostics.Error("SL0375", argument.Span,
+                diagnostics.Report(Codes.SpawnBorrowsTemporary, argument.Span,
                     $"a spawned call borrows its arguments, so this '{argument.Type.Name}' must be " +
                     "held in a variable or field first; a temporary is destroyed at the end of " +
                     "this statement, before the job runs",
@@ -2746,7 +2749,7 @@ public sealed partial class Binder
     {
         if (ReadOnlySliceUnder(place) is not { } slice) return false;
 
-        diagnostics.Error("SL0808", span,
+        diagnostics.Report(Codes.ReadOnlySpanElementWritten, span,
             $"this writes an element of a '{slice.Name}', which is a view that only reads; " +
             $"take a 'Span<{slice.Element.Name}>' where the elements are meant to change",
             slice);

@@ -83,7 +83,7 @@ public sealed partial class Binder
 
         if (dispatched)
         {
-            diagnostics.Error("SL0331", member.Constraints[0].Span,
+            diagnostics.Report(Codes.WhereClauseNotAllowed, member.Constraints[0].Span,
                 $"'{member.Name}' is dispatched, so every '{template.Name}' has it whatever its " +
                 "arguments; only a member an instantiation can leave out may have a 'where' of " +
                 "its own");
@@ -130,7 +130,7 @@ public sealed partial class Binder
                 .FirstOrDefault(required =>
                     ReferenceEquals(type.FindImplementation(required), member))
             is { } implemented)
-            diagnostics.Error("SL0331", member.Span,
+            diagnostics.Report(Codes.WhereClauseNotAllowed, member.Span,
                 $"'{member.Name}' implements " +
                 $"'{implemented.ContainingType!.Name}.{implemented.Name}', so every " +
                 $"'{type.Name}' has it whatever its arguments; only a member an instantiation " +
@@ -154,7 +154,7 @@ public sealed partial class Binder
             if (MemberUnavailability(member) is not { } why)
                 continue;
 
-            diagnostics.Error("SL0816", span,
+            diagnostics.Report(Codes.MemberUnavailableForTypeArguments, span,
                 $"'{member.ContainingType!.Name}' has no '{member.Name}': {why}",
                 member.ContainingType);
         }
@@ -205,7 +205,7 @@ public sealed partial class Binder
         {
             if (!inScope.Contains(clause.TypeParameter))
             {
-                diagnostics.Error("SL0330", clause.Span,
+                diagnostics.Report(Codes.ConstraintOnUnknownTypeParameter, clause.Span,
                     $"'{clause.TypeParameter}' is not a type parameter of {owner}; " +
                     $"it declares {string.Join(", ", parameters.Select(p => "'" + p + "'"))}");
                 continue;
@@ -213,7 +213,7 @@ public sealed partial class Binder
 
             if (seen.ContainsKey(clause.TypeParameter))
             {
-                diagnostics.Error("SL0788", clause.Span,
+                diagnostics.Report(Codes.DuplicateWhereClause, clause.Span,
                     $"'{clause.TypeParameter}' already has a 'where' clause in {owner}; write " +
                     "everything asked of one parameter in one clause, separated by commas");
                 continue;
@@ -222,7 +222,7 @@ public sealed partial class Binder
             seen[clause.TypeParameter] = clause;
 
             if (!isOverride && clause.Constraints.Any(c => c.Kind == ConstraintKind.Default))
-                diagnostics.Error("SL0792",
+                diagnostics.Report(Codes.DefaultConstraintNotOnOverride,
                     clause.Constraints.First(c => c.Kind == ConstraintKind.Default).Span,
                     $"'default' says '{clause.TypeParameter}' is unconstrained, which is what " +
                     "leaving the clause out already says; it is for an 'override', which " +
@@ -247,7 +247,7 @@ public sealed partial class Binder
         // A reference of any kind is never null, so it has no zero to give.
         if (kind is { Kind: ConstraintKind.Class } &&
             clause.Constraints.FirstOrDefault(c => c.Kind == ConstraintKind.Zeroable) is { } zeroable)
-            diagnostics.Error("SL0581", zeroable.Span,
+            diagnostics.Report(Codes.ConstraintsContradict, zeroable.Span,
                 "'class' and 'zeroable' contradict each other: a class, interface or array " +
                 "reference is never null, so it has no zero value");
 
@@ -259,7 +259,7 @@ public sealed partial class Binder
 
             if (written.Contains(spelled))
             {
-                diagnostics.Error("SL0789", constraint.Span,
+                diagnostics.Report(Codes.DuplicateConstraint, constraint.Span,
                     $"'{parameter}' is already constrained to '{DisplayConstraint(constraint)}'");
                 continue;
             }
@@ -283,7 +283,7 @@ public sealed partial class Binder
             switch (ConstraintTarget(constraint.Type, inScope, scope))
             {
                 case ClassTypeSymbol { IsSealed: true } sealedClass:
-                    diagnostics.Error("SL0329", constraint.Span,
+                    diagnostics.Report(Codes.InvalidConstraintType, constraint.Span,
                         $"'{sealedClass.Name}' cannot constrain '{parameter}': it is sealed, so " +
                         "the only type that could satisfy it is itself, and a parameter that can " +
                         $"only be one type is that type. Write '{sealedClass.Name}' instead",
@@ -293,7 +293,7 @@ public sealed partial class Binder
                 case ClassTypeSymbol or GenericTypeTemplate { Declaration.Kind: TypeDeclKind.Class }:
                     if (baseClass is not null)
                     {
-                        diagnostics.Error("SL0790", constraint.Span,
+                        diagnostics.Report(Codes.MultipleBaseClassConstraints, constraint.Span,
                             $"'{parameter}' is already constrained to derive from " +
                             $"'{SpellType(baseClass.Type!)}', and a class has one base chain: " +
                             "constrain it to the more derived of the two");
@@ -302,7 +302,7 @@ public sealed partial class Binder
 
                     baseClass = constraint;
                     if (kind is { Kind: ConstraintKind.Struct or ConstraintKind.Unmanaged })
-                        diagnostics.Error("SL0581", constraint.Span,
+                        diagnostics.Report(Codes.ConstraintsContradict, constraint.Span,
                             $"'{KindWord(kind.Kind)}' and a base class contradict each other: " +
                             $"only a class derives from '{SpellType(constraint.Type)}'");
                     break;
@@ -311,7 +311,7 @@ public sealed partial class Binder
                     break;
 
                 case TypeSymbol { } other when !other.IsError():
-                    diagnostics.Error("SL0329", constraint.Span,
+                    diagnostics.Report(Codes.InvalidConstraintType, constraint.Span,
                         $"'{other.Name}' cannot constrain '{parameter}': a constraint is an " +
                         "interface to implement, a class to derive from, 'class', 'struct' or " +
                         $"'new()', and nothing derives from a {KindOf(other)}",
@@ -319,7 +319,7 @@ public sealed partial class Binder
                     break;
 
                 case GenericTypeTemplate other:
-                    diagnostics.Error("SL0329", constraint.Span,
+                    diagnostics.Report(Codes.InvalidConstraintType, constraint.Span,
                         $"'{other.Name}' cannot constrain '{parameter}': a constraint is an " +
                         "interface to implement or a class to derive from, and nothing derives " +
                         $"from a {other.Declaration.Kind.ToString().ToLowerInvariant()}");
@@ -378,7 +378,7 @@ public sealed partial class Binder
             if (FindConstraintCycle(start, start, edges, path, []) is not { } closing) continue;
 
             foreach (string member in path) reported.Add(member);
-            diagnostics.Error("SL0791", closing,
+            diagnostics.Report(Codes.CircularConstraint, closing,
                 $"the constraints on {string.Join(", ", path.Select(p => "'" + p + "'"))} " +
                 "go round in a circle, so each would have to be the others; constrain one of " +
                 "them to something that is not a parameter");

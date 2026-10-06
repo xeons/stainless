@@ -37,7 +37,7 @@ public sealed partial class Binder
         {
             if (unit.ModuleName is null)
             {
-                diagnostics.Error("SL0332", new SourceSpan(unit.File, 0, 0),
+                diagnostics.Report(Codes.ModuleDeclarationMissing, new SourceSpan(unit.File, 0, 0),
                     "this file does not say which module it belongs to; " +
                     "start it with a declaration such as 'module App.Thing;'");
                 continue;
@@ -70,14 +70,14 @@ public sealed partial class Binder
             {
                 if (!_modules.TryGetValue(import.Name.Text, out var target))
                 {
-                    diagnostics.Error("SL0202", import.Span,
+                    diagnostics.Report(Codes.ImportedModuleNotFound, import.Span,
                         $"module '{import.Name.Text}' was not found among the compiled sources");
                     continue;
                 }
 
                 if (target == scope.Module)
                 {
-                    diagnostics.Warning("SL0203", import.Span,
+                    diagnostics.Report(Codes.ImportOfOwnModule, import.Span,
                         "a file does not need to import its own module");
                     continue;
                 }
@@ -105,7 +105,7 @@ public sealed partial class Binder
 
         if (candidates.Count > 1)
         {
-            diagnostics.Error("SL0280", candidates[1].Span,
+            diagnostics.Report(Codes.MultipleEntryPoints, candidates[1].Span,
                 "more than one 'Main' was found: " +
                 string.Join(", ", candidates.Select(c => c.ModuleName + ".Main")));
             return candidates[0];
@@ -114,7 +114,7 @@ public sealed partial class Binder
         var entry = candidates[0];
         bool returnsInt = entry.ReturnType is PrimitiveTypeSymbol { Kind: PrimitiveKind.Int };
         if (!returnsInt && !entry.ReturnType.IsVoid())
-            diagnostics.Error("SL0281", entry.Span,
+            diagnostics.Report(Codes.EntryPointReturnType, entry.Span,
                 $"'Main' must return 'int' or 'void', not '{entry.ReturnType.Name}'",
                 entry.ReturnType);
 
@@ -123,7 +123,7 @@ public sealed partial class Binder
         // the program's business, the type is not.
         if (entry.Parameters.Count > 1 ||
             (entry.Parameters.Count == 1 && !IsStringArray(entry.Parameters[0].Type)))
-            diagnostics.Error("SL0282", entry.Span,
+            diagnostics.Report(Codes.EntryPointParameters, entry.Span,
                 "'Main' takes either nothing or 'String[]' -- the arguments the " +
                 "program was started with, without the program's own name");
 

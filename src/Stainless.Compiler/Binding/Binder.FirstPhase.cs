@@ -144,12 +144,12 @@ public sealed partial class Binder
         else finder.Visit((BoundExpression)node);
 
         if (finder.Reach is { } reach)
-            diagnostics.Error("SL0937", reach,
+            diagnostics.Report(Codes.ObjectReachedBeforeBase, reach,
                 "this reaches the object before 'base(...)' has run; until then a constructor " +
                 "may only give this class's own fields their values and read them back, " +
                 "because the object is not whole");
         else if (finder.ReturnSpan is { } returned)
-            diagnostics.Error("SL0937", returned,
+            diagnostics.Report(Codes.ObjectReachedBeforeBase, returned,
                 "this returns before 'base(...)' has run, which would leave the base unbuilt");
     }
 
@@ -181,7 +181,7 @@ public sealed partial class Binder
                     ? "'base(...)' runs"
                     : "the object is first reached here -- a method called, a property read, " +
                       "'this' handed on, or the base built";
-                ReportNoZeroValue("SL0938", first.End,
+                ReportNoZeroValue(Codes.FieldWithoutZeroUnsetAtBase, first.End,
                     $"'{type.Name}.{named}' has no value yet when {where}, and '{leaf.Type.Name}' " +
                     $"has no zero value: {ExplainNullInZero(FindNullInField(leaf.ContainingType, leaf))}. " +
                     "Give it its value before this, so that nothing can find the object without it",
@@ -207,7 +207,7 @@ public sealed partial class Binder
             : null;
         if (refused is null) return true;
 
-        diagnostics.Error("SL0940", field.Span,
+        diagnostics.Report(Codes.LateFieldNotAllowed, field.Span,
             $"'{type.Name}.{field.Name}' cannot be 'late': {refused}", type);
         return false;
     }
@@ -265,7 +265,7 @@ public sealed partial class Binder
             if (!_reported.Add(span.Start))
                 return;
             var leaf = path[^1];
-            binder.ReportNoZeroValue("SL0939", span,
+            binder.ReportNoZeroValue(Codes.FieldWithoutZeroReadBeforeSet, span,
                 $"'{string.Join('.', path.Select(f => f.Name))}' is read here before the constructor " +
                 $"has given it a value, and '{leaf.Type.Name}' has no zero value: " +
                 $"{ExplainNullInZero(FindNullInField(leaf.ContainingType, leaf))}",

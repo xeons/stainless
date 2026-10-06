@@ -103,7 +103,7 @@ public sealed class Parser
         if (!_tooDeep)
         {
             _tooDeep = true;
-            _diagnostics.Error("SL0108", Current.Span,
+            _diagnostics.Report(Codes.NestingTooDeep, Current.Span,
                 $"this is nested more than {Source.Recursion.MaxDepth} levels deep, which is " +
                 "past what can be compiled; the usual cause is generated source, and the fix " +
                 "is to give the inner part a name of its own");
@@ -217,7 +217,8 @@ public sealed class Parser
     private Token Expect(TokenKind kind)
     {
         if (At(kind)) return Advance();
-        ReportExpected("SL0100", $"expected {kind.Describe()}, found {Current.Kind.Describe()}");
+        ReportExpected(Codes.ExpectedToken,
+            $"expected {kind.Describe()}, found {Current.Kind.Describe()}");
         return new Token(kind, Current.Span, kind.FixedText() ?? "");
     }
 
@@ -230,7 +231,7 @@ public sealed class Parser
     {
         if (_accessorProperty is not null && name.Kind == TokenKind.Identifier && !name.IsVerbatim &&
             name.Text == "field")
-            _diagnostics.Error("SL0936", name.Span,
+            _diagnostics.Report(Codes.VariableNamedFieldInAccessor, name.Span,
                 $"inside an accessor of '{_accessorProperty}', 'field' is the property's storage, so " +
                 "a variable of that name could never be read by it; name it something else, or " +
                 "write '@field'");
@@ -239,7 +240,8 @@ public sealed class Parser
     private string ExpectIdentifier()
     {
         if (At(TokenKind.Identifier)) return Advance().Text;
-        ReportExpected("SL0101", $"expected an identifier, found {Current.Kind.Describe()}");
+        ReportExpected(Codes.ExpectedIdentifier,
+            $"expected an identifier, found {Current.Kind.Describe()}");
         return "?";
     }
 
@@ -251,12 +253,12 @@ public sealed class Parser
     /// </summary>
     private (DiagnosticBag? Bag, int At) _lastExpected = (null, -1);
 
-    private void ReportExpected(string code, string message)
+    private void ReportExpected(DiagnosticDescriptor code, string message)
     {
         if (_tooDeep) return;
         if (ReferenceEquals(_lastExpected.Bag, _diagnostics) && _lastExpected.At == Current.Span.Start) return;
         _lastExpected = (_diagnostics, Current.Span.Start);
-        _diagnostics.Error(code, Current.Span, message);
+        _diagnostics.Report(code, Current.Span, message);
     }
 
     /// <summary>
@@ -412,7 +414,7 @@ public sealed class Parser
         }
 
         foreach (var spelling in _sliceSpellings.Distinct())
-            _diagnostics.Error("SL0807", spelling,
+            _diagnostics.Report(Codes.SliceSyntaxInType, spelling,
                 "a slice's type is written 'Span<T>', or 'ReadOnlySpan<T>' where it is only " +
                 "read; '[:]' belongs to an expression, as in 'numbers[1:4]'");
 
@@ -457,14 +459,14 @@ public sealed class Parser
         foreach (var declaration in declarations)
             if ((declaration.Modifiers & (Modifiers.Objc | Modifiers.Extern)) != Modifiers.None &&
                 declaration is not (TypeDeclSyntax or DelegateDeclSyntax))
-                _diagnostics.Error("SL0900", declaration.Span,
+                _diagnostics.Report(Codes.ObjCModifierMisplaced, declaration.Span,
                     "'objc' goes before 'interface', 'class' or 'closure'; a member of an objc " +
                     "type is Objective-C's because its type is");
 
         foreach (var declaration in declarations)
             if (declaration.Modifiers.HasFlag(Modifiers.Required) &&
                 declaration is not (FieldDeclSyntax or PropertyDeclSyntax))
-                _diagnostics.Error("SL0783", declaration.Span,
+                _diagnostics.Report(Codes.InvalidRequiredMember, declaration.Span,
                     "only a field or a property of an object can be 'required': the word says " +
                     "that whoever makes the object must give it a value");
 
@@ -493,7 +495,7 @@ public sealed class Parser
         {
             string article = "aeiou".Contains(what[0]) ? "an" : "a";
 
-            _diagnostics.Error("SL0578", SpanFrom(start),
+            _diagnostics.Report(Codes.StaticModifierOnWrongKind, SpanFrom(start),
                 $"{article} {what} cannot be 'static': the word means that a thing belongs to " +
                 $"its type rather than to an object of it, and {article} {what} has neither. " +
                 "Only a class may be static, and a module is usually the better answer");
@@ -614,7 +616,7 @@ public sealed class Parser
             if (ctorChain is not null)
             {
                 if (ChainCallIn(ctorBody) is { } twice)
-                    _diagnostics.Error("SL0733", twice.Span,
+                    _diagnostics.Report(Codes.ConstructorChainsTwice, twice.Span,
                         "this constructor already chains after its parameters, so the body " +
                         "must not chain again; the two spellings are one call and a " +
                         "constructor makes it once");
@@ -623,7 +625,7 @@ public sealed class Parser
             }
 
             if (ctorVariadic)
-                _diagnostics.Error("SL0493", SpanFrom(start),
+                _diagnostics.Report(Codes.VariadicNotAllowedHere, SpanFrom(start),
                     $"'{enclosingType}' cannot have a variadic constructor; '...' may only " +
                     "be written on a function at module level, which reads them with a 'VaList'");
 
@@ -685,7 +687,7 @@ public sealed class Parser
                 Attributes = kept.Where(a => !IsDoesNotReturn(a)).ToList(),
             };
 
-        _diagnostics.Error("SL0728", declaration.Span,
+        _diagnostics.Report(Codes.AttributeNotAllowedHere, declaration.Span,
             $"'[{kept[0].Name.Last}]' is about a call, so it can only be written on an " +
             "'extern' function; this declares a value");
         return declaration;
@@ -752,7 +754,7 @@ public sealed class Parser
             {
                 var label = Advance();
                 if (Advance().Kind == TokenKind.Colon)
-                    _diagnostics.Error("SL0727", SpanFrom(start),
+                    _diagnostics.Report(Codes.AttributeArgumentUsesColon, SpanFrom(start),
                         $"'{label.Text}' is a field of the attribute, so it is set with " +
                         $"'{label.Text} = ...'; ':' is how a call names a parameter, and an " +
                         "attribute is a value rather than a call");
@@ -785,7 +787,7 @@ public sealed class Parser
     {
         if (attributes.Count == 0) return;
 
-        _diagnostics.Error("SL0728", attributes[0].Span,
+        _diagnostics.Report(Codes.AttributeNotAllowedHere, attributes[0].Span,
             $"'[{attributes[0].Name.Last}]' cannot be written on {what}. An attribute goes on a " +
             "type, an enum, a field, a property, an event or a static, which are the " +
             "declarations something reads one back from");
@@ -818,14 +820,14 @@ public sealed class Parser
 
             if ((modifiers & modifier) != Modifiers.None)
             {
-                _diagnostics.Error("SL0109", written.Span,
+                _diagnostics.Report(Codes.ModifierRepeatedOrConflicting, written.Span,
                     $"'{written.Text}' is already written on this declaration; say it once");
                 continue;
             }
 
             if (VisibilityConflict(modifiers, modifier) is { } conflict)
             {
-                _diagnostics.Error("SL0109", written.Span, conflict);
+                _diagnostics.Report(Codes.ModifierRepeatedOrConflicting, written.Span, conflict);
                 continue;
             }
 
@@ -962,14 +964,14 @@ public sealed class Parser
         {
             string convention = (string)(Advance().Value ?? "");
             if (convention is not ("C" or "C++"))
-                _diagnostics.Error("SL0102", SpanFrom(start),
+                _diagnostics.Report(Codes.UnsupportedLinkageConvention, SpanFrom(start),
                     $"unsupported linkage convention \"{convention}\"; \"C\" and \"C++\" are supported");
 
             isCpp = convention == "C++";
         }
         else
         {
-            _diagnostics.Error("SL0103", Current.Span,
+            _diagnostics.Report(Codes.MissingLinkageConvention, Current.Span,
                 $"expected a linkage convention string such as \"C\" after '{(isExtern ? "extern" : "export")}'");
         }
 
@@ -1037,7 +1039,7 @@ public sealed class Parser
         if (declaration is FunctionDeclSyntax function)
             return function with { CallingConvention = convention };
 
-        _diagnostics.Error("SL0827", declaration.Span,
+        _diagnostics.Report(Codes.CallingConventionMisplaced, declaration.Span,
             "a calling convention says how a function is called, so it can only be written on " +
             "one; this declares a value");
 
@@ -1090,7 +1092,7 @@ public sealed class Parser
     {
         if ((modifiers & Modifiers.Objc) != 0)
         {
-            _diagnostics.Error("SL0923", SpanFrom(start),
+            _diagnostics.Report(Codes.ObjCClassShapeUnsupported, SpanFrom(start),
                 "a record cannot be 'objc': 'with' copies an object field by field, and the " +
                 "Objective-C runtime makes one by 'alloc'");
             modifiers &= ~(Modifiers.Objc | Modifiers.Extern);
@@ -1104,7 +1106,7 @@ public sealed class Parser
             // What a record struct would generate is writable by hand, since a
             // struct may implement IEquatable and IHashable; the generating is
             // what is missing.
-            _diagnostics.Error("SL0734", SpanFrom(_pos),
+            _diagnostics.Report(Codes.RecordStructNotSupported, SpanFrom(_pos),
                 "there is no 'record struct' yet; write 'record' for a class, or a struct " +
                 "with a constructor, 'Equals' and 'GetHashCode' of its own, which may " +
                 "implement 'IEquatable' and 'IHashable' as a record's would");
@@ -1187,14 +1189,14 @@ public sealed class Parser
 
             if (kind is not (TypeDeclKind.Class or TypeDeclKind.Struct))
             {
-                _diagnostics.Error("SL0786", SpanFrom(at),
+                _diagnostics.Report(Codes.InvalidPrimaryConstructorSyntax, SpanFrom(at),
                     $"'{name}' is not a class or a struct, so it has no constructor for a " +
                     "parameter list after its name to be");
                 primary = null;
             }
             else if (variadic)
             {
-                _diagnostics.Error("SL0493", SpanFrom(at),
+                _diagnostics.Report(Codes.VariadicNotAllowedHere, SpanFrom(at),
                     $"'{name}' cannot have a variadic constructor; '...' may only be written " +
                     "on a function at module level, which reads them with a 'VaList'");
             }
@@ -1224,7 +1226,7 @@ public sealed class Parser
                 }
                 else
                 {
-                    _diagnostics.Error("SL0786", SpanFrom(at),
+                    _diagnostics.Report(Codes.InvalidPrimaryConstructorSyntax, SpanFrom(at),
                         "arguments after a base type are the primary constructor's call to the " +
                         "base's constructor, so they go on the first type in the list, of a " +
                         "class declared with a parameter list after its name");
@@ -1353,14 +1355,14 @@ public sealed class Parser
         Expect(TokenKind.CloseBrace);
 
         if (constraints.Count > 0 && typeParameters.Count == 0)
-            _diagnostics.Error("SL0331", SpanFrom(start),
+            _diagnostics.Report(Codes.WhereClauseNotAllowed, SpanFrom(start),
                 $"'{name}' is not generic, so it cannot have a 'where' clause");
 
         if (primary is not null)
             members.Add(PrimaryConstructor(start, name, primary, baseArguments, baseArgumentsSpan));
 
         if (kind == TypeDeclKind.Variant && cases.Count == 0)
-            _diagnostics.Error("SL0430", SpanFrom(start),
+            _diagnostics.Report(Codes.VariantHasNoCases, SpanFrom(start),
                 $"variant '{name}' has no cases; a variant is the choice between its cases, " +
                 "so one with none has no values at all");
 
@@ -1465,7 +1467,7 @@ public sealed class Parser
         if (At(TokenKind.OpenParen)) parameters = ParseParameterList(out variadic);
 
         if (variadic)
-            _diagnostics.Error("SL0431", SpanFrom(start),
+            _diagnostics.Report(Codes.VariantCaseVariadic, SpanFrom(start),
                 $"case '{name}' cannot be variadic; a case's parameters are the fields it " +
                 "carries, and a value has a fixed number of them");
 
@@ -1473,7 +1475,7 @@ public sealed class Parser
         // same way is one mistake, not the several a member parse would find.
         if (At(TokenKind.Comma))
         {
-            _diagnostics.Error("SL0100", Current.Span,
+            _diagnostics.Report(Codes.ExpectedToken, Current.Span,
                 $"case '{name}' ends with ';', not ','; a variant's cases are declarations, not a list");
             Advance();
         }
@@ -1567,7 +1569,7 @@ public sealed class Parser
         string kind = carriesReceiver ? "closure" : "delegate";
 
         if (variadic)
-            _diagnostics.Error("SL0358", SpanFrom(start),
+            _diagnostics.Report(Codes.VariadicNotAllowed, SpanFrom(start),
                 $"{kind} '{name}' cannot be variadic; there is no way to call one safely");
 
         // A closure is a pointer *and* a receiver, and the receiver is passed
@@ -1575,7 +1577,7 @@ public sealed class Parser
         // is no foreign function on the other end of one, so a convention would
         // describe nothing.
         if (carriesReceiver && convention != CallingConvention.Default)
-            _diagnostics.Error("SL0827", SpanFrom(start),
+            _diagnostics.Report(Codes.CallingConventionMisplaced, SpanFrom(start),
                 $"closure '{name}' cannot name a calling convention; only a delegate can, "
                 + "because only a delegate is a C function pointer");
 
@@ -1728,7 +1730,7 @@ public sealed class Parser
         // event exists to refuse. Said here rather than at the binder, because
         // the parser is where the reader is still looking at the '='.
         if (At(TokenKind.Equals))
-            _diagnostics.Error("SL0817", SpanFrom(start),
+            _diagnostics.Report(Codes.EventGivenInitializer, SpanFrom(start),
                 $"'{name}' is an event, so it cannot be given a value: an event is the " +
                 "subscribers it has, and it starts with none. Subscribe with '+='");
 
@@ -1785,7 +1787,7 @@ public sealed class Parser
 
         if (name is null)
         {
-            _diagnostics.Error("SL0558", token.Span,
+            _diagnostics.Report(Codes.OperatorNotOverloadable, token.Span,
                 $"'{token.Text}' cannot be overloaded. The operators that can are " +
                 OperatorNames.List);
             name = "op_Error";
@@ -1802,7 +1804,7 @@ public sealed class Parser
         {
             Expect(TokenKind.Semicolon);
             if (!modifiers.HasFlag(Modifiers.Abstract))
-                _diagnostics.Error("SL0559", SpanFrom(start),
+                _diagnostics.Report(Codes.OperatorMissingBody, SpanFrom(start),
                     "an operator needs a body; one an interface requires of each type that " +
                     "implements it is declared 'static abstract'");
         }
@@ -1838,13 +1840,14 @@ public sealed class Parser
         var body = At(TokenKind.OpenBrace) ? ParseBlock() : ParseArrowBodyOrNull(isGetter: true);
 
         if (variadic)
-            _diagnostics.Error("SL0615", SpanFrom(start),
+            _diagnostics.Report(Codes.InvalidConversionDeclaration, SpanFrom(start),
                 "a conversion takes exactly the value it converts, so it cannot be variadic");
 
         if (body is null)
         {
             Expect(TokenKind.Semicolon);
-            _diagnostics.Error("SL0559", SpanFrom(start), "an operator needs a body");
+            _diagnostics.Report(Codes.OperatorMissingBody, SpanFrom(start),
+                "an operator needs a body");
         }
 
         return new FunctionDeclSyntax(
@@ -1910,7 +1913,7 @@ public sealed class Parser
                 RejectAttributes(attributes, "a function");
 
             if (isReadonly)
-                _diagnostics.Error("SL0828", SpanFrom(start),
+                _diagnostics.Report(Codes.StorageModifierMisplaced, SpanFrom(start),
                     $"'{function.Name}' is a method, and 'readonly' is about storage");
             return enclosingType is null ? member : function with { Attributes = attributes };
         }
@@ -1921,7 +1924,7 @@ public sealed class Parser
 
         if (member is not FieldDeclSyntax field)
         {
-            _diagnostics.Error("SL0828", SpanFrom(start),
+            _diagnostics.Report(Codes.StorageModifierMisplaced, SpanFrom(start),
                 $"'static' cannot be written on this");
             return member;
         }
@@ -1939,7 +1942,7 @@ public sealed class Parser
         Expect(TokenKind.Tilde);
         string name = ExpectIdentifier();
         if (name != enclosingType && name != "?")
-            _diagnostics.Error("SL0104", SpanFrom(start),
+            _diagnostics.Report(Codes.DestructorNameMismatch, SpanFrom(start),
                 $"destructor name '{name}' does not match enclosing type '{enclosingType}'");
         Expect(TokenKind.OpenParen);
         Expect(TokenKind.CloseParen);
@@ -2040,13 +2043,13 @@ public sealed class Parser
             // it exists only for the arguments that meet them.
             if (constraints.Count > 0 && typeParameters.Count == 0 &&
                 !(_typeIsGeneric.TryPeek(out bool inGeneric) && inGeneric))
-                _diagnostics.Error("SL0331", SpanFrom(start),
+                _diagnostics.Report(Codes.WhereClauseNotAllowed, SpanFrom(start),
                     $"'{name}' is not generic, so it cannot have a 'where' clause");
 
             if (linkage.IsImport() && body is not null)
             {
                 string how = linkage == LinkageKind.ExternC ? "C" : "C++";
-                _diagnostics.Error("SL0105", SpanFrom(start),
+                _diagnostics.Report(Codes.ExternFunctionHasBody, SpanFrom(start),
                     $"'extern \"{how}\"' declares an external function, so '{name}' must not " +
                     $"have a body; use 'export \"{how}\"' to define one");
             }
@@ -2054,7 +2057,7 @@ public sealed class Parser
             // A generic is a template rather than one function, and a template
             // nobody instantiates is never bound, so it is refused here.
             if (isVariadic && typeParameters.Count > 0)
-                _diagnostics.Error("SL0493", SpanFrom(start),
+                _diagnostics.Report(Codes.VariadicNotAllowedHere, SpanFrom(start),
                     $"'{name}' cannot be variadic; a generic is not one function, and '...' may only " +
                     "be written on a function at module level, which reads them with a 'VaList'");
 
@@ -2072,7 +2075,7 @@ public sealed class Parser
         if (At(TokenKind.OpenBrace) || At(TokenKind.EqualsGreater))
         {
             if (typeParameters.Count > 0)
-                _diagnostics.Error("SL0320", SpanFrom(start),
+                _diagnostics.Report(Codes.TypeParametersOnNonMethod, SpanFrom(start),
                     $"'{name}' is a property and cannot have type parameters");
 
             var property = ParseProperty(start, modifiers, returnType, name, attributes ?? []);
@@ -2082,12 +2085,12 @@ public sealed class Parser
         }
 
         if (explicitInterface is not null)
-            _diagnostics.Error("SL0793", SpanFrom(start),
+            _diagnostics.Report(Codes.InvalidExplicitInterfaceMember, SpanFrom(start),
                 $"'{name}' is named for an interface, and only a method or a property can be: " +
                 "an interface has no fields");
 
         if (typeParameters.Count > 0)
-            _diagnostics.Error("SL0320", SpanFrom(start),
+            _diagnostics.Report(Codes.TypeParametersOnNonMethod, SpanFrom(start),
                 $"'{name}' is a field and cannot have type parameters");
 
         // `int flags : 3;` — a field that is some of the bits of one. Nothing
@@ -2179,7 +2182,7 @@ public sealed class Parser
         Expect(TokenKind.CloseBracket);
 
         if (parameters.Count == 0)
-            _diagnostics.Error("SL0568", SpanFrom(start),
+            _diagnostics.Report(Codes.IndexerWithoutParameters, SpanFrom(start),
                 "an indexer takes at least one index; `this[]` indexes by nothing");
 
         // `T this[nuint i] => expression;` is a getter and nothing else, as it
@@ -2324,7 +2327,7 @@ public sealed class Parser
             // in the language, so they are recognised by text rather than reserved.
             if (!(AtWord && Current.Text is "get" or "set" or "init"))
             {
-                _diagnostics.Error("SL0385", Current.Span,
+                _diagnostics.Report(Codes.PropertyAccessorExpected, Current.Span,
                     $"expected 'get', 'set' or 'init' in property '{name}'");
                 if (_pos == before) Advance();
                 continue;
@@ -2512,7 +2515,7 @@ public sealed class Parser
             Expect(TokenKind.CloseParen);
 
             if (elements.Count < 2)
-                _diagnostics.Error("SL0606", SpanFrom(start),
+                _diagnostics.Report(Codes.TupleTypeTooFewElements, SpanFrom(start),
                     "a tuple type has at least two elements; one value in parentheses is " +
                     "that value");
 
@@ -2680,7 +2683,7 @@ public sealed class Parser
         {
             Expect(TokenKind.OpenParen);
             if (!At(TokenKind.CloseParen))
-                _diagnostics.Error("SL0579", SpanFrom(start),
+                _diagnostics.Report(Codes.NewConstraintWithParameters, SpanFrom(start),
                     "a 'new()' constraint takes no parameters; it says the type can be made " +
                     "with none, which is the only promise a template could rely on");
             while (!At(TokenKind.CloseParen) && !At(TokenKind.EndOfFile)) Advance();
@@ -2707,7 +2710,7 @@ public sealed class Parser
         bool severalKinds = kinds.Count > 1;
 
         if (severalKinds)
-            _diagnostics.Error("SL0581", kinds[1].Span,
+            _diagnostics.Report(Codes.ConstraintsContradict, kinds[1].Span,
                 $"'{KindWord(kinds[0].Kind)}' and '{KindWord(kinds[1].Kind)}' both say what " +
                 "kind of type this is, and a type parameter is one kind");
 
@@ -2716,12 +2719,12 @@ public sealed class Parser
             var constraint = constraints[i];
 
             if (!severalKinds && IsKindConstraint(constraint.Kind) && i != 0)
-                _diagnostics.Error("SL0580", constraint.Span,
+                _diagnostics.Report(Codes.ConstraintOrderInvalid, constraint.Span,
                     $"'{KindWord(constraint.Kind)}' says what kind of type this is, so it comes " +
                     "first in the clause");
 
             if (constraint.Kind == ConstraintKind.New && i != constraints.Count - 1)
-                _diagnostics.Error("SL0580", constraint.Span,
+                _diagnostics.Report(Codes.ConstraintOrderInvalid, constraint.Span,
                     "'new()' is the last thing asked of a type parameter, so it comes last " +
                     "in the clause");
         }
@@ -2729,13 +2732,13 @@ public sealed class Parser
         if (constraints.Count > 1 &&
             constraints[0].Kind is ConstraintKind.Struct or ConstraintKind.Unmanaged &&
             constraints.Any(c => c.Kind == ConstraintKind.New))
-            _diagnostics.Error("SL0581", constraints[0].Span,
+            _diagnostics.Report(Codes.ConstraintsContradict, constraints[0].Span,
                 $"'{KindWord(constraints[0].Kind)}' and 'new()' contradict each other: 'new' " +
                 "allocates, and only a class is allocated. A struct is declared where it is used");
 
         // `default` removes constraints rather than adding one.
         if (constraints.Count > 1 && constraints.Any(c => c.Kind == ConstraintKind.Default))
-            _diagnostics.Error("SL0581", constraints[0].Span,
+            _diagnostics.Report(Codes.ConstraintsContradict, constraints[0].Span,
                 "'default' says the parameter is unconstrained, so it stands alone in its clause");
     }
 
@@ -2817,7 +2820,7 @@ public sealed class Parser
             }
 
             if (written != Variance.None && refused is not null)
-                _diagnostics.Error("SL0800", SpanFrom(at),
+                _diagnostics.Report(Codes.VarianceOnInvariantParameter, SpanFrom(at),
                     $"'{(written == Variance.In ? "in" : "out")}' may be written only on an " +
                     $"interface's or a delegate's type parameter, and this is {refused}. It " +
                     "says when one instantiation may stand for another, and only an " +
@@ -3126,14 +3129,14 @@ public sealed class Parser
         if (declared is FunctionDeclSyntax function)
         {
             if (function.Body is null)
-                _diagnostics.Error("SL0210", function.Span,
+                _diagnostics.Report(Codes.FunctionWithoutBody, function.Span,
                     $"'{function.Name}' has no body; a function declared in a block is " +
                     "defined where it stands");
 
             return new LocalFunctionSyntax(SpanFrom(start), function);
         }
 
-        _diagnostics.Error("SL0770", SpanFrom(start),
+        _diagnostics.Report(Codes.StaticLocalVariable, SpanFrom(start),
             "only a function may be declared 'static' in a block; a local variable lives " +
             "in the frame it was declared in, and a 'static' one belongs at module level");
         return new BlockSyntax(SpanFrom(start), []);
@@ -3179,7 +3182,7 @@ public sealed class Parser
         }
 
         if (!_tooDeep)
-            _diagnostics.Error("SL0714", Current.Span,
+            _diagnostics.Report(Codes.AsmBlockExpected, Current.Span,
                 $"expected the assembly block after 'asm', found {Current.Kind.Describe()}; " +
                 "the instructions go between braces, as in 'asm (out rax = low) { rdtsc }'");
 
@@ -3210,7 +3213,7 @@ public sealed class Parser
         {
             // Read on as though 'in' had been written, so that the register and
             // the value are still checked; the direction is the one mistake.
-            _diagnostics.Error("SL0715", Current.Span,
+            _diagnostics.Report(Codes.AsmOperandDirectionMissing, Current.Span,
                 "an 'asm' operand says which way its value goes: 'in rcx = value' before the " +
                 "block, 'out rax = place' after it, or 'inout rdx = place' for both");
         }
@@ -3287,7 +3290,7 @@ public sealed class Parser
 
             if (patterns.Count == 0 && !hasDefault)
             {
-                _diagnostics.Error("SL0402", Current.Span,
+                _diagnostics.Report(Codes.SwitchStatementOutsideSection, Current.Span,
                     "expected 'case' or 'default'; every statement in a switch belongs to a " +
                     "labelled section");
                 Advance();
@@ -3507,7 +3510,7 @@ public sealed class Parser
         // `case default:` is almost always a `default:` label written wrong,
         // and as a constant it would mean whatever zero the type has.
         if (At(TokenKind.DefaultKeyword) && Peek(1).Kind != TokenKind.OpenParen)
-            _diagnostics.Error("SL0758", Current.Span,
+            _diagnostics.Report(Codes.DefaultLiteralAsPattern, Current.Span,
                 "a bare 'default' is not a pattern; for the section that runs when nothing " +
                 "else matched, write 'default:' without 'case', and to match the zero value " +
                 "write it out -- '0', 'null', or 'default(T)'");
@@ -4012,7 +4015,7 @@ public sealed class Parser
             Advance();
             if (TryParseLambdaAfterModifiers(start, isStatic: true) is { } made) return made;
 
-            _diagnostics.Error("SL0100", Current.Span,
+            _diagnostics.Report(Codes.ExpectedToken, Current.Span,
                 $"expected a lambda after 'static', found '{Current.Text}'");
             return Unreadable(start);
         }
@@ -4389,7 +4392,7 @@ public sealed class Parser
 
                 if (indices.Count == 0)
                 {
-                    _diagnostics.Error("SL0450", SpanFrom(start),
+                    _diagnostics.Report(Codes.IndexMissing, SpanFrom(start),
                         "an index is missing; write 'a[i]' to read one element, or 'a[i:j]' " +
                         "to take a slice");
                     continue;
@@ -4525,8 +4528,9 @@ public sealed class Parser
 
             if (_tooDeep && !savedTooDeep)
             {
-                foreach (var reached in looked.Items.Where(d => d.Code == "SL0108"))
-                    _diagnostics.Error(reached.Code, reached.Span, reached.Message);
+                string deep = Codes.NestingTooDeep.Code;
+                foreach (var reached in looked.Items.Where(d => d.Code == deep))
+                    _diagnostics.Report(reached);
                 _pos = _tokens.Count - 1;
             }
             else
@@ -4572,7 +4576,7 @@ public sealed class Parser
         bool toBase = At(TokenKind.BaseKeyword);
         if (!toBase && !At(TokenKind.ThisKeyword))
         {
-            _diagnostics.Error("SL0732", SpanFrom(start),
+            _diagnostics.Report(Codes.ConstructorInitializerListNotSupported, SpanFrom(start),
                 "a constructor may be followed by ': base(...)' or ': this(...)' and nothing " +
                 "else; there are no initializer lists here, because a field is initialized " +
                 "where it is declared or in the body");
@@ -4723,7 +4727,9 @@ public sealed class Parser
             // for the parentheses, and so does this.
             if (segment.Format is not null && HasTopLevelQuestion(segment.Tokens!))
             {
-                _diagnostics.Error("SL0755", segment.Tokens![0].Span,
+                _diagnostics.Report(Codes.InterpolationConditionalNotParenthesized,
+                    segment.Tokens![0].Span,
+                    
                     "a ':' in an interpolation starts its format, so a conditional here is " +
                     "cut in two; put it in parentheses, as in '{(a ? b : c)}'");
                 continue;
@@ -4753,7 +4759,7 @@ public sealed class Parser
             }
 
             if (!inner.At(TokenKind.EndOfFile))
-                _diagnostics.Error("SL0556", inner.Current.Span,
+                _diagnostics.Report(Codes.InterpolationHasExtraTokens, inner.Current.Span,
                     $"an interpolation holds one expression, and {inner.Current.Kind.Describe()} " +
                     "follows this one");
 
@@ -5048,14 +5054,14 @@ public sealed class Parser
                 if (AtAny(PrimitiveKeywords))
                 {
                     // Reached via things like `int(x)`, which is not valid syntax here.
-                    _diagnostics.Error("SL0106", Current.Span,
+                    _diagnostics.Report(Codes.TypeNameUsedAsValue, Current.Span,
                         $"'{Current.Text}' is a type name and cannot be used as a value");
                     Advance();
                     return new LiteralSyntax(SpanFrom(start), TokenKind.IntLiteral, 0UL);
                 }
 
                 if (!_tooDeep)
-                    _diagnostics.Error("SL0107", Current.Span,
+                    _diagnostics.Report(Codes.ExpectedExpression, Current.Span,
                         $"expected an expression, found {Current.Kind.Describe()}");
                 Advance();
                 return new LiteralSyntax(SpanFrom(start), TokenKind.IntLiteral, 0UL);

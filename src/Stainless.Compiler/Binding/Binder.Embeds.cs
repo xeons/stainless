@@ -76,7 +76,7 @@ public sealed partial class Binder
         StringArgument? access = Literal(given[2], declared.Fields[2], out bool accessFailed);
 
         if (path is null && !pathFailed)
-            diagnostics.Error("SL0703", syntax.Span,
+            diagnostics.Report(Codes.EmbedPathMissing, syntax.Span,
                 "'[Embed]' needs the path of the file to carry, as a string literal: " +
                 "'[Embed(\"logo.png\")]'");
 
@@ -95,7 +95,7 @@ public sealed partial class Binder
         {
             if (EmbeddedFile.ParseAccess(writtenAccess.Text) is not { } parsed)
             {
-                diagnostics.Error("SL0707", writtenAccess.Span,
+                diagnostics.Report(Codes.EmbedAccessInvalid, writtenAccess.Span,
                     $"'{Printable(writtenAccess.Text)}' is not an access; write the letters " +
                     "'r', 'w' and 'x', each at most once and 'r' always — \"r\", \"rw\", " +
                     "\"rx\" or \"rwx\"");
@@ -111,7 +111,7 @@ public sealed partial class Binder
         {
             if (EmbeddedFile.SectionProblem(writtenSection.Text, target) is { } problem)
             {
-                diagnostics.Error("SL0709", writtenSection.Span,
+                diagnostics.Report(Codes.EmbedSectionNameInvalid, writtenSection.Span,
                     $"'{Printable(writtenSection.Text)}' cannot name a section: {problem}");
                 return null;
             }
@@ -119,7 +119,7 @@ public sealed partial class Binder
             if (target.IsMachO &&
                 EmbeddedFile.MachOSectionProblem(writtenSection.Text) is { } machOProblem)
             {
-                diagnostics.Error("SL0830", writtenSection.Span,
+                diagnostics.Report(Codes.SectionNameInvalidForTarget, writtenSection.Span,
                     $"'{Printable(writtenSection.Text)}' cannot name a section on " +
                     $"{target.Triple}: {machOProblem}");
                 return null;
@@ -129,7 +129,7 @@ public sealed partial class Binder
 
             if (target.Format == ObjectFormat.Coff &&
                 Encoding.UTF8.GetByteCount(placed) > EmbeddedFile.ImageSectionNameLimit)
-                diagnostics.Warning("SL0710", writtenSection.Span,
+                diagnostics.Report(Codes.EmbedSectionNameTruncated, writtenSection.Span,
                     $"'{placed}' is longer than the {EmbeddedFile.ImageSectionNameLimit} bytes a " +
                     "PE image keeps for a section name, so the linker will cut it to " +
                     $"'{TruncatedSectionName(placed)}' in {target.Triple}'s executable; the " +
@@ -142,7 +142,7 @@ public sealed partial class Binder
         }
         else if (target.IsMachO)
         {
-            diagnostics.Error("SL0708", access!.Value.Span,
+            diagnostics.Report(Codes.EmbedWritableExecutableSection, access!.Value.Span,
                 $"memory both writable and executable has no section on {target.Triple}: a " +
                 "Mach-O section has its segment's permissions, and no segment an embed can " +
                 "use is both");
@@ -150,7 +150,7 @@ public sealed partial class Binder
         }
         else
         {
-            diagnostics.Error("SL0708", access!.Value.Span,
+            diagnostics.Report(Codes.EmbedWritableExecutableSection, access!.Value.Span,
                 "memory both writable and executable has no default section; name one with " +
                 "'Section = ...', so that asking for it is something the source says out loud");
             return null;
@@ -203,7 +203,7 @@ public sealed partial class Binder
         if (written is LiteralSyntax { Kind: TokenKind.StringLiteral, Value: string text })
             return new StringArgument(text, written.Span);
 
-        diagnostics.Error("SL0704", written.Span,
+        diagnostics.Report(Codes.EmbedArgumentNotLiteral, written.Span,
             $"'[Embed]' needs '{field.Name}' as a string literal, because it is decided when " +
             "the program is built rather than when it runs; to read a file at run time, use " +
             "'Standard.File'");
@@ -223,7 +223,7 @@ public sealed partial class Binder
         {
             if (fixedAccess == 0)
             {
-                diagnostics.Error("SL0711", span,
+                diagnostics.Report(Codes.EmbedSectionIncompatible, span,
                     $"'{section}' holds no bytes in the file on {target.Triple} — the loader " +
                     "zeroes it — so an embedded file cannot be placed there; choose another " +
                     "section");
@@ -232,7 +232,7 @@ public sealed partial class Binder
 
             if (fixedAccess != access)
             {
-                diagnostics.Error("SL0711", span,
+                diagnostics.Report(Codes.EmbedSectionIncompatible, span,
                     $"'{section}' is always \"{EmbeddedFile.Spell(fixedAccess)}\" on " +
                     $"{target.Triple}, and the assembler would keep that whatever an embed " +
                     $"asked for, so \"{EmbeddedFile.Spell(access)}\" cannot be placed there; " +
@@ -247,7 +247,7 @@ public sealed partial class Binder
         {
             if (first.Access == access) return true;
 
-            diagnostics.Error("SL0711", span,
+            diagnostics.Report(Codes.EmbedSectionIncompatible, span,
                 $"'{section}' was already given \"{EmbeddedFile.Spell(first.Access)}\" by the " +
                 $"embed at {first.Span}; a section has one set of permissions, so this one " +
                 $"cannot also be \"{EmbeddedFile.Spell(access)}\" — name a different section");
@@ -287,7 +287,7 @@ public sealed partial class Binder
         {
             if (written.Text.Length == 0)
             {
-                diagnostics.Error("SL0706", written.Span,
+                diagnostics.Report(Codes.EmbedFileUnreadable, written.Span,
                     "an empty path names no file to embed");
                 return null;
             }
@@ -314,7 +314,7 @@ public sealed partial class Binder
 
                 if (directory is null)
                 {
-                    diagnostics.Error("SL0705", written.Span,
+                    diagnostics.Report(Codes.EmbedRelativePathWithoutFile, written.Span,
                         $"'{source.Path}' is not a file on disk, so there is no directory to " +
                         $"find '{Printable(written.Text)}' relative to; give an absolute path, " +
                         "or compile the source from a file");
@@ -327,14 +327,14 @@ public sealed partial class Binder
         catch (Exception e) when (e is ArgumentException or NotSupportedException
                                       or PathTooLongException)
         {
-            diagnostics.Error("SL0706", written.Span,
+            diagnostics.Report(Codes.EmbedFileUnreadable, written.Span,
                 $"'{Printable(written.Text)}' is not a path this system can open: {e.Message}");
             return null;
         }
 
         if (Directory.Exists(full))
         {
-            diagnostics.Error("SL0706", written.Span,
+            diagnostics.Report(Codes.EmbedFileUnreadable, written.Span,
                 $"'{full}' is a directory; 'embed' carries the bytes of one file");
             return null;
         }
@@ -348,7 +348,7 @@ public sealed partial class Binder
             var info = new FileInfo(full);
             if (!info.Exists)
             {
-                diagnostics.Error("SL0706", written.Span,
+                diagnostics.Report(Codes.EmbedFileUnreadable, written.Span,
                     $"there is no file at '{full}' to embed");
                 return null;
             }
@@ -366,7 +366,7 @@ public sealed partial class Binder
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            diagnostics.Error("SL0706", written.Span,
+            diagnostics.Report(Codes.EmbedFileUnreadable, written.Span,
                 $"'{full}' cannot be read, so it cannot be embedded: {e.Message}");
             return null;
         }
@@ -376,7 +376,7 @@ public sealed partial class Binder
         long limit = TargetPlatform.Current.PointerWidth == 8 ? long.MaxValue : int.MaxValue;
         if (length > limit)
         {
-            diagnostics.Error("SL0706", written.Span,
+            diagnostics.Report(Codes.EmbedFileUnreadable, written.Span,
                 $"'{full}' is {length} bytes, more than an array on " +
                 $"{TargetPlatform.Current.Triple} can hold");
             return null;

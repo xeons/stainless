@@ -207,7 +207,7 @@ public sealed partial class Binder
     {
         if (arguments.Count != template.Parameters.Count)
         {
-            diagnostics.Error("SL0323", span,
+            diagnostics.Report(Codes.TypeArgumentCountMismatch, span,
                 $"'{template.Name}' takes {template.Parameters.Count} type " +
                 $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
                 $"but {Given(arguments.Count)}");
@@ -377,7 +377,7 @@ public sealed partial class Binder
     {
         if (arguments.Count != template.Parameters.Count)
         {
-            diagnostics.Error("SL0323", span,
+            diagnostics.Report(Codes.TypeArgumentCountMismatch, span,
                 $"'{template.Name}' takes {template.Parameters.Count} type " +
                 $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
                 $"but {Given(arguments.Count)}");
@@ -431,7 +431,7 @@ public sealed partial class Binder
 
         if (arguments.Count != template.Parameters.Count)
         {
-            diagnostics.Error("SL0324", span,
+            diagnostics.Report(Codes.InferredTypeArgumentCountMismatch, span,
                 $"'{template.Name}' takes {template.Parameters.Count} type " +
                 $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
                 $"but {arguments.Count} were inferred");
@@ -543,7 +543,7 @@ public sealed partial class Binder
         // Every path into the runaway meets the limit at the same call.
         if (!Remember(_runawayReported, span)) return true;
 
-        diagnostics.Error("SL0798", span,
+        diagnostics.Report(Codes.GenericInstantiationTooDeep, span,
             $"'{name}' is being instantiated with a type argument nested more than " +
             $"{MaximumInstantiationDepth} deep, which is a generic that instantiates itself with " +
             "a larger argument each time: it would be a new function or type at every step, " +
@@ -643,7 +643,7 @@ public sealed partial class Binder
             if (!substitution.TryGetValue(clause.TypeParameter, out var argument))
             {
                 if (!checkedWhereDeclared)
-                    diagnostics.Error("SL0330", clause.Span,
+                    diagnostics.Report(Codes.ConstraintOnUnknownTypeParameter, clause.Span,
                         $"'{clause.TypeParameter}' is not a type parameter of {owner}; " +
                         $"it declares {string.Join(", ", parameters.Select(p => "'" + p + "'"))}");
                 continue;
@@ -674,7 +674,7 @@ public sealed partial class Binder
             case ConstraintKind.Unmanaged:
                 if (IsUnmanaged(argument)) return;
 
-                ReportUnmetConstraint("SL0328", span,
+                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'unmanaged', and " +
                     (IsValueType(argument)
@@ -688,7 +688,7 @@ public sealed partial class Binder
                 if (ZeroValues.FindNullInZero(argument) is not { } found)
                     return;
 
-                ReportUnmetConstraint("SL0815", span,
+                ReportUnmetConstraint(Codes.ZeroableConstraintUnmet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'zeroable', and '{argument.Name}' has no " +
                     $"zero value: {ExplainNullInZero(found)}",
@@ -698,7 +698,7 @@ public sealed partial class Binder
             case ConstraintKind.NotNull:
                 if (!IsNullable(argument)) return;
 
-                ReportUnmetConstraint("SL0328", span,
+                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'notnull', and a '{argument.Name}' may be " +
                     "null",
@@ -708,7 +708,7 @@ public sealed partial class Binder
             case ConstraintKind.Class:
                 if (IsReferenceType(argument)) return;
 
-                ReportUnmetConstraint("SL0328", span,
+                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'class', and '{argument.Name}' is a " +
                     $"{KindOf(argument)}: it is copied rather than referenced, and is never null",
@@ -718,7 +718,7 @@ public sealed partial class Binder
             case ConstraintKind.Struct:
                 if (IsValueType(argument)) return;
 
-                ReportUnmetConstraint("SL0328", span,
+                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'struct', and '{argument.Name}' is a " +
                     $"{KindOf(argument)}: it is a counted reference and may be null",
@@ -728,7 +728,7 @@ public sealed partial class Binder
             case ConstraintKind.Threadsafe:
                 if (IsSendable(argument)) return;
 
-                ReportUnmetConstraint("SL0328", span,
+                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'threadsafe', and nothing about " +
                     $"'{argument.Name}' says how two threads may hold it. Declare it " +
@@ -743,7 +743,7 @@ public sealed partial class Binder
                     made.Constructors.FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis)) is
                         not { SetsRequiredMembers: true })
                 {
-                    ReportUnmetConstraint("SL0328", span,
+                    ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                         $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                         $"'{parameter}' is constrained to 'new()', and '{argument.Name}' has " +
                         $"required members, which 'new {parameter}()' has no way to set: " +
@@ -754,7 +754,7 @@ public sealed partial class Binder
 
                 if (IsDefaultConstructible(argument)) return;
 
-                ReportUnmetConstraint("SL0328", span,
+                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'new()', and " +
                     argument switch
@@ -780,7 +780,7 @@ public sealed partial class Binder
         {
             if (Satisfies(argument, contract)) return;
 
-            ReportUnmetConstraint("SL0328", span,
+            ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                 $"'{argument.Name}' cannot be used as '{parameter}' in {owner} " +
                 $"because it does not implement '{contract.Name}'" +
                 (argument is ClassTypeSymbol implementer && implementer.Interfaces.Count > 0
@@ -800,7 +800,7 @@ public sealed partial class Binder
             if (argument is ClassTypeSymbol derived &&
                 derived.SelfAndBases().Contains(baseClass)) return;
 
-            ReportUnmetConstraint("SL0328", span,
+            ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
                 $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because it " +
                 $"does not derive from '{baseClass.Name}'",
                 argument, baseClass);
@@ -815,7 +815,7 @@ public sealed partial class Binder
         } bare && _context.Substitution.ContainsKey(bare.Name.Parts[0]);
 
         if (!checkedWhereDeclared || namesParameter)
-            diagnostics.Error("SL0329", constraint.Span,
+            diagnostics.Report(Codes.InvalidConstraintType, constraint.Span,
                 $"'{required.Name}' cannot constrain '{parameter}': a constraint is an interface " +
                 "to implement, a class to derive from, 'class', 'struct' or 'new()', and " +
                 $"nothing derives from a {KindOf(required)}",
@@ -830,10 +830,10 @@ public sealed partial class Binder
     private List<string>? _unmetConstraints;
 
     private void ReportUnmetConstraint(
-        string code, SourceSpan span, string message, params TypeSymbol[] subjects)
+        DiagnosticDescriptor code, SourceSpan span, string message, params TypeSymbol[] subjects)
     {
         if (_unmetConstraints is null)
-            diagnostics.Error(code, span, message, subjects);
+            diagnostics.Report(code, span, message, subjects);
         else if (!subjects.Any(s => s.StandsForAnError))
             _unmetConstraints.Add(message);
     }

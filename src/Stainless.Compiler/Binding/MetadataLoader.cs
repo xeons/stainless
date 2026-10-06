@@ -77,7 +77,7 @@ public sealed class MetadataLoader(
             {
                 if (module.Aliases.ContainsKey(name) || module.Types.ContainsKey(name))
                 {
-                    diagnostics.Error("SL0417", ReferencedSpan,
+                    diagnostics.Report(Codes.ReferencedTypeRedeclared, ReferencedSpan,
                         $"'{described.Module}.{name}' is declared both in this program and in " +
                         $"the referenced library '{reference.Library}'; a referenced type " +
                         "cannot be redeclared");
@@ -97,7 +97,7 @@ public sealed class MetadataLoader(
 
             if (module.Types.ContainsKey(name))
             {
-                diagnostics.Error("SL0417", ReferencedSpan,
+                diagnostics.Report(Codes.ReferencedTypeRedeclared, ReferencedSpan,
                     $"'{described.Module}.{name}' is declared both in this program and in the " +
                     $"referenced library '{reference.Library}'; a referenced type cannot be " +
                     "redeclared");
@@ -215,7 +215,7 @@ public sealed class MetadataLoader(
                 continue;
             }
 
-            diagnostics.Error("SL0826", ReferencedSpan,
+            diagnostics.Report(Codes.MetadataInconsistentWithLibrary, ReferencedSpan,
                 $"'{classType.QualifiedName}' has a dispatch slot filled by '{slot}', which its " +
                 "metadata does not describe. The library and its metadata were written by the " +
                 "same compilation, so this file has been edited or is not the one that library " +
@@ -287,7 +287,7 @@ public sealed class MetadataLoader(
 
         if (returns is null)
         {
-            diagnostics.Error("SL0418", ReferencedSpan,
+            diagnostics.Report(Codes.ReferencedSignatureTypeUnknown, ReferencedSpan,
                 $"'{symbol.QualifiedName}' returns '{described.Returns}', which this program " +
                 "does not know");
             returns = ErrorTypeSymbol.Instance;
@@ -302,7 +302,7 @@ public sealed class MetadataLoader(
 
             if (parameterType is null)
             {
-                diagnostics.Error("SL0418", ReferencedSpan,
+                diagnostics.Report(Codes.ReferencedSignatureTypeUnknown, ReferencedSpan,
                     $"'{symbol.QualifiedName}' takes a '{parameter.Type}', which this program " +
                     "does not know");
                 parameterType = ErrorTypeSymbol.Instance;
@@ -342,7 +342,7 @@ public sealed class MetadataLoader(
         {
             if (Resolve(described_.Type) is not ClosureTypeSymbol closure)
             {
-                diagnostics.Error("SL0418", ReferencedSpan,
+                diagnostics.Report(Codes.ReferencedSignatureTypeUnknown, ReferencedSpan,
                     $"the event '{symbol.QualifiedName}.{described_.Name}' is of type " +
                     $"'{described_.Type}', which this program does not know as a closure");
                 continue;
@@ -360,7 +360,7 @@ public sealed class MetadataLoader(
 
             if (backing is null || add is null || remove is null)
             {
-                diagnostics.Error("SL0826", ReferencedSpan,
+                diagnostics.Report(Codes.MetadataInconsistentWithLibrary, ReferencedSpan,
                     $"the event '{symbol.QualifiedName}.{described_.Name}' is described without " +
                     "the storage and methods it is made of. Metadata is generated from the " +
                     "library it describes; rebuild the library rather than editing the file");
@@ -420,7 +420,7 @@ public sealed class MetadataLoader(
         {
             if (Resolve(field.Type) is not { } fieldType)
             {
-                diagnostics.Error("SL0418", ReferencedSpan,
+                diagnostics.Report(Codes.ReferencedSignatureTypeUnknown, ReferencedSpan,
                     $"'{symbol.QualifiedName}.{field.Name}' has type '{field.Type}', which this " +
                     "program does not know; the library was built against something this one " +
                     "does not reference");
@@ -507,7 +507,7 @@ public sealed class MetadataLoader(
         var returns = Resolve(described.Returns);
         if (returns is null)
         {
-            diagnostics.Error("SL0418", ReferencedSpan,
+            diagnostics.Report(Codes.ReferencedSignatureTypeUnknown, ReferencedSpan,
                 $"'{described.Name}' returns a '{described.Returns}', which this program " +
                 "does not know");
             returns = ErrorTypeSymbol.Instance;
@@ -555,7 +555,7 @@ public sealed class MetadataLoader(
             var type = Resolve(parameter.Type);
             if (type is null)
             {
-                diagnostics.Error("SL0418", ReferencedSpan,
+                diagnostics.Report(Codes.ReferencedSignatureTypeUnknown, ReferencedSpan,
                     $"'{described.Name}' takes a '{parameter.Type}', which this program does " +
                     "not know");
                 type = ErrorTypeSymbol.Instance;

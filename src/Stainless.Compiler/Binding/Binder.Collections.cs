@@ -57,7 +57,7 @@ public sealed partial class Binder
 
             if (bound.Type.IsVoid())
             {
-                diagnostics.Error("SL0310", bound.Span,
+                diagnostics.Report(Codes.VoidArrayElement, bound.Span,
                     "there is no array of 'void'; an element has to be a value, and this produces none");
                 failed = true;
             }
@@ -85,7 +85,7 @@ public sealed partial class Binder
 
         if (SpreadElementOf(source.Type) is not { } element)
         {
-            diagnostics.Error("SL0778", syntax.Operand.Span,
+            diagnostics.Report(Codes.InvalidSpreadElement, syntax.Operand.Span,
                 $"'..' spreads the elements of an array, a slice or anything with a " +
                 $"'GetEnumerator()', and '{source.Type.Name}' is none of those",
                 source.Type);
@@ -220,7 +220,7 @@ public sealed partial class Binder
             }
         }
 
-        diagnostics.Error("SL0546", span,
+        diagnostics.Report(Codes.ArrayLiteralTargetInvalid, span,
             $"'{target.Name}' is not an array, a slice, or a class with 'Add', so an array " +
             "literal cannot become one",
             target);
@@ -237,7 +237,7 @@ public sealed partial class Binder
             if (draft.Elements.FirstOrDefault(p => p is BoundSpread { Source.Type: not FixedArrayTypeSymbol })
                 is { } unmeasured)
             {
-                diagnostics.Error("SL0779", unmeasured.Span,
+                diagnostics.Report(Codes.SpreadIntoFixedLengthUnknown, unmeasured.Span,
                     $"'{wanted.Name}' holds exactly {Counted(wanted.Length, "element")}, and this " +
                     $"'..' has no length until it runs; only an inline array's is known here",
                     wanted);
@@ -246,7 +246,7 @@ public sealed partial class Binder
 
             if (WrittenLength(draft) is { } written && written != wanted.Length)
             {
-                diagnostics.Error("SL0547", span,
+                diagnostics.Report(Codes.InlineArrayLengthMismatch, span,
                     $"'{wanted.Name}' holds exactly {wanted.Length} " +
                     $"element{(wanted.Length == 1 ? "" : "s")}, and this literal has " +
                     $"{written}; an inline array is its elements, so there is " +
@@ -343,7 +343,7 @@ public sealed partial class Binder
     {
         if (CollectionShapeOf(collection) is not { } shape)
         {
-            diagnostics.Error("SL0546", span,
+            diagnostics.Report(Codes.ArrayLiteralTargetInvalid, span,
                 IsDefaultConstructible(collection)
                     ? $"'{collection.Name}' has no 'Add' taking one element, so there is nothing " +
                       "for an array literal's elements to be added with"
@@ -447,7 +447,7 @@ public sealed partial class Binder
 
             if (!PartFits(spread, element))
             {
-                diagnostics.Error("SL0778", spread.Span,
+                diagnostics.Report(Codes.InvalidSpreadElement, spread.Span,
                     $"this '..' yields '{spread.Type.Name}', which does not convert to " +
                     $"'{element.Name}', the element type here",
                     spread.Type, element);
@@ -583,7 +583,7 @@ public sealed partial class Binder
     {
         if (draft.Elements.Count == 0)
         {
-            diagnostics.Error("SL0548", draft.Span,
+            diagnostics.Report(Codes.EmptyArrayLiteralUntyped, draft.Span,
                 "an empty array literal has no element type and nothing here says what it " +
                 "should be; write 'new T[0]', or give the variable a type");
             return new BoundErrorExpression(draft.Span);
@@ -593,7 +593,7 @@ public sealed partial class Binder
         if (disagreeing is null)
             return BindArraySettle(draft, ArrayOf(element), draft.Span);
 
-        diagnostics.Error("SL0549", disagreeing.Span,
+        diagnostics.Report(Codes.ArrayLiteralElementTypesDisagree, disagreeing.Span,
             $"this element is '{disagreeing.Type.Name}' and the ones before it are " +
             $"'{element.Name}'; an array holds one type, so either make them agree " +
             "or give the array a type of its own",

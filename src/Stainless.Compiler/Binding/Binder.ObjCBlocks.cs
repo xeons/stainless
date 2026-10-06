@@ -61,19 +61,19 @@ public sealed partial class Binder
         foreach (var parameter in block.Signature)
         {
             if (parameter.Mode is ParameterMode.Out or ParameterMode.Ref)
-                diagnostics.Error("SL0907", declaration.Span,
+                diagnostics.Report(Codes.ObjCSignatureCannotCross, declaration.Span,
                     $"'{parameter.Name}' of the block '{block.Name}' is '{(parameter.Mode == ParameterMode.Out ? "out" : "ref")}', " +
                     "and a block's arguments are written back by nothing; declare a pointer",
                     block);
             else if (ObjCSignatureProblem(parameter.Type) is { } why)
-                diagnostics.Error("SL0907", declaration.Span,
+                diagnostics.Report(Codes.ObjCSignatureCannotCross, declaration.Span,
                     $"'{parameter.Name}' of the block '{block.Name}' is {why}, which a block " +
                     "cannot carry; it takes what C can spell and Objective-C objects",
                     parameter.Type);
         }
 
         if (ObjCSignatureProblem(block.ReturnType) is { } result)
-            diagnostics.Error("SL0907", declaration.Span,
+            diagnostics.Report(Codes.ObjCSignatureCannotCross, declaration.Span,
                 $"the block '{block.Name}' returns {result}, which a block cannot carry; it " +
                 "takes what C can spell and Objective-C objects",
                 block.ReturnType);

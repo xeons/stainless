@@ -118,7 +118,7 @@ public sealed partial class Binder
             (containingType is not null &&
              !(symbol.IsMessage && IsDescribedOnly(containingType) && declaration.Body is null) ||
              declaration.TypeParameters.Count > 0))
-            diagnostics.Error("SL0493", declaration.Span,
+            diagnostics.Report(Codes.VariadicNotAllowedHere, declaration.Span,
                 $"'{symbol.Name}' cannot be variadic; '...' may only be written on a function at " +
                 "module level, which reads them with a 'VaList', or a message an Objective-C class " +
                 "that already exists answers. Take an array, a slice, or a count and a pointer");
@@ -160,7 +160,7 @@ public sealed partial class Binder
 
         if (Dispatchable(declaration.Modifiers) is { } dispatch &&
             containingType is not ClassTypeSymbol && !staticRequirement)
-            diagnostics.Error("SL0519", declaration.Span,
+            diagnostics.Report(Codes.ClassOnlyModifierOutsideClass, declaration.Span,
                 containingType is { IsContract: true }
                     ? $"'{declaration.Name}' is an interface method, so '{dispatch}' says nothing " +
                       "new: every interface method is dispatched already"
@@ -175,14 +175,14 @@ public sealed partial class Binder
 
         if (declaration.Modifiers.HasFlag(Modifiers.Protected) &&
             containingType is not ClassTypeSymbol)
-            diagnostics.Error("SL0519", declaration.Span,
+            diagnostics.Report(Codes.ClassOnlyModifierOutsideClass, declaration.Span,
                 $"'{declaration.Name}' cannot be 'protected'; the word means 'and anything " +
                 "deriving from this', and only a class is derived from");
 
         // 'override' already says it is dispatched, because what it replaces was.
         if (declaration.Modifiers.HasFlag(Modifiers.Override) &&
             declaration.Modifiers.HasFlag(Modifiers.Virtual))
-            diagnostics.Error("SL0507", declaration.Span,
+            diagnostics.Report(Codes.DispatchModifiersMisused, declaration.Span,
                 $"'{declaration.Name}' is both 'virtual' and 'override'; an override is " +
                 "dispatched because what it replaces was");
 
@@ -197,7 +197,7 @@ public sealed partial class Binder
             if (symbol.IsAbstract)
             {
                 if (declaration.Body is not null)
-                    diagnostics.Error("SL0498", declaration.Span,
+                    diagnostics.Report(Codes.AbstractMemberHasBody, declaration.Span,
                         $"'{declaration.Name}' is abstract, so it cannot have a body; " +
                         "a derived class supplies one");
             }
@@ -208,7 +208,7 @@ public sealed partial class Binder
         }
 
         if (containingType is null && CaseNamed(scope, declaration.Name) is { } shadowed)
-            diagnostics.Error("SL0414", declaration.Span,
+            diagnostics.Report(Codes.FunctionNamedAfterVariantCase, declaration.Span,
                 $"a module-level function cannot be named '{declaration.Name}': it is a case of " +
                 $"variant '{shadowed.DeclaringVariant.QualifiedName}', and a bare " +
                 $"'{declaration.Name}(...)' builds one of those. A method of a type may still " +
@@ -237,7 +237,7 @@ public sealed partial class Binder
         // declaration, which the language has no need of.
         if (containingType is null &&
             module.FindFunctions(declaration.Name).Any(f => f.Accepts(symbol.ParameterTypes.ToList())))
-            diagnostics.Error("SL0211", declaration.Span,
+            diagnostics.Report(Codes.DuplicateOverload, declaration.Span,
                 $"'{module.Name}' already declares a function '{declaration.Name}' taking " +
                 "these parameter types; overloads must differ in their parameters, and a " +
                 "return type alone does not distinguish two functions");
@@ -247,7 +247,7 @@ public sealed partial class Binder
             var signature = symbol.ParameterTypes.ToList();
 
             if (containingType.Methods.Any(m => m.Name == declaration.Name && m.Accepts(signature)))
-                diagnostics.Error("SL0211", declaration.Span,
+                diagnostics.Report(Codes.DuplicateOverload, declaration.Span,
                     $"'{containingType.Name}' already declares a method '{declaration.Name}' " +
                     "taking these parameter types; overloads must differ in their parameters, " +
                     "and a return type alone does not distinguish two methods",
@@ -273,7 +273,7 @@ public sealed partial class Binder
     {
         if (containingType is null)
         {
-            diagnostics.Error("SL0794", declaration.Span,
+            diagnostics.Report(Codes.ExplicitInterfaceTargetInvalid, declaration.Span,
                 $"'{declaration.Name}' is named for an interface at module level; only a member " +
                 "of a type that implements the interface can fill one of its slots");
             return;
@@ -282,7 +282,7 @@ public sealed partial class Binder
         if (ResolveType(named, scope) is not InterfaceTypeSymbol contract)
         {
             if (!ResolveType(named, scope).IsError())
-                diagnostics.Error("SL0794", named.Span,
+                diagnostics.Report(Codes.ExplicitInterfaceTargetInvalid, named.Span,
                     $"'{SpellType(named)}' is not an interface, so '{declaration.Name}' cannot " +
                     "be named for it");
             return;
@@ -295,14 +295,14 @@ public sealed partial class Binder
         if ((declaration.Modifiers & (Modifiers.Public | Modifiers.Protected |
                 Modifiers.Private | Modifiers.Internal | Modifiers.Virtual | Modifiers.Override |
                 Modifiers.Abstract | Modifiers.Sealed | Modifiers.Static)) != Modifiers.None)
-            diagnostics.Error("SL0795", declaration.Span,
+            diagnostics.Report(Codes.ExplicitInterfaceMemberHasModifier, declaration.Span,
                 $"'{contract.Name}.{declaration.Name}' is reached only through '{contract.Name}', " +
                 "so it takes no modifier: it is as visible as the interface, and dispatched " +
                 "because the interface is",
                 contract);
 
         if (declaration.Body is null && !containingType.IsContract)
-            diagnostics.Error("SL0210", declaration.Span,
+            diagnostics.Report(Codes.FunctionWithoutBody, declaration.Span,
                 $"'{contract.Name}.{declaration.Name}' has no body; a class fills an interface's " +
                 "slot with one",
                 contract);
@@ -310,7 +310,7 @@ public sealed partial class Binder
         var signature = symbol.ParameterTypes.ToList();
         if (containingType.ExplicitImplementations.Any(m =>
                 m.ExplicitInterface == contract && m.Name == symbol.Name && m.Accepts(signature)))
-            diagnostics.Error("SL0211", declaration.Span,
+            diagnostics.Report(Codes.DuplicateOverload, declaration.Span,
                 $"'{containingType.Name}' already declares '{contract.Name}.{declaration.Name}' " +
                 "taking these parameter types",
                 containingType, contract);
@@ -330,7 +330,7 @@ public sealed partial class Binder
     {
         if (containingType is null)
         {
-            diagnostics.Error("SL0573", declaration.Span,
+            diagnostics.Report(Codes.StaticModuleFunction, declaration.Span,
                 $"'{declaration.Name}' is already at module scope, so 'static' says nothing " +
                 "new: a module has no instance for a function to belong to. Write the " +
                 "function without the word, or move it into the type it is about");
@@ -347,18 +347,18 @@ public sealed partial class Binder
             bool isVirtual = declaration.Modifiers.HasFlag(Modifiers.Virtual);
 
             if (isAbstract && declaration.Body is not null)
-                diagnostics.Error("SL0498", declaration.Span,
+                diagnostics.Report(Codes.AbstractMemberHasBody, declaration.Span,
                     $"'{declaration.Name}' is abstract, so it cannot have a body; " +
                     "an implementing type supplies one");
             else if (!isAbstract && declaration.Body is null)
-                diagnostics.Error("SL0574", declaration.Span,
+                diagnostics.Report(Codes.StaticInterfaceMemberModifiersInvalid, declaration.Span,
                     $"'{containingType.Name}.{declaration.Name}' is static and has no body, so " +
                     "it has to be 'static abstract': a requirement every implementing type " +
                     "supplies. A static member with a body is the interface's own, or with " +
                     "'virtual' a default an implementing type may replace",
                     containingType);
             else if (isAbstract && isVirtual)
-                diagnostics.Error("SL0574", declaration.Span,
+                diagnostics.Report(Codes.StaticInterfaceMemberModifiersInvalid, declaration.Span,
                     $"'{containingType.Name}.{declaration.Name}' cannot be both 'abstract' and " +
                     "'virtual'; one has no body and the other is one",
                     containingType);
@@ -369,13 +369,13 @@ public sealed partial class Binder
         // Only for a class: on anything else the word was already refused for
         // the better reason that there is nothing to derive from.
         if (containingType is ClassTypeSymbol && Dispatchable(declaration.Modifiers) is { } dispatch)
-            diagnostics.Error("SL0575", declaration.Span,
+            diagnostics.Report(Codes.StaticMemberWithInstanceModifier, declaration.Span,
                 $"'{declaration.Name}' cannot be both 'static' and '{dispatch}'; dispatch " +
                 "chooses a body from the object a call arrives on, and a static method has " +
                 "no object");
 
         if (containingType is ClassTypeSymbol && declaration.Modifiers.HasFlag(Modifiers.Protected))
-            diagnostics.Error("SL0575", declaration.Span,
+            diagnostics.Report(Codes.StaticMemberWithInstanceModifier, declaration.Span,
                 $"'{declaration.Name}' cannot be both 'static' and 'protected'; 'protected' " +
                 "is about what a derived object may reach through itself, and a static " +
                 "method is not reached through an object");
@@ -406,7 +406,7 @@ public sealed partial class Binder
 
         if (containingType is null)
         {
-            diagnostics.Error("SL0560", declaration.Span,
+            diagnostics.Report(Codes.OperatorDeclaredOutsideType, declaration.Span,
                 $"operator '{written}' has to be declared inside the type it is for; a " +
                 "module-level one would let a program give somebody else's type a meaning " +
                 "from a distance");
@@ -421,7 +421,7 @@ public sealed partial class Binder
             !declaration.Modifiers.HasFlag(Modifiers.Abstract) &&
             !declaration.Modifiers.HasFlag(Modifiers.Virtual))
         {
-            diagnostics.Error("SL0560", declaration.Span,
+            diagnostics.Report(Codes.OperatorDeclaredOutsideType, declaration.Span,
                 $"'{containingType.Name}' is an interface, and an operator is chosen from the " +
                 "operand types where it is written; write it 'static abstract' to require it " +
                 "of every implementing type, or 'static virtual' to give them one",
@@ -430,7 +430,7 @@ public sealed partial class Binder
         }
 
         if (!declaration.Modifiers.HasFlag(Modifiers.Public) && !containingType.IsContract)
-            diagnostics.Error("SL0561", declaration.Span,
+            diagnostics.Report(Codes.OperatorNotPublic, declaration.Span,
                 $"operator '{written}' has to be 'public'; an operator only this module could " +
                 "write is a method with an unusual spelling");
 
@@ -440,11 +440,11 @@ public sealed partial class Binder
 
         int wanted = unary ? 1 : 2;
         if ((unary || !either) && count != wanted)
-            diagnostics.Error("SL0562", declaration.Span,
+            diagnostics.Report(Codes.OperatorOperandCountMismatch, declaration.Span,
                 $"operator '{written}' takes {wanted} operand{(wanted == 1 ? "" : "s")}, " +
                 $"and this declares {count}");
         else if (either && count is not (1 or 2))
-            diagnostics.Error("SL0562", declaration.Span,
+            diagnostics.Report(Codes.OperatorOperandCountMismatch, declaration.Span,
                 $"operator '{written}' takes one operand or two, and this declares {count}");
 
         // One operand has to be the type, so that reading `a + b` says where
@@ -454,7 +454,7 @@ public sealed partial class Binder
         if (count > 0 && !symbol.Parameters.Any(p =>
                 Mentions(p.Type, containingType) ||
                 (containingType.IsContract && containingType.TypeArguments.Contains(p.Type))))
-            diagnostics.Error("SL0563", declaration.Span,
+            diagnostics.Report(Codes.OperatorOperandNotContainingType, declaration.Span,
                 $"operator '{written}' is declared in '{containingType.Name}', so one of its " +
                 "operands has to be one; an operator over other people's types belongs to " +
                 "neither of them",
@@ -462,14 +462,14 @@ public sealed partial class Binder
 
         if (OperatorNames.IsComparison(token) && !symbol.ReturnType.IsBool() &&
             !symbol.ReturnType.IsError())
-            diagnostics.Error("SL0564", declaration.Span,
+            diagnostics.Report(Codes.ComparisonOperatorNotBool, declaration.Span,
                 $"operator '{written}' answers a question, so it returns 'bool', not " +
                 $"'{symbol.ReturnType.Name}'",
                 symbol.ReturnType);
 
         var signature = symbol.ParameterTypes.ToList();
         if (containingType.Operators.Any(o => o.Name == symbol.Name && o.Accepts(signature)))
-            diagnostics.Error("SL0211", declaration.Span,
+            diagnostics.Report(Codes.DuplicateOverload, declaration.Span,
                 $"'{containingType.Name}' already declares operator '{written}' for these " +
                 "operand types",
                 containingType);
@@ -490,20 +490,20 @@ public sealed partial class Binder
     {
         if (containingType is null)
         {
-            diagnostics.Error("SL0615", declaration.Span,
+            diagnostics.Report(Codes.InvalidConversionDeclaration, declaration.Span,
                 "a conversion belongs to one of the two types it converts between; a " +
                 "module-level one would give somebody else's types a meaning from a distance");
             return;
         }
 
         if (!symbol.IsPublic)
-            diagnostics.Error("SL0615", declaration.Span,
+            diagnostics.Report(Codes.InvalidConversionDeclaration, declaration.Span,
                 "a conversion must be 'public'; one only its own module could use is a " +
                 "function with an unusual spelling");
 
         if (symbol.Parameters.Count != 1)
         {
-            diagnostics.Error("SL0615", declaration.Span,
+            diagnostics.Report(Codes.InvalidConversionDeclaration, declaration.Span,
                 "a conversion takes exactly the value it converts, and this declares " +
                 $"{symbol.Parameters.Count}");
             return;
@@ -544,7 +544,7 @@ public sealed partial class Binder
 
                 if (from.Equals(to))
                 {
-                    diagnostics.Error("SL0615", conversion.Span,
+                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
                         $"this converts '{from.Name}' to itself, which is what it already is",
                         from);
                     continue;
@@ -555,7 +555,7 @@ public sealed partial class Binder
                 // look for what it means.
                 if (!Mentions(from, type) && !Mentions(to, type))
                 {
-                    diagnostics.Error("SL0615", conversion.Span,
+                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
                         $"this converts '{from.Name}' to '{to.Name}', and neither is " +
                         $"'{type.Name}'; a conversion belongs to one of the two types it is " +
                         "between, so that the two types are where a reader looks for it",
@@ -569,7 +569,7 @@ public sealed partial class Binder
                 if (from is InterfaceTypeSymbol or ComInterfaceTypeSymbol ||
                     to is InterfaceTypeSymbol or ComInterfaceTypeSymbol)
                 {
-                    diagnostics.Error("SL0615", conversion.Span,
+                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
                         "a conversion may not be to or from an interface: a cast to one asks " +
                         "the object what it is, and a conversion would make a different " +
                         "object instead");
@@ -584,7 +584,7 @@ public sealed partial class Binder
                 if (ClassifyConversion(
                         from, to, explicitCast: !conversion.IsImplicitConversion) is not null)
                 {
-                    diagnostics.Error("SL0615", conversion.Span,
+                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
                         $"'{from.Name}' already converts to '{to.Name}'" +
                         (conversion.IsImplicitConversion ? "" : " with a cast") +
                         "; a second answer to the same question is one the reader would have " +
@@ -595,7 +595,7 @@ public sealed partial class Binder
 
                 if (kept.Any(c => c.ReturnType.Equals(to) && c.Parameters[0].Type.Equals(from)))
                 {
-                    diagnostics.Error("SL0211", conversion.Span,
+                    diagnostics.Report(Codes.DuplicateOverload, conversion.Span,
                         $"'{type.Name}' already declares a conversion from '{from.Name}' " +
                         $"to '{to.Name}'",
                         type, from, to);
@@ -656,7 +656,7 @@ public sealed partial class Binder
             // imported C++ one has no ARC rule to say who owns what it returns.
             if ((symbol.Linkage != LinkageKind.ExternC && IsObjCReference(symbol.ReturnType)) ||
                 (!symbol.Linkage.IsImport() && symbol.Parameters.Any(p => IsObjCReference(p.Type))))
-                diagnostics.Error("SL0916", symbol.Span,
+                diagnostics.Report(Codes.ObjCObjectAcrossCLinkage, symbol.Span,
                     symbol.Linkage.IsImport()
                         ? $"'{symbol.Name}' returns an Objective-C object across {how}, and C++ " +
                           "has no rule for who owns one. Declare it 'extern \"C\"', or return a pointer"
@@ -668,18 +668,18 @@ public sealed partial class Binder
             // behind pointers, which no signature here can spell.
             if (TargetPlatform.Current is { Architecture: TargetArch.X86, IsWindows: true } &&
                 symbol.Parameters.Count(p => !p.IsByReference && p.Type is VectorTypeSymbol) > 3)
-                diagnostics.Error("SL0933", symbol.Span,
+                diagnostics.Report(Codes.TooManyVectorsAcrossX86Windows, symbol.Span,
                     $"'{symbol.Name}' passes more than three vectors across {how}, and 32-bit Windows " +
                     "passes only three in registers; pass the rest by 'ref' or in a struct");
 
             if (FindSlot(symbol.ReturnType) is { } returnedSlot)
-                diagnostics.Error("SL0284", symbol.Span,
+                diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
                     $"'{symbol.ReturnType.Name}' is or holds '{returnedSlot.Name}', whose layout " +
                     $"depends on whether its element has a zero value, so it cannot be returned " +
                     $"across {how}. Return the element, or a raw pointer",
                     returnedSlot);
             else if (symbol.ReturnType is StructTypeSymbol { } returned && returned.CarriesReferences())
-                diagnostics.Error("SL0284", symbol.Span,
+                diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
                     $"'{returned.Name}' holds a reference, so it cannot be returned across " +
                     $"{how}; C would copy its bytes and leave the count behind. Return a " +
                     "struct of plain data, or a raw pointer",
@@ -689,7 +689,7 @@ public sealed partial class Binder
             {
                 if (FindSlot(parameter.Type) is { } passedSlot)
                 {
-                    diagnostics.Error("SL0284", symbol.Span,
+                    diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
                         $"'{parameter.Type.Name}' is or holds '{passedSlot.Name}', whose layout " +
                         $"depends on whether its element has a zero value, so parameter " +
                         $"'{parameter.Name}' cannot cross {how}. Pass the element, or a raw pointer",
@@ -701,7 +701,7 @@ public sealed partial class Binder
                     !passed.CarriesReferences())
                     continue;
 
-                diagnostics.Error("SL0284", symbol.Span,
+                diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
                     $"'{passed.Name}' holds a reference, so parameter '{parameter.Name}' " +
                     $"cannot cross {how}; C would copy its bytes and leave the count behind. " +
                     "Pass a struct of plain data, or a raw pointer",
@@ -732,7 +732,7 @@ public sealed partial class Binder
         if (declaration.Linkage.IsImport() || declaration.Body is not null)
             return;
 
-        diagnostics.Error("SL0210", declaration.Span,
+        diagnostics.Report(Codes.FunctionWithoutBody, declaration.Span,
             $"'{declaration.Name}' has no body; Stainless has no forward declarations, " +
             "because declaration order never matters");
     }
@@ -787,7 +787,7 @@ public sealed partial class Binder
             }
 
             if (clash is not null)
-                diagnostics.Error("SL0295", variable.Span,
+                diagnostics.Report(Codes.DuplicateForeignSymbol, variable.Span,
                     $"the C name '{name}' already names {clash}, and this declares " +
                     $"'{variable.Name}' under it; C has one symbol per name, so give this one a " +
                     "name of its own",
@@ -809,7 +809,7 @@ public sealed partial class Binder
             // definition is the one to blame.
             if (s_runtimeFunctionNames.Value.Contains(group.Key))
             {
-                diagnostics.Error("SL0295", definition.Span,
+                diagnostics.Report(Codes.DuplicateForeignSymbol, definition.Span,
                     $"'{group.Key}' is a function of the Stainless runtime, which every program " +
                     "links; export this one under another name");
                 continue;
@@ -825,7 +825,7 @@ public sealed partial class Binder
                 string what = other.Linkage == LinkageKind.ExportC
                     ? "defines it a second time"
                     : "declares it with another signature";
-                diagnostics.Error("SL0295", other.Span,
+                diagnostics.Report(Codes.DuplicateForeignSymbol, other.Span,
                     $"the C name '{group.Key}' is defined by '{definition.ModuleName}.{definition.Name}', " +
                     $"and this {what}; C has one function per name, so give this one a " +
                     "name of its own");
@@ -867,14 +867,14 @@ public sealed partial class Binder
 
             if (symbol.Parameters.Any(p => p.Name == parameter.Name))
             {
-                diagnostics.Error("SL0212", parameter.Span,
+                diagnostics.Report(Codes.DuplicateParameterName, parameter.Span,
                     $"duplicate parameter name '{parameter.Name}'");
                 continue;
             }
 
             var type = ResolveType(parameter.Type, scope);
             if (type.IsVoid())
-                diagnostics.Error("SL0213", parameter.Span,
+                diagnostics.Report(Codes.VoidParameter, parameter.Span,
                     $"parameter '{parameter.Name}' cannot have type 'void'");
 
             // C decays an array parameter to a pointer and Stainless has no
@@ -882,7 +882,7 @@ public sealed partial class Binder
             // element *and* a different ABI from the C it is meant to match.
             // `ref` is the one that lines up: it is `T (*)[N]` on both sides.
             if (type is FixedArrayTypeSymbol && parameter.Mode == ParameterMode.Value)
-                diagnostics.Error("SL0491", parameter.Span,
+                diagnostics.Report(Codes.InlineArrayParameterByValue, parameter.Span,
                     $"parameter '{parameter.Name}' cannot be '{type.Name}' by value; C " +
                     "passes an array as a pointer and copying every element here would " +
                     $"be neither. Write 'ref {type.Name}' or 'in {type.Name}'",
@@ -908,7 +908,9 @@ public sealed partial class Binder
         for (int i = 1; i < written.Count; i++)
             if (!written[i].IsOptional && !written[i].IsParams && written[i - 1].IsOptional)
             {
-                diagnostics.Error("SL0614", written[i].DeclaredSpan ?? symbol.Span,
+                diagnostics.Report(Codes.MisplacedParameterDefault,
+                    written[i].DeclaredSpan ?? symbol.Span,
+                    
                     $"'{written[i].Name}' has no default and '{written[i - 1].Name}' before it " +
                     "has one; the ones that may be left out go at the end, so that what a call " +
                     "leaves off is the tail of the list and not a hole in the middle");
@@ -931,7 +933,7 @@ public sealed partial class Binder
 
         if (parameter.Mode != ParameterMode.Value)
         {
-            diagnostics.Error("SL0613", parameter.Default.Span,
+            diagnostics.Report(Codes.InvalidParameterDefault, parameter.Default.Span,
                 $"'{parameter.Name}' is '{Spelled(parameter.Mode)}', which passes the caller's " +
                 "storage rather than a value, and a default has no storage to be; make it an " +
                 "ordinary parameter, or write an overload that supplies one");
@@ -940,7 +942,7 @@ public sealed partial class Binder
 
         if (symbol.IsVariadic)
         {
-            diagnostics.Error("SL0613", parameter.Default.Span,
+            diagnostics.Report(Codes.InvalidParameterDefault, parameter.Default.Span,
                 $"'{symbol.Name}' is variadic, so what a call leaves off is already open-ended; " +
                 "a default here would make two rules for the same tail");
             return null;
@@ -977,7 +979,8 @@ public sealed partial class Binder
 
         if (why is null) return type is not ErrorTypeSymbol;
 
-        diagnostics.Error("SL0763", parameter.Span, $"'{parameter.Name}' cannot be 'params': {why}");
+        diagnostics.Report(Codes.InvalidParamsParameter, parameter.Span,
+            $"'{parameter.Name}' cannot be 'params': {why}");
         return false;
     }
 
@@ -1047,7 +1050,7 @@ public sealed partial class Binder
 
             if (function.IsOverride)
             {
-                diagnostics.Error("SL0614", written.Span,
+                diagnostics.Report(Codes.MisplacedParameterDefault, written.Span,
                     $"'{function.Name}' is an override, so it cannot give '{parameter.Name}' a " +
                     "default: a call fills one in from the declaration it can see, which is the " +
                     "one the static type gives it, and a second value here would mean the same " +
@@ -1078,7 +1081,7 @@ public sealed partial class Binder
                     if (!required.Parameters.Any(p => p.Name == parameter.Name && p.IsOptional))
                         continue;
 
-                    diagnostics.Error("SL0614", written.Span,
+                    diagnostics.Report(Codes.MisplacedParameterDefault, written.Span,
                         $"'{contract.Name}.{required.Name}' already gives '{parameter.Name}' a " +
                         "default, and a call fills one in from the declaration it can see; two " +
                         "of them would mean a call through the interface and a call through " +
@@ -1118,7 +1121,7 @@ public sealed partial class Binder
 
         if (!IsConstantDefault(bound))
         {
-            diagnostics.Error("SL0613", written.Span,
+            diagnostics.Report(Codes.InvalidParameterDefault, written.Span,
                 $"the default for '{parameter.Name}' is not a constant, and a default is " +
                 "written into every call that leaves it out -- so a call would be running this " +
                 "rather than passing it. A literal, 'null', a 'const', an enum member or " +
@@ -1162,7 +1165,7 @@ public sealed partial class Binder
 
         if (containingType is null && module.Constants.ContainsKey(declaration.Name))
         {
-            diagnostics.Error("SL0201", declaration.Span,
+            diagnostics.Report(Codes.DuplicateModuleMember, declaration.Span,
                 $"'{declaration.Name}' is already declared in module '{module.Name}'");
             return;
         }
@@ -1173,7 +1176,7 @@ public sealed partial class Binder
              containingType.FindStorage(declaration.Name) is not null ||
              containingType.FindProperty(declaration.Name) is not null))
         {
-            diagnostics.Error("SL0205", declaration.Span,
+            diagnostics.Report(Codes.DuplicateTypeMember, declaration.Span,
                 $"'{containingType.Name}' already declares a member named '{declaration.Name}'",
                 containingType);
             return;
@@ -1199,7 +1202,7 @@ public sealed partial class Binder
             value = negated ? Negate(literal.Value) : literal.Value;
 
             if (negated && value is null)
-                diagnostics.Error("SL0215", declaration.Value.Span,
+                diagnostics.Report(Codes.InvalidConstantInitializer, declaration.Value.Span,
                     "only a number can be negated");
 
             if (declaration.Type is null)
@@ -1217,7 +1220,7 @@ public sealed partial class Binder
         }
         else
         {
-            diagnostics.Error("SL0215", declaration.Value.Span,
+            diagnostics.Report(Codes.InvalidConstantInitializer, declaration.Value.Span,
                 "a 'const' must be initialized with a literal");
         }
 
@@ -1253,7 +1256,7 @@ public sealed partial class Binder
     }
 
     private void ReportUnsuitableConstantType(GlobalConstDeclSyntax declaration, TypeSymbol type) =>
-        diagnostics.Error("SL0478", declaration.Span,
+        diagnostics.Report(Codes.ConstTypeNotInlinable, declaration.Span,
             $"a 'const' holds a number, a bool, a char, an enum, a 'String', a C string " +
             $"('byte*', 'char16*', 'char32*') or an Objective-C string ('NSString', 'CFStringRef'), " +
             $"and '{type.Name}' is none of those. " +
@@ -1262,7 +1265,7 @@ public sealed partial class Binder
             type);
 
     private void ReportUnsuitableLiteral(GlobalConstDeclSyntax declaration, LiteralSyntax literal, TypeSymbol type) =>
-        diagnostics.Error("SL0479", declaration.Value.Span,
+        diagnostics.Report(Codes.ConstValueTypeMismatch, declaration.Value.Span,
             $"'{declaration.Name}' is declared '{type.Name}', and " +
             $"{literal.Kind.Describe()} is not one",
             type);

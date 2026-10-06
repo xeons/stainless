@@ -177,7 +177,7 @@ public sealed partial class Binder
         // has a size whatever it points at, and means what C's does.
         if (resolved.IsVoid() && !allowVoid)
         {
-            diagnostics.Error("SL0309", syntax.Span,
+            diagnostics.Report(Codes.VoidUsedAsValueType, syntax.Span,
                 "'void' is the absence of a value, so it can only be what a function returns; " +
                 "there is no variable, field, parameter or type argument of it");
             return ErrorTypeSymbol.Instance;
@@ -185,7 +185,7 @@ public sealed partial class Binder
 
         if (resolved is StructTypeSymbol { IsOpaque: true } opaque)
         {
-            diagnostics.Error("SL0524", syntax.Span,
+            diagnostics.Report(Codes.IncompleteTypeUsedByValue, syntax.Span,
                 $"'{opaque.Name}' is declared without a body, so its size is not known here " +
                 $"and there is no value of it to have; write '{opaque.Name}*', which is what an " +
                 "incomplete type is for",
@@ -221,7 +221,7 @@ public sealed partial class Binder
 
                 if (element.IsVoid())
                 {
-                    diagnostics.Error("SL0451", sliceSyntax.Span,
+                    diagnostics.Report(Codes.SpanOfVoid, sliceSyntax.Span,
                         $"there is no '{(sliceSyntax.IsReadOnly ? "ReadOnlySpan" : "Span")}<void>'");
                     return ErrorTypeSymbol.Instance;
                 }
@@ -235,7 +235,8 @@ public sealed partial class Binder
                 if (element.IsError()) return element;
                 if (element.IsVoid())
                 {
-                    diagnostics.Error("SL0310", syntax.Span, "there is no array of 'void'");
+                    diagnostics.Report(Codes.VoidArrayElement, syntax.Span,
+                        "there is no array of 'void'");
                     return ErrorTypeSymbol.Instance;
                 }
                 return ArrayOf(element);
@@ -256,7 +257,7 @@ public sealed partial class Binder
                     !IsStandardLibrary(scope.Module))
                 {
                     _reportedNarrowInt128 = true;
-                    diagnostics.Error("SL0831", primitive.Span,
+                    diagnostics.Report(Codes.Int128OnThirtyTwoBitTarget, primitive.Span,
                         $"'{primitive.Keyword.FixedText()}' needs a 64-bit target, and " +
                         $"'{TargetPlatform.Current.Name}' is 32-bit: clang has no __int128 there, and " +
                         "nothing divides one");
@@ -274,7 +275,7 @@ public sealed partial class Binder
                 if (element.IsError()) return element;
                 if (element is NamedTypeSymbol { IsReferenceType: true })
                 {
-                    diagnostics.Error("SL0270", syntax.Span,
+                    diagnostics.Report(Codes.PointerToReferenceType, syntax.Span,
                         $"'{element.Name}' is a reference type, so '{element.Name}*' is not " +
                         "allowed; it is already a managed pointer",
                         element);
@@ -295,7 +296,7 @@ public sealed partial class Binder
 
                 if (element is not (NamedTypeSymbol { IsReferenceType: true } or ArrayTypeSymbol))
                 {
-                    diagnostics.Error("SL0271", syntax.Span,
+                    diagnostics.Report(Codes.OptionalOfValueType, syntax.Span,
                         $"'{element.Name}?' is not valid; only class, interface and array " +
                         $"references can be optional (a '{element.Name}' is a value and is never " +
                         "null)",
@@ -313,7 +314,7 @@ public sealed partial class Binder
                 var referenced = element.AsReference();
                 if (referenced is null)
                 {
-                    diagnostics.Error("SL0272", syntax.Span,
+                    diagnostics.Report(Codes.WeakOfNonReference, syntax.Span,
                         $"'weak' requires a class or interface reference, but '{element.Name}' is not one",
                         element);
                     return ErrorTypeSymbol.Instance;
@@ -327,7 +328,7 @@ public sealed partial class Binder
                 var resolved = ResolveNamedType(named, scope);
                 if (resolved is AttributeTypeSymbol)
                 {
-                    diagnostics.Error("SL0345", syntax.Span,
+                    diagnostics.Report(Codes.AttributeUsedAsType, syntax.Span,
                         $"'{resolved.Name}' is an attribute and cannot be used as a type; " +
                         $"write it as '[{resolved.Name}]' on a declaration instead",
                         resolved);
@@ -384,7 +385,7 @@ public sealed partial class Binder
             // Naming a generic without arguments is a common slip; say so plainly.
             if (module.FindGenericType(parts[0], null) is { } template)
             {
-                diagnostics.Error("SL0325", syntax.Span,
+                diagnostics.Report(Codes.GenericTypeMissingArguments, syntax.Span,
                     $"'{template.Name}' is generic and needs type arguments, " +
                     $"as in '{template.Name}<{string.Join(", ", template.Parameters)}>'");
                 return ErrorTypeSymbol.Instance;
@@ -409,7 +410,7 @@ public sealed partial class Binder
                 if (aliases.Count == 1) return ResolveAlias(aliases[0]);
                 if (aliases.Count > 1)
                 {
-                    diagnostics.Error("SL0273", syntax.Span,
+                    diagnostics.Report(Codes.AmbiguousTypeName, syntax.Span,
                         $"'{parts[0]}' is ambiguous between " +
                         string.Join(" and ", aliases.Select(a => $"'{a.QualifiedName}'")) +
                         "; qualify it with its module name");
@@ -420,7 +421,7 @@ public sealed partial class Binder
             if (visible.Count == 1) return visible[0];
             if (visible.Count > 1)
             {
-                diagnostics.Error("SL0273", syntax.Span,
+                diagnostics.Report(Codes.AmbiguousTypeName, syntax.Span,
                     $"'{parts[0]}' is ambiguous between " +
                     string.Join(" and ", visible.Select(t => $"'{t.QualifiedName}'")) +
                     "; qualify it with its module name");
@@ -441,7 +442,7 @@ public sealed partial class Binder
                 {
                     if (target != module && !type.IsPublic)
                     {
-                        diagnostics.Error("SL0274", syntax.Span,
+                        diagnostics.Report(Codes.TypeNotAccessible, syntax.Span,
                             $"'{type.QualifiedName}' is not public");
                         return ErrorTypeSymbol.Instance;
                     }
@@ -452,20 +453,20 @@ public sealed partial class Binder
                 {
                     if (target != module && !qualifiedAlias.IsPublic)
                     {
-                        diagnostics.Error("SL0274", syntax.Span,
+                        diagnostics.Report(Codes.TypeNotAccessible, syntax.Span,
                             $"'{qualifiedAlias.QualifiedName}' is not public");
                         return ErrorTypeSymbol.Instance;
                     }
                     return ResolveAlias(qualifiedAlias);
                 }
 
-                diagnostics.Error("SL0275", syntax.Span,
+                diagnostics.Report(Codes.ModuleTypeNotFound, syntax.Span,
                     $"module '{target.Name}' does not declare a type named '{parts[^1]}'");
                 return ErrorTypeSymbol.Instance;
             }
         }
 
-        diagnostics.Error("SL0276", syntax.Span,
+        diagnostics.Report(Codes.TypeNotFound, syntax.Span,
             $"the type '{syntax.Name.Text}' was not found; " +
             "check the spelling, or add an 'import' for the module that declares it");
         return ErrorTypeSymbol.Instance;
@@ -493,7 +494,7 @@ public sealed partial class Binder
 
         if (template is null)
         {
-            diagnostics.Error("SL0326", syntax.Span,
+            diagnostics.Report(Codes.GenericTypeNotFound, syntax.Span,
                 $"no generic type named '{syntax.Name.Text}' is in scope");
             return ErrorTypeSymbol.Instance;
         }
@@ -648,7 +649,7 @@ public sealed partial class Binder
             if (arity.Count == 0)
             {
                 var counts = candidates.Select(c => c.Parameters.Count).Distinct().Order().ToList();
-                diagnostics.Error("SL0760", syntax.Callee.Span,
+                diagnostics.Report(Codes.CallTypeArgumentCountMismatch, syntax.Callee.Span,
                     $"'{candidates[0].Name}' takes " +
                     string.Join(" or ", counts) +
                     $" type argument{(counts is [1] ? "" : "s")}, and {given.Count} " +
@@ -740,7 +741,7 @@ public sealed partial class Binder
 
         if (fitting.Count > 1)
         {
-            diagnostics.Error("SL0453", syntax.Span,
+            diagnostics.Report(Codes.AmbiguousGenericType, syntax.Span,
                 $"'{candidates[0].Name}' is ambiguous here: " +
                 string.Join(" and ", fitting.Select(f =>
                     $"'{f.Template.Name}<{string.Join(", ", f.Arguments.Select(a => a.Name))}>'")) +
@@ -775,7 +776,7 @@ public sealed partial class Binder
         var reported = firstFailure ?? new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         var missing = template.Parameters.Where(p => !reported.ContainsKey(p)).ToList();
 
-        diagnostics.Error("SL0327", syntax.Span,
+        diagnostics.Report(Codes.TypeArgumentNotInferred, syntax.Span,
             $"cannot infer {string.Join(" and ", missing.Select(m => "'" + m + "'"))} " +
             $"for '{template.Name}' from these arguments; " +
             "Stainless infers type arguments only from the values passed");
@@ -1243,7 +1244,8 @@ public sealed partial class Binder
 
         if (!candidates[0].IsPublic && type.ModuleName != _currentModule!.Name)
         {
-            diagnostics.Error("SL0257", member.Span, $"'{type.Name}.{member.Member}' is not public",
+            diagnostics.Report(Codes.MethodNotAccessible, member.Span,
+                $"'{type.Name}.{member.Member}' is not public",
                 type);
             return new BoundErrorExpression(syntax.Span);
         }

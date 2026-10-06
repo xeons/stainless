@@ -63,22 +63,32 @@ public partial class DiagnosticTests
         return found;
     }
 
-    /// <summary>
-    /// Every code the compiler can report, as a quoted literal.
-    ///
-    /// Diagnostics.cs is left out because the only codes in it are the retired
-    /// ones, listed there precisely so that bringing one back is caught.
-    /// Counting that list as live would make the check assert against itself.
-    /// </summary>
-    private static readonly SortedSet<string> Emitted = CodesIn(
-        Files("src", "*.cs")
-            .Where(p => !p.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
-            .Where(p => Path.GetFileName(p) != "Diagnostics.cs"),
-        "\"(SL\\d{4})\"");
+    /// <summary>Every code the compiler can report: what the registry declares.</summary>
+    private static readonly SortedSet<string> Emitted =
+        new(Codes.All.Select(d => d.Code), StringComparer.Ordinal);
 
-    /// <summary>Every code the documentation names.</summary>
+    /// <summary>The compiler's own source, the registry and the bag aside.</summary>
+    private static readonly Dictionary<string, string> CompilerSource = Files("src", "*.cs")
+        .Where(p => !p.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
+        .Where(p => Path.GetFileName(p) is not ("Codes.cs" or "Diagnostics.cs"))
+        .ToDictionary(p => p, File.ReadAllText);
+
+    private static readonly DiagnosticDescriptor AnError =
+        Codes.All.First(d => d.Severity == Severity.Error);
+    private static readonly DiagnosticDescriptor AnotherError =
+        Codes.All.Where(d => d.Severity == Severity.Error).Skip(1).First();
+    private static readonly DiagnosticDescriptor AWarning =
+        Codes.All.First(d => d.Severity == Severity.Warning);
+
+    /// <summary>
+    /// Every code the documentation names, the inventory aside: it names every
+    /// code because it is generated from the registry, not because prose makes
+    /// a claim about each.
+    /// </summary>
     private static readonly SortedSet<string> Documented = CodesIn(
-        Files("docs", "*.md").Append(Path.Combine(Root, "README.md")),
+        Files("docs", "*.md")
+            .Where(p => Path.GetFileName(p) != "diagnostics.md")
+            .Append(Path.Combine(Root, "README.md")),
         @"\b(SL\d{4})\b");
 
     /// <summary>Every code an end-to-end case pins.</summary>
@@ -164,13 +174,60 @@ public partial class DiagnosticTests
     public void EveryCodeIsWellFormed() =>
         Assert.All(Emitted, code => Assert.Matches(CodePattern, code));
 
+    // ------------------------------------------------------------ the registry
+
+    /// <summary>A code is declared once, so it means one thing.</summary>
+    [Fact]
+    public void NoCodeIsDeclaredTwice() =>
+        Assert.Equal(Codes.All.Count, Emitted.Count);
+
+    /// <summary>
+    /// Two codes with one title are one rule with two handles, which is what
+    /// the registry is for finding.
+    /// </summary>
+    [Fact]
+    public void NoTwoCodesShareATitle() =>
+        Assert.Empty(Codes.All.GroupBy(d => d.Title, StringComparer.OrdinalIgnoreCase)
+                              .Where(g => g.Count() > 1)
+                              .Select(g => string.Join(", ", g.Select(d => d.Code)) + ": " + g.Key));
+
+    /// <summary>A place that reports names its diagnostic; it never spells a code.</summary>
+    [Fact]
+    public void NoPlaceSpellsACode() =>
+        Assert.Empty(CompilerSource
+            .SelectMany(f => Regex.Matches(f.Value, "\"SL\\d{4}\"")
+                                  .Select(m => $"{Path.GetFileName(f.Key)}: {m.Value}")));
+
+    /// <summary>Every declared diagnostic is reported somewhere.</summary>
+    [Fact]
+    public void EveryDeclaredCodeIsReported()
+    {
+        var named = new HashSet<string>(
+            CompilerSource.Values.SelectMany(text => Regex.Matches(text, @"\bCodes\.(\w+)")
+                                                          .Select(m => m.Groups[1].Value)),
+            StringComparer.Ordinal);
+        var declared = typeof(Codes).GetFields()
+            .Where(f => f.FieldType == typeof(DiagnosticDescriptor))
+            .Select(f => f.Name);
+        Assert.Empty(declared.Where(name => !named.Contains(name)));
+    }
+
+    /// <summary>The inventory page is the registry's, as it is now.</summary>
+    [Fact]
+    public void TheInventoryPageIsCurrent()
+    {
+        string page = File.ReadAllText(Path.Combine(Root, "docs", "diagnostics.md")).ReplaceLineEndings("\n");
+        Assert.True(page == DiagnosticInventory.Markdown(),
+                    "docs/diagnostics.md is stale; regenerate it with 'stainless explain --markdown'");
+    }
+
     // ------------------------------------------------------------ the record
 
     [Fact]
     public void AnErrorIsAnError()
     {
         var bag = new DiagnosticBag();
-        bag.Error("SL0001", default, "something");
+        bag.Report(AnError, default, "something");
 
         Assert.True(bag.HasErrors);
         Assert.Equal(1, bag.ErrorCount);
@@ -181,7 +238,7 @@ public partial class DiagnosticTests
     public void AWarningIsNotAnError()
     {
         var bag = new DiagnosticBag();
-        bag.Warning("SL0002", default, "something");
+        bag.Report(AWarning, default, "something");
 
         Assert.False(bag.HasErrors);
         Assert.Equal(0, bag.ErrorCount);
@@ -198,11 +255,11 @@ public partial class DiagnosticTests
         var file = Front.Text("0123456789");
         var bag = new DiagnosticBag();
 
-        bag.Warning("SL0002", new SourceSpan(file, 1, 2), "early warning");
-        bag.Error("SL0001", new SourceSpan(file, 5, 6), "late error");
-        bag.Error("SL0003", new SourceSpan(file, 3, 4), "early error");
+        bag.Report(AWarning, new SourceSpan(file, 1, 2), "early warning");
+        bag.Report(AnError, new SourceSpan(file, 5, 6), "late error");
+        bag.Report(AnotherError, new SourceSpan(file, 3, 4), "early error");
 
-        Assert.Equal(["SL0003", "SL0001", "SL0002"],
+        Assert.Equal([AnotherError.Code, AnError.Code, AWarning.Code],
                      bag.Sorted().Select(d => d.Code));
     }
 
@@ -215,8 +272,8 @@ public partial class DiagnosticTests
     public void SortingSurvivesADiagnosticWithNoFile()
     {
         var bag = new DiagnosticBag();
-        bag.Error("SL0001", new SourceSpan(Front.Text("x"), 0, 1), "somewhere");
-        bag.Error("SL0002", default, "nowhere");
+        bag.Report(AnError, new SourceSpan(Front.Text("x"), 0, 1), "somewhere");
+        bag.Report(AnotherError, default, "nowhere");
 
         Assert.Equal(2, bag.Sorted().Count());
     }
@@ -255,7 +312,7 @@ public partial class DiagnosticTests
     {
         var bag = new DiagnosticBag();
         Assert.Throws<InternalCompilerError>(
-            () => bag.Error("SL0262", default, $"expects '{DiagnosticBag.ErrorTypeName}'"));
+            () => bag.Report(AnError, default, $"expects '{DiagnosticBag.ErrorTypeName}'"));
     }
 
     /// <summary>
@@ -313,11 +370,11 @@ public partial class DiagnosticTests
     {
         var first = new DiagnosticBag();
         var second = new DiagnosticBag();
-        first.Error("SL0001", default, "a");
-        second.Warning("SL0002", default, "b");
+        first.Report(AnError, default, "a");
+        second.Report(AWarning, default, "b");
         first.AddRange(second);
 
-        Assert.Equal(["SL0001", "SL0002"], first.Items.Select(d => d.Code));
+        Assert.Equal([AnError.Code, AWarning.Code], first.Items.Select(d => d.Code));
     }
 
     // ------------------------------------------------------------ rendering

@@ -51,7 +51,7 @@ public sealed partial class Binder
         // variadic function cannot start its list either.
         if (_context.Function is not { IsVariadic: true } function)
         {
-            diagnostics.Error("SL0935", syntax.Span,
+            diagnostics.Report(Codes.VaListMisused, syntax.Span,
                 "'VaList.Start()' reads the extra arguments of the function it is written in, and " +
                 $"{(_context.Function is { } inside ? $"'{inside.Name}'" : "this")} takes none; " +
                 "declare it with '...' after its parameters");
@@ -60,7 +60,7 @@ public sealed partial class Binder
 
         if (arguments.Count != 0)
         {
-            diagnostics.Error("SL0935", syntax.Span,
+            diagnostics.Report(Codes.VaListMisused, syntax.Span,
                 $"'VaList.Start()' takes nothing; it starts at the first argument after '{function.Name}''s own");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -76,13 +76,15 @@ public sealed partial class Binder
 
         if (arguments.Count != 0)
         {
-            diagnostics.Error("SL0935", syntax.Span, "'Next<T>()' takes nothing; the type says what to read");
+            diagnostics.Report(Codes.VaListMisused, syntax.Span,
+                "'Next<T>()' takes nothing; the type says what to read");
             return new BoundErrorExpression(syntax.Span);
         }
 
         if (VaArgRefusal(type) is { } why)
         {
-            diagnostics.Error("SL0935", written.Span, $"'Next<{type.Name}>' cannot be read: {why}", type);
+            diagnostics.Report(Codes.VaListMisused, written.Span,
+                $"'Next<{type.Name}>' cannot be read: {why}", type);
             return new BoundErrorExpression(syntax.Span);
         }
 

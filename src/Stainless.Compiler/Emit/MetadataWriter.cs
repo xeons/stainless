@@ -96,7 +96,9 @@ public static class MetadataWriter
                 // metadata would stop at the fields as well, short of the
                 // tear-offs.
                 case ComInterfaceTypeSymbol comInterface:
-                    diagnostics?.Warning("SL0543", comInterface.Span ?? default,
+                    diagnostics?.Report(Codes.ComInterfaceOmittedFromMetadata,
+                        comInterface.Span ?? default,
+                        
                         $"'{comInterface.QualifiedName}' is a com interface, so it is not " +
                         "described in this library's metadata: what identifies one is its IID " +
                         "and the order of its vtable, and both are things a consumer states for " +
@@ -109,7 +111,7 @@ public static class MetadataWriter
                 // a blob of bytes, which the consumer could construct, copy and
                 // never switch on. Better to say so where the library is built.
                 case VariantTypeSymbol variant:
-                    diagnostics?.Warning("SL0441", variant.Span ?? default,
+                    diagnostics?.Report(Codes.VariantOmittedFromMetadata, variant.Span ?? default,
                         $"'{variant.QualifiedName}' is a variant, so it is not described in " +
                         "this library's metadata: its cases are what a consumer would switch " +
                         "on, and the metadata carries layouts rather than cases. A variant " +
@@ -149,7 +151,9 @@ public static class MetadataWriter
                 // a public type that was somehow not there, and nothing said
                 // why.
                 case InterfaceTypeSymbol interfaceType:
-                    diagnostics?.Warning("SL0545", interfaceType.Span ?? default,
+                    diagnostics?.Report(Codes.InterfaceOmittedFromMetadata,
+                        interfaceType.Span ?? default,
+                        
                         $"'{interfaceType.QualifiedName}' is an interface, so it is not " +
                         "described in this library's metadata: dispatch through one is indexed " +
                         "by an id assigned across a whole program, and this library and its " +
@@ -182,7 +186,7 @@ public static class MetadataWriter
                          .Where(m => ownModules.Contains(m.Name))
                          .SelectMany(m => m.GenericTypes.Values)
                          .Where(t => t.IsPublic))
-                diagnostics.Warning("SL0419", template.Declaration.Span,
+                diagnostics.Report(Codes.GenericOmittedFromMetadata, template.Declaration.Span,
                     $"'{template.Name}' is generic, so it is not described in this library's " +
                     "metadata: a template emits nothing until it is instantiated, and a consumer " +
                     "with only the binary has nothing to instantiate. A generic crosses a library " +
@@ -274,7 +278,7 @@ public static class MetadataWriter
                 if (known.Contains(bare)) continue;
                 if (!reported.Add(owner + "/" + bare)) continue;
 
-                diagnostics.Warning("SL0477",
+                diagnostics.Report(Codes.MetadataReferencesUndescribedType,
                     spans.TryGetValue(owner, out var at) ? at : default,
                     $"'{owner}' is described in this library's metadata and {what} is " +
                     $"'{written}', which is not. A consumer would read a name it cannot " +
@@ -336,7 +340,7 @@ public static class MetadataWriter
 
         if (excluded.IsCom)
         {
-            diagnostics.Warning("SL0544", Where(excluded),
+            diagnostics.Report(Codes.ComClassOmittedFromMetadata, Where(excluded),
                 $"'{excluded.QualifiedName}' is a com class, so it is not described in this " +
                 "library's metadata: its vtables and adjustor thunks are internal symbols of " +
                 "this compilation, and a consumer's 'new' would have to point at them. Hand one " +
@@ -346,7 +350,7 @@ public static class MetadataWriter
 
         if (HasGenericVirtual(excluded))
         {
-            diagnostics.Warning("SL0799", Where(excluded),
+            diagnostics.Report(Codes.GenericVirtualExcludedFromMetadata, Where(excluded),
                 $"'{excluded.QualifiedName}' has a generic virtual method, so it is not described " +
                 "in this library's metadata: each instantiation the program calls is a slot " +
                 "numbered after every other, and a class derived from it in another program " +
@@ -354,7 +358,7 @@ public static class MetadataWriter
             return;
         }
 
-        diagnostics.Warning("SL0420", Where(excluded),
+        diagnostics.Report(Codes.InterfaceImplementerOmittedFromMetadata, Where(excluded),
             $"'{excluded.QualifiedName}' implements an interface, so it is not described in " +
             "this library's metadata: a dispatch table is indexed by an interface id assigned " +
             "across a whole program, and this library and its consumer are two of those");

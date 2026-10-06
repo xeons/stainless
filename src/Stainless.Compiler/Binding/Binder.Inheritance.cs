@@ -97,7 +97,7 @@ public sealed partial class Binder
         if (type is VariantTypeSymbol or UnionTypeSymbol && listed.Implements.Count > 0)
         {
             string kind = type is VariantTypeSymbol ? "variant" : "union";
-            diagnostics.Error("SL0302", declaration.Span,
+            diagnostics.Report(Codes.StructCannotBeInterface, declaration.Span,
                 $"{kind} '{type.Name}' cannot implement an interface; an interface " +
                 "reference is a counted pointer, and a " + kind + " is a plain C value",
                 type);
@@ -141,7 +141,7 @@ public sealed partial class Binder
 
                 if (resolved is not InterfaceTypeSymbol interfaceType)
                 {
-                    diagnostics.Error("SL0303", written.Span,
+                    diagnostics.Report(Codes.BaseInterfaceNotInterface, written.Span,
                         $"'{resolved.Name}' is not an interface, so '{type.Name}' cannot " +
                         (type.IsContract ? "extend" : "implement") + " it",
                         resolved, type);
@@ -153,7 +153,7 @@ public sealed partial class Binder
                 // interface is not reached through a vtable pointer at all.
                 if (type is ComInterfaceTypeSymbol)
                 {
-                    diagnostics.Error("SL0529", written.Span,
+                    diagnostics.Report(Codes.ComInterfaceExtendsNonCom, written.Span,
                         $"'{type.Name}' is a com interface and '{interfaceType.Name}' is not; " +
                         "a COM vtable is one array with IUnknown at the front, and a Stainless " +
                         "interface is reached through the object header instead",
@@ -163,7 +163,7 @@ public sealed partial class Binder
 
                 if (type.Interfaces.Contains(interfaceType))
                 {
-                    diagnostics.Warning("SL0304", written.Span,
+                    diagnostics.Report(Codes.InterfaceListedTwice, written.Span,
                         $"'{type.Name}' already lists '{interfaceType.Name}'",
                         type, interfaceType);
                     continue;
@@ -171,7 +171,7 @@ public sealed partial class Binder
 
                 if (interfaceType == type || interfaceType.AllInterfaces().Contains(type))
                 {
-                    diagnostics.Error("SL0333", written.Span,
+                    diagnostics.Report(Codes.InterfaceInheritanceCycle, written.Span,
                         $"'{type.Name}' and '{interfaceType.Name}' extend each other",
                         type, interfaceType);
                     continue;
@@ -224,7 +224,7 @@ public sealed partial class Binder
         {
             if (derived.BaseInterface is not null)
             {
-                diagnostics.Error("SL0530", span,
+                diagnostics.Report(Codes.ComInterfaceMultipleBases, span,
                     $"'{derived.Name}' already extends '{derived.BaseInterface.Name}', so it " +
                     $"cannot also extend '{comInterface.Name}'. A COM vtable is one array and a " +
                     "reference is one pointer to it, so there is room for one chain and not two",
@@ -234,7 +234,7 @@ public sealed partial class Binder
 
             if (comInterface == derived || comInterface.DerivesFrom(derived))
             {
-                diagnostics.Error("SL0531", span,
+                diagnostics.Report(Codes.CircularComInterfaceInheritance, span,
                     comInterface == derived
                         ? $"'{derived.Name}' cannot extend itself"
                         : $"'{derived.Name}' and '{comInterface.Name}' extend each other, so " +
@@ -251,7 +251,7 @@ public sealed partial class Binder
 
             if (derived.HasUnknown != comInterface.HasUnknown)
             {
-                diagnostics.Error("SL0622", span,
+                diagnostics.Report(Codes.ComInterfaceUnknownMismatch, span,
                     $"'{derived.Name}' and '{comInterface.Name}' disagree about whether their " +
                     "vtable begins with IUnknown, and one table cannot do both: extending the " +
                     "other would put IUnknown three slots into the middle of it. Write " +
@@ -266,7 +266,7 @@ public sealed partial class Binder
 
         if (classType is null)
         {
-            diagnostics.Error("SL0532", span,
+            diagnostics.Report(Codes.ComInterfaceOnNonClass, span,
                 $"'{type.Name}' cannot present '{comInterface.Name}': a com interface is laid " +
                 "out inside the object that presents it, and only a class has an object",
                 type, comInterface);
@@ -275,7 +275,7 @@ public sealed partial class Binder
 
         if (!classType.IsCom)
         {
-            diagnostics.Error("SL0533", span,
+            diagnostics.Report(Codes.ComInterfaceOnNonComClass, span,
                 $"'{classType.Name}' implements the com interface '{comInterface.Name}', so it " +
                 $"must be declared 'com class {classType.Name}'. A COM reference points at a " +
                 "vtable pointer, and an ordinary class has no room for one",
@@ -285,7 +285,7 @@ public sealed partial class Binder
 
         if (classType.ComInterfaces.Contains(comInterface))
         {
-            diagnostics.Warning("SL0304", span,
+            diagnostics.Report(Codes.InterfaceListedTwice, span,
                 $"'{classType.Name}' already lists '{comInterface.Name}'",
                 classType, comInterface);
             return;
@@ -338,7 +338,7 @@ public sealed partial class Binder
         if (type.VirtualTable.Count > inherited) return;
         if (type == _builtins.Unknown) return;
 
-        diagnostics.Warning("SL0534", declaration.Span,
+        diagnostics.Report(Codes.ComInterfaceEmpty, declaration.Span,
             $"'{type.Name}' declares no methods, so it is IUnknown under another name; " +
             "give it members or use 'IUnknown' directly",
             type);
@@ -352,7 +352,9 @@ public sealed partial class Binder
     {
         if (classType.ComInterfaces.Count == 0)
         {
-            diagnostics.Error("SL0535", classType.Span ?? declaration.Span,
+            diagnostics.Report(Codes.ComClassWithoutComInterface,
+                classType.Span ?? declaration.Span,
+                
                 $"'{classType.Name}' is a com class and presents no com interface, so nothing " +
                 "outside could ever hold one. List at least one after ':'",
                 classType);
@@ -360,7 +362,7 @@ public sealed partial class Binder
         }
 
         if (classType.BaseClass is not null)
-            diagnostics.Error("SL0536", classType.Span ?? declaration.Span,
+            diagnostics.Report(Codes.ComClassWithBaseClass, classType.Span ?? declaration.Span,
                 $"'{classType.Name}' is a com class and derives from " +
                 $"'{classType.BaseClass.Name}'; the two cannot be combined yet, because the " +
                 "tear-offs sit after the fields and a derived class adds fields after those",
@@ -404,7 +406,7 @@ public sealed partial class Binder
             var found = classType.FindImplementation(required);
             if (found is null)
             {
-                diagnostics.Error("SL0305", span,
+                diagnostics.Report(Codes.InterfaceMemberNotImplemented, span,
                     $"'{classType.Name}' does not implement '{comInterface.Name}.{required.Name}'; " +
                     $"add 'public {required.ReturnType.Name} {required.Name}(" +
                     string.Join(", ", required.Parameters.Where(p => !p.IsThis)
@@ -414,7 +416,7 @@ public sealed partial class Binder
             }
 
             if (!found.IsPublic)
-                diagnostics.Error("SL0306", found.Span,
+                diagnostics.Report(Codes.ImplementationNotPublic, found.Span,
                     $"'{classType.Name}.{found.Name}' implements " +
                     $"'{comInterface.Name}.{required.Name}' and must therefore be public",
                     classType, comInterface);
@@ -432,7 +434,7 @@ public sealed partial class Binder
     {
         if (classType is null)
         {
-            diagnostics.Error("SL0512", span,
+            diagnostics.Report(Codes.InterfaceExtendsClass, span,
                 $"'{type.Name}' is an interface and '{baseClass.Name}' is a class; an interface " +
                 "extends interfaces only, because it has no state to inherit",
                 type, baseClass);
@@ -441,7 +443,7 @@ public sealed partial class Binder
 
         if (classType.BaseClass is not null)
         {
-            diagnostics.Error("SL0510", span,
+            diagnostics.Report(Codes.MultipleBaseClasses, span,
                 $"'{classType.Name}' already derives from '{classType.BaseClass.Name}', so it " +
                 $"cannot also derive from '{baseClass.Name}'. With two bases a reference to one " +
                 "of them is a different address from the object itself, and reference identity, " +
@@ -453,7 +455,7 @@ public sealed partial class Binder
 
         if (!isFirst)
         {
-            diagnostics.Error("SL0508", span,
+            diagnostics.Report(Codes.BaseClassNotFirst, span,
                 $"the base class must be written first: '{classType.Name} : {baseClass.Name}, ...'. " +
                 "A class has one base and any number of interfaces, and putting the base at the " +
                 "front is what tells them apart without a keyword",
@@ -463,7 +465,7 @@ public sealed partial class Binder
 
         if (_inheritanceInProgress.Contains(baseClass))
         {
-            diagnostics.Error("SL0511", span,
+            diagnostics.Report(Codes.CircularClassInheritance, span,
                 baseClass == classType
                     ? $"'{classType.Name}' cannot derive from itself"
                     : $"'{classType.Name}' and '{baseClass.Name}' derive from each other, so " +
@@ -474,7 +476,7 @@ public sealed partial class Binder
 
         if (baseClass.IsSealed)
         {
-            diagnostics.Error("SL0509", span,
+            diagnostics.Report(Codes.BaseClassSealed, span,
                 $"'{baseClass.Name}' is sealed, so nothing may derive from it",
                 baseClass);
             return;
@@ -484,7 +486,7 @@ public sealed partial class Binder
         // class deriving from one would be compared and copied as the record.
         if (baseClass.RecordParameters.Count > 0 && classType.RecordParameters.Count == 0)
         {
-            diagnostics.Error("SL0804", span,
+            diagnostics.Report(Codes.NonRecordDerivesFromRecord, span,
                 $"'{baseClass.Name}' is a record, and only a record may derive from one: " +
                 $"'{classType.Name}' would be compared and copied by 'with' as a " +
                 $"'{baseClass.Name}', losing what it adds. Declare it a record with the " +
@@ -495,7 +497,7 @@ public sealed partial class Binder
 
         if (baseClass.IsIntrinsic || baseClass.RuntimeFactory is not null)
         {
-            diagnostics.Error("SL0513", span,
+            diagnostics.Report(Codes.BaseClassProvidedByRuntime, span,
                 $"'{baseClass.Name}' is provided by the runtime rather than compiled here, so " +
                 "its layout and its destructor are not this compilation's to extend",
                 baseClass);
@@ -553,20 +555,20 @@ public sealed partial class Binder
         foreach (var method in classType.Methods)
         {
             if (method.IsVirtual && !method.IsPublic && !method.IsProtected)
-                diagnostics.Error("SL0506", method.Span,
+                diagnostics.Report(Codes.DispatchedMemberNotAccessible, method.Span,
                     $"'{classType.Name}.{Describe(method)}' is dispatched, so it must be " +
                     "'public' or 'protected': a derived class has to be able to name what it " +
                     "is replacing",
                     classType);
 
             if (method.IsSealed && !method.IsOverride)
-                diagnostics.Error("SL0507", method.Span,
+                diagnostics.Report(Codes.DispatchModifiersMisused, method.Span,
                     $"'{classType.Name}.{Describe(method)}' is 'sealed' and overrides nothing; " +
                     "the word closes an inherited chain, so it goes with 'override'",
                     classType);
 
             if (method.IsAbstract && !classType.IsAbstract)
-                diagnostics.Error("SL0505", method.Span,
+                diagnostics.Report(Codes.AbstractMemberInConcreteClass, method.Span,
                     $"'{classType.Name}.{Describe(method)}' is abstract, so '{classType.Name}' " +
                     "must be abstract too; a class with a method that has no body cannot be made",
                     classType);
@@ -603,7 +605,7 @@ public sealed partial class Binder
                 // Silent hiding is the one shape C# allows here and this does
                 // not: `new` exists to say "I know", and a language with no way
                 // to reach the hidden member has nothing to say it about.
-                diagnostics.Error("SL0503", method.Span,
+                diagnostics.Report(Codes.InheritedMemberHiddenWithoutOverride, method.Span,
                     $"'{classType.Name}.{Describe(method)}' has the same name and parameters as " +
                     $"'{inherited.ContainingType!.Name}.{Describe(inherited)}'" +
                     (inherited.IsVirtual
@@ -629,7 +631,9 @@ public sealed partial class Binder
         // the missing constructor goes.
         if (classType.Constructors.Count == 0 &&
             !TryImplicitBaseConstructor(classType, out _))
-            diagnostics.Error("SL0517", classType.Span ?? declaration.Span,
+            diagnostics.Report(Codes.BaseConstructorCallMismatch,
+                classType.Span ?? declaration.Span,
+                
                 $"'{classType.Name}' declares no constructor and every constructor of " +
                 $"'{NearestConstructing(classType)!.Name}' takes arguments, so nothing could " +
                 $"ever build one; give '{classType.Name}' a constructor whose first statement " +
@@ -643,7 +647,9 @@ public sealed partial class Binder
         // against that declaration, which is where the mistake is.
         foreach (var missing in classType.VirtualTable
                      .Where(m => m.IsAbstract && m.ContainingType != classType))
-            diagnostics.Error("SL0504", classType.Span ?? declaration.Span,
+            diagnostics.Report(Codes.AbstractMemberNotImplemented,
+                classType.Span ?? declaration.Span,
+                
                 $"'{classType.Name}' does not implement abstract " +
                 $"'{missing.ContainingType!.Name}.{Describe(missing)}'; add 'public override " +
                 $"{missing.ReturnType.Name} {missing.Name}(" +
@@ -668,7 +674,7 @@ public sealed partial class Binder
             classType.BaseClass?.FindProperty(property.Name) is { } widerProperty &&
             !widerProperty.Type.Equals(property.Type))
         {
-            diagnostics.Error("SL0502", method.Span,
+            diagnostics.Report(Codes.OverrideSignatureMismatch, method.Span,
                 $"'{classType.Name}.{property.Name}' narrows its type from " +
                 $"'{widerProperty.Type.Name}' to '{property.Type.Name}', and only a property " +
                 $"with no setter may: a caller holding '{widerProperty.ContainingType.Name}' " +
@@ -679,7 +685,7 @@ public sealed partial class Binder
 
         if (inherited is null)
         {
-            diagnostics.Error("SL0499", method.Span,
+            diagnostics.Report(Codes.OverrideHasNoBase, method.Span,
                 classType.BaseClass is null
                     ? $"'{classType.Name}.{Describe(method)}' is marked 'override' and " +
                       $"'{classType.Name}' derives from nothing"
@@ -692,7 +698,7 @@ public sealed partial class Binder
 
         if (!inherited.IsVirtual)
         {
-            diagnostics.Error("SL0500", method.Span,
+            diagnostics.Report(Codes.OverriddenMethodNotVirtual, method.Span,
                 $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is not " +
                 "virtual, so it cannot be overridden; mark it 'virtual' or 'abstract'",
                 inherited.ContainingType);
@@ -701,7 +707,7 @@ public sealed partial class Binder
 
         if (inherited.IsSealed)
         {
-            diagnostics.Error("SL0501", method.Span,
+            diagnostics.Report(Codes.OverriddenMethodSealed, method.Span,
                 $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is a sealed " +
                 "override, so nothing may override it further",
                 inherited.ContainingType);
@@ -710,7 +716,7 @@ public sealed partial class Binder
 
         if (!SignaturesAgree(method, inherited))
         {
-            diagnostics.Error("SL0502", method.Span,
+            diagnostics.Report(Codes.OverrideSignatureMismatch, method.Span,
                 $"'{classType.Name}.{Describe(method)}' does not match what it overrides; " +
                 $"expected '{inherited.ReturnType.Name} {inherited.Name}(" +
                 string.Join(", ", inherited.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
@@ -741,7 +747,7 @@ public sealed partial class Binder
         string owner = required.ContainingType!.Name;
         string name = required.Accessor?.Name ?? required.Name;
 
-        diagnostics.Error("SL0782", found.Span,
+        diagnostics.Report(Codes.InitSetAccessorMismatch, found.Span,
             required.IsInitAccessor
                 ? $"'{owner}.{name}' is written with 'init', so what stands in for it must be " +
                   "'init' too; a 'set' would let a write through here that the declaration forbids"
@@ -826,7 +832,7 @@ public sealed partial class Binder
         foreach (var (type, entry) in _typeSyntax)
             if (entry.Declaration.Attributes.Count > 0 &&
                 entry.Declaration.Attributes.Any(a => a.Name.Last == "Flags"))
-                diagnostics.Error("SL0411", entry.Declaration.Span,
+                diagnostics.Report(Codes.FlagsAttributeOnNonEnum, entry.Declaration.Span,
                     $"'[Flags]' says an enum's members combine as bits; '{type.Name}' is not an enum",
                     type);
 
@@ -849,25 +855,25 @@ public sealed partial class Binder
                 // are not, and a variant's shape is its cases, which the field
                 // tables have no way to say.
                 if (type is VariantTypeSymbol)
-                    diagnostics.Error("SL0442", entry.Declaration.Span,
+                    diagnostics.Report(Codes.ReflectOnVariant, entry.Declaration.Span,
                         $"'[Reflect]' emits a type's fields, and the fields of variant " +
                         $"'{type.Name}' are a tag and a payload the source cannot name. What " +
                         "a reader would want is its cases, and those are not described yet",
                         type);
                 else if (type.Fields.Any(f => f.IsBitField))
-                    diagnostics.Error("SL0475", entry.Declaration.Span,
+                    diagnostics.Report(Codes.ReflectWithBitFields, entry.Declaration.Span,
                         $"'[Reflect]' describes a field by its byte offset, and '{type.Name}' " +
                         "has bit-fields, which have not got one. Reflecting them means saying " +
                         "where in a byte they start, and the tables do not",
                         type);
                 else if (IsObjCType(type))
-                    diagnostics.Error("SL0341", entry.Declaration.Span,
+                    diagnostics.Report(Codes.ReflectOnUnsupportedType, entry.Declaration.Span,
                         $"'[Reflect]' describes what a Stainless type holds, and '{type.Name}' is " +
                         "an Objective-C type, which the Objective-C runtime describes",
                         type);
                 else if (type is ClassTypeSymbol or StructTypeSymbol) type.IsReflected = true;
                 else
-                    diagnostics.Error("SL0341", entry.Declaration.Span,
+                    diagnostics.Report(Codes.ReflectOnUnsupportedType, entry.Declaration.Span,
                         $"'[Reflect]' applies to a class or a struct; '{type.Name}' is neither",
                         type);
             }
@@ -941,7 +947,9 @@ public sealed partial class Binder
                 .FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis));
             if (classType.Constructors.Count > 0 && empty is null)
             {
-                diagnostics.Error("SL0611", classType.Span ?? entry.Declaration.Span,
+                diagnostics.Report(Codes.GuidClassNotFactoryConstructible,
+                    classType.Span ?? entry.Declaration.Span,
+                    
                     $"'{classType.Name}' has a '[Guid]', so a class factory can be asked to make " +
                     "one, and a class factory has no arguments to pass. Give it a constructor " +
                     "taking none, or drop the '[Guid]' and hand the object out instead",
@@ -953,7 +961,9 @@ public sealed partial class Binder
             if (required.Count == 0 || empty?.SetsRequiredMembers == true)
                 continue;
 
-            diagnostics.Error("SL0611", classType.Span ?? entry.Declaration.Span,
+            diagnostics.Report(Codes.GuidClassNotFactoryConstructible,
+                classType.Span ?? entry.Declaration.Span,
+                
                 $"'{classType.Name}' has a '[Guid]', so a class factory can be asked to make " +
                 "one, and a class factory has nothing to give its required " +
                 $"{(required.Count == 1 ? "member" : "members")} " +
@@ -984,7 +994,7 @@ public sealed partial class Binder
             : declaration.Attributes.Except(unknowns).ToList();
 
         if (unknowns.Count > 0 && type is not ComInterfaceTypeSymbol)
-            diagnostics.Error("SL0623", unknowns[0].Span,
+            diagnostics.Report(Codes.NoUnknownOnNonComInterface, unknowns[0].Span,
                 $"'[NoUnknown]' says a COM vtable does not begin with IUnknown, and " +
                 $"'{type.Name}' is not a com interface; write it on a 'com interface'",
                 type);
@@ -998,7 +1008,7 @@ public sealed partial class Binder
             // an IID would name something nobody could use.
             if (type is ComInterfaceTypeSymbol { HasUnknown: true } needsOne &&
                 needsOne != _builtins.Unknown)
-                diagnostics.Error("SL0537", declaration.Span,
+                diagnostics.Report(Codes.ComInterfaceMissingGuid, declaration.Span,
                     $"'{type.Name}' is a com interface and has no '[Guid(\"...\")]'. An IID is " +
                     "how QueryInterface names an interface, so without one nothing could ever " +
                     "ask an object for this one",
@@ -1008,7 +1018,7 @@ public sealed partial class Binder
 
         if (type is ComInterfaceTypeSymbol { HasUnknown: false })
         {
-            diagnostics.Error("SL0624", guids[0].Span,
+            diagnostics.Report(Codes.GuidOnNoUnknownInterface, guids[0].Span,
                 $"'{type.Name}' is '[NoUnknown]', so its vtable has no QueryInterface and an " +
                 "IID would name something nothing could ask for. Drop the '[Guid]', or drop " +
                 "the '[NoUnknown]'",
@@ -1021,7 +1031,7 @@ public sealed partial class Binder
         // what the number names, and so what may be asked with it.
         if (type is not (ComInterfaceTypeSymbol or ClassTypeSymbol { IsCom: true }))
         {
-            diagnostics.Error("SL0538", guids[0].Span,
+            diagnostics.Report(Codes.GuidOnNonComType, guids[0].Span,
                 $"'[Guid]' names a COM interface or a COM class, and '{type.Name}' is " +
                 "neither; write it on a 'com interface' or a 'com class' declaration",
                 type);
@@ -1029,7 +1039,7 @@ public sealed partial class Binder
         }
 
         if (guids.Count > 1)
-            diagnostics.Error("SL0539", guids[1].Span,
+            diagnostics.Report(Codes.DuplicateGuidAttribute, guids[1].Span,
                 $"'{type.Name}' has more than one '[Guid]', and an interface has one identity",
                 type);
 
@@ -1037,14 +1047,14 @@ public sealed partial class Binder
         if (only.Arguments.Count != 1 ||
             ConstantValue(only.Arguments[0], _builtins.String) is not string text)
         {
-            diagnostics.Error("SL0540", only.Span,
+            diagnostics.Report(Codes.GuidArgumentInvalid, only.Span,
                 "'[Guid]' takes one string literal, as in " +
                 "'[Guid(\"42f85136-db7e-439c-85f1-e4075d135fc8\")]'");
             return rest.Except(guids).ToList();
         }
 
         if (!Guid.TryParseExact(text, "D", out var parsed))
-            diagnostics.Error("SL0541", only.Arguments[0].Span,
+            diagnostics.Report(Codes.GuidFormatInvalid, only.Arguments[0].Span,
                 $"'{text}' is not a GUID; the form is eight hex digits, three groups of four, " +
                 "then twelve, separated by hyphens");
         else if (type is ComInterfaceTypeSymbol comInterface)
@@ -1080,7 +1090,7 @@ public sealed partial class Binder
 
             if (resolved is not AttributeTypeSymbol attributeType)
             {
-                diagnostics.Error("SL0342", attribute.Span,
+                diagnostics.Report(Codes.NotAnAttribute, attribute.Span,
                     $"'{resolved.Name}' is not an attribute, so it cannot be written on {owner}",
                     resolved);
                 continue;
@@ -1093,7 +1103,7 @@ public sealed partial class Binder
             if (attributeType == _builtins.Embed)
             {
                 if (embed is null)
-                    diagnostics.Error("SL0729", attribute.Span,
+                    diagnostics.Report(Codes.InvalidEmbedPlacement, attribute.Span,
                         "'[Embed]' says where a static's bytes come from, and " +
                         $"'{owner}' is not a static; write it on a " +
                         "'static readonly byte[]' with no initializer");
@@ -1124,7 +1134,7 @@ public sealed partial class Binder
                 var value = ConstantValue(written, field.Type);
                 if (value is null)
                 {
-                    diagnostics.Error("SL0344", written.Span,
+                    diagnostics.Report(Codes.AttributeArgumentNotConstant, written.Span,
                         $"'{attributeType.Name}.{field.Name}' must be a constant " +
                         $"'{field.Type.Name}'; attribute values are written into the binary",
                         attributeType, field.Type);
@@ -1176,7 +1186,7 @@ public sealed partial class Binder
                 int at = IndexOfField(type, name.Name);
                 if (at < 0)
                 {
-                    diagnostics.Error("SL0724", name.NameSpan,
+                    diagnostics.Report(Codes.AttributeFieldNotFound, name.NameSpan,
                         $"'{type.Name}' has no field named '{name.Name}'; it has " +
                         (type.Fields.Count == 0
                             ? "none at all"
@@ -1188,7 +1198,7 @@ public sealed partial class Binder
 
                 if (given[at] is not null)
                 {
-                    diagnostics.Error("SL0725", argument.Span,
+                    diagnostics.Report(Codes.AttributeFieldGivenTwice, argument.Span,
                         $"'{type.Name}.{type.Fields[at].Name}' is given twice; an attribute's " +
                         "field has one value",
                         type);
@@ -1202,7 +1212,7 @@ public sealed partial class Binder
 
             if (named)
             {
-                diagnostics.Error("SL0726", argument.Span,
+                diagnostics.Report(Codes.AttributePositionalAfterNamed, argument.Span,
                     "this value comes after a field named with '=', so which field of " +
                     $"'{type.Name}' it is for would have to be counted out; write the " +
                     "positional arguments first, or name this one too",
@@ -1213,7 +1223,7 @@ public sealed partial class Binder
 
             if (next >= type.Fields.Count)
             {
-                diagnostics.Error("SL0343", attribute.Span,
+                diagnostics.Report(Codes.AttributeArgumentCountMismatch, attribute.Span,
                     $"'{type.Name}' has {type.Fields.Count} " +
                     $"field{(type.Fields.Count == 1 ? "" : "s")}, " +
                     $"but {Given(attribute.Arguments.Count)}",
@@ -1268,7 +1278,7 @@ public sealed partial class Binder
 
             if (!type.AllInterfaces().Contains(contract))
             {
-                diagnostics.Error("SL0794", member.Span,
+                diagnostics.Report(Codes.ExplicitInterfaceTargetInvalid, member.Span,
                     $"'{type.Name}' does not {(type.IsContract ? "extend" : "implement")} " +
                     $"'{contract.Name}', so it has no slot of '{contract.Name}' for " +
                     $"'{member.Name}' to fill",
@@ -1282,7 +1292,7 @@ public sealed partial class Binder
 
             if (required is null)
             {
-                diagnostics.Error("SL0794", member.Span,
+                diagnostics.Report(Codes.ExplicitInterfaceTargetInvalid, member.Span,
                     $"'{contract.Name}' declares no '{member.Name}' taking " +
                     (signature.Count == 0
                         ? "nothing"
@@ -1295,7 +1305,7 @@ public sealed partial class Binder
             member.ImplementedMember = required;
 
             if (!SameSignature(member, required))
-                diagnostics.Error("SL0307", member.Span,
+                diagnostics.Report(Codes.ImplementationSignatureMismatch, member.Span,
                     $"'{type.Name}.{contract.Name}.{member.Name}' does not match " +
                     $"'{contract.Name}.{required.Name}'; expected " +
                     $"'{required.ReturnType.Name} {required.Name}(" +
@@ -1336,7 +1346,7 @@ public sealed partial class Binder
         {
             if (structType.FindImplementation(required) is not { } found)
             {
-                diagnostics.Error("SL0305", span,
+                diagnostics.Report(Codes.InterfaceMemberNotImplemented, span,
                     required.Accessor is { } declared
                         ? $"'{structType.Name}' does not implement property " +
                           $"'{interfaceType.Name}.{declared.Name}'; add 'public {declared.Type.Name} " +
@@ -1350,13 +1360,13 @@ public sealed partial class Binder
             }
 
             if (!found.IsPublic)
-                diagnostics.Error("SL0306", found.Span,
+                diagnostics.Report(Codes.ImplementationNotPublic, found.Span,
                     $"'{structType.Name}.{found.Name}' implements " +
                     $"'{interfaceType.Name}.{required.Name}' and must therefore be public",
                     structType, interfaceType);
 
             if (!SameSignature(found, required))
-                diagnostics.Error("SL0307", found.Span,
+                diagnostics.Report(Codes.ImplementationSignatureMismatch, found.Span,
                     $"'{structType.Name}.{found.Name}' does not match " +
                     $"'{interfaceType.Name}.{required.Name}'; expected " +
                     $"'{required.ReturnType.Name} {required.Name}(" +
@@ -1400,7 +1410,7 @@ public sealed partial class Binder
 
                 if (tied.Count > 1)
                 {
-                    diagnostics.Error("SL0796", span,
+                    diagnostics.Report(Codes.AmbiguousDefaultInterfaceMember, span,
                         $"'{classType.Name}' does not implement " +
                         $"'{interfaceType.Name}.{Describe(required)}', and " +
                         string.Join(" and ", tied.Select(t => $"'{t.ContainingType!.Name}'")) +
@@ -1424,7 +1434,7 @@ public sealed partial class Binder
             {
                 // A missing accessor is a missing property as far as the source
                 // is concerned, so say so in the shape it was written in.
-                diagnostics.Error("SL0305", span,
+                diagnostics.Report(Codes.InterfaceMemberNotImplemented, span,
                     required.Accessor is { } declared
                         ? $"'{classType.Name}' does not implement property " +
                           $"'{interfaceType.Name}.{declared.Name}'; add 'public {declared.Type.Name} " +
@@ -1443,7 +1453,7 @@ public sealed partial class Binder
 
             if (!found.IsPublic)
             {
-                diagnostics.Error("SL0306", found.Span,
+                diagnostics.Report(Codes.ImplementationNotPublic, found.Span,
                     $"'{classType.Name}.{found.Name}' implements " +
                     $"'{interfaceType.Name}.{required.Name}' and must therefore be public",
                     classType, interfaceType);
@@ -1457,7 +1467,7 @@ public sealed partial class Binder
             // the caller is about to hand a pointer to.
             if (!SameSignature(found, required))
             {
-                diagnostics.Error("SL0307", found.Span,
+                diagnostics.Report(Codes.ImplementationSignatureMismatch, found.Span,
                     $"'{classType.Name}.{found.Name}' does not match " +
                     $"'{interfaceType.Name}.{required.Name}'; expected " +
                     $"'{required.ReturnType.Name} {required.Name}(" +
@@ -1505,7 +1515,7 @@ public sealed partial class Binder
                     required != missing.Getter)
                     continue;
 
-                diagnostics.Error("SL0305", span,
+                diagnostics.Report(Codes.InterfaceMemberNotImplemented, span,
                     $"'{implementer.Name}' does not implement static " +
                     $"'{interfaceType.Name}.{Describe(required)}'; add 'public static " +
                     $"{(required.Accessor?.Type ?? required.ReturnType).Name} " +
@@ -1522,12 +1532,12 @@ public sealed partial class Binder
             }
 
             if (!found.IsPublic)
-                diagnostics.Error("SL0306", found.Span,
+                diagnostics.Report(Codes.ImplementationNotPublic, found.Span,
                     $"'{implementer.Name}.{Describe(found)}' implements " +
                     $"'{interfaceType.Name}.{Describe(required)}' and must therefore be public",
                     implementer, interfaceType);
             else if (!SameSignature(found, required))
-                diagnostics.Error("SL0307", found.Span,
+                diagnostics.Report(Codes.ImplementationSignatureMismatch, found.Span,
                     $"'{implementer.Name}.{Describe(found)}' does not match " +
                     $"'{interfaceType.Name}.{Describe(required)}'; expected " +
                     $"'{required.ReturnType.Name}'",
@@ -1569,7 +1579,7 @@ public sealed partial class Binder
 
         if (why is null) field.IsPacked = true;
         else
-            diagnostics.Error("SL0463", span,
+            diagnostics.Report(Codes.PackedAttributeInvalid, span,
                 $"'[Packed]' on '{type.Name}.{field.Name}' lays the field out with no padding before " +
                 $"it, and {why}",
                 type);
@@ -1585,7 +1595,7 @@ public sealed partial class Binder
         {
             if (type is StructTypeSymbol and not VariantTypeSymbol) type.IsPacked = true;
             else
-                diagnostics.Error("SL0463", span,
+                diagnostics.Report(Codes.PackedAttributeInvalid, span,
                     $"'[Packed]' lays out a struct with no padding, and '{type.Name}' is " +
                     (type is VariantTypeSymbol
                         ? "a variant, whose payload area is not a field the source arranged"
@@ -1599,7 +1609,7 @@ public sealed partial class Binder
 
         if (type is not StructTypeSymbol || type is VariantTypeSymbol)
         {
-            diagnostics.Error("SL0464", span,
+            diagnostics.Report(Codes.AlignAttributeOnNonStruct, span,
                 $"'[Align]' applies to a struct; '{type.Name}' is not one",
                 type);
             return;
@@ -1611,14 +1621,14 @@ public sealed partial class Binder
 
         if (requested <= 0 || (requested & (requested - 1)) != 0)
         {
-            diagnostics.Error("SL0465", span,
+            diagnostics.Report(Codes.AlignmentNotPowerOfTwo, span,
                 $"'[Align({requested})]' is not an alignment; it must be a power of two");
             return;
         }
 
         if (requested > MaxAlignment)
         {
-            diagnostics.Error("SL0466", span,
+            diagnostics.Report(Codes.AlignmentTooLarge, span,
                 $"'[Align({requested})]' is more than a page, {MaxAlignment} bytes, which is " +
                 "the most a struct may ask: the allocator places an object on any boundary up " +
                 "to it, and nothing a C header declares asks more");
@@ -1651,7 +1661,8 @@ public sealed partial class Binder
 
         if (why is not null)
         {
-            diagnostics.Error("SL0421", span, $"'[Pack({bytes})]' cannot be written here: {why}", type);
+            diagnostics.Report(Codes.PackAttributeInvalid, span,
+                $"'[Pack({bytes})]' cannot be written here: {why}", type);
             return;
         }
 
@@ -1672,13 +1683,13 @@ public sealed partial class Binder
         foreach (var union in _modules.Values.SelectMany(m => m.Types.Values).OfType<UnionTypeSymbol>())
         {
             if (union.Fields.Count == 0)
-                diagnostics.Error("SL0467", union.Span ?? default,
+                diagnostics.Report(Codes.UnionHasNoMembers, union.Span ?? default,
                     $"union '{union.Name}' has no members; a union is the choice between its " +
                     "members, so one with none has no values at all",
                     union);
 
             foreach (var member in union.Fields.Where(f => f.Type.CarriesReferences()))
-                diagnostics.Error("SL0468", union.Span ?? default,
+                diagnostics.Report(Codes.UnionMemberCounted, union.Span ?? default,
                     $"'{union.Name}.{member.Name}' is '{member.Type.Name}', which holds a " +
                     "counted reference, and a union does not record which member is the live " +
                     "one -- so a copy could not know what to retain. Hold the reference beside " +

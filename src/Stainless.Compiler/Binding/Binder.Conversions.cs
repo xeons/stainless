@@ -41,7 +41,7 @@ public sealed partial class Binder
             !structType.AllInterfaces().Contains(contract))
             return false;
 
-        diagnostics.Error("SL0302", span,
+        diagnostics.Report(Codes.StructCannotBeInterface, span,
             $"'{structType.Name}' implements '{contract.Name}' and still cannot be one: an " +
             "interface reference is a counted pointer, and a struct is a plain C value. A " +
             $"generic parameter 'T' with 'where T : {contract.Name}' takes it, with no copy",
@@ -173,7 +173,7 @@ public sealed partial class Binder
             IntegerLiteral(expression) is { } tooLarge)
         {
             string written = tooLarge.Negative ? "-" + tooLarge.Magnitude : $"{tooLarge.Magnitude}";
-            diagnostics.Error("SL0266", span,
+            diagnostics.Report(Codes.ConstantOutOfRange, span,
                 $"{written} does not fit in '{target.Name}', so it cannot be one; the value is " +
                 "outside the range of that type rather than in need of a conversion",
                 target);
@@ -182,7 +182,7 @@ public sealed partial class Binder
 
         if (_builtins.IsString(expression.Type) && IsBytePointer(target))
         {
-            diagnostics.Error("SL0293", span,
+            diagnostics.Report(Codes.StringToBytePointer, span,
                 "a String does not convert to 'byte*' on its own; call ToPointer() to hand its " +
                 "bytes to C, and keep the String alive for as long as C holds the pointer");
             return new BoundErrorExpression(span);
@@ -202,7 +202,8 @@ public sealed partial class Binder
             if (expression.Type is PrimitiveTypeSymbol { IsCodeUnit: true } fromUnit &&
                 target is PrimitiveTypeSymbol { IsCodeUnit: true } toUnit)
             {
-                diagnostics.Error("SL0527", span, CodeUnitMessage(expression, fromUnit, toUnit));
+                diagnostics.Report(Codes.CodeUnitConversionInvalid, span,
+                    CodeUnitMessage(expression, fromUnit, toUnit));
                 return new BoundErrorExpression(span);
             }
 
@@ -219,7 +220,7 @@ public sealed partial class Binder
                 : ClassifyConversion(expression.Type, target, explicitCast: true) is not null
                     ? $"; an explicit cast '({target.Name})' would allow it"
                     : "";
-            diagnostics.Error("SL0265", span,
+            diagnostics.Report(Codes.NoImplicitConversion, span,
                 $"cannot convert '{expression.Type.Name}' to '{target.Name}'{hint}",
                 expression.Type, target);
             return new BoundErrorExpression(span);
@@ -267,7 +268,7 @@ public sealed partial class Binder
 
         if (candidates.Count > 1)
         {
-            diagnostics.Error("SL0616", span,
+            diagnostics.Report(Codes.AmbiguousConversion, span,
                 $"two conversions turn '{expression.Type.Name}' into '{target.Name}', and " +
                 "nothing here says which was meant; one of them belongs somewhere else",
                 expression.Type, target);
@@ -337,13 +338,13 @@ public sealed partial class Binder
             // message that was here before groups carried a receiver.
             if (group.Receiver is not null)
             {
-                diagnostics.Error("SL0250", span,
+                diagnostics.Report(Codes.MethodUsedAsValue, span,
                     $"'{group.Name}' is a method; call it with '()', or store it in a " +
                     "'closure' type, which is what can hold a method and its object");
                 return new BoundErrorExpression(span);
             }
 
-            diagnostics.Error("SL0360", span,
+            diagnostics.Report(Codes.FunctionTargetNotDelegate, span,
                 $"'{group.Name}' is a function; it converts to a delegate type, " +
                 $"and '{target.Name}' is not one",
                 target);
@@ -352,7 +353,7 @@ public sealed partial class Binder
 
         if (group.Receiver is not null)
         {
-            diagnostics.Error("SL0360", span,
+            diagnostics.Report(Codes.FunctionTargetNotDelegate, span,
                 $"'{group.Name}' is a method, so it carries the object it was reached " +
                 $"through, and '{wanted.Name}' is a delegate -- one pointer, with nowhere " +
                 "to keep it. Declare the type 'closure' instead of 'delegate'",
@@ -364,7 +365,7 @@ public sealed partial class Binder
 
         if (matches.Count == 0)
         {
-            diagnostics.Error("SL0361", span,
+            diagnostics.Report(Codes.NoOverloadMatchesDelegate, span,
                 $"no overload of '{group.Name}' matches delegate '{wanted.Name}', " +
                 $"which is '{wanted.SignatureText}'",
                 [wanted, wanted.ReturnType, .. wanted.Signature.Select(p => p.Type)]);
@@ -373,7 +374,7 @@ public sealed partial class Binder
 
         if (matches.Count > 1)
         {
-            diagnostics.Error("SL0362", span,
+            diagnostics.Report(Codes.AmbiguousDelegateConversion, span,
                 $"'{group.Name}' is ambiguous for delegate '{wanted.Name}'",
                 wanted);
             return new BoundErrorExpression(span);
@@ -409,7 +410,7 @@ public sealed partial class Binder
 
         if (matches.Count == 0)
         {
-            diagnostics.Error("SL0361", span,
+            diagnostics.Report(Codes.NoOverloadMatchesDelegate, span,
                 $"no overload of '{group.Name}' matches closure '{wanted.Name}', " +
                 $"which is '{wanted.SignatureText}'",
                 [wanted, wanted.ReturnType, .. wanted.Signature.Select(p => p.Type)]);
@@ -418,7 +419,7 @@ public sealed partial class Binder
 
         if (matches.Count > 1)
         {
-            diagnostics.Error("SL0362", span,
+            diagnostics.Report(Codes.AmbiguousDelegateConversion, span,
                 $"'{group.Name}' is ambiguous for closure '{wanted.Name}'",
                 wanted);
             return new BoundErrorExpression(span);

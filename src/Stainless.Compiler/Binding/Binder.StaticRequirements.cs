@@ -81,7 +81,7 @@ public sealed partial class Binder
         if (reached is not { IsStatic: true, IsVirtual: true }) return false;
 
         string name = reached.Accessor?.Name ?? reached.Name;
-        diagnostics.Error("SL0797", span,
+        diagnostics.Report(Codes.StaticAbstractReachedThroughInterface, span,
             $"'{contract.Name}.{name}' is 'static {(reached.IsAbstract ? "abstract" : "virtual")}', " +
             "so it is reached through a type parameter constrained to the interface, as " +
             $"'T.{name}' where 'T : {contract.Name}', and not through the interface, which is " +

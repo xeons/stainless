@@ -83,13 +83,13 @@ public static partial class AssemblerDiagnosis
             placed = true;
             if (!reported.Add((span.Start, message))) continue;
 
-            diagnostics.Error("SL0723", span,
+            diagnostics.Report(Codes.AsmRejectedByAssembler, span,
                 $"the assembler rejected this line of an 'asm' block: {message}");
         }
 
         if (placed) return;
 
-        diagnostics.Error("SL0723", blocks[0].TextSpan,
+        diagnostics.Report(Codes.AsmRejectedByAssembler, blocks[0].TextSpan,
             "the assembler rejected an 'asm' block, and did not say which line:\n" +
             output.Trim());
     }

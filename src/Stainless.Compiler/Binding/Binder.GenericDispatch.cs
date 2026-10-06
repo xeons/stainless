@@ -167,7 +167,7 @@ public sealed partial class Binder
         if (found is null) return null;
 
         if (!SameSignature(found, required) && _mismatchReported.Add(template))
-            diagnostics.Error("SL0307", template.Declaration.Span,
+            diagnostics.Report(Codes.ImplementationSignatureMismatch, template.Declaration.Span,
                 $"'{classType.Name}.{found.Name}' does not match " +
                 $"'{required.ContainingType!.Name}.{required.Name}' when both are " +
                 $"'<{string.Join(", ", required.TypeArguments.Select(t => t.Name))}>': expected " +
@@ -198,7 +198,7 @@ public sealed partial class Binder
         if (found is null || found == root) return found;
 
         if (!SignaturesAgree(found, root) && _mismatchReported.Add(template))
-            diagnostics.Error("SL0502", template.Declaration.Span,
+            diagnostics.Report(Codes.OverrideSignatureMismatch, template.Declaration.Span,
                 $"'{classType.Name}.{found.Name}' does not match what it overrides when both " +
                 $"are '<{string.Join(", ", root.TypeArguments.Select(t => t.Name))}>'; " +
                 $"expected '{root.ReturnType.Name} {root.Name}(" +
@@ -256,12 +256,12 @@ public sealed partial class Binder
             var inherited = inheritedTemplates.FirstOrDefault(t => t.HasShapeOf(template));
 
             if (modifiers.HasFlag(Modifiers.Abstract) && template.Declaration.Body is not null)
-                diagnostics.Error("SL0498", template.Declaration.Span,
+                diagnostics.Report(Codes.AbstractMemberHasBody, template.Declaration.Span,
                     $"'{template.Name}' is abstract, so it cannot have a body; " +
                     "a derived class supplies one");
 
             if (modifiers.HasFlag(Modifiers.Abstract) && !classType.IsAbstract)
-                diagnostics.Error("SL0505", template.Declaration.Span,
+                diagnostics.Report(Codes.AbstractMemberInConcreteClass, template.Declaration.Span,
                     $"'{classType.Name}.{template.Name}' is abstract, so '{classType.Name}' " +
                     "must be abstract too; a class with a method that has no body cannot be made",
                     classType);
@@ -269,13 +269,13 @@ public sealed partial class Binder
             if (modifiers.HasFlag(Modifiers.Override))
             {
                 if (inherited is null)
-                    diagnostics.Error("SL0499", template.Declaration.Span,
+                    diagnostics.Report(Codes.OverrideHasNoBase, template.Declaration.Span,
                         $"'{classType.Name}.{template.Name}' is marked 'override' and nothing " +
                         "it inherits is a generic method of that name, type parameters and " +
                         "parameters",
                         classType);
                 else if (!inherited.IsDispatched)
-                    diagnostics.Error("SL0500", template.Declaration.Span,
+                    diagnostics.Report(Codes.OverriddenMethodNotVirtual, template.Declaration.Span,
                         $"'{inherited.ContainingType!.Name}.{template.Name}' is not virtual, so " +
                         "it cannot be overridden; mark it 'virtual' or 'abstract'",
                         inherited.ContainingType);
@@ -286,7 +286,9 @@ public sealed partial class Binder
             }
 
             if (inherited is not null)
-                diagnostics.Error("SL0503", template.Declaration.Span,
+                diagnostics.Report(Codes.InheritedMemberHiddenWithoutOverride,
+                    template.Declaration.Span,
+                    
                     $"'{classType.Name}.{template.Name}' has the same name, type parameters and " +
                     $"parameters as '{inherited.ContainingType!.Name}.{inherited.Name}'" +
                     (inherited.IsDispatched
@@ -309,7 +311,9 @@ public sealed partial class Binder
                     .Any(t => t.Declaration.Body is not null && t.Root == missing.Root);
 
                 if (!answered)
-                    diagnostics.Error("SL0504", classType.Span ?? declaration.Span,
+                    diagnostics.Report(Codes.AbstractMemberNotImplemented,
+                        classType.Span ?? declaration.Span,
+                        
                         $"'{classType.Name}' does not implement abstract " +
                         $"'{owner.Name}.{missing.Name}'; add 'public override' with the same " +
                         "type parameters and parameters",
@@ -337,7 +341,7 @@ public sealed partial class Binder
             {
                 if (required.Declaration.Body is not null || classType.IsAbstract) continue;
 
-                diagnostics.Error("SL0305", span,
+                diagnostics.Report(Codes.InterfaceMemberNotImplemented, span,
                     $"'{classType.Name}' does not implement '{interfaceType.Name}.{required.Name}'; " +
                     $"add a public generic method '{required.Name}' taking " +
                     $"{required.Parameters.Count} type parameter" +
@@ -349,7 +353,7 @@ public sealed partial class Binder
             }
 
             if (!found.IsPublic)
-                diagnostics.Error("SL0306", found.Declaration.Span,
+                diagnostics.Report(Codes.ImplementationNotPublic, found.Declaration.Span,
                     $"'{classType.Name}.{found.Name}' implements " +
                     $"'{interfaceType.Name}.{required.Name}' and must therefore be public",
                     classType, interfaceType);

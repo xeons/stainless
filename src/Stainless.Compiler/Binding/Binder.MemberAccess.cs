@@ -82,7 +82,7 @@ public sealed partial class Binder
 
         if (receiver.Type is not OptionalTypeSymbol optional)
         {
-            diagnostics.Error("SL0604", span,
+            diagnostics.Report(Codes.NullOperatorOnNonNullable, span,
                 $"'{receiver.Type.Name}' cannot be nothing, so '{asking}' has no question to ask; " +
                 $"write {plain} instead",
                 receiver.Type);
@@ -124,7 +124,7 @@ public sealed partial class Binder
         }
         else
         {
-            diagnostics.Error("SL0605", span,
+            diagnostics.Report(Codes.ConditionalAccessResultNotNullable, span,
                 $"{reached} is '{value.Type.Name}', which has no null to stand for the " +
                 "receiver having been nothing. Say what it is instead, with '?? something' " +
                 "after it, or ask with an 'if'",
@@ -159,7 +159,7 @@ public sealed partial class Binder
 
         if (left.Type is not (OptionalTypeSymbol or PointerTypeSymbol))
         {
-            diagnostics.Error("SL0604", syntax.Left.Span,
+            diagnostics.Report(Codes.NullOperatorOnNonNullable, syntax.Left.Span,
                 $"'{left.Type.Name}' cannot be nothing, so '??' has nothing to fall back from",
                 left.Type);
             return new BoundErrorExpression(syntax.Span);
@@ -195,7 +195,7 @@ public sealed partial class Binder
         {
             if (BindVectorConstant(syntax, vectorType) is { } constant) return constant;
 
-            diagnostics.Error("SL0934", syntax.Span,
+            diagnostics.Report(Codes.VectorFunctionInvalid, syntax.Span,
                 $"'{vectorType.Name}' has no member named '{syntax.Member}'; it has Zero and One, " +
                 "and functions called as 'vfloat4.Dot(a, b)'",
                 vectorType);
@@ -220,7 +220,7 @@ public sealed partial class Binder
                 return new BoundFunctionGroup(syntax.Span, FunctionGroupType.Instance,
                     $"{importedModule.Name}.{syntax.Member}", functions);
 
-            diagnostics.Error("SL0246", syntax.Span,
+            diagnostics.Report(Codes.ModuleMemberNotFound, syntax.Span,
                 $"module '{importedModule.Name}' has no public member named '{syntax.Member}'");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -231,7 +231,7 @@ public sealed partial class Binder
         {
             if (variantType.FindCase(syntax.Member) is not { } named)
             {
-                diagnostics.Error("SL0435", syntax.Span,
+                diagnostics.Report(Codes.VariantCaseNotFound, syntax.Span,
                     $"variant '{variantType.Name}' has no case named '{syntax.Member}'; it has " +
                     Listed(variantType.Cases.Select(c => c.Name)),
                     variantType);
@@ -249,7 +249,7 @@ public sealed partial class Binder
         {
             if (!CanReach(inlined.IsPublic, isProtected: false, constantOwner))
             {
-                diagnostics.Error("SL0249", syntax.Span,
+                diagnostics.Report(Codes.MemberNotAccessible, syntax.Span,
                     NotVisible(constantOwner, syntax.Member, isProtected: false));
                 return new BoundErrorExpression(syntax.Span);
             }
@@ -266,7 +266,7 @@ public sealed partial class Binder
         {
             if (!CanReach(onType.IsPublic, isProtected: false, holder))
             {
-                diagnostics.Error("SL0249", syntax.Span,
+                diagnostics.Report(Codes.MemberNotAccessible, syntax.Span,
                     NotVisible(holder, syntax.Member, isProtected: false));
                 return new BoundErrorExpression(syntax.Span);
             }
@@ -298,7 +298,7 @@ public sealed partial class Binder
 
             if (ResolveModulePrefix(syntax.Target) is null)
             {
-                diagnostics.Error("SL0576", syntax.Span,
+                diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, syntax.Span,
                     $"'{staticOwner.Name}.{syntax.Member}' is not static, so it needs an " +
                     "object to be reached through; name one instead of the type",
                     staticOwner);
@@ -312,7 +312,7 @@ public sealed partial class Binder
             if (enumType.FindMember(syntax.Member) is { } member)
                 return new BoundLiteral(syntax.Span, enumType, member.Value);
 
-            diagnostics.Error("SL0355", syntax.Span,
+            diagnostics.Report(Codes.EnumMemberNotFound, syntax.Span,
                 $"enum '{enumType.Name}' has no member named '{syntax.Member}'",
                 enumType);
             return new BoundErrorExpression(syntax.Span);
@@ -322,7 +322,7 @@ public sealed partial class Binder
         // that name.
         if (!syntax.ThroughPointer && ConstructedTypeNamed(syntax.Target) is { } constructed)
         {
-            diagnostics.Error("SL0247", syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{constructed.Name}' has no static member named '{syntax.Member}'",
                 constructed);
             return new BoundErrorExpression(syntax.Span);
@@ -357,7 +357,7 @@ public sealed partial class Binder
                 return new BoundLiteral(
                     syntax.Span, PrimitiveTypeSymbol.NUInt, (ulong)inline.Length);
 
-            diagnostics.Error("SL0313", syntax.Span,
+            diagnostics.Report(Codes.ArrayMemberNotFound, syntax.Span,
                 $"'{inline.Name}' has no member named '{syntax.Member}'; " +
                 "an inline array has only 'Length', and is indexed",
                 inline);
@@ -375,7 +375,7 @@ public sealed partial class Binder
 
         if (receiver.Type is ArrayTypeSymbol)
         {
-            diagnostics.Error("SL0313", syntax.Span,
+            diagnostics.Report(Codes.ArrayMemberNotFound, syntax.Span,
                 $"'{receiver.Type.Name}' has no member named '{syntax.Member}'; " +
                 "an array has only 'Length'",
                 receiver.Type);
@@ -388,7 +388,7 @@ public sealed partial class Binder
 
         if (receiver.Type is not NamedTypeSymbol && receiver.Type.AsClass() is null)
         {
-            diagnostics.Error("SL0247", syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{receiver.Type.Name}' has no member named '{syntax.Member}'",
                 receiver.Type);
             return new BoundErrorExpression(syntax.Span);
@@ -402,7 +402,7 @@ public sealed partial class Binder
             // check could establish anything about it. Reading it into a strong
             // optional is what makes it safe to look at, and is the only way.
             if (receiver.Type is WeakTypeSymbol weakReceiver)
-                diagnostics.Error("SL0248", syntax.Span,
+                diagnostics.Report(Codes.MemberAccessOnMaybeNull, syntax.Span,
                     $"'{receiver.Type.Name}' may already have died, so checking it against " +
                     $"null would prove nothing about the moment after; read it into a " +
                     $"'{weakReceiver.Element.Name}?' first, and check that",
@@ -412,7 +412,7 @@ public sealed partial class Binder
             // something about one evaluation and let it be read from another,
             // which is the rule variants already follow (SL0285).
             else if (NarrowableSubject(receiver) is null)
-                diagnostics.Error("SL0248", syntax.Span,
+                diagnostics.Report(Codes.MemberAccessOnMaybeNull, syntax.Span,
                     $"'{receiver.Type.Name}' may be null, and this is not something a check " +
                     "can be about: a field or a call result may be a different value by the " +
                     $"time it is read. Put it in a local, check that against null, and reach " +
@@ -420,7 +420,7 @@ public sealed partial class Binder
                     receiver.Type);
 
             else
-                diagnostics.Error("SL0248", syntax.Span,
+                diagnostics.Report(Codes.MemberAccessOnMaybeNull, syntax.Span,
                     $"'{receiver.Type.Name}' may be null; check it against null before " +
                     $"accessing '{syntax.Member}'",
                     receiver.Type);
@@ -444,7 +444,7 @@ public sealed partial class Binder
         {
             if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
             {
-                diagnostics.Error("SL0249", syntax.Span,
+                diagnostics.Report(Codes.MemberNotAccessible, syntax.Span,
                     NotVisible(field.ContainingType, syntax.Member, field.IsProtected));
                 return new BoundErrorExpression(syntax.Span);
             }
@@ -474,7 +474,7 @@ public sealed partial class Binder
                     Receiver = receiver,
                 };
 
-            diagnostics.Error("SL0250", syntax.Span,
+            diagnostics.Report(Codes.MethodUsedAsValue, syntax.Span,
                 $"'{namedType.Name}.{syntax.Member}' is a method; call it with '()'",
                 namedType);
             return new BoundErrorExpression(syntax.Span);
@@ -484,7 +484,7 @@ public sealed partial class Binder
         // it is not there would send the reader looking for a spelling mistake.
         if (namedType.FindEvent(syntax.Member) is { } subscribed)
         {
-            diagnostics.Error("SL0824", syntax.Span,
+            diagnostics.Report(Codes.EventReadAsValue, syntax.Span,
                 $"'{namedType.Name}.{syntax.Member}' is an event, and an event has no value to " +
                 "read: what it holds is a list of subscribers, and only " +
                 $"'{subscribed.ContainingType.Name}' can see it. Subscribe with '+=' and " +
@@ -493,7 +493,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        diagnostics.Error("SL0247", syntax.Span,
+        diagnostics.Report(Codes.MemberNotFound, syntax.Span,
             $"'{namedType.Name}' has no member named '{syntax.Member}'",
             namedType);
         return new BoundErrorExpression(syntax.Span);
@@ -517,7 +517,7 @@ public sealed partial class Binder
 
         if (!syntax.ThroughPointer) return receiver;
 
-        diagnostics.Error("SL0494", syntax.Span,
+        diagnostics.Report(Codes.ArrowOnNonPointer, syntax.Span,
             receiver.Type is PointerTypeSymbol pointed
                 ? $"'{pointed.Name}' points at '{pointed.Element.Name}', which has no members, " +
                   $"so '->{syntax.Member}' reaches nothing"
@@ -567,7 +567,7 @@ public sealed partial class Binder
             {
                 // The generated names are deliberately unwritable, so naming
                 // them here would point at something the reader cannot use.
-                diagnostics.Error("SL0492", span,
+                diagnostics.Report(Codes.AmbiguousNamelessMember, span,
                     $"'{member}' is ambiguous: {Counted(found.Count, "nameless member")} " +
                     $"of '{type.Name}' declare{(found.Count == 1 ? "s" : "")} it. Give one of " +
                     "them a name, so that the one you mean can be said",
@@ -715,7 +715,7 @@ public sealed partial class Binder
     {
         if (target is not VariantTypeSymbol variant)
         {
-            diagnostics.Error("SL0413", span,
+            diagnostics.Report(Codes.VariantCaseWhereOtherTypeExpected, span,
                 $"'{draft.Case}' names a variant's case, but '{target.Name}' is expected here",
                 target);
             return new BoundErrorExpression(span);
@@ -723,7 +723,7 @@ public sealed partial class Binder
 
         if (variant.FindCase(draft.Case) is not { } variantCase)
         {
-            diagnostics.Error("SL0435", span,
+            diagnostics.Report(Codes.VariantCaseNotFound, span,
                 $"'{variant.Name}' has no case named '{draft.Case}'; it has " +
                 Listed(variant.Cases.Select(c => c.Name)),
                 variant);
@@ -744,7 +744,7 @@ public sealed partial class Binder
 
         if (arguments.Count != fields.Count)
         {
-            diagnostics.Error("SL0289", span,
+            diagnostics.Report(Codes.VariantCaseArgumentCount, span,
                 $"'{variant.Name}.{variantCase.Name}' carries {Counted(fields.Count, "field")}, " +
                 $"but {Given(arguments.Count)}; " +
                 $"it is written '{variantCase.Signature}'",
@@ -785,13 +785,13 @@ public sealed partial class Binder
         {
             if (variant.FindMethod(syntax.Member) is not null)
             {
-                diagnostics.Error("SL0250", syntax.Span,
+                diagnostics.Report(Codes.MethodUsedAsValue, syntax.Span,
                     $"'{variant.Name}.{syntax.Member}' is a method; call it with '()'",
                     variant);
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            diagnostics.Error("SL0247", syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{variant.Name}' has no case or field named '{syntax.Member}'; its cases are " +
                 Listed(variant.Cases.Select(c => c.Signature)),
                 [variant, .. variant.Cases.SelectMany(c => c.Fields.Select(f => f.Type))]);
@@ -802,7 +802,7 @@ public sealed partial class Binder
 
         if (subject is null)
         {
-            diagnostics.Error("SL0285", syntax.Span,
+            diagnostics.Report(Codes.VariantFieldOnNonLocal, syntax.Span,
                 $"'{syntax.Member}' can only be read from a variant held in a local or a " +
                 "parameter, because that is the only thing a check can be about; assign " +
                 "this to one first, then test which case it is");
@@ -815,7 +815,7 @@ public sealed partial class Binder
         if (known is null)
         {
             var suggestion = carrying[0];
-            diagnostics.Error("SL0286", syntax.Span,
+            diagnostics.Report(Codes.VariantFieldNotEstablished, syntax.Span,
                 $"'{name}.{syntax.Member}' is not readable here, because nothing has " +
                 $"established that '{name}' is '{suggestion.Name}'; " +
                 $"check 'if ({name}.{suggestion.Name})' first, or switch over '{name}'");
@@ -824,7 +824,7 @@ public sealed partial class Binder
 
         if (known.FindField(syntax.Member) is not { } field)
         {
-            diagnostics.Error("SL0286", syntax.Span,
+            diagnostics.Report(Codes.VariantFieldNotEstablished, syntax.Span,
                 $"'{name}' is known to be '{known.Name}' here, and '{known.Signature}' does " +
                 $"not carry '{syntax.Member}'; that field belongs to " +
                 Listed(carrying.Select(c => "'" + c.Name + "'")),

@@ -61,7 +61,7 @@ public sealed partial class Binder
 
         if (count.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
-            diagnostics.Error("SL0242", syntax.Operand.Span,
+            diagnostics.Report(Codes.IndexNotInteger, syntax.Operand.Span,
                 $"'^' counts back from the end by an integer, but this is '{count.Type.Name}'",
                 count.Type);
             return new BoundErrorExpression(syntax.Span);
@@ -99,7 +99,7 @@ public sealed partial class Binder
 
         if (bound.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
-            diagnostics.Error("SL0242", syntax.Span,
+            diagnostics.Report(Codes.IndexNotInteger, syntax.Span,
                 $"a range runs between integers or 'Index' values, but this is '{bound.Type.Name}'",
                 bound.Type);
             return new BoundErrorExpression(syntax.Span);
@@ -158,7 +158,7 @@ public sealed partial class Binder
                 return IndexByPosition(target, position, span);
 
             case FixedArrayTypeSymbol:
-                diagnostics.Error("SL0452", span,
+                diagnostics.Report(Codes.TypeCannotBeSliced, span,
                     $"cannot slice '{target.Type.Name}'; a slice holds the array it is part of, " +
                     "and an inline array is not one that can be held",
                     target.Type);
@@ -170,7 +170,7 @@ public sealed partial class Binder
                     : IndexCountable(named, target, position, span);
 
             default:
-                diagnostics.Error("SL0777", span,
+                diagnostics.Report(Codes.IndexFromEndWithoutLength, span,
                     $"'{target.Type.Name}' has no length, so there is no end to count back " +
                     "from; '^' and ranges work on an array, a slice, an inline array, or a " +
                     "type with 'Count' or 'Length'",
@@ -198,7 +198,7 @@ public sealed partial class Binder
         {
             if (back == 0 || back > (ulong)inline.Length)
             {
-                diagnostics.Error("SL0490", position.Span,
+                diagnostics.Report(Codes.ConstantIndexOutOfRange, position.Span,
                     $"^{back} is outside '{inline.Name}', which has " +
                     $"{Counted(inline.Length, "element")}",
                     inline);
@@ -258,7 +258,7 @@ public sealed partial class Binder
 
         if (element is null)
         {
-            diagnostics.Error("SL0452", span,
+            diagnostics.Report(Codes.TypeCannotBeSliced, span,
                 $"cannot slice '{target.Type.Name}' with ':'; that takes part of an array or " +
                 "of another slice, and a type's own 'Slice(start, length)' is reached with a " +
                 "range, as 'a[i..j]'",
@@ -289,7 +289,7 @@ public sealed partial class Binder
 
         if (IntegerIndexerOf(named) is not { } indexer)
         {
-            diagnostics.Error("SL0241", span,
+            diagnostics.Report(Codes.TypeNotIndexable, span,
                 $"no indexer on '{named.Name}' takes an integer, so there is nothing for an " +
                 "'Index' to become",
                 named);
@@ -326,7 +326,7 @@ public sealed partial class Binder
 
         if (SliceMethodOf(named) is not { } slice)
         {
-            diagnostics.Error("SL0452", span,
+            diagnostics.Report(Codes.TypeCannotBeSliced, span,
                 $"cannot slice '{named.Name}'; a range takes part of an array or a slice, or " +
                 "calls a type's own 'Slice(start, length)', and it declares none",
                 named);
@@ -379,7 +379,7 @@ public sealed partial class Binder
 
     private BoundErrorExpression RefuseUncounted(NamedTypeSymbol named, SourceSpan span)
     {
-        diagnostics.Error("SL0777", span,
+        diagnostics.Report(Codes.IndexFromEndWithoutLength, span,
             $"'{named.Name}' has no 'Count' or 'Length', so there is no end to count back " +
             "from; '^' and ranges work on an array, a slice, an inline array, or a type " +
             "with one",

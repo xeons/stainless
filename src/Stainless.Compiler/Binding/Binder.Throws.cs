@@ -64,7 +64,8 @@ public sealed partial class Binder
 
         if (refused is not null)
         {
-            diagnostics.Error("SL0941", span, $"'[Throws]' cannot be written here: {refused}");
+            diagnostics.Report(Codes.ThrowsAttributeMisplaced, span,
+                $"'[Throws]' cannot be written here: {refused}");
 
             // The foreign call's own result, so that nothing after this
             // reports the declared one as though C returned it.

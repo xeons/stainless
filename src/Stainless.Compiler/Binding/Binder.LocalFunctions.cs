@@ -137,7 +137,7 @@ public sealed partial class Binder
 
         if (scope.ContainsKey(declaration.Name) || LookupLocal(declaration.Name) is not null)
         {
-            diagnostics.Error("SL0218", declaration.Span,
+            diagnostics.Report(Codes.DuplicateLocalName, declaration.Span,
                 $"'{declaration.Name}' is already declared in this scope; local functions are " +
                 "not overloaded, as in C#");
             return null;
@@ -474,7 +474,7 @@ public sealed partial class Binder
 
         if (local.Template is not null)
         {
-            diagnostics.Error("SL0761", span,
+            diagnostics.Report(Codes.NotUsableAsValue, span,
                 $"'{declaration.Name}' is generic, and a local function's type arguments come " +
                 "from a call; wrap the call in a lambda to make a value of one instantiation");
             return new BoundErrorExpression(span);
@@ -524,7 +524,7 @@ public sealed partial class Binder
     }
 
     private void ReportCaptureNotHere(LocalFunction local, string name, SourceSpan span) =>
-        diagnostics.Error("SL0768", span,
+        diagnostics.Report(Codes.LocalFunctionCaptureNotInScope, span,
             $"'{local.Syntax.Declaration.Name}' reads '{name}' from around it, which every call " +
             $"passes it, and that '{name}' is not in reach here -- it is declared later, or " +
             "another variable has its name. Call it where the variable is in scope");
@@ -589,7 +589,7 @@ public sealed partial class Binder
 
         if (local.IsStatic)
         {
-            diagnostics.Error("SL0767", span,
+            diagnostics.Report(Codes.StaticLocalFunctionCaptures, span,
                 $"'{local.Syntax.Declaration.Name}' is a static local function, so it cannot read " +
                 $"'{name}' from the function around it. Pass it in as a parameter, or drop 'static'");
             return null;
@@ -624,7 +624,7 @@ public sealed partial class Binder
 
         if (local.IsStatic)
         {
-            diagnostics.Error("SL0767", span,
+            diagnostics.Report(Codes.StaticLocalFunctionCaptures, span,
                 $"'{local.Syntax.Declaration.Name}' is a static local function, so it has no " +
                 "'this' and cannot reach the object of the method around it. Pass what it " +
                 "needs as a parameter, or drop 'static'");
@@ -655,7 +655,7 @@ public sealed partial class Binder
             return;
         }
 
-        diagnostics.Error("SL0768", span,
+        diagnostics.Report(Codes.LocalFunctionCaptureNotInScope, span,
             "a local function here is used before what it reads from around it is known; " +
             "declare it before it is first used");
     }

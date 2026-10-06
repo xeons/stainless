@@ -44,7 +44,7 @@ public sealed partial class Binder
         if (type is not ClassTypeSymbol { ObjC: ObjCClassKind.Defined }) return;
 
         foreach (var attribute in attributes.Where(a => a.Name.Last != "Selector"))
-            diagnostics.Error("SL0906", attribute.Span,
+            diagnostics.Report(Codes.ObjCMemberAttributeMisplaced, attribute.Span,
                 $"'[{attribute.Name.Last}]' means nothing on a constructor of '{type.Name}'; it " +
                 "takes '[Selector]', the init message Objective-C makes one with",
                 type);
@@ -54,7 +54,7 @@ public sealed partial class Binder
 
         if (selector is not null && FamilyOf(selector) != "init")
         {
-            diagnostics.Error("SL0924", span,
+            diagnostics.Report(Codes.ObjCInitializerInvalid, span,
                 $"a constructor of '{type.Name}' is answered as an init message, and " +
                 $"'{selector}' is not one: its selector MUST begin with 'init', as " +
                 "'initWithFrame:' does",
@@ -145,7 +145,7 @@ public sealed partial class Binder
         var candidates = ObjCBaseInitializers(classType, out var owner);
         if (candidates.Count == 0)
         {
-            diagnostics.Error("SL0924", syntax.Span,
+            diagnostics.Report(Codes.ObjCInitializerInvalid, syntax.Span,
                 $"nothing '{classType.Name}' is built on declares an init message to run; " +
                 $"declare '[Selector(\"init\")] public Self Init();' on " +
                 $"'{owner?.Name ?? classType.Name}'",
@@ -171,7 +171,7 @@ public sealed partial class Binder
     {
         if (ObjCImplicitBaseInitializer(classType, out var owner) is not { } chained)
         {
-            diagnostics.Error("SL0924", constructor.Span,
+            diagnostics.Report(Codes.ObjCInitializerInvalid, constructor.Span,
                 $"'{owner?.Name ?? classType.Name}' has no initializer that takes no arguments, " +
                 $"so '{classType.Name}' has to say which one to run: write 'base(...)' as the " +
                 "first statement of its constructor",
@@ -199,7 +199,7 @@ public sealed partial class Binder
             .FirstOrDefault(m => m is { Selector: "init", IsStatic: false });
         if (init is not null) return init;
 
-        diagnostics.Error("SL0924", span,
+        diagnostics.Report(Codes.ObjCInitializerInvalid, span,
             $"'new {classType.Name}()' sends 'init', and nothing '{classType.Name}' is built on " +
             "declares it; declare '[Selector(\"init\")] public Self Init();' on its root class",
             classType);
@@ -219,14 +219,14 @@ public sealed partial class Binder
         foreach (var field in defined.Fields)
         {
             if (field.IsBitField)
-                diagnostics.Error("SL0923", defined.Span ?? default,
+                diagnostics.Report(Codes.ObjCClassShapeUnsupported, defined.Span ?? default,
                     $"'{defined.Name}.{field.Name}' is a bit-field, which an Objective-C class " +
                     "cannot hold; use a whole integer",
                     defined);
             else if (field.InitializerSyntax is null && !field.Type.IsError() &&
                      !ZeroValues.HasZeroValue(field.Type) &&
                      !defined.Events.Any(e => e.BackingField == field))
-                diagnostics.Error("SL0925", defined.Span ?? default,
+                diagnostics.Report(Codes.ObjCFieldWithoutZero, defined.Span ?? default,
                     $"'{defined.Name}.{field.Name}' is a '{field.Type.Name}', which has no zero " +
                     "value, and Objective-C may make the object through an init that runs none " +
                     "of its constructors; give the field an initializer, or make it optional",
@@ -240,7 +240,7 @@ public sealed partial class Binder
             string selector = member.Selector ?? member.InitSelector!;
             if (answered.TryAdd(selector, member)) continue;
 
-            diagnostics.Error("SL0921", member.Span,
+            diagnostics.Report(Codes.ObjCOverrideInvalid, member.Span,
                 $"'{defined.Name}' answers '{selector}' twice; a class answers each message " +
                 "with one method",
                 defined);

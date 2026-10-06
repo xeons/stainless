@@ -86,7 +86,7 @@ public sealed partial class Binder
 
         if (label.Declared is not null)
         {
-            diagnostics.Error("SL0588", syntax.Span,
+            diagnostics.Report(Codes.DuplicateLabel, syntax.Span,
                 $"'{syntax.Name}' is already a label in this function; a 'goto' names one " +
                 "place, so two of a name would be a jump with two destinations");
             return new BoundBlock(syntax.Span, []);
@@ -127,7 +127,7 @@ public sealed partial class Binder
 
         if (_context.Jumps.Switches.Count == 0)
         {
-            diagnostics.Error("SL0802", syntax.Span,
+            diagnostics.Report(Codes.GotoCaseOutsideSwitch, syntax.Span,
                 $"'{written}' names a section of the switch statement it is in, and this " +
                 "is not in one");
             return statement;
@@ -138,7 +138,7 @@ public sealed partial class Binder
 
         if (syntax.Value is not null && frame.OverVariant)
         {
-            diagnostics.Error("SL0803", syntax.Span, NoCaseOfAVariant);
+            diagnostics.Report(Codes.GotoCaseTargetInvalid, syntax.Span, NoCaseOfAVariant);
             return statement;
         }
 
@@ -154,7 +154,7 @@ public sealed partial class Binder
 
             if (key is null)
             {
-                diagnostics.Error("SL0803", syntax.Value.Span,
+                diagnostics.Report(Codes.GotoCaseTargetInvalid, syntax.Value.Span,
                     "'goto case' names a section by its constant label, and this is not a constant");
                 return statement;
             }
@@ -187,7 +187,7 @@ public sealed partial class Binder
 
             if (index < 0 || index >= sections.Count)
             {
-                diagnostics.Error("SL0803", span, key is null
+                diagnostics.Report(Codes.GotoCaseTargetInvalid, span, key is null
                     ? "this switch has no 'default' section for 'goto default' to run"
                     : "this switch has no 'case' label with that value for 'goto case' to run");
                 continue;
@@ -217,11 +217,11 @@ public sealed partial class Binder
         foreach (var label in _context.Jumps.Labels.Values)
         {
             if (label.Declared is null && label.FirstUse is { } used)
-                diagnostics.Error("SL0589", used,
+                diagnostics.Report(Codes.LabelNotFound, used,
                     $"there is no label '{label.Name}' in {owner}; a 'goto' names a label in " +
                     "the function it is written in, and nowhere else");
             else if (label.Declared is { } declared && !label.IsUsed)
-                diagnostics.Warning("SL0591", declared,
+                diagnostics.Report(Codes.LabelUnused, declared,
                     $"nothing jumps to '{label.Name}'");
         }
 
@@ -233,12 +233,12 @@ public sealed partial class Binder
             int depth = jump.Blocks.IndexOf((Dictionary<string, LocalSymbol>)block);
 
             if (depth < 0)
-                diagnostics.Error("SL0595", jump.Statement.Span,
+                diagnostics.Report(Codes.JumpIntoBlock, jump.Statement.Span,
                     $"'{jump.Written}' names a label inside a block the jump is not in; a " +
                     "jump may leave blocks but not enter one, because what the block declared " +
                     "before the label would never have been made");
             else if (depth < jump.ParallelBase)
-                diagnostics.Error("SL0590", jump.Statement.Span,
+                diagnostics.Report(Codes.JumpOutOfParallelBlock, jump.Statement.Span,
                     $"'{jump.Written}' leaves the 'parallel' block it is in; the work queued in " +
                     "a block has to finish there, so there is nothing a jump out of it could " +
                     "mean. Leave with a flag the block sets");

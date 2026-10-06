@@ -124,7 +124,7 @@ public sealed partial class Binder
     /// </summary>
     private void ReportNotSendable(TypeSymbol type, SourceSpan span, string what)
     {
-        diagnostics.Warning("SL0377", span,
+        diagnostics.Report(Codes.SharedStateNotThreadSafe, span,
             $"{what} is '{type.Name}', which more than one thread would reach, and " +
             "nothing about it says how two of them may. Counts are atomic, so the " +
             "reference itself is safe; what is not is the contents. Pass plain data or " +

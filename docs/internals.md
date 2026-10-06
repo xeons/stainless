@@ -311,12 +311,24 @@ because the cache would otherwise hand the instantiation to the real bind
 with its complaint lost, and a constraint broken by a call written
 `n.Count()` would go unreported.
 
+## Diagnostics
+
+Every diagnostic is declared once, in `Source/Codes.cs`: its code, whether it
+is an error or a warning, and a title saying in one line what it means. A
+place that reports one names it -- `diagnostics.Report(Codes.TypeNotFound,
+span, message)` -- and never spells a code; the message is the place's own,
+since it names what that place found. The registry is the inventory, so a
+rule that is already there gets its existing code rather than a new one, and
+[diagnostics.md](diagnostics.md) is generated from it by `stainless explain
+--markdown`. Unit tests refuse a code spelled at a call site, a declared code
+nothing reports, two codes with one title, and a stale page.
+
 ## The error type
 
 A type that could not be resolved becomes the error type, and that failure
 is reported where it happened. Everything that later meets it says nothing.
 A report names the types its message spells after the message, as
-`diagnostics.Error(code, span, message, target, argument.Type)`, and one that
+`diagnostics.Report(code, span, message, target, argument.Type)`, and one that
 is or is built from the error type makes the report a consequence, which is
 dropped. Types are asked, rather than the message searched for `<error>`, so
 a message may say anything. A place that spells a type without naming it is a

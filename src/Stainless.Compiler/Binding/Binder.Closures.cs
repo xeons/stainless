@@ -254,7 +254,7 @@ public sealed partial class Binder
                 ? $"'{owner.Name}.{name}' is assigned elsewhere"
                 : $"'{owner.Name}.{name}' reads '{through}', which is assigned elsewhere";
 
-            diagnostics.Warning("SL0610", span,
+            diagnostics.Report(Codes.CapturedByValueThenChanged, span,
                 $"this lambda captures '{name}' by value, and {changes} -- so it will keep " +
                 "reading what it said here, not what it says when the lambda runs. " +
                 advice);
@@ -292,7 +292,7 @@ public sealed partial class Binder
 
         if (closure.Type is null)
         {
-            diagnostics.Error("SL0381", span,
+            diagnostics.Report(Codes.CapturingLambdaToDelegate, span,
                 $"this lambda reads '{name}' from around it, so it cannot become a delegate; " +
                 "a delegate is a bare function pointer with nowhere to keep what was " +
                 "captured. Convert it to a single-method interface instead");
@@ -425,7 +425,7 @@ public sealed partial class Binder
 
         if (outer is null)
         {
-            diagnostics.Error("SL0228", span,
+            diagnostics.Report(Codes.ThisOutsideInstanceMember, span,
                 "'this' is only valid inside a method, constructor or destructor");
             return new BoundErrorExpression(span);
         }
@@ -440,7 +440,7 @@ public sealed partial class Binder
 
         if (closure.Type is null)
         {
-            diagnostics.Error("SL0381", span,
+            diagnostics.Report(Codes.CapturingLambdaToDelegate, span,
                 "this lambda reads 'this' from around it, so it cannot become a delegate; " +
                 "a delegate is a bare function pointer with nowhere to keep what was " +
                 "captured. Convert it to a single-method interface instead");
@@ -492,7 +492,7 @@ public sealed partial class Binder
     }
 
     private void ReportStaticCapture(string name, SourceSpan span) =>
-        diagnostics.Error("SL0764", span,
+        diagnostics.Report(Codes.StaticLambdaCaptures, span,
             $"this lambda is 'static', so it cannot read '{name}' from around it; a static " +
             "lambda captures nothing. Pass it in as a parameter, or drop 'static'");
 
@@ -528,7 +528,7 @@ public sealed partial class Binder
 
         if (target is DelegateTypeSymbol && lambda.LocalFunction is { } named)
         {
-            diagnostics.Error("SL0381", span,
+            diagnostics.Report(Codes.CapturingLambdaToDelegate, span,
                 $"'{named}' reads variables of the function around it, or its object, so it " +
                 "cannot become a delegate; a delegate is a bare function pointer with nowhere " +
                 "to keep them. Convert it to a closure instead");
@@ -544,7 +544,7 @@ public sealed partial class Binder
         if (target is InterfaceTypeSymbol asInterface && SingleMethodOf(asInterface) is { } method)
             return BindLambdaAsClosure(syntax, asInterface, method, span);
 
-        diagnostics.Error("SL0382", span,
+        diagnostics.Report(Codes.LambdaTargetInvalid, span,
             $"a lambda becomes a delegate or an interface with exactly one method, " +
             $"and '{target.Name}' is neither",
             target);
@@ -841,7 +841,7 @@ public sealed partial class Binder
         if (bound.Type.IsError()) return null;
         if (constant) return bound;
 
-        diagnostics.Error("SL0613", written.Span,
+        diagnostics.Report(Codes.InvalidParameterDefault, written.Span,
             $"the default for '{parameter.Name}' is not a constant, and a default is written " +
             "into every call that leaves it out. A literal, 'null', a 'const', an enum member " +
             "or 'default(T)' is what it may be");
@@ -877,7 +877,7 @@ public sealed partial class Binder
             var written = ResolveType(syntax.ReturnType, _context.File!, allowVoid: true);
             if (!written.IsError() && !written.Equals(returns))
             {
-                diagnostics.Error("SL0765", syntax.ReturnType.Span,
+                diagnostics.Report(Codes.LambdaReturnTypeMismatch, syntax.ReturnType.Span,
                     $"this lambda returns '{written.Name}', and '{target}' returns " +
                     $"'{returns.Name}'; a result written out is not converted",
                     written, returns);
@@ -896,7 +896,7 @@ public sealed partial class Binder
             if (wanted[i].Default is { } theirs && ConstantKey(theirs) == ConstantKey(bound))
                 continue;
 
-            diagnostics.Warning("SL0766", written.Span,
+            diagnostics.Report(Codes.LambdaDefaultNotSeenByTarget, written.Span,
                 $"'{target}' gives '{parameter.Name}' " +
                 (wanted[i].Default is null ? "no default" : "a different default") +
                 ", so a call through it never sees this one. A default on a lambda is " +
@@ -1112,7 +1112,7 @@ public sealed partial class Binder
     {
         if (syntax.Parameters.Count == wanted) return true;
 
-        diagnostics.Error("SL0383", span,
+        diagnostics.Report(Codes.LambdaParameterCountMismatch, span,
             $"'{target}' takes {wanted} argument{(wanted == 1 ? "" : "s")}, " +
             $"but this lambda declares {syntax.Parameters.Count}");
         return false;
@@ -1137,7 +1137,7 @@ public sealed partial class Binder
             {
                 var written = ResolveType(declared.Type, _context.File!);
                 if (!written.IsError() && !written.Equals(type))
-                    diagnostics.Error("SL0384", declared.Span,
+                    diagnostics.Report(Codes.LambdaParameterTypeMismatch, declared.Span,
                         $"parameter '{declared.Name}' is '{written.Name}', but the target " +
                         $"expects '{type.Name}'",
                         written, type);
@@ -1196,7 +1196,7 @@ public sealed partial class Binder
             ReportLostCapturedWrites(body, closureType, context);
 
         if (!symbol.ReturnType.IsVoid() && EndIsReachable(body))
-            diagnostics.Error("SL0217", syntax.Span,
+            diagnostics.Report(Codes.NotAllPathsReturn, syntax.Span,
                 $"not all paths through this lambda return a value of type '{symbol.ReturnType.Name}'",
                 symbol.ReturnType);
 
@@ -1231,7 +1231,7 @@ public sealed partial class Binder
                     : $"'{owner.Name}' is a struct, so the lambda holds a copy of the whole " +
                       "value; return the new value instead, or make it a class";
 
-                diagnostics.Warning("SL0829", span,
+                diagnostics.Report(Codes.CapturedCopyWrittenInLambda, span,
                     $"this writes the lambda's own copy of '{name}', so '{owner.Name}.{name}' " +
                     "does not change: a lambda captures a member it names without 'this' by " +
                     "value. " + advice);
@@ -1247,7 +1247,7 @@ public sealed partial class Binder
                 ? $"'this', a '{field.Type.Name}', so the struct the method was called on"
                 : $"'{name}', so the '{name}' outside the lambda";
 
-            diagnostics.Warning("SL0829", span,
+            diagnostics.Report(Codes.CapturedCopyWrittenInLambda, span,
                 $"this writes the lambda's own copy of {what} does not change, and nothing " +
                 "reads the copy again: a lambda captures by value. Keep the state in an " +
                 "object the lambda holds, or return the new value");
@@ -1273,7 +1273,7 @@ public sealed partial class Binder
             return BindVariantSwitch(syntax, value, variant);
 
         foreach (var binding in syntax.Sections.SelectMany(section => section.Bindings))
-            diagnostics.Error("SL0438", binding.Span,
+            diagnostics.Report(Codes.CasePatternOnNonVariant, binding.Span,
                 $"'case {binding.Case} {binding.Name}' matches a variant's case and binds what " +
                 $"it carries, and '{value.Type.Name}' is not a variant",
                 value.Type);
@@ -1284,7 +1284,7 @@ public sealed partial class Binder
 
         if (!onText && !onOrdinal)
         {
-            diagnostics.Error("SL0403", syntax.Value.Span,
+            diagnostics.Report(Codes.SwitchValueTypeNotSwitchable, syntax.Value.Span,
                 $"'{value.Type.Name}' cannot be switched on; a switch needs a value with " +
                 "constant labels, so it takes an integer, 'char', 'bool', an enum or a String",
                 value.Type);
@@ -1314,13 +1314,13 @@ public sealed partial class Binder
                 {
                     if (Underlying(bound) is not BoundStringLiteral text)
                     {
-                        diagnostics.Error("SL0404", label.Span,
+                        diagnostics.Report(Codes.CaseLabelNotConstant, label.Span,
                             "a 'case' label must be a constant, and this is not a string literal");
                         continue;
                     }
 
                     if (!seenText.TryAdd(text.Value, label.Span))
-                        diagnostics.Error("SL0405", label.Span,
+                        diagnostics.Report(Codes.DuplicateSwitchCase, label.Span,
                             $"this switch already has a case for \"{text.Value}\"");
                     else
                     {
@@ -1333,7 +1333,7 @@ public sealed partial class Binder
 
                 if (FoldSwitchLabel(bound) is not { } bits)
                 {
-                    diagnostics.Error("SL0404", label.Span,
+                    diagnostics.Report(Codes.CaseLabelNotConstant, label.Span,
                         $"a 'case' label must be a constant of type '{value.Type.Name}', " +
                         "and this is not one",
                         value.Type);
@@ -1341,7 +1341,7 @@ public sealed partial class Binder
                 }
 
                 if (!seenOrdinals.TryAdd(bits, label.Span))
-                    diagnostics.Error("SL0405", label.Span,
+                    diagnostics.Report(Codes.DuplicateSwitchCase, label.Span,
                         "this switch already has a case for that value");
                 else
                 {
@@ -1357,7 +1357,7 @@ public sealed partial class Binder
             if (section.HasDefault)
             {
                 if (sawDefault)
-                    diagnostics.Error("SL0406", section.Span,
+                    diagnostics.Report(Codes.DuplicateSwitchDefault, section.Span,
                         "this switch already has a 'default' section");
                 else
                     frame.Default = index;
@@ -1373,7 +1373,7 @@ public sealed partial class Binder
             // almost always a forgotten 'break', and the reader of one that
             // meant it has no way to tell.
             if (EndIsReachable(body))
-                diagnostics.Error("SL0407", section.Span,
+                diagnostics.Report(Codes.SwitchSectionFallsThrough, section.Span,
                     "a switch section must not run off its end; finish it with 'break', " +
                     "'return', 'continue' or 'goto'. Stack the labels instead, as in " +
                     "'case 1: case 2:', when two values share a body, or end one section " +
@@ -1437,7 +1437,7 @@ public sealed partial class Binder
                     variant.FindCase(only) is { } named)
                 {
                     if (!covered.TryAdd(named, label.Span))
-                        diagnostics.Error("SL0405", label.Span,
+                        diagnostics.Report(Codes.DuplicateSwitchCase, label.Span,
                             $"this switch already has a case for '{named.Name}'");
                     else
                         cases.Add(named);
@@ -1445,7 +1445,7 @@ public sealed partial class Binder
                     continue;
                 }
 
-                diagnostics.Error("SL0404", label.Span,
+                diagnostics.Report(Codes.CaseLabelNotConstant, label.Span,
                     $"a 'case' label in a switch over '{variant.Name}' names one of its cases; " +
                     "they are " + Listed(variant.Cases.Select(c => c.Name)),
                     variant);
@@ -1455,7 +1455,7 @@ public sealed partial class Binder
             {
                 if (variant.FindCase(declared.Case) is not { } matched)
                 {
-                    diagnostics.Error("SL0435", declared.Span,
+                    diagnostics.Report(Codes.VariantCaseNotFound, declared.Span,
                         $"variant '{variant.Name}' has no case named '{declared.Case}'; it has " +
                         Listed(variant.Cases.Select(c => c.Name)),
                         variant);
@@ -1464,7 +1464,7 @@ public sealed partial class Binder
 
                 if (!covered.TryAdd(matched, declared.Span))
                 {
-                    diagnostics.Error("SL0405", declared.Span,
+                    diagnostics.Report(Codes.DuplicateSwitchCase, declared.Span,
                         $"this switch already has a case for '{matched.Name}'");
                     continue;
                 }
@@ -1473,7 +1473,7 @@ public sealed partial class Binder
 
                 if (matched.Payload is null)
                 {
-                    diagnostics.Error("SL0439", declared.Span,
+                    diagnostics.Report(Codes.EmptyVariantCaseBound, declared.Span,
                         $"case '{matched.Name}' carries nothing, so there is nothing for " +
                         $"'{declared.Name}' to be; write 'case {matched.Name}:'");
                     continue;
@@ -1481,7 +1481,7 @@ public sealed partial class Binder
 
                 if (bound is not null || cases.Count > 1)
                 {
-                    diagnostics.Error("SL0440", declared.Span,
+                    diagnostics.Report(Codes.MultipleBoundCasesInSection, declared.Span,
                         "only one case may be bound in a section, because each carries " +
                         "something different; give this case a section of its own");
                     continue;
@@ -1495,7 +1495,7 @@ public sealed partial class Binder
             if (section.HasDefault)
             {
                 if (sawDefault)
-                    diagnostics.Error("SL0406", section.Span,
+                    diagnostics.Report(Codes.DuplicateSwitchDefault, section.Span,
                         "this switch already has a 'default' section");
                 else
                     frame.Default = sections.Count;
@@ -1536,7 +1536,7 @@ public sealed partial class Binder
             _context.VariantFacts = saved;
 
             if (EndIsReachable(body))
-                diagnostics.Error("SL0407", section.Span,
+                diagnostics.Report(Codes.SwitchSectionFallsThrough, section.Span,
                     "a switch section must not run off its end; finish it with 'break', " +
                     "'return', 'continue' or 'goto'. Stack the labels instead, as in " +
                     "'case Circle: case Rect:', when two cases share a body");
@@ -1550,7 +1550,7 @@ public sealed partial class Binder
         var missing = variant.Uncovered(covered.Keys).ToList();
 
         if (missing.Count > 0 && !sawDefault)
-            diagnostics.Error("SL0436", syntax.Span,
+            diagnostics.Report(Codes.VariantSwitchNotExhaustive, syntax.Span,
                 $"this switch over '{variant.Name}' does not cover " +
                 Listed(missing.Select(c => "'" + c.Name + "'")) +
                 "; a variant is the choice between its cases, so a switch that leaves one out " +
@@ -1585,7 +1585,7 @@ public sealed partial class Binder
     {
         if (_context.ParallelDepth > 0)
         {
-            diagnostics.Error("SL0374", syntax.Span,
+            diagnostics.Report(Codes.ReturnFromParallel, syntax.Span,
                 "'return' cannot leave a 'parallel' block; the join at its closing brace " +
                 "would be skipped and the jobs left running against a dead frame");
             return new BoundReturn(syntax.Span, null);
@@ -1606,7 +1606,7 @@ public sealed partial class Binder
         if (syntax.Value is null)
         {
             if (!expected.IsVoid())
-                diagnostics.Error("SL0223", syntax.Span,
+                diagnostics.Report(Codes.ReturnMissingValue, syntax.Span,
                     $"this function must return a value of type '{expected.Name}'",
                     expected);
             return new BoundReturn(syntax.Span, null);
@@ -1615,7 +1615,7 @@ public sealed partial class Binder
         var value = BindExpression(syntax.Value);
         if (expected.IsVoid())
         {
-            diagnostics.Error("SL0224", syntax.Span,
+            diagnostics.Report(Codes.ReturnValueFromVoid, syntax.Span,
                 "this function returns 'void', so 'return' cannot take a value");
             return new BoundReturn(syntax.Span, null);
         }
@@ -1626,7 +1626,7 @@ public sealed partial class Binder
     private BoundStatement BindBreak(BreakSyntax syntax)
     {
         if (_context.LoopDepth == 0 && _context.SwitchDepth == 0)
-            diagnostics.Error("SL0225", syntax.Span,
+            diagnostics.Report(Codes.BreakOutsideLoopOrSwitch, syntax.Span,
                 "'break' is only valid inside a loop or a switch");
         return new BoundBreak(syntax.Span);
     }
@@ -1634,7 +1634,8 @@ public sealed partial class Binder
     private BoundStatement BindContinue(ContinueSyntax syntax)
     {
         if (_context.LoopDepth == 0)
-            diagnostics.Error("SL0226", syntax.Span, "'continue' is only valid inside a loop");
+            diagnostics.Report(Codes.ContinueOutsideLoop, syntax.Span,
+                "'continue' is only valid inside a loop");
         return new BoundContinue(syntax.Span);
     }
 
@@ -1642,7 +1643,7 @@ public sealed partial class Binder
     {
         var condition = BindExpression(syntax);
         if (!condition.Type.IsBool() && !condition.Type.IsError())
-            diagnostics.Error("SL0227", syntax.Span,
+            diagnostics.Report(Codes.ConditionNotBool, syntax.Span,
                 $"a condition must be 'bool', but this is '{condition.Type.Name}'; " +
                 "Stainless has no implicit conversion to 'bool'",
                 condition.Type);

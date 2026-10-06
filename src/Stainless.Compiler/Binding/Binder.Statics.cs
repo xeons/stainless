@@ -48,7 +48,7 @@ public sealed partial class Binder
         if (module.Statics.ContainsKey(declaration.Name) ||
             module.Constants.ContainsKey(declaration.Name))
         {
-            diagnostics.Error("SL0201", declaration.Span,
+            diagnostics.Report(Codes.DuplicateModuleMember, declaration.Span,
                 $"'{declaration.Name}' is already declared in module '{module.Name}'");
             return;
         }
@@ -59,7 +59,7 @@ public sealed partial class Binder
         // produce a link error nobody could read.
         if (declaration.Linkage.IsCpp())
         {
-            diagnostics.Error("SL0701", declaration.Span,
+            diagnostics.Report(Codes.CppVariableNotSupported, declaration.Span,
                 $"'{declaration.Name}' is a variable, and a C++ variable's name is mangled by " +
                 "rules this compiler does not implement; declare it 'extern \"C\"', or reach it " +
                 "through a C++ function that returns its address");
@@ -73,7 +73,7 @@ public sealed partial class Binder
         // definition and wants one, for the same reason any other static does.
         if (imported && declaration.Initializer is not null)
         {
-            diagnostics.Error("SL0702", declaration.Span,
+            diagnostics.Report(Codes.ExternVariableInitialized, declaration.Span,
                 $"'{declaration.Name}' is declared 'extern \"C\"', so it is defined elsewhere " +
                 "and cannot be given a value here");
             return;
@@ -112,7 +112,7 @@ public sealed partial class Binder
             (module.Statics.ContainsKey(declaration.Name) ||
              module.Constants.ContainsKey(declaration.Name)))
         {
-            diagnostics.Error("SL0201", declaration.Span,
+            diagnostics.Report(Codes.DuplicateModuleMember, declaration.Span,
                 $"'{declaration.Name}' is already declared in module '{module.Name}'");
             return;
         }
@@ -123,7 +123,7 @@ public sealed partial class Binder
              containingType.FindStorage(declaration.Name) is not null ||
              containingType.FindProperty(declaration.Name) is not null))
         {
-            diagnostics.Error("SL0205", declaration.Span,
+            diagnostics.Report(Codes.DuplicateTypeMember, declaration.Span,
                 $"'{containingType.Name}' already declares a member named '{declaration.Name}'",
                 containingType);
             return;
@@ -245,7 +245,7 @@ public sealed partial class Binder
                 // A second one would be a second file for one static, and there
                 // is one static.
                 if (embed is not null)
-                    diagnostics.Error("SL0729", written.Span,
+                    diagnostics.Report(Codes.InvalidEmbedPlacement, written.Span,
                         $"'{symbol.Name}' already has an '[Embed]'; a static holds one object, " +
                         "so it carries one file");
                 else
@@ -258,12 +258,12 @@ public sealed partial class Binder
                 ArrayTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } };
 
             if (declaration.Value is not null)
-                diagnostics.Error("SL0731", declaration.Value.Span,
+                diagnostics.Report(Codes.EmbedStaticHasInitializer, declaration.Value.Span,
                     $"'{symbol.Name}' has an '[Embed]', so the linker makes what it holds and " +
                     "there is nothing for an initializer to run; drop the '=', or drop the " +
                     "attribute and read the file with 'Standard.File'");
             else if (!isBytes)
-                diagnostics.Error("SL0730", declaration.Span,
+                diagnostics.Report(Codes.EmbedStaticNotByteArray, declaration.Span,
                     $"'{symbol.Name}' is '{symbol.Type.Name}', and an embedded file is its bytes: " +
                     "declare it 'byte[]'",
                     symbol.Type);
@@ -283,7 +283,7 @@ public sealed partial class Binder
 
         if (declaration.Value is null)
         {
-            diagnostics.Error("SL0376", declaration.Span,
+            diagnostics.Report(Codes.StaticWithoutInitializer, declaration.Span,
                 $"'{symbol.Name}' is a static, so it needs a value: the initializers run in " +
                 "dependency order before 'Main', and there is no later moment at which one " +
                 "could be given a first value");
@@ -356,7 +356,7 @@ public sealed partial class Binder
     {
         if (type.StaticConstructor is not null)
         {
-            diagnostics.Error("SL0209", declaration.Span,
+            diagnostics.Report(Codes.DuplicateDestructorOrStaticConstructor, declaration.Span,
                 $"'{type.Name}' already declares a 'static {type.SimpleName}()'; there is one " +
                 "moment before 'Main' at which a type is set up, so there is one block for it",
                 type);
@@ -459,12 +459,12 @@ public sealed partial class Binder
             if (!onStack.Add(node))
             {
                 if (node is StaticSymbol symbol)
-                    diagnostics.Error("SL0378", symbol.Span,
+                    diagnostics.Report(Codes.StaticInitializationCycle, symbol.Span,
                         $"the initializer of '{symbol.QualifiedName.TrimEnd('$')}' depends on " +
                         "itself, directly or through another static; there is no order that would " +
                         "give it a value before it is read");
                 else if (node is FunctionSymbol constructor)
-                    diagnostics.Error("SL0378", constructor.Span,
+                    diagnostics.Report(Codes.StaticInitializationCycle, constructor.Span,
                         $"the static constructor of '{constructor.ContainingType!.Name}' reads a " +
                         "static that, directly or through another, needs this type set up first; " +
                         "there is no order that would run both",

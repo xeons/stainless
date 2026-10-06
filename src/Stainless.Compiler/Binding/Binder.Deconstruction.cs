@@ -185,7 +185,7 @@ public sealed partial class Binder
             {
                 if (use == DeconstructionUse.Value)
                 {
-                    diagnostics.Error("SL0771", declaration.Span,
+                    diagnostics.Report(Codes.DeclarationOutsideDeconstruction, declaration.Span,
                         $"'{declaration.Name}' is declared inside an expression, where there is " +
                         "no statement for it to belong to; a deconstruction that declares has " +
                         "to be a statement of its own");
@@ -216,7 +216,7 @@ public sealed partial class Binder
 
         if (use == DeconstructionUse.ForEach)
         {
-            diagnostics.Error("SL0772", syntax.Span,
+            diagnostics.Report(Codes.ForeachDeconstructionWithoutDeclaration, syntax.Span,
                 "a 'foreach' declares the names it takes an element apart into, and this " +
                 "names something that already exists; write 'var' or a type in front of it, " +
                 "or assign it inside the loop");
@@ -354,7 +354,7 @@ public sealed partial class Binder
     {
         if (target.Elements.Count == count) return true;
 
-        diagnostics.Error("SL0609", span,
+        diagnostics.Report(Codes.DeconstructionArityMismatch, span,
             $"{what} has {Counted(count, "element")}, and this names {target.Elements.Count}");
         return false;
     }
@@ -368,14 +368,14 @@ public sealed partial class Binder
 
         if (value.Type.IsVoid())
         {
-            diagnostics.Error("SL0607", value.Span,
+            diagnostics.Report(Codes.TupleElementHasNoValue, value.Span,
                 "an element of a tuple has to be a value, and this produces none");
             return false;
         }
 
         if (target.Type is null && !HasOwnType(value))
         {
-            diagnostics.Error("SL0553", value.Span,
+            diagnostics.Report(Codes.VarTypeNotInferable, value.Span,
                 (target.Kind == DeconstructionKind.Declare ? $"'{target.Name}'" : "a discard") +
                 " cannot be a 'var': this takes its type from where it is going, and a 'var' " +
                 "is waiting to be told. Write the type in its place");
@@ -486,7 +486,7 @@ public sealed partial class Binder
 
         if (call.Type.IsError() || parts.Count != arity)
         {
-            diagnostics.Error("SL0608", value.Span,
+            diagnostics.Report(Codes.ValueCannotBeDeconstructed, value.Span,
                 $"'{value.Type.Name}' is not a tuple and has no 'Deconstruct' with " +
                 $"{Counted(arity, "'out' parameter")}, so it cannot be taken apart " +
                 $"into {arity}",

@@ -205,7 +205,7 @@ public sealed partial class Binder
     }
 
     private void ReportContainsItself(NamedTypeSymbol type) =>
-        diagnostics.Error("SL0216", type.Span ?? default,
+        diagnostics.Report(Codes.StructContainsItself, type.Span ?? default,
             $"struct '{type.QualifiedName}' contains itself, so it has no finite size");
 
     /// <summary>
@@ -250,7 +250,7 @@ public sealed partial class Binder
         // Checked here rather than where the width was read, because [Packed] is
         // not known until attributes have been folded and that is a pass later.
         if (type.IsPacked || type.PackAlignment is not null)
-            diagnostics.Error("SL0470", type.Span ?? default,
+            diagnostics.Report(Codes.PackedWithBitFields, type.Span ?? default,
                 $"'{type.Name}' is '[{(type.IsPacked ? "Packed" : "Pack")}]' and has bit-fields, and the two together mean " +
                 "different things to different C compilers -- gcc packs the bits and MSVC keeps " +
                 "the storage unit. Until one of them is chosen and checked against it, this is " +

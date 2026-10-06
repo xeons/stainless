@@ -41,7 +41,7 @@ public sealed partial class Binder
         if (ZeroValues.FindNullInZero(type) is not { } found)
             return;
 
-        ReportNoZeroValue("SL0810", span,
+        ReportNoZeroValue(Codes.DefaultOfTypeWithoutZero, span,
             $"'{type.Name}' has no zero value: {ExplainNullInZero(found)}, so 'default' would " +
             "hand out a null where the type says there is none. Build the value with a " +
             "constructor, or make the reference nullable",
@@ -60,7 +60,7 @@ public sealed partial class Binder
         if (ZeroValues.FindNullInZero(element) is not { } found)
             return;
 
-        ReportNoZeroValue("SL0812", span,
+        ReportNoZeroValue(Codes.ArrayOfTypeWithoutZero, span,
             $"'new {element.Name}[n]' would start every element as a zero, and " +
             $"'{element.Name}' has none: {ExplainNullInZero(found)}. Write the elements out, " +
             "as '[a, b, c]', make them with 'Array.Create(n, (i) => ...)', or collect them " +
@@ -152,7 +152,7 @@ public sealed partial class Binder
             : $"'{local.Name}' is read here before '{local.Name}." +
               $"{string.Join('.', slot.Select(f => f.Name))}' has been assigned";
 
-        ReportNoZeroValue("SL0811", span,
+        ReportNoZeroValue(Codes.LocalWithoutZeroUnassigned, span,
             $"{what}, and '{slotType.Name}' has no zero value: {ExplainNullInZero(found)}. " +
             "Assign it on every path before this, or give it a value where it is declared",
             local.Type);
@@ -360,7 +360,7 @@ public sealed partial class Binder
             foreach (var field in FieldsNeedingValues(type, setsRequired: false))
             {
                 var found = FindNullInField(type, field);
-                ReportNoZeroValue("SL0813", span,
+                ReportNoZeroValue(Codes.FieldWithoutZeroUnassigned, span,
                     $"'{type.Name}' has no constructor, so nothing gives '{field.Name}' a value, " +
                     $"and '{field.Type.Name}' has no zero value: " +
                     $"{ExplainNullInZero(found)}. Give the field an initializer, mark it " +
@@ -439,7 +439,7 @@ public sealed partial class Binder
             var slot = path[^1];
             var found = FindNullInField(slot.ContainingType, slot);
             string named = string.Join('.', path.Select(f => f.Name));
-            binder.ReportNoZeroValue("SL0813", span,
+            binder.ReportNoZeroValue(Codes.FieldWithoutZeroUnassigned, span,
                 $"'{Field.ContainingType.Name}' can be made without '{named}' being written, " +
                 $"and '{slot.Type.Name}' has no zero value: {ExplainNullInZero(found)}. Assign " +
                 "it on every path through the constructor, or give it an initializer",
@@ -528,7 +528,7 @@ public sealed partial class Binder
             return false;
 
         if (!symbol.IsFilledOnFirstUse)
-            ReportNoZeroValue("SL0814", declaration.Span,
+            ReportNoZeroValue(Codes.StaticWithoutZeroUninitialized, declaration.Span,
                 $"'{symbol.DisplayName}' has no '= value', so it would start as the zero of " +
                 $"'{symbol.Type.Name}', which has none: {ExplainNullInZero(found)}. Give it an " +
                 "initializer",
@@ -560,6 +560,6 @@ public sealed partial class Binder
     }
 
     private void ReportNoZeroValue(
-        string code, SourceSpan span, string message, TypeSymbol about) =>
-        diagnostics.Error(code, span, message, about);
+        DiagnosticDescriptor code, SourceSpan span, string message, TypeSymbol about) =>
+        diagnostics.Report(code, span, message, about);
 }

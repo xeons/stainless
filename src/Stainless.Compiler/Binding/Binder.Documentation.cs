@@ -227,14 +227,14 @@ public sealed partial class Binder
 
             if (tag.Kind == DocTagKind.Unknown)
             {
-                diagnostics.Warning("SL0739", where,
+                diagnostics.Report(Codes.DocumentationTagUnknown, where,
                     $"'@{tag.Word}' is not a tag{Instead(tag.Word)}");
                 continue;
             }
 
             if (!Applies(tag.Kind, subject.Kind))
             {
-                diagnostics.Warning("SL0743", where,
+                diagnostics.Report(Codes.DocumentationTagMisplaced, where,
                     $"'@{tag.Word}' says nothing about {Describe(subject)}; " +
                     $"it belongs on {WhereItBelongs(tag.Kind)}");
                 continue;
@@ -248,14 +248,14 @@ public sealed partial class Binder
 
                 case DocTagKind.TypeParam:
                     if (tag.Name is null || !subject.TypeParameters.Contains(tag.Name))
-                        diagnostics.Warning("SL0742", where,
+                        diagnostics.Report(Codes.DocumentedTypeParameterNotFound, where,
                             $"'{subject.Name}' has no type parameter named " +
                             $"'{tag.Name ?? ""}'{Among(subject.TypeParameters)}");
                     break;
 
                 case DocTagKind.Returns:
                     if (subject.Returns is PrimitiveTypeSyntax { Keyword: TokenKind.VoidKeyword })
-                        diagnostics.Warning("SL0743", where,
+                        diagnostics.Report(Codes.DocumentationTagMisplaced, where,
                             $"'{subject.Name}' returns nothing, so there is nothing for " +
                             "'@returns' to describe");
                     break;
@@ -281,14 +281,14 @@ public sealed partial class Binder
     {
         if (tag.Name is null || !subject.Parameters.Contains(tag.Name))
         {
-            diagnostics.Warning("SL0740", where,
+            diagnostics.Report(Codes.DocumentedParameterInvalid, where,
                 $"'{subject.Name}' has no parameter named " +
                 $"'{tag.Name ?? ""}'{Among(subject.Parameters)}");
             return;
         }
 
         if (!documented.TryAdd(tag.Name, tag.Span))
-            diagnostics.Warning("SL0740", where,
+            diagnostics.Report(Codes.DocumentedParameterInvalid, where,
                 $"'{tag.Name}' is documented twice, and the second is what a reader would " +
                 "have to notice is not the first");
     }
@@ -309,7 +309,7 @@ public sealed partial class Binder
 
         var where = read.FirstOfKind(DocTagKind.Param)?.Span ?? declaration;
 
-        diagnostics.Warning("SL0741", where,
+        diagnostics.Report(Codes.DocumentedParametersIncomplete, where,
             $"'{subject.Name}' documents some of its parameters and not " +
             Listed(missing.Select(m => "'" + m + "'")) +
             "; document all of them or none");
@@ -324,7 +324,7 @@ public sealed partial class Binder
     {
         if (ErrorTypeOf(subject.Returns) is not { } declared)
         {
-            diagnostics.Warning("SL0744", where,
+            diagnostics.Report(Codes.DocumentedFailureInvalid, where,
                 $"'{subject.Name}' reports no failure, so there is nothing for '@failure' to " +
                 "name; a call that can fail returns a 'Result' or the error itself");
             return;
@@ -332,7 +332,7 @@ public sealed partial class Binder
 
         if (tag.Name is null)
         {
-            diagnostics.Warning("SL0744", where,
+            diagnostics.Report(Codes.DocumentedFailureInvalid, where,
                 "'@failure' names the error it is about, as in " +
                 $"'@failure {declared.Name}.Something what went wrong'",
                 declared);
@@ -348,7 +348,7 @@ public sealed partial class Binder
         if (CaseNames(declared) is not { } cases) return;
 
         if (!cases.Contains(cased))
-            diagnostics.Warning("SL0744", where,
+            diagnostics.Report(Codes.DocumentedFailureInvalid, where,
                 $"'{declared.Name}' has no case named '{cased}'{Among(cases)}",
                 declared);
     }
@@ -360,13 +360,13 @@ public sealed partial class Binder
         if (tag.Name is null)
         {
             if (tag.Kind != DocTagKind.InheritDoc)
-                diagnostics.Warning("SL0745", where,
+                diagnostics.Report(Codes.DocumentationReferenceUnresolved, where,
                     $"'@{tag.Word}' names what it points at, and this one names nothing");
             return;
         }
 
         if (!Resolves(tag.Name) && !NamesOmittedModule(tag.Name))
-            diagnostics.Warning("SL0745", where,
+            diagnostics.Report(Codes.DocumentationReferenceUnresolved, where,
                 $"'{tag.Name}' is not a type, a member or a module this file can see");
     }
 

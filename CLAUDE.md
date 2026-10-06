@@ -167,6 +167,10 @@ These are rules held by the unit tests, and each has caught a real commit:
   fail on Linux.
 - **A documented `SL####` needs an `errors.txt` case pinning it**, or
   `DiagnosticTests.EveryDocumentedCodeIsPinnedByACase` fails.
+- **A new diagnostic is declared in `Source/Codes.cs`**, reported by name, and
+  `docs/diagnostics.md` regenerated with `stainless explain --markdown`, or
+  `DiagnosticTests` fails. Read the titles first: a rule already there keeps
+  its code.
 - **A test that looks a function up by name fragment will eventually match the
   standard library.** `AbiTests` once matched `Standard.Xml.Cursor.Take` instead
   of its own; qualify with the mangled prefix (`4Test4Take`).
