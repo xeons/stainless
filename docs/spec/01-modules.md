@@ -77,7 +77,7 @@ may carry depends on whose layout it is:
 | In a later declaration | of a class | of anything else |
 |---|---|---|
 | a method or a property | added | added |
-| a field | added, after the fields before it | SL0552 — the layout is C's, or the runtime's |
+| a field | added, after the fields before it | SL0551 — the layout is C's, or the runtime's |
 | a base or interface list | taken, if no other declaration has one | SL0551 |
 | a different kind | SL0550 | SL0550 |
 

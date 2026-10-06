@@ -182,7 +182,7 @@ public sealed partial class Binder
 
         if (_builtins.IsString(expression.Type) && IsBytePointer(target))
         {
-            diagnostics.Report(Codes.StringToBytePointer, span,
+            diagnostics.Report(Codes.StringIsNotBytePointer, span,
                 "a String does not convert to 'byte*' on its own; call ToPointer() to hand its " +
                 "bytes to C, and keep the String alive for as long as C holds the pointer");
             return new BoundErrorExpression(span);

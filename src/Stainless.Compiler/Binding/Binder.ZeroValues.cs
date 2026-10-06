@@ -152,7 +152,7 @@ public sealed partial class Binder
             : $"'{local.Name}' is read here before '{local.Name}." +
               $"{string.Join('.', slot.Select(f => f.Name))}' has been assigned";
 
-        ReportNoZeroValue(Codes.LocalWithoutZeroUnassigned, span,
+        ReportNoZeroValue(Codes.ReadBeforeAssigned, span,
             $"{what}, and '{slotType.Name}' has no zero value: {ExplainNullInZero(found)}. " +
             "Assign it on every path before this, or give it a value where it is declared",
             local.Type);
@@ -360,7 +360,7 @@ public sealed partial class Binder
             foreach (var field in FieldsNeedingValues(type, setsRequired: false))
             {
                 var found = FindNullInField(type, field);
-                ReportNoZeroValue(Codes.FieldWithoutZeroUnassigned, span,
+                ReportNoZeroValue(Codes.FieldMayBeUnassigned, span,
                     $"'{type.Name}' has no constructor, so nothing gives '{field.Name}' a value, " +
                     $"and '{field.Type.Name}' has no zero value: " +
                     $"{ExplainNullInZero(found)}. Give the field an initializer, mark it " +
@@ -439,7 +439,7 @@ public sealed partial class Binder
             var slot = path[^1];
             var found = FindNullInField(slot.ContainingType, slot);
             string named = string.Join('.', path.Select(f => f.Name));
-            binder.ReportNoZeroValue(Codes.FieldWithoutZeroUnassigned, span,
+            binder.ReportNoZeroValue(Codes.FieldMayBeUnassigned, span,
                 $"'{Field.ContainingType.Name}' can be made without '{named}' being written, " +
                 $"and '{slot.Type.Name}' has no zero value: {ExplainNullInZero(found)}. Assign " +
                 "it on every path through the constructor, or give it an initializer",

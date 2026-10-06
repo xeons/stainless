@@ -198,7 +198,7 @@ public sealed partial class Binder
 
             if (parameterType.IsVoid())
             {
-                diagnostics.Report(Codes.VoidParameterInTypeDeclaration, parameter.Span,
+                diagnostics.Report(Codes.VoidUsedAsValue, parameter.Span,
                     $"parameter '{parameter.Name}' of {kind} '{type.Name}' cannot be 'void'",
                     type);
                 parameterType = ErrorTypeSymbol.Instance;
@@ -269,7 +269,7 @@ public sealed partial class Binder
         {
             if (type.FindMember(member.Name) is not null)
             {
-                diagnostics.Report(Codes.DuplicateEnumMember, member.Span,
+                diagnostics.Report(Codes.DuplicateMember, member.Span,
                     $"'{type.Name}' already has a member named '{member.Name}'",
                     type);
                 continue;
@@ -338,7 +338,7 @@ public sealed partial class Binder
         {
             if (variant.FindCase(declared.Name) is not null)
             {
-                diagnostics.Report(Codes.DuplicateVariantCase, declared.Span,
+                diagnostics.Report(Codes.DuplicateMember, declared.Span,
                     $"variant '{variant.Name}' already has a case named '{declared.Name}'",
                     variant);
                 continue;
@@ -603,7 +603,7 @@ public sealed partial class Binder
                     // so only a class takes fields from a later declaration.
                     if (_additionalParts.Contains(declaration) && !SpansDeclarations(type))
                     {
-                        diagnostics.Report(Codes.FieldInTypeRedeclaration, field.Span,
+                        diagnostics.Report(Codes.OnlyFirstDeclarationMay, field.Span,
                             $"'{type.Name}' is already declared in this module, so this " +
                             $"declaration may add methods but not the field '{field.Name}'; " +
                             "only a class takes fields from a declaration other than the first",
@@ -614,7 +614,7 @@ public sealed partial class Binder
                     if (type.FindStorage(field.Name) is not null ||
                         type.FindProperty(field.Name) is not null)
                     {
-                        diagnostics.Report(Codes.DuplicateTypeMember, field.Span,
+                        diagnostics.Report(Codes.DuplicateMember, field.Span,
                             $"'{type.Name}' already declares a member named '{field.Name}'",
                             type);
                         break;
@@ -1114,7 +1114,7 @@ public sealed partial class Binder
 
         if (type.Methods.Any(m => m.Name == name && m.Accepts([symbol.Type])))
         {
-            diagnostics.Report(Codes.EventAccessorNameTaken, symbol.Span,
+            diagnostics.Report(Codes.AccessorNameTaken, symbol.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking one " +
                 $"'{symbol.Type.Name}', which is what the event '{symbol.Name}' has to use",
                 type, symbol.Type);
@@ -1237,7 +1237,7 @@ public sealed partial class Binder
 
         if (type.Methods.Any(m => m.Name == name && m.Accepts(parameters)))
         {
-            diagnostics.Report(Codes.EventAccessorNameTaken, symbol.Span,
+            diagnostics.Report(Codes.AccessorNameTaken, symbol.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking these " +
                 $"parameters, which is what raising the event '{symbol.Name}' has to use",
                 type);
@@ -1370,7 +1370,7 @@ public sealed partial class Binder
             (type.FindStorage(declaration.Name) is not null ||
              type.FindProperty(declaration.Name) is not null))
         {
-            diagnostics.Report(Codes.DuplicateTypeMember, declaration.Span,
+            diagnostics.Report(Codes.DuplicateMember, declaration.Span,
                 $"'{type.Name}' already declares a member named '{declaration.Name}'",
                 type);
             return;
@@ -1379,7 +1379,7 @@ public sealed partial class Binder
         var propertyType = ResolveType(declaration.Type, scope);
         if (propertyType.IsVoid())
         {
-            diagnostics.Report(Codes.PropertyTypeIsVoid, declaration.Span,
+            diagnostics.Report(Codes.VoidUsedAsValue, declaration.Span,
                 $"property '{type.Name}.{declaration.Name}' cannot have type 'void'; " +
                 "a property is a value, and 'void' is the absence of one",
                 type);
@@ -1421,7 +1421,7 @@ public sealed partial class Binder
         if (isAbstract)
         {
             foreach (var accessor in declaration.Accessors.Where(a => a.Body is not null))
-                diagnostics.Report(Codes.AbstractAccessorHasBody, accessor.Span,
+                diagnostics.Report(Codes.AbstractMemberHasBody, accessor.Span,
                     $"'{type.Name}.{declaration.Name}' is abstract, so its " +
                     $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
                     "a derived class supplies one",
@@ -1653,7 +1653,7 @@ public sealed partial class Binder
 
         if (taken.Any(m => m.Name == name && m.Accepts(willTake)))
         {
-            diagnostics.Report(Codes.AccessorNameCollision, accessor.Span,
+            diagnostics.Report(Codes.AccessorNameTaken, accessor.Span,
                 $"'{type.Name}' already declares a method named '{name}' taking these " +
                 $"parameters, which is what the {role} of " +
                 (property.IsIndexer ? "this indexer" : $"property '{property.Name}'") +

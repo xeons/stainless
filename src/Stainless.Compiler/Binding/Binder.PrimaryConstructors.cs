@@ -234,7 +234,7 @@ public sealed partial class Binder
             if (TryGiveLocalFunctionThis(_context.Function, span))
                 return new BoundErrorExpression(span);
 
-            diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, span,
+            diagnostics.Report(Codes.InstanceMemberWithoutInstance, span,
                 $"'{name}' is a parameter of the primary constructor of " +
                 $"'{owner.Name}', kept by each instance, and " +
                 $"'{_context.Function.Name}' is static, so there is no instance here",

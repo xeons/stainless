@@ -1506,14 +1506,14 @@ because the address has to come from the import address table.
   stable across compilations — which the dense directly-indexed table exists to
   avoid — or registering tables when the library loads.
 
-Both are reported where the library is built, as SL0419 and SL0420. A class
+Both are reported where the library is built, as SL0419. A class
 with a generic virtual method is left out for the second reason in another
-form (SL0799): its instantiations' slots are numbered after the table the
+form (SL0419): its instantiations' slots are numbered after the table the
 metadata would describe, so a class derived from it elsewhere would put its own
-methods in them. A **com class** stays behind too (SL0544): its vtables and
+methods in them. A **com class** stays behind too (SL0419): its vtables and
 adjustor thunks are internal symbols a consumer's `new` would have to name, so
 it crosses as a com interface instead. A
-**variant** stays behind as well (SL0441), because the metadata carries layouts
+**variant** stays behind as well (SL0419), because the metadata carries layouts
 and a variant is its cases; and anything described that reaches an undescribed
 type through a field or a signature is reported too (SL0477). A slice or a tuple
 of described types does cross.

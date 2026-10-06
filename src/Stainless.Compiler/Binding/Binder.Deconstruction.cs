@@ -375,7 +375,7 @@ public sealed partial class Binder
 
         if (target.Type is null && !HasOwnType(value))
         {
-            diagnostics.Report(Codes.VarTypeNotInferable, value.Span,
+            diagnostics.Report(Codes.VarCannotInfer, value.Span,
                 (target.Kind == DeconstructionKind.Declare ? $"'{target.Name}'" : "a discard") +
                 " cannot be a 'var': this takes its type from where it is going, and a 'var' " +
                 "is waiting to be told. Write the type in its place");

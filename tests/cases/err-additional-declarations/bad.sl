@@ -34,7 +34,7 @@ public struct Point
 // Not fine: a struct's layout belongs to the declaration that has the fields.
 public struct Point
 {
-    public int Y;                               // SL0552
+    public int Y;                               // SL0551
 }
 
 // Not fine: nor does a struct take a base list from a later declaration.

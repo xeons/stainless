@@ -265,7 +265,7 @@ public sealed partial class Binder
             if (!_reported.Add(span.Start))
                 return;
             var leaf = path[^1];
-            binder.ReportNoZeroValue(Codes.FieldWithoutZeroReadBeforeSet, span,
+            binder.ReportNoZeroValue(Codes.ReadBeforeAssigned, span,
                 $"'{string.Join('.', path.Select(f => f.Name))}' is read here before the constructor " +
                 $"has given it a value, and '{leaf.Type.Name}' has no zero value: " +
                 $"{ExplainNullInZero(FindNullInField(leaf.ContainingType, leaf))}",

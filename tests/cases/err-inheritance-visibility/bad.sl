@@ -15,7 +15,7 @@ public class Quieter : Quiet
     public int Fine() => Legs();
 
     // Private is the module's, and deriving is not being in the module.
-    public int Wrong() => Tag(); // SL0257
+    public int Wrong() => Tag(); // SL0249
 }
 
 /// Not derived from anything, so protected means nothing to it.
@@ -23,7 +23,7 @@ public class Bystander
 {
     public int Peek(Animal animal)
     {
-        return animal.Legs();                             // SL0257
+        return animal.Legs();                             // SL0249
     }
 
     public int Poke(Animal animal)

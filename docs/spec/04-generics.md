@@ -130,7 +130,7 @@ are still checked per instantiation, so a template nobody uses is never checked
 at all, and a mistake inside one is reported against the instantiation rather
 than the declaration. An instantiation whose arguments fail a constraint is
 reported at the use and its body is not checked for them, since it was not
-written for them: `Array.Clear` on a `String[]` is one SL0815, not that and
+written for them: `Array.Clear` on a `String[]` is one SL0328, not that and
 every error its body would then have.
 
 The reason is that definition-site checking is all or nothing. It would require
@@ -166,13 +166,13 @@ as constraints only where a constraint is, and a type of any of those names is
 still named with arguments or a qualifier.
 
 **`zeroable` is what `default(T)` needs.** A type with no zero value — a
-`String`, a class, a struct holding either — fails it (SL0815), as SL0328
-reports the others. `unmanaged` implies it, and `class` contradicts it
+`String`, a class, a struct holding either — fails it (SL0328), the code every
+unmet constraint reports. `unmanaged` implies it, and `class` contradicts it
 (SL0581): every reference that is not optional is never null. `default` would
 read better and is taken; it is the override constraint below.
 
 ```
-error[SL0815]: 'String' cannot be used as 'T' in 'ZeroOf' because 'T' is
+error[SL0328]: 'String' cannot be used as 'T' in 'ZeroOf' because 'T' is
 constrained to 'zeroable', and 'String' has no zero value: a 'String' is never
 null
 ```
@@ -477,8 +477,8 @@ var none = Zero<int>();         // nothing passed could have said what T is
 ```
 
 **Only a generic candidate is considered**, as in C#. `Plain<int>(1)` on a
-function that is not generic is SL0759, and a count that no template of that
-name takes is SL0760. A function written with type arguments and not called —
+function that is not generic, and a count that no template of that name takes,
+are each SL0323. A function written with type arguments and not called —
 `var f = Pick<int>;` — is SL0761: an instantiation is not a value of its own,
 and a delegate names the overload it wants by its own signature.
 
@@ -600,8 +600,7 @@ does.
   recursing the same way.
 - **Another binary.** A library's slots are numbered without its consumer's
   instantiations, so a class with a generic virtual method is left out of a
-  library's metadata (SL0799), as a class implementing an interface already is
-  (SL0420).
+  library's metadata (SL0419), as a class implementing an interface already is.
 
 A `static abstract` or `static virtual` member may not be generic (SL0322): it
 is met by a member of each implementing type, which is not a slot an

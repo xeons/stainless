@@ -33,11 +33,11 @@ public enum Severity { Error, Warning, Note }
 ///   SL0214, SL0321  -> SL0201   'X' is already declared in module 'Y'
 ///   SL0386          -> SL0205   'X' already declares a member named 'Y'
 ///   SL0251          -> SL0247   'X' has no member named 'Y'
-///   SL0237          -> SL0234   operator 'X' cannot be applied to these
-///   SL0256          -> SL0255   'X' has no method named 'Y'
-///   SL0259          -> SL0252   no function named 'X' is in scope
+///   SL0237          -> SL0232   operator 'X' cannot be applied to these
+///   SL0256          -> SL0247   'X' has no method named 'Y'
+///   SL0259          -> SL0229   no function named 'X' is in scope
 ///   SL0261          -> SL0260   'X' takes N arguments, but M were given
-///   SL0311, SL0485  -> SL0310   there is no array of 'void'
+///   SL0311, SL0485  -> SL0309   there is no array of 'void'
 ///
 /// The numbering has always had gaps -- the ranges are banded by pass -- so
 /// these leave no hole worth closing.

@@ -69,7 +69,7 @@ public sealed partial class Binder
         {
             if (prefix.FindCase(named.Member) is not { } prefixCase)
             {
-                diagnostics.Report(Codes.VariantCaseNotFound, named.Span,
+                diagnostics.Report(Codes.MemberNotFound, named.Span,
                     $"variant '{prefix.Name}' has no case named '{named.Member}'; it has " +
                     Listed(prefix.Cases.Select(c => c.Name)),
                     prefix);
@@ -178,7 +178,7 @@ public sealed partial class Binder
                     var owner = method.ContainingType ?? _context.Function!.ContainingType!;
                     if (!CanReach(method.IsPublic, method.IsProtected, owner))
                     {
-                        diagnostics.Report(Codes.MethodNotAccessible, callee.Span,
+                        diagnostics.Report(Codes.NotVisible, callee.Span,
                             NotVisible(owner, callee.Name.Text, method.IsProtected));
                         return new BoundErrorExpression(syntax.Span);
                     }
@@ -188,7 +188,7 @@ public sealed partial class Binder
 
                 if (_context.Function is { IsStatic: true } enclosingStatic)
                 {
-                    diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, callee.Span,
+                    diagnostics.Report(Codes.InstanceMemberWithoutInstance, callee.Span,
                         $"'{callee.Name.Text}' is an instance method of " +
                         $"'{enclosingStatic.ContainingType!.Name}', and '{enclosingStatic.Name}' " +
                         "is static, so there is no object to call it on. Take one as a " +
@@ -277,7 +277,7 @@ public sealed partial class Binder
                 var self = BindImplicitThis(callee.Span);
                 if (self is null)
                 {
-                    diagnostics.Report(Codes.InstanceEventFromStatic, callee.Span,
+                    diagnostics.Report(Codes.InstanceMemberWithoutInstance, callee.Span,
                         $"'{raised.Name}' is an event and belongs to an instance, so it cannot " +
                         "be raised from a static method");
                     return new BoundErrorExpression(syntax.Span);
@@ -286,7 +286,7 @@ public sealed partial class Binder
                 return BuildCall(syntax, raiser, self, arguments);
             }
 
-            diagnostics.Report(Codes.FunctionNotFound, callee.Span,
+            diagnostics.Report(Codes.NameNotFound, callee.Span,
                 $"no function named '{callee.Name.Text}' is in scope");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -323,7 +323,7 @@ public sealed partial class Binder
         {
             if (local.Template is null)
             {
-                diagnostics.Report(Codes.TypeArgumentsOnNonGeneric, callee.Span,
+                diagnostics.Report(Codes.TypeArgumentCountMismatch, callee.Span,
                     $"'{name}' is not generic, so it takes no type arguments; leave the " +
                     "'<...>' off");
                 return new BoundErrorExpression(callee.Span);
@@ -346,7 +346,7 @@ public sealed partial class Binder
             if (receiver is not null)
                 return BuildCall(syntax, instantiated, receiver, arguments);
 
-            diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, callee.Span,
+            diagnostics.Report(Codes.InstanceMemberWithoutInstance, callee.Span,
                 $"'{name}' is an instance method of '{enclosing.Name}', and there is no object " +
                 "here to call it on",
                 enclosing);
@@ -367,13 +367,13 @@ public sealed partial class Binder
     {
         if (exists)
         {
-            diagnostics.Report(Codes.TypeArgumentsOnNonGeneric, callee.Span,
+            diagnostics.Report(Codes.TypeArgumentCountMismatch, callee.Span,
                 $"'{name}' is not generic, so it takes no type arguments; leave the " +
                 "'<...>' off");
         }
         else
         {
-            diagnostics.Report(Codes.FunctionNotFound, callee.Span,
+            diagnostics.Report(Codes.NameNotFound, callee.Span,
                 $"no function named '{name}' is in scope");
         }
 
@@ -725,7 +725,7 @@ public sealed partial class Binder
     {
         if (target.Type is ClosureTypeSymbol { IsNullable: true } maybe)
         {
-            diagnostics.Report(Codes.MemberAccessOnMaybeNull, syntax.Callee.Span,
+            diagnostics.Report(Codes.MaybeNullUsedWithoutCheck, syntax.Callee.Span,
                 $"'{maybe.Name}' may be null, so it cannot be called until a check says it holds " +
                 $"a closure: test it against null, or name what it holds with 'is {{ }} handler'",
                 maybe);
@@ -780,7 +780,7 @@ public sealed partial class Binder
 
         if (arguments.Count < required || arguments.Count > signature.Count)
         {
-            diagnostics.Report(Codes.DelegateArgumentCountMismatch, syntax.Span,
+            diagnostics.Report(Codes.ArgumentCountMismatch, syntax.Span,
                 $"'{name}' is '{shape}' and takes " +
                 (required == signature.Count
                     ? Counted(signature.Count, "argument")
@@ -859,7 +859,7 @@ public sealed partial class Binder
         {
             if (!templates[0].IsPublic && type.ModuleName != _currentModule!.Name)
             {
-                diagnostics.Report(Codes.MethodNotAccessible, member.Span,
+                diagnostics.Report(Codes.NotVisible, member.Span,
                     $"'{type.Name}.{member.Member}' is not public",
                     type);
                 return new BoundErrorExpression(syntax.Span);
@@ -870,7 +870,7 @@ public sealed partial class Binder
 
             if (!instantiated.IsStatic)
             {
-                diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, member.Span,
+                diagnostics.Report(Codes.InstanceMemberWithoutInstance, member.Span,
                     $"'{type.Name}.{member.Member}' is not static, so it needs an object to be " +
                     "called on; name one instead of the type",
                     type);
@@ -887,7 +887,7 @@ public sealed partial class Binder
         // is worth naming: the call is missing the thing it is about.
         if (overloads.All(m => !m.IsStatic))
         {
-            diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, member.Span,
+            diagnostics.Report(Codes.InstanceMemberWithoutInstance, member.Span,
                 $"'{type.Name}.{member.Member}' is not static, so it needs an object to be " +
                 "called on; name one instead of the type",
                 type);
@@ -907,7 +907,7 @@ public sealed partial class Binder
 
         if (!CanReach(method.IsPublic, method.IsProtected, method.ContainingType ?? type))
         {
-            diagnostics.Report(Codes.MethodNotAccessible, member.Span,
+            diagnostics.Report(Codes.NotVisible, member.Span,
                 NotVisible(method.ContainingType ?? type, member.Member, method.IsProtected));
             return new BoundErrorExpression(syntax.Span);
         }
@@ -920,7 +920,7 @@ public sealed partial class Binder
     {
         if (!member.ThroughPointer && ConstructedTypeNamed(member.Target) is { } constructed)
         {
-            diagnostics.Report(Codes.MethodNotFound, member.Span,
+            diagnostics.Report(Codes.MemberNotFound, member.Span,
                 $"'{constructed.Name}' has no static method named '{member.Member}'",
                 constructed);
             return new BoundErrorExpression(syntax.Span);
@@ -952,7 +952,7 @@ public sealed partial class Binder
 
         if (receiver.Type is OptionalTypeSymbol or WeakTypeSymbol)
         {
-            diagnostics.Report(Codes.MethodCallOnMaybeNull, member.Span,
+            diagnostics.Report(Codes.MaybeNullUsedWithoutCheck, member.Span,
                 $"'{receiver.Type.Name}' may be null; check it against null before calling '{member.Member}'",
                 receiver.Type);
             return new BoundErrorExpression(syntax.Span);
@@ -992,7 +992,7 @@ public sealed partial class Binder
             if (TryBindAsFreeFunction(syntax, member, receiver, arguments) is { } chained)
                 return chained;
 
-            diagnostics.Report(Codes.MethodNotFound, member.Span,
+            diagnostics.Report(Codes.MemberNotFound, member.Span,
                 $"'{receiver.Type.Name}' has no method named '{member.Member}'" +
                 NoFreeFunctionEither(member.Member),
                 receiver.Type);
@@ -1016,7 +1016,7 @@ public sealed partial class Binder
         {
             if (!CanReach(callable.IsPublic, callable.IsProtected, callable.ContainingType))
             {
-                diagnostics.Report(Codes.MemberNotAccessible, member.Span,
+                diagnostics.Report(Codes.NotVisible, member.Span,
                     NotVisible(callable.ContainingType, member.Member, callable.IsProtected));
                 return new BoundErrorExpression(syntax.Span);
             }
@@ -1069,7 +1069,7 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            diagnostics.Report(Codes.MethodNotFound, member.Span,
+            diagnostics.Report(Codes.MemberNotFound, member.Span,
                 $"'{namedType.Name}' has no method named '{member.Member}'" +
                 NoFreeFunctionEither(member.Member),
                 namedType);
@@ -1081,7 +1081,7 @@ public sealed partial class Binder
         // being used for something.
         if (overloads.All(m => m.IsStatic))
         {
-            diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, member.Span,
+            diagnostics.Report(Codes.InstanceMemberWithoutInstance, member.Span,
                 $"'{namedType.Name}.{member.Member}' is static, so it is called on the type " +
                 $"rather than on a value: write '{namedType.SimpleName}.{member.Member}(...)'",
                 namedType);
@@ -1111,7 +1111,7 @@ public sealed partial class Binder
 
         if (!CanReach(method.IsPublic, method.IsProtected, method.ContainingType ?? namedType))
         {
-            diagnostics.Report(Codes.MethodNotAccessible, member.Span,
+            diagnostics.Report(Codes.NotVisible, member.Span,
                 NotVisible(method.ContainingType ?? namedType, member.Member, method.IsProtected));
             return new BoundErrorExpression(syntax.Span);
         }
@@ -1210,14 +1210,14 @@ public sealed partial class Binder
 
         if (arguments.Count != 0)
         {
-            diagnostics.Report(Codes.BuiltInMemberArgumentCount, syntax.Span,
+            diagnostics.Report(Codes.ArgumentCountMismatch, syntax.Span,
                 $"'{cleared.Name}.Clear' takes no arguments, but {Given(arguments.Count)}");
             return new BoundErrorExpression(syntax.Span);
         }
 
         if (BindImplicitThis(syntax.Span) is not { } receiver)
         {
-            diagnostics.Report(Codes.InstanceEventFromStatic, syntax.Span,
+            diagnostics.Report(Codes.InstanceMemberWithoutInstance, syntax.Span,
                 $"'{cleared.Name}' is an event and belongs to an instance, so it cannot be " +
                 "reached from a static method");
             return new BoundErrorExpression(syntax.Span);
@@ -1243,7 +1243,7 @@ public sealed partial class Binder
 
         if (arguments.Count != wanted)
         {
-            diagnostics.Report(Codes.BuiltInMemberArgumentCount, syntax.Span,
+            diagnostics.Report(Codes.ArgumentCountMismatch, syntax.Span,
                 $"'{type.Name}.{member.Member}' takes {wanted} " +
                 $"argument{(wanted == 1 ? "" : "s")}, but {Given(arguments.Count)}",
                 type);
@@ -1349,7 +1349,7 @@ public sealed partial class Binder
     {
         if (candidates.Count == 0)
         {
-            diagnostics.Report(Codes.FunctionNotFound, syntax.Span,
+            diagnostics.Report(Codes.NameNotFound, syntax.Span,
                 $"no function named '{name}' is in scope");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -1555,7 +1555,7 @@ public sealed partial class Binder
 
         if (_builtins.IsString(argument.Type))
         {
-            diagnostics.Report(Codes.StringToVariadicArgument, argument.Span,
+            diagnostics.Report(Codes.StringIsNotBytePointer, argument.Span,
                 "pass ToPointer() when giving a String to a C variadic function such as printf; " +
                 "the String itself is an object, not a byte pointer");
             return new BoundErrorExpression(argument.Span);
@@ -1582,7 +1582,7 @@ public sealed partial class Binder
     {
         if (_builtins.IsString(argument.Type) && IsBytePointer(target))
         {
-            diagnostics.Report(Codes.StringToBytePointer, argument.Span,
+            diagnostics.Report(Codes.StringIsNotBytePointer, argument.Span,
                 $"argument {index + 1} of '{name}' expects 'byte*'; a String does not convert to " +
                 "one on its own. Call ToPointer() to hand its bytes to C, and keep the String " +
                 "alive for as long as C holds the pointer");
@@ -1828,7 +1828,7 @@ public sealed partial class Binder
 
         if (parameter.Mode == ParameterMode.Out && !outward)
         {
-            diagnostics.Report(Codes.OutArgumentMissingModifier, argument.Span,
+            diagnostics.Report(Codes.RefArgumentWithoutKeyword, argument.Span,
                 $"argument {index + 1} of '{name}' is 'out {parameter.Type.Name} " +
                 $"{parameter.Name}', so the call must say so too: write 'out' before it, or " +
                 "'out var' to declare the variable right there",
@@ -1838,7 +1838,7 @@ public sealed partial class Binder
 
         if (parameter.Mode != ParameterMode.Out && outward)
         {
-            diagnostics.Report(Codes.OutArgumentForNonOutParameter, argument.Span,
+            diagnostics.Report(Codes.RefKeywordOnPlainParameter, argument.Span,
                 $"argument {index + 1} of '{name}' is " +
                 (parameter.Mode == ParameterMode.Ref
                     ? $"'ref {parameter.Type.Name} {parameter.Name}', which the caller has to " +
@@ -1851,7 +1851,7 @@ public sealed partial class Binder
 
         if (parameter.Mode == ParameterMode.Ref && !given)
         {
-            diagnostics.Report(Codes.RefArgumentMissingKeyword, argument.Span,
+            diagnostics.Report(Codes.RefArgumentWithoutKeyword, argument.Span,
                 $"argument {index + 1} of '{name}' is 'ref {parameter.Type.Name} " +
                 $"{parameter.Name}', so the call must say so too: write " +
                 "'ref' before it",
@@ -1861,7 +1861,7 @@ public sealed partial class Binder
 
         if (parameter.Mode != ParameterMode.Ref && given)
         {
-            diagnostics.Report(Codes.RefArgumentNotExpected, argument.Span,
+            diagnostics.Report(Codes.RefKeywordOnPlainParameter, argument.Span,
                 $"argument {index + 1} of '{name}' is " +
                 (parameter.Mode == ParameterMode.In
                     ? $"'in {parameter.Type.Name} {parameter.Name}', which the callee promises " +

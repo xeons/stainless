@@ -267,7 +267,7 @@ public variant TooMany // SL0432
 // `[Reflect]` emits a type's fields, and a variant's fields are a tag and a
 // blob of bytes. Its shape is its cases, which the field tables cannot say.
 [Reflect]
-public variant Reflected // SL0442
+public variant Reflected // SL0728
 {
     Round(double radius);
     Empty;

@@ -14,10 +14,10 @@ int Main()
     a.xx = new vfloat2(1, 2);                           // SL0931: a lane written twice
     vfloat4[] all = new vfloat4[2];
     all[Next()].xy += new vfloat2(1, 2);                // SL0931: worked out twice
-    bool less = a < b;                                  // SL0932: not ordered as a whole
-    vfloat4 mixed = a + new vint4(1);                   // SL0932: two kinds of vector
-    vfloat4 bits = a & b;                               // SL0932: float lanes have no bits
-    vint4 shifted = 1 << new vint4(2);                  // SL0932: shifts its left side
+    bool less = a < b;                                  // SL0232: not ordered as a whole
+    vfloat4 mixed = a + new vint4(1);                   // SL0232: two kinds of vector
+    vfloat4 bits = a & b;                               // SL0232: float lanes have no bits
+    vint4 shifted = 1 << new vint4(2);                  // SL0232: shifts its left side
     vint4 implicit = new vbyte4(1);                     // SL0265: no implicit lane change
     vfloat4 flipped = !a;                               // SL0232: not a bool
     vfloat4 unknown = vfloat4.Spin(a);                  // SL0934: no such function

@@ -343,7 +343,7 @@ and `err-member-constraint`.
 | SL0812 | `new T[n]` for such an element, pointing at `Array.Create`, a literal and `List` |
 | SL0813 | a constructor that can finish without writing such a field, at the path that does; or a field no constructor could write |
 | SL0814 | a static property of such a type with no value |
-| SL0815 | an argument that fails `zeroable`, as SL0328 reports the others |
+| SL0328 | an argument that fails `zeroable`, as it reports every unmet constraint |
 | SL0816 | a member whose own `where` its type's arguments fail, named at the call |
 
 Inside an instantiation each names the instantiation, as a constraint failure

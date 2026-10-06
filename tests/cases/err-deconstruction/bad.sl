@@ -28,7 +28,7 @@ int Main()
     var (x, y, z) = new Two();              // SL0608
     var n = (int p, int q) = pair;          // SL0771
     var (u, v) = (null, 1);                 // SL0553
-    var loose = (null, 1);                  // SL0773
+    var loose = (null, 1);                  // SL0756
 
     (int, int)[] pairs = [(1, 2)];
     foreach ((a, var w) in pairs) { }       // SL0772

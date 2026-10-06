@@ -119,9 +119,9 @@ public class InferenceTests
     /// would send the reader to the call instead.
     /// </summary>
     [Theory]
-    [InlineData("int result = Transform(numbers, n => n.NoSuchMethod());", "SL0255")]
+    [InlineData("int result = Transform(numbers, n => n.NoSuchMethod());", "SL0247")]
     [InlineData("int result = Transform(words, (String w) => w.NoSuchField);", "SL0247")]
-    [InlineData("int result = Transform(numbers, n => NoSuchFunction(n));", "SL0252")]
+    [InlineData("int result = Transform(numbers, n => NoSuchFunction(n));", "SL0229")]
     public void ABodyThatCannotBindReportsItsOwnError(string body, string code)
     {
         var codes = Body(body);
@@ -140,7 +140,7 @@ public class InferenceTests
         var codes = Body("var f = (int n) => n.NoSuchField;\n    int k = f(2);");
         Assert.Contains("SL0247", codes);
         Assert.DoesNotContain("SL0553", codes);
-        Assert.DoesNotContain("SL0252", codes);
+        Assert.DoesNotContain("SL0229", codes);
     }
 
     /// <summary>

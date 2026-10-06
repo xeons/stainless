@@ -492,7 +492,7 @@ public sealed partial class Binder
     }
 
     private void ReportStaticCapture(string name, SourceSpan span) =>
-        diagnostics.Report(Codes.StaticLambdaCaptures, span,
+        diagnostics.Report(Codes.StaticBodyCaptures, span,
             $"this lambda is 'static', so it cannot read '{name}' from around it; a static " +
             "lambda captures nothing. Pass it in as a parameter, or drop 'static'");
 
@@ -1455,7 +1455,7 @@ public sealed partial class Binder
             {
                 if (variant.FindCase(declared.Case) is not { } matched)
                 {
-                    diagnostics.Report(Codes.VariantCaseNotFound, declared.Span,
+                    diagnostics.Report(Codes.MemberNotFound, declared.Span,
                         $"variant '{variant.Name}' has no case named '{declared.Case}'; it has " +
                         Listed(variant.Cases.Select(c => c.Name)),
                         variant);
@@ -1473,7 +1473,7 @@ public sealed partial class Binder
 
                 if (matched.Payload is null)
                 {
-                    diagnostics.Report(Codes.EmptyVariantCaseBound, declared.Span,
+                    diagnostics.Report(Codes.EmptyCaseBound, declared.Span,
                         $"case '{matched.Name}' carries nothing, so there is nothing for " +
                         $"'{declared.Name}' to be; write 'case {matched.Name}:'");
                     continue;
@@ -1585,7 +1585,7 @@ public sealed partial class Binder
     {
         if (_context.ParallelDepth > 0)
         {
-            diagnostics.Report(Codes.ReturnFromParallel, syntax.Span,
+            diagnostics.Report(Codes.JumpOutOfParallelBlock, syntax.Span,
                 "'return' cannot leave a 'parallel' block; the join at its closing brace " +
                 "would be skipped and the jobs left running against a dead frame");
             return new BoundReturn(syntax.Span, null);

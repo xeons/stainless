@@ -488,7 +488,7 @@ public sealed partial class Binder
             {
                 diagnostics.Report(
                     context.Site == PatternSite.Is
-                        ? Codes.PatternBindsEmptyCase : Codes.InvalidPatternInSwitch,
+                        ? Codes.EmptyCaseBound : Codes.InvalidPatternInSwitch,
                     span,
                     $"case '{matched.Name}' carries nothing, so there is nothing for " +
                     $"'{name}' to be; the test on its own is the whole question");

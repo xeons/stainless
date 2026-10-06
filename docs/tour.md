@@ -99,7 +99,7 @@ machinery:
 
 ```csharp
 if (shape.Circle) { return shape.Radius; }   // fine
-return shape.Radius;                         // error[SL0286]
+return shape.Radius;                         // error[SL0285]
 ```
 
 A field or a call result carries no proof — either could be a different value
@@ -140,7 +140,7 @@ takes its type from what it is assigned to. Reading `Value` before checking `Ok`
 is a compile error rather than a wrong answer:
 
 ```
-error[SL0286]: 'read.Value' is not readable here, because nothing has
+error[SL0285]: 'read.Value' is not readable here, because nothing has
 established that 'read' is 'Ok'; check 'if (read.Ok)' first, or switch over
 'read'
 ```

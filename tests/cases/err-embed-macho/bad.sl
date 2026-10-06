@@ -2,18 +2,18 @@
 // The program is only bound, so no SDK is needed on any host.
 module ErrEmbedMachO;
 
-// SL0830: not 'segment,section'.
+// SL0709: not 'segment,section'.
 [Embed("ok.bin", Section = ".rodata")]
 static readonly byte[] NoSegment;
 
 [Embed("ok.bin", Section = "__DATA,__blob,regular", Access = "rw")]
 static byte[] TwoCommas;
 
-// SL0830: a header keeps sixteen bytes of each name.
+// SL0709: a header keeps sixteen bytes of each name.
 [Embed("ok.bin", Section = "__DATA,__seventeen_bytes", Access = "rw")]
 static byte[] TooLong;
 
-// SL0830: a segment whose permissions the linker sets.
+// SL0709: a segment whose permissions the linker sets.
 [Embed("ok.bin", Section = "__BLOBS,__blob")]
 static readonly byte[] OtherSegment;
 

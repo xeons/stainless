@@ -322,7 +322,7 @@ public class ErrorTypeTests
         {(try Convert.ToLong(text));
         }
         """)]
-    [InlineData("SL0598", """
+    [InlineData("SL0446", """
 
         module NarrowingWritten; class Node { int V = 1; }
         void Fill(out ? n) { n = Node(); }

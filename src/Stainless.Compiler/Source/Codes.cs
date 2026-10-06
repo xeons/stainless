@@ -85,10 +85,8 @@ public static class Codes
     // ---------------------------------------------------------- SL01xx
 
     public static readonly DiagnosticDescriptor ExpectedToken =
-        Error("SL0100", "the parser found a token other than the one the grammar requires");
+        Error("SL0100", "the parser expected something other than what it found");
 
-    public static readonly DiagnosticDescriptor ExpectedIdentifier =
-        Error("SL0101", "an identifier is required and something else was found");
 
     public static readonly DiagnosticDescriptor UnsupportedLinkageConvention =
         Error("SL0102", "an extern or export names a linkage convention other than C or C++");
@@ -102,11 +100,7 @@ public static class Codes
     public static readonly DiagnosticDescriptor ExternFunctionHasBody =
         Error("SL0105", "a function declared extern has a body");
 
-    public static readonly DiagnosticDescriptor TypeNameUsedAsValue =
-        Error("SL0106", "a type name stands where a value is expected");
 
-    public static readonly DiagnosticDescriptor ExpectedExpression =
-        Error("SL0107", "an expression is required and something else was found");
 
     public static readonly DiagnosticDescriptor NestingTooDeep =
         Error("SL0108", "source is nested deeper than the compiler can process");
@@ -129,8 +123,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor ModuleLevelVariable =
         Error("SL0204", "a variable is declared at module scope, where only constants are allowed");
 
-    public static readonly DiagnosticDescriptor DuplicateTypeMember =
-        Error("SL0205", "a type declares two members with the same name");
+    public static readonly DiagnosticDescriptor DuplicateMember =
+        Error("SL0205", "a type declares two members of one name");
 
     public static readonly DiagnosticDescriptor ConstructorOnNonConstructibleType =
         Error("SL0207", "a constructor is declared on a type that is neither a class nor a struct");
@@ -142,7 +136,7 @@ public static class Codes
         Error("SL0209", "a type declares more than one destructor or static constructor");
 
     public static readonly DiagnosticDescriptor FunctionWithoutBody =
-        Error("SL0210", "a function that must be defined where it is declared has no body");
+        Error("SL0210", "a function that needs a body has none");
 
     public static readonly DiagnosticDescriptor DuplicateOverload = Error(
         "SL0211",
@@ -151,8 +145,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor DuplicateParameterName =
         Error("SL0212", "two parameters of one function share a name");
 
-    public static readonly DiagnosticDescriptor VoidParameter =
-        Error("SL0213", "a parameter is declared with type void");
 
     public static readonly DiagnosticDescriptor InvalidConstantInitializer =
         Error("SL0215", "a constant is initialized with something other than a literal");
@@ -172,8 +164,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor VarWithoutInitializer =
         Error("SL0220", "a var declaration has no initializer to infer its type from");
 
-    public static readonly DiagnosticDescriptor VarInferredFromVoid =
-        Error("SL0221", "a var declaration's initializer has type void");
 
     public static readonly DiagnosticDescriptor ExpressionHasNoEffect =
         Warning("SL0222", "an expression statement computes a value and discards it");
@@ -196,8 +186,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor ThisOutsideInstanceMember =
         Error("SL0228", "this is used outside an instance method, constructor or destructor");
 
-    public static readonly DiagnosticDescriptor NameNotDefined =
-        Error("SL0229", "a name used as a value is not defined");
+    public static readonly DiagnosticDescriptor NameNotFound =
+        Error("SL0229", "a name matches nothing in scope");
 
     public static readonly DiagnosticDescriptor AddressOfTemporary =
         Error("SL0230", "the address of a temporary value is taken");
@@ -205,26 +195,16 @@ public static class Codes
     public static readonly DiagnosticDescriptor DereferenceOfNonPointer =
         Error("SL0231", "something other than a pointer is dereferenced");
 
-    public static readonly DiagnosticDescriptor UnaryOperatorTypeMismatch =
-        Error("SL0232", "a unary operator is applied to an operand type it does not accept");
+    public static readonly DiagnosticDescriptor OperatorNotApplicable =
+        Error("SL0232", "an operator cannot be applied to the operands' types");
 
-    public static readonly DiagnosticDescriptor LogicalOperatorNeedsBool =
-        Error("SL0233", "a logical operator is applied to operands that are not bool");
 
-    public static readonly DiagnosticDescriptor BinaryOperatorTypeMismatch =
-        Error("SL0234", "a binary operator is applied to operand types it does not accept");
 
-    public static readonly DiagnosticDescriptor ShiftOperandNotInteger =
-        Error("SL0235", "a shift operator is applied to operands that are not integers");
 
-    public static readonly DiagnosticDescriptor OperatorOnBoolOperands =
-        Error("SL0236", "an operator that bool does not support is applied to bool operands");
 
     public static readonly DiagnosticDescriptor NoCommonOperandType =
         Error("SL0238", "two operands have no common type for a binary operator");
 
-    public static readonly DiagnosticDescriptor OperatorNeedsIntegers =
-        Error("SL0239", "an integer-only operator is applied to operands that are not integers");
 
     public static readonly DiagnosticDescriptor AssignmentTargetNotAssignable = Error(
         "SL0240",
@@ -242,41 +222,30 @@ public static class Codes
     public static readonly DiagnosticDescriptor NewOfNonConstructibleType =
         Error("SL0244", "new is applied to a type that is neither a class nor a struct");
 
-    public static readonly DiagnosticDescriptor NewWithoutConstructor = Error(
-        "SL0245",
-        "new passes arguments to, or is applied to, a type that declares no constructor");
+    public static readonly DiagnosticDescriptor NoConstructorTakesArguments =
+        Error("SL0245", "arguments are passed to a class with no constructor that takes any");
 
     public static readonly DiagnosticDescriptor ModuleMemberNotFound =
         Error("SL0246", "a module has no public member with the name accessed");
 
     public static readonly DiagnosticDescriptor MemberNotFound =
-        Error("SL0247", "a type, variant or variant case has no member with the name accessed");
+        Error("SL0247", "a type has no member of the name used");
 
-    public static readonly DiagnosticDescriptor MemberAccessOnMaybeNull = Error(
-        "SL0248",
-        "a value that may be null or dead is used without a check proving it is not");
+    public static readonly DiagnosticDescriptor MaybeNullUsedWithoutCheck =
+        Error("SL0248", "a value that may be null is used without a check");
 
-    public static readonly DiagnosticDescriptor MemberNotAccessible =
-        Error("SL0249", "a field, property, event or constant is not visible from here");
+    public static readonly DiagnosticDescriptor NotVisible =
+        Error("SL0249", "a declaration is not visible from where it is used");
 
     public static readonly DiagnosticDescriptor MethodUsedAsValue =
-        Error("SL0250", "a method is named as a value without being called");
+        Error("SL0250", "a method is used as a value without being called");
 
-    public static readonly DiagnosticDescriptor FunctionNotFound =
-        Error("SL0252", "no function with the called name is in scope");
 
     public static readonly DiagnosticDescriptor ExpressionNotCallable =
         Error("SL0253", "a call is made through a value that is not a delegate or closure");
 
-    public static readonly DiagnosticDescriptor MethodCallOnMaybeNull =
-        Error("SL0254", "a method is called on a value that may be null without a check");
 
-    public static readonly DiagnosticDescriptor MethodNotFound =
-        Error("SL0255", "a type has no method with the called name");
 
-    public static readonly DiagnosticDescriptor MethodNotAccessible = Error(
-        "SL0257",
-        "a called method, or a member named through a type, is not visible from here");
 
     public static readonly DiagnosticDescriptor ArgumentCountMismatch =
         Error("SL0260", "a call passes the wrong number of arguments");
@@ -308,14 +277,12 @@ public static class Codes
     public static readonly DiagnosticDescriptor AmbiguousTypeName =
         Error("SL0273", "an unqualified type name matches types in more than one module");
 
-    public static readonly DiagnosticDescriptor TypeNotAccessible =
-        Error("SL0274", "a type or type alias named from another module is not public");
 
     public static readonly DiagnosticDescriptor ModuleTypeNotFound =
         Error("SL0275", "a qualified type name names a module that declares no such type");
 
     public static readonly DiagnosticDescriptor TypeNotFound =
-        Error("SL0276", "a type name matches no type in scope");
+        Error("SL0276", "a type name matches nothing in scope");
 
     public static readonly DiagnosticDescriptor MultipleEntryPoints =
         Error("SL0280", "more than one Main is declared in the program");
@@ -326,19 +293,13 @@ public static class Codes
     public static readonly DiagnosticDescriptor EntryPointParameters =
         Error("SL0282", "Main takes parameters other than none or one String array");
 
-    public static readonly DiagnosticDescriptor ForeignSignatureCannotCross = Error(
-        "SL0284",
-        "a foreign function's parameter or return type cannot cross the C boundary");
+    public static readonly DiagnosticDescriptor TypeCannotCrossBoundary =
+        Error("SL0284", "a parameter or return type cannot cross a foreign boundary");
 
-    public static readonly DiagnosticDescriptor VariantFieldOnNonLocal = Error(
-        "SL0285",
-        "a variant case field is read from something other than a local or parameter");
+    public static readonly DiagnosticDescriptor CaseFieldReadWithoutCheck =
+        Error("SL0285", "a variant case's field is read where no check established the case");
 
-    public static readonly DiagnosticDescriptor VariantFieldNotEstablished =
-        Error("SL0286", "a variant case field is read where the case is not known to carry it");
 
-    public static readonly DiagnosticDescriptor VarFromUnqualifiedCase =
-        Error("SL0287", "a var is initialized with a variant case that does not name its variant");
 
     public static readonly DiagnosticDescriptor VariantCaseArgumentCount =
         Error("SL0289", "a variant case is constructed with the wrong number of fields");
@@ -346,17 +307,13 @@ public static class Codes
     public static readonly DiagnosticDescriptor EntryPointNotFound =
         Error("SL0290", "an executable is built with no Main in any compiled module");
 
-    public static readonly DiagnosticDescriptor OperatorOnStrings =
-        Error("SL0291", "an operator that strings do not support is applied to two strings");
 
     public static readonly DiagnosticDescriptor StringOperandTypeMismatch =
         Error("SL0292", "a string operator is applied to a string and a value of another type");
 
-    public static readonly DiagnosticDescriptor StringToBytePointer =
-        Error("SL0293", "a String is used where a byte pointer is required without ToPointer");
+    public static readonly DiagnosticDescriptor StringIsNotBytePointer =
+        Error("SL0293", "a String is passed where a byte pointer is expected");
 
-    public static readonly DiagnosticDescriptor StringToVariadicArgument =
-        Error("SL0294", "a String is passed to a C variadic function without ToPointer");
 
     public static readonly DiagnosticDescriptor DuplicateForeignSymbol = Error(
         "SL0295",
@@ -372,15 +329,15 @@ public static class Codes
         "SL0302",
         "a struct or other plain value type is used as or declared to implement an interface");
 
-    public static readonly DiagnosticDescriptor BaseInterfaceNotInterface =
-        Error("SL0303", "a type implements or extends something that is not an interface");
+    public static readonly DiagnosticDescriptor ExtendsNonInterface =
+        Error("SL0303", "a type extends something that is not an interface");
 
     public static readonly DiagnosticDescriptor InterfaceListedTwice = Warning(
         "SL0304",
         "a type lists the same interface, COM interface or protocol more than once");
 
     public static readonly DiagnosticDescriptor InterfaceMemberNotImplemented =
-        Error("SL0305", "a type does not implement a member its interface requires");
+        Error("SL0305", "a type does not provide a member its interface requires");
 
     public static readonly DiagnosticDescriptor ImplementationNotPublic =
         Error("SL0306", "a member implementing an interface member is not public");
@@ -388,21 +345,14 @@ public static class Codes
     public static readonly DiagnosticDescriptor ImplementationSignatureMismatch =
         Error("SL0307", "a member implementing an interface member does not match its signature");
 
-    public static readonly DiagnosticDescriptor ConstructorTakesNoArguments =
-        Error("SL0308", "'new' passes arguments to a class that has no constructor taking any");
 
-    public static readonly DiagnosticDescriptor VoidUsedAsValueType = Error(
-        "SL0309",
-        "'void' is used as the type of a variable, field, parameter or type argument");
+    public static readonly DiagnosticDescriptor VoidUsedAsValue =
+        Error("SL0309", "'void' is used where a value or its type is needed");
 
-    public static readonly DiagnosticDescriptor VoidArrayElement =
-        Error("SL0310", "an array is declared or built with 'void' elements");
 
     public static readonly DiagnosticDescriptor ArrayLengthNotInteger =
         Error("SL0312", "an array length is not an integer");
 
-    public static readonly DiagnosticDescriptor ArrayMemberNotFound =
-        Error("SL0313", "an array or inline array is accessed for a member other than 'Length'");
 
     public static readonly DiagnosticDescriptor TypeParametersOnNonMethod =
         Error("SL0320", "a property or field declares type parameters");
@@ -413,20 +363,16 @@ public static class Codes
     public static readonly DiagnosticDescriptor TypeArgumentCountMismatch =
         Error("SL0323", "a generic is given the wrong number of type arguments");
 
-    public static readonly DiagnosticDescriptor InferredTypeArgumentCountMismatch =
-        Error("SL0324", "inference produced the wrong number of type arguments for a generic");
 
     public static readonly DiagnosticDescriptor GenericTypeMissingArguments =
         Error("SL0325", "a generic type is named without its type arguments");
 
-    public static readonly DiagnosticDescriptor GenericTypeNotFound =
-        Error("SL0326", "no generic type of the given name is in scope");
 
     public static readonly DiagnosticDescriptor TypeArgumentNotInferred =
         Error("SL0327", "type arguments for a generic cannot be inferred from the values passed");
 
-    public static readonly DiagnosticDescriptor TypeArgumentConstraintUnmet =
-        Error("SL0328", "a type argument does not satisfy a constraint on its type parameter");
+    public static readonly DiagnosticDescriptor ConstraintNotMet =
+        Error("SL0328", "a type argument does not meet its parameter's constraint");
 
     public static readonly DiagnosticDescriptor InvalidConstraintType = Error(
         "SL0329",
@@ -442,15 +388,10 @@ public static class Codes
     public static readonly DiagnosticDescriptor ModuleDeclarationMissing =
         Error("SL0332", "a file does not declare which module it belongs to");
 
-    public static readonly DiagnosticDescriptor InterfaceInheritanceCycle =
-        Error("SL0333", "two interfaces extend each other");
 
     public static readonly DiagnosticDescriptor AttributeMemberNotField =
         Error("SL0340", "an attribute type declares a member that is not a field");
 
-    public static readonly DiagnosticDescriptor ReflectOnUnsupportedType = Error(
-        "SL0341",
-        "'[Reflect]' is written on something other than a Stainless class or struct");
 
     public static readonly DiagnosticDescriptor NotAnAttribute =
         Error("SL0342", "a type that is not an attribute is written as an attribute");
@@ -481,8 +422,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor EnumUnderlyingTypeNotInteger =
         Error("SL0350", "an enum is built on a type that is not an integer");
 
-    public static readonly DiagnosticDescriptor DuplicateEnumMember =
-        Error("SL0351", "an enum declares two members with the same name");
 
     public static readonly DiagnosticDescriptor EnumValueNotConstant =
         Error("SL0352", "an enum member's value is not an integer constant");
@@ -490,12 +429,7 @@ public static class Codes
     public static readonly DiagnosticDescriptor EnumComparisonTypeMismatch =
         Error("SL0353", "an enum is compared with a value of a different type");
 
-    public static readonly DiagnosticDescriptor EnumOperatorNotSupported = Error(
-        "SL0354",
-        "an arithmetic or bitwise operator is applied to an enum that does not support it");
 
-    public static readonly DiagnosticDescriptor EnumMemberNotFound =
-        Error("SL0355", "an enum has no member of the given name");
 
     public static readonly DiagnosticDescriptor ForEachNotEnumerable = Error(
         "SL0356",
@@ -504,12 +438,7 @@ public static class Codes
     public static readonly DiagnosticDescriptor GetEnumeratorReturnsNonEnumerator =
         Error("SL0357", "'GetEnumerator()' returns a type lacking 'MoveNext()' and 'Current'");
 
-    public static readonly DiagnosticDescriptor VariadicNotAllowed = Error(
-        "SL0358",
-        "a declaration that cannot be called safely as variadic is declared variadic");
 
-    public static readonly DiagnosticDescriptor VoidParameterInTypeDeclaration =
-        Error("SL0359", "a parameter of a delegate, closure or similar type declaration is 'void'");
 
     public static readonly DiagnosticDescriptor FunctionTargetNotDelegate =
         Error("SL0360", "a function or method is converted to a type that cannot hold it");
@@ -521,8 +450,6 @@ public static class Codes
         "SL0362",
         "a method group matches a delegate or closure type through more than one overload");
 
-    public static readonly DiagnosticDescriptor DelegateArgumentCountMismatch =
-        Error("SL0363", "a delegate or closure value is called with the wrong number of arguments");
 
     public static readonly DiagnosticDescriptor SpawnOutsideParallel =
         Error("SL0364", "'spawn' is used outside a 'parallel' block");
@@ -556,8 +483,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor ParallelForOuterAssignment =
         Error("SL0373", "a 'for parallel' body assigns a variable declared outside it");
 
-    public static readonly DiagnosticDescriptor ReturnFromParallel =
-        Error("SL0374", "'return' leaves a 'parallel' block");
 
     public static readonly DiagnosticDescriptor SpawnBorrowsTemporary = Error(
         "SL0375",
@@ -594,8 +519,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor PropertyAccessorExpected =
         Error("SL0385", "a property body contains something other than 'get', 'set' or 'init'");
 
-    public static readonly DiagnosticDescriptor PropertyTypeIsVoid =
-        Error("SL0387", "a property is declared with type 'void'");
 
     public static readonly DiagnosticDescriptor DuplicatePropertyAccessor =
         Error("SL0388", "a property declares the same accessor twice");
@@ -609,11 +532,9 @@ public static class Codes
     public static readonly DiagnosticDescriptor MixedAutoAndWrittenAccessors =
         Error("SL0391", "a property mixes an automatic accessor with a written one");
 
-    public static readonly DiagnosticDescriptor AbstractAccessorHasBody =
-        Error("SL0392", "an accessor of an abstract property has a body");
 
-    public static readonly DiagnosticDescriptor AccessorNameCollision =
-        Error("SL0393", "a method already uses the name and parameters a property accessor needs");
+    public static readonly DiagnosticDescriptor AccessorNameTaken =
+        Error("SL0393", "a declared method already has the name a generated accessor needs");
 
     public static readonly DiagnosticDescriptor GetterAccessibilityNarrowed =
         Error("SL0394", "a property getter is given narrower accessibility than its property");
@@ -621,8 +542,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor PropertyHasNoSetter =
         Error("SL0395", "a property without a setter is assigned");
 
-    public static readonly DiagnosticDescriptor PropertySetterInaccessible =
-        Error("SL0396", "a property is assigned from outside where its setter is accessible");
 
     public static readonly DiagnosticDescriptor AccessorCalledDirectly = Error(
         "SL0398",
@@ -672,11 +591,7 @@ public static class Codes
         "SL0410",
         "a flag test reads the same expression twice; it must be put in a variable first");
 
-    public static readonly DiagnosticDescriptor FlagsAttributeOnNonEnum =
-        Error("SL0411", "'[Flags]' is applied to a type that is not an enum");
 
-    public static readonly DiagnosticDescriptor BuiltInMemberArgumentCount =
-        Error("SL0412", "a built-in member is called with the wrong number of arguments");
 
     public static readonly DiagnosticDescriptor VariantCaseWhereOtherTypeExpected =
         Error("SL0413", "a variant's case is named where a value of another type is expected");
@@ -694,13 +609,9 @@ public static class Codes
     public static readonly DiagnosticDescriptor ReferencedSignatureTypeUnknown =
         Error("SL0418", "a referenced library's member uses a type the program does not know");
 
-    public static readonly DiagnosticDescriptor GenericOmittedFromMetadata = Warning(
-        "SL0419",
-        "a generic is left out of a library's metadata, since it crosses as source only");
+    public static readonly DiagnosticDescriptor OmittedFromMetadata =
+        Warning("SL0419", "a public declaration is not described in the library's metadata");
 
-    public static readonly DiagnosticDescriptor InterfaceImplementerOmittedFromMetadata = Warning(
-        "SL0420",
-        "a type that implements an interface is left out of a library's metadata");
 
     public static readonly DiagnosticDescriptor PackAttributeInvalid = Error(
         "SL0421",
@@ -709,20 +620,14 @@ public static class Codes
     public static readonly DiagnosticDescriptor VariantHasNoCases =
         Error("SL0430", "a variant declares no cases");
 
-    public static readonly DiagnosticDescriptor VariantCaseVariadic =
-        Error("SL0431", "a variant case declares variadic parameters");
 
     public static readonly DiagnosticDescriptor TooManyVariantCases =
         Error("SL0432", "a variant has more cases than its one-byte tag can number");
 
-    public static readonly DiagnosticDescriptor DuplicateVariantCase =
-        Error("SL0433", "a variant declares two cases with the same name");
 
     public static readonly DiagnosticDescriptor DuplicateVariantCaseField =
         Error("SL0434", "a variant case declares two fields with the same name");
 
-    public static readonly DiagnosticDescriptor VariantCaseNotFound =
-        Error("SL0435", "a variant has no case of the given name");
 
     public static readonly DiagnosticDescriptor VariantSwitchNotExhaustive =
         Error("SL0436", "a switch over a variant leaves cases uncovered and has no 'default'");
@@ -731,18 +636,11 @@ public static class Codes
         "SL0438",
         "a case or class pattern is matched against something neither a variant nor an object");
 
-    public static readonly DiagnosticDescriptor EmptyVariantCaseBound =
-        Error("SL0439", "a case that carries nothing is given a name to bind");
 
     public static readonly DiagnosticDescriptor MultipleBoundCasesInSection =
         Error("SL0440", "a switch section binds more than one variant case");
 
-    public static readonly DiagnosticDescriptor VariantOmittedFromMetadata = Warning(
-        "SL0441",
-        "a variant is left out of a library's metadata, since it crosses as source only");
 
-    public static readonly DiagnosticDescriptor ReflectOnVariant =
-        Error("SL0442", "'[Reflect]' is applied to a variant, whose cases cannot be described yet");
 
     public static readonly DiagnosticDescriptor ArgumentHasNoStorage = Error(
         "SL0443",
@@ -751,11 +649,11 @@ public static class Codes
     public static readonly DiagnosticDescriptor ReadOnlyPassedByReference =
         Error("SL0444", "a read-only location is passed as 'ref' or 'out'");
 
-    public static readonly DiagnosticDescriptor RefArgumentMissingKeyword =
-        Error("SL0445", "an argument to a 'ref' parameter is passed without 'ref'");
+    public static readonly DiagnosticDescriptor RefArgumentWithoutKeyword =
+        Error("SL0445", "an argument for a ref or out parameter omits the keyword");
 
-    public static readonly DiagnosticDescriptor RefArgumentNotExpected =
-        Error("SL0446", "'ref' is written on an argument to a parameter taken by value or as 'in'");
+    public static readonly DiagnosticDescriptor RefKeywordOnPlainParameter =
+        Error("SL0446", "'ref' or 'out' is written for a parameter of another mode");
 
     public static readonly DiagnosticDescriptor RefArgumentTypeMismatch =
         Error("SL0447", "a 'ref' or 'out' argument's type does not exactly match the parameter's");
@@ -770,8 +668,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor IndexMissing =
         Error("SL0450", "an indexing expression has no index");
 
-    public static readonly DiagnosticDescriptor SpanOfVoid =
-        Error("SL0451", "a span or read-only span of 'void' is written");
 
     public static readonly DiagnosticDescriptor TypeCannotBeSliced =
         Error("SL0452", "a slice is taken of a value that cannot be sliced");
@@ -809,8 +705,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor PackedAttributeInvalid =
         Error("SL0463", "'[Packed]' is on a non-struct, or on a field that cannot be packed");
 
-    public static readonly DiagnosticDescriptor AlignAttributeOnNonStruct =
-        Error("SL0464", "'[Align]' is applied to a type that is not a struct");
 
     public static readonly DiagnosticDescriptor AlignmentNotPowerOfTwo =
         Error("SL0465", "'[Align(N)]' asks for an alignment that is not a power of two");
@@ -895,9 +789,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor AmbiguousNamelessMember =
         Error("SL0492", "a member name is declared by more than one nameless member of a type");
 
-    public static readonly DiagnosticDescriptor VariadicNotAllowedHere = Error(
-        "SL0493",
-        "'...' is written on something other than a module-level function or foreign message");
+    public static readonly DiagnosticDescriptor VariadicNotAllowed =
+        Error("SL0493", "'...' is written on a declaration that cannot be variadic");
 
     public static readonly DiagnosticDescriptor ArrowOnNonPointer =
         Error("SL0494", "'->' is applied to a non-pointer, or a pointer to a type with no members");
@@ -905,14 +798,12 @@ public static class Codes
     public static readonly DiagnosticDescriptor AbstractOrSealedNonClass =
         Error("SL0495", "'abstract' or 'sealed' is applied to a type that is not a class");
 
-    public static readonly DiagnosticDescriptor AbstractAndSealed =
-        Error("SL0496", "a class is marked both 'abstract' and 'sealed'");
 
     public static readonly DiagnosticDescriptor DispatchModifierOnField =
         Error("SL0497", "a field is given a dispatch modifier such as 'virtual' or 'override'");
 
     public static readonly DiagnosticDescriptor AbstractMemberHasBody =
-        Error("SL0498", "an abstract method has a body");
+        Error("SL0498", "an abstract member has a body");
 
     public static readonly DiagnosticDescriptor OverrideHasNoBase =
         Error("SL0499", "a member marked 'override' matches nothing it inherits");
@@ -941,8 +832,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor DispatchedMemberNotAccessible =
         Error("SL0506", "a virtual, abstract or override method is neither public nor protected");
 
-    public static readonly DiagnosticDescriptor DispatchModifiersMisused =
-        Error("SL0507", "a method combines dispatch modifiers that contradict each other");
+    public static readonly DiagnosticDescriptor ModifiersConflict =
+        Error("SL0507", "two modifiers on one declaration contradict each other");
 
     public static readonly DiagnosticDescriptor BaseClassNotFirst =
         Error("SL0508", "a base class is listed after an interface in a base list");
@@ -950,14 +841,12 @@ public static class Codes
     public static readonly DiagnosticDescriptor BaseClassSealed =
         Error("SL0509", "a class derives from a sealed class");
 
-    public static readonly DiagnosticDescriptor MultipleBaseClasses =
-        Error("SL0510", "a class names more than one base class");
+    public static readonly DiagnosticDescriptor SingleInheritance =
+        Error("SL0510", "a type derives from a second base where only one is allowed");
 
-    public static readonly DiagnosticDescriptor CircularClassInheritance =
-        Error("SL0511", "a class derives from itself, directly or through a cycle");
+    public static readonly DiagnosticDescriptor InheritanceCycle =
+        Error("SL0511", "a type inherits from itself, directly or through others");
 
-    public static readonly DiagnosticDescriptor InterfaceExtendsClass =
-        Error("SL0512", "an interface names a class as a base");
 
     public static readonly DiagnosticDescriptor BaseClassProvidedByRuntime = Error(
         "SL0513",
@@ -1017,11 +906,7 @@ public static class Codes
     public static readonly DiagnosticDescriptor ComInterfaceExtendsNonCom =
         Error("SL0529", "a com interface extends an interface that is not com");
 
-    public static readonly DiagnosticDescriptor ComInterfaceMultipleBases =
-        Error("SL0530", "a com interface extends more than one com interface");
 
-    public static readonly DiagnosticDescriptor CircularComInterfaceInheritance =
-        Error("SL0531", "a com interface extends itself, directly or through a cycle");
 
     public static readonly DiagnosticDescriptor ComInterfaceOnNonClass =
         Error("SL0532", "a type other than a class implements a com interface");
@@ -1041,8 +926,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor ComInterfaceMissingGuid =
         Error("SL0537", "a com interface has no '[Guid]' attribute");
 
-    public static readonly DiagnosticDescriptor GuidOnNonComType =
-        Error("SL0538", "'[Guid]' is written on a type that is not a com interface or com class");
 
     public static readonly DiagnosticDescriptor DuplicateGuidAttribute =
         Error("SL0539", "a type carries more than one '[Guid]' attribute");
@@ -1056,14 +939,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor IidOfNonComInterface =
         Error("SL0542", "'iidof' names a type that is not a com interface");
 
-    public static readonly DiagnosticDescriptor ComInterfaceOmittedFromMetadata =
-        Warning("SL0543", "a public com interface is left out of a library's metadata");
 
-    public static readonly DiagnosticDescriptor ComClassOmittedFromMetadata =
-        Warning("SL0544", "a public com class is left out of a library's metadata");
 
-    public static readonly DiagnosticDescriptor InterfaceOmittedFromMetadata =
-        Warning("SL0545", "a public interface is left out of a library's metadata");
 
     public static readonly DiagnosticDescriptor ArrayLiteralTargetInvalid =
         Error("SL0546", "an array literal targets a type that cannot be built from elements");
@@ -1081,15 +958,12 @@ public static class Codes
     public static readonly DiagnosticDescriptor TypeRedeclarationUnresolved =
         Error("SL0550", "a further declaration of a type cannot be matched to the type it adds to");
 
-    public static readonly DiagnosticDescriptor TypeRedeclarationConflicts = Error(
-        "SL0551",
-        "a further declaration of a type restates what only one declaration may say");
+    public static readonly DiagnosticDescriptor OnlyFirstDeclarationMay =
+        Error("SL0551", "a further declaration of a type says what only the first may");
 
-    public static readonly DiagnosticDescriptor FieldInTypeRedeclaration =
-        Error("SL0552", "a further declaration of a non-class type adds a field");
 
-    public static readonly DiagnosticDescriptor VarTypeNotInferable =
-        Error("SL0553", "a 'var' is given a value whose type cannot be inferred");
+    public static readonly DiagnosticDescriptor VarCannotInfer =
+        Error("SL0553", "'var' is given an initializer whose type cannot be inferred");
 
     public static readonly DiagnosticDescriptor UnmatchedInterpolationBrace =
         Error("SL0554", "an interpolated string has a '}' that closes nothing");
@@ -1106,8 +980,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor OperatorNotOverloadable =
         Error("SL0558", "an operator that cannot be overloaded is declared");
 
-    public static readonly DiagnosticDescriptor OperatorMissingBody =
-        Error("SL0559", "an operator declaration has no body");
 
     public static readonly DiagnosticDescriptor OperatorDeclaredOutsideType =
         Error("SL0560", "an operator is declared somewhere other than the concrete type it is for");
@@ -1148,22 +1020,15 @@ public static class Codes
     public static readonly DiagnosticDescriptor ConstructorNotAccessible =
         Error("SL0572", "a type is constructed from outside the module that owns its constructors");
 
-    public static readonly DiagnosticDescriptor StaticModuleFunction =
-        Error("SL0573", "a module-level function is marked 'static'");
 
     public static readonly DiagnosticDescriptor StaticInterfaceMemberModifiersInvalid = Error(
         "SL0574",
         "a static interface member has an invalid combination of body and modifiers");
 
-    public static readonly DiagnosticDescriptor StaticMemberWithInstanceModifier =
-        Error("SL0575", "a static method is also marked with a dispatch modifier or 'protected'");
 
-    public static readonly DiagnosticDescriptor MemberAccessedWithWrongReceiver = Error(
-        "SL0576",
-        "an instance member is reached without an instance, or a static one through a value");
+    public static readonly DiagnosticDescriptor InstanceMemberWithoutInstance =
+        Error("SL0576", "an instance member is reached without an instance");
 
-    public static readonly DiagnosticDescriptor StaticModifierOnWrongKind =
-        Error("SL0578", "'static' is written on a kind of type that cannot be static");
 
     public static readonly DiagnosticDescriptor NewConstraintWithParameters =
         Error("SL0579", "a 'new()' constraint lists parameters");
@@ -1183,8 +1048,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor PatternVariableNotDefinitelyMatched =
         Error("SL0585", "a pattern variable is used where its pattern may not have matched");
 
-    public static readonly DiagnosticDescriptor PatternBindsEmptyCase =
-        Error("SL0586", "a pattern names a variable for a variant case that carries nothing");
+    public static readonly DiagnosticDescriptor EmptyCaseBound =
+        Error("SL0586", "a name is bound to a variant case that carries nothing");
 
     public static readonly DiagnosticDescriptor PatternBindsInterface =
         Error("SL0587", "a pattern names or deconstructs a value tested against an interface");
@@ -1196,7 +1061,7 @@ public static class Codes
         Error("SL0589", "a 'goto' names a label that does not exist in its function");
 
     public static readonly DiagnosticDescriptor JumpOutOfParallelBlock =
-        Error("SL0590", "a jump leaves a 'parallel' block");
+        Error("SL0590", "a jump leaves a parallel block");
 
     public static readonly DiagnosticDescriptor LabelUnused =
         Warning("SL0591", "a label is never jumped to");
@@ -1204,8 +1069,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor NameofOperandUnnamed =
         Error("SL0592", "'nameof' is given an expression that is not a name");
 
-    public static readonly DiagnosticDescriptor IncrementOfReadOnlyProperty =
-        Error("SL0593", "an increment or decrement targets a property with no setter");
 
     public static readonly DiagnosticDescriptor IncrementOperandInvalid = Error(
         "SL0594",
@@ -1214,14 +1077,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor JumpIntoBlock =
         Error("SL0595", "a jump enters a block it is not already in");
 
-    public static readonly DiagnosticDescriptor NameofNameNotFound =
-        Error("SL0596", "'nameof' names something that does not exist");
 
-    public static readonly DiagnosticDescriptor OutArgumentMissingModifier =
-        Error("SL0597", "an argument for an 'out' parameter is not written with 'out'");
 
-    public static readonly DiagnosticDescriptor OutArgumentForNonOutParameter =
-        Error("SL0598", "an argument is written 'out' for a parameter that is not 'out'");
 
     // ---------------------------------------------------------- SL06xx
 
@@ -1236,8 +1093,6 @@ public static class Codes
         "SL0602",
         "a named argument is passed to something that takes its arguments only by position");
 
-    public static readonly DiagnosticDescriptor DefaultOfVoid =
-        Error("SL0603", "'default' is used where the type is 'void', which has no value");
 
     public static readonly DiagnosticDescriptor NullOperatorOnNonNullable =
         Error("SL0604", "a null-testing operator is applied to a type that cannot be null");
@@ -1301,8 +1156,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor ComInterfaceUnknownMismatch =
         Error("SL0622", "a COM interface and the one it extends disagree about '[NoUnknown]'");
 
-    public static readonly DiagnosticDescriptor NoUnknownOnNonComInterface =
-        Error("SL0623", "'[NoUnknown]' is written on a type that is not a com interface");
 
     public static readonly DiagnosticDescriptor GuidOnNoUnknownInterface = Error(
         "SL0624",
@@ -1341,8 +1194,8 @@ public static class Codes
         "SL0708",
         "an embed asks for writable and executable memory with no section that can hold it");
 
-    public static readonly DiagnosticDescriptor EmbedSectionNameInvalid =
-        Error("SL0709", "an embed's section name is not a valid section name");
+    public static readonly DiagnosticDescriptor EmbedSectionInvalid =
+        Error("SL0709", "an embed names a section that cannot be one");
 
     public static readonly DiagnosticDescriptor EmbedSectionNameTruncated = Warning(
         "SL0710",
@@ -1388,8 +1241,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor AttributeFieldNotFound =
         Error("SL0724", "an attribute argument names a field the attribute does not have");
 
-    public static readonly DiagnosticDescriptor AttributeFieldGivenTwice =
-        Error("SL0725", "an attribute field is given a value more than once");
+    public static readonly DiagnosticDescriptor MemberGivenTwice =
+        Error("SL0725", "a member is given a value twice in one list");
 
     public static readonly DiagnosticDescriptor AttributePositionalAfterNamed =
         Error("SL0726", "a positional attribute argument follows a named one");
@@ -1398,7 +1251,7 @@ public static class Codes
         Error("SL0727", "an attribute field is set with ':' rather than '='");
 
     public static readonly DiagnosticDescriptor AttributeNotAllowedHere =
-        Error("SL0728", "an attribute is written on a declaration that cannot carry it");
+        Error("SL0728", "an attribute is written on a declaration it does not apply to");
 
     public static readonly DiagnosticDescriptor InvalidEmbedPlacement =
         Error("SL0729", "'[Embed]' is written on something other than a static, or more than once");
@@ -1427,8 +1280,6 @@ public static class Codes
         "SL0736",
         "a 'with' expression assigns a name the record has no parameter or settable property for");
 
-    public static readonly DiagnosticDescriptor WithMemberAssignedTwice =
-        Error("SL0737", "a 'with' expression assigns the same member twice");
 
     public static readonly DiagnosticDescriptor StructParameterlessConstructor =
         Error("SL0738", "a struct declares a constructor taking no arguments");
@@ -1491,23 +1342,17 @@ public static class Codes
     public static readonly DiagnosticDescriptor InterpolationConditionalNotParenthesized =
         Error("SL0755", "a conditional expression in an interpolation hole is not parenthesized");
 
-    public static readonly DiagnosticDescriptor TargetTypedNewWithoutTarget =
-        Error("SL0756", "a 'new(...)' has no target type to take its type from");
+    public static readonly DiagnosticDescriptor TargetTypedWithoutTarget =
+        Error("SL0756", "a target-typed expression has no type to take");
 
-    public static readonly DiagnosticDescriptor DefaultLiteralWithoutTarget =
-        Error("SL0757", "a bare 'default' has no target type to take its type from");
 
     public static readonly DiagnosticDescriptor DefaultLiteralAsPattern =
         Error("SL0758", "a bare 'default' is used as a case pattern");
 
-    public static readonly DiagnosticDescriptor TypeArgumentsOnNonGeneric =
-        Error("SL0759", "type arguments are written on a function that is not generic");
 
-    public static readonly DiagnosticDescriptor CallTypeArgumentCountMismatch =
-        Error("SL0760", "a call writes a number of type arguments no candidate takes");
 
-    public static readonly DiagnosticDescriptor NotUsableAsValue =
-        Error("SL0761", "a type or an uninstantiated generic is used where a value is expected");
+    public static readonly DiagnosticDescriptor TypeUsedAsValue =
+        Error("SL0761", "a type name stands where a value is expected");
 
     public static readonly DiagnosticDescriptor AssignmentThroughConditionalAccess =
         Error("SL0762", "an assignment is made through '?.' or '?['");
@@ -1515,8 +1360,8 @@ public static class Codes
     public static readonly DiagnosticDescriptor InvalidParamsParameter =
         Error("SL0763", "a parameter is marked 'params' where it is not allowed");
 
-    public static readonly DiagnosticDescriptor StaticLambdaCaptures =
-        Error("SL0764", "a 'static' lambda reads a variable from its enclosing scope");
+    public static readonly DiagnosticDescriptor StaticBodyCaptures =
+        Error("SL0764", "a static lambda or local function reads from around it");
 
     public static readonly DiagnosticDescriptor LambdaReturnTypeMismatch =
         Error("SL0765", "a lambda's declared return type differs from its target delegate's");
@@ -1525,9 +1370,6 @@ public static class Codes
         "SL0766",
         "a lambda parameter's default differs from the one its target type gives");
 
-    public static readonly DiagnosticDescriptor StaticLocalFunctionCaptures = Error(
-        "SL0767",
-        "a 'static' local function reads a variable or 'this' from its enclosing function");
 
     public static readonly DiagnosticDescriptor LocalFunctionCaptureNotInScope = Error(
         "SL0768",
@@ -1537,8 +1379,6 @@ public static class Codes
         "SL0769",
         "a local function assigns its enclosing function's parameter, of which it has a copy");
 
-    public static readonly DiagnosticDescriptor StaticLocalVariable =
-        Error("SL0770", "a local variable is declared 'static'");
 
     public static readonly DiagnosticDescriptor DeclarationOutsideDeconstruction = Error(
         "SL0771",
@@ -1548,8 +1388,6 @@ public static class Codes
         "SL0772",
         "a 'foreach' deconstruction names existing variables rather than declaring new ones");
 
-    public static readonly DiagnosticDescriptor TupleTargetTypeUnknown =
-        Error("SL0773", "a tuple has an element that needs a target type and none is available");
 
     public static readonly DiagnosticDescriptor ListPatternTypeNotIndexable = Error(
         "SL0774",
@@ -1636,9 +1474,6 @@ public static class Codes
         "SL0798",
         "a generic instantiates itself with ever-larger type arguments without end");
 
-    public static readonly DiagnosticDescriptor GenericVirtualExcludedFromMetadata = Warning(
-        "SL0799",
-        "a type with a generic virtual method is left out of the library's metadata");
 
     // ---------------------------------------------------------- SL08xx
 
@@ -1677,23 +1512,18 @@ public static class Codes
     public static readonly DiagnosticDescriptor DefaultOfTypeWithoutZero =
         Error("SL0810", "'default' is taken of a type that has no zero value");
 
-    public static readonly DiagnosticDescriptor LocalWithoutZeroUnassigned = Error(
-        "SL0811",
-        "a local whose type has no zero value is read before it is assigned on every path");
+    public static readonly DiagnosticDescriptor ReadBeforeAssigned =
+        Error("SL0811", "a slot with no zero value is read before it is assigned");
 
     public static readonly DiagnosticDescriptor ArrayOfTypeWithoutZero =
         Error("SL0812", "'new T[n]' is written for an element type that has no zero value");
 
-    public static readonly DiagnosticDescriptor FieldWithoutZeroUnassigned = Error(
-        "SL0813",
-        "a field whose type has no zero value can be left unassigned by construction");
+    public static readonly DiagnosticDescriptor FieldMayBeUnassigned =
+        Error("SL0813", "a field with no zero value may be left unassigned by construction");
 
     public static readonly DiagnosticDescriptor StaticWithoutZeroUninitialized =
         Error("SL0814", "a static or global whose type has no zero value has no initializer");
 
-    public static readonly DiagnosticDescriptor ZeroableConstraintUnmet = Error(
-        "SL0815",
-        "a type argument with no zero value is given for a 'zeroable' type parameter");
 
     public static readonly DiagnosticDescriptor MemberUnavailableForTypeArguments = Error(
         "SL0816",
@@ -1711,13 +1541,7 @@ public static class Codes
     public static readonly DiagnosticDescriptor StaticEventNotSupported =
         Error("SL0820", "an event is declared static");
 
-    public static readonly DiagnosticDescriptor EventAccessorNameTaken = Error(
-        "SL0821",
-        "a method already declared takes the name and signature an event's generated method needs");
 
-    public static readonly DiagnosticDescriptor InstanceEventFromStatic = Error(
-        "SL0822",
-        "an instance event is raised, cleared or subscribed to from a static method");
 
     public static readonly DiagnosticDescriptor EventRaisedOutsideDeclarer =
         Error("SL0823", "an event is raised from outside the type that declares it");
@@ -1732,19 +1556,14 @@ public static class Codes
         "SL0826",
         "a library's metadata describes a slot or event incompletely, as if edited");
 
-    public static readonly DiagnosticDescriptor CallingConventionMisplaced = Error(
-        "SL0827",
-        "a calling convention is written on something that is not a function or delegate");
 
-    public static readonly DiagnosticDescriptor StorageModifierMisplaced =
-        Error("SL0828", "'readonly' or 'static' is written on a declaration it cannot apply to");
+    public static readonly DiagnosticDescriptor ModifierNotAllowedHere =
+        Error("SL0828", "a modifier is written on a declaration it does not apply to");
 
     public static readonly DiagnosticDescriptor CapturedCopyWrittenInLambda = Warning(
         "SL0829",
         "a lambda assigns its own copy of a captured variable or member, changing nothing");
 
-    public static readonly DiagnosticDescriptor SectionNameInvalidForTarget =
-        Error("SL0830", "an embed names a section the target's object format cannot have");
 
     public static readonly DiagnosticDescriptor Int128OnThirtyTwoBitTarget =
         Error("SL0831", "a 128-bit integer type is used on a 32-bit target");
@@ -1770,8 +1589,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor SelectorArgumentCountMismatch =
         Error("SL0905", "a selector's colon count disagrees with the member's parameter count");
 
-    public static readonly DiagnosticDescriptor ObjCMemberAttributeMisplaced =
-        Error("SL0906", "an attribute is written on an Objective-C member it does not apply to");
 
     public static readonly DiagnosticDescriptor ObjCSignatureCannotCross = Error(
         "SL0907",
@@ -1790,8 +1607,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor ObjCClassRootInvalid =
         Error("SL0911", "an Objective-C class does not reach exactly one '[ObjCRoot]' root class");
 
-    public static readonly DiagnosticDescriptor ObjCMemberHeldWithoutCall =
-        Error("SL0913", "a member of an Objective-C type is taken as a value without being called");
 
     public static readonly DiagnosticDescriptor ExternObjCClassConstructedWithNew =
         Error("SL0914", "'new' is used on an 'extern objc class'");
@@ -1799,8 +1614,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor ObjCOnNonAppleTarget =
         Error("SL0915", "an Objective-C message is sent on a target that is not macOS");
 
-    public static readonly DiagnosticDescriptor ObjCObjectAcrossCLinkage =
-        Error("SL0916", "an Objective-C object crosses a C++ or exported C boundary");
 
     public static readonly DiagnosticDescriptor InjectedTypeNotConstructible =
         Error("SL0917", "a dependency container is asked for a type it cannot construct");
@@ -1821,8 +1634,6 @@ public static class Codes
         "SL0921",
         "an Objective-C class method's override, selector or modifier is inconsistent");
 
-    public static readonly DiagnosticDescriptor ObjCProtocolMemberUnimplemented =
-        Error("SL0922", "a class adopting a protocol does not answer one of its required messages");
 
     public static readonly DiagnosticDescriptor ObjCClassShapeUnsupported = Error(
         "SL0923",
@@ -1831,8 +1642,6 @@ public static class Codes
     public static readonly DiagnosticDescriptor ObjCInitializerInvalid =
         Error("SL0924", "an Objective-C class's constructor has no valid init message to run");
 
-    public static readonly DiagnosticDescriptor ObjCFieldWithoutZero =
-        Error("SL0925", "a field of an Objective-C class has no zero value and no initializer");
 
     public static readonly DiagnosticDescriptor ForeignObjCObjectWritten =
         Error("SL0926", "an Objective-C object owned by a C library is written to");
@@ -1854,8 +1663,6 @@ public static class Codes
         "SL0931",
         "a lane write repeats a lane or writes back to a non-repeatable vector expression");
 
-    public static readonly DiagnosticDescriptor VectorOperandsMismatch =
-        Error("SL0932", "a binary operator is applied to vectors it does not accept");
 
     public static readonly DiagnosticDescriptor TooManyVectorsAcrossX86Windows =
         Error("SL0933", "more than three vectors cross a foreign boundary on 32-bit Windows");
@@ -1876,13 +1683,8 @@ public static class Codes
         "SL0938",
         "a field with no zero value is still unset when the object becomes reachable");
 
-    public static readonly DiagnosticDescriptor FieldWithoutZeroReadBeforeSet = Error(
-        "SL0939",
-        "a field with no zero value is read in a constructor before it is assigned");
 
     public static readonly DiagnosticDescriptor LateFieldNotAllowed =
         Error("SL0940", "'late' is written on a field that cannot be late");
 
-    public static readonly DiagnosticDescriptor ThrowsAttributeMisplaced =
-        Error("SL0941", "'[Throws]' is written where it cannot apply");
 }

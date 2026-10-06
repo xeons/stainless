@@ -39,8 +39,8 @@ namespace Stainless.Binding;
 /// bounds how many there can be.
 ///
 /// What it does not reach is another binary. An interface and a class
-/// implementing one never cross a library boundary (SL0420, SL0545), and a
-/// class with a dispatched generic method does not either (SL0799): the
+/// implementing one never cross a library boundary (SL0419, SL0419), and a
+/// class with a dispatched generic method does not either (SL0419): the
 /// library's slots were numbered without the consumer's instantiations.
 /// </summary>
 public sealed partial class Binder

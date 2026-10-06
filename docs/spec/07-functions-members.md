@@ -296,7 +296,7 @@ closure is made — the rule for a lambda, because it is one; it cannot be a
 its type arguments (SL0761).
 
 **`static` promises it reads nothing** from around it — no variable, no object
-— and each attempt is SL0767. It is the same promise a `static` lambda makes,
+— and each attempt is SL0764. It is the same promise a `static` lambda makes,
 written where the function is.
 
 **How the list of what it reads is worked out.** A call may be bound before the
@@ -426,8 +426,8 @@ saying so is a line about the mechanism. `out var x` takes its type from the
 parameter, which means it says nothing about which overload was meant and does
 not vote on the choice.
 
-`out` is written at the call (SL0597) for the reason `ref` is, and is refused
-where the parameter is not one (SL0598).
+`out` is written at the call (SL0445) for the reason `ref` is, and is refused
+where the parameter is not one (SL0446).
 
 **`out` is a contextual keyword**, and the standard library is what decided it:
 `Convert.sl` and `Encoding.sl` both use `out` as a local. It is the modifier
@@ -1002,11 +1002,11 @@ What `static` may not be written on:
 
 | | Refused because | |
 |---|---|---|
-| a module-level function | a module has no instance for a function to belong to | SL0573 |
+| a module-level function | a module has no instance for a function to belong to | SL0828 |
 | an interface member with no body, unless it is `static abstract` | a requirement says so ([§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type)) | SL0574 |
-| `virtual`, `override`, `abstract`, on a class | dispatch chooses a body from the object a call arrives on | SL0575 |
-| `protected` | the word is about what a derived object reaches through itself | SL0575 |
-| a struct, interface, enum, variant, union or delegate | only a class has instances for the word to deny | SL0578 |
+| `virtual`, `override`, `abstract`, on a class | dispatch chooses a body from the object a call arrives on | SL0507 |
+| `protected` | the word is about what a derived object reaches through itself | SL0507 |
+| a struct, interface, enum, variant, union or delegate | only a class has instances for the word to deny | SL0828 |
 
 ---
 

@@ -1641,7 +1641,7 @@ public sealed partial class Binder
                 }
                 else if (type.IsVoid())
                 {
-                    diagnostics.Report(Codes.VarInferredFromVoid, syntax.Initializer.Span,
+                    diagnostics.Report(Codes.VarCannotInfer, syntax.Initializer.Span,
                         "cannot infer a type from an expression of type 'void'");
                     type = ErrorTypeSymbol.Instance;
                 }
@@ -1667,7 +1667,7 @@ public sealed partial class Binder
                     }
                     else
                     {
-                        diagnostics.Report(Codes.VarTypeNotInferable, syntax.Initializer.Span,
+                        diagnostics.Report(Codes.VarCannotInfer, syntax.Initializer.Span,
                             $"'{syntax.Name}' cannot be a 'var': " +
                             (written.Parameters.Any(p => p.Type is null)
                                 ? "this lambda does not say what its parameters are, so there " +
@@ -1696,7 +1696,7 @@ public sealed partial class Binder
                     // closure it is stored in, and `var` supplies neither.
                     bool bound = initializer is BoundFunctionGroup { Receiver: not null };
 
-                    diagnostics.Report(Codes.VarTypeNotInferable, syntax.Initializer.Span,
+                    diagnostics.Report(Codes.VarCannotInfer, syntax.Initializer.Span,
                         $"'{syntax.Name}' cannot be a 'var': " +
                         (bound
                             ? "a method reached through an object is a closure, and which " +
@@ -1710,7 +1710,7 @@ public sealed partial class Binder
                 else if (type is VariantDraftType)
                 {
                     string built = (initializer as BoundVariantDraft)?.Case ?? "a case";
-                    diagnostics.Report(Codes.VarFromUnqualifiedCase, syntax.Initializer.Span,
+                    diagnostics.Report(Codes.VarCannotInfer, syntax.Initializer.Span,
                         $"'{syntax.Name}' cannot be a 'var': '{built}' names a case without " +
                         "naming its variant, and one value does not say what a variant's type " +
                         "arguments are. Write the type out, name the variant as in " +

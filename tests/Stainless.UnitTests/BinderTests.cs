@@ -164,7 +164,7 @@ public class BinderTests
     [Theory]
     [InlineData("bool F(int[] a, int[] b) => a == b;", new string[0])]
     [InlineData("bool F(int[] a, int[] b) => a != b;", new string[0])]
-    [InlineData("bool F(int[] a, long[] b) => a == b;", new[] { "SL0234" })]
+    [InlineData("bool F(int[] a, long[] b) => a == b;", new[] { "SL0232" })]
     public void ArraysCompareByIdentity(string module, string[] expected) =>
         Assert.Equal(expected, Front.ModuleCodes(module));
 
@@ -245,7 +245,7 @@ public class BinderTests
 
     [Fact]
     public void AnUnknownFunctionUnderlinesItsName() =>
-        Assert.Equal(("SL0252", "nope"), One("nope();"));
+        Assert.Equal(("SL0229", "nope"), One("nope();"));
 
     [Fact]
     public void AnUnknownNameUnderlinesItself() =>
@@ -447,7 +447,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void APlainClassStillRefusesAGuid() =>
-        Assert.Contains("SL0538", Front.ModuleCodes(
+        Assert.Contains("SL0728", Front.ModuleCodes(
             "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] class C { }"));
 
     /// <summary>
@@ -535,7 +535,7 @@ public class BinderTests
     /// <summary>A struct does not: its layout is C's.</summary>
     [Fact]
     public void ASecondDeclarationOfAStructMayNotAddAField() =>
-        Assert.Equal(["SL0552"], Front.ModuleCodes(
+        Assert.Equal(["SL0551"], Front.ModuleCodes(
             "public struct S { public int A; }" +
             "\npublic struct S { public int B; }"));
 
@@ -626,7 +626,7 @@ public class BinderTests
         bool addsToTheFirst = first == second && parts.Contains(first);
         bool anotherArity = first.StartsWith("generic") != second.StartsWith("generic");
 
-        string[] reported = ["SL0201", "SL0550", "SL0551", "SL0552"];
+        string[] reported = ["SL0201", "SL0550", "SL0551", "SL0551"];
 
         foreach (var codes in new[]
                  {
@@ -829,7 +829,7 @@ public class BinderTests
     {
         var codes = Front.ModuleCodes("class Box { }\n" + body);
 
-        Assert.Contains("SL0573", codes);
+        Assert.Contains("SL0828", codes);
         Assert.Contains("SL0229", codes);
     }
 

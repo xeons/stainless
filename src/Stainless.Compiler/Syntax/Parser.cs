@@ -122,7 +122,7 @@ public sealed class Parser
 
     /// <summary>
     /// What stands in for an expression that could not be read. The same
-    /// zero SL0107 leaves behind, so nothing downstream has a second shape
+    /// zero SL0100 leaves behind, so nothing downstream has a second shape
     /// to know about.
     /// </summary>
     private ExpressionSyntax Unreadable(int start) =>
@@ -240,7 +240,7 @@ public sealed class Parser
     private string ExpectIdentifier()
     {
         if (At(TokenKind.Identifier)) return Advance().Text;
-        ReportExpected(Codes.ExpectedIdentifier,
+        ReportExpected(Codes.ExpectedToken,
             $"expected an identifier, found {Current.Kind.Describe()}");
         return "?";
     }
@@ -495,7 +495,7 @@ public sealed class Parser
         {
             string article = "aeiou".Contains(what[0]) ? "an" : "a";
 
-            _diagnostics.Report(Codes.StaticModifierOnWrongKind, SpanFrom(start),
+            _diagnostics.Report(Codes.ModifierNotAllowedHere, SpanFrom(start),
                 $"{article} {what} cannot be 'static': the word means that a thing belongs to " +
                 $"its type rather than to an object of it, and {article} {what} has neither. " +
                 "Only a class may be static, and a module is usually the better answer");
@@ -625,7 +625,7 @@ public sealed class Parser
             }
 
             if (ctorVariadic)
-                _diagnostics.Report(Codes.VariadicNotAllowedHere, SpanFrom(start),
+                _diagnostics.Report(Codes.VariadicNotAllowed, SpanFrom(start),
                     $"'{enclosingType}' cannot have a variadic constructor; '...' may only " +
                     "be written on a function at module level, which reads them with a 'VaList'");
 
@@ -1039,7 +1039,7 @@ public sealed class Parser
         if (declaration is FunctionDeclSyntax function)
             return function with { CallingConvention = convention };
 
-        _diagnostics.Report(Codes.CallingConventionMisplaced, declaration.Span,
+        _diagnostics.Report(Codes.ModifierNotAllowedHere, declaration.Span,
             "a calling convention says how a function is called, so it can only be written on " +
             "one; this declares a value");
 
@@ -1196,7 +1196,7 @@ public sealed class Parser
             }
             else if (variadic)
             {
-                _diagnostics.Report(Codes.VariadicNotAllowedHere, SpanFrom(at),
+                _diagnostics.Report(Codes.VariadicNotAllowed, SpanFrom(at),
                     $"'{name}' cannot have a variadic constructor; '...' may only be written " +
                     "on a function at module level, which reads them with a 'VaList'");
             }
@@ -1467,7 +1467,7 @@ public sealed class Parser
         if (At(TokenKind.OpenParen)) parameters = ParseParameterList(out variadic);
 
         if (variadic)
-            _diagnostics.Report(Codes.VariantCaseVariadic, SpanFrom(start),
+            _diagnostics.Report(Codes.VariadicNotAllowed, SpanFrom(start),
                 $"case '{name}' cannot be variadic; a case's parameters are the fields it " +
                 "carries, and a value has a fixed number of them");
 
@@ -1577,7 +1577,7 @@ public sealed class Parser
         // is no foreign function on the other end of one, so a convention would
         // describe nothing.
         if (carriesReceiver && convention != CallingConvention.Default)
-            _diagnostics.Report(Codes.CallingConventionMisplaced, SpanFrom(start),
+            _diagnostics.Report(Codes.ModifierNotAllowedHere, SpanFrom(start),
                 $"closure '{name}' cannot name a calling convention; only a delegate can, "
                 + "because only a delegate is a C function pointer");
 
@@ -1804,7 +1804,7 @@ public sealed class Parser
         {
             Expect(TokenKind.Semicolon);
             if (!modifiers.HasFlag(Modifiers.Abstract))
-                _diagnostics.Report(Codes.OperatorMissingBody, SpanFrom(start),
+                _diagnostics.Report(Codes.FunctionWithoutBody, SpanFrom(start),
                     "an operator needs a body; one an interface requires of each type that " +
                     "implements it is declared 'static abstract'");
         }
@@ -1846,7 +1846,7 @@ public sealed class Parser
         if (body is null)
         {
             Expect(TokenKind.Semicolon);
-            _diagnostics.Report(Codes.OperatorMissingBody, SpanFrom(start),
+            _diagnostics.Report(Codes.FunctionWithoutBody, SpanFrom(start),
                 "an operator needs a body");
         }
 
@@ -1913,7 +1913,7 @@ public sealed class Parser
                 RejectAttributes(attributes, "a function");
 
             if (isReadonly)
-                _diagnostics.Report(Codes.StorageModifierMisplaced, SpanFrom(start),
+                _diagnostics.Report(Codes.ModifierNotAllowedHere, SpanFrom(start),
                     $"'{function.Name}' is a method, and 'readonly' is about storage");
             return enclosingType is null ? member : function with { Attributes = attributes };
         }
@@ -1924,7 +1924,7 @@ public sealed class Parser
 
         if (member is not FieldDeclSyntax field)
         {
-            _diagnostics.Report(Codes.StorageModifierMisplaced, SpanFrom(start),
+            _diagnostics.Report(Codes.ModifierNotAllowedHere, SpanFrom(start),
                 $"'static' cannot be written on this");
             return member;
         }
@@ -2057,7 +2057,7 @@ public sealed class Parser
             // A generic is a template rather than one function, and a template
             // nobody instantiates is never bound, so it is refused here.
             if (isVariadic && typeParameters.Count > 0)
-                _diagnostics.Report(Codes.VariadicNotAllowedHere, SpanFrom(start),
+                _diagnostics.Report(Codes.VariadicNotAllowed, SpanFrom(start),
                     $"'{name}' cannot be variadic; a generic is not one function, and '...' may only " +
                     "be written on a function at module level, which reads them with a 'VaList'");
 
@@ -3136,7 +3136,7 @@ public sealed class Parser
             return new LocalFunctionSyntax(SpanFrom(start), function);
         }
 
-        _diagnostics.Report(Codes.StaticLocalVariable, SpanFrom(start),
+        _diagnostics.Report(Codes.ModifierNotAllowedHere, SpanFrom(start),
             "only a function may be declared 'static' in a block; a local variable lives " +
             "in the frame it was declared in, and a 'static' one belongs at module level");
         return new BlockSyntax(SpanFrom(start), []);
@@ -5054,14 +5054,14 @@ public sealed class Parser
                 if (AtAny(PrimitiveKeywords))
                 {
                     // Reached via things like `int(x)`, which is not valid syntax here.
-                    _diagnostics.Report(Codes.TypeNameUsedAsValue, Current.Span,
+                    _diagnostics.Report(Codes.TypeUsedAsValue, Current.Span,
                         $"'{Current.Text}' is a type name and cannot be used as a value");
                     Advance();
                     return new LiteralSyntax(SpanFrom(start), TokenKind.IntLiteral, 0UL);
                 }
 
                 if (!_tooDeep)
-                    _diagnostics.Report(Codes.ExpectedExpression, Current.Span,
+                    _diagnostics.Report(Codes.ExpectedToken, Current.Span,
                         $"expected an expression, found {Current.Kind.Describe()}");
                 Advance();
                 return new LiteralSyntax(SpanFrom(start), TokenKind.IntLiteral, 0UL);

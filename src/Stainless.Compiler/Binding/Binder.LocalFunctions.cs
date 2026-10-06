@@ -474,7 +474,7 @@ public sealed partial class Binder
 
         if (local.Template is not null)
         {
-            diagnostics.Report(Codes.NotUsableAsValue, span,
+            diagnostics.Report(Codes.TypeUsedAsValue, span,
                 $"'{declaration.Name}' is generic, and a local function's type arguments come " +
                 "from a call; wrap the call in a lambda to make a value of one instantiation");
             return new BoundErrorExpression(span);
@@ -589,7 +589,7 @@ public sealed partial class Binder
 
         if (local.IsStatic)
         {
-            diagnostics.Report(Codes.StaticLocalFunctionCaptures, span,
+            diagnostics.Report(Codes.StaticBodyCaptures, span,
                 $"'{local.Syntax.Declaration.Name}' is a static local function, so it cannot read " +
                 $"'{name}' from the function around it. Pass it in as a parameter, or drop 'static'");
             return null;
@@ -624,7 +624,7 @@ public sealed partial class Binder
 
         if (local.IsStatic)
         {
-            diagnostics.Report(Codes.StaticLocalFunctionCaptures, span,
+            diagnostics.Report(Codes.StaticBodyCaptures, span,
                 $"'{local.Syntax.Declaration.Name}' is a static local function, so it has no " +
                 "'this' and cannot reach the object of the method around it. Pass what it " +
                 "needs as a parameter, or drop 'static'");

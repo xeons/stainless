@@ -147,14 +147,14 @@ public class StaticMethodTests
     [InlineData("virtual")]
     [InlineData("abstract")]
     [InlineData("override")]
-    public void ADispatchWordIsRefused(string word) => Assert.Contains("SL0575",
+    public void ADispatchWordIsRefused(string word) => Assert.Contains("SL0507",
         Front.ModuleCodes(
             "public class C { public " + word + " static int Get() { return 1; } }\n" +
             "int Main() { return 0; }"));
 
     /// <summary>`protected` is about what a derived object reaches through itself.</summary>
     [Fact]
-    public void ProtectedIsRefused() => Assert.Contains("SL0575", Front.ModuleCodes("""
+    public void ProtectedIsRefused() => Assert.Contains("SL0507", Front.ModuleCodes("""
         public class C { protected static int Get() { return 1; } }
         int Main() { return 0; }
         """));
@@ -190,7 +190,7 @@ public class StaticMethodTests
     /// <summary>At module scope the word says nothing that was not already true.</summary>
     [Fact]
     public void AModuleLevelFunctionIsRefused() =>
-        Assert.Contains("SL0573", Front.ModuleCodes("static int Free() { return 1; }\nint Main() { return 0; }"));
+        Assert.Contains("SL0828", Front.ModuleCodes("static int Free() { return 1; }\nint Main() { return 0; }"));
 
     /// <summary>
     /// Only a class may be static, because only a class has instances for the
@@ -202,7 +202,7 @@ public class StaticMethodTests
     [InlineData("public static enum E { A }")]
     [InlineData("public static delegate void D();")]
     public void AStaticTypeIsRefused(string declaration) =>
-        Assert.Contains("SL0578", Front.ModuleCodes(declaration + "\nint Main() { return 0; }"));
+        Assert.Contains("SL0828", Front.ModuleCodes(declaration + "\nint Main() { return 0; }"));
 
     /// <summary>A static class holds static members and has no instances.</summary>
     [Fact]

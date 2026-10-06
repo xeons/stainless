@@ -112,7 +112,7 @@ int PrintSections(String path)
 // ------------------------------------------------------------------ self test
 
 /// Reports one check and carries the verdict along, which is how the Forms
-/// samples do it: a module-level flag is refused (SL0575 territory -- only
+/// samples do it: a module-level flag is refused (SL0507 territory -- only
 /// `const` lives at module scope), and threading it reads better than a class
 /// that exists to hold one bool.
 bool ReportCheck(bool sofar, String what, bool ok)

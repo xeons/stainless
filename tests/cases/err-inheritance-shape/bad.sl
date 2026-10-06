@@ -17,7 +17,7 @@ public sealed class Final
 public abstract struct Value { public int X; }        // SL0495
 
 // The two say opposite things.
-public abstract sealed class Neither { }              // SL0496
+public abstract sealed class Neither { }              // SL0507
 
 // The base comes first, so that no keyword is needed to tell it from an
 // interface. Written second it is not a base at all.
@@ -40,7 +40,7 @@ public class Right : Left { }
 public class Itself : Itself { }                      // SL0511
 
 // An interface has no state, so there is nothing for it to inherit.
-public interface IExtends : Plain { }                 // SL0512
+public interface IExtends : Plain { }                 // SL0303
 
 // The runtime compiled String's layout and its destructor, and neither is
 // this compilation's to extend.

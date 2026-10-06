@@ -6,7 +6,7 @@
 // every refusal the binder would have made.
 module ErrStaticModifier;
 
-// SL0578: only a class has instances for the word to be denying. A module is
+// SL0828: only a class has instances for the word to be denying. A module is
 // what this language has instead of a static class anyway, and it is better --
 // a module is a scope, so its members need no prefix inside it.
 public static struct Holder { public int x; }

@@ -334,7 +334,7 @@ public sealed class MetadataLoader(
     /// Looked up by name because that is what the writer guarantees: the
     /// storage is named after the event and the methods are <c>add_</c> and
     /// <c>remove_</c> in front of it, which is the same rule that keeps them
-    /// apart from a hand-written method of the same name (SL0821).
+    /// apart from a hand-written method of the same name (SL0393).
     /// </summary>
     private void LoadEvents(MetadataType described, NamedTypeSymbol symbol)
     {

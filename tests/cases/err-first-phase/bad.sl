@@ -35,7 +35,7 @@ public class Late : Shape
     }
 }
 
-// SL0939: a field read before it has a value.
+// SL0811: a field read before it has a value.
 public class Early
 {
     String _first;

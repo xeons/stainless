@@ -123,7 +123,7 @@ public sealed partial class Binder
              containingType.FindStorage(declaration.Name) is not null ||
              containingType.FindProperty(declaration.Name) is not null))
         {
-            diagnostics.Report(Codes.DuplicateTypeMember, declaration.Span,
+            diagnostics.Report(Codes.DuplicateMember, declaration.Span,
                 $"'{containingType.Name}' already declares a member named '{declaration.Name}'",
                 containingType);
             return;

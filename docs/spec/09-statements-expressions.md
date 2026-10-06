@@ -836,7 +836,7 @@ held to C#'s definite assignment instead: each slot of it that has none is
 written, on every path, before it is read
 ([§2.16.1](02-types.md#2161-locals)).
 
-`default(void)` is the one refusal (SL0603): `void` is the absence of a value,
+`default(void)` is the one refusal (SL0309): `void` is the absence of a value,
 so there is none of it to zero.
 
 **A bare `default` takes its type from where it is going**, as in C#:
@@ -853,7 +853,7 @@ long wide = (long)default;                  // a cast
 
 It is `default(T)` for the `T` that place names, and costs exactly that. With
 nothing to name one — `var x = default;`, `default.ToString()`,
-`default == default` — it is SL0757. As an argument it fits any parameter, so
+`default == default` — it is SL0756. As an argument it fits any parameter, so
 two overloads that differ only there are ambiguous, as in C#.
 
 **`case default:` is refused** (SL0758). It is nearly always a `default:` label
@@ -924,7 +924,7 @@ The last name written, as a `String`. What it buys over the literal is that the
 name is bound, so renaming the member breaks the build rather than the run:
 reflection here is reached by name, and `FindType("App.Buton")` has nothing to
 say for itself. It takes a variable, parameter, field, property, method or type
-(SL0592, SL0596), and answers with the last name in it — `nameof(button.Width)`
+(SL0592, SL0229), and answers with the last name in it — `nameof(button.Width)`
 is `"Width"`.
 
 ## 9.12 `checked`

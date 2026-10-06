@@ -111,7 +111,7 @@ public sealed partial class Binder
         {
             if (EmbeddedFile.SectionProblem(writtenSection.Text, target) is { } problem)
             {
-                diagnostics.Report(Codes.EmbedSectionNameInvalid, writtenSection.Span,
+                diagnostics.Report(Codes.EmbedSectionInvalid, writtenSection.Span,
                     $"'{Printable(writtenSection.Text)}' cannot name a section: {problem}");
                 return null;
             }
@@ -119,7 +119,7 @@ public sealed partial class Binder
             if (target.IsMachO &&
                 EmbeddedFile.MachOSectionProblem(writtenSection.Text) is { } machOProblem)
             {
-                diagnostics.Report(Codes.SectionNameInvalidForTarget, writtenSection.Span,
+                diagnostics.Report(Codes.EmbedSectionInvalid, writtenSection.Span,
                     $"'{Printable(writtenSection.Text)}' cannot name a section on " +
                     $"{target.Triple}: {machOProblem}");
                 return null;

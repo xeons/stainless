@@ -296,7 +296,7 @@ public sealed partial class Binder
         if (classType.RuntimeFactory is not null)
         {
             if (syntax.Arguments.Count > 0)
-                diagnostics.Report(Codes.ConstructorTakesNoArguments, syntax.Span,
+                diagnostics.Report(Codes.NoConstructorTakesArguments, syntax.Span,
                     $"'new {classType.Name}()' takes no arguments",
                     classType);
             return new BoundNew(syntax.Span, classType, constructor: null, []);
@@ -305,7 +305,7 @@ public sealed partial class Binder
         if (classType.ObjC == ObjCClassKind.Defined && classType.Constructors.Count == 0)
         {
             if (arguments.Count > 0)
-                diagnostics.Report(Codes.NewWithoutConstructor, syntax.Span,
+                diagnostics.Report(Codes.NoConstructorTakesArguments, syntax.Span,
                     $"'{classType.Name}' has no constructor, so 'new {classType.Name}()' takes no arguments",
                     classType);
 
@@ -318,7 +318,7 @@ public sealed partial class Binder
         if (classType.Constructors.Count == 0)
         {
             if (arguments.Count > 0)
-                diagnostics.Report(Codes.NewWithoutConstructor, syntax.Span,
+                diagnostics.Report(Codes.NoConstructorTakesArguments, syntax.Span,
                     $"'{classType.Name}' has no constructor, so 'new {classType.Name}()' takes no arguments",
                     classType);
 
@@ -397,7 +397,7 @@ public sealed partial class Binder
     {
         if (structType.Constructors.Count == 0)
         {
-            diagnostics.Report(Codes.NewWithoutConstructor, syntax.Span,
+            diagnostics.Report(Codes.NoConstructorTakesArguments, syntax.Span,
                 $"'{structType.Name}' declares no constructor, so there is nothing for " +
                 $"'new {structType.Name}' to run; write '{structType.Name} value;' for the " +
                 "zero value and give its fields their values",
@@ -585,7 +585,7 @@ public sealed partial class Binder
 
             if (!CanReach(property.IsPublic, property.IsProtected, property.ContainingType))
             {
-                diagnostics.Report(Codes.MemberNotAccessible, entry.NameSpan,
+                diagnostics.Report(Codes.NotVisible, entry.NameSpan,
                     NotVisible(property.ContainingType, name, property.IsProtected));
                 return null;
             }
@@ -601,7 +601,7 @@ public sealed partial class Binder
         {
             if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
             {
-                diagnostics.Report(Codes.MemberNotAccessible, entry.NameSpan,
+                diagnostics.Report(Codes.NotVisible, entry.NameSpan,
                     NotVisible(field.ContainingType, name, field.IsProtected));
                 return null;
             }
@@ -1034,7 +1034,7 @@ public sealed partial class Binder
 
         if (element.IsVoid())
         {
-            diagnostics.Report(Codes.VoidArrayElement, syntax.Span, "there is no array of 'void'");
+            diagnostics.Report(Codes.VoidUsedAsValue, syntax.Span, "there is no array of 'void'");
             return new BoundErrorExpression(syntax.Span);
         }
 

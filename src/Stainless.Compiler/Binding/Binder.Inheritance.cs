@@ -141,7 +141,7 @@ public sealed partial class Binder
 
                 if (resolved is not InterfaceTypeSymbol interfaceType)
                 {
-                    diagnostics.Report(Codes.BaseInterfaceNotInterface, written.Span,
+                    diagnostics.Report(Codes.ExtendsNonInterface, written.Span,
                         $"'{resolved.Name}' is not an interface, so '{type.Name}' cannot " +
                         (type.IsContract ? "extend" : "implement") + " it",
                         resolved, type);
@@ -171,7 +171,7 @@ public sealed partial class Binder
 
                 if (interfaceType == type || interfaceType.AllInterfaces().Contains(type))
                 {
-                    diagnostics.Report(Codes.InterfaceInheritanceCycle, written.Span,
+                    diagnostics.Report(Codes.InheritanceCycle, written.Span,
                         $"'{type.Name}' and '{interfaceType.Name}' extend each other",
                         type, interfaceType);
                     continue;
@@ -224,7 +224,7 @@ public sealed partial class Binder
         {
             if (derived.BaseInterface is not null)
             {
-                diagnostics.Report(Codes.ComInterfaceMultipleBases, span,
+                diagnostics.Report(Codes.SingleInheritance, span,
                     $"'{derived.Name}' already extends '{derived.BaseInterface.Name}', so it " +
                     $"cannot also extend '{comInterface.Name}'. A COM vtable is one array and a " +
                     "reference is one pointer to it, so there is room for one chain and not two",
@@ -234,7 +234,7 @@ public sealed partial class Binder
 
             if (comInterface == derived || comInterface.DerivesFrom(derived))
             {
-                diagnostics.Report(Codes.CircularComInterfaceInheritance, span,
+                diagnostics.Report(Codes.InheritanceCycle, span,
                     comInterface == derived
                         ? $"'{derived.Name}' cannot extend itself"
                         : $"'{derived.Name}' and '{comInterface.Name}' extend each other, so " +
@@ -434,7 +434,7 @@ public sealed partial class Binder
     {
         if (classType is null)
         {
-            diagnostics.Report(Codes.InterfaceExtendsClass, span,
+            diagnostics.Report(Codes.ExtendsNonInterface, span,
                 $"'{type.Name}' is an interface and '{baseClass.Name}' is a class; an interface " +
                 "extends interfaces only, because it has no state to inherit",
                 type, baseClass);
@@ -443,7 +443,7 @@ public sealed partial class Binder
 
         if (classType.BaseClass is not null)
         {
-            diagnostics.Report(Codes.MultipleBaseClasses, span,
+            diagnostics.Report(Codes.SingleInheritance, span,
                 $"'{classType.Name}' already derives from '{classType.BaseClass.Name}', so it " +
                 $"cannot also derive from '{baseClass.Name}'. With two bases a reference to one " +
                 "of them is a different address from the object itself, and reference identity, " +
@@ -465,7 +465,7 @@ public sealed partial class Binder
 
         if (_inheritanceInProgress.Contains(baseClass))
         {
-            diagnostics.Report(Codes.CircularClassInheritance, span,
+            diagnostics.Report(Codes.InheritanceCycle, span,
                 baseClass == classType
                     ? $"'{classType.Name}' cannot derive from itself"
                     : $"'{classType.Name}' and '{baseClass.Name}' derive from each other, so " +
@@ -511,8 +511,8 @@ public sealed partial class Binder
         // of class that could not survive that never cross in the first place:
         // a com class's tear-offs sit after its fields, and a class
         // implementing an interface is indexed by a program-wide id. The
-        // metadata writer refuses both where the library is built (SL0544,
-        // SL0545), so a referenced base is never either one.
+        // metadata writer refuses both where the library is built (SL0419,
+        // SL0419), so a referenced base is never either one.
         //
         // What deriving costs is that the base's table *length* is now part of
         // its contract: this class appends after the last slot, so a later
@@ -562,7 +562,7 @@ public sealed partial class Binder
                     classType);
 
             if (method.IsSealed && !method.IsOverride)
-                diagnostics.Report(Codes.DispatchModifiersMisused, method.Span,
+                diagnostics.Report(Codes.ModifiersConflict, method.Span,
                     $"'{classType.Name}.{Describe(method)}' is 'sealed' and overrides nothing; " +
                     "the word closes an inherited chain, so it goes with 'override'",
                     classType);
@@ -832,7 +832,7 @@ public sealed partial class Binder
         foreach (var (type, entry) in _typeSyntax)
             if (entry.Declaration.Attributes.Count > 0 &&
                 entry.Declaration.Attributes.Any(a => a.Name.Last == "Flags"))
-                diagnostics.Report(Codes.FlagsAttributeOnNonEnum, entry.Declaration.Span,
+                diagnostics.Report(Codes.AttributeNotAllowedHere, entry.Declaration.Span,
                     $"'[Flags]' says an enum's members combine as bits; '{type.Name}' is not an enum",
                     type);
 
@@ -855,7 +855,7 @@ public sealed partial class Binder
                 // are not, and a variant's shape is its cases, which the field
                 // tables have no way to say.
                 if (type is VariantTypeSymbol)
-                    diagnostics.Report(Codes.ReflectOnVariant, entry.Declaration.Span,
+                    diagnostics.Report(Codes.AttributeNotAllowedHere, entry.Declaration.Span,
                         $"'[Reflect]' emits a type's fields, and the fields of variant " +
                         $"'{type.Name}' are a tag and a payload the source cannot name. What " +
                         "a reader would want is its cases, and those are not described yet",
@@ -867,13 +867,13 @@ public sealed partial class Binder
                         "where in a byte they start, and the tables do not",
                         type);
                 else if (IsObjCType(type))
-                    diagnostics.Report(Codes.ReflectOnUnsupportedType, entry.Declaration.Span,
+                    diagnostics.Report(Codes.AttributeNotAllowedHere, entry.Declaration.Span,
                         $"'[Reflect]' describes what a Stainless type holds, and '{type.Name}' is " +
                         "an Objective-C type, which the Objective-C runtime describes",
                         type);
                 else if (type is ClassTypeSymbol or StructTypeSymbol) type.IsReflected = true;
                 else
-                    diagnostics.Report(Codes.ReflectOnUnsupportedType, entry.Declaration.Span,
+                    diagnostics.Report(Codes.AttributeNotAllowedHere, entry.Declaration.Span,
                         $"'[Reflect]' applies to a class or a struct; '{type.Name}' is neither",
                         type);
             }
@@ -994,7 +994,7 @@ public sealed partial class Binder
             : declaration.Attributes.Except(unknowns).ToList();
 
         if (unknowns.Count > 0 && type is not ComInterfaceTypeSymbol)
-            diagnostics.Report(Codes.NoUnknownOnNonComInterface, unknowns[0].Span,
+            diagnostics.Report(Codes.AttributeNotAllowedHere, unknowns[0].Span,
                 $"'[NoUnknown]' says a COM vtable does not begin with IUnknown, and " +
                 $"'{type.Name}' is not a com interface; write it on a 'com interface'",
                 type);
@@ -1031,7 +1031,7 @@ public sealed partial class Binder
         // what the number names, and so what may be asked with it.
         if (type is not (ComInterfaceTypeSymbol or ClassTypeSymbol { IsCom: true }))
         {
-            diagnostics.Report(Codes.GuidOnNonComType, guids[0].Span,
+            diagnostics.Report(Codes.AttributeNotAllowedHere, guids[0].Span,
                 $"'[Guid]' names a COM interface or a COM class, and '{type.Name}' is " +
                 "neither; write it on a 'com interface' or a 'com class' declaration",
                 type);
@@ -1198,7 +1198,7 @@ public sealed partial class Binder
 
                 if (given[at] is not null)
                 {
-                    diagnostics.Report(Codes.AttributeFieldGivenTwice, argument.Span,
+                    diagnostics.Report(Codes.MemberGivenTwice, argument.Span,
                         $"'{type.Name}.{type.Fields[at].Name}' is given twice; an attribute's " +
                         "field has one value",
                         type);
@@ -1609,7 +1609,7 @@ public sealed partial class Binder
 
         if (type is not StructTypeSymbol || type is VariantTypeSymbol)
         {
-            diagnostics.Report(Codes.AlignAttributeOnNonStruct, span,
+            diagnostics.Report(Codes.AttributeNotAllowedHere, span,
                 $"'[Align]' applies to a struct; '{type.Name}' is not one",
                 type);
             return;

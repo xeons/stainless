@@ -56,7 +56,7 @@ one.
 `void` is the absence of a value rather than a value of no size, so the only
 place it can be written is what a function returns (SL0309). There is no
 variable, field, parameter or type argument of it, and no array or slice of one
-(SL0310, SL0451). `void*` is not a value of it but a pointer, and means what
+(SL0309). `void*` is not a value of it but a pointer, and means what
 C's does: any pointer converts to `void*` without a cast, as it does to
 `byte*`, and between any two other pointer types it takes one.
 
@@ -367,7 +367,7 @@ the tuple is going somewhere that says what that is:
 ```csharp
 (String?, int) Find(String key) => found ? (name, at) : (null, -1);
 Report((Ok(5), "five"));
-var loose = (null, 1);                  // SL0773: nothing says what the null is
+var loose = (null, 1);                  // SL0756: nothing says what the null is
 ```
 
 A tuple held in a variable converts only to its own type. Converting one
@@ -525,7 +525,7 @@ from sharing one.
 They apply to a `struct`, and `[Pack]` to a `union` as well, and to nothing else. A class's fields sit behind an
 object header the compiler owns, and a variant's payload area is not a field the
 source arranged, so neither is a layout the programmer is choosing (SL0463,
-SL0464).
+SL0728).
 
 A generated C header states each -- `#pragma pack(push, 1)` around a packed
 struct, `#pragma pack(push, N)` around one with `[Pack(N)]`, and `__declspec(align(n))` or `__attribute__((aligned(n)))` behind a
@@ -825,7 +825,7 @@ Field initializers run first of all, in the first phase: they cannot read the
 object, so nothing in them can tell.
 
 **Every field with no zero value MUST have its value by the end of the first
-phase** (SL0938), and none may be read before it has one (SL0939). Before a
+phase** (SL0938), and none may be read before it has one (SL0811). Before a
 written `base(...)`, reaching the object is refused (SL0937), as is returning:
 the base would never be built. A field whose value needs the finished object --
 a child that is handed its parent, a peer handed the control it reports to --
@@ -847,7 +847,7 @@ back, because the object is not whole
 error[SL0938]: 'Button._native' has no value yet when 'base(...)' runs, and
 'IPushButtonPeer' has no zero value: ... Give it its value before this, so that
 nothing can find the object without it
-error[SL0939]: '_items' is read here before the constructor has given it a
+error[SL0811]: '_items' is read here before the constructor has given it a
 value, and 'List<int>' has no zero value: ...
 error[SL0732]: a constructor may be followed by ': base(...)' or ': this(...)'
 and nothing else; there are no initializer lists here, because a field is
@@ -917,10 +917,10 @@ enforced by the ABI digest rather than by convention (see
 [§5 of packages.md](../packages.md#5-the-digest)).
 
 Three kinds of class are not in a library's metadata at all, so none of them is
-there to derive from: a `com class` (SL0544), whose tear-offs are laid out after
+there to derive from: a `com class` (SL0419), whose tear-offs are laid out after
 its fields by the compilation that built it; a class that implements an
-interface (SL0420), whose dispatch tables are indexed by ids assigned across one
-whole program; and a class with a generic virtual method (SL0799). A class the
+interface (SL0419), whose dispatch tables are indexed by ids assigned across one
+whole program; and a class with a generic virtual method (SL0419). A class the
 runtime provides, such as `String`, cannot be derived from either (SL0513).
 
 ### 2.4.4 `is`, `as`, and casting down
@@ -1305,7 +1305,7 @@ error[SL0735]: 'with' makes a copy of a record with some of it changed, and
 construction this would have made
 error[SL0736]: 'Point' has no parameter or settable property named 'Z', so
 there is nothing for this to change; it takes 'X', 'Y'
-error[SL0737]: 'X' is given a value twice here, and the second would silently be
+error[SL0725]: 'X' is given a value twice here, and the second would silently be
 the one that counted
 ```
 
@@ -1490,7 +1490,7 @@ Area(Circle(2.0));                // and so does a parameter
 
 The bare form is the one `Ok` and `Fail` have always used, and it obeys the same
 rule a lambda does: it takes its type from where it is going. It cannot be
-inferred *from*, so `var s = Circle(2.0);` is SL0287. A generic variant is
+inferred *from*, so `var s = Circle(2.0);` is SL0553. A generic variant is
 built this way, or named with its type arguments in front of the case, as in
 `Tree<int>.Leaf(1)` ([§4.4.1](04-generics.md#441-writing-type-arguments-at-a-call)).
 
@@ -1511,7 +1511,7 @@ case is there first. This is the whole point of the type, and it is checked
 rather than trusted:
 
 ```csharp
-shape.Radius                  // error[SL0286]: nothing has established that
+shape.Radius                  // error[SL0285]: nothing has established that
                               // 'shape' is 'Circle'
 if (shape.Circle) { shape.Radius }    // fine
 ```
@@ -1603,9 +1603,9 @@ bytes, and copies with a `memcpy` like any other struct.
 across `extern "C"` if no case holds a reference and not at all if one does
 (SL0284), into an array, into a field, across a thread when everything every
 case carries could cross on its own. Two things it does not do yet: cross a
-library boundary as a binary (SL0441 — the metadata carries layouts, and a
+library boundary as a binary (SL0419 — the metadata carries layouts, and a
 variant's cases are what a consumer would switch on), and carry `[Reflect]`
-(SL0442 — the field tables would describe the tag and the payload, which are not
+(SL0728 — the field tables would describe the tag and the payload, which are not
 fields the program has).
 
 ## 2.7 `union` — every member at offset zero
@@ -1757,7 +1757,7 @@ Result<int, Why> Doubled(int n)
 }
 
 Result<int, Why> held = Ok(4);                  // and from a declared local
-var loose = Ok(4);                              // error[SL0287]: nothing to infer from
+var loose = Ok(4);                              // error[SL0553]: nothing to infer from
 ```
 
 For the same reason a module-level function may not be named `Ok` or `Fail`
@@ -1769,7 +1769,7 @@ different from a pair of fields that happen to sit together:
 
 ```csharp
 var read = File.ReadAllText(path);
-read.Value                     // error[SL0286]: nothing has established that
+read.Value                     // error[SL0285]: nothing has established that
                                // 'read' succeeded
 ```
 
@@ -1803,7 +1803,7 @@ var r = Get();
 if (!r.Ok)
     return 0;
 r = Get();
-return r.Value;               // error[SL0286]: the proof was about the old value
+return r.Value;               // error[SL0285]: the proof was about the old value
 ```
 
 **What is not narrowed.** Only a Result held in a local or a parameter can
@@ -2708,7 +2708,7 @@ itself, so a 32-bit call through a delegate that did not say so returns to a
 stack pointer several words adrift — and the program does not fail at that
 call, it fails later, somewhere else.
 
-A `closure` may not name one (SL0827). It is a pointer *and* a receiver, passed
+A `closure` may not name one (SL0828). It is a pointer *and* a receiver, passed
 by machinery this language emits at both ends, so there is no foreign function
 for a convention to describe.
 
@@ -3402,7 +3402,7 @@ nothing null that may not be.
 ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)):
 `default(T)` in `Box<T>` is nothing in `Box<int>` and SL0810 in `Box<String>`,
 reported in the template with the instantiation named. A template says what it
-needs with `where T : zeroable` (SL0815), and a member that needs it says so in
+needs with `where T : zeroable` (SL0328), and a member that needs it says so in
 a `where` of its own, so an instantiation that fails it simply lacks that
 member (SL0816, [§4.3.3](04-generics.md#433-a-members-own-where)):
 
@@ -3538,10 +3538,10 @@ written, and a vector with an even count has halves: `lo`, `hi`, `even` and
 >>>` on integer lanes. A lane value on one side fills every lane, so `v * 2`
 scales. Arithmetic wraps as SIMD does, whatever `checked` says; an integer
 division by zero in any lane stops the program, as it does for a number.
-Two different vectors do not mix (SL0932): one is cast to the other first.
+Two different vectors do not mix (SL0232): one is cast to the other first.
 
 **`==` is a `bool`**, true when every lane is equal, and `!=` is its opposite.
-A vector is not ordered as a whole, so `<` is refused (SL0932); comparing lane
+A vector is not ordered as a whole, so `<` is refused (SL0232); comparing lane
 by lane gives a mask, which is a function and not an operator.
 
 **Its functions are static members of the type**, as .NET's are, so they are

@@ -105,7 +105,7 @@ last person to edit it -- the suite is the authority.
   does storage a property only fills with `field ??=`. Construction is in two
   phases, as Swift's: every such field has its value before the object can be
   reached -- before `base(...)`, a method call or `this` handed on (SL0937,
-  SL0938, SL0939) -- so a base constructor's virtual call finds derived fields
+  SL0938, SL0811) -- so a base constructor's virtual call finds derived fields
   set. A field whose value needs the finished object is `late` (SL0940), and a
   read of one with no value yet stops the program, naming it. Generic bodies are judged
   per instantiation. `Array.Create` and `Array.Repeat` make an array whole,
@@ -128,7 +128,7 @@ last person to edit it -- the suite is the authority.
   and never called until a check says it holds one (SL0248)
 - `where T : zeroable`, and a `where` on a member of a generic type that
   constrains the type's parameters: the member exists only in instantiations
-  that meet it, so `Span<String>` has no `Clear` (SL0815, SL0816)
+  that meet it, so `Span<String>` has no `Clear` (SL0328, SL0816)
 - `[DoesNotReturn]` on an `extern` function: nothing after a call to it is
   reached, so `sl_fail` ends a function that needs no `return` after it
 - `union`: C's, every member at offset zero, with the size and alignment C
@@ -212,7 +212,7 @@ last person to edit it -- the suite is the authority.
   is stamped on when its table is numbered. `[NoUnknown]` describes the vtable a
   C library hands out that is not COM — XAudio2's voices — so its first method
   is slot 0 and ARC counts nothing through it; the cost is no `[Guid]`, no
-  `QueryInterface` and no cast (SL0622, SL0623, SL0624)
+  `QueryInterface` and no cast (SL0622, SL0728, SL0624)
 - **Objective-C.** `objc interface` is a protocol and
   `extern objc class` a class that already exists; every member names its
   selector, a call is clang's `objc_msgSend` through `__objc_selrefs`, and ARC
@@ -1083,7 +1083,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   per instantiation the program calls, filled for every class that could be
   behind the call. So an instantiation that makes a larger one of itself
   through the interface has no end (SL0798) where C# would make the next one on
-  demand, and such a class does not cross a library boundary (SL0799).
+  demand, and such a class does not cross a library boundary (SL0419).
 - **No exhaustiveness requirement on a statement over an enum**, whose value
   need not be one of its members. A switch expression over
   one is covered by naming them all, and ends the program on a value that is
@@ -1205,7 +1205,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   alone, because the C runtime's objects are compiled for the MSVC target and
   carry CodeView.
 - **A variant does not cross a library boundary or carry `[Reflect]`.** Both
-  are reported where they are written (SL0441, SL0442) rather than left to be
+  are reported where they are written (SL0419, SL0728) rather than left to be
   discovered. The metadata describes layouts and the reflection tables describe
   fields, and a variant's shape is neither — it is its cases, which nothing yet
   writes down. Its tag is also one byte, so 255 cases is the limit.
@@ -1253,7 +1253,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   assigned across a whole program, and a variant's cases are not a layout. A
   slice or a tuple of what the metadata describes does cross.
   Anything reaching one of those through a field or a signature is reported too
-  (SL0419, SL0420, SL0441, SL0477), all of them where the library is built
+  (SL0419, SL0477), all of them where the library is built
   rather than where the consumer trips over them.
 - **The shared runtime is a file to carry.** Where two Stainless binaries meet
   the runtime is one shared library, which is what puts them on one allocator

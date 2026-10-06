@@ -45,7 +45,7 @@ public sealed partial class Binder
             : ResolveType(declaration.ReturnType, scope, allowVoid: true);
 
         // Static is a statement about a member. On a module-level function the
-        // word is refused below (SL0573) and the function is an ordinary one:
+        // word is refused below (SL0828) and the function is an ordinary one:
         // everything that reads IsStatic goes on to ask which type the method
         // is a member of, and this one is a member of nothing.
         bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
@@ -118,7 +118,7 @@ public sealed partial class Binder
             (containingType is not null &&
              !(symbol.IsMessage && IsDescribedOnly(containingType) && declaration.Body is null) ||
              declaration.TypeParameters.Count > 0))
-            diagnostics.Report(Codes.VariadicNotAllowedHere, declaration.Span,
+            diagnostics.Report(Codes.VariadicNotAllowed, declaration.Span,
                 $"'{symbol.Name}' cannot be variadic; '...' may only be written on a function at " +
                 "module level, which reads them with a 'VaList', or a message an Objective-C class " +
                 "that already exists answers. Take an array, a slice, or a count and a pointer");
@@ -182,7 +182,7 @@ public sealed partial class Binder
         // 'override' already says it is dispatched, because what it replaces was.
         if (declaration.Modifiers.HasFlag(Modifiers.Override) &&
             declaration.Modifiers.HasFlag(Modifiers.Virtual))
-            diagnostics.Report(Codes.DispatchModifiersMisused, declaration.Span,
+            diagnostics.Report(Codes.ModifiersConflict, declaration.Span,
                 $"'{declaration.Name}' is both 'virtual' and 'override'; an override is " +
                 "dispatched because what it replaces was");
 
@@ -330,7 +330,7 @@ public sealed partial class Binder
     {
         if (containingType is null)
         {
-            diagnostics.Report(Codes.StaticModuleFunction, declaration.Span,
+            diagnostics.Report(Codes.ModifierNotAllowedHere, declaration.Span,
                 $"'{declaration.Name}' is already at module scope, so 'static' says nothing " +
                 "new: a module has no instance for a function to belong to. Write the " +
                 "function without the word, or move it into the type it is about");
@@ -369,13 +369,13 @@ public sealed partial class Binder
         // Only for a class: on anything else the word was already refused for
         // the better reason that there is nothing to derive from.
         if (containingType is ClassTypeSymbol && Dispatchable(declaration.Modifiers) is { } dispatch)
-            diagnostics.Report(Codes.StaticMemberWithInstanceModifier, declaration.Span,
+            diagnostics.Report(Codes.ModifiersConflict, declaration.Span,
                 $"'{declaration.Name}' cannot be both 'static' and '{dispatch}'; dispatch " +
                 "chooses a body from the object a call arrives on, and a static method has " +
                 "no object");
 
         if (containingType is ClassTypeSymbol && declaration.Modifiers.HasFlag(Modifiers.Protected))
-            diagnostics.Report(Codes.StaticMemberWithInstanceModifier, declaration.Span,
+            diagnostics.Report(Codes.ModifiersConflict, declaration.Span,
                 $"'{declaration.Name}' cannot be both 'static' and 'protected'; 'protected' " +
                 "is about what a derived object may reach through itself, and a static " +
                 "method is not reached through an object");
@@ -656,7 +656,7 @@ public sealed partial class Binder
             // imported C++ one has no ARC rule to say who owns what it returns.
             if ((symbol.Linkage != LinkageKind.ExternC && IsObjCReference(symbol.ReturnType)) ||
                 (!symbol.Linkage.IsImport() && symbol.Parameters.Any(p => IsObjCReference(p.Type))))
-                diagnostics.Report(Codes.ObjCObjectAcrossCLinkage, symbol.Span,
+                diagnostics.Report(Codes.TypeCannotCrossBoundary, symbol.Span,
                     symbol.Linkage.IsImport()
                         ? $"'{symbol.Name}' returns an Objective-C object across {how}, and C++ " +
                           "has no rule for who owns one. Declare it 'extern \"C\"', or return a pointer"
@@ -673,13 +673,13 @@ public sealed partial class Binder
                     "passes only three in registers; pass the rest by 'ref' or in a struct");
 
             if (FindSlot(symbol.ReturnType) is { } returnedSlot)
-                diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
+                diagnostics.Report(Codes.TypeCannotCrossBoundary, symbol.Span,
                     $"'{symbol.ReturnType.Name}' is or holds '{returnedSlot.Name}', whose layout " +
                     $"depends on whether its element has a zero value, so it cannot be returned " +
                     $"across {how}. Return the element, or a raw pointer",
                     returnedSlot);
             else if (symbol.ReturnType is StructTypeSymbol { } returned && returned.CarriesReferences())
-                diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
+                diagnostics.Report(Codes.TypeCannotCrossBoundary, symbol.Span,
                     $"'{returned.Name}' holds a reference, so it cannot be returned across " +
                     $"{how}; C would copy its bytes and leave the count behind. Return a " +
                     "struct of plain data, or a raw pointer",
@@ -689,7 +689,7 @@ public sealed partial class Binder
             {
                 if (FindSlot(parameter.Type) is { } passedSlot)
                 {
-                    diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
+                    diagnostics.Report(Codes.TypeCannotCrossBoundary, symbol.Span,
                         $"'{parameter.Type.Name}' is or holds '{passedSlot.Name}', whose layout " +
                         $"depends on whether its element has a zero value, so parameter " +
                         $"'{parameter.Name}' cannot cross {how}. Pass the element, or a raw pointer",
@@ -701,7 +701,7 @@ public sealed partial class Binder
                     !passed.CarriesReferences())
                     continue;
 
-                diagnostics.Report(Codes.ForeignSignatureCannotCross, symbol.Span,
+                diagnostics.Report(Codes.TypeCannotCrossBoundary, symbol.Span,
                     $"'{passed.Name}' holds a reference, so parameter '{parameter.Name}' " +
                     $"cannot cross {how}; C would copy its bytes and leave the count behind. " +
                     "Pass a struct of plain data, or a raw pointer",
@@ -874,7 +874,7 @@ public sealed partial class Binder
 
             var type = ResolveType(parameter.Type, scope);
             if (type.IsVoid())
-                diagnostics.Report(Codes.VoidParameter, parameter.Span,
+                diagnostics.Report(Codes.VoidUsedAsValue, parameter.Span,
                     $"parameter '{parameter.Name}' cannot have type 'void'");
 
             // C decays an array parameter to a pointer and Stainless has no
@@ -1176,7 +1176,7 @@ public sealed partial class Binder
              containingType.FindStorage(declaration.Name) is not null ||
              containingType.FindProperty(declaration.Name) is not null))
         {
-            diagnostics.Report(Codes.DuplicateTypeMember, declaration.Span,
+            diagnostics.Report(Codes.DuplicateMember, declaration.Span,
                 $"'{containingType.Name}' already declares a member named '{declaration.Name}'",
                 containingType);
             return;

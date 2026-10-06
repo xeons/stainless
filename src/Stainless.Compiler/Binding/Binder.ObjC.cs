@@ -252,7 +252,7 @@ public sealed partial class Binder
                 case "Optional":
                     if (type is ObjCProtocolTypeSymbol) symbol.IsObjCOptional = true;
                     else
-                        diagnostics.Report(Codes.ObjCMemberAttributeMisplaced, attribute.Span,
+                        diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                             $"'[Optional]' says an object may not answer a protocol's member, and " +
                             $"'{type.Name}' is a class, whose members it answers by having them",
                             type);
@@ -261,14 +261,14 @@ public sealed partial class Binder
                 case "ReturnsRetained":
                 case "ReturnsNotRetained":
                     if (selector is null)
-                        diagnostics.Report(Codes.ObjCMemberAttributeMisplaced, attribute.Span,
+                        diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                             $"'[{attribute.Name.Last}]' is about what a message hands back, and " +
                             $"'{symbol.Name}' sends none",
                             type);
                     break;
 
                 default:
-                    diagnostics.Report(Codes.ObjCMemberAttributeMisplaced, attribute.Span,
+                    diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                         $"'[{attribute.Name.Last}]' means nothing on a member of an objc type; it " +
                         "takes '[Selector]', '[Optional]', '[ReturnsRetained]', " +
                         "'[ReturnsNotRetained]' and '[Throws]'",
@@ -289,7 +289,7 @@ public sealed partial class Binder
         {
             if (!IsObjCReference(symbol.ReturnType))
             {
-                diagnostics.Report(Codes.ObjCMemberAttributeMisplaced, attribute.Span,
+                diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                     $"'[{attribute.Name.Last}]' says who owns the object a call hands back, and " +
                     $"'{symbol.Name}' returns '{symbol.ReturnType.Name}', which is not one",
                     symbol.ReturnType);
@@ -364,7 +364,7 @@ public sealed partial class Binder
                 if (property.Setter is { } optionalSetter) optionalSetter.IsObjCOptional = true;
             }
             else if (attribute.Name.Last is "ReturnsRetained" or "ReturnsNotRetained" or "Optional")
-                diagnostics.Report(Codes.ObjCMemberAttributeMisplaced, attribute.Span,
+                diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                     $"'[{attribute.Name.Last}]' is not written on a property of '{type.Name}'",
                     type);
 
@@ -600,7 +600,7 @@ public sealed partial class Binder
     {
         if (!chosen.IsMessage && !IsObjCReference(receiver?.Type)) return false;
 
-        diagnostics.Report(Codes.ObjCMemberHeldWithoutCall, span,
+        diagnostics.Report(Codes.MethodUsedAsValue, span,
             $"'{chosen.Name}' is a member of an Objective-C type, so it cannot be held without " +
             "being called: a message has no function to point at, and the object it goes to " +
             "is not counted the way a closure counts its own. Write a lambda that sends it, " +
@@ -806,7 +806,7 @@ public sealed partial class Binder
                         $"'{classType.Name}' and '{superclass.Name}' derive from each other",
                         classType, superclass);
                 else if (classType.BaseClass is { } named)
-                    diagnostics.Report(Codes.TypeRedeclarationConflicts, span,
+                    diagnostics.Report(Codes.OnlyFirstDeclarationMay, span,
                         $"'{classType.Name}' already derives from '{named.Name}' in another " +
                         "declaration; a category adds members and protocols, and names no superclass",
                         classType, superclass);
@@ -1080,7 +1080,7 @@ public sealed partial class Binder
                     m.Selector == required.Selector && m.IsStatic == required.IsStatic));
                 if (answered) continue;
 
-                diagnostics.Report(Codes.ObjCProtocolMemberUnimplemented, defined.Span ?? default,
+                diagnostics.Report(Codes.InterfaceMemberNotImplemented, defined.Span ?? default,
                     $"'{defined.Name}' adopts '{protocol.Name}' and does not answer " +
                     $"'{required.Selector}', which it requires: declare " +
                     $"'{MemberName(required)}' " +

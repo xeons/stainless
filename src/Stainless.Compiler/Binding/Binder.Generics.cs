@@ -431,7 +431,7 @@ public sealed partial class Binder
 
         if (arguments.Count != template.Parameters.Count)
         {
-            diagnostics.Report(Codes.InferredTypeArgumentCountMismatch, span,
+            diagnostics.Report(Codes.TypeArgumentCountMismatch, span,
                 $"'{template.Name}' takes {template.Parameters.Count} type " +
                 $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
                 $"but {arguments.Count} were inferred");
@@ -478,7 +478,7 @@ public sealed partial class Binder
                 ContainingType = template.ContainingType,
                 IsPublic = template.IsPublic,
                 // Only a member is static; the word on a module function was
-                // refused where the template was declared (SL0573).
+                // refused where the template was declared (SL0828).
                 IsStatic = declaration.Modifiers.HasFlag(Modifiers.Static) &&
                            template.ContainingType is not null,
                 Body = declaration.Body,
@@ -674,7 +674,7 @@ public sealed partial class Binder
             case ConstraintKind.Unmanaged:
                 if (IsUnmanaged(argument)) return;
 
-                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+                ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'unmanaged', and " +
                     (IsValueType(argument)
@@ -688,7 +688,7 @@ public sealed partial class Binder
                 if (ZeroValues.FindNullInZero(argument) is not { } found)
                     return;
 
-                ReportUnmetConstraint(Codes.ZeroableConstraintUnmet, span,
+                ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'zeroable', and '{argument.Name}' has no " +
                     $"zero value: {ExplainNullInZero(found)}",
@@ -698,7 +698,7 @@ public sealed partial class Binder
             case ConstraintKind.NotNull:
                 if (!IsNullable(argument)) return;
 
-                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+                ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'notnull', and a '{argument.Name}' may be " +
                     "null",
@@ -708,7 +708,7 @@ public sealed partial class Binder
             case ConstraintKind.Class:
                 if (IsReferenceType(argument)) return;
 
-                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+                ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'class', and '{argument.Name}' is a " +
                     $"{KindOf(argument)}: it is copied rather than referenced, and is never null",
@@ -718,7 +718,7 @@ public sealed partial class Binder
             case ConstraintKind.Struct:
                 if (IsValueType(argument)) return;
 
-                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+                ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'struct', and '{argument.Name}' is a " +
                     $"{KindOf(argument)}: it is a counted reference and may be null",
@@ -728,7 +728,7 @@ public sealed partial class Binder
             case ConstraintKind.Threadsafe:
                 if (IsSendable(argument)) return;
 
-                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+                ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'threadsafe', and nothing about " +
                     $"'{argument.Name}' says how two threads may hold it. Declare it " +
@@ -743,7 +743,7 @@ public sealed partial class Binder
                     made.Constructors.FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis)) is
                         not { SetsRequiredMembers: true })
                 {
-                    ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+                    ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                         $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                         $"'{parameter}' is constrained to 'new()', and '{argument.Name}' has " +
                         $"required members, which 'new {parameter}()' has no way to set: " +
@@ -754,7 +754,7 @@ public sealed partial class Binder
 
                 if (IsDefaultConstructible(argument)) return;
 
-                ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+                ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'new()', and " +
                     argument switch
@@ -780,7 +780,7 @@ public sealed partial class Binder
         {
             if (Satisfies(argument, contract)) return;
 
-            ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+            ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                 $"'{argument.Name}' cannot be used as '{parameter}' in {owner} " +
                 $"because it does not implement '{contract.Name}'" +
                 (argument is ClassTypeSymbol implementer && implementer.Interfaces.Count > 0
@@ -800,7 +800,7 @@ public sealed partial class Binder
             if (argument is ClassTypeSymbol derived &&
                 derived.SelfAndBases().Contains(baseClass)) return;
 
-            ReportUnmetConstraint(Codes.TypeArgumentConstraintUnmet, span,
+            ReportUnmetConstraint(Codes.ConstraintNotMet, span,
                 $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because it " +
                 $"does not derive from '{baseClass.Name}'",
                 argument, baseClass);

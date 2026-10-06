@@ -91,7 +91,7 @@ public class InterfaceTests
 
     [Fact]
     public void ADefaultIsNotAMemberOfTheClass() =>
-        Assert.Equal(["SL0255"], Front.ModuleCodes(
+        Assert.Equal(["SL0247"], Front.ModuleCodes(
             """
             public interface IGreeter { String Greet() => "hello"; }
             public class Quiet : IGreeter { }
@@ -162,7 +162,7 @@ public class InterfaceTests
 
     [Fact]
     public void AnExplicitMemberIsNotReachedByName() =>
-        Assert.Equal(["SL0255"], Front.ModuleCodes(
+        Assert.Equal(["SL0247"], Front.ModuleCodes(
             """
             public interface IShape { double Area(); }
             public class Square : IShape { double IShape.Area() => 1.0; }

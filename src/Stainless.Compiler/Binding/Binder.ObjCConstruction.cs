@@ -44,7 +44,7 @@ public sealed partial class Binder
         if (type is not ClassTypeSymbol { ObjC: ObjCClassKind.Defined }) return;
 
         foreach (var attribute in attributes.Where(a => a.Name.Last != "Selector"))
-            diagnostics.Report(Codes.ObjCMemberAttributeMisplaced, attribute.Span,
+            diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                 $"'[{attribute.Name.Last}]' means nothing on a constructor of '{type.Name}'; it " +
                 "takes '[Selector]', the init message Objective-C makes one with",
                 type);
@@ -226,7 +226,7 @@ public sealed partial class Binder
             else if (field.InitializerSyntax is null && !field.Type.IsError() &&
                      !ZeroValues.HasZeroValue(field.Type) &&
                      !defined.Events.Any(e => e.BackingField == field))
-                diagnostics.Report(Codes.ObjCFieldWithoutZero, defined.Span ?? default,
+                diagnostics.Report(Codes.FieldMayBeUnassigned, defined.Span ?? default,
                     $"'{defined.Name}.{field.Name}' is a '{field.Type.Name}', which has no zero " +
                     "value, and Objective-C may make the object through an init that runs none " +
                     "of its constructors; give the field an initializer, or make it optional",

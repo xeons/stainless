@@ -433,8 +433,8 @@ missing:
 | | |
 |---|---|
 | a generic (SL0419) | a template emits nothing until it is instantiated, so a consumer with only the binary has nothing to instantiate. A generic crosses as source |
-| a class implementing an interface (SL0420) | a dispatch table is indexed by an interface id assigned across a whole program, and a library and its consumer are two different programs |
-| a variant (SL0441) | its cases are what a consumer would switch on, and the metadata carries layouts rather than cases |
+| a class implementing an interface (SL0419) | a dispatch table is indexed by an interface id assigned across a whole program, and a library and its consumer are two different programs |
+| a variant (SL0419) | its cases are what a consumer would switch on, and the metadata carries layouts rather than cases |
 | a slice, `Span<T>` | it is a type the compiler builds on demand rather than one the source declared, so there is no name for a consumer to resolve |
 
 **And anything reaching one of those through a field or a signature** is reported
@@ -502,7 +502,7 @@ it is nothing.
 
 **Every com interface extends `IUnknown`**, written or not, so a declaration's
 own first method is slot 3. Extension is **single**: a COM vtable is one array
-and a reference is one pointer to it, so there is room for one chain (SL0530).
+and a reference is one pointer to it, so there is room for one chain (SL0510).
 A derived interface's table is its base's with its own methods appended, which
 is what makes an upcast free — the same property that makes a class upcast free
 ([§2.4.3](02-types.md#243-inheritance)), arrived at from the table side rather than the object side.
@@ -588,7 +588,7 @@ is no cast to or from another com interface (SL0243), no `is` (SL0518) and no
 type pattern (SL0619), whichever side the `[NoUnknown]` is on. And a chain is
 all one kind or the other (SL0622): extending across would put `IUnknown` three
 slots into the middle of one table. It may be written only on a
-`com interface` (SL0623).
+`com interface` (SL0728).
 
 A cast from `byte*` still adopts the pointer, and adopting costs nothing here
 because there was no `+1` to take over:
@@ -854,7 +854,7 @@ stainless: '+[SLNothing nothing]' answered nil, and a Demo.SLNothing is never ni
 one asks `respondsToSelector:` first and stops the program, naming the
 message, if the answer is no -- rather than let Objective-C raise its
 unrecognized-selector exception. It means nothing on a class's member
-(SL0906).
+(SL0728).
 
 ### What crosses a message
 
@@ -973,7 +973,7 @@ A C function MAY take and return an Objective-C object. What it returns
 arrives at +0, which is ARC's rule for a C function, and is claimed at once;
 `[ReturnsRetained]` says it is handed over instead -- Core Foundation's
 Create rule -- and `[ReturnsNotRetained]` says the rule again. Either on a
-function returning no object is refused (SL0906). One declared `T` that
+function returning no object is refused (SL0728). One declared `T` that
 returns nil stops the program, naming the function.
 
 A C variable holding an object is read at +0 and retained, and is never
@@ -983,7 +983,7 @@ written (SL0926): a store would release what the library owns.
 extern "C" NSString NSDefaultRunLoopMode;
 ```
 
-A C++ function returning an object is refused (SL0916): C++ has no rule for
+A C++ function returning an object is refused (SL0284): C++ has no rule for
 who owns it.
 
 ### A class defined here
@@ -1023,7 +1023,7 @@ overridable already, so `virtual` and `abstract` mean nothing here; an
 `override` of nothing, a selector the superclass answers without `override`,
 and a selector answered twice are refused (SL0921). Every required member of
 a protocol the class adopts MUST be answered, by the class or by a class it
-derives from (SL0922).
+derives from (SL0305).
 
 A message to an object of the class goes through `objc_msgSend`, whoever
 sends it, so a subclass written in Objective-C overrides it; a helper is
@@ -1034,7 +1034,7 @@ the call names. `base.Member` sends to the superclass.
 object through an init that runs none of the constructors -- a nib, or a
 superclass's designated initializer -- so the field initializers run as the
 runtime allocates the object, whatever init follows, and a field with no zero
-value MUST have one (SL0925). An event's list is made there too. Every field
+value MUST have one (SL0813). An event's list is made there too. Every field
 is released as the object is freed, after `~Canvas()`, which is the class's
 `dealloc` and runs before its superclass's.
 
@@ -1162,7 +1162,7 @@ class its unwinder header carries, and is deleted unread: only C++ can read the
 object, and nothing here links the C++ runtime, so its name and reason are
 empty.
 
-`[Throws]` is refused (SL0941) on a function Stainless defines, on one declared
+`[Throws]` is refused (SL0728) on a function Stainless defines, on one declared
 answering anything else, on one whose result is returned in memory -- a call
 that threw would leave it unwritten -- and on one that returns `Self`, takes
 `...` or takes a parameter by reference. Windows raises a C++ exception through
@@ -1185,7 +1185,7 @@ A case or a program may also include `.m` files, compiled with
 ### What is not there yet
 
 - **A message held without being sent**, in a closure or a delegate
-  (SL0913). A message has no function to point at; write a lambda that sends
+  (SL0250). A message has no function to point at; write a lambda that sends
   it.
 - **An Objective-C exception** is caught only where a binding said a call
   throws (`[Throws]`, above). One that reaches a method a defined class answers
@@ -1406,14 +1406,14 @@ exactly one comma, and each name from one to sixteen bytes of letters, digits,
 string table. The directive states no permissions there: a section has its
 segment's. So the segment has to be one whose permissions an object file can
 count on: `__TEXT` for `"rx"`, `__DATA` for `"rw"` and `__DATA_CONST` for
-`"r"`. Anything else is refused (SL0830), as is a name without a segment.
+`"r"`. Anything else is refused (SL0709), as is a name without a segment.
 A segment of another name gets whatever the linker gives it. The access rule
 above applies to the segment: `__TEXT,__const` asked for as `"r"` would still be
 executable, and `__DATA,__bss` holds no bytes. The comma is Mach-O's alone; on
 the other formats it is refused with the rest (SL0709).
 
 ```
-error[SL0830]: '.rodata' cannot name a section on arm64-apple-macosx15.0: a
+error[SL0709]: '.rodata' cannot name a section on arm64-apple-macosx15.0: a
 Mach-O section is named 'segment,section', with exactly one comma
 ```
 

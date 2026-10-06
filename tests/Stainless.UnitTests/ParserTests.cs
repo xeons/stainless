@@ -1057,7 +1057,7 @@ public class ParserTests
     public void AStaticLocalVariableIsRefused()
     {
         FirstStatement("static int count = 0;", out var diagnostics);
-        Assert.Contains("SL0770", Front.Codes(diagnostics));
+        Assert.Contains("SL0828", Front.Codes(diagnostics));
     }
 
     [Fact]

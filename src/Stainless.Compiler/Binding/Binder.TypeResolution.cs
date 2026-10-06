@@ -177,7 +177,7 @@ public sealed partial class Binder
         // has a size whatever it points at, and means what C's does.
         if (resolved.IsVoid() && !allowVoid)
         {
-            diagnostics.Report(Codes.VoidUsedAsValueType, syntax.Span,
+            diagnostics.Report(Codes.VoidUsedAsValue, syntax.Span,
                 "'void' is the absence of a value, so it can only be what a function returns; " +
                 "there is no variable, field, parameter or type argument of it");
             return ErrorTypeSymbol.Instance;
@@ -221,7 +221,7 @@ public sealed partial class Binder
 
                 if (element.IsVoid())
                 {
-                    diagnostics.Report(Codes.SpanOfVoid, sliceSyntax.Span,
+                    diagnostics.Report(Codes.VoidUsedAsValue, sliceSyntax.Span,
                         $"there is no '{(sliceSyntax.IsReadOnly ? "ReadOnlySpan" : "Span")}<void>'");
                     return ErrorTypeSymbol.Instance;
                 }
@@ -235,7 +235,7 @@ public sealed partial class Binder
                 if (element.IsError()) return element;
                 if (element.IsVoid())
                 {
-                    diagnostics.Report(Codes.VoidArrayElement, syntax.Span,
+                    diagnostics.Report(Codes.VoidUsedAsValue, syntax.Span,
                         "there is no array of 'void'");
                     return ErrorTypeSymbol.Instance;
                 }
@@ -442,7 +442,7 @@ public sealed partial class Binder
                 {
                     if (target != module && !type.IsPublic)
                     {
-                        diagnostics.Report(Codes.TypeNotAccessible, syntax.Span,
+                        diagnostics.Report(Codes.NotVisible, syntax.Span,
                             $"'{type.QualifiedName}' is not public");
                         return ErrorTypeSymbol.Instance;
                     }
@@ -453,7 +453,7 @@ public sealed partial class Binder
                 {
                     if (target != module && !qualifiedAlias.IsPublic)
                     {
-                        diagnostics.Report(Codes.TypeNotAccessible, syntax.Span,
+                        diagnostics.Report(Codes.NotVisible, syntax.Span,
                             $"'{qualifiedAlias.QualifiedName}' is not public");
                         return ErrorTypeSymbol.Instance;
                     }
@@ -494,7 +494,7 @@ public sealed partial class Binder
 
         if (template is null)
         {
-            diagnostics.Report(Codes.GenericTypeNotFound, syntax.Span,
+            diagnostics.Report(Codes.TypeNotFound, syntax.Span,
                 $"no generic type named '{syntax.Name.Text}' is in scope");
             return ErrorTypeSymbol.Instance;
         }
@@ -649,7 +649,7 @@ public sealed partial class Binder
             if (arity.Count == 0)
             {
                 var counts = candidates.Select(c => c.Parameters.Count).Distinct().Order().ToList();
-                diagnostics.Report(Codes.CallTypeArgumentCountMismatch, syntax.Callee.Span,
+                diagnostics.Report(Codes.TypeArgumentCountMismatch, syntax.Callee.Span,
                     $"'{candidates[0].Name}' takes " +
                     string.Join(" or ", counts) +
                     $" type argument{(counts is [1] ? "" : "s")}, and {given.Count} " +
@@ -1244,7 +1244,7 @@ public sealed partial class Binder
 
         if (!candidates[0].IsPublic && type.ModuleName != _currentModule!.Name)
         {
-            diagnostics.Report(Codes.MethodNotAccessible, member.Span,
+            diagnostics.Report(Codes.NotVisible, member.Span,
                 $"'{type.Name}.{member.Member}' is not public",
                 type);
             return new BoundErrorExpression(syntax.Span);

@@ -54,7 +54,7 @@ public sealed partial class Binder
                     }
                     else if (ImportedHomeOf(declaration, scope, unit, homes) is { } other)
                     {
-                        diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
+                        diagnostics.Report(Codes.OnlyFirstDeclarationMay, declaration.Span,
                             $"'{declaration.Name}' already names its superclass in '{other}', which " +
                             "this file imports; a category adds members and protocols, and names no superclass");
                         continue;
@@ -547,7 +547,7 @@ public sealed partial class Binder
 
         if (isAbstract && isSealed)
         {
-            diagnostics.Report(Codes.AbstractAndSealed, declaration.Span,
+            diagnostics.Report(Codes.ModifiersConflict, declaration.Span,
                 $"'{type.Name}' cannot be both 'abstract' and 'sealed': the first says it must " +
                 "be derived from and the second says it cannot be",
                 type);
@@ -610,13 +610,13 @@ public sealed partial class Binder
                              existing is StructTypeSymbol and not (VariantTypeSymbol or UnionTypeSymbol);
 
             if (!takesList)
-                diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
+                diagnostics.Report(Codes.OnlyFirstDeclarationMay, declaration.Span,
                     $"'{declaration.Name}' is already declared in this module, so this " +
                     "declaration may add members but not a base list; only a class or a struct " +
                     "takes its base list from a declaration other than the first");
             else if (_typeSyntax.TryGetValue(existing, out var first) && first.Declaration.Implements.Count > 0 ||
                      _baseListSyntax.ContainsKey(existing))
-                diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
+                diagnostics.Report(Codes.OnlyFirstDeclarationMay, declaration.Span,
                     $"'{declaration.Name}' already says what it derives from in another " +
                     "declaration; write the base list on exactly one of them");
             else
@@ -624,7 +624,7 @@ public sealed partial class Binder
         }
 
         if (declaration.IsOpaque)
-            diagnostics.Report(Codes.TypeRedeclarationConflicts, declaration.Span,
+            diagnostics.Report(Codes.OnlyFirstDeclarationMay, declaration.Span,
                 $"'{declaration.Name}' is already declared in this module, so this declaration " +
                 "has nothing to say by having no body");
 

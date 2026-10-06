@@ -21,7 +21,7 @@ int Main()
     int b = 2;
     Swap(a, ref b);                         // SL0445
     String word = "";
-    TryFirst(["x"], "none", ref word);      // SL0597
+    TryFirst(["x"], "none", ref word);      // SL0445
     long wide = 3L;
     Swap(ref a, ref wide);                  // SL0447
     return 0;

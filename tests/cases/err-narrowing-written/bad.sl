@@ -18,7 +18,7 @@ void ByReference()
     if (r.Ok)
     {
         Spoil(ref r);
-        Console.WriteLine(Text.FromInteger(r.Value));   // SL0286
+        Console.WriteLine(Text.FromInteger(r.Value));   // SL0285
     }
 }
 

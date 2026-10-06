@@ -64,7 +64,7 @@ public sealed partial class Binder
 
         if (refused is not null)
         {
-            diagnostics.Report(Codes.ThrowsAttributeMisplaced, span,
+            diagnostics.Report(Codes.AttributeNotAllowedHere, span,
                 $"'[Throws]' cannot be written here: {refused}");
 
             // The foreign call's own result, so that nothing after this

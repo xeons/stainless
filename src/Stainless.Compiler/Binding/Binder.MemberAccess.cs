@@ -231,7 +231,7 @@ public sealed partial class Binder
         {
             if (variantType.FindCase(syntax.Member) is not { } named)
             {
-                diagnostics.Report(Codes.VariantCaseNotFound, syntax.Span,
+                diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                     $"variant '{variantType.Name}' has no case named '{syntax.Member}'; it has " +
                     Listed(variantType.Cases.Select(c => c.Name)),
                     variantType);
@@ -249,7 +249,7 @@ public sealed partial class Binder
         {
             if (!CanReach(inlined.IsPublic, isProtected: false, constantOwner))
             {
-                diagnostics.Report(Codes.MemberNotAccessible, syntax.Span,
+                diagnostics.Report(Codes.NotVisible, syntax.Span,
                     NotVisible(constantOwner, syntax.Member, isProtected: false));
                 return new BoundErrorExpression(syntax.Span);
             }
@@ -266,7 +266,7 @@ public sealed partial class Binder
         {
             if (!CanReach(onType.IsPublic, isProtected: false, holder))
             {
-                diagnostics.Report(Codes.MemberNotAccessible, syntax.Span,
+                diagnostics.Report(Codes.NotVisible, syntax.Span,
                     NotVisible(holder, syntax.Member, isProtected: false));
                 return new BoundErrorExpression(syntax.Span);
             }
@@ -298,7 +298,7 @@ public sealed partial class Binder
 
             if (ResolveModulePrefix(syntax.Target) is null)
             {
-                diagnostics.Report(Codes.MemberAccessedWithWrongReceiver, syntax.Span,
+                diagnostics.Report(Codes.InstanceMemberWithoutInstance, syntax.Span,
                     $"'{staticOwner.Name}.{syntax.Member}' is not static, so it needs an " +
                     "object to be reached through; name one instead of the type",
                     staticOwner);
@@ -312,7 +312,7 @@ public sealed partial class Binder
             if (enumType.FindMember(syntax.Member) is { } member)
                 return new BoundLiteral(syntax.Span, enumType, member.Value);
 
-            diagnostics.Report(Codes.EnumMemberNotFound, syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"enum '{enumType.Name}' has no member named '{syntax.Member}'",
                 enumType);
             return new BoundErrorExpression(syntax.Span);
@@ -357,7 +357,7 @@ public sealed partial class Binder
                 return new BoundLiteral(
                     syntax.Span, PrimitiveTypeSymbol.NUInt, (ulong)inline.Length);
 
-            diagnostics.Report(Codes.ArrayMemberNotFound, syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{inline.Name}' has no member named '{syntax.Member}'; " +
                 "an inline array has only 'Length', and is indexed",
                 inline);
@@ -375,7 +375,7 @@ public sealed partial class Binder
 
         if (receiver.Type is ArrayTypeSymbol)
         {
-            diagnostics.Report(Codes.ArrayMemberNotFound, syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{receiver.Type.Name}' has no member named '{syntax.Member}'; " +
                 "an array has only 'Length'",
                 receiver.Type);
@@ -402,7 +402,7 @@ public sealed partial class Binder
             // check could establish anything about it. Reading it into a strong
             // optional is what makes it safe to look at, and is the only way.
             if (receiver.Type is WeakTypeSymbol weakReceiver)
-                diagnostics.Report(Codes.MemberAccessOnMaybeNull, syntax.Span,
+                diagnostics.Report(Codes.MaybeNullUsedWithoutCheck, syntax.Span,
                     $"'{receiver.Type.Name}' may already have died, so checking it against " +
                     $"null would prove nothing about the moment after; read it into a " +
                     $"'{weakReceiver.Element.Name}?' first, and check that",
@@ -412,7 +412,7 @@ public sealed partial class Binder
             // something about one evaluation and let it be read from another,
             // which is the rule variants already follow (SL0285).
             else if (NarrowableSubject(receiver) is null)
-                diagnostics.Report(Codes.MemberAccessOnMaybeNull, syntax.Span,
+                diagnostics.Report(Codes.MaybeNullUsedWithoutCheck, syntax.Span,
                     $"'{receiver.Type.Name}' may be null, and this is not something a check " +
                     "can be about: a field or a call result may be a different value by the " +
                     $"time it is read. Put it in a local, check that against null, and reach " +
@@ -420,7 +420,7 @@ public sealed partial class Binder
                     receiver.Type);
 
             else
-                diagnostics.Report(Codes.MemberAccessOnMaybeNull, syntax.Span,
+                diagnostics.Report(Codes.MaybeNullUsedWithoutCheck, syntax.Span,
                     $"'{receiver.Type.Name}' may be null; check it against null before " +
                     $"accessing '{syntax.Member}'",
                     receiver.Type);
@@ -444,7 +444,7 @@ public sealed partial class Binder
         {
             if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
             {
-                diagnostics.Report(Codes.MemberNotAccessible, syntax.Span,
+                diagnostics.Report(Codes.NotVisible, syntax.Span,
                     NotVisible(field.ContainingType, syntax.Member, field.IsProtected));
                 return new BoundErrorExpression(syntax.Span);
             }
@@ -723,7 +723,7 @@ public sealed partial class Binder
 
         if (variant.FindCase(draft.Case) is not { } variantCase)
         {
-            diagnostics.Report(Codes.VariantCaseNotFound, span,
+            diagnostics.Report(Codes.MemberNotFound, span,
                 $"'{variant.Name}' has no case named '{draft.Case}'; it has " +
                 Listed(variant.Cases.Select(c => c.Name)),
                 variant);
@@ -802,7 +802,7 @@ public sealed partial class Binder
 
         if (subject is null)
         {
-            diagnostics.Report(Codes.VariantFieldOnNonLocal, syntax.Span,
+            diagnostics.Report(Codes.CaseFieldReadWithoutCheck, syntax.Span,
                 $"'{syntax.Member}' can only be read from a variant held in a local or a " +
                 "parameter, because that is the only thing a check can be about; assign " +
                 "this to one first, then test which case it is");
@@ -815,7 +815,7 @@ public sealed partial class Binder
         if (known is null)
         {
             var suggestion = carrying[0];
-            diagnostics.Report(Codes.VariantFieldNotEstablished, syntax.Span,
+            diagnostics.Report(Codes.CaseFieldReadWithoutCheck, syntax.Span,
                 $"'{name}.{syntax.Member}' is not readable here, because nothing has " +
                 $"established that '{name}' is '{suggestion.Name}'; " +
                 $"check 'if ({name}.{suggestion.Name})' first, or switch over '{name}'");
@@ -824,7 +824,7 @@ public sealed partial class Binder
 
         if (known.FindField(syntax.Member) is not { } field)
         {
-            diagnostics.Report(Codes.VariantFieldNotEstablished, syntax.Span,
+            diagnostics.Report(Codes.CaseFieldReadWithoutCheck, syntax.Span,
                 $"'{name}' is known to be '{known.Name}' here, and '{known.Signature}' does " +
                 $"not carry '{syntax.Member}'; that field belongs to " +
                 Listed(carrying.Select(c => "'" + c.Name + "'")),

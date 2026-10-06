@@ -328,7 +328,7 @@ public sealed partial class Binder
 
         if (left.Type is VectorTypeSymbol l && right.Type is VectorTypeSymbol r && l != r)
         {
-            diagnostics.Report(Codes.VectorOperandsMismatch, span,
+            diagnostics.Report(Codes.OperatorNotApplicable, span,
                 $"'{l.Name}' and '{r.Name}' are different vectors; convert one with a cast, as " +
                 $"'({l.Name})value'",
                 l, r);
@@ -351,7 +351,7 @@ public sealed partial class Binder
         };
         if (refusal is not null)
         {
-            diagnostics.Report(Codes.VectorOperandsMismatch, span,
+            diagnostics.Report(Codes.OperatorNotApplicable, span,
                 $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}' and " +
                 $"'{right.Type.Name}': {refusal}",
                 left.Type, right.Type);
@@ -408,7 +408,7 @@ public sealed partial class Binder
             case TokenKind.Tilde when vector.Element.IsInteger:
                 return new BoundUnary(syntax.Span, vector, BoundUnaryOp.BitwiseNot, operand);
             default:
-                diagnostics.Report(Codes.UnaryOperatorTypeMismatch, syntax.Span,
+                diagnostics.Report(Codes.OperatorNotApplicable, syntax.Span,
                     $"operator '{syntax.Operator.FixedText()}' cannot be applied to '{vector.Name}'",
                     vector);
                 return new BoundErrorExpression(syntax.Span);

@@ -7,17 +7,17 @@ module Warned;
 
 /// An interface. Dispatch through one is indexed by an id assigned across a
 /// whole program, and a library and its consumer are two programs.
-public interface IShape { double Area(); }      // SL0545
+public interface IShape { double Area(); }      // SL0419
 
 /// A com interface. This one is not about ids: what identifies a COM interface
 /// is its IID and the order of its vtable, and a consumer states both for
 /// itself, exactly as a C header does.
 [Guid("3e5c1a08-7b42-4f96-8d13-c05a2e647b9f")]
-public com interface ICounter { int Value(); }  // SL0543
+public com interface ICounter { int Value(); }  // SL0419
 
 /// A com class. Its vtables and adjustor thunks are internal symbols of the
 /// library, and a consumer's `new` would have to point at them.
-public com class Counter : ICounter // SL0544
+public com class Counter : ICounter // SL0419
 {
     public int Value() => 1;
 }
@@ -25,7 +25,7 @@ public com class Counter : ICounter // SL0544
 /// A class implementing an interface. Its dispatch table is indexed by an id
 /// assigned across a whole program, and a library and its consumer are two
 /// programs -- so the table built there would be indexed by the wrong ids.
-public class Circle : IShape // SL0420
+public class Circle : IShape // SL0419
 {
     public double Radius;
     Circle(double r) => Radius = r;
@@ -42,7 +42,7 @@ public class Box<T> // SL0419
 
 /// A variant. Its cases are what a consumer would switch on, and the metadata
 /// carries layouts rather than cases.
-public variant Shape // SL0441
+public variant Shape // SL0419
 {
     Round(double radius);
     Empty;
@@ -51,7 +51,7 @@ public variant Shape // SL0441
 /// A class with a generic virtual method. Each instantiation the program calls
 /// is a slot numbered after every other, and a class derived from it elsewhere
 /// would put its own methods in those slots.
-public class Formatter // SL0799
+public class Formatter // SL0419
 {
     Formatter() { }
     public virtual String Format<T>(T value) => "?";

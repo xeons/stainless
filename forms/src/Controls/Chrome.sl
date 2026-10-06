@@ -560,7 +560,7 @@ public class OfficeXpRenderer : ChromeRenderer
     ///
     /// Module level rather than a static member: a static is not reached
     /// through an object, so `protected` has nothing to say about one
-    /// (SL0575), and a subclass wanting it can call it by name like anything
+    /// (SL0507), and a subclass wanting it can call it by name like anything
     /// else in this module.
     static Color BlendColors(Color a, Color b, int percent)
     {

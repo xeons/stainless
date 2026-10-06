@@ -57,7 +57,7 @@ public sealed partial class Binder
 
             if (bound.Type.IsVoid())
             {
-                diagnostics.Report(Codes.VoidArrayElement, bound.Span,
+                diagnostics.Report(Codes.VoidUsedAsValue, bound.Span,
                     "there is no array of 'void'; an element has to be a value, and this produces none");
                 failed = true;
             }

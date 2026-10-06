@@ -3,13 +3,13 @@ SL0528
 # a com interface extending a Stainless one
 SL0529
 # a com interface with two bases
-SL0530
+SL0510
 # a com class deriving from a class
 SL0536
 # a com interface with no [Guid]
 SL0537
 # [Guid] on something that is not a com interface
-SL0538
+SL0728
 # more than one [Guid]
 SL0539
 # a [Guid] that is not a GUID

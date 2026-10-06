@@ -96,7 +96,7 @@ public static class MetadataWriter
                 // metadata would stop at the fields as well, short of the
                 // tear-offs.
                 case ComInterfaceTypeSymbol comInterface:
-                    diagnostics?.Report(Codes.ComInterfaceOmittedFromMetadata,
+                    diagnostics?.Report(Codes.OmittedFromMetadata,
                         comInterface.Span ?? default,
                         
                         $"'{comInterface.QualifiedName}' is a com interface, so it is not " +
@@ -111,7 +111,7 @@ public static class MetadataWriter
                 // a blob of bytes, which the consumer could construct, copy and
                 // never switch on. Better to say so where the library is built.
                 case VariantTypeSymbol variant:
-                    diagnostics?.Report(Codes.VariantOmittedFromMetadata, variant.Span ?? default,
+                    diagnostics?.Report(Codes.OmittedFromMetadata, variant.Span ?? default,
                         $"'{variant.QualifiedName}' is a variant, so it is not described in " +
                         "this library's metadata: its cases are what a consumer would switch " +
                         "on, and the metadata carries layouts rather than cases. A variant " +
@@ -151,7 +151,7 @@ public static class MetadataWriter
                 // a public type that was somehow not there, and nothing said
                 // why.
                 case InterfaceTypeSymbol interfaceType:
-                    diagnostics?.Report(Codes.InterfaceOmittedFromMetadata,
+                    diagnostics?.Report(Codes.OmittedFromMetadata,
                         interfaceType.Span ?? default,
                         
                         $"'{interfaceType.QualifiedName}' is an interface, so it is not " +
@@ -186,7 +186,7 @@ public static class MetadataWriter
                          .Where(m => ownModules.Contains(m.Name))
                          .SelectMany(m => m.GenericTypes.Values)
                          .Where(t => t.IsPublic))
-                diagnostics.Report(Codes.GenericOmittedFromMetadata, template.Declaration.Span,
+                diagnostics.Report(Codes.OmittedFromMetadata, template.Declaration.Span,
                     $"'{template.Name}' is generic, so it is not described in this library's " +
                     "metadata: a template emits nothing until it is instantiated, and a consumer " +
                     "with only the binary has nothing to instantiate. A generic crosses a library " +
@@ -340,7 +340,7 @@ public static class MetadataWriter
 
         if (excluded.IsCom)
         {
-            diagnostics.Report(Codes.ComClassOmittedFromMetadata, Where(excluded),
+            diagnostics.Report(Codes.OmittedFromMetadata, Where(excluded),
                 $"'{excluded.QualifiedName}' is a com class, so it is not described in this " +
                 "library's metadata: its vtables and adjustor thunks are internal symbols of " +
                 "this compilation, and a consumer's 'new' would have to point at them. Hand one " +
@@ -350,7 +350,7 @@ public static class MetadataWriter
 
         if (HasGenericVirtual(excluded))
         {
-            diagnostics.Report(Codes.GenericVirtualExcludedFromMetadata, Where(excluded),
+            diagnostics.Report(Codes.OmittedFromMetadata, Where(excluded),
                 $"'{excluded.QualifiedName}' has a generic virtual method, so it is not described " +
                 "in this library's metadata: each instantiation the program calls is a slot " +
                 "numbered after every other, and a class derived from it in another program " +
@@ -358,7 +358,7 @@ public static class MetadataWriter
             return;
         }
 
-        diagnostics.Report(Codes.InterfaceImplementerOmittedFromMetadata, Where(excluded),
+        diagnostics.Report(Codes.OmittedFromMetadata, Where(excluded),
             $"'{excluded.QualifiedName}' implements an interface, so it is not described in " +
             "this library's metadata: a dispatch table is indexed by an interface id assigned " +
             "across a whole program, and this library and its consumer are two of those");

@@ -477,9 +477,9 @@ public class EmbedTests
             Assert.Empty(scratch.Codes(
                 """[Embed("stub.bin", Section = "__DATA_CONST,__a_sixteen_byte")] static readonly byte[] S;"""));
 
-            Assert.Equal(["SL0830"], scratch.Codes(
+            Assert.Equal(["SL0709"], scratch.Codes(
                 """[Embed("stub.bin", Section = ".stub", Access = "rx")] static readonly byte[] S;"""));
-            Assert.Equal(["SL0830"], scratch.Codes(
+            Assert.Equal(["SL0709"], scratch.Codes(
                 """[Embed("stub.bin", Section = "__DATA,__seventeen_bytes")] static readonly byte[] S;"""));
 
             // A known segment with the wrong access, a zero-fill section, and

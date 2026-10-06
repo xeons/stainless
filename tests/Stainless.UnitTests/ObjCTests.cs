@@ -374,7 +374,7 @@ public class ObjCTests
 
     [Fact]
     public void AFieldWithNoZeroValueNeedsAnInitializer() =>
-        Assert.Contains("SL0925", CodesFor("""
+        Assert.Contains("SL0813", CodesFor("""
             public objc class Unset : NSObject
             {
                 String _name;

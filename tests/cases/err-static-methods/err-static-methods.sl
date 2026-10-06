@@ -24,10 +24,10 @@ public class Box
     // SL0576: so is the method.
     public static int CallsMethod() => Read();
 
-    // SL0575: dispatch chooses a body from the object a call arrives on.
+    // SL0507: dispatch chooses a body from the object a call arrives on.
     public static virtual int Dispatched() => 1;
 
-    // SL0575: `protected` is about what a derived object reaches through
+    // SL0507: `protected` is about what a derived object reaches through
     // itself.
     protected static int Guarded() => 1;
 
@@ -40,7 +40,7 @@ public interface IThing
     static int Detached();
 }
 
-// SL0573: at module scope the word says nothing that was not already true.
+// SL0828: at module scope the word says nothing that was not already true.
 public static int Free() => 1;
 
 public int Main()

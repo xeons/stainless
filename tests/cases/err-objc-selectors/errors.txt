@@ -7,6 +7,6 @@ SL0904
 # a selector whose colons do not match the parameters
 SL0905
 # '[Optional]' on a class's member
-SL0906
+SL0728
 # a 'String' in a message's signature
 SL0907
