@@ -1,0 +1,2 @@
+# A C++ exception travels through the unwinder the same way on both.
+linux

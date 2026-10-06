@@ -1,0 +1,8 @@
+count 3: 3
+count -1: NSInvalidArgumentException: negative
+reset: fine
+reset again: SLTest: already reset
+made: an object
+halve 8: 4
+halve 7: SLOdd: 7 is odd
+kind: Objective-C

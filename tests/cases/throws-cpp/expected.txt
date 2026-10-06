@@ -1,0 +1,4 @@
+halve 8: 4
+halve 7: a C++ exception
+check 1: fine
+check -1: a C++ exception

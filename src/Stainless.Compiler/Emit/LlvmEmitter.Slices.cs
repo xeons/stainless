@@ -524,25 +524,27 @@ public sealed partial class LlvmEmitter
 
         if (returnInfo.Style == PassStyle.Ignore)
         {
-            Line(invocation);
+            EmitInvocation(call, null, invocation);
             return EmptyResult(function.ReturnType);
         }
 
         if (function.ReturnType.IsVoid())
         {
-            Line(invocation);
+            EmitInvocation(call, null, invocation);
             return Val.Void;
         }
 
-        string result = Emit(returnInfo.LlvmType, invocation);
+        string result = EmitInvocation(call, returnInfo.LlvmType, invocation, returned =>
+        {
+            // ARC's rule for a C function: an object handed back at +0 unless it
+            // was declared to hand one over.
+            if (function.Linkage.IsImport() && IsObjCReference(function.ReturnType) && !function.ReturnsRetained)
+                returned = ClaimReturned(returned!);
 
-        // ARC's rule for a C function: an object handed back at +0 unless it
-        // was declared to hand one over.
-        if (function.Linkage.IsImport() && IsObjCReference(function.ReturnType) && !function.ReturnsRetained)
-            result = ClaimReturned(result);
-
-        if (function.Linkage.IsImport() && IsNeverNullReference(function.ReturnType))
-            RequireForeignResult(result, function);
+            if (function.Linkage.IsImport() && IsNeverNullReference(function.ReturnType))
+                RequireForeignResult(returned!, function);
+            return returned;
+        })!;
 
         return Landed(result, returnInfo, function.ReturnType);
     }

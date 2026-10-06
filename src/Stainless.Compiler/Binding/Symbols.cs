@@ -152,7 +152,7 @@ public sealed class FunctionSymbol
 {
     public required string Name { get; init; }
     public required string ModuleName { get; init; }
-    public required TypeSymbol ReturnType { get; init; }
+    public required TypeSymbol ReturnType { get; set; }
     public required LinkageKind Linkage { get; init; }
 
     /// <summary>
@@ -446,6 +446,16 @@ public sealed class FunctionSymbol
     /// claims it.
     /// </summary>
     public bool ReturnsRetained { get; set; }
+
+    /// <summary>
+    /// A foreign function declared <c>[Throws]</c>. Its <see cref="ReturnType"/>
+    /// is what the foreign call itself hands back; a program calls
+    /// <see cref="ThrowsWrapper"/> in its place, which answers what was declared.
+    /// </summary>
+    public FunctionSymbol? ThrowsWrapper { get; set; }
+
+    /// <summary>For a <c>[Throws]</c> wrapper, the foreign function it calls.</summary>
+    public FunctionSymbol? WrapsThrowing { get; set; }
 
     /// <summary>An <c>init</c> method: a call consumes its receiver.</summary>
     public bool ConsumesSelf { get; set; }

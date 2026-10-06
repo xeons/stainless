@@ -1112,6 +1112,63 @@ pool of their own, so a program never has to make one to be correct.
 `WithAutoreleasePool(() => ...)` drains one each time round a loop that makes
 many such objects and should not hold them all until it ends.
 
+### A call that throws: `[Throws]`
+
+```csharp
+[Throws]
+[Selector("readDataOfLength:")]
+public Result<NSData, ForeignException> ReadDataOfLength(nuint length);
+
+[Throws]
+[Selector("closeFile")]
+public ForeignException? CloseFile();
+
+[Throws]
+extern "C" Result<int, ForeignException> parse_config(byte* path);
+```
+
+**Stainless does not unwind**, and a foreign exception that reaches Stainless
+code stops the program. Most of what Cocoa throws is a programmer's error --
+an index past the end, a nil where none may go -- and stopping is the answer to
+that. A few APIs throw as their ordinary way of failing, though: `NSFileHandle`
+reading past what it can, `NSTask` launching, `NSKeyedUnarchiver` decoding, and
+C++ libraries throw as a matter of course. For those, `[Throws]` on the binding
+turns what is thrown into a value at the call.
+
+The function is declared answering what a call answers once it has caught:
+`Result<T, ForeignException>` for a foreign call that produces a `T`, and
+`ForeignException?` -- null when it worked -- for one that produces nothing,
+the library's two conventions for failure
+([section 2.9](02-types.md#29-how-the-library-reports-failure)). It is
+written on a message of a class that exists already or of a protocol, and on
+an `extern "C"` function, which is how a C++ library is reached.
+
+```csharp
+var read = handle.ReadDataOfLength(64u);
+if (!read.Ok)
+    Console.WriteLine(read.Error.Name + ": " + read.Error.Reason);
+```
+
+**Only that one call catches, and nothing unwinds through Stainless code.** The
+compiler makes the foreign call through an `invoke` whose landing pad records
+what was thrown and goes on. An exception thrown into a Stainless frame some
+other way -- through a callback the framework made into a class defined here
+-- still stops the program, as it did: frames it unwound through released
+nothing they held.
+
+A `ForeignException` says which language threw it (`Kind`). An Objective-C
+exception brings its `Name` and `Reason`. A C++ exception is told apart by the
+class its unwinder header carries, and is deleted unread: only C++ can read the
+object, and nothing here links the C++ runtime, so its name and reason are
+empty.
+
+`[Throws]` is refused (SL0941) on a function Stainless defines, on one declared
+answering anything else, on one whose result is returned in memory -- a call
+that threw would leave it unwritten -- and on one that returns `Self`, takes
+`...` or takes a parameter by reference. Windows raises a C++ exception through
+its own structured handling, which this does not catch yet, so there it is
+refused too.
+
 ### Linking
 
 A program that names an Objective-C type is linked with libobjc. A framework
@@ -1130,10 +1187,10 @@ A case or a program may also include `.m` files, compiled with
 - **A message held without being sent**, in a closure or a delegate
   (SL0913). A message has no function to point at; write a lambda that sends
   it.
-- **An Objective-C exception** is not caught by anything a Stainless program
-  can write. One that reaches a method a defined class answers stops the
-  program there; one that reaches the top ends it with Objective-C's own
-  message.
+- **An Objective-C exception** is caught only where a binding said a call
+  throws (`[Throws]`, above). One that reaches a method a defined class answers
+  stops the program there, saying its reason; one that reaches the top ends it
+  with Objective-C's own message.
 - **A class method that knows its class.** A static member's body runs
   whichever class the message was sent to, and cannot ask which: `+make` sent
   to a subclass runs the same body as it does for the class that declared it.

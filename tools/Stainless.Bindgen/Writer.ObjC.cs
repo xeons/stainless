@@ -518,13 +518,40 @@ public sealed partial class Writer
         if (!isProtocol)
             context.Runtime.Add(new RuntimeCheck(owner, method.Selector, method.IsInstance, Later(method.Availability) ?? context.Introduced));
 
+        // A message that throws in ordinary use answers what it threw.
+        string throws = "";
+        if (ThrowingMessages.Contains($"{owner} {(method.IsInstance ? "-" : "+")}{method.Selector}"))
+        {
+            throws = "    [Throws]\n";
+            result = result == "void" ? "ForeignException?" : $"Result<{result}, ForeignException>";
+        }
+
         string optional = method.IsOptional ? "    [Optional]\n" : "";
         string visibility = isProtocol ? "" : "public ";
         string isStatic = method.IsInstance ? "" : isProtocol ? "static abstract " : "static ";
         return Indented(Documentation(method.Availability)) +
-               $"{optional}{ownership}    [Selector(\"{method.Selector}\")]\n" +
+               $"{optional}{ownership}{throws}    [Selector(\"{method.Selector}\")]\n" +
                $"    {visibility}{isStatic}{result} {Identifier(claimed)}({string.Join(", ", parameters)});\n";
     }
+
+    /// <summary>
+    /// The messages Apple documents as raising an exception in ordinary use
+    /// rather than for a programmer's error, which a binding writes
+    /// <c>[Throws]</c> so that a program can answer the failure. Kept by hand:
+    /// no header says which these are.
+    /// </summary>
+    private static readonly HashSet<string> ThrowingMessages = new(StringComparer.Ordinal)
+    {
+        "NSFileHandle -readDataOfLength:",
+        "NSFileHandle -readDataToEndOfFile",
+        "NSFileHandle -writeData:",
+        "NSFileHandle -seekToEndOfFile",
+        "NSFileHandle -seekToFileOffset:",
+        "NSFileHandle -truncateFileAtOffset:",
+        "NSFileHandle -synchronizeFile",
+        "NSFileHandle -closeFile",
+        "NSTask -launch",
+    };
 
     /// <summary>A type where a value is: an object with its <c>?</c>, anything else as it is.</summary>
     private string SpellValue(CType type, Nullability nullability, Context context, string hint)

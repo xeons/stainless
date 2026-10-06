@@ -668,7 +668,7 @@ public sealed class Parser
     {
         var kept = isExtern
             ? attributes.Where(a => IsDoesNotReturn(a) ||
-                                    a.Name.Last is "ReturnsRetained" or "ReturnsNotRetained").ToList()
+                                    a.Name.Last is "ReturnsRetained" or "ReturnsNotRetained" or "Throws").ToList()
             : [];
         RejectAttributes(attributes.Except(kept).ToList(),
             "an 'extern' or 'export' declaration, whose shape belongs to the other language");

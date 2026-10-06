@@ -109,12 +109,18 @@ public sealed partial class LlvmEmitter
 
         MarkRegisters(symbol, declaredParameters, declaredFirst ?? declaredParameters.Count);
 
-        _module.AppendLine(
+        // Where the header's `{` lands, so that a body which turns out to
+        // catch can be given a personality once it has been emitted.
+        int headerOpen = _module.Length;
+        string header =
             $"define {linkage}{storage}{Convention(symbol)}{returnType} {Symbol(symbol)}" +
             $"({string.Join(", ", declaredParameters)})" + FrameAttributes +
-            (_debugScope is { } attached ? $" !dbg !{attached}" : "") + " {");
+            (_debugScope is { } attached ? $" !dbg !{attached}" : "");
+        headerOpen += header.Length;
+        _module.AppendLine(header + " {");
         _body.Clear();
         _blockTerminated = false;
+        _catchesForeign = false;
 
         PushScope();
 
@@ -219,6 +225,9 @@ public sealed partial class LlvmEmitter
             throw new InternalCompilerError(
                 $"{_unsettled.Count} owned value(s) left unconsumed", function.Symbol.Span);
 #endif
+
+        if (_catchesForeign)
+            _module.Insert(headerOpen, " personality ptr " + ForeignPersonality);
 
         _module.AppendLine("entry:");
         _module.Append(_entryAllocas);

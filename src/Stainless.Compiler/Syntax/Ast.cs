@@ -1405,6 +1405,12 @@ public sealed record AssignmentSyntax(
     TokenKind Operator,
     ExpressionSyntax Value) : ExpressionSyntax(Span);
 
+/// <summary>
+/// The foreign call a <c>[Throws]</c> wrapper's body makes, with the wrapper's
+/// own parameters as its receiver and arguments. Only the compiler writes one.
+/// </summary>
+public sealed record ForeignCallSyntax(SourceSpan Span, string Caught) : ExpressionSyntax(Span);
+
 public sealed record CallSyntax(
     SourceSpan Span,
     ExpressionSyntax Callee,

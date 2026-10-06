@@ -1407,6 +1407,9 @@ public sealed partial class Binder
             converted is [var count, { Type: ClosureTypeSymbol } make])
             return new BoundArrayCreate(syntax.Span, (ArrayTypeSymbol)function.ReturnType, count, make);
 
+        if (function.ThrowsWrapper is { } wrapper)
+            return CallThrowingWrapper(syntax.Span, wrapper, receiver, converted, order);
+
         if (function.IsMessage)
             return SendMessage(syntax.Span, function, receiver, converted, order, nonVirtual, named);
 

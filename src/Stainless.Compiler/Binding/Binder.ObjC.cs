@@ -71,7 +71,7 @@ public sealed partial class Binder
 
     /// <summary>The attributes a member of an objc type may carry, which the compiler reads itself.</summary>
     private static bool IsObjCMemberAttribute(AttributeSyntax attribute) =>
-        attribute.Name.Last is "Selector" or "Optional" or "ReturnsRetained" or "ReturnsNotRetained";
+        attribute.Name.Last is "Selector" or "Optional" or "ReturnsRetained" or "ReturnsNotRetained" or "Throws";
 
     /// <summary>
     /// Says which declarations <c>objc</c> and <c>extern</c> may be written on,
@@ -166,7 +166,14 @@ public sealed partial class Binder
 
         symbol.Selector = selector;
         ApplyFamily(symbol, selector, attributes);
-        CheckObjCSignature(symbol, span);
+
+        // A `[Throws]` message is declared answering what a call answers once
+        // it has caught; what crosses is the foreign call's own result.
+        var crossing = attributes.Any(a => a.Name.Last == "Throws") &&
+                       FindThrowingNativeResult(symbol.ReturnType) is { } native
+            ? native
+            : symbol.ReturnType;
+        CheckObjCSignature(symbol, span, crossing);
     }
 
     /// <summary>
@@ -239,6 +246,7 @@ public sealed partial class Binder
             switch (attribute.Name.Last)
             {
                 case "Selector":
+                case "Throws":
                     break;
 
                 case "Optional":
@@ -262,8 +270,8 @@ public sealed partial class Binder
                 default:
                     diagnostics.Error("SL0906", attribute.Span,
                         $"'[{attribute.Name.Last}]' means nothing on a member of an objc type; it " +
-                        "takes '[Selector]', '[Optional]', '[ReturnsRetained]' and " +
-                        "'[ReturnsNotRetained]'",
+                        "takes '[Selector]', '[Optional]', '[ReturnsRetained]', " +
+                        "'[ReturnsNotRetained]' and '[Throws]'",
                         type);
                     break;
             }
@@ -607,7 +615,7 @@ public sealed partial class Binder
     /// object, a <c>String</c>, an array, a closure, or a struct holding any
     /// of them. What crosses is what C can spell, plus objc references.
     /// </summary>
-    private void CheckObjCSignature(FunctionSymbol symbol, SourceSpan span)
+    private void CheckObjCSignature(FunctionSymbol symbol, SourceSpan span, TypeSymbol? crossing = null)
     {
         foreach (var parameter in symbol.Parameters.Where(p => !p.IsThis))
             if (ObjCSignatureProblem(parameter.Type) is { } why)
@@ -616,11 +624,12 @@ public sealed partial class Binder
                     "message cannot carry; it takes what C can spell and Objective-C objects",
                     parameter.Type);
 
-        if (ObjCSignatureProblem(symbol.ReturnType) is { } result)
+        var returned = crossing ?? symbol.ReturnType;
+        if (ObjCSignatureProblem(returned) is { } result)
             diagnostics.Error("SL0907", span,
                 $"'{symbol.Name}' returns {result}, which an Objective-C message cannot carry; " +
                 "it takes what C can spell and Objective-C objects",
-                symbol.ReturnType);
+                returned);
     }
 
     /// <summary>Why <paramref name="type"/> cannot cross an objc message, or null when it can.</summary>

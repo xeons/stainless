@@ -80,6 +80,7 @@ public sealed partial class Binder
         BinarySyntax binary => BindBinary(binary),
         AssignmentSyntax assignment => BindAssignment(assignment),
         CallSyntax call => BindCall(call),
+        ForeignCallSyntax foreign => BindForeignCall(foreign),
         MemberAccessSyntax member => BindMemberAccess(member),
         SliceSyntax slice => BindSlice(slice),
         IndexSyntax index => BindIndex(index),

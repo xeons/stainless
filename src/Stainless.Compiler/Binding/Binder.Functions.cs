@@ -104,8 +104,12 @@ public sealed partial class Binder
         if (containingType is not null)
             ReadMethodAttributes(symbol, containingType, declaration.Attributes,
                 declaration.Body is not null, declaration.Span);
-        else if (declaration.Attributes.Count > 0)
-            ReadForeignOwnership(symbol, declaration.Attributes);
+        else if (declaration.Attributes.Any(a => a.Name.Last is "ReturnsRetained" or "ReturnsNotRetained"))
+            ReadForeignOwnership(symbol,
+                declaration.Attributes.Where(a => a.Name.Last is "ReturnsRetained" or "ReturnsNotRetained").ToList());
+
+        if (declaration.Attributes.Any(a => a.Name.Last == "Throws"))
+            DeclareThrowing(symbol, declaration, scope);
 
         // A function at module level reads its extra arguments with a VaList,
         // and a message Objective-C answers reads its own. A method has no C

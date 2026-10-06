@@ -49,6 +49,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
  * Reports why the program is stopping, and stops it.
@@ -281,6 +282,61 @@ void sl_objc_exception(const char *message, const char *reason)
     fflush(stderr);
 
     abort();
+}
+
+/* What a [Throws] call's landing pad caught, until ForeignException.Take
+   reads it and frees it. The strings are copies: an exception's own are gone
+   once its catch has ended. */
+typedef struct SlForeignCaught
+{
+    int kind;
+    char *name;
+    char *reason;
+} SlForeignCaught;
+
+static char *sl_foreign_copy(const char *text)
+{
+    if (text == NULL)
+        text = "";
+    size_t length = strlen(text);
+    char *copy = (char *)malloc(length + 1);
+    if (copy != NULL)
+        memcpy(copy, text, length + 1);
+    return copy;
+}
+
+/* An Objective-C exception, with its name and reason. */
+void *sl_foreign_caught(const char *name, const char *reason)
+{
+    SlForeignCaught *caught = (SlForeignCaught *)calloc(1, sizeof(SlForeignCaught));
+    if (caught == NULL)
+        sl_fail("out of memory");
+    caught->kind = 0;
+    caught->name = sl_foreign_copy(name);
+    caught->reason = sl_foreign_copy(reason);
+    return caught;
+}
+
+/* Any other exception, told apart by the class its unwinder header carries:
+   clang's and GCC's C++ runtimes each write their own. */
+void *sl_foreign_caught_other(const void *thrown)
+{
+    SlForeignCaught *caught = (SlForeignCaught *)sl_foreign_caught(NULL, NULL);
+    uint64_t class_of = thrown == NULL ? 0 : *(const uint64_t *)thrown;
+    caught->kind = class_of == 0x434C4E47432B2B00ull || class_of == 0x474E5543432B2B00ull ? 1 : 2;
+    return caught;
+}
+
+int sl_foreign_kind(void *caught) { return ((SlForeignCaught *)caught)->kind; }
+const char *sl_foreign_name(void *caught) { return ((SlForeignCaught *)caught)->name; }
+const char *sl_foreign_reason(void *caught) { return ((SlForeignCaught *)caught)->reason; }
+
+void sl_foreign_free(void *caught)
+{
+    SlForeignCaught *held = (SlForeignCaught *)caught;
+    free(held->name);
+    free(held->reason);
+    free(held);
 }
 
 /* The class name is asked of the Objective-C runtime by the program, so the

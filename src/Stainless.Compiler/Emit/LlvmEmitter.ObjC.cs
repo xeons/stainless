@@ -149,22 +149,22 @@ public sealed partial class LlvmEmitter
         string calleeType = function.IsVariadic ? $"{spelling} ({MessageVariadicSignature(function, stret)})" : spelling;
         string invocation = $"call {calleeType} {callee}({string.Join(", ", arguments)})";
 
-        string? result = null;
-        if (stret || returnInfo.Style == PassStyle.Ignore || function.ReturnType.IsVoid())
-            Line(invocation);
-        else
-            result = Emit(boolResult ? "i8" : returnInfo.LlvmType, invocation);
-
-        // A constructor's `this` is the object alloc made, so the superclass's
-        // init MUST answer with it.
-        if (super && function.ConsumesSelf && _inObjCConstructor && result is not null)
-            RequireSameObject(result, receiver, function);
-
-        // Straight after the send, before anything else can run: an object
-        // handed back at +0 is only alive until the pool drains.
         bool returnsObject = IsObjCReference(function.ReturnType);
-        if (result is not null && returnsObject && !function.ReturnsRetained)
-            result = ClaimReturned(result);
+        bool producesNothing = stret || returnInfo.Style == PassStyle.Ignore || function.ReturnType.IsVoid();
+        string? result = EmitInvocation(call, producesNothing ? null : boolResult ? "i8" : returnInfo.LlvmType,
+                                        invocation, returned =>
+        {
+            // A constructor's `this` is the object alloc made, so the superclass's
+            // init MUST answer with it.
+            if (super && function.ConsumesSelf && _inObjCConstructor && returned is not null)
+                RequireSameObject(returned, receiver, function);
+
+            // Straight after the send, before anything else can run: an object
+            // handed back at +0 is only alive until the pool drains.
+            if (returned is not null && returnsObject && !function.ReturnsRetained)
+                returned = ClaimReturned(returned);
+            return returned;
+        });
 
         foreach (var (target, temporary, type) in writebacks)
             WriteBack(target, temporary, type);

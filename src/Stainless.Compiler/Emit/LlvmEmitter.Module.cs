@@ -451,6 +451,20 @@ public sealed partial class LlvmEmitter
         Declare("sl_objc_cast_failed", "declare void @sl_objc_cast_failed(ptr, ptr) noreturn nounwind");
         Declare("sl_objc_nil_argument", "declare void @sl_objc_nil_argument(ptr, ptr, ptr) noreturn nounwind");
         Declare("sl_objc_exception", "declare void @sl_objc_exception(ptr, ptr) noreturn nounwind");
+
+        // What a [Throws] call's landing pad records and how it lets go of
+        // what it caught. A declaration nothing calls costs nothing to link.
+        Declare("sl_foreign_caught", "declare ptr @sl_foreign_caught(ptr, ptr) nounwind");
+        Declare("sl_foreign_caught_other", "declare ptr @sl_foreign_caught_other(ptr) nounwind");
+        Declare("_Unwind_DeleteException", "declare void @_Unwind_DeleteException(ptr) nounwind");
+        Declare(ForeignPersonality[1..], $"declare i32 {ForeignPersonality}(...)");
+        if (TargetPlatform.Current.IsDarwin)
+        {
+            Declare("objc_begin_catch", "declare ptr @objc_begin_catch(ptr)");
+            Declare("objc_end_catch", "declare void @objc_end_catch()");
+            Declare("OBJC_EHTYPE_id", "@OBJC_EHTYPE_id = external global ptr");
+            Declare("llvm.eh.typeid.for.p0", "declare i32 @llvm.eh.typeid.for.p0(ptr) nounwind memory(none)");
+        }
         Declare("sl_objc_weak_new", "declare noalias ptr @sl_objc_weak_new(ptr) nounwind");
         Declare("sl_objc_weak_load", "declare ptr @sl_objc_weak_load(ptr) nounwind");
         Declare("sl_objc_init_replaced", "declare void @sl_objc_init_replaced(ptr, ptr) noreturn nounwind");

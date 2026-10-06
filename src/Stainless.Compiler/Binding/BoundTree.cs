@@ -367,6 +367,14 @@ public sealed class BoundCall(
     /// NSObject that declares it. Null for every other call.
     /// </summary>
     public ClassTypeSymbol? ClassReceiver { get; init; }
+
+    /// <summary>
+    /// For the foreign call inside a <c>[Throws]</c> wrapper, the local that
+    /// learns what it threw: null while nothing has, and the runtime's record
+    /// of the exception once something did. The call is the one place an
+    /// exception is caught; null for every other call.
+    /// </summary>
+    public LocalSymbol? CatchesForeign { get; init; }
 }
 
 public sealed class BoundUnary(
