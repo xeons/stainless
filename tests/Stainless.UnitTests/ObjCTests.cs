@@ -324,13 +324,13 @@ public class ObjCTests
     [Fact]
     public void AnOverrideOfNothingAndAnUnmarkedReplacementAreRefused()
     {
-        Assert.Contains("SL0921", CodesFor("""
+        Assert.Contains("SL0499", CodesFor("""
             public objc class Mine : NSObject
             {
                 public override long Missing() => 1;
             }
             """));
-        Assert.Contains("SL0921", CodesFor("""
+        Assert.Contains("SL0503", CodesFor("""
             public objc class Mine : NSString
             {
                 [Selector("length")] public nuint Size => 3u;

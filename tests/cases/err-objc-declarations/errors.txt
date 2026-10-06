@@ -3,7 +3,7 @@ SL0900
 # 'extern' on a protocol
 SL0901
 # '[ObjCName]' on a Stainless type
-SL0908
+SL0728
 # a field in an 'extern objc class'
 SL0909
 # an Objective-C class deriving from a Stainless one

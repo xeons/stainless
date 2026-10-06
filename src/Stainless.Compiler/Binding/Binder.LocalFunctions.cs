@@ -474,7 +474,7 @@ public sealed partial class Binder
 
         if (local.Template is not null)
         {
-            diagnostics.Report(Codes.TypeUsedAsValue, span,
+            diagnostics.Report(Codes.GenericFunctionUsedAsValue, span,
                 $"'{declaration.Name}' is generic, and a local function's type arguments come " +
                 "from a call; wrap the call in a lambda to make a value of one instantiation");
             return new BoundErrorExpression(span);

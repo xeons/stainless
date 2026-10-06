@@ -21,7 +21,7 @@ last person to edit it -- the suite is the authority.
   `public` exports and an unmarked declaration is module-wide. `internal` writes
   that default down, anywhere a visibility may go, and `protected internal` is
   C#'s union and so the same as `protected`; a second visibility or a repeated
-  modifier is refused (SL0109)
+  modifier is refused (SL0507, SL0109)
 - Aliases, qualified names without an import, full order independence
 - `string` as a second spelling of `String`, declared as an alias in the
   auto-imported `Standard.Text`, so it needs no import and costs nothing
@@ -175,7 +175,7 @@ last person to edit it -- the suite is the authority.
   `(shape as INamed)?.Name() ?? "anonymous"`. The value is read once, the arm
   the test allows is that same pointer with no second check, and a conversion
   that cannot fail gets no test at all. What could only ever be null is a
-  mistake rather than a null (SL0612), and a COM interface is refused because
+  mistake rather than a null (SL0625), and a COM interface is refused because
   `QueryInterface` is a call that would be made twice
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
@@ -354,7 +354,7 @@ last person to edit it -- the suite is the authority.
   = 80;`, run at the head of every constructor in declaration order. A class
   that declares no constructor is given one to run them in; a constructor that
   chains to `this(...)` does not run them again; and an initializer may not read
-  the object it belongs to (SL0617), because it runs before the constructor's
+  the object it belongs to (SL0633), because it runs before the constructor's
   body and would be reading zeroes. A value type has no moment to run one at and
   refuses it, unless it has a primary constructor, which every constructor of
   it runs
@@ -375,13 +375,13 @@ last person to edit it -- the suite is the authority.
   the same system the built-in conversions are in. One conversion and no chain:
   the value is exactly what the operator takes, except for a literal, which
   adopts the source type as it does anywhere else. What is refused is anything a
-  reader could not find from the two types, and anything the language already
-  answers (SL0615)
+  reader could not find from the two types (SL0615), and anything the language
+  already answers (SL0632)
 - Default values on parameters: `void Draw(String text, int width = 8)`, filled
   in at the call from the declaration the caller can see. A constant is what one
   may be (SL0613), the ones that may be left out are the tail of the list, and
   exactly one declaration may give it -- an `override` may not restate a default
-  and neither may a method beside the interface method it implements (SL0614),
+  and neither may a method beside the interface method it implements (SL0627),
   because a call reads the static type's declaration and two values would make
   the same line mean two things. They cross a library boundary as the value they
   folded to

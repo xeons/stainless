@@ -1,7 +1,8 @@
 # A tag that names a parameter, a type parameter, a failure case or a member
 # that is not there is a claim the compiler can check, so it does. The last
 # function in the file gets all of it right and is what says these fire on the
-# mistake rather than on the tags.
+# mistake rather than on the tags. A parameter documented twice and a
+# failure on a function that cannot fail are claims it can check too.
 SL0739
 SL0740
 SL0741
@@ -9,3 +10,5 @@ SL0742
 SL0743
 SL0744
 SL0745
+SL0832
+SL0833

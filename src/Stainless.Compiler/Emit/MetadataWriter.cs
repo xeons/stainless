@@ -98,7 +98,6 @@ public static class MetadataWriter
                 case ComInterfaceTypeSymbol comInterface:
                     diagnostics?.Report(Codes.OmittedFromMetadata,
                         comInterface.Span ?? default,
-                        
                         $"'{comInterface.QualifiedName}' is a com interface, so it is not " +
                         "described in this library's metadata: what identifies one is its IID " +
                         "and the order of its vtable, and both are things a consumer states for " +
@@ -153,7 +152,6 @@ public static class MetadataWriter
                 case InterfaceTypeSymbol interfaceType:
                     diagnostics?.Report(Codes.OmittedFromMetadata,
                         interfaceType.Span ?? default,
-                        
                         $"'{interfaceType.QualifiedName}' is an interface, so it is not " +
                         "described in this library's metadata: dispatch through one is indexed " +
                         "by an id assigned across a whole program, and this library and its " +

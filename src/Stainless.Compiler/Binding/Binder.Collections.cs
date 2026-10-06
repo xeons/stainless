@@ -85,7 +85,7 @@ public sealed partial class Binder
 
         if (SpreadElementOf(source.Type) is not { } element)
         {
-            diagnostics.Report(Codes.InvalidSpreadElement, syntax.Operand.Span,
+            diagnostics.Report(Codes.SpreadSourceNotEnumerable, syntax.Operand.Span,
                 $"'..' spreads the elements of an array, a slice or anything with a " +
                 $"'GetEnumerator()', and '{source.Type.Name}' is none of those",
                 source.Type);
@@ -447,7 +447,7 @@ public sealed partial class Binder
 
             if (!PartFits(spread, element))
             {
-                diagnostics.Report(Codes.InvalidSpreadElement, spread.Span,
+                diagnostics.Report(Codes.SpreadElementTypeMismatch, spread.Span,
                     $"this '..' yields '{spread.Type.Name}', which does not convert to " +
                     $"'{element.Name}', the element type here",
                     spread.Type, element);

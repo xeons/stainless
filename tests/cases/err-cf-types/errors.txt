@@ -2,3 +2,5 @@
 SL0927
 # a mutable CF type, which shares its base's CFTypeID, asked of an object
 SL0518
+SL0942
+SL0952

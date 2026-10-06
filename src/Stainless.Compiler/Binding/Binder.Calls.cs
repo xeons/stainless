@@ -1081,7 +1081,7 @@ public sealed partial class Binder
         // being used for something.
         if (overloads.All(m => m.IsStatic))
         {
-            diagnostics.Report(Codes.InstanceMemberWithoutInstance, member.Span,
+            diagnostics.Report(Codes.StaticMemberThroughValue, member.Span,
                 $"'{namedType.Name}.{member.Member}' is static, so it is called on the type " +
                 $"rather than on a value: write '{namedType.SimpleName}.{member.Member}(...)'",
                 namedType);

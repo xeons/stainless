@@ -83,7 +83,7 @@ public sealed partial class Binder
 
         if (dispatched)
         {
-            diagnostics.Report(Codes.WhereClauseNotAllowed, member.Constraints[0].Span,
+            diagnostics.Report(Codes.WhereOnRequiredMember, member.Constraints[0].Span,
                 $"'{member.Name}' is dispatched, so every '{template.Name}' has it whatever its " +
                 "arguments; only a member an instantiation can leave out may have a 'where' of " +
                 "its own");
@@ -130,7 +130,7 @@ public sealed partial class Binder
                 .FirstOrDefault(required =>
                     ReferenceEquals(type.FindImplementation(required), member))
             is { } implemented)
-            diagnostics.Report(Codes.WhereClauseNotAllowed, member.Span,
+            diagnostics.Report(Codes.WhereOnRequiredMember, member.Span,
                 $"'{member.Name}' implements " +
                 $"'{implemented.ContainingType!.Name}.{implemented.Name}', so every " +
                 $"'{type.Name}' has it whatever its arguments; only a member an instantiation " +

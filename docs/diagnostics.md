@@ -4,7 +4,7 @@ Every diagnostic the compiler can report, with what it means. Generated from
 `src/Stainless.Compiler/Source/Codes.cs` by `stainless explain --markdown`;
 edit that file, not this one.
 
-477 codes: 453 errors and 24 warnings.
+520 codes: 494 errors and 26 warnings.
 
 ## SL00xx
 
@@ -13,13 +13,14 @@ edit that file, not this one.
 | SL0001 | error | a character in the source begins no token |
 | SL0002 | error | a block comment is never closed |
 | SL0003 | error | a numeric literal has a prefix but no digits |
-| SL0004 | error | a numeric literal has an unknown or unsuitable suffix, or is not a valid float |
+| SL0004 | error | a numeric literal has a suffix it cannot take |
 | SL0005 | error | an integer literal does not fit in 64 bits |
 | SL0006 | error | a string literal, raw or interpolated, is never closed |
 | SL0007 | error | a character literal is never closed |
 | SL0008 | error | a hex escape has too few or the wrong number of hex digits |
 | SL0009 | error | a backslash escape is not one the language defines |
 | SL0010 | error | a character literal holds no character |
+| SL0011 | error | a floating-point literal is malformed |
 
 ## SL01xx
 
@@ -31,7 +32,7 @@ edit that file, not this one.
 | SL0104 | error | a destructor's name is not the name of its enclosing type |
 | SL0105 | error | a function declared extern has a body |
 | SL0108 | error | source is nested deeper than the compiler can process |
-| SL0109 | error | a modifier is written twice, or conflicts with another, on one declaration |
+| SL0109 | error | a modifier is written twice on one declaration |
 
 ## SL02xx
 
@@ -62,7 +63,7 @@ edit that file, not this one.
 | SL0227 | error | a condition is not of type bool |
 | SL0228 | error | this is used outside an instance method, constructor or destructor |
 | SL0229 | error | a name matches nothing in scope |
-| SL0230 | error | the address of a temporary value is taken |
+| SL0230 | error | the address of something with no storage is taken |
 | SL0231 | error | something other than a pointer is dereferenced |
 | SL0232 | error | an operator cannot be applied to the operands' types |
 | SL0238 | error | two operands have no common type for a binary operator |
@@ -106,7 +107,7 @@ edit that file, not this one.
 | Code | Severity | Means |
 |---|---|---|
 | SL0300 | error | an interface declares state, a constructor or a destructor, or a property naming storage |
-| SL0302 | error | a struct or other plain value type is used as or declared to implement an interface |
+| SL0302 | error | a struct is converted to an interface reference |
 | SL0303 | error | a type extends something that is not an interface |
 | SL0304 | warning | a type lists the same interface, COM interface or protocol more than once |
 | SL0305 | error | a type does not provide a member its interface requires |
@@ -114,6 +115,7 @@ edit that file, not this one.
 | SL0307 | error | a member implementing an interface member does not match its signature |
 | SL0309 | error | 'void' is used where a value or its type is needed |
 | SL0312 | error | an array length is not an integer |
+| SL0314 | error | a variant or union lists an interface to implement |
 | SL0320 | error | a property or field declares type parameters |
 | SL0322 | error | a 'static abstract' or 'static virtual' interface member is generic |
 | SL0323 | error | a generic is given the wrong number of type arguments |
@@ -122,8 +124,9 @@ edit that file, not this one.
 | SL0328 | error | a type argument does not meet its parameter's constraint |
 | SL0329 | error | a type cannot be used as a constraint because it is sealed or cannot be derived from |
 | SL0330 | error | a 'where' clause names something that is not a type parameter of its declaration |
-| SL0331 | error | a 'where' clause is written on a member that cannot have one |
+| SL0331 | error | a 'where' clause is written on a declaration that is not generic |
 | SL0332 | error | a file does not declare which module it belongs to |
+| SL0334 | error | a dispatched or interface-implementing member of a generic type has its own 'where' |
 | SL0340 | error | an attribute type declares a member that is not a field |
 | SL0342 | error | a type that is not an attribute is written as an attribute |
 | SL0343 | error | an attribute is given a number of arguments different from its field count |
@@ -138,7 +141,7 @@ edit that file, not this one.
 | SL0353 | error | an enum is compared with a value of a different type |
 | SL0356 | error | 'foreach' iterates something that is not an array and has no 'GetEnumerator()' |
 | SL0357 | error | 'GetEnumerator()' returns a type lacking 'MoveNext()' and 'Current' |
-| SL0360 | error | a function or method is converted to a type that cannot hold it |
+| SL0360 | error | a function is converted to a type that is not a delegate or closure |
 | SL0361 | error | no overload of a method group matches the delegate or closure type |
 | SL0362 | error | a method group matches a delegate or closure type through more than one overload |
 | SL0364 | error | 'spawn' is used outside a 'parallel' block |
@@ -156,7 +159,7 @@ edit that file, not this one.
 | SL0377 | warning | a value reached by more than one thread has no declared thread safety |
 | SL0378 | error | a static initializer or static constructor depends on itself through other statics |
 | SL0379 | error | a 'static readonly' or a field of the struct it holds is written after initialization |
-| SL0381 | error | a lambda or local function that captures state is converted to a delegate |
+| SL0381 | error | a function that carries state is converted to a delegate |
 | SL0382 | error | a lambda is converted to a type that is not a delegate or single-method interface |
 | SL0383 | error | a lambda declares a parameter count different from its target type |
 | SL0384 | error | a lambda parameter's written type differs from what its target expects |
@@ -179,7 +182,7 @@ edit that file, not this one.
 | SL0401 | error | an automatic property has no setter and its type has no constructor to fill it |
 | SL0402 | error | a statement in a switch is not under a 'case' or 'default' label |
 | SL0403 | error | a switch is over a type that cannot have constant labels |
-| SL0404 | error | a 'case' label is not a constant of the switched type, or not one of the variant's cases |
+| SL0404 | error | a 'case' label is not a constant of the switched type |
 | SL0405 | error | a switch has two cases or arms for the same value |
 | SL0406 | error | a switch has more than one 'default' section |
 | SL0407 | error | a switch section runs off its end without 'break', 'return', 'continue' or 'goto' |
@@ -192,14 +195,14 @@ edit that file, not this one.
 | SL0417 | error | a type is declared both in the program and in a referenced library |
 | SL0418 | error | a referenced library's member uses a type the program does not know |
 | SL0419 | warning | a public declaration is not described in the library's metadata |
-| SL0421 | error | '[Pack(N)]' is on something other than a struct or union, or N is not a valid alignment |
+| SL0421 | error | '[Pack(N)]' is written on a type already marked '[Packed]' |
 | SL0430 | error | a variant declares no cases |
 | SL0432 | error | a variant has more cases than its one-byte tag can number |
 | SL0434 | error | a variant case declares two fields with the same name |
 | SL0436 | error | a switch over a variant leaves cases uncovered and has no 'default' |
 | SL0438 | error | a case or class pattern is matched against something neither a variant nor an object |
 | SL0440 | error | a switch section binds more than one variant case |
-| SL0443 | error | an expression with no addressable storage is passed by 'ref' or 'out', or addressed |
+| SL0443 | error | an expression with no storage is passed by 'ref' or 'out' |
 | SL0444 | error | a read-only location is passed as 'ref' or 'out' |
 | SL0445 | error | an argument for a ref or out parameter omits the keyword |
 | SL0446 | error | 'ref' or 'out' is written for a parameter of another mode |
@@ -218,9 +221,9 @@ edit that file, not this one.
 | SL0460 | error | a '#' line names no directive the language has |
 | SL0461 | error | an '#elif', '#else' or '#endif' has no '#if' to belong to |
 | SL0462 | error | a conditional directive's condition is missing or malformed |
-| SL0463 | error | '[Packed]' is on a non-struct, or on a field that cannot be packed |
-| SL0465 | error | '[Align(N)]' asks for an alignment that is not a power of two |
-| SL0466 | error | '[Align(N)]' asks for more than the largest alignment allowed |
+| SL0463 | error | '[Packed]' is on a field that cannot be packed |
+| SL0465 | error | '[Pack(N)]' or '[Align(N)]' asks for an alignment that is not a power of two |
+| SL0466 | error | '[Pack(N)]' or '[Align(N)]' asks for more than the largest alignment allowed |
 | SL0467 | error | a union declares no members |
 | SL0468 | error | a union member holds a counted reference |
 | SL0469 | error | a bit-field is declared in a type that is not a struct or union |
@@ -271,10 +274,10 @@ edit that file, not this one.
 | SL0511 | error | a type inherits from itself, directly or through others |
 | SL0513 | error | a class derives from a type the runtime provides rather than this compilation |
 | SL0514 | error | an abstract class is constructed with 'new' |
-| SL0515 | error | 'base' is used with no base class, or not as a member access or constructor call |
+| SL0515 | error | 'base' is used where there is no base class to reach |
 | SL0516 | error | a 'base(...)' or 'this(...)' call is outside a constructor or in the wrong place in one |
-| SL0517 | error | a base constructor call is missing where one is required, or written where none exists |
-| SL0518 | error | an 'is' test asks something the subject's type cannot answer |
+| SL0517 | error | a base has no parameterless constructor and no 'base(...)' says which |
+| SL0518 | error | a pattern asks about a type its subject's type cannot answer |
 | SL0519 | error | a dispatch modifier or 'protected' is used on a member outside a class |
 | SL0520 | warning | a type test always succeeds because the subject's type already is the tested type |
 | SL0521 | error | constructors delegate to themselves or to each other in a cycle |
@@ -292,7 +295,7 @@ edit that file, not this one.
 | SL0535 | error | a com class implements no com interface |
 | SL0536 | error | a com class derives from a base class |
 | SL0537 | error | a com interface has no '[Guid]' attribute |
-| SL0539 | error | a type carries more than one '[Guid]' attribute |
+| SL0539 | error | an attribute is written more than once on one declaration |
 | SL0540 | error | '[Guid]' is not given exactly one string literal |
 | SL0541 | error | a '[Guid]' string is not in GUID form |
 | SL0542 | error | 'iidof' names a type that is not a com interface |
@@ -300,7 +303,7 @@ edit that file, not this one.
 | SL0547 | error | an array literal has a different number of elements than its inline array type |
 | SL0548 | error | an empty array literal has no element type to infer |
 | SL0549 | error | the elements of an array literal do not share one type |
-| SL0550 | error | a further declaration of a type cannot be matched to the type it adds to |
+| SL0550 | error | a type is declared again in its module as a different kind of type |
 | SL0551 | error | a further declaration of a type says what only the first may |
 | SL0553 | error | 'var' is given an initializer whose type cannot be inferred |
 | SL0554 | error | an interpolated string has a '}' that closes nothing |
@@ -308,7 +311,7 @@ edit that file, not this one.
 | SL0556 | error | an interpolation hole holds more than one expression |
 | SL0557 | error | an interpolation hole holds a value with no defined text form |
 | SL0558 | error | an operator that cannot be overloaded is declared |
-| SL0560 | error | an operator is declared somewhere other than the concrete type it is for |
+| SL0560 | error | an operator is declared at module level rather than in a type |
 | SL0561 | error | an operator is not declared 'public' |
 | SL0562 | error | an operator declares the wrong number of operands |
 | SL0563 | error | no operand of an operator is the type that declares it |
@@ -327,7 +330,7 @@ edit that file, not this one.
 | SL0580 | error | a constraint is out of order in a type parameter's clause |
 | SL0581 | error | a type parameter's constraints contradict each other |
 | SL0582 | error | 'threadsafe' is written on a kind of type that cannot claim it |
-| SL0583 | error | a static class is instantiated or declares an instance member |
+| SL0583 | error | a static class is constructed with 'new' |
 | SL0585 | error | a pattern variable is used where its pattern may not have matched |
 | SL0586 | error | a name is bound to a variant case that carries nothing |
 | SL0587 | error | a pattern names or deconstructs a value tested against an interface |
@@ -354,18 +357,40 @@ edit that file, not this one.
 | SL0609 | error | a positional pattern or deconstruction names the wrong number of elements |
 | SL0610 | warning | a lambda captures a variable by value that is changed afterwards |
 | SL0611 | error | a class with '[Guid]' cannot be made by a class factory with no arguments |
-| SL0612 | error | an 'as' expression is redundant, misapplied or can never succeed |
-| SL0613 | error | a parameter's default value is not allowed |
-| SL0614 | error | a parameter default is placed where it would be ambiguous or leave a hole |
-| SL0615 | error | a user-defined conversion operator is declared in a way that is not allowed |
+| SL0612 | error | 'as' is applied to a value or a type it cannot ask about |
+| SL0613 | error | a parameter's default value is not a constant |
+| SL0614 | error | a parameter without a default follows one with a default |
+| SL0615 | error | a conversion is declared outside both types it converts between |
 | SL0616 | error | two user-defined conversions apply and nothing chooses between them |
-| SL0617 | error | a field or property initializer is written where it cannot run |
-| SL0618 | error | an entry in an object or collection initializer cannot be applied |
-| SL0619 | error | a pattern in a switch binds a name that is never assigned or asks something it cannot |
-| SL0620 | error | a switch expression does not produce a value for every input |
+| SL0617 | error | a field or property of a type that is not a class has an initializer |
+| SL0618 | error | a brace initializer mixes member entries and element entries |
+| SL0619 | error | a pattern names a variable that is not assigned wherever it would be used |
+| SL0620 | error | a switch expression has no arm for some input |
 | SL0621 | warning | a switch label or arm is unreachable because earlier ones cover it |
 | SL0622 | error | a COM interface and the one it extends disagree about '[NoUnknown]' |
 | SL0624 | error | a '[NoUnknown]' com interface also has a '[Guid]' nothing could query for |
+| SL0625 | error | an 'as' can never succeed, because no object is both types |
+| SL0626 | error | a 'ref', 'out' or 'in' parameter, or one of a variadic function, has a default |
+| SL0627 | error | an override or interface implementation gives a parameter a default |
+| SL0628 | error | a conversion operator is not 'public' |
+| SL0629 | error | a conversion does not take exactly one non-variadic parameter |
+| SL0630 | error | a conversion converts a type to itself |
+| SL0631 | error | a conversion is to or from an interface |
+| SL0632 | error | a conversion between two types is declared twice |
+| SL0633 | error | a field initializer reads the object it belongs to |
+| SL0635 | error | a computed property has an initializer |
+| SL0636 | error | a brace list of elements initializes a type with no 'Add' method |
+| SL0637 | error | an arm of a switch expression produces no value |
+| SL0638 | error | a weak reference is used or tested without first being read into an optional |
+| SL0639 | error | a variant is taken apart by a pattern that does not name its case |
+| SL0640 | error | a static class declares an instance member |
+| SL0641 | error | 'base' is used as a value rather than as 'base.Member' or 'base(...)' |
+| SL0642 | error | 'base(...)' is written and nothing derived from declares a constructor |
+| SL0643 | error | an Objective-C category names a class no import declares, or one several do |
+| SL0644 | error | a type already declared in the module is declared again with no body |
+| SL0645 | error | an interface declares an operator that is not 'static abstract' or 'static virtual' |
+| SL0646 | error | a static method is called through a value rather than its type |
+| SL0647 | error | the type after 'as' is written optional, which 'as' already makes it |
 
 ## SL07xx
 
@@ -399,7 +424,6 @@ edit that file, not this one.
 | SL0726 | error | a positional attribute argument follows a named one |
 | SL0727 | error | an attribute field is set with ':' rather than '=' |
 | SL0728 | error | an attribute is written on a declaration it does not apply to |
-| SL0729 | error | '[Embed]' is written on something other than a static, or more than once |
 | SL0730 | error | a static with '[Embed]' is not declared 'byte[]' |
 | SL0731 | error | a static with '[Embed]' also has an initializer |
 | SL0732 | error | a constructor is followed by something other than ': base(...)' or ': this(...)' |
@@ -409,11 +433,11 @@ edit that file, not this one.
 | SL0736 | error | a 'with' expression assigns a name the record has no parameter or settable property for |
 | SL0738 | error | a struct declares a constructor taking no arguments |
 | SL0739 | warning | a documentation comment uses a tag that does not exist |
-| SL0740 | warning | a '@param' tag names a parameter that does not exist or was already documented |
+| SL0740 | warning | a '@param' tag names a parameter the function does not have |
 | SL0741 | warning | a documentation comment documents some parameters but not all |
 | SL0742 | warning | a documentation tag names a type parameter that does not exist |
 | SL0743 | warning | a documentation tag is written on a declaration it says nothing about |
-| SL0744 | warning | a '@failure' tag is on a function that cannot fail or does not name a valid error case |
+| SL0744 | warning | a '@failure' tag names no case of the function's error type |
 | SL0745 | warning | a documentation cross-reference names nothing or names something not in scope |
 | SL0746 | error | text follows the opening quotes of a multi-line raw string on the same line |
 | SL0747 | error | a multi-line raw string has no content or its closing quotes are not on their own line |
@@ -438,18 +462,18 @@ edit that file, not this one.
 | SL0771 | error | a variable is declared inside an expression where no deconstruction statement holds it |
 | SL0772 | error | a 'foreach' deconstruction names existing variables rather than declaring new ones |
 | SL0774 | error | a list pattern is matched against a type that cannot be indexed element by element |
-| SL0775 | error | a '..' in a pattern is misplaced, repeated or cannot name what it skips |
-| SL0776 | error | a name in a positional or property pattern does not match a readable member |
+| SL0775 | error | a '..' stands outside a list pattern, or a list pattern has two |
+| SL0776 | error | a name in a positional pattern is not that position's name |
 | SL0777 | error | '^' or a range is applied to a type with no length |
-| SL0778 | error | a '..' spread in a collection expression cannot be spread into its target |
+| SL0778 | error | a '..' spread names a value that is not an array, slice or enumerable |
 | SL0779 | error | a spread of unknown length fills a fixed-length inline array |
 | SL0780 | error | a static property declares an 'init' accessor |
 | SL0781 | error | an 'init' property is assigned outside of the object's construction |
 | SL0782 | error | a property's 'init' or 'set' differs from that of the member it implements or overrides |
-| SL0783 | error | a member is marked 'required' where that is not allowed |
+| SL0783 | error | a member is marked 'required' that cannot be |
 | SL0784 | error | a construction does not set every required member |
 | SL0785 | error | a constructor of a type with a primary constructor does not chain to it |
-| SL0786 | error | a primary constructor parameter list or base arguments are written where not allowed |
+| SL0786 | error | a parameter list follows the name of a type that is not a class or struct |
 | SL0787 | error | a by-reference primary constructor parameter is used by a member body |
 | SL0788 | error | a type parameter has more than one 'where' clause |
 | SL0789 | error | a type parameter is given the same constraint twice |
@@ -470,7 +494,7 @@ edit that file, not this one.
 | SL0800 | error | 'in' or 'out' is written on a type parameter that is not an interface's or a delegate's |
 | SL0801 | error | a variant type parameter is used in a position its variance forbids |
 | SL0802 | error | 'goto case' or 'goto default' is written outside a switch statement |
-| SL0803 | error | 'goto case' or 'goto default' names no section the switch can run |
+| SL0803 | error | 'goto case' or 'goto default' has no section to run |
 | SL0804 | error | a class that is not a record derives from a record |
 | SL0805 | error | an argument of no settled type is passed to a C variadic parameter list |
 | SL0806 | error | a 'base' call names a member that is abstract in the base |
@@ -494,21 +518,30 @@ edit that file, not this one.
 | SL0828 | error | a modifier is written on a declaration it does not apply to |
 | SL0829 | warning | a lambda assigns its own copy of a captured variable or member, changing nothing |
 | SL0831 | error | a 128-bit integer type is used on a 32-bit target |
+| SL0832 | warning | a parameter is documented by more than one '@param' tag |
+| SL0833 | warning | a '@failure' tag is on a function that reports no failure |
+| SL0834 | error | a generic function is used as a value rather than called |
+| SL0835 | error | a '..' names what it skips on a type that cannot be sliced |
+| SL0836 | error | a property pattern names a method rather than a field or property |
+| SL0837 | error | a '..' spread yields elements that do not convert to the target's |
+| SL0838 | error | a required member of a public type, or its setter, is not public |
+| SL0839 | error | base constructor arguments follow a base type other than the first in the list |
+| SL0840 | error | 'goto case' names a value that is not a constant |
 
 ## SL09xx
 
 | Code | Severity | Means |
 |---|---|---|
-| SL0900 | error | 'objc' is written on a declaration that cannot be an Objective-C type |
+| SL0900 | error | 'objc' is written on something other than an interface, class or closure |
 | SL0901 | error | 'extern' is written on an Objective-C type that cannot take it |
 | SL0902 | error | a member of an Objective-C class or protocol has no '[Selector]' |
 | SL0903 | error | a protocol member or an existing class's selector member is given a body |
-| SL0904 | error | a '[Selector]' attribute is repeated, malformed or names an invalid selector |
+| SL0904 | error | a '[Selector]' has the wrong arguments or names an invalid selector |
 | SL0905 | error | a selector's colon count disagrees with the member's parameter count |
 | SL0907 | error | a parameter or return type cannot be carried by an Objective-C message or block |
-| SL0908 | error | an Objective-C type attribute is on the wrong type or malformed |
+| SL0908 | error | '[ObjCRoot]' or '[ObjCName]' has the wrong arguments |
 | SL0909 | error | an 'extern objc class' declares a member it cannot have, such as a field |
-| SL0910 | error | an Objective-C type's base or protocol list is cyclic, misordered or names a wrong kind |
+| SL0910 | error | an Objective-C type names a base or protocol of a kind it cannot take |
 | SL0911 | error | an Objective-C class does not reach exactly one '[ObjCRoot]' root class |
 | SL0914 | error | 'new' is used on an 'extern objc class' |
 | SL0915 | error | an Objective-C message is sent on a target that is not macOS |
@@ -516,19 +549,29 @@ edit that file, not this one.
 | SL0918 | error | a dependency container cannot choose between equally wide public constructors |
 | SL0919 | error | a constructor parameter is of a kind a dependency container cannot supply |
 | SL0920 | error | a default implementation named for a contract is not a matching generic class |
-| SL0921 | error | an Objective-C class method's override, selector or modifier is inconsistent |
-| SL0923 | error | an Objective-C type is used or declared in a way the runtime cannot support |
-| SL0924 | error | an Objective-C class's constructor has no valid init message to run |
+| SL0921 | error | a method of an Objective-C class is marked 'abstract' or 'virtual' |
+| SL0923 | error | an Objective-C type is declared in a shape the runtime cannot support |
+| SL0924 | error | an Objective-C constructor's selector does not begin with 'init' |
 | SL0926 | error | an Objective-C object owned by a C library is written to |
-| SL0927 | error | '[CFType]' is misplaced or malformed, or a Core Foundation type is misused |
+| SL0927 | error | '[CFType]' has arguments other than one type-ID function name |
 | SL0928 | error | a class member of a protocol is sent to the protocol rather than a class |
-| SL0929 | error | a vector is constructed with wrong arguments |
-| SL0930 | error | a vector member access names no lane or swizzle |
-| SL0931 | error | a lane write repeats a lane or writes back to a non-repeatable vector expression |
+| SL0929 | error | a vector constructor argument is named or passed by 'ref' or 'out' |
+| SL0931 | error | a lane write names one lane twice |
 | SL0933 | error | more than three vectors cross a foreign boundary on 32-bit Windows |
-| SL0934 | error | a vector type's static member or function is unknown or wrongly applied |
-| SL0935 | error | 'VaList.Start' or 'Next<T>' is used where or how it cannot be |
+| SL0934 | error | a vector function is applied to a vector of an element kind it does not take |
+| SL0935 | error | 'VaList.Start()' is called in a function that is not variadic |
 | SL0936 | error | a variable named 'field' is declared inside a property accessor |
 | SL0937 | error | a constructor reaches the object or returns before 'base(...)' has run |
 | SL0938 | error | a field with no zero value is still unset when the object becomes reachable |
 | SL0940 | error | 'late' is written on a field that cannot be late |
+| SL0942 | error | a class derives from a Core Foundation type without being marked '[CFType]' |
+| SL0943 | error | a vector is made from a vector with a different element type |
+| SL0944 | error | a vector is made from values that do not fill its lanes |
+| SL0945 | error | a compound lane write targets a vector that is not a stable location |
+| SL0946 | error | 'VaList.Start()' or 'Next<T>()' is given arguments |
+| SL0947 | error | 'Next<T>()' names a type a variadic argument cannot be read as |
+| SL0948 | error | an override of an Objective-C message names a different selector |
+| SL0949 | error | an Objective-C class answers one selector with two methods |
+| SL0950 | error | 'typeof' is applied to an Objective-C type, which the runtime describes |
+| SL0951 | error | an Objective-C class is constructed and nothing it is built on declares 'init' |
+| SL0952 | error | a Core Foundation type has a root, base, protocol or message it cannot have |

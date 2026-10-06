@@ -138,7 +138,7 @@ public sealed partial class Binder
 
         if (syntax.Value is not null && frame.OverVariant)
         {
-            diagnostics.Report(Codes.GotoCaseTargetInvalid, syntax.Span, NoCaseOfAVariant);
+            diagnostics.Report(Codes.GotoCaseTargetNotFound, syntax.Span, NoCaseOfAVariant);
             return statement;
         }
 
@@ -154,7 +154,7 @@ public sealed partial class Binder
 
             if (key is null)
             {
-                diagnostics.Report(Codes.GotoCaseTargetInvalid, syntax.Value.Span,
+                diagnostics.Report(Codes.GotoCaseNotConstant, syntax.Value.Span,
                     "'goto case' names a section by its constant label, and this is not a constant");
                 return statement;
             }
@@ -187,7 +187,7 @@ public sealed partial class Binder
 
             if (index < 0 || index >= sections.Count)
             {
-                diagnostics.Report(Codes.GotoCaseTargetInvalid, span, key is null
+                diagnostics.Report(Codes.GotoCaseTargetNotFound, span, key is null
                     ? "this switch has no 'default' section for 'goto default' to run"
                     : "this switch has no 'case' label with that value for 'goto case' to run");
                 continue;

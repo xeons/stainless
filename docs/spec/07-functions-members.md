@@ -149,12 +149,12 @@ is what it may be; anything else belongs in the body
 in the middle could only be reached by a name, and a reader counting arguments
 would have to know which of them had been filled in.
 
-**`ref`, `in` and `out` may not have one** (SL0613): all three pass the caller's
+**`ref`, `in` and `out` may not have one** (SL0626): all three pass the caller's
 storage rather than a value, and a default has no storage to be.
 
 **Only one declaration may give it.** An `override` may not restate a default,
 and neither may a method beside the interface method it implements (both
-SL0614). C# allows both, and both are the same trap: a call reads the
+SL0627). C# allows both, and both are the same trap: a call reads the
 declaration the *static* type gives it, so the same line would mean different
 things through a base reference and a derived one. The default belongs to the
 declaration, and there is one of it.
@@ -293,7 +293,7 @@ like a module-level one, and fits a `delegate` or a `closure`. One that reads
 something becomes a closure that calls it, and what it reads is copied when the
 closure is made — the rule for a lambda, because it is one; it cannot be a
 `delegate` (SL0381). A generic one is a value only through a call that settles
-its type arguments (SL0761).
+its type arguments (SL0834).
 
 **`static` promises it reads nothing** from around it — no variable, no object
 — and each attempt is SL0764. It is the same promise a `static` lambda makes,
@@ -613,9 +613,9 @@ expression makes. A type argument for a `new()` constraint is refused if its
 constructor taking nothing would leave one unset, because `new T()` has no
 initializer to name them in (SL0328).
 
-Only an instance field or a property with a setter or `init` can be required;
-and on a public type it has to be public, setter included, because every `new`
-anywhere must be able to set it (SL0783).
+Only an instance field or a property with a setter or `init` can be required
+(SL0783); and on a public type it has to be public, setter included, because
+every `new` anywhere must be able to set it (SL0838).
 
 ### 7.3.3 `field` — the property's own storage
 
@@ -677,7 +677,7 @@ and has no storage to reach: an interface has no state.
 - **Initialized at the declaration only when it owns storage.** `public int X
   { get; set; } = 5;` gives that storage its first value, at the head of every
   constructor, exactly as a field initializer does ([§2.4.1](02-types.md#241-a-field-with-a-value)). A property that
-  *computes* its value has no storage to give one to, and says so (SL0617).
+  *computes* its value has no storage to give one to, and says so (SL0635).
 - **Not indexed, by itself.** `this[i]` is an indexer, which is a property that takes arguments and has a section of its own ([§7.5](#75-indexers)).
 
 ## 7.4 Operators
@@ -742,7 +742,7 @@ rule where two could disagree.
   far from the declaration that forgot it.
 - An interface declares one only as `static abstract`, which every implementing
   type must supply, or `static virtual`, whose body is what one that supplies
-  none falls back on (SL0560). An operator is chosen from the operand types
+  none falls back on (SL0645). An operator is chosen from the operand types
   where it is written rather than dispatched, so one of the interface's own
   would be reached only by an operand typed as the interface; see
   [§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type).
@@ -793,20 +793,20 @@ either — write the cast. C# composes a standard conversion with a user-defined
 one at each end and arrives at rules nobody can hold in their head; the rule
 here is meant to fit in a sentence.
 
-**What is refused, and why** (all SL0615):
+**What is refused, and why**:
 
-- **Neither side is the declaring type.** A conversion between two other types
+- **Neither side is the declaring type** (SL0615). A conversion between two other types
   would give somebody else's types a meaning from a distance, and a reader
   would have nowhere to look for it. Same rule as an operator's operand
   ([§7.4](#74-operators)).
-- **To or from an interface.** A cast to an interface asks the object what it
+- **To or from an interface** (SL0631). A cast to an interface asks the object what it
   is; a conversion would make a different object instead, and the same
   punctuation would mean two things.
-- **A conversion the language already has.** A derived class already converts
+- **A conversion the language already has** (SL0632). A derived class already converts
   to its base, an array to a slice, an `int` to a `long`. A second answer to a
   question already answered is one a reader would have to know about to predict
   what a cast does.
-- **A type to itself**, and the same pair declared twice (SL0211).
+- **A type to itself** (SL0630), and the same pair declared twice (SL0211).
 
 Two conversions from different types that both reach the same target are not a
 conflict; two that could both carry *this* value to *that* type are, and the
@@ -908,8 +908,8 @@ var small = try Small.Parse(text);
 
 There is no `this`, so the body cannot read a field or call a method without
 saying which object it means (SL0228, SL0576). A call names the type; naming a
-value instead is refused, as is naming the type to reach an instance method
-(SL0576). Each of those says which spelling was meant.
+value instead is refused (SL0646), as is naming the type to reach an instance
+method (SL0576). Each of those says which spelling was meant.
 
 Everything else about it is an ordinary method. It overloads by parameters
 alongside the instance methods of the same name — though two members differing
@@ -991,9 +991,9 @@ public static class Defaults
 }
 ```
 
-`new Defaults()` is refused, and so is any member that would need an instance —
+`new Defaults()` is refused (SL0583), and so is any member that would need an instance —
 a field, a constructor, a destructor, an instance method or an instance property
-(SL0583). A **module** is usually the better answer, and is what the standard
+(SL0640). A **module** is usually the better answer, and is what the standard
 library uses: a module is a scope, so its members need no prefix inside it. What
 a static class buys is a name that sits *inside* a module and is reached from
 one.

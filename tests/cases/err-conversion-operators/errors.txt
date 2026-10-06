@@ -1,6 +1,11 @@
 # A conversion the language already has, one between two types neither of which
-# declares it, one to an interface, one that is not public, one to itself, and
-# the same pair declared twice.
+# declares it, one to an interface, one that is not public, one to itself,
+# the same pair declared twice, and one taking two values.
 SL0615
 SL0211
 SL0616
+SL0628
+SL0630
+SL0631
+SL0632
+SL0629

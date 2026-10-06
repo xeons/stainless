@@ -33,7 +33,7 @@ public sealed partial class Binder
     {
         if (syntax.Arguments.Any(a => a is NamedArgumentSyntax or RefArgumentSyntax or OutArgumentSyntax))
         {
-            diagnostics.Report(Codes.VectorConstructionInvalid, syntax.Span,
+            diagnostics.Report(Codes.VectorArgumentNamedOrByReference, syntax.Span,
                 $"'{vector.Name}' is made from its lanes in order, so an argument is not named and not 'ref' or 'out'",
                 vector);
             return new BoundErrorExpression(syntax.Span);
@@ -51,7 +51,7 @@ public sealed partial class Binder
             {
                 if (given.Element != vector.Element)
                 {
-                    diagnostics.Report(Codes.VectorConstructionInvalid, argument.Span,
+                    diagnostics.Report(Codes.VectorElementTypeMismatch, argument.Span,
                         $"'{given.Name}' holds '{given.Element.Name}' and '{vector.Name}' holds " +
                         $"'{vector.Element.Name}'; convert it with '({vector.WithLanes(given.Lanes)!.Name})' first",
                         given, vector);
@@ -71,7 +71,7 @@ public sealed partial class Binder
 
         if (filled != 0 && filled != vector.Lanes)
         {
-            diagnostics.Report(Codes.VectorConstructionInvalid, syntax.Span,
+            diagnostics.Report(Codes.VectorLaneCountMismatch, syntax.Span,
                 $"'{vector.Name}' has {vector.Lanes} lanes, and these fill {filled}; give one value for " +
                 "every lane, or one value to fill them all",
                 vector);
@@ -147,7 +147,7 @@ public sealed partial class Binder
     {
         if (VectorSignature(name) is not { } signature)
         {
-            diagnostics.Report(Codes.VectorFunctionInvalid, syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{vector.Name}' has no function named '{name}'; it has Dot, Cross, Distance, " +
                 "Normalize, Min, Max, Clamp, Abs, Sqrt, Floor, Ceiling, Round, Truncate, FusedMultiplyAdd, " +
                 "Lerp, Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual, " +
@@ -158,7 +158,7 @@ public sealed partial class Binder
 
         if (LanesRefused(signature.Lanes, vector) is { } wanted)
         {
-            diagnostics.Report(Codes.VectorFunctionInvalid, syntax.Span,
+            diagnostics.Report(Codes.VectorFunctionWrongElement, syntax.Span,
                 $"'{vector.Name}.{name}' is for a vector of {wanted}, and '{vector.Name}' is not one",
                 vector);
             return new BoundErrorExpression(syntax.Span);
@@ -166,7 +166,7 @@ public sealed partial class Binder
 
         if (arguments.Count != signature.Parameters.Length)
         {
-            diagnostics.Report(Codes.VectorFunctionInvalid, syntax.Span,
+            diagnostics.Report(Codes.ArgumentCountMismatch, syntax.Span,
                 $"'{vector.Name}.{name}' takes {Counted(signature.Parameters.Length, "argument")}, " +
                 $"and {arguments.Count} {(arguments.Count == 1 ? "was" : "were")} given",
                 vector);
@@ -225,7 +225,7 @@ public sealed partial class Binder
 
         if (function == VectorFunction.Length && !vector.Element.IsFloat)
         {
-            diagnostics.Report(Codes.VectorFunctionInvalid, syntax.Span,
+            diagnostics.Report(Codes.VectorFunctionWrongElement, syntax.Span,
                 $"'Length' is a square root, which a vector of '{vector.Element.Name}' has no lanes to hold; " +
                 "'LengthSquared' is exact",
                 vector);
@@ -261,7 +261,7 @@ public sealed partial class Binder
             string letters = LaneLetters[..Math.Min(4, vector.Lanes)];
             string named = string.Join(", ", letters.AsEnumerable());
             string reversed = new(letters.Reverse().ToArray());
-            diagnostics.Report(Codes.VectorLaneNameUnknown, syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{vector.Name}' has no member named '{member}'; " +
                 (vector.Lanes > 4 ? $"its first four lanes are {named}" : $"its lanes are {named}") +
                 $", which combine as 'v.{reversed}', and every lane is 'v[i]'" +
@@ -285,7 +285,7 @@ public sealed partial class Binder
     {
         if (target.Lanes.Distinct().Count() != target.Lanes.Count)
         {
-            diagnostics.Report(Codes.VectorLaneWriteInvalid, syntax.Target.Span,
+            diagnostics.Report(Codes.VectorLaneRepeated, syntax.Target.Span,
                 "a lane named twice would be written twice, and which write lasts is no answer; " +
                 "name each lane once",
                 target.Type);
@@ -301,7 +301,7 @@ public sealed partial class Binder
 
         if (!IsRepeatable(target.Vector))
         {
-            diagnostics.Report(Codes.VectorLaneWriteInvalid, syntax.Target.Span,
+            diagnostics.Report(Codes.VectorLaneTargetUnstable, syntax.Target.Span,
                 $"'{syntax.Operator.FixedText()}' on lanes reads the vector and writes it back, and this " +
                 "vector is worked out by something that may not give the same answer twice; " +
                 "put it in a local first",

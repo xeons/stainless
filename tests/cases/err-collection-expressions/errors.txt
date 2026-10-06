@@ -6,3 +6,4 @@ SL0779
 SL0547
 # a class with no Add, and one with no constructor taking nothing
 SL0546
+SL0837

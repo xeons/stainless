@@ -246,7 +246,7 @@ the whole names what matched: `Circle { Radius: > 1.0 } big`.
 **Members** are fields and properties, read by name. `Owner.Name: "a"` is
 `Owner: { Name: "a" }`, which asks that the owner is there before it asks
 anything of it; `{ }` alone asks only that. A member that is a method is
-refused (SL0776) — a pattern reads, and a call belongs in a `when`.
+refused (SL0836) — a pattern reads, and a call belongs in a `when`.
 
 **Positions** are a tuple's elements, a variant case's payload fields in the
 order they were declared — `Circle(var r)`, `Ok(var value)` — or, for anything
@@ -262,15 +262,14 @@ There is one `..` at most (SL0775). What `.. var rest` names is a slice of the
 same array ([§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array)), which shares its storage
 rather than copying it, or, for a type, what its `Slice(start, length)` answers
 — `a[1..]` asks the same thing ([§9.17](#917--and-)). Naming the run of
-anything with neither is refused (SL0775). A `String` is not matched element
+anything with neither is refused (SL0835). A `String` is not matched element
 by element (SL0774): its positions are bytes, and a pattern of characters over
 it would be a pattern of bytes that looked like something else.
 
 **A type is asked only of a reference.** An object is asked what class it is
 and a variant which case it holds; any other value is exactly what it was
 declared to be, so the one type it matches is its own — `(int count, _)` over
-an `(int, String)` names the first element -- and any other is SL0438, or
-SL0518 after `is`.
+an `(int, String)` names the first element -- and any other is SL0518.
 
 **A pattern is a question, and every one of them is asked by a `bool`** — a
 comparison, a tag test, `is`, a member read, a length. There is no matching

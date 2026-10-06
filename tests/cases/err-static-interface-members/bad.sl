@@ -21,7 +21,7 @@ public interface IVague
 // An interface's operator is required of implementing types or given to them.
 public interface IPlus
 {
-    static IPlus operator +(IPlus a, IPlus b) => a;      // SL0560
+    static IPlus operator +(IPlus a, IPlus b) => a;      // SL0645
 }
 
 // Supplies nothing for the requirement.

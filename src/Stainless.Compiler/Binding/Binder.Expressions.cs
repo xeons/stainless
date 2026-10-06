@@ -838,7 +838,7 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindBaseValue(BaseSyntax syntax)
     {
-        diagnostics.Report(Codes.NoBaseToReach, syntax.Span,
+        diagnostics.Report(Codes.BaseUsedAsValue, syntax.Span,
             "'base' is not a value; it says where to look a member up, so it is only useful " +
             "as 'base.Member' or, at the head of a constructor, as 'base(...)'");
         return new BoundErrorExpression(syntax.Span);
@@ -946,7 +946,7 @@ public sealed partial class Binder
         if (syntax.Tested is NullableTypeSyntax written)
         {
             var span = written.Element.Span;
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Tested.Span,
+            diagnostics.Report(Codes.AsTypeRedundantlyOptional, syntax.Tested.Span,
                 "'as' answers with an optional already, so the '?' says it twice; write " +
                 $"'as {span.File.Text[span.Start..span.End]}'");
             return new BoundErrorExpression(syntax.Span);
@@ -954,7 +954,7 @@ public sealed partial class Binder
 
         if (value.Type is VariantTypeSymbol asked)
         {
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Span,
+            diagnostics.Report(Codes.AsNotApplicable, syntax.Span,
                 $"'{asked.Name}' is a variant, and which case it holds is asked with 'is' or " +
                 "a 'switch'; 'as' is for an object that may or may not be of some class",
                 asked);
@@ -963,7 +963,7 @@ public sealed partial class Binder
 
         if (value.Type is WeakTypeSymbol)
         {
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Span,
+            diagnostics.Report(Codes.WeakReferenceUsedDirectly, syntax.Span,
                 $"'{value.Type.Name}' may already have died, so what it is cannot be asked " +
                 "directly; read it into an optional first, which is the check that makes it " +
                 "safe to look at",
@@ -976,7 +976,7 @@ public sealed partial class Binder
 
         if (tested is not NamedTypeSymbol { IsReferenceType: true } wanted)
         {
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Tested.Span,
+            diagnostics.Report(Codes.AsNotApplicable, syntax.Tested.Span,
                 $"'{tested.Name}' is not a class or an interface, so 'as' has nothing to ask " +
                 "and nothing to answer null with: every other type is known exactly where it " +
                 "is written",
@@ -989,7 +989,7 @@ public sealed partial class Binder
         // QueryInterface calls are two answers, and this would need both.
         if (wanted is ComInterfaceTypeSymbol || value.Type.AsReference() is ComInterfaceTypeSymbol)
         {
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Span,
+            diagnostics.Report(Codes.AsNotApplicable, syntax.Span,
                 $"a QueryInterface for '{wanted.Name}' is a call the object answers, so 'as' " +
                 $"would ask it twice; cast it instead, as '({wanted.Name})...', which asks once " +
                 "and ends the program if the answer was no",
@@ -999,7 +999,7 @@ public sealed partial class Binder
 
         if (value.Type.AsReference() is not NamedTypeSymbol subject)
         {
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Span,
+            diagnostics.Report(Codes.AsNotApplicable, syntax.Span,
                 $"'as' asks what an object really is, and '{value.Type.Name}' is not a " +
                 "reference to one",
                 value.Type);
@@ -1025,7 +1025,7 @@ public sealed partial class Binder
         {
             if (generic)
                 return new BoundSequence(syntax.Span, [value], new BoundNullLiteral(syntax.Span, result));
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Span,
+            diagnostics.Report(Codes.AsAlwaysNull, syntax.Span,
                 $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
                 "neither derives from the other, so this would always be null",
                 subjectClass, wantedClass);
@@ -1037,7 +1037,7 @@ public sealed partial class Binder
         {
             if (generic)
                 return new BoundSequence(syntax.Span, [value], new BoundNullLiteral(syntax.Span, result));
-            diagnostics.Report(Codes.InvalidAsExpression, syntax.Span,
+            diagnostics.Report(Codes.AsAlwaysNull, syntax.Span,
                 $"'{sealedSubject.Name}' is sealed and does not implement '{contract.Name}', " +
                 "so this would always be null",
                 sealedSubject, contract);
@@ -1204,7 +1204,7 @@ public sealed partial class Binder
 
         _reportedFieldInitializerReach = true;
 
-        diagnostics.Report(Codes.InvalidMemberInitializer, span,
+        diagnostics.Report(Codes.FieldInitializerReadsObject, span,
             "a field initializer cannot read the object it belongs to: it runs before the " +
             "constructor's body, in declaration order, so what it would read is whatever the " +
             "allocation left. A constructor is where one field's value can depend on another");
@@ -1227,14 +1227,14 @@ public sealed partial class Binder
             var target = Widened(BindExpression(syntax.Operand));
             if (!target.IsLValue && !target.Type.IsError())
             {
-                diagnostics.Report(Codes.AddressOfTemporary, syntax.Span,
+                diagnostics.Report(Codes.AddressOfNoStorage, syntax.Span,
                     "cannot take the address of a temporary value");
                 return new BoundErrorExpression(syntax.Span);
             }
 
             if (target is BoundFieldAccess { Field.IsBitField: true })
             {
-                diagnostics.Report(Codes.ArgumentHasNoStorage, syntax.Span,
+                diagnostics.Report(Codes.AddressOfNoStorage, syntax.Span,
                     "a bit-field is some of the bits of its storage unit and has no address " +
                     "of its own; copy it into a local first");
                 return new BoundErrorExpression(syntax.Span);
@@ -2172,7 +2172,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        diagnostics.Report(Codes.TypeUsedAsValue, syntax.Span,
+        diagnostics.Report(Codes.GenericFunctionUsedAsValue, syntax.Span,
             $"'{name}' is written with type arguments and is not being called; type " +
             "arguments go on a call, as in 'Pick<int>(a, b)', or on a type before its " +
             "member, as in 'Box<int>.Create()'");

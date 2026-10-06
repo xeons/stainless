@@ -408,8 +408,7 @@ from it:
   never reads the null, so the parser records whether every mention of `field`
   in an accessor is what `??=` fills, and such storage is exempt from SL0813
   and SL0814. Any other read of `field` makes it an ordinary field again.
-- **A member `where` on a dispatched member is SL0331**, the code for a `where`
-  that has nothing to constrain: a virtual, abstract, override or interface
+- **A member `where` on a dispatched member is SL0334**: a virtual, abstract, override or interface
   member is in every instantiation's table, so it cannot be left out.
 - **`class, zeroable` is SL0581**, the contradiction every other pair of kinds
   gets: a reference that is not optional is never null.

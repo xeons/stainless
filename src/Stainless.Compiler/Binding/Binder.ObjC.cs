@@ -89,7 +89,7 @@ public sealed partial class Binder
                 "it holds by reference");
 
         if (objc && declaration.Modifiers.HasFlag(Modifiers.Com))
-            diagnostics.Report(Codes.ObjCModifierMisplaced, declaration.Span,
+            diagnostics.Report(Codes.ModifiersConflict, declaration.Span,
                 $"'{declaration.Name}' cannot be both 'com' and 'objc'; the two are different " +
                 "object models, counted by different calls");
 
@@ -102,7 +102,7 @@ public sealed partial class Binder
                       $"and '{declaration.Name}' is not one; write 'extern objc class'");
 
         if (objc && declaration.TypeParameters.Count > 0)
-            diagnostics.Report(Codes.ObjCModifierMisplaced, declaration.Span,
+            diagnostics.Report(Codes.ObjCClassShapeUnsupported, declaration.Span,
                 $"'{declaration.Name}' cannot be generic: an Objective-C class or protocol is " +
                 "one runtime object, and Objective-C's generics are a fact about its headers");
     }
@@ -189,7 +189,7 @@ public sealed partial class Binder
 
         span = written[0].Span;
         if (written.Count > 1)
-            diagnostics.Report(Codes.SelectorAttributeMalformed, written[1].Span,
+            diagnostics.Report(Codes.AttributeRepeated, written[1].Span,
                 $"'{member}' has more than one '[Selector]'; a member sends one message");
 
         if (written[0].Arguments.Count != 1 ||
@@ -381,7 +381,7 @@ public sealed partial class Binder
         }
 
         if (written.Count > 1)
-            diagnostics.Report(Codes.SelectorAttributeMalformed, written[1].Span,
+            diagnostics.Report(Codes.AttributeRepeated, written[1].Span,
                 $"'{property.Name}' has more than one '[Selector]'; one names both messages");
 
         var arguments = written[0].Arguments;
@@ -671,7 +671,7 @@ public sealed partial class Binder
         {
             if (!IsObjCType(type))
             {
-                diagnostics.Report(Codes.ObjCTypeAttributeMisplaced, attribute.Span,
+                diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                     $"'[{attribute.Name.Last}]' is about an Objective-C class or protocol, and " +
                     $"'{type.Name}' is neither",
                     type);
@@ -688,12 +688,14 @@ public sealed partial class Binder
             {
                 if (type is ClassTypeSymbol { ObjC: ObjCClassKind.Imported } root && attribute.Arguments.Count == 0)
                     root.IsObjCRoot = true;
+                else if (type is ClassTypeSymbol { ObjC: ObjCClassKind.Defined })
+                    diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
+                        $"'{type.Name}' is defined here, and a root class is one the " +
+                        "runtime's own classes are built on; derive from 'NSObject' instead",
+                        type);
                 else
-                    diagnostics.Report(Codes.ObjCTypeAttributeMisplaced, attribute.Span,
-                        type is ClassTypeSymbol { ObjC: ObjCClassKind.Defined }
-                            ? $"'{type.Name}' is defined here, and a root class is one the " +
-                              "runtime's own classes are built on; derive from 'NSObject' instead"
-                            : $"'[ObjCRoot]' takes nothing and goes on an 'extern objc class'",
+                    diagnostics.Report(Codes.ObjCTypeAttributeMalformed, attribute.Span,
+                        $"'[ObjCRoot]' takes nothing and goes on an 'extern objc class'",
                         type);
                 continue;
             }
@@ -702,7 +704,7 @@ public sealed partial class Binder
                 ConstantValue(attribute.Arguments[0], _builtins.String) is not string name ||
                 name.Length == 0 || !name.All(c => char.IsAsciiLetterOrDigit(c) || c is '_' or '.'))
             {
-                diagnostics.Report(Codes.ObjCTypeAttributeMisplaced, attribute.Span,
+                diagnostics.Report(Codes.ObjCTypeAttributeMalformed, attribute.Span,
                     "'[ObjCName]' takes one string literal, the name the Objective-C runtime " +
                     "knows: '[ObjCName(\"NSObject\")]'",
                     type);
@@ -725,7 +727,7 @@ public sealed partial class Binder
     {
         if (type is not ClassTypeSymbol { ObjC: ObjCClassKind.Imported } classType)
         {
-            diagnostics.Report(Codes.CFTypeMisused, attribute.Span,
+            diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                 $"'[CFType]' marks a Core Foundation type, which exists already, and '{type.Name}' " +
                 "is not an 'extern objc class'",
                 type);
@@ -737,7 +739,7 @@ public sealed partial class Binder
              (ConstantValue(attribute.Arguments[0], _builtins.String) is not string function ||
               function.Length == 0 || !function.All(c => char.IsAsciiLetterOrDigit(c) || c == '_'))))
         {
-            diagnostics.Report(Codes.CFTypeMisused, attribute.Span,
+            diagnostics.Report(Codes.CFTypeMalformed, attribute.Span,
                 "'[CFType]' takes nothing, or the name of the C function that answers the type's " +
                 "CFTypeID: '[CFType(\"CFStringGetTypeID\")]'",
                 type);
@@ -765,7 +767,7 @@ public sealed partial class Binder
             : null;
 
         if (why is not null)
-            diagnostics.Report(Codes.CFTypeMisused, span,
+            diagnostics.Report(Codes.CFTypeShapeUnsupported, span,
                 $"'{classType.Name}' is '[CFType]', and cannot be {why}", classType);
     }
 
@@ -780,7 +782,7 @@ public sealed partial class Binder
         {
             case (ObjCProtocolTypeSymbol protocol, ObjCProtocolTypeSymbol adopted):
                 if (adopted == protocol || adopted.Adopts(protocol))
-                    diagnostics.Report(Codes.ObjCInheritanceListInvalid, span,
+                    diagnostics.Report(Codes.InheritanceCycle, span,
                         $"'{protocol.Name}' and '{adopted.Name}' adopt each other",
                         protocol, adopted);
                 else if (protocol.Bases.Contains(adopted))
@@ -797,12 +799,12 @@ public sealed partial class Binder
                     ResolveImplements(superclass, entry.Declaration, entry.Scope);
 
                 if (!isFirst)
-                    diagnostics.Report(Codes.ObjCInheritanceListInvalid, span,
+                    diagnostics.Report(Codes.BaseClassNotFirst, span,
                         $"'{superclass.Name}' is a class, so it is '{classType.Name}''s superclass " +
                         "and goes first in the list, before the protocols",
                         classType, superclass);
                 else if (superclass == classType || superclass.DerivesFrom(classType))
-                    diagnostics.Report(Codes.ObjCInheritanceListInvalid, span,
+                    diagnostics.Report(Codes.InheritanceCycle, span,
                         $"'{classType.Name}' and '{superclass.Name}' derive from each other",
                         classType, superclass);
                 else if (classType.BaseClass is { } named)
@@ -844,7 +846,7 @@ public sealed partial class Binder
                 $"'{resolved.Name}'; write 'objc class {type.Name}'",
         };
 
-        diagnostics.Report(Codes.ObjCInheritanceListInvalid, span, why, type, resolved);
+        diagnostics.Report(Codes.ObjCBaseWrongKind, span, why, type, resolved);
         if (type is ClassTypeSymbol refused) _objcBaseRefused.Add(refused);
     }
 
@@ -871,7 +873,7 @@ public sealed partial class Binder
 
             if (classType.BaseClass is { IsCoreFoundation: true } cfBase)
             {
-                diagnostics.Report(Codes.CFTypeMisused, span,
+                diagnostics.Report(Codes.CFTypeBaseUnmarked, span,
                     $"'{classType.Name}' derives from '{cfBase.Name}', a Core Foundation type, which " +
                     "has no class object for an Objective-C class to be built on; mark it '[CFType]' " +
                     "if it is one too",
@@ -958,7 +960,7 @@ public sealed partial class Binder
         {
             if (method.IsVirtual && !method.IsOverride)
             {
-                diagnostics.Report(Codes.ObjCOverrideInvalid, method.Span,
+                diagnostics.Report(Codes.ObjCMethodVirtual, method.Span,
                     $"'{defined.Name}.{MemberName(method)}' is '{(method.IsAbstract ? "abstract" : "virtual")}', " +
                     "which an Objective-C class does not need: every message it answers can be " +
                     "overridden already. Drop the word",
@@ -981,7 +983,7 @@ public sealed partial class Binder
             if (defined.BaseClass is { } baseClass &&
                 SelfAndProtocols(baseClass).SelectMany(t => t.Methods)
                     .Any(m => m.Selector == method.Selector && m.IsStatic == method.IsStatic))
-                diagnostics.Report(Codes.ObjCOverrideInvalid, method.Span,
+                diagnostics.Report(Codes.InheritedMemberHiddenWithoutOverride, method.Span,
                     $"'{defined.Name}.{MemberName(method)}' answers '{method.Selector}', which " +
                     $"'{baseClass.Name}' already answers; write 'override' to replace it",
                     defined, baseClass);
@@ -1001,7 +1003,7 @@ public sealed partial class Binder
 
         if (inherited is null)
         {
-            diagnostics.Report(Codes.ObjCOverrideInvalid, method.Span,
+            diagnostics.Report(Codes.OverrideHasNoBase, method.Span,
                 $"'{defined.Name}.{MemberName(method)}' is an 'override', and no superclass of " +
                 $"'{defined.Name}' has a message named '{MemberName(method)}' taking these parameters " +
                 $"to replace{(method.Selector is null ? "" : $"; to answer '{method.Selector}' afresh, drop 'override'")}",
@@ -1011,7 +1013,7 @@ public sealed partial class Binder
 
         if (method.Selector is not null && method.Selector != inherited.Selector)
         {
-            diagnostics.Report(Codes.ObjCOverrideInvalid, method.Span,
+            diagnostics.Report(Codes.ObjCOverrideSelectorChanged, method.Span,
                 $"'{defined.Name}.{MemberName(method)}' overrides '{inherited.Selector}', so it answers " +
                 $"that selector and not '{method.Selector}'; an override inherits its selector, " +
                 "so leave '[Selector]' off",
@@ -1026,7 +1028,7 @@ public sealed partial class Binder
                            (method.ReturnType is not OptionalTypeSymbol ||
                             inherited.ReturnType is OptionalTypeSymbol));
         if (!returnFits)
-            diagnostics.Report(Codes.ObjCOverrideInvalid, method.Span,
+            diagnostics.Report(Codes.OverrideSignatureMismatch, method.Span,
                 $"'{defined.Name}.{MemberName(method)}' returns '{method.ReturnType.Name}', and the " +
                 $"'{inherited.Selector}' it overrides returns '{inherited.ReturnType.Name}'; an " +
                 "override returns the same, or a class derived from it",

@@ -1,5 +1,5 @@
 # Box<String> has no Reset; a virtual member, and one that implements an
 # interface, may not have a where of its own.
 SL0816
-SL0331
-SL0331
+SL0334
+SL0334

@@ -195,7 +195,7 @@ public sealed partial class Binder
         {
             if (BindVectorConstant(syntax, vectorType) is { } constant) return constant;
 
-            diagnostics.Report(Codes.VectorFunctionInvalid, syntax.Span,
+            diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"'{vectorType.Name}' has no member named '{syntax.Member}'; it has Zero and One, " +
                 "and functions called as 'vfloat4.Dot(a, b)'",
                 vectorType);
@@ -402,7 +402,7 @@ public sealed partial class Binder
             // check could establish anything about it. Reading it into a strong
             // optional is what makes it safe to look at, and is the only way.
             if (receiver.Type is WeakTypeSymbol weakReceiver)
-                diagnostics.Report(Codes.MaybeNullUsedWithoutCheck, syntax.Span,
+                diagnostics.Report(Codes.WeakReferenceUsedDirectly, syntax.Span,
                     $"'{receiver.Type.Name}' may already have died, so checking it against " +
                     $"null would prove nothing about the moment after; read it into a " +
                     $"'{weakReceiver.Element.Name}?' first, and check that",

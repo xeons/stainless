@@ -288,7 +288,6 @@ public sealed partial class Binder
             if (inherited is not null)
                 diagnostics.Report(Codes.InheritedMemberHiddenWithoutOverride,
                     template.Declaration.Span,
-                    
                     $"'{classType.Name}.{template.Name}' has the same name, type parameters and " +
                     $"parameters as '{inherited.ContainingType!.Name}.{inherited.Name}'" +
                     (inherited.IsDispatched
@@ -313,7 +312,6 @@ public sealed partial class Binder
                 if (!answered)
                     diagnostics.Report(Codes.AbstractMemberNotImplemented,
                         classType.Span ?? declaration.Span,
-                        
                         $"'{classType.Name}' does not implement abstract " +
                         $"'{owner.Name}.{missing.Name}'; add 'public override' with the same " +
                         "type parameters and parameters",

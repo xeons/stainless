@@ -245,7 +245,7 @@ public sealed partial class Binder
                 // A second one would be a second file for one static, and there
                 // is one static.
                 if (embed is not null)
-                    diagnostics.Report(Codes.InvalidEmbedPlacement, written.Span,
+                    diagnostics.Report(Codes.AttributeRepeated, written.Span,
                         $"'{symbol.Name}' already has an '[Embed]'; a static holds one object, " +
                         "so it carries one file");
                 else

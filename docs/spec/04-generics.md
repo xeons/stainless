@@ -313,7 +313,7 @@ interface is not one of the types that meets it. A plain `static` member with a
 body is the interface's own function and is named through it,
 `IAdditive<Money>.Describe()`. A static member with no body has to say it is a
 requirement by being `abstract` (SL0574). An operator on an interface is
-`static abstract` or `static virtual` (SL0560); one operand is the interface's
+`static abstract` or `static virtual` (SL0645); one operand is the interface's
 own type argument, since that is the implementing type.
 
 **One place this is wider than C#.** A `static virtual` operator's body is
@@ -406,8 +406,8 @@ conditional extension are the same idea; without it, `Span<String>` itself
 would be refused for a method it never calls.
 
 A dispatched member — virtual, abstract, an override, an interface's — is in
-every instantiation's table, so it may not have one (SL0331), and neither may a
-member of a type that is not generic.
+every instantiation's table, so it may not have one (SL0334), and neither may a
+member of a type that is not generic (SL0331).
 
 ## 4.4 What is and is not supported
 
@@ -479,7 +479,7 @@ var none = Zero<int>();         // nothing passed could have said what T is
 **Only a generic candidate is considered**, as in C#. `Plain<int>(1)` on a
 function that is not generic, and a count that no template of that name takes,
 are each SL0323. A function written with type arguments and not called —
-`var f = Pick<int>;` — is SL0761: an instantiation is not a value of its own,
+`var f = Pick<int>;` — is SL0834: an instantiation is not a value of its own,
 and a delegate names the overload it wants by its own signature.
 
 **`<` after a name is read the way C# reads it.** In an expression `<` is also

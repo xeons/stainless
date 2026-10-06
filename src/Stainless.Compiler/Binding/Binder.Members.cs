@@ -257,7 +257,6 @@ public sealed partial class Binder
             {
                 diagnostics.Report(Codes.EnumUnderlyingTypeNotInteger,
                     declaration.UnderlyingType.Span,
-                    
                     $"an enum must be built on an integer type, but '{underlying.Name}' is not one",
                     underlying);
             }
@@ -558,7 +557,7 @@ public sealed partial class Binder
             // reached through one is a member that could never be reached.
             if (staticOnly && InstanceMember(member) is { } instanceMember)
             {
-                diagnostics.Report(Codes.StaticClassMisused, member.Span,
+                diagnostics.Report(Codes.InstanceMemberInStaticClass, member.Span,
                     $"'{type.Name}' is a static class, so it has no instance for " +
                     $"{instanceMember} to belong to. Make it 'static', or make the class " +
                     "an ordinary one",
@@ -724,7 +723,6 @@ public sealed partial class Binder
                     if (constructor.Attributes.Count > 0 && !IsObjCType(type))
                         diagnostics.Report(Codes.AttributeNotAllowedHere,
                             constructor.Attributes[0].Span,
-                            
                             $"'[{constructor.Attributes[0].Name.Last}]' cannot be written on a " +
                             "constructor; the one a constructor takes is '[SetsRequiredMembers]', " +
                             "and an objc class's may take '[Selector]'",
@@ -734,7 +732,6 @@ public sealed partial class Binder
                     {
                         diagnostics.Report(Codes.ConstructorOnNonConstructibleType,
                             constructor.Span,
-                            
                             $"'{type.Name}' is {DescribeKind(type)}, so it has no constructor; " +
                             "only a class or a struct is made by writing 'new'",
                             type);
@@ -822,7 +819,6 @@ public sealed partial class Binder
                     {
                         diagnostics.Report(Codes.DuplicateDestructorOrStaticConstructor,
                             destructor.Span,
-                            
                             $"'{type.Name}' already declares a destructor",
                             type);
                         break;
@@ -953,7 +949,7 @@ public sealed partial class Binder
         // constructor of it runs the primary one.
         if (type is not ClassTypeSymbol && declaration.PrimaryParameters.Count == 0)
         {
-            diagnostics.Report(Codes.InvalidMemberInitializer, field.Initializer.Span,
+            diagnostics.Report(Codes.InitializerOutsideClass, field.Initializer.Span,
                 $"'{type.Name}' is not a class, so there is no moment at which this would " +
                 $"run: '{type.Name} value;' makes one by declaring it rather than by " +
                 "constructing it, and a field initializer runs in a constructor. Give the " +
@@ -962,17 +958,9 @@ public sealed partial class Binder
             return null;
         }
 
-        if (field.IsAnonymous)
-        {
-            diagnostics.Report(Codes.InvalidMemberInitializer, field.Initializer.Span,
-                "a nameless member has no name to assign to; give its fields their values " +
-                "one at a time");
-            return null;
-        }
-
         if (field.BitWidth is not null)
         {
-            diagnostics.Report(Codes.InvalidMemberInitializer, field.Initializer.Span,
+            diagnostics.Report(Codes.InitializerOutsideClass, field.Initializer.Span,
                 $"'{field.Name}' is a bit-field, and bit-fields are laid out in a struct, " +
                 "which has no constructor to run this in");
             return null;
@@ -992,7 +980,7 @@ public sealed partial class Binder
 
         if (type is not ClassTypeSymbol && !hasPrimaryConstructor)
         {
-            diagnostics.Report(Codes.InvalidMemberInitializer, declaration.Initializer.Span,
+            diagnostics.Report(Codes.InitializerOutsideClass, declaration.Initializer.Span,
                 $"'{type.Name}' is not a class, so there is no moment at which this would " +
                 "run: a property's first value is given in a constructor, and a value type " +
                 "has none",
@@ -1511,7 +1499,7 @@ public sealed partial class Binder
         }
 
         if (declaration.Initializer is not null && !wantsStorage)
-            diagnostics.Report(Codes.InvalidMemberInitializer, declaration.Initializer.Span,
+            diagnostics.Report(Codes.InitializerOnComputedProperty, declaration.Initializer.Span,
                 $"'{type.Name}.{declaration.Name}' computes its value, so there is no storage " +
                 "here to give one to; a value after the accessors belongs to an automatic " +
                 "property, which is the one that owns a field",
@@ -1620,7 +1608,7 @@ public sealed partial class Binder
     {
         if (!type.IsPublic || isPublic) return;
 
-        diagnostics.Report(Codes.InvalidRequiredMember, span,
+        diagnostics.Report(Codes.RequiredMemberNotPublic, span,
             $"'{type.Name}.{name}' is 'required' and '{type.Name}' is public, so every 'new' of " +
             "it anywhere has to set it; make the member and its setter public too",
             type);

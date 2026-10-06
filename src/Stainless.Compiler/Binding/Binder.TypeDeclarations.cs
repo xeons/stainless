@@ -340,7 +340,7 @@ public sealed partial class Binder
             switch (found.Count)
             {
                 case 0:
-                    diagnostics.Report(Codes.TypeRedeclarationUnresolved, declaration.Span,
+                    diagnostics.Report(Codes.ObjCCategoryClassUnresolved, declaration.Span,
                         $"'{declaration.Name}' names no superclass, so it adds to an Objective-C class " +
                         "declared elsewhere, and neither this module nor any this file imports declares one");
                     break;
@@ -350,7 +350,7 @@ public sealed partial class Binder
                     break;
 
                 default:
-                    diagnostics.Report(Codes.TypeRedeclarationUnresolved, declaration.Span,
+                    diagnostics.Report(Codes.ObjCCategoryClassUnresolved, declaration.Span,
                         $"'{declaration.Name}' is an Objective-C class in both " +
                         $"'{found[0].ModuleName}' and '{found[1].ModuleName}', which this file " +
                         "imports, so there is no telling which this adds to");
@@ -586,7 +586,7 @@ public sealed partial class Binder
             (existing is ClassTypeSymbol { ObjC: ObjCClassKind.Imported }) !=
                 declaration.Modifiers.HasFlag(Modifiers.Extern))
         {
-            diagnostics.Report(Codes.TypeRedeclarationUnresolved, declaration.Span,
+            diagnostics.Report(Codes.TypeRedeclaredAsOtherKind, declaration.Span,
                 $"'{declaration.Name}' is already declared in this module as a " +
                 $"{Described(existing)}, so this declaration cannot add to it. A type may be " +
                 "declared more than once inside its own module, but every declaration must " +
@@ -624,7 +624,7 @@ public sealed partial class Binder
         }
 
         if (declaration.IsOpaque)
-            diagnostics.Report(Codes.OnlyFirstDeclarationMay, declaration.Span,
+            diagnostics.Report(Codes.TypeRedeclaredWithoutBody, declaration.Span,
                 $"'{declaration.Name}' is already declared in this module, so this declaration " +
                 "has nothing to say by having no body");
 

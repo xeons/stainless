@@ -49,4 +49,7 @@ public struct Shape // SL0550
     public int Wrong() => 0;
 }
 
+// Not fine: a type with a body already is not made opaque by one without.
+public struct Point; // SL0644
+
 int Main() => 0;

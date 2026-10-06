@@ -406,7 +406,7 @@ public sealed partial class Binder
 
         if (containingType is null)
         {
-            diagnostics.Report(Codes.OperatorDeclaredOutsideType, declaration.Span,
+            diagnostics.Report(Codes.OperatorAtModuleLevel, declaration.Span,
                 $"operator '{written}' has to be declared inside the type it is for; a " +
                 "module-level one would let a program give somebody else's type a meaning " +
                 "from a distance");
@@ -421,7 +421,7 @@ public sealed partial class Binder
             !declaration.Modifiers.HasFlag(Modifiers.Abstract) &&
             !declaration.Modifiers.HasFlag(Modifiers.Virtual))
         {
-            diagnostics.Report(Codes.OperatorDeclaredOutsideType, declaration.Span,
+            diagnostics.Report(Codes.InterfaceOperatorNotStaticAbstract, declaration.Span,
                 $"'{containingType.Name}' is an interface, and an operator is chosen from the " +
                 "operand types where it is written; write it 'static abstract' to require it " +
                 "of every implementing type, or 'static virtual' to give them one",
@@ -490,20 +490,20 @@ public sealed partial class Binder
     {
         if (containingType is null)
         {
-            diagnostics.Report(Codes.InvalidConversionDeclaration, declaration.Span,
+            diagnostics.Report(Codes.ConversionNotOnItsType, declaration.Span,
                 "a conversion belongs to one of the two types it converts between; a " +
                 "module-level one would give somebody else's types a meaning from a distance");
             return;
         }
 
         if (!symbol.IsPublic)
-            diagnostics.Report(Codes.InvalidConversionDeclaration, declaration.Span,
+            diagnostics.Report(Codes.ConversionNotPublic, declaration.Span,
                 "a conversion must be 'public'; one only its own module could use is a " +
                 "function with an unusual spelling");
 
         if (symbol.Parameters.Count != 1)
         {
-            diagnostics.Report(Codes.InvalidConversionDeclaration, declaration.Span,
+            diagnostics.Report(Codes.ConversionParameterCount, declaration.Span,
                 "a conversion takes exactly the value it converts, and this declares " +
                 $"{symbol.Parameters.Count}");
             return;
@@ -544,7 +544,7 @@ public sealed partial class Binder
 
                 if (from.Equals(to))
                 {
-                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
+                    diagnostics.Report(Codes.ConversionToItself, conversion.Span,
                         $"this converts '{from.Name}' to itself, which is what it already is",
                         from);
                     continue;
@@ -555,7 +555,7 @@ public sealed partial class Binder
                 // look for what it means.
                 if (!Mentions(from, type) && !Mentions(to, type))
                 {
-                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
+                    diagnostics.Report(Codes.ConversionNotOnItsType, conversion.Span,
                         $"this converts '{from.Name}' to '{to.Name}', and neither is " +
                         $"'{type.Name}'; a conversion belongs to one of the two types it is " +
                         "between, so that the two types are where a reader looks for it",
@@ -569,7 +569,7 @@ public sealed partial class Binder
                 if (from is InterfaceTypeSymbol or ComInterfaceTypeSymbol ||
                     to is InterfaceTypeSymbol or ComInterfaceTypeSymbol)
                 {
-                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
+                    diagnostics.Report(Codes.ConversionInvolvesInterface, conversion.Span,
                         "a conversion may not be to or from an interface: a cast to one asks " +
                         "the object what it is, and a conversion would make a different " +
                         "object instead");
@@ -584,7 +584,7 @@ public sealed partial class Binder
                 if (ClassifyConversion(
                         from, to, explicitCast: !conversion.IsImplicitConversion) is not null)
                 {
-                    diagnostics.Report(Codes.InvalidConversionDeclaration, conversion.Span,
+                    diagnostics.Report(Codes.DuplicateConversion, conversion.Span,
                         $"'{from.Name}' already converts to '{to.Name}'" +
                         (conversion.IsImplicitConversion ? "" : " with a cast") +
                         "; a second answer to the same question is one the reader would have " +
@@ -908,9 +908,8 @@ public sealed partial class Binder
         for (int i = 1; i < written.Count; i++)
             if (!written[i].IsOptional && !written[i].IsParams && written[i - 1].IsOptional)
             {
-                diagnostics.Report(Codes.MisplacedParameterDefault,
+                diagnostics.Report(Codes.RequiredParameterAfterOptional,
                     written[i].DeclaredSpan ?? symbol.Span,
-                    
                     $"'{written[i].Name}' has no default and '{written[i - 1].Name}' before it " +
                     "has one; the ones that may be left out go at the end, so that what a call " +
                     "leaves off is the tail of the list and not a hole in the middle");
@@ -933,7 +932,7 @@ public sealed partial class Binder
 
         if (parameter.Mode != ParameterMode.Value)
         {
-            diagnostics.Report(Codes.InvalidParameterDefault, parameter.Default.Span,
+            diagnostics.Report(Codes.ParameterDefaultNotAllowed, parameter.Default.Span,
                 $"'{parameter.Name}' is '{Spelled(parameter.Mode)}', which passes the caller's " +
                 "storage rather than a value, and a default has no storage to be; make it an " +
                 "ordinary parameter, or write an overload that supplies one");
@@ -942,7 +941,7 @@ public sealed partial class Binder
 
         if (symbol.IsVariadic)
         {
-            diagnostics.Report(Codes.InvalidParameterDefault, parameter.Default.Span,
+            diagnostics.Report(Codes.ParameterDefaultNotAllowed, parameter.Default.Span,
                 $"'{symbol.Name}' is variadic, so what a call leaves off is already open-ended; " +
                 "a default here would make two rules for the same tail");
             return null;
@@ -1050,7 +1049,7 @@ public sealed partial class Binder
 
             if (function.IsOverride)
             {
-                diagnostics.Report(Codes.MisplacedParameterDefault, written.Span,
+                diagnostics.Report(Codes.ParameterDefaultRestated, written.Span,
                     $"'{function.Name}' is an override, so it cannot give '{parameter.Name}' a " +
                     "default: a call fills one in from the declaration it can see, which is the " +
                     "one the static type gives it, and a second value here would mean the same " +
@@ -1081,7 +1080,7 @@ public sealed partial class Binder
                     if (!required.Parameters.Any(p => p.Name == parameter.Name && p.IsOptional))
                         continue;
 
-                    diagnostics.Report(Codes.MisplacedParameterDefault, written.Span,
+                    diagnostics.Report(Codes.ParameterDefaultRestated, written.Span,
                         $"'{contract.Name}.{required.Name}' already gives '{parameter.Name}' a " +
                         "default, and a call fills one in from the declaration it can see; two " +
                         "of them would mean a call through the interface and a call through " +
@@ -1121,7 +1120,7 @@ public sealed partial class Binder
 
         if (!IsConstantDefault(bound))
         {
-            diagnostics.Report(Codes.InvalidParameterDefault, written.Span,
+            diagnostics.Report(Codes.ParameterDefaultNotConstant, written.Span,
                 $"the default for '{parameter.Name}' is not a constant, and a default is " +
                 "written into every call that leaves it out -- so a call would be running this " +
                 "rather than passing it. A literal, 'null', a 'const', an enum member or " +

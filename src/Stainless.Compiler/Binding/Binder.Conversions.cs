@@ -41,7 +41,7 @@ public sealed partial class Binder
             !structType.AllInterfaces().Contains(contract))
             return false;
 
-        diagnostics.Report(Codes.StructCannotBeInterface, span,
+        diagnostics.Report(Codes.StructConvertedToInterface, span,
             $"'{structType.Name}' implements '{contract.Name}' and still cannot be one: an " +
             "interface reference is a counted pointer, and a struct is a plain C value. A " +
             $"generic parameter 'T' with 'where T : {contract.Name}' takes it, with no copy",
@@ -344,7 +344,7 @@ public sealed partial class Binder
                 return new BoundErrorExpression(span);
             }
 
-            diagnostics.Report(Codes.FunctionTargetNotDelegate, span,
+            diagnostics.Report(Codes.FunctionConvertedToNonDelegate, span,
                 $"'{group.Name}' is a function; it converts to a delegate type, " +
                 $"and '{target.Name}' is not one",
                 target);
@@ -353,7 +353,7 @@ public sealed partial class Binder
 
         if (group.Receiver is not null)
         {
-            diagnostics.Report(Codes.FunctionTargetNotDelegate, span,
+            diagnostics.Report(Codes.CapturingFunctionToDelegate, span,
                 $"'{group.Name}' is a method, so it carries the object it was reached " +
                 $"through, and '{wanted.Name}' is a delegate -- one pointer, with nowhere " +
                 "to keep it. Declare the type 'closure' instead of 'delegate'",

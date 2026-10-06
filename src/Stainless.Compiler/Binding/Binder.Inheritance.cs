@@ -97,7 +97,7 @@ public sealed partial class Binder
         if (type is VariantTypeSymbol or UnionTypeSymbol && listed.Implements.Count > 0)
         {
             string kind = type is VariantTypeSymbol ? "variant" : "union";
-            diagnostics.Report(Codes.StructCannotBeInterface, declaration.Span,
+            diagnostics.Report(Codes.ValueTypeImplementsInterface, declaration.Span,
                 $"{kind} '{type.Name}' cannot implement an interface; an interface " +
                 "reference is a counted pointer, and a " + kind + " is a plain C value",
                 type);
@@ -354,7 +354,6 @@ public sealed partial class Binder
         {
             diagnostics.Report(Codes.ComClassWithoutComInterface,
                 classType.Span ?? declaration.Span,
-                
                 $"'{classType.Name}' is a com class and presents no com interface, so nothing " +
                 "outside could ever hold one. List at least one after ':'",
                 classType);
@@ -631,9 +630,8 @@ public sealed partial class Binder
         // the missing constructor goes.
         if (classType.Constructors.Count == 0 &&
             !TryImplicitBaseConstructor(classType, out _))
-            diagnostics.Report(Codes.BaseConstructorCallMismatch,
+            diagnostics.Report(Codes.BaseConstructorCallRequired,
                 classType.Span ?? declaration.Span,
-                
                 $"'{classType.Name}' declares no constructor and every constructor of " +
                 $"'{NearestConstructing(classType)!.Name}' takes arguments, so nothing could " +
                 $"ever build one; give '{classType.Name}' a constructor whose first statement " +
@@ -649,7 +647,6 @@ public sealed partial class Binder
                      .Where(m => m.IsAbstract && m.ContainingType != classType))
             diagnostics.Report(Codes.AbstractMemberNotImplemented,
                 classType.Span ?? declaration.Span,
-                
                 $"'{classType.Name}' does not implement abstract " +
                 $"'{missing.ContainingType!.Name}.{Describe(missing)}'; add 'public override " +
                 $"{missing.ReturnType.Name} {missing.Name}(" +
@@ -949,7 +946,6 @@ public sealed partial class Binder
             {
                 diagnostics.Report(Codes.GuidClassNotFactoryConstructible,
                     classType.Span ?? entry.Declaration.Span,
-                    
                     $"'{classType.Name}' has a '[Guid]', so a class factory can be asked to make " +
                     "one, and a class factory has no arguments to pass. Give it a constructor " +
                     "taking none, or drop the '[Guid]' and hand the object out instead",
@@ -963,7 +959,6 @@ public sealed partial class Binder
 
             diagnostics.Report(Codes.GuidClassNotFactoryConstructible,
                 classType.Span ?? entry.Declaration.Span,
-                
                 $"'{classType.Name}' has a '[Guid]', so a class factory can be asked to make " +
                 "one, and a class factory has nothing to give its required " +
                 $"{(required.Count == 1 ? "member" : "members")} " +
@@ -1039,7 +1034,7 @@ public sealed partial class Binder
         }
 
         if (guids.Count > 1)
-            diagnostics.Report(Codes.DuplicateGuidAttribute, guids[1].Span,
+            diagnostics.Report(Codes.AttributeRepeated, guids[1].Span,
                 $"'{type.Name}' has more than one '[Guid]', and an interface has one identity",
                 type);
 
@@ -1103,7 +1098,7 @@ public sealed partial class Binder
             if (attributeType == _builtins.Embed)
             {
                 if (embed is null)
-                    diagnostics.Report(Codes.InvalidEmbedPlacement, attribute.Span,
+                    diagnostics.Report(Codes.AttributeNotAllowedHere, attribute.Span,
                         "'[Embed]' says where a static's bytes come from, and " +
                         $"'{owner}' is not a static; write it on a " +
                         "'static readonly byte[]' with no initializer");
@@ -1579,7 +1574,7 @@ public sealed partial class Binder
 
         if (why is null) field.IsPacked = true;
         else
-            diagnostics.Report(Codes.PackedAttributeInvalid, span,
+            diagnostics.Report(Codes.PackedFieldInvalid, span,
                 $"'[Packed]' on '{type.Name}.{field.Name}' lays the field out with no padding before " +
                 $"it, and {why}",
                 type);
@@ -1595,7 +1590,7 @@ public sealed partial class Binder
         {
             if (type is StructTypeSymbol and not VariantTypeSymbol) type.IsPacked = true;
             else
-                diagnostics.Report(Codes.PackedAttributeInvalid, span,
+                diagnostics.Report(Codes.AttributeNotAllowedHere, span,
                     $"'[Packed]' lays out a struct with no padding, and '{type.Name}' is " +
                     (type is VariantTypeSymbol
                         ? "a variant, whose payload area is not a field the source arranged"
@@ -1652,17 +1647,36 @@ public sealed partial class Binder
             ? Convert.ToInt32(value, System.Globalization.CultureInfo.InvariantCulture)
             : 0;
 
-        string? why =
-            type is not StructTypeSymbol || type is VariantTypeSymbol ? $"'{type.Name}' is not a struct or a union"
-            : type.IsPacked ? $"'{type.Name}' is '[Packed]', which is '[Pack(1)]' already"
-            : bytes <= 0 || (bytes & (bytes - 1)) != 0 ? $"{bytes} is not an alignment; it must be a power of two"
-            : bytes > maxAlignment ? $"{bytes} is more than the {maxAlignment} bytes any alignment here may be"
-            : null;
-
-        if (why is not null)
+        if (type is not StructTypeSymbol || type is VariantTypeSymbol)
         {
-            diagnostics.Report(Codes.PackAttributeInvalid, span,
-                $"'[Pack({bytes})]' cannot be written here: {why}", type);
+            diagnostics.Report(Codes.AttributeNotAllowedHere, span,
+                $"'[Pack({bytes})]' cannot be written here: '{type.Name}' is not a struct or a union",
+                type);
+            return;
+        }
+
+        if (type.IsPacked)
+        {
+            diagnostics.Report(Codes.PackOnPackedType, span,
+                $"'[Pack({bytes})]' cannot be written here: '{type.Name}' is '[Packed]', which is " +
+                "'[Pack(1)]' already",
+                type);
+            return;
+        }
+
+        if (bytes <= 0 || (bytes & (bytes - 1)) != 0)
+        {
+            diagnostics.Report(Codes.AlignmentNotPowerOfTwo, span,
+                $"'[Pack({bytes})]' cannot be written here: {bytes} is not an alignment; it must " +
+                "be a power of two");
+            return;
+        }
+
+        if (bytes > maxAlignment)
+        {
+            diagnostics.Report(Codes.AlignmentTooLarge, span,
+                $"'[Pack({bytes})]' cannot be written here: {bytes} is more than the " +
+                $"{maxAlignment} bytes any alignment here may be");
             return;
         }
 

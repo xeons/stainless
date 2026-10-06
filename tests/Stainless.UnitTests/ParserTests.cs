@@ -693,18 +693,26 @@ public class ParserTests
     }
 
     [Theory]
+    [InlineData("internal internal int X;")]
+    [InlineData("static static int X;")]
+    [InlineData("public public int X;")]
+    public void AModifierIsWrittenOnce(string member)
+    {
+        Front.Parse("module A;\nclass C { " + member + " }", out var diagnostics);
+        Assert.Equal(["SL0109"], Front.Codes(diagnostics));
+    }
+
+    /// <summary>Two visibilities contradict each other, as any two modifiers can.</summary>
+    [Theory]
     [InlineData("public internal int X;")]
     [InlineData("private internal int X;")]
     [InlineData("public private int X;")]
     [InlineData("public protected int X;")]
     [InlineData("private protected int X;")]
-    [InlineData("internal internal int X;")]
-    [InlineData("static static int X;")]
-    [InlineData("public public int X;")]
-    public void AModifierIsWrittenOnceAndAVisibilityOnce(string member)
+    public void AVisibilityIsWrittenOnce(string member)
     {
         Front.Parse("module A;\nclass C { " + member + " }", out var diagnostics);
-        Assert.Equal(["SL0109"], Front.Codes(diagnostics));
+        Assert.Equal(["SL0507"], Front.Codes(diagnostics));
     }
 
     [Fact]

@@ -97,6 +97,14 @@ public class Misplaced
     }
 }
 
+/// Nothing above it declares a constructor, so there is none to chain to.
+public class Bare { }
+
+public class OnBare : Bare
+{
+    OnBare() => base();                               // SL0642
+}
+
 int Main()
 {
     // An abstract class exists to be derived from; there is no such object.

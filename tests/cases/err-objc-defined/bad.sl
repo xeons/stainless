@@ -39,6 +39,25 @@ public objc class Overrides : NSObject
     public long Second() => 2;
 }
 
+// An override answers the selector it overrides, not one of its own.
+public objc class Renamed : NSObject
+{
+    [Selector("myHash")]
+    public override nuint Hash => 4;
+}
+
+// A root that answers no init.
+[ObjCRoot]
+public extern objc class Uninitialized
+{
+    [Selector("alloc")]
+    public static Self Alloc();
+}
+
+public objc class OnUninitialized : Uninitialized
+{
+}
+
 // A required protocol member nobody answers.
 public objc class Unanswered : NSObject, Named
 {
@@ -73,5 +92,8 @@ int Main()
 {
     // 'typeof' on an Objective-C class.
     var described = typeof(Unset);
+
+    // Nothing it is built on declares 'init'.
+    var made = new OnUninitialized();
     return 0;
 }

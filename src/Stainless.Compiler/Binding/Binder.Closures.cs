@@ -292,7 +292,7 @@ public sealed partial class Binder
 
         if (closure.Type is null)
         {
-            diagnostics.Report(Codes.CapturingLambdaToDelegate, span,
+            diagnostics.Report(Codes.CapturingFunctionToDelegate, span,
                 $"this lambda reads '{name}' from around it, so it cannot become a delegate; " +
                 "a delegate is a bare function pointer with nowhere to keep what was " +
                 "captured. Convert it to a single-method interface instead");
@@ -440,7 +440,7 @@ public sealed partial class Binder
 
         if (closure.Type is null)
         {
-            diagnostics.Report(Codes.CapturingLambdaToDelegate, span,
+            diagnostics.Report(Codes.CapturingFunctionToDelegate, span,
                 "this lambda reads 'this' from around it, so it cannot become a delegate; " +
                 "a delegate is a bare function pointer with nowhere to keep what was " +
                 "captured. Convert it to a single-method interface instead");
@@ -528,7 +528,7 @@ public sealed partial class Binder
 
         if (target is DelegateTypeSymbol && lambda.LocalFunction is { } named)
         {
-            diagnostics.Report(Codes.CapturingLambdaToDelegate, span,
+            diagnostics.Report(Codes.CapturingFunctionToDelegate, span,
                 $"'{named}' reads variables of the function around it, or its object, so it " +
                 "cannot become a delegate; a delegate is a bare function pointer with nowhere " +
                 "to keep them. Convert it to a closure instead");
@@ -841,7 +841,7 @@ public sealed partial class Binder
         if (bound.Type.IsError()) return null;
         if (constant) return bound;
 
-        diagnostics.Report(Codes.InvalidParameterDefault, written.Span,
+        diagnostics.Report(Codes.ParameterDefaultNotConstant, written.Span,
             $"the default for '{parameter.Name}' is not a constant, and a default is written " +
             "into every call that leaves it out. A literal, 'null', a 'const', an enum member " +
             "or 'default(T)' is what it may be");
@@ -1445,7 +1445,7 @@ public sealed partial class Binder
                     continue;
                 }
 
-                diagnostics.Report(Codes.CaseLabelNotConstant, label.Span,
+                diagnostics.Report(Codes.MemberNotFound, label.Span,
                     $"a 'case' label in a switch over '{variant.Name}' names one of its cases; " +
                     "they are " + Listed(variant.Cases.Select(c => c.Name)),
                     variant);

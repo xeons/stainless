@@ -374,7 +374,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void AWeakReferenceIsNeverNarrowed() =>
-        Assert.Equal(["SL0248"],
+        Assert.Equal(["SL0638"],
                      Narrowing("weak C? c = null; if (c != null) { int n = c.V; }"));
 
     // ------------------------------------------------------- declarations
@@ -460,8 +460,8 @@ public class BinderTests
     [InlineData("bool r = a is IB;", "SL0518")]
     [InlineData("bool r = c is IA;", "SL0518")]
     [InlineData("bool r = a is IC;", "SL0518")]
-    [InlineData("int r = a switch { IB => 1, _ => 0 };", "SL0619")]
-    [InlineData("int r = c switch { IA => 1, _ => 0 };", "SL0619")]
+    [InlineData("int r = a switch { IB => 1, _ => 0 };", "SL0518")]
+    [InlineData("int r = c switch { IA => 1, _ => 0 };", "SL0518")]
     [InlineData("var r = (IB)a;", "SL0243")]
     [InlineData("var r = a as IB;", "SL0612")]
     public void ANoUnknownInterfaceCannotBeAskedWhatItIs(string statement, string code) =>
@@ -626,7 +626,7 @@ public class BinderTests
         bool addsToTheFirst = first == second && parts.Contains(first);
         bool anotherArity = first.StartsWith("generic") != second.StartsWith("generic");
 
-        string[] reported = ["SL0201", "SL0550", "SL0551", "SL0551"];
+        string[] reported = ["SL0201", "SL0550", "SL0551", "SL0644"];
 
         foreach (var codes in new[]
                  {
@@ -1205,7 +1205,7 @@ public class BinderTests
     [InlineData("void F() { goto default; }", "SL0802")]
     [InlineData("void F(int n) { switch (n) { case 1: goto case 2; } }", "SL0803")]
     [InlineData("void F(int n) { switch (n) { case 1: goto default; } }", "SL0803")]
-    [InlineData("void F(int n) { switch (n) { case 1: goto case n; } }", "SL0803")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto case n; } }", "SL0840")]
     [InlineData("void F(int n) { switch (n) { case 1: Func<int, int> f = x => { goto case 1; }; break; } }", "SL0802")]
     public void GotoCaseNamesASectionOfTheSwitchItIsIn(string module, string code) =>
         Assert.Equal([code], Front.ModuleCodes(module));

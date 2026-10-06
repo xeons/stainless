@@ -284,10 +284,10 @@ public class EmbedTests
     /// Where <c>[Embed]</c> may not go, each named by what it was written on.
     /// </summary>
     [Theory]
-    [InlineData("""public class Held { [Embed("stub.bin")] public byte[] Bytes; }""", "SL0729")]
-    [InlineData("""[Embed("stub.bin")] public class Held { }""", "SL0729")]
+    [InlineData("""public class Held { [Embed("stub.bin")] public byte[] Bytes; }""", "SL0728")]
+    [InlineData("""[Embed("stub.bin")] public class Held { }""", "SL0728")]
     [InlineData("""public class Held { [Embed("stub.bin")] public byte[] B { get; set; } }""",
-                "SL0729")]
+                "SL0728")]
     [InlineData("""[Embed("stub.bin")] public void F() { }""", "SL0728")]
     [InlineData("""[Embed("stub.bin")] using Bytes = byte[];""", "SL0728")]
     [InlineData("""[Embed("stub.bin")] const int Size = 1;""", "SL0728")]
@@ -315,7 +315,7 @@ public class EmbedTests
 
     [Fact]
     public void OneStaticCarriesOneFile() =>
-        Assert.Equal(["SL0729"], new Scratch().Codes(
+        Assert.Equal(["SL0539"], new Scratch().Codes(
             """[Embed("stub.bin"), Embed("data/table.bin")] static readonly byte[] S;"""));
 
     [Fact]

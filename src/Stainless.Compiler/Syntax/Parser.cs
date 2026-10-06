@@ -820,14 +820,14 @@ public sealed class Parser
 
             if ((modifiers & modifier) != Modifiers.None)
             {
-                _diagnostics.Report(Codes.ModifierRepeatedOrConflicting, written.Span,
+                _diagnostics.Report(Codes.DuplicateModifier, written.Span,
                     $"'{written.Text}' is already written on this declaration; say it once");
                 continue;
             }
 
             if (VisibilityConflict(modifiers, modifier) is { } conflict)
             {
-                _diagnostics.Report(Codes.ModifierRepeatedOrConflicting, written.Span, conflict);
+                _diagnostics.Report(Codes.ModifiersConflict, written.Span, conflict);
                 continue;
             }
 
@@ -1189,7 +1189,7 @@ public sealed class Parser
 
             if (kind is not (TypeDeclKind.Class or TypeDeclKind.Struct))
             {
-                _diagnostics.Report(Codes.InvalidPrimaryConstructorSyntax, SpanFrom(at),
+                _diagnostics.Report(Codes.PrimaryConstructorOnWrongKind, SpanFrom(at),
                     $"'{name}' is not a class or a struct, so it has no constructor for a " +
                     "parameter list after its name to be");
                 primary = null;
@@ -1226,7 +1226,7 @@ public sealed class Parser
                 }
                 else
                 {
-                    _diagnostics.Report(Codes.InvalidPrimaryConstructorSyntax, SpanFrom(at),
+                    _diagnostics.Report(Codes.BaseArgumentsMisplaced, SpanFrom(at),
                         "arguments after a base type are the primary constructor's call to the " +
                         "base's constructor, so they go on the first type in the list, of a " +
                         "class declared with a parameter list after its name");
@@ -1355,7 +1355,7 @@ public sealed class Parser
         Expect(TokenKind.CloseBrace);
 
         if (constraints.Count > 0 && typeParameters.Count == 0)
-            _diagnostics.Report(Codes.WhereClauseNotAllowed, SpanFrom(start),
+            _diagnostics.Report(Codes.WhereOnNonGeneric, SpanFrom(start),
                 $"'{name}' is not generic, so it cannot have a 'where' clause");
 
         if (primary is not null)
@@ -1840,7 +1840,7 @@ public sealed class Parser
         var body = At(TokenKind.OpenBrace) ? ParseBlock() : ParseArrowBodyOrNull(isGetter: true);
 
         if (variadic)
-            _diagnostics.Report(Codes.InvalidConversionDeclaration, SpanFrom(start),
+            _diagnostics.Report(Codes.ConversionParameterCount, SpanFrom(start),
                 "a conversion takes exactly the value it converts, so it cannot be variadic");
 
         if (body is null)
@@ -2043,7 +2043,7 @@ public sealed class Parser
             // it exists only for the arguments that meet them.
             if (constraints.Count > 0 && typeParameters.Count == 0 &&
                 !(_typeIsGeneric.TryPeek(out bool inGeneric) && inGeneric))
-                _diagnostics.Report(Codes.WhereClauseNotAllowed, SpanFrom(start),
+                _diagnostics.Report(Codes.WhereOnNonGeneric, SpanFrom(start),
                     $"'{name}' is not generic, so it cannot have a 'where' clause");
 
             if (linkage.IsImport() && body is not null)
@@ -4729,7 +4729,6 @@ public sealed class Parser
             {
                 _diagnostics.Report(Codes.InterpolationConditionalNotParenthesized,
                     segment.Tokens![0].Span,
-                    
                     "a ':' in an interpolation starts its format, so a conditional here is " +
                     "cut in two; put it in parentheses, as in '{(a ? b : c)}'");
                 continue;

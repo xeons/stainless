@@ -199,7 +199,7 @@ public sealed partial class Binder
 
         if (!TryImplicitBaseConstructor(classType, out var chained))
         {
-            diagnostics.Report(Codes.BaseConstructorCallMismatch, constructor.Span,
+            diagnostics.Report(Codes.BaseConstructorCallRequired, constructor.Span,
                 $"'{NearestConstructing(classType)!.Name}' has no constructor that takes no " +
                 $"arguments, so '{classType.Name}' has to say which one to run: write " +
                 "'base(...)' in its constructor, after the statements that give its fields " +
@@ -341,7 +341,7 @@ public sealed partial class Binder
         // to run, and what is above it still has to be built.
         if (NearestConstructing(classType) is not { } ancestor)
         {
-            diagnostics.Report(Codes.BaseConstructorCallMismatch, syntax.Span,
+            diagnostics.Report(Codes.BaseConstructorCallUnneeded, syntax.Span,
                 $"nothing '{classType.Name}' derives from declares a constructor, so there is " +
                 "none to call; remove the 'base(...)'",
                 classType);

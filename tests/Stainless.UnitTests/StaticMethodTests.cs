@@ -134,10 +134,10 @@ public class StaticMethodTests
     /// right, because the fix is a spelling and the reader may not know it.
     /// </summary>
     [Theory]
-    [InlineData("var b = Box.Make(); var c = b.Make();")]
-    [InlineData("int n = Box.Read();")]
-    public void TheWrongReceiverIsRefused(string body) =>
-        Assert.Contains("SL0576", With(body));
+    [InlineData("var b = Box.Make(); var c = b.Make();", "SL0646")]
+    [InlineData("int n = Box.Read();", "SL0576")]
+    public void TheWrongReceiverIsRefused(string body, string code) =>
+        Assert.Contains(code, With(body));
 
     /// <summary>
     /// Dispatch chooses a body from the object a call arrives on. A static
@@ -220,7 +220,7 @@ public class StaticMethodTests
     [InlineData("public int Read() { return 1; }")]
     [InlineData("public int Value { get { return 1; } }")]
     public void AStaticClassRefusesAnInstanceMember(string member) =>
-        Assert.Contains("SL0583", Front.ModuleCodes(
+        Assert.Contains("SL0640", Front.ModuleCodes(
             "public static class C { " + member + " }\nint Main() { return 0; }"));
 
     [Fact]

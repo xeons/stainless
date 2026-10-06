@@ -560,8 +560,8 @@ one explicitly; the default is the host's, and it reaches C++ names, bit-fields
 and how a struct is passed — Win64 asks only how big one is, System V asks what
 is in it. See [§3.4 of abi.md](../abi.md#34-how-a-struct-is-passed).
 
-**A bit-field has no address** (SL0443), for the reason C refuses `&s.flags`.
-It cannot be passed by `ref` and cannot be pointed at.
+**A bit-field has no address** (SL0230), for the reason C refuses `&s.flags`.
+It cannot be passed by `ref` (SL0443) and cannot be pointed at.
 
 Reading one is a load of the storage unit, a shift and a mask; writing one is a
 read, a splice and a write, so the neighbours sharing the unit are untouched.
@@ -638,7 +638,7 @@ it delegates to already did, and running them twice would undo whatever that
 constructor decided. The base class's initializers are not here either: the
 base's own constructor runs them, after this class's.
 
-**An initializer cannot read the object** (SL0617) — not `this`, not another
+**An initializer cannot read the object** (SL0633) — not `this`, not another
 field, not a method. It runs before the constructor's body and in declaration
 order, so what it would read is whatever the allocation left, which is zero.
 A constructor is where one field's value may depend on another. Everything else
@@ -1063,13 +1063,13 @@ gets no test at all: `square as Shape` is the ordinary widening and emits
 nothing.
 
 What it refuses is what could never be anything but null, since `as` is for a
-question with two answers and these have one (all SL0612):
+question with two answers and these have one (SL0625, SL0647):
 
 ```
-error[SL0612]: no object is both a 'Alpha' and a 'Beta': neither derives from
+error[SL0625]: no object is both a 'Alpha' and a 'Beta': neither derives from
 the other, so this would always be null
 
-error[SL0612]: 'as' answers with an optional already, so the '?' says it twice;
+error[SL0647]: 'as' answers with an optional already, so the '?' says it twice;
 write 'as Alpha'
 ```
 
@@ -1126,7 +1126,7 @@ the one that gives the parameters and the fields kept from them their values
 (SL0785). Only the primary constructor runs the initializers, so a struct with
 one may have them too: every `new` of it runs one. `: Shape("circle")` after the
 name is the primary constructor's `base(...)`, and goes on the first entry of the
-list (SL0786); a record passes its parameters on the same way.
+list (SL0839); a record passes its parameters on the same way.
 
 **On a struct, kept fields are part of the value.** They come after every field
 the struct declares, in the order of the parameter list, which is where C would
@@ -1657,7 +1657,7 @@ public struct Tagged
 
 A union has no constructor (SL0207) and no destructor, and it implements no
 interface, because an interface reference is a counted pointer and a union is a
-plain C value (SL0302). Which member is live is exactly what a union does not
+plain C value (SL0314). Which member is live is exactly what a union does not
 record, so there is nothing for a constructor to have established. `[Packed]` and `[Align]` apply to one as
 they do to a struct. A generated C header writes it as a C `union`, member for
 member.
@@ -2381,7 +2381,7 @@ error[SL0546]: 'Sealed' has no 'Add' taking one element, so there is nothing
 for an array literal's elements to be added with
 ```
 
-A spread whose elements do not convert to the element type is SL0778 as well,
+A spread whose elements do not convert to the element type is SL0837,
 and an inline array spread of the wrong length is SL0547.
 
 ## 2.12 `Span<T>` and `ReadOnlySpan<T>` — part of an array
@@ -2797,7 +2797,7 @@ return type, as it is off a lambda's body
 
 **What it is not**
 
-- **Not a C function pointer** (SL0360). Sixteen bytes cannot go where eight
+- **Not a C function pointer** (SL0381). Sixteen bytes cannot go where eight
   are expected, so a closure never satisfies a `delegate` and never crosses
   `extern "C"`. Declare a `delegate` for that, and take the context as an
   argument the way C does.
@@ -3524,7 +3524,7 @@ new vfloat4()                   // zero
 ```
 
 A lane is converted as an argument would be, and the count has to come out
-right (SL0929).
+right (SL0944).
 
 **A lane is storage.** `v.x`, `v.y`, `v.z` and `v.w` name the first four,
 `v[i]` names any one -- checked against the count, at compile time for a
@@ -3571,8 +3571,9 @@ mask `Select` takes. A lane given where a vector is wanted fills it, so
 `v.Sum`, `v.LengthSquared`, and `v.Length` for float lanes. `vfloat4.Zero` and
 `vfloat4.One` are what they say. Each is an LLVM intrinsic or a few vector
 instructions; `Dot` and `Sum` add the lanes in order, as a loop would, so a
-float answer is the same on every target. A function that does not exist, or
-is not for these lanes, or is given the wrong count is SL0934.
+float answer is the same on every target. A function that does not exist
+(SL0247), or is not for these lanes (SL0934), or is given the wrong count
+(SL0260) is refused.
 
 **A cast converts each lane**, as each lane alone would convert -- saturating
 from float to integer, wrapping from wider integer to narrower -- between

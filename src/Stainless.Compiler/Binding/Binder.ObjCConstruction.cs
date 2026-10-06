@@ -54,7 +54,7 @@ public sealed partial class Binder
 
         if (selector is not null && FamilyOf(selector) != "init")
         {
-            diagnostics.Report(Codes.ObjCInitializerInvalid, span,
+            diagnostics.Report(Codes.ObjCConstructorSelectorNotInit, span,
                 $"a constructor of '{type.Name}' is answered as an init message, and " +
                 $"'{selector}' is not one: its selector MUST begin with 'init', as " +
                 "'initWithFrame:' does",
@@ -145,7 +145,7 @@ public sealed partial class Binder
         var candidates = ObjCBaseInitializers(classType, out var owner);
         if (candidates.Count == 0)
         {
-            diagnostics.Report(Codes.ObjCInitializerInvalid, syntax.Span,
+            diagnostics.Report(Codes.ObjCInitNotDeclared, syntax.Span,
                 $"nothing '{classType.Name}' is built on declares an init message to run; " +
                 $"declare '[Selector(\"init\")] public Self Init();' on " +
                 $"'{owner?.Name ?? classType.Name}'",
@@ -171,7 +171,7 @@ public sealed partial class Binder
     {
         if (ObjCImplicitBaseInitializer(classType, out var owner) is not { } chained)
         {
-            diagnostics.Report(Codes.ObjCInitializerInvalid, constructor.Span,
+            diagnostics.Report(Codes.BaseConstructorCallRequired, constructor.Span,
                 $"'{owner?.Name ?? classType.Name}' has no initializer that takes no arguments, " +
                 $"so '{classType.Name}' has to say which one to run: write 'base(...)' as the " +
                 "first statement of its constructor",
@@ -199,7 +199,7 @@ public sealed partial class Binder
             .FirstOrDefault(m => m is { Selector: "init", IsStatic: false });
         if (init is not null) return init;
 
-        diagnostics.Report(Codes.ObjCInitializerInvalid, span,
+        diagnostics.Report(Codes.ObjCInitNotDeclared, span,
             $"'new {classType.Name}()' sends 'init', and nothing '{classType.Name}' is built on " +
             "declares it; declare '[Selector(\"init\")] public Self Init();' on its root class",
             classType);
@@ -240,7 +240,7 @@ public sealed partial class Binder
             string selector = member.Selector ?? member.InitSelector!;
             if (answered.TryAdd(selector, member)) continue;
 
-            diagnostics.Report(Codes.ObjCOverrideInvalid, member.Span,
+            diagnostics.Report(Codes.ObjCSelectorAnsweredTwice, member.Span,
                 $"'{defined.Name}' answers '{selector}' twice; a class answers each message " +
                 "with one method",
                 defined);

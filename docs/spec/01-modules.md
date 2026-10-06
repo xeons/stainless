@@ -132,7 +132,7 @@ accepted wherever the others are and also means the module, because there is
 no narrower unit for it to name; on a setter it is the usual way to narrow one
 ([§7](07-functions-members.md)).
 
-A declaration has one visibility, and each modifier is written once (SL0109).
+A declaration has one visibility (SL0507), and each modifier is written once (SL0109).
 `public internal` and `public protected` contradict themselves, `private
 internal` names one visibility twice, and `static static` says nothing twice. The one pair that combines
 is `protected internal`, which is C#'s union of the two — its module, or a
@@ -300,7 +300,7 @@ itself with `None` for success, as most of `Standard.File` does. The error
 type's own name may be written in front of the case or left off.
 
 **A `@failure` that names no case of that type is SL0744**, and a tag on a
-declaration that reports no failure at all is the same code. What is *not*
+declaration that reports no failure at all is SL0833. What is *not*
 checked is whether the case can actually occur: the compiler knows the name
 exists and no more, so the claim is still the author's.
 

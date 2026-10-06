@@ -10,3 +10,8 @@ SL0923
 SL0924
 # a field with no zero value and no initializer
 SL0813
+SL0949
+SL0950
+# an override naming its own selector, and a class nothing gives an init
+SL0948
+SL0951

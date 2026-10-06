@@ -113,7 +113,7 @@ only a variadic function may call it (SL0935). `Next<T>()` reads one, on a
 local or a parameter that is a `VaList`, and only as what C actually passes
 there -- an `int` or wider integer, a `double`, a pointer, a function pointer:
 a `float` arrives as a `double` and a `byte` as an `int`, so asking for either
-is refused rather than read wrongly (SL0935). Reading as the wrong one of
+is refused rather than read wrongly (SL0947). Reading as the wrong one of
 those, or past the last, is what it is in C, which says nothing about it. A
 list needs no ending: `va_end` does nothing on any target here.
 
@@ -584,8 +584,8 @@ Two things follow, and both are consequences rather than choices:
 What the attribute costs is everything `IUnknown` was for. There is no `[Guid]`
 (SL0624) — an IID names an interface *to QueryInterface*, and there is none to
 ask. For the same reason nothing can ask what such a reference really is: there
-is no cast to or from another com interface (SL0243), no `is` (SL0518) and no
-type pattern (SL0619), whichever side the `[NoUnknown]` is on. And a chain is
+is no cast to or from another com interface (SL0243), no `is` and no
+type pattern (SL0518), whichever side the `[NoUnknown]` is on. And a chain is
 all one kind or the other (SL0622): extending across would put `IUnknown` three
 slots into the middle of one table. It may be written only on a
 `com interface` (SL0728).
@@ -901,7 +901,7 @@ the rest are protocols; an objc type derives from objc types only (SL0910).
 `[ObjCName]` is the name the Objective-C runtime knows, where it differs
 from the declaration's -- Objective-C's `NSObject` is a class and a protocol
 both, and Stainless needs two names. Either attribute on anything but an
-objc type is refused (SL0908).
+objc type is refused (SL0728).
 
 An `extern objc class` describes a class that is laid out, made and taken
 apart by code compiled somewhere else, so it declares no field, no static
@@ -935,7 +935,7 @@ or is `[ObjCRoot]`; any other is a category, and adds to the class its own
 module or a module its file imports declares. Each may adopt protocols. A
 second declaration naming a superclass, in a file that imports the class's
 module, is refused (SL0551); so is a category whose file sees no such class,
-or two of them, and cannot say which it adds to (SL0550).
+or two of them, and cannot say which it adds to (SL0643).
 
 ### Core Foundation
 
@@ -958,8 +958,8 @@ extern "C" CFStringRef CFStringCreateWithCString(
 ```
 
 A Core Foundation type derives from Core Foundation types alone, ending at
-one with no base; it adopts no protocol, answers no message and is no
-Objective-C class's superclass (SL0927). A cast down to one asks the
+one with no base; it adopts no protocol and answers no message (SL0952), and
+is no Objective-C class's superclass (SL0942). A cast down to one asks the
 object's `CFTypeID` against the function the attribute names, and nil
 answers no. Any object is a `CFTypeRef`, as Core Foundation's own functions
 take it, so a cast to the root asks nothing. A mutable type has no
@@ -1019,9 +1019,9 @@ name and parameters, and takes the ownership that member declared; it writes
 no selector of its own. A member with the name and parameters of a member of
 a protocol the class adopts answers that protocol's selector. A member that
 answers none is a Stainless helper, called directly. Every message is
-overridable already, so `virtual` and `abstract` mean nothing here; an
-`override` of nothing, a selector the superclass answers without `override`,
-and a selector answered twice are refused (SL0921). Every required member of
+overridable already, so `virtual` and `abstract` mean nothing here (SL0921);
+an `override` of nothing (SL0499), a selector the superclass answers without
+`override` (SL0503), and a selector answered twice (SL0949) are refused. Every required member of
 a protocol the class adopts MUST be answered, by the class or by a class it
 derives from (SL0305).
 
@@ -1066,8 +1066,8 @@ after that could be trusted. Any other exception -- a C++ one from a framework
 
 What a defined class cannot be is what the runtime has no way to give it: it
 is not a record, not `static`, takes no primary constructor, has no
-bit-fields, and answers no generic message; `typeof` does not describe it
-(SL0923). It implements no Stainless interface (SL0910).
+bit-fields, and answers no generic message (SL0923); `typeof` does not
+describe it (SL0950). It implements no Stainless interface (SL0910).
 
 ### Blocks
 
@@ -1276,7 +1276,7 @@ so.
 
 It goes on a module-level `static` or on a `static` field of a class or struct
 — the two are the same storage named by different scopes — and nowhere else
-(SL0729). The static must be declared `byte[]` (SL0730) and must have no
+(SL0728). The static must be declared `byte[]` (SL0730) and must have no
 initializer (SL0731): the linker makes the object, so there is nothing for an
 initializer to run, and a declaration with both would be two answers to the
 same question.

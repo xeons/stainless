@@ -75,4 +75,22 @@ String NamedUnderNot(Shape shape) => shape switch
     _ => "other",
 };
 
+// SL0639: what a variant holds depends on its case, so the case comes first.
+String NoCase(Shape shape) => shape switch
+{
+    { Radius: > 1.0 } => "large",
+    _ => "other",
+};
+
+// SL0637: every arm of a switch expression is a value.
+void Nothing() { }
+
+void NoValue(int n)
+{
+    var none = n switch
+    {
+        _ => Nothing(),
+    };
+}
+
 public int Main() => 0;

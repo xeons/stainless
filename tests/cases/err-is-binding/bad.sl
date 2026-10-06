@@ -70,7 +70,7 @@ void AnInterface(Animal animal)
         Console.WriteLine("no");
 }
 
-// SL0518: a variant is asked which case it holds and nothing else.
+// SL0247: a variant is asked which case it holds and nothing else.
 void NoSuchCase(Value value)
 {
     if (value is Animal a)

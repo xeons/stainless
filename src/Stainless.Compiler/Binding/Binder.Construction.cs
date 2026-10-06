@@ -108,7 +108,7 @@ public sealed partial class Binder
 
         if (IsObjCType(measured))
         {
-            diagnostics.Report(Codes.ObjCClassShapeUnsupported, syntax.Span,
+            diagnostics.Report(Codes.TypeofObjCType, syntax.Span,
                 $"'{measured.Name}' is an Objective-C type, which the Objective-C runtime " +
                 "describes; ask it for the class instead",
                 measured);
@@ -240,7 +240,7 @@ public sealed partial class Binder
     {
         if (type is ClassTypeSymbol { IsStaticClass: true })
         {
-            diagnostics.Report(Codes.StaticClassMisused, syntax.Span,
+            diagnostics.Report(Codes.StaticClassConstructed, syntax.Span,
                 $"'{type.Name}' is a static class, so there is nothing to make one of: its " +
                 "members belong to the type. Call them on the type itself",
                 type);
@@ -533,7 +533,7 @@ public sealed partial class Binder
         foreach (var entry in initializer.Entries)
             if (entry.Name is not null != named)
             {
-                diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.Span,
+                diagnostics.Report(Codes.BraceListMixesMembersAndElements, entry.Span,
                     named
                         ? "this entry has no name, and the ones before it write members; a " +
                           "brace list either writes members or adds elements, and cannot be " +
@@ -576,7 +576,7 @@ public sealed partial class Binder
         {
             if (property.Setter is null)
             {
-                diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.NameSpan,
+                diagnostics.Report(Codes.PropertyHasNoSetter, entry.NameSpan,
                     $"'{type.Name}.{name}' has no setter, so there is nothing here to " +
                     "write; a brace list writes members the way an assignment does",
                     type);
@@ -613,7 +613,7 @@ public sealed partial class Binder
             return new BoundAssignment(entry.Span, target, value);
         }
 
-        diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.NameSpan,
+        diagnostics.Report(Codes.MemberNotFound, entry.NameSpan,
             $"'{type.Name}' has no field or property named '{name}' to write",
             type);
         return null;
@@ -630,7 +630,7 @@ public sealed partial class Binder
 
         if (candidates.Count == 0)
         {
-            diagnostics.Report(Codes.InvalidBraceInitializerEntry, entry.Span,
+            diagnostics.Report(Codes.CollectionInitializerWithoutAdd, entry.Span,
                 $"'{type.Name}' has no 'Add' method, so there is nothing for an element " +
                 "here to be added with; a brace list of values is a call to 'Add' per value",
                 type);

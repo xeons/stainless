@@ -129,7 +129,6 @@ public sealed class Lexer(
             foreach (var open in _conditions)
                 diagnostics.Report(Codes.UnclosedConditionalDirective,
                     new SourceSpan(source, open.Start, open.Start + 3),
-                    
                     "this '#if' is never closed; add '#endif'");
         }
 
@@ -837,14 +836,14 @@ public sealed class Lexer(
         bool isSingle = false;
 
         if (suffixText is not ("" or "u" or "l" or "ul" or "lu" or "f" or "d"))
-            diagnostics.Report(Codes.InvalidNumericLiteral, SpanFrom(start),
+            diagnostics.Report(Codes.InvalidNumericSuffix, SpanFrom(start),
                 $"'{suffixText}' is not a suffix a number can take; they are 'u', 'l', 'ul', " +
                 "'f' for a float and 'd' for a double");
         else if (suffixText is "f" or "d")
         {
             if (radix == 10) { isFloat = true; isSingle = suffixText == "f"; }
             else
-                diagnostics.Report(Codes.InvalidNumericLiteral, SpanFrom(start),
+                diagnostics.Report(Codes.InvalidNumericSuffix, SpanFrom(start),
                     $"a binary literal is an integer, so it cannot take the '{suffixText}' " +
                     "suffix of a floating-point one");
         }
@@ -868,7 +867,7 @@ public sealed class Lexer(
             {
                 if (!float.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out float f))
                 {
-                    diagnostics.Report(Codes.InvalidNumericLiteral, span,
+                    diagnostics.Report(Codes.InvalidFloatLiteral, span,
                         $"{raw} is not a valid floating-point literal");
                     f = 0;
                 }
@@ -877,7 +876,7 @@ public sealed class Lexer(
 
             if (!double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
             {
-                diagnostics.Report(Codes.InvalidNumericLiteral, span,
+                diagnostics.Report(Codes.InvalidFloatLiteral, span,
                     $"{raw} is not a valid floating-point literal");
                 d = 0;
             }
@@ -964,7 +963,6 @@ public sealed class Lexer(
             if (dollars > 1)
                 diagnostics.Report(Codes.MultipleDollarsOnNonRawString,
                     new SourceSpan(source, start, start + at),
-                    
                     "more than one '$' sets how many braces open a hole, and only a raw string " +
                     "has holes that need it; write one '$', or open the string with '\"\"\"'");
 
@@ -1169,7 +1167,6 @@ public sealed class Lexer(
                 if (run > quotes)
                     diagnostics.Report(Codes.RawStringQuoteRunTooLong,
                         new SourceSpan(source, _pos, _pos + run),
-                        
                         $"this raw string opens with {quotes} quotes, so {run} in a row cannot be " +
                         $"part of it; open and close it with {run + 1}");
 
@@ -1200,7 +1197,6 @@ public sealed class Lexer(
                 {
                     diagnostics.Report(Codes.InterpolationBraceRunInvalid,
                         new SourceSpan(source, _pos, _pos + run),
-                        
                         $"with {dollars} '$', {dollars} braces belong to a hole, so these {run} " +
                         "'}' close one that was never opened; start the string with " +
                         $"{run + 1} '$' to write them as text");
@@ -1214,7 +1210,6 @@ public sealed class Lexer(
                 if (run >= 2 * dollars)
                     diagnostics.Report(Codes.InterpolationBraceRunInvalid,
                         new SourceSpan(source, _pos, _pos + run),
-                        
                         $"with {dollars} '$', the last {dollars} of these {run} '{{' open a " +
                         $"hole and the rest are text, which only a run shorter than {dollars} " +
                         $"can be; start the string with {run / 2 + 1} '$'");
@@ -1278,7 +1273,6 @@ public sealed class Lexer(
             int at = first.Positions.Count > 0 ? first.Positions[0] : start;
             diagnostics.Report(Codes.RawStringOpeningLineNotEmpty,
                 new SourceSpan(source, at, at + 1),
-                
                 "a raw string that spans lines starts on the line after its opening quotes, " +
                 "and nothing but whitespace may follow them");
             return;
@@ -1293,7 +1287,6 @@ public sealed class Lexer(
             bool empty = pieces.Count == 1 && IsBlank(closing, 0, closing.Length);
             diagnostics.Report(Codes.RawStringClosingMalformed,
                 new SourceSpan(source, _pos - 1, _pos),
-                
                 empty
                     ? "a raw string that spans lines needs a line of content between its quotes"
                     : "the closing quotes of a raw string that spans lines stand on a line of " +
@@ -1346,7 +1339,6 @@ public sealed class Lexer(
                         int at = lineBegin < piece.Positions.Count ? piece.Positions[lineBegin] : start;
                         diagnostics.Report(Codes.RawStringIndentationMismatch,
                             new SourceSpan(source, at, at + 1),
-                            
                             "this line of a raw string does not start with the whitespace its " +
                             "closing quotes are indented by, which is taken off every line; " +
                             "indent it at least as far, with the same characters");
@@ -1390,7 +1382,6 @@ public sealed class Lexer(
                 TooDeep = true;
                 diagnostics.Report(Codes.NestingTooDeep,
                     new SourceSpan(source, openedAt, openedAt + 1),
-                    
                     $"this is nested more than {Source.Recursion.MaxDepth} levels deep, which " +
                     "is past what can be compiled; the usual cause is generated source, and " +
                     "the fix is to give the inner part a name of its own");
@@ -1513,7 +1504,6 @@ public sealed class Lexer(
 
         diagnostics.Report(Codes.InterpolationBraceRunInvalid,
             new SourceSpan(source, _pos, _pos + run),
-            
             $"this hole was opened with {braces} braces and is closed with {run}; a hole " +
             "closes with as many as opened it");
         _pos += run;

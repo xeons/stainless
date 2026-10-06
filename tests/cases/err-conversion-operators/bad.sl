@@ -33,6 +33,14 @@ public struct Coin
         return made;
     }
 
+    // Two values to convert.
+    public static implicit operator Coin(int dollars, int cents)
+    {
+        Coin made;
+        made.Cents = dollars * 100 + cents;
+        return made;
+    }
+
     // Two of the same pair.
     public static implicit operator Coin(long cents)
     {

@@ -281,14 +281,14 @@ public sealed partial class Binder
     {
         if (tag.Name is null || !subject.Parameters.Contains(tag.Name))
         {
-            diagnostics.Report(Codes.DocumentedParameterInvalid, where,
+            diagnostics.Report(Codes.DocumentedParameterNotFound, where,
                 $"'{subject.Name}' has no parameter named " +
                 $"'{tag.Name ?? ""}'{Among(subject.Parameters)}");
             return;
         }
 
         if (!documented.TryAdd(tag.Name, tag.Span))
-            diagnostics.Report(Codes.DocumentedParameterInvalid, where,
+            diagnostics.Report(Codes.DocumentedParameterRepeated, where,
                 $"'{tag.Name}' is documented twice, and the second is what a reader would " +
                 "have to notice is not the first");
     }
@@ -324,7 +324,7 @@ public sealed partial class Binder
     {
         if (ErrorTypeOf(subject.Returns) is not { } declared)
         {
-            diagnostics.Report(Codes.DocumentedFailureInvalid, where,
+            diagnostics.Report(Codes.DocumentedFailureOnInfallible, where,
                 $"'{subject.Name}' reports no failure, so there is nothing for '@failure' to " +
                 "name; a call that can fail returns a 'Result' or the error itself");
             return;
@@ -332,7 +332,7 @@ public sealed partial class Binder
 
         if (tag.Name is null)
         {
-            diagnostics.Report(Codes.DocumentedFailureInvalid, where,
+            diagnostics.Report(Codes.DocumentedFailureCaseInvalid, where,
                 "'@failure' names the error it is about, as in " +
                 $"'@failure {declared.Name}.Something what went wrong'",
                 declared);
@@ -348,7 +348,7 @@ public sealed partial class Binder
         if (CaseNames(declared) is not { } cases) return;
 
         if (!cases.Contains(cased))
-            diagnostics.Report(Codes.DocumentedFailureInvalid, where,
+            diagnostics.Report(Codes.DocumentedFailureCaseInvalid, where,
                 $"'{declared.Name}' has no case named '{cased}'{Among(cases)}",
                 declared);
     }

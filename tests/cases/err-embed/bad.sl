@@ -99,7 +99,7 @@ static readonly byte[] AlsoAssigned = null;
 // SL0376: the other half of the same rule — no attribute and no value.
 static readonly int Uninitialized;
 
-// SL0729: an instance field is not a static, and neither is a type.
+// SL0728: an instance field is not a static, and neither is a type.
 public class Holder
 {
     [Embed("ok.bin")]

@@ -3,3 +3,6 @@
 # setter, named and bare entries mixed, and a type with no 'Add'.
 SL0617
 SL0618
+SL0633
+SL0635
+SL0636
